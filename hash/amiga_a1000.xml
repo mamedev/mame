@@ -14,19 +14,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Kickstart 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="327244-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961" offset="0"/>
+				<rom name="327244-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="327245-01_workbench.adf" size="901120" crc="9578c4db" sha1="8d853d46a9817161ba0a4f493ae6856d36e8d685" offset="0"/>
+				<rom name="327245-01_workbench.adf" size="901120" crc="9578c4db" sha1="8d853d46a9817161ba0a4f493ae6856d36e8d685"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="327246-01_extras.adf" size="901120" crc="6cf114a5" sha1="895f0157c8ec8b9233ec1550e1531a28e11277b4" offset="0"/>
+				<rom name="327246-01_extras.adf" size="901120" crc="6cf114a5" sha1="895f0157c8ec8b9233ec1550e1531a28e11277b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,19 +39,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="317451-01_extras.adf" size="901120" crc="6cf114a5" sha1="895f0157c8ec8b9233ec1550e1531a28e11277b4" offset="0"/>
+				<rom name="317451-01_extras.adf" size="901120" crc="6cf114a5" sha1="895f0157c8ec8b9233ec1550e1531a28e11277b4"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="317481-01_workbench.adf" size="901120" crc="9578c4db" sha1="8d853d46a9817161ba0a4f493ae6856d36e8d685" offset="0"/>
+				<rom name="317481-01_workbench.adf" size="901120" crc="9578c4db" sha1="8d853d46a9817161ba0a4f493ae6856d36e8d685"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Kickstart 1.0" />
 			<dataarea name="flop" size="901120">
-				<rom name="317483-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961" offset="0"/>
+				<rom name="317483-01_kickstart.adf" size="901120" crc="fc1c4ce8" sha1="e2f7fd40b5f626f1719628e720bc4440cca7c961"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,20 +65,20 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="316167-01_extras.adf" size="901120" crc="9c9fb14c" sha1="45a2506556ce3b13404194b26d04f451984c689a" offset="0"/>
+				<rom name="316167-01_extras.adf" size="901120" crc="9c9fb14c" sha1="45a2506556ce3b13404194b26d04f451984c689a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<!-- Probably good dump -->
 			<feature name="part_id" value="Kickstart 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="327244-02_kickstart_pal.adf" size="901120" crc="70d0030a" sha1="0d79e2444421e5b66b5f295a5d3685d286208128" offset="0"/>
+				<rom name="327244-02_kickstart_pal.adf" size="901120" crc="70d0030a" sha1="0d79e2444421e5b66b5f295a5d3685d286208128"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="327245-02_workbench.adf" size="901120" crc="0be0603c" status="nodump" offset="0"/>
+				<rom name="327245-02_workbench.adf" size="901120" crc="0be0603c" status="nodump"/>
 			</dataarea>
 		</part>
 		<!-- Kaleidoscope (316160-01, 317489-01)? -->
@@ -91,19 +91,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="316167-01_extras.adf" size="901120" crc="9c9fb14c" sha1="45a2506556ce3b13404194b26d04f451984c689a" offset="0"/>
+				<rom name="316167-01_extras.adf" size="901120" crc="9c9fb14c" sha1="45a2506556ce3b13404194b26d04f451984c689a"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="317481-02_workbench.adf" size="901120" status="nodump" offset="0"/>
+				<rom name="317481-02_workbench.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Kickstart 1.1" />
 			<dataarea name="flop" size="901120">
-				<rom name="317483-02_kickstart_ntsc.adf" size="901120" crc="73789bf8" sha1="68b667395be3a50be86fb6ad78155e1741255822" offset="0"/>
+				<rom name="317483-02_kickstart_ntsc.adf" size="901120" crc="73789bf8" sha1="68b667395be3a50be86fb6ad78155e1741255822"/>
 			</dataarea>
 		</part>
 		<!-- Kaleidoscope (316160-01, 317489-01)? -->
@@ -118,14 +118,14 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.2" />
 			<dataarea name="flop" size="901120">
-				<rom name="317481-03_workbench.adf" size="901120" status="nodump" offset="0"/>
+				<rom name="317481-03_workbench.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<!-- Alternate P/N: 380663-01 (Europe?) -->
 			<feature name="part_id" value="Kickstart 1.2" />
 			<dataarea name="flop" size="901120">
-				<rom name="317483-03_kickstart.adf" size="901120" crc="9d68d211" sha1="44682d10a7f62896b46180491d60db4ee8c30529" offset="0"/>
+				<rom name="317483-03_kickstart.adf" size="901120" crc="9d68d211" sha1="44682d10a7f62896b46180491d60db4ee8c30529"/>
 			</dataarea>
 		</part>
 		<!-- Extras 1.2? -->
@@ -140,19 +140,19 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Workbench 1.3" />
 			<dataarea name="flop" size="901120">
-				<rom name="317746-01_workbench.adf" size="901120" status="nodump" offset="0"/>
+				<rom name="317746-01_workbench.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Kickstart 1.3" />
 			<dataarea name="flop" size="901120">
-				<rom name="317747-01_kickstart.adf" size="901120" crc="5fd0ef3b" sha1="a80b001b98a997969bf709cecd07f8578f861148" offset="0"/>
+				<rom name="317747-01_kickstart.adf" size="901120" crc="5fd0ef3b" sha1="a80b001b98a997969bf709cecd07f8578f861148"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<feature name="part_id" value="Extras 1.3" />
 			<dataarea name="flop" size="901120">
-				<rom name="317748-01_extras.adf" size="901120" status="nodump" offset="0"/>
+				<rom name="317748-01_extras.adf" size="901120" status="nodump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="EmuTOS 0.9.3" />
 			<dataarea name="flop" size="901120">
-				<rom name="emutos_093.adf" size="901120" crc="96f5cc88" sha1="fa3a3aa314d50e1131a5b65a048519c76c836bd2" offset="0"/>
+				<rom name="emutos_093.adf" size="901120" crc="96f5cc88" sha1="fa3a3aa314d50e1131a5b65a048519c76c836bd2"/>
 			</dataarea>
 		</part>
 	</software>

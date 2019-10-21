@@ -144,7 +144,7 @@ bits(7:4) and bit(24)), X, and Y:
 
 #include "emu.h"
 #include "voodoo.h"
-#include "vooddefs.h"
+#include "vooddefs.ipp"
 
 #include "screen.h"
 
@@ -242,7 +242,7 @@ uint32_t voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1, (((tex0) == 0xffffffff) ? 0 : ((tex1) == 0xffffffff) ? 1 : 2), fbzcp, fbz, alpha, fog, tex0, tex1)
 
-#include "voodoo_rast.hxx"
+#include "voodoo_rast.ipp"
 
 #undef RASTERIZER_ENTRY
 
@@ -259,7 +259,7 @@ uint32_t voodoo_reciplog[(2 << RECIPLOG_LOOKUP_BITS) + 2];
 
 const voodoo_device::raster_info voodoo_device::predef_raster_table[] =
 {
-#include "voodoo_rast.hxx"
+#include "voodoo_rast.ipp"
 	{ nullptr }
 };
 
@@ -2929,8 +2929,8 @@ int32_t voodoo_device::lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_m
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(reg[lfbMode].u))
 	{
-		data = flipendian_int32(data);
-		mem_mask = flipendian_int32(mem_mask);
+		data = swapendian_int32(data);
+		mem_mask = swapendian_int32(mem_mask);
 	}
 
 	/* word swapping */
@@ -2957,6 +2957,8 @@ int32_t voodoo_device::lfb_direct_w(offs_t offset, uint32_t data, uint32_t mem_m
 		dest[bufoffs + 0] = data&0xffff;
 	if (ACCESSING_BITS_16_31)
 		dest[bufoffs + 1] = data>>16;
+	// Need to notify that frame buffer has changed
+	fbi.video_changed = true;
 	if (LOG_LFB) logerror("VOODOO.%d.LFB:write direct (%d,%d) = %08X & %08X\n", index, x, y, data, mem_mask);
 	return 0;
 }
@@ -2977,8 +2979,8 @@ int32_t voodoo_device::lfb_w(voodoo_device* vd, offs_t offset, uint32_t data, ui
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_WRITES(vd->reg[lfbMode].u))
 	{
-		data = flipendian_int32(data);
-		mem_mask = flipendian_int32(mem_mask);
+		data = swapendian_int32(data);
+		mem_mask = swapendian_int32(mem_mask);
 	}
 
 	/* word swapping */
@@ -3441,7 +3443,7 @@ int32_t voodoo_device::texture_w(voodoo_device *vd, offs_t offset, uint32_t data
 
 	/* swizzle the data */
 	if (TEXLOD_TDATA_SWIZZLE(t->reg[tLOD].u))
-		data = flipendian_int32(data);
+		data = swapendian_int32(data);
 	if (TEXLOD_TDATA_SWAP(t->reg[tLOD].u))
 		data = (data >> 16) | (data << 16);
 
@@ -3670,7 +3672,7 @@ void voodoo_device::flush_fifos(voodoo_device *vd, attotime current_time)
  *
  *************************************/
 
-WRITE32_MEMBER( voodoo_device::voodoo_w )
+void voodoo_device::voodoo_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	int stall = false;
 
@@ -3700,7 +3702,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 				{
 					/* check for byte swizzling (bit 18) */
 					if (offset & 0x40000/4)
-						data = flipendian_int32(data);
+						data = swapendian_int32(data);
 					cmdfifo_w(this, &fbi.cmdfifo[0], offset & 0xffff, data);
 					g_profiler.stop();
 					return;
@@ -3722,7 +3724,7 @@ WRITE32_MEMBER( voodoo_device::voodoo_w )
 
 			/* if not, we might be byte swizzled (bit 20) */
 			else if (offset & 0x100000/4)
-				data = flipendian_int32(data);
+				data = swapendian_int32(data);
 		}
 
 		/* check the access behavior; note that the table works even if the */
@@ -4120,7 +4122,7 @@ static uint32_t lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
 
 	/* byte swizzling */
 	if (LFBMODE_BYTE_SWIZZLE_READS(vd->reg[lfbMode].u))
-		data = flipendian_int32(data);
+		data = swapendian_int32(data);
 
 	if (LOG_LFB) vd->logerror("VOODOO.%d.LFB:read (%d,%d) = %08X\n", vd->index, x, y, data);
 	return data;
@@ -4135,7 +4137,7 @@ static uint32_t lfb_r(voodoo_device *vd, offs_t offset, bool lfb_3d)
  *
  *************************************/
 
-READ32_MEMBER( voodoo_device::voodoo_r )
+u32 voodoo_device::voodoo_r(offs_t offset)
 {
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (pci.op_pending)
@@ -4159,7 +4161,7 @@ READ32_MEMBER( voodoo_device::voodoo_r )
  *
  *************************************/
 
-READ32_MEMBER( voodoo_banshee_device::banshee_agp_r )
+u32 voodoo_banshee_device::banshee_agp_r(offs_t offset)
 {
 	uint32_t result;
 
@@ -4219,7 +4221,7 @@ READ32_MEMBER( voodoo_banshee_device::banshee_agp_r )
 }
 
 
-READ32_MEMBER( voodoo_banshee_device::banshee_r )
+u32 voodoo_banshee_device::banshee_r(offs_t offset, u32 mem_mask)
 {
 	uint32_t result = 0xffffffff;
 
@@ -4228,9 +4230,9 @@ READ32_MEMBER( voodoo_banshee_device::banshee_r )
 		flush_fifos(this, machine().time());
 
 	if (offset < 0x80000/4)
-		result = banshee_io_r(space, offset, mem_mask);
+		result = banshee_io_r(offset, mem_mask);
 	else if (offset < 0x100000/4)
-		result = banshee_agp_r(space, offset, mem_mask);
+		result = banshee_agp_r(offset);
 	else if (offset < 0x200000/4)
 		logerror("%s:banshee_r(2D:%X)\n", machine().describe_context(), (offset*4) & 0xfffff);
 	else if (offset < 0x600000/4)
@@ -4253,7 +4255,7 @@ READ32_MEMBER( voodoo_banshee_device::banshee_r )
 }
 
 
-READ32_MEMBER( voodoo_banshee_device::banshee_fb_r )
+u32 voodoo_banshee_device::banshee_fb_r(offs_t offset)
 {
 	uint32_t result = 0xffffffff;
 
@@ -4280,7 +4282,7 @@ READ32_MEMBER( voodoo_banshee_device::banshee_fb_r )
 }
 
 
-READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
+u8 voodoo_banshee_device::banshee_vga_r(offs_t offset)
 {
 	uint8_t result = 0xff;
 
@@ -4375,7 +4377,7 @@ READ8_MEMBER( voodoo_banshee_device::banshee_vga_r )
 }
 
 
-READ32_MEMBER( voodoo_banshee_device::banshee_io_r )
+u32 voodoo_banshee_device::banshee_io_r(offs_t offset, u32 mem_mask)
 {
 	uint32_t result;
 
@@ -4399,13 +4401,13 @@ READ32_MEMBER( voodoo_banshee_device::banshee_io_r )
 		case io_vgad0:  case io_vgad4:  case io_vgad8:  case io_vgadc:
 			result = 0;
 			if (ACCESSING_BITS_0_7)
-				result |= banshee_vga_r(space, offset*4+0, mem_mask >> 0) << 0;
+				result |= banshee_vga_r(offset*4+0) << 0;
 			if (ACCESSING_BITS_8_15)
-				result |= banshee_vga_r(space, offset*4+1, mem_mask >> 8) << 8;
+				result |= banshee_vga_r(offset*4+1) << 8;
 			if (ACCESSING_BITS_16_23)
-				result |= banshee_vga_r(space, offset*4+2, mem_mask >> 16) << 16;
+				result |= banshee_vga_r(offset*4+2) << 16;
 			if (ACCESSING_BITS_24_31)
-				result |= banshee_vga_r(space, offset*4+3, mem_mask >> 24) << 24;
+				result |= banshee_vga_r(offset*4+3) << 24;
 			break;
 
 		default:
@@ -4419,7 +4421,7 @@ READ32_MEMBER( voodoo_banshee_device::banshee_io_r )
 }
 
 
-READ32_MEMBER( voodoo_banshee_device::banshee_rom_r )
+u32 voodoo_banshee_device::banshee_rom_r(offs_t offset)
 {
 	logerror("%s:banshee_rom_r(%X)\n", machine().describe_context(), offset*4);
 	return 0xffffffff;
@@ -4691,7 +4693,7 @@ int32_t voodoo_device::banshee_2d_w(voodoo_device *vd, offs_t offset, uint32_t d
 
 
 
-WRITE32_MEMBER( voodoo_banshee_device::banshee_agp_w )
+void voodoo_banshee_device::banshee_agp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	offset &= 0x1ff/4;
 
@@ -4780,16 +4782,16 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_agp_w )
 }
 
 
-WRITE32_MEMBER( voodoo_banshee_device::banshee_w )
+void voodoo_banshee_device::banshee_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	/* if we have something pending, flush the FIFOs up to the current time */
 	if (pci.op_pending)
 		flush_fifos(this, machine().time());
 
 	if (offset < 0x80000/4)
-		banshee_io_w(space, offset, data, mem_mask);
+		banshee_io_w(offset, data, mem_mask);
 	else if (offset < 0x100000/4)
-		banshee_agp_w(space, offset, data, mem_mask);
+		banshee_agp_w(offset, data, mem_mask);
 	else if (offset < 0x200000/4)
 		logerror("%s:banshee_w(2D:%X) = %08X & %08X\n", machine().describe_context(), (offset*4) & 0xfffff, data, mem_mask);
 	else if (offset < 0x600000/4)
@@ -4811,7 +4813,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_w )
 }
 
 
-WRITE32_MEMBER( voodoo_banshee_device::banshee_fb_w )
+void voodoo_banshee_device::banshee_fb_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	uint32_t addr = offset*4;
 
@@ -4841,7 +4843,7 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_fb_w )
 }
 
 
-WRITE8_MEMBER( voodoo_banshee_device::banshee_vga_w )
+void voodoo_banshee_device::banshee_vga_w(offs_t offset, u8 data)
 {
 	offset &= 0x1f;
 
@@ -4900,7 +4902,7 @@ WRITE8_MEMBER( voodoo_banshee_device::banshee_vga_w )
 }
 
 
-WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
+void voodoo_banshee_device::banshee_io_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	uint32_t old;
 
@@ -5010,13 +5012,13 @@ WRITE32_MEMBER( voodoo_banshee_device::banshee_io_w )
 		case io_vgac0:  case io_vgac4:  case io_vgac8:  case io_vgacc:
 		case io_vgad0:  case io_vgad4:  case io_vgad8:  case io_vgadc:
 			if (ACCESSING_BITS_0_7)
-				banshee_vga_w(space, offset*4+0, data >> 0, mem_mask >> 0);
+				banshee_vga_w(offset*4+0, data >> 0);
 			if (ACCESSING_BITS_8_15)
-				banshee_vga_w(space, offset*4+1, data >> 8, mem_mask >> 8);
+				banshee_vga_w(offset*4+1, data >> 8);
 			if (ACCESSING_BITS_16_23)
-				banshee_vga_w(space, offset*4+2, data >> 16, mem_mask >> 16);
+				banshee_vga_w(offset*4+2, data >> 16);
 			if (ACCESSING_BITS_24_31)
-				banshee_vga_w(space, offset*4+3, data >> 24, mem_mask >> 24);
+				banshee_vga_w(offset*4+3, data >> 24);
 			if (LOG_REGISTERS)
 				logerror("%s:banshee_io_w(%s) = %08X & %08X\n", machine().describe_context(), banshee_io_reg_name[offset], data, mem_mask);
 			break;
@@ -5749,7 +5751,8 @@ voodoo_device::raster_info *voodoo_device::add_rasterizer(voodoo_device *vd, con
 	raster_info *info = &vd->rasterizer[vd->next_rasterizer++];
 	int hash = cinfo->compute_hash();
 
-	assert_always(vd->next_rasterizer <= MAX_RASTERIZERS, "Out of space for new rasterizers!");
+	if (vd->next_rasterizer > MAX_RASTERIZERS)
+		throw emu_fatalerror("voodoo_device::add_rasterizer: Out of space for new rasterizers!");
 
 	/* make a copy of the info */
 	*info = *cinfo;

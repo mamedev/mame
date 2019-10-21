@@ -15,6 +15,7 @@
 
 #include "epson_sio.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/upd765.h"
 #include "machine/z80dart.h"
@@ -67,9 +68,7 @@ private:
 	required_device<upd765a_device> m_fdc;
 	required_device<upd7201_device> m_mpsc;
 	required_device<epson_sio_device> m_sio_output;
-
-	floppy_image_device *m_fd0;
-	floppy_image_device *m_fd1;
+	required_device_array<floppy_connector, 2> m_fd;
 
 	emu_timer *m_timer_serial;
 	emu_timer *m_timer_tc;

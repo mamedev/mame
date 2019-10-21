@@ -23,8 +23,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "MPS802/C1526 Printer")
-DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "C4023 Printer")
+DEFINE_DEVICE_TYPE(C1526, c1526_device, "c1526", "Commodore 1526/MPS802 Printer")
+DEFINE_DEVICE_TYPE(C4023, c4023_device, "c4023", "Commodore 4023 Printer")
 
 
 //-------------------------------------------------
@@ -88,20 +88,22 @@ void c1526_device_base::c1526_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c1526_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(c1526_mem)
-MACHINE_CONFIG_END
+void c1526_device::device_add_mconfig(machine_config &config)
+{
+	m6504_device &cpu(M6504(config, M6504_TAG, XTAL(4'000'000)/4));
+	cpu.set_addrmap(AS_PROGRAM, &c1526_device::c1526_mem);
+}
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c4023_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6504_TAG, M6504, XTAL(4'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(c1526_mem)
-MACHINE_CONFIG_END
+void c4023_device::device_add_mconfig(machine_config &config)
+{
+	m6504_device &cpu(M6504(config, M6504_TAG, XTAL(4'000'000)/4));
+	cpu.set_addrmap(AS_PROGRAM, &c4023_device::c1526_mem);
+}
 
 
 //-------------------------------------------------

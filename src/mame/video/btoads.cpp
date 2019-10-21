@@ -127,13 +127,13 @@ WRITE16_MEMBER( btoads_state::scroll1_w )
 
 WRITE16_MEMBER( btoads_state::paletteram_w )
 {
-	m_tlc34076->write(space, offset/2, data);
+	m_tlc34076->write(offset/2, data);
 }
 
 
 READ16_MEMBER( btoads_state::paletteram_r )
 {
-	return m_tlc34076->read(space, offset/2);
+	return m_tlc34076->read(offset/2);
 }
 
 

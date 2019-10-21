@@ -130,7 +130,7 @@ void iop_timer_device::update_count()
 
 void iop_timer_device::set_ctrl(uint32_t data)
 {
-	static const char *gatm_names[4] = { "low?", "reset+rising?", "reset+falling?", "reset+both?" };
+	static char const *const gatm_names[4] = { "low?", "reset+rising?", "reset+falling?", "reset+both?" };
 	logerror("%s: set_ctrl: GATE=%d, GATM=%s, ZRET=%d\n", machine().describe_context(), data & CTRL_GATE, gatm_names[(data & CTRL_GATM) >> 1], (data & CTRL_ZRET) >> 3);
 	logerror("%s:           CMPE=%d, OVFE=%d, REP_INT=%d, TOG_INT=%d\n", machine().describe_context(), (data & CTRL_CMPE) >> 4, (data & CTRL_OVFE) >> 5, (data & CTRL_REPI) >> 6, (data & CTRL_TOGI) >> 7);
 

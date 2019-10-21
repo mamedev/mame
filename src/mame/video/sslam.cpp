@@ -120,7 +120,7 @@ WRITE16_MEMBER(sslam_state::sslam_bg_tileram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(sslam_state::get_powerbls_bg_tile_info)
+TILE_GET_INFO_MEMBER(powerbls_state::get_powerbls_bg_tile_info)
 {
 	int code = m_bg_tileram[tile_index*2+1] & 0x0fff;
 	int colr = (m_bg_tileram[tile_index*2+1] & 0xf000) >> 12;
@@ -131,13 +131,13 @@ TILE_GET_INFO_MEMBER(sslam_state::get_powerbls_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1,code,colr,0);
 }
 
-WRITE16_MEMBER(sslam_state::powerbls_bg_tileram_w)
+WRITE16_MEMBER(powerbls_state::powerbls_bg_tileram_w)
 {
 	COMBINE_DATA(&m_bg_tileram[offset]);
 	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
-VIDEO_START_MEMBER(sslam_state,sslam)
+void sslam_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
@@ -150,15 +150,15 @@ VIDEO_START_MEMBER(sslam_state,sslam)
 	save_item(NAME(m_sprites_x_offset));
 }
 
-VIDEO_START_MEMBER(sslam_state,powerbls)
+void powerbls_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_powerbls_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbls_state::get_powerbls_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
 
 	m_sprites_x_offset = -21;
 	save_item(NAME(m_sprites_x_offset));
 }
 
-uint32_t sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sslam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!(m_regs[6] & 1))
 	{
@@ -196,7 +196,7 @@ uint32_t sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-uint32_t sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t powerbls_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!(m_regs[6] & 1))
 	{

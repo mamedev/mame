@@ -135,10 +135,10 @@ static std::string get_extension(const char *name)
 	return s ? std::string(s+1) : "";
 }
 
-static void display_usage(void)
+static void display_usage(const char *argv0)
 {
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "       castool.exe convert <format> <inputfile> <outputfile.wav>\n");
+	fprintf(stderr, "       %s convert <format> <inputfile> <outputfile.wav>\n", argv0);
 }
 
 static void display_formats(void)
@@ -168,7 +168,7 @@ int CLIB_DECL main(int argc, char *argv[])
 			// convert command
 			if (argc!=5) {
 				fprintf(stderr, "Wrong parameter number.\n\n");
-				display_usage();
+				display_usage(argv[0]);
 				return -1;
 			} else {
 				for (i = 0; formats[i].name; i++) {
@@ -179,7 +179,7 @@ int CLIB_DECL main(int argc, char *argv[])
 				}
 				if (found==0) {
 					fprintf(stderr, "Wrong format name.\n\n");
-					display_usage();
+					display_usage(argv[0]);
 					fprintf(stderr, "\n");
 					display_formats();
 					return -1;
@@ -207,11 +207,11 @@ int CLIB_DECL main(int argc, char *argv[])
 
 	/* Usage */
 	fprintf(stderr, "castool - Generic cassette manipulation tool for use with MAME\n\n");
-	display_usage();
+	display_usage(argv[0]);
 	fprintf(stderr, "\n");
 	display_formats();
 	fprintf(stderr, "\nExample usage:\n");
-	fprintf(stderr, "        castool.exe convert tzx game.tzx game.wav\n\n");
+	fprintf(stderr, "        %s convert tzx game.tzx game.wav\n\n", argv[0]);
 
 theend :
 	return 0;

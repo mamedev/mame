@@ -533,16 +533,6 @@ int floppy_get_drive_by_type(legacy_floppy_image_device *image,int ftype)
 	return -1;
 }
 
-int floppy_get_count(running_machine &machine)
-{
-	int cnt = 0;
-	if (machine.device<legacy_floppy_image_device>(FLOPPY_0)) cnt++;
-	if (machine.device<legacy_floppy_image_device>(FLOPPY_1)) cnt++;
-	if (machine.device<legacy_floppy_image_device>(FLOPPY_2)) cnt++;
-	if (machine.device<legacy_floppy_image_device>(FLOPPY_3)) cnt++;
-	return cnt;
-}
-
 
 /* drive select 0 */
 WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_ds0_w )

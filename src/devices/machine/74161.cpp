@@ -26,7 +26,7 @@ ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type
 	, m_pe(0)
 	, m_cet(0)
 	, m_cep(0)
-	, m_clock(0)
+	, m_pclock(0)
 	, m_p(0)
 	, m_out(0)
 	, m_tc(0)
@@ -61,7 +61,7 @@ void ttl7416x_device::device_start()
 	save_item(NAME(m_pe));
 	save_item(NAME(m_cet));
 	save_item(NAME(m_cep));
-	save_item(NAME(m_clock));
+	save_item(NAME(m_pclock));
 	save_item(NAME(m_p));
 	save_item(NAME(m_out));
 	save_item(NAME(m_tc));
@@ -81,7 +81,7 @@ void ttl7416x_device::init()
 	m_pe = 1;
 	m_cet = 0;
 	m_cep = 0;
-	m_clock = 0;
+	m_pclock = 0;
 	m_p = 0;
 
 	m_out = 0;
@@ -159,9 +159,9 @@ WRITE_LINE_MEMBER( ttl7416x_device::cep_w )
 
 WRITE_LINE_MEMBER( ttl7416x_device::clock_w )
 {
-	uint8_t last_clock = m_clock;
-	m_clock = state;
-	if (m_clock != last_clock && m_clock != 0)
+	uint8_t last_clock = m_pclock;
+	m_pclock = state;
+	if (m_pclock != last_clock && m_pclock != 0)
 	{
 		tick();
 	}

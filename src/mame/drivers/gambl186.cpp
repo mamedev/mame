@@ -380,11 +380,11 @@ void gambl186_state::gambl186_io(address_map &map)
 	map(0x0502, 0x0503).portr("IN1");
 	map(0x0504, 0x0505).portr("IN2");  // Seems to writes more upd7759 params in MSB...
 
-	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
+	//map(0x0500, 0x050f).r(FUNC(gambl186_state::unk_r));
 	map(0x0580, 0x0581).portr("DSW1");
 	map(0x0582, 0x0583).portr("JOY");
 	map(0x0584, 0x0585).portr("DSW0").nopw(); // Watchdog: bit 8
-//  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
+//  map(0x0600, 0x0603).nopw(); // lamps
 	map(0x0680, 0x0683).rw(FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
 	map(0x0700, 0x0701).w(FUNC(gambl186_state::data_bank_w));
 }
@@ -472,26 +472,25 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(gambl186_state::gambl186)
-	MCFG_DEVICE_ADD("maincpu", I80186, XTAL(40'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(gambl186_map)
-	MCFG_DEVICE_IO_MAP(gambl186_io)
+void gambl186_state::gambl186(machine_config &config)
+{
+	I80186(config, m_maincpu, XTAL(40'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &gambl186_state::gambl186_map);
+	m_maincpu->set_addrmap(AS_IO, &gambl186_state::gambl186_io);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(25'174'800),900,0,640,526,0,480)
-	MCFG_SCREEN_UPDATE_DEVICE("vga", cirrus_gd5428_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
+	screen.set_screen_update("vga", FUNC(cirrus_gd5428_device::screen_update));
 
-	MCFG_DEVICE_ADD("vga", CIRRUS_GD5428, 0)
-	MCFG_VIDEO_SET_SCREEN("screen")
+	CIRRUS_GD5428(config, "vga", 0).set_screen("screen");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("7759", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 

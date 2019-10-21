@@ -106,26 +106,27 @@ void a78_xm_device::device_reset()
 }
 
 
-MACHINE_CONFIG_START(a78_xboard_device::device_add_mconfig)
-	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
+void a78_xboard_device::device_add_mconfig(machine_config &config)
+{
+	A78_CART_SLOT(config, m_xbslot, a7800_cart, nullptr);
 
 	SPEAKER(config, "xb_speaker").front_center();
 
-	MCFG_DEVICE_ADD("xb_pokey", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey, XTAL(14'318'181)/8);
+	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
+}
 
-MACHINE_CONFIG_START(a78_xm_device::device_add_mconfig)
-	MCFG_A78_CARTRIDGE_ADD("xb_slot", a7800_cart, nullptr)
+void a78_xm_device::device_add_mconfig(machine_config &config)
+{
+	A78_CART_SLOT(config, m_xbslot, a7800_cart, nullptr);
 
 	SPEAKER(config, "xb_speaker").front_center();
 
-	MCFG_DEVICE_ADD("xb_pokey", POKEY, XTAL(14'318'181)/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
+	POKEY(config, m_pokey, XTAL(14'318'181)/8);
+	m_pokey->add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
 
-	MCFG_DEVICE_ADD("xm_ym2151", YM2151, XTAL(14'318'181)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "xb_speaker", 1.00)
-MACHINE_CONFIG_END
+	YM2151(config, m_ym, XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "xb_speaker", 1.00);
+}
 
 
 /*-------------------------------------------------
@@ -157,7 +158,7 @@ WRITE8_MEMBER(a78_xboard_device::write_40xx)
 READ8_MEMBER(a78_xboard_device::read_04xx)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
-		return m_pokey->read(space, offset & 0x0f);
+		return m_pokey->read(offset & 0x0f);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
 		return m_xbslot->read_04xx(space, offset - 0x10);   // access second POKEY
 	else
@@ -167,7 +168,7 @@ READ8_MEMBER(a78_xboard_device::read_04xx)
 WRITE8_MEMBER(a78_xboard_device::write_04xx)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
-		m_pokey->write(space, offset & 0x0f, data);
+		m_pokey->write(offset & 0x0f, data);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
 		m_xbslot->write_04xx(space, offset - 0x10, data);   // access second POKEY
 	else if (offset >= 0x70 && offset < 0x80)
@@ -202,9 +203,9 @@ READ8_MEMBER(a78_xm_device::read_30xx)
 READ8_MEMBER(a78_xm_device::read_04xx)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
-		return m_pokey->read(space, offset & 0x0f);
+		return m_pokey->read(offset & 0x0f);
 	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
-		return m_ym->read(space, offset & 1);
+		return m_ym->read(offset & 1);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
 		return m_xbslot->read_04xx(space, offset - 0x10);   // access second POKEY
 	else
@@ -214,9 +215,9 @@ READ8_MEMBER(a78_xm_device::read_04xx)
 WRITE8_MEMBER(a78_xm_device::write_04xx)
 {
 	if (BIT(m_reg, 4) && offset >= 0x50 && offset < 0x60)
-		m_pokey->write(space, offset & 0x0f, data);
+		m_pokey->write(offset & 0x0f, data);
 	else if (m_ym_enabled && offset >= 0x60 && offset <= 0x61)
-		m_ym->write(space, offset & 1, data);
+		m_ym->write(offset & 1, data);
 	else if (BIT(m_reg, 4) && offset >= 0x60 && offset < 0x70)
 		m_xbslot->write_04xx(space, offset - 0x10, data);   // access second POKEY
 	else if (offset >= 0x70 && offset < 0x80)

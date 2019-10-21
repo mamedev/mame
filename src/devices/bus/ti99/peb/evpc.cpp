@@ -213,7 +213,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
 
 	if (m_video_accessed)
 	{
-		*value = m_video->read(space, m_address>>1);
+		*value = m_video->read(m_address>>1);
 	}
 }
 
@@ -223,7 +223,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::readz)
     0x5f00 - 0x5fef   NOVRAM
     0x5ff0 - 0x5fff   Palette (5ff8, 5ffa, 5ffc, 5ffe)
 */
-WRITE8_MEMBER(snug_enhanced_video_device::write)
+void snug_enhanced_video_device::write(offs_t offset, uint8_t data)
 {
 	if (m_selected && m_inDsrArea)
 	{
@@ -296,7 +296,7 @@ WRITE8_MEMBER(snug_enhanced_video_device::write)
 
 	if (m_video_accessed)
 	{
-		m_video->write(space, m_address>>1, data);
+		m_video->write(m_address>>1, data);
 	}
 
 	if (m_sound_accessed)
@@ -321,10 +321,13 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
-		if ((offset & 0x00f0)==0) // offset 0 delivers bits 0-7 (address 00-0f)
+		switch ((offset>>1) & 7)
 		{
-			*value = ~(ioport("EVPC-SW1")->read() | (ioport("EVPC-SW3")->read()<<2)
-				| (ioport("EVPC-SW4")->read()<<3) | (ioport("EVPC-SW8")->read()<<7));
+		case 0: *value = ~(ioport("EVPC-SW1")->read()); break;
+		case 2: *value = ~(ioport("EVPC-SW3")->read()); break;
+		case 3: *value = ~(ioport("EVPC-SW4")->read()); break;
+		case 7: *value = ~(ioport("EVPC-SW8")->read()); break;
+		default: *value = ~0; break;
 		}
 	}
 }
@@ -340,7 +343,7 @@ READ8Z_MEMBER(snug_enhanced_video_device::crureadz)
     Bit 6: -
     Bit 7: -
 */
-WRITE8_MEMBER(snug_enhanced_video_device::cruwrite)
+void snug_enhanced_video_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==EVPC_CRU_BASE)
 	{
@@ -437,8 +440,6 @@ WRITE_LINE_MEMBER( snug_enhanced_video_device::video_interrupt_in )
 		m_intlevel = state;
 		if (m_console_conn != nullptr) m_console_conn->vclock_line(state);
 		else m_slot->lcp_line(state);
-
-		if (state!=0) m_colorbus->poll();
 	}
 }
 
@@ -482,21 +483,33 @@ ioport_constructor snug_enhanced_video_device::device_input_ports() const
 	return INPUT_PORTS_NAME(ti99_evpc);
 }
 
-MACHINE_CONFIG_START(snug_enhanced_video_device::device_add_mconfig)
+void snug_enhanced_video_device::device_add_mconfig(machine_config& config)
+{
 	// video hardware
-	MCFG_V9938_ADD(TI_VDP_TAG, TI_SCREEN_TAG, 0x20000, XTAL(21'477'272))  /* typical 9938 clock, not verified */
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, snug_enhanced_video_device, video_interrupt_in))
-	MCFG_V99X8_SCREEN_ADD_NTSC(TI_SCREEN_TAG, TI_VDP_TAG, XTAL(21'477'272))
+	V9938(config, m_video, XTAL(21'477'272)); // typical 9938 clock, not verified
+	m_video->set_vram_size(0x20000);
+	m_video->int_cb().set(FUNC(snug_enhanced_video_device::video_interrupt_in));
+	m_video->set_screen(TI_SCREEN_TAG);
+	screen_device& screen(SCREEN(config, TI_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(21'477'272),
+		v99x8_device::HTOTAL,
+		0,
+		v99x8_device::HVISIBLE - 1,
+		v99x8_device::VTOTAL_NTSC * 2,
+		v99x8_device::VERTICAL_ADJUST * 2,
+		v99x8_device::VVISIBLE_NTSC * 2 - 1 - v99x8_device::VERTICAL_ADJUST * 2);
+	screen.set_screen_update(TI_VDP_TAG, FUNC(v99x8_device::screen_update));
 
 	// Sound hardware
 	SPEAKER(config, "sound_out").front_center();
-	MCFG_DEVICE_ADD(TI_SOUNDCHIP_TAG, SN94624, 3579545/8) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "sound_out", 0.75)
-	MCFG_SN76496_READY_HANDLER( WRITELINE(*this, snug_enhanced_video_device, ready_line) )
+	sn94624_device& soundgen(SN94624(config, TI_SOUNDCHIP_TAG, 3579545/8));
+	soundgen.ready_cb().set(FUNC(snug_enhanced_video_device::ready_line));
+	soundgen.add_route(ALL_OUTPUTS, "sound_out", 0.75);
 
-	// Mouse connected to the color bus of the v9938
-	MCFG_COLORBUS_MOUSE_ADD( COLORBUS_TAG )
-
-MACHINE_CONFIG_END
+	// Mouse connected to the color bus of the v9938; default: none
+	V9938_COLORBUS(config, m_colorbus, 0, ti99_colorbus_options, nullptr);
+}
 
 } } } // end namespace bus::ti99::peb
+
+

@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbm2-burnin.d80" size="533248" crc="b716a2af" sha1="b9c12437a178a574675168ec3f751afc7d24b638" offset="0" />
+				<rom name="cbm2-burnin.d80" size="533248" crc="b716a2af" sha1="b9c12437a178a574675168ec3f751afc7d24b638"/>
 			</dataarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbmtermv2.d80" size="533248" crc="cd0d4cd4" sha1="e0064bfe4576171cf852cb0bf4b61630a653529a" offset="0" />
+				<rom name="cbmtermv2.d80" size="533248" crc="cd0d4cd4" sha1="e0064bfe4576171cf852cb0bf4b61630a653529a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="ukb700-demo.d80" size="533248" crc="dc7f9f48" sha1="b1778b7d8e8c2f1749ec05485b01878e4271b4f9" offset="0" />
+				<rom name="ukb700-demo.d80" size="533248" crc="dc7f9f48" sha1="b1778b7d8e8c2f1749ec05485b01878e4271b4f9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -45,13 +45,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1070662">
-				<rom name="calc_result_700_bx_single_version_v1.0.d82" size="1070662" crc="244a2122" sha1="44661ed8e3307bb967f97ce1f5a247ca3cded0b3" offset="0" />
+				<rom name="calc_result_700_bx_single_version_v1.0.d82" size="1070662" crc="244a2122" sha1="44661ed8e3307bb967f97ce1f5a247ca3cded0b3"/>
 			</dataarea>
 		</part>
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank3" size="0x2000">
-				<rom name="calc_result-bx700.bin" size="0x2000" crc="4775ebb3" sha1="5c6928a9cd8a3ce6a1d11221292b832295d6543e" offset="0" />
+				<rom name="calc_result-bx700.bin" size="0x2000" crc="4775ebb3" sha1="5c6928a9cd8a3ce6a1d11221292b832295d6543e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,14 +63,14 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
-				<rom name="wordresult.d80" size="1066496" status="nodump" offset="0" />
+				<rom name="wordresult.d80" size="1066496" status="nodump"/>
 			</dataarea>
 		</part>
 
 		<part name="cart" interface="cbm2_cart">
 			<dataarea name="bank1" size="0x1000">
 				<!-- this is the Commodore 64 character generator ROM, used as a copy protection dongle -->
-				<rom name="901225-01.bin" size="0x1000" crc="ec4272ee" sha1="adc7c31e18c7c7413d54802ef2f4193da14711aa" offset="0" />
+				<rom name="901225-01.bin" size="0x1000" crc="ec4272ee" sha1="adc7c31e18c7c7413d54802ef2f4193da14711aa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -82,13 +82,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
-				<rom name="proxa7000d1.d82" size="1066496" crc="9cd9b57f" sha1="79358e050a8a3c0c336c8c4a579af86aefe787a3" offset="0" />
+				<rom name="proxa7000d1.d82" size="1066496" crc="9cd9b57f" sha1="79358e050a8a3c0c336c8c4a579af86aefe787a3"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
-				<rom name="proxa7000d2.d82" size="1066496" crc="6e0f7e44" sha1="4d742b82956126ff568762f8e82ad7290e6cc8a4" offset="0" />
+				<rom name="proxa7000d2.d82" size="1066496" crc="6e0f7e44" sha1="4d742b82956126ff568762f8e82ad7290e6cc8a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="disk2002.d80" size="533248" crc="bed6b1cd" sha1="624ae3c03c03274cc66d027c6be331f064c7773c" offset="0" />
+				<rom name="disk2002.d80" size="533248" crc="bed6b1cd" sha1="624ae3c03c03274cc66d027c6be331f064c7773c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -112,13 +112,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="6509bioscpm-d0.d80" size="533248" crc="b5333233" sha1="83907995853a8aa38e8fb5609841f2f91f513758" offset="0" />
+				<rom name="6509bioscpm-d0.d80" size="533248" crc="b5333233" sha1="83907995853a8aa38e8fb5609841f2f91f513758"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="6509bioscpm-d1.d80" size="533248" crc="bc746f8c" sha1="f1bfafb60aee1acd2afd00fa165675a787a4d14a" offset="0" />
+				<rom name="6509bioscpm-d1.d80" size="533248" crc="bc746f8c" sha1="f1bfafb60aee1acd2afd00fa165675a787a4d14a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -130,7 +130,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="b-128 fast bus.d80" size="533248" crc="04cb3692" sha1="4d60d77a4a25aeafa608c7198d8fb59f4b135518" offset="0" />
+				<rom name="b-128 fast bus.d80" size="533248" crc="04cb3692" sha1="4d60d77a4a25aeafa608c7198d8fb59f4b135518"/>
 			</dataarea>
 		</part>
 	</software>
@@ -142,7 +142,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="b128-256diags.d80" size="533248" crc="8082fe73" sha1="86cf972e13ff729b4916e9995c51658973a1c50d" offset="0" />
+				<rom name="b128-256diags.d80" size="533248" crc="8082fe73" sha1="86cf972e13ff729b4916e9995c51658973a1c50d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -154,7 +154,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="beeline.d80" size="533248" crc="e2a2a13c" sha1="3c8c26b7ef402c8f39429302ac2bf754ca974635" offset="0" />
+				<rom name="beeline.d80" size="533248" crc="e2a2a13c" sha1="3c8c26b7ef402c8f39429302ac2bf754ca974635"/>
 			</dataarea>
 		</part>
 	</software>
@@ -166,7 +166,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="norm's copier.d80" size="533248" crc="913907cf" sha1="16c824ee1001fd9682b2fb627003529b30fa5e31" offset="0" />
+				<rom name="norm's copier.d80" size="533248" crc="913907cf" sha1="16c824ee1001fd9682b2fb627003529b30fa5e31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -178,7 +178,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="superbase 700.d80" size="533248" crc="4c4b1b9e" sha1="70ab9636609de2eb2a1a7963b6b5eafdfa98cb89" offset="0" />
+				<rom name="superbase 700.d80" size="533248" crc="4c4b1b9e" sha1="70ab9636609de2eb2a1a7963b6b5eafdfa98cb89"/>
 			</dataarea>
 		</part>
 	</software>
@@ -190,7 +190,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="superscriptii.d80" size="533248" crc="e3da7e0d" sha1="e9e303857ee4b0c0655050a97142f75b2ad13838" offset="0" />
+				<rom name="superscriptii.d80" size="533248" crc="e3da7e0d" sha1="e9e303857ee4b0c0655050a97142f75b2ad13838"/>
 			</dataarea>
 		</part>
 	</software>
@@ -204,7 +204,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug02.d80" size="533248" crc="09d364a4" sha1="5f3213e8799f4df637e0f5d6c592f6ef49666cf2" offset="0" />
+				<rom name="cbug02.d80" size="533248" crc="09d364a4" sha1="5f3213e8799f4df637e0f5d6c592f6ef49666cf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -216,7 +216,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug03.d80" size="533248" crc="2ecf3c47" sha1="c2b68d1b69e495715283242551e7971344f7a2a7" offset="0" />
+				<rom name="cbug03.d80" size="533248" crc="2ecf3c47" sha1="c2b68d1b69e495715283242551e7971344f7a2a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -228,7 +228,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug04.d80" size="533248" crc="aa615833" sha1="5d9a72f8669eceea223c1e43e3337b09e27e0b1f" offset="0" />
+				<rom name="cbug04.d80" size="533248" crc="aa615833" sha1="5d9a72f8669eceea223c1e43e3337b09e27e0b1f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +240,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug05.d80" size="533248" crc="bd4f42ce" sha1="a44cbf5a594dff2182248999a8a04a014c816d63" offset="0" />
+				<rom name="cbug05.d80" size="533248" crc="bd4f42ce" sha1="a44cbf5a594dff2182248999a8a04a014c816d63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -252,7 +252,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug06.d80" size="533248" crc="d734dc8b" sha1="e8b01501c24b16c932de9746bbc91d49c80c91d1" offset="0" />
+				<rom name="cbug06.d80" size="533248" crc="d734dc8b" sha1="e8b01501c24b16c932de9746bbc91d49c80c91d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -264,7 +264,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug07.d80" size="533248" crc="fb250c96" sha1="0d763cba26edc9b42dd5dfd7d5cb94184934d56e" offset="0" />
+				<rom name="cbug07.d80" size="533248" crc="fb250c96" sha1="0d763cba26edc9b42dd5dfd7d5cb94184934d56e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -276,7 +276,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug08.d80" size="533248" crc="9f35fde0" sha1="0923b3db904e8892037f3eba405c488f9bd6d8bc" offset="0" />
+				<rom name="cbug08.d80" size="533248" crc="9f35fde0" sha1="0923b3db904e8892037f3eba405c488f9bd6d8bc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,7 +288,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug09.d80" size="533248" crc="20de4f39" sha1="196234a189e0aa2c38f44aef6892ea97989c2ed1" offset="0" />
+				<rom name="cbug09.d80" size="533248" crc="20de4f39" sha1="196234a189e0aa2c38f44aef6892ea97989c2ed1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -300,7 +300,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug10.d80" size="533248" crc="ea55aa06" sha1="5290998301f4ff390cd2ebf3b6709f46b62c1490" offset="0" />
+				<rom name="cbug10.d80" size="533248" crc="ea55aa06" sha1="5290998301f4ff390cd2ebf3b6709f46b62c1490"/>
 			</dataarea>
 		</part>
 	</software>
@@ -312,7 +312,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug11.d80" size="533248" crc="3c82a5e2" sha1="6518e91cccf248740fff4b0108acd2e0e34e34a9" offset="0" />
+				<rom name="cbug11.d80" size="533248" crc="3c82a5e2" sha1="6518e91cccf248740fff4b0108acd2e0e34e34a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -324,7 +324,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug11a.d80" size="533248" crc="66a027c8" sha1="e6f18a637309c75d8a2528018c87187d7385b6f0" offset="0" />
+				<rom name="cbug11a.d80" size="533248" crc="66a027c8" sha1="e6f18a637309c75d8a2528018c87187d7385b6f0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -336,7 +336,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug12.d80" size="533248" crc="2ceb7e7c" sha1="a2f17413b0afdcea6fb5359833adbf58d7e39867" offset="0" />
+				<rom name="cbug12.d80" size="533248" crc="2ceb7e7c" sha1="a2f17413b0afdcea6fb5359833adbf58d7e39867"/>
 			</dataarea>
 		</part>
 	</software>
@@ -348,7 +348,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug13.d80" size="533248" crc="9d3f6784" sha1="b70b7721875278881e6b218b8444530fd428bfa1" offset="0" />
+				<rom name="cbug13.d80" size="533248" crc="9d3f6784" sha1="b70b7721875278881e6b218b8444530fd428bfa1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -360,7 +360,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug14.d80" size="533248" crc="b2d7cd43" sha1="f76b4f895c818ac199ced73e6a94c6b527e67c14" offset="0" />
+				<rom name="cbug14.d80" size="533248" crc="b2d7cd43" sha1="f76b4f895c818ac199ced73e6a94c6b527e67c14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -372,7 +372,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug15.d80" size="533248" crc="796779df" sha1="94639da95102877278b11cb5f148570e239257a7" offset="0" />
+				<rom name="cbug15.d80" size="533248" crc="796779df" sha1="94639da95102877278b11cb5f148570e239257a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -384,7 +384,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug17.d80" size="533248" crc="cf28c6d9" sha1="a430b243af6a1537ee6cff57ad7dda3fe5ffd03b" offset="0" />
+				<rom name="cbug17.d80" size="533248" crc="cf28c6d9" sha1="a430b243af6a1537ee6cff57ad7dda3fe5ffd03b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -396,7 +396,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug18.d80" size="533248" crc="70c5d190" sha1="230516b694b6aea429cfb8a73fc409a9bb2891d7" offset="0" />
+				<rom name="cbug18.d80" size="533248" crc="70c5d190" sha1="230516b694b6aea429cfb8a73fc409a9bb2891d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -408,7 +408,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug19.d80" size="533248" crc="46d0e934" sha1="f8e7d1293d50a1d71fb25bcfba3fb1c5983b08d1" offset="0" />
+				<rom name="cbug19.d80" size="533248" crc="46d0e934" sha1="f8e7d1293d50a1d71fb25bcfba3fb1c5983b08d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -420,7 +420,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug21.d80" size="533248" crc="4225ba3c" sha1="45f24060262e7f894ce68ce86b5b7cc2941df386" offset="0" />
+				<rom name="cbug21.d80" size="533248" crc="4225ba3c" sha1="45f24060262e7f894ce68ce86b5b7cc2941df386"/>
 			</dataarea>
 		</part>
 	</software>
@@ -432,7 +432,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug22.d80" size="533248" crc="601d41f8" sha1="5b1362a2eefa5941cf20493a1242952ea6bd3fe4" offset="0" />
+				<rom name="cbug22.d80" size="533248" crc="601d41f8" sha1="5b1362a2eefa5941cf20493a1242952ea6bd3fe4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -444,7 +444,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug24.d80" size="533248" crc="d0baffc3" sha1="53b77314590f27c0ea504b52af08253919d17cb1" offset="0" />
+				<rom name="cbug24.d80" size="533248" crc="d0baffc3" sha1="53b77314590f27c0ea504b52af08253919d17cb1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -456,7 +456,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug25.d80" size="533248" crc="35b67761" sha1="a654b942158bd9ea5b9439039f860f44e3b06fd5" offset="0" />
+				<rom name="cbug25.d80" size="533248" crc="35b67761" sha1="a654b942158bd9ea5b9439039f860f44e3b06fd5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -468,7 +468,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug26.d80" size="533248" crc="d5916df2" sha1="fe49ed6d1b9016548ffd846af67ac87132f53d31" offset="0" />
+				<rom name="cbug26.d80" size="533248" crc="d5916df2" sha1="fe49ed6d1b9016548ffd846af67ac87132f53d31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -480,7 +480,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug27.d80" size="533248" crc="8fba5beb" sha1="86266f22b4e82bc950d2a59c980292c8b1a695d3" offset="0" />
+				<rom name="cbug27.d80" size="533248" crc="8fba5beb" sha1="86266f22b4e82bc950d2a59c980292c8b1a695d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -492,7 +492,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug28.d80" size="533248" crc="311e816f" sha1="fecebb75bf1dcaed7f52d238b72f366cadd8121b" offset="0" />
+				<rom name="cbug28.d80" size="533248" crc="311e816f" sha1="fecebb75bf1dcaed7f52d238b72f366cadd8121b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -504,7 +504,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug29.d80" size="533248" crc="7d70aeb5" sha1="b554505d21be53223408730e82bb9a9ebc0b88d7" offset="0" />
+				<rom name="cbug29.d80" size="533248" crc="7d70aeb5" sha1="b554505d21be53223408730e82bb9a9ebc0b88d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -516,7 +516,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug30.d80" size="533248" crc="1ba818bc" sha1="792d475cadada79e8b4f70e161d7c62d9ac5fde4" offset="0" />
+				<rom name="cbug30.d80" size="533248" crc="1ba818bc" sha1="792d475cadada79e8b4f70e161d7c62d9ac5fde4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -528,7 +528,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug31.d80" size="533248" crc="f6b88fc3" sha1="e3406bd478be3e5a271cdb606b08acbcbf0f3ca0" offset="0" />
+				<rom name="cbug31.d80" size="533248" crc="f6b88fc3" sha1="e3406bd478be3e5a271cdb606b08acbcbf0f3ca0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -540,7 +540,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug32.d80" size="533248" crc="7350ea23" sha1="037962d31ad6080a5d37c5c74dd53aaece59e6cd" offset="0" />
+				<rom name="cbug32.d80" size="533248" crc="7350ea23" sha1="037962d31ad6080a5d37c5c74dd53aaece59e6cd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -552,7 +552,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug33.d80" size="533248" crc="be32bad2" sha1="b6f78fbaf137d394e8d21468c2e86aaf23fd7cfa" offset="0" />
+				<rom name="cbug33.d80" size="533248" crc="be32bad2" sha1="b6f78fbaf137d394e8d21468c2e86aaf23fd7cfa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -564,7 +564,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug36.d80" size="533248" crc="11079504" sha1="82448e4b315560ecaf20e203557464b9327faebb" offset="0" />
+				<rom name="cbug36.d80" size="533248" crc="11079504" sha1="82448e4b315560ecaf20e203557464b9327faebb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -576,7 +576,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug37.d80" size="533248" crc="44bf80c9" sha1="4cc89bfc6760f15bc447f95a831dd4bad0a985e0" offset="0" />
+				<rom name="cbug37.d80" size="533248" crc="44bf80c9" sha1="4cc89bfc6760f15bc447f95a831dd4bad0a985e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -588,7 +588,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug38.d80" size="533248" crc="16d26b36" sha1="ef008cea97f637637268524f4e857c2d405380d4" offset="0" />
+				<rom name="cbug38.d80" size="533248" crc="16d26b36" sha1="ef008cea97f637637268524f4e857c2d405380d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -601,7 +601,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<!-- TODO: Identical SHA1 of cbug52.  Is this image for 39 or 52? -->
-				<rom name="cbug39.d80" size="533248" crc="6e7560bb" sha1="316e1601cad5f74d84e1346518e5cbfa7b5f211e" offset="0" />
+				<rom name="cbug39.d80" size="533248" crc="6e7560bb" sha1="316e1601cad5f74d84e1346518e5cbfa7b5f211e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug40.d80" size="533248" crc="40538765" sha1="88b83f35455782f3a4a90c341850ca7ba48dceb8" offset="0" />
+				<rom name="cbug40.d80" size="533248" crc="40538765" sha1="88b83f35455782f3a4a90c341850ca7ba48dceb8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -625,7 +625,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug41.d80" size="533248" crc="8c47e71b" sha1="215266e1282b83b4eca5e572b51ba5d743e30824" offset="0" />
+				<rom name="cbug41.d80" size="533248" crc="8c47e71b" sha1="215266e1282b83b4eca5e572b51ba5d743e30824"/>
 			</dataarea>
 		</part>
 	</software>
@@ -637,7 +637,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug42.d80" size="533248" crc="3ddec7e3" sha1="75e9599cbdd0848beadfc4998758fae227c98171" offset="0" />
+				<rom name="cbug42.d80" size="533248" crc="3ddec7e3" sha1="75e9599cbdd0848beadfc4998758fae227c98171"/>
 			</dataarea>
 		</part>
 	</software>
@@ -649,7 +649,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug43.d80" size="533248" crc="98a673a5" sha1="eac5ce9e56a9d95885decaa1cc3a0632cdf76fbe" offset="0" />
+				<rom name="cbug43.d80" size="533248" crc="98a673a5" sha1="eac5ce9e56a9d95885decaa1cc3a0632cdf76fbe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -661,7 +661,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug44.d80" size="533248" crc="202fc2b1" sha1="74d6e3e36ce713214f799bf9afe0cca458d555fa" offset="0" />
+				<rom name="cbug44.d80" size="533248" crc="202fc2b1" sha1="74d6e3e36ce713214f799bf9afe0cca458d555fa"/>
 			</dataarea>
 		</part>
 	</software>
@@ -673,7 +673,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug44a.d80" size="533248" crc="2fd1cf36" sha1="9625a6ac43811f2b9a024ac585dd7ddbef793b69" offset="0" />
+				<rom name="cbug44a.d80" size="533248" crc="2fd1cf36" sha1="9625a6ac43811f2b9a024ac585dd7ddbef793b69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -685,7 +685,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug46.d80" size="533248" crc="675ef0f6" sha1="b5c0fa98df2d6db6f887cf793a55104a8bce4fa7" offset="0" />
+				<rom name="cbug46.d80" size="533248" crc="675ef0f6" sha1="b5c0fa98df2d6db6f887cf793a55104a8bce4fa7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -697,7 +697,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug47.d80" size="533248" crc="883c67d9" sha1="eec9fd273dafab516f01d0988f86645c7856208b" offset="0" />
+				<rom name="cbug47.d80" size="533248" crc="883c67d9" sha1="eec9fd273dafab516f01d0988f86645c7856208b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -709,7 +709,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug47a.d80" size="533248" crc="70a909af" sha1="40bbb38a0ff431c2aaa51a1230838e1ecab2bf62" offset="0" />
+				<rom name="cbug47a.d80" size="533248" crc="70a909af" sha1="40bbb38a0ff431c2aaa51a1230838e1ecab2bf62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -721,7 +721,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug48.d80" size="533248" crc="d6d5d44e" sha1="7f9c4302db07603590a8548bfcf93bd98f953141" offset="0" />
+				<rom name="cbug48.d80" size="533248" crc="d6d5d44e" sha1="7f9c4302db07603590a8548bfcf93bd98f953141"/>
 			</dataarea>
 		</part>
 	</software>
@@ -733,7 +733,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug48a.d80" size="533248" crc="8639a5d9" sha1="a58c296168800e95fd4f529017725fb5a058c140" offset="0" />
+				<rom name="cbug48a.d80" size="533248" crc="8639a5d9" sha1="a58c296168800e95fd4f529017725fb5a058c140"/>
 			</dataarea>
 		</part>
 	</software>
@@ -745,7 +745,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug49.d80" size="533248" crc="9d2bb8a8" sha1="b9117aec83c17d97c086ffd462f423a93aa84011" offset="0" />
+				<rom name="cbug49.d80" size="533248" crc="9d2bb8a8" sha1="b9117aec83c17d97c086ffd462f423a93aa84011"/>
 			</dataarea>
 		</part>
 	</software>
@@ -757,7 +757,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug50.d80" size="533248" crc="1fc33e61" sha1="b17cfdc3503fb717cf13ad5272579287d241a6a9" offset="0" />
+				<rom name="cbug50.d80" size="533248" crc="1fc33e61" sha1="b17cfdc3503fb717cf13ad5272579287d241a6a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -769,7 +769,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug51i.d80" size="533248" crc="202e2ab8" sha1="4a6e514c45069ffa09b4057ee60ccfcc51c89bf0" offset="0" />
+				<rom name="cbug51i.d80" size="533248" crc="202e2ab8" sha1="4a6e514c45069ffa09b4057ee60ccfcc51c89bf0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -781,7 +781,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug51p.d80" size="533248" crc="b2bdee0b" sha1="a9f1361832ed0f3738effce8a232187d1dbcc578" offset="0" />
+				<rom name="cbug51p.d80" size="533248" crc="b2bdee0b" sha1="a9f1361832ed0f3738effce8a232187d1dbcc578"/>
 			</dataarea>
 		</part>
 	</software>
@@ -794,7 +794,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<!-- TODO: Identical SHA1 of cbug39.  Is this image for 39 or 52? -->
-				<rom name="cbug52.d80" size="533248" crc="6e7560bb" sha1="316e1601cad5f74d84e1346518e5cbfa7b5f211e" offset="0" />
+				<rom name="cbug52.d80" size="533248" crc="6e7560bb" sha1="316e1601cad5f74d84e1346518e5cbfa7b5f211e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -806,7 +806,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug53.d80" size="533248" crc="8c48d543" sha1="2a25fd4ff5596e94c77e418ce37696d579b71ed8" offset="0" />
+				<rom name="cbug53.d80" size="533248" crc="8c48d543" sha1="2a25fd4ff5596e94c77e418ce37696d579b71ed8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -818,7 +818,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug54.d80" size="533248" crc="e533b9bd" sha1="f64a232869fec3eeba7dc866586034d90f2dab44" offset="0" />
+				<rom name="cbug54.d80" size="533248" crc="e533b9bd" sha1="f64a232869fec3eeba7dc866586034d90f2dab44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -830,7 +830,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug55.d80" size="533248" crc="ea49680b" sha1="0bea8ffd3c6f56614daa50c8a1809675b3a16215" offset="0" />
+				<rom name="cbug55.d80" size="533248" crc="ea49680b" sha1="0bea8ffd3c6f56614daa50c8a1809675b3a16215"/>
 			</dataarea>
 		</part>
 	</software>
@@ -842,7 +842,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug56.d80" size="533248" crc="164689e7" sha1="920e7ff87a4d0b4c1e2b44054466fb75ac3b2658" offset="0" />
+				<rom name="cbug56.d80" size="533248" crc="164689e7" sha1="920e7ff87a4d0b4c1e2b44054466fb75ac3b2658"/>
 			</dataarea>
 		</part>
 	</software>
@@ -854,7 +854,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug57.d80" size="533248" crc="0efd6a05" sha1="ad145355d04cc83df5cdeee9896d90aba8c3014a" offset="0" />
+				<rom name="cbug57.d80" size="533248" crc="0efd6a05" sha1="ad145355d04cc83df5cdeee9896d90aba8c3014a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -866,7 +866,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug58.d80" size="533248" crc="80fb650b" sha1="2ce64fea8d65fa6587e5b261877a22ef6c50acf3" offset="0" />
+				<rom name="cbug58.d80" size="533248" crc="80fb650b" sha1="2ce64fea8d65fa6587e5b261877a22ef6c50acf3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -878,7 +878,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug59.d80" size="533248" crc="685af3a2" sha1="cdabc81b06cd5eb142730e649b9a26d7ad78cdc5" offset="0" />
+				<rom name="cbug59.d80" size="533248" crc="685af3a2" sha1="cdabc81b06cd5eb142730e649b9a26d7ad78cdc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -890,7 +890,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug60.d80" size="533248" crc="54bc9bf6" sha1="c2223ffd286d123e3529ab954be2511b83cb00c9" offset="0" />
+				<rom name="cbug60.d80" size="533248" crc="54bc9bf6" sha1="c2223ffd286d123e3529ab954be2511b83cb00c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -902,7 +902,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug60a.d80" size="533248" crc="b852c24d" sha1="561c298ffe8dab5dfbabce18fb01e19ed29d28f3" offset="0" />
+				<rom name="cbug60a.d80" size="533248" crc="b852c24d" sha1="561c298ffe8dab5dfbabce18fb01e19ed29d28f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -914,7 +914,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug61.d80" size="533248" crc="84079189" sha1="82eede2c6cdbdd1621d1b0149e3d22a4862f4c9e" offset="0" />
+				<rom name="cbug61.d80" size="533248" crc="84079189" sha1="82eede2c6cdbdd1621d1b0149e3d22a4862f4c9e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -926,7 +926,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug62.d80" size="533248" crc="6e63f34d" sha1="7b1273430d4211cad8f021323de2ea7a2982bbc5" offset="0" />
+				<rom name="cbug62.d80" size="533248" crc="6e63f34d" sha1="7b1273430d4211cad8f021323de2ea7a2982bbc5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -938,13 +938,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug63a.d80" size="533248" crc="abfe3572" sha1="926e25a5d18335e602f3ec1ff9b32e2db1ee7a1a" offset="0" />
+				<rom name="cbug63a.d80" size="533248" crc="abfe3572" sha1="926e25a5d18335e602f3ec1ff9b32e2db1ee7a1a"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug63b.d80" size="533248" crc="9b4e7a4d" sha1="712ce9cc42a885a39820834b71fa2069b3632de6" offset="0" />
+				<rom name="cbug63b.d80" size="533248" crc="9b4e7a4d" sha1="712ce9cc42a885a39820834b71fa2069b3632de6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -956,7 +956,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug64.d80" size="533248" crc="5eef626c" sha1="31f6d762767e5fcb31bb0e1074e9419179ba6e50" offset="0" />
+				<rom name="cbug64.d80" size="533248" crc="5eef626c" sha1="31f6d762767e5fcb31bb0e1074e9419179ba6e50"/>
 			</dataarea>
 		</part>
 	</software>
@@ -968,7 +968,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug65.d80" size="533248" crc="58ff4bc3" sha1="47a78e91dae0a2db7e73972b35b379ffd76441e8" offset="0" />
+				<rom name="cbug65.d80" size="533248" crc="58ff4bc3" sha1="47a78e91dae0a2db7e73972b35b379ffd76441e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -980,7 +980,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug66.d80" size="533248" crc="4bb24013" sha1="066b4be9ffe9d416d9ed1f4c70d476a5715a72f8" offset="0" />
+				<rom name="cbug66.d80" size="533248" crc="4bb24013" sha1="066b4be9ffe9d416d9ed1f4c70d476a5715a72f8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -992,7 +992,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug67.d80" size="533248" crc="0b44b106" sha1="23b7cba7cb7bf05256cd68ed81ba81ba77ccf41c" offset="0" />
+				<rom name="cbug67.d80" size="533248" crc="0b44b106" sha1="23b7cba7cb7bf05256cd68ed81ba81ba77ccf41c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1004,7 +1004,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug68.d80" size="533248" crc="0b0b39ad" sha1="e368a85c6d05953592aa1837eec639965edf5b76" offset="0" />
+				<rom name="cbug68.d80" size="533248" crc="0b0b39ad" sha1="e368a85c6d05953592aa1837eec639965edf5b76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1016,7 +1016,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug69.d80" size="533248" crc="2dcd38f3" sha1="3a94d9588128d33d88413c083af28b42f1fe9ed3" offset="0" />
+				<rom name="cbug69.d80" size="533248" crc="2dcd38f3" sha1="3a94d9588128d33d88413c083af28b42f1fe9ed3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1028,7 +1028,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug70.d80" size="533248" crc="23d2bebd" sha1="e9ddd97e120d479ba93e6d3abeb3090a574198e2" offset="0" />
+				<rom name="cbug70.d80" size="533248" crc="23d2bebd" sha1="e9ddd97e120d479ba93e6d3abeb3090a574198e2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1040,7 +1040,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug71.d80" size="533248" crc="50188eac" sha1="d9f3d401956aefd754bb326e5a3996a20232cd1c" offset="0" />
+				<rom name="cbug71.d80" size="533248" crc="50188eac" sha1="d9f3d401956aefd754bb326e5a3996a20232cd1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1052,7 +1052,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug72.d80" size="533248" crc="139b2277" sha1="60f3f0715be52570ee3818df35704e81f28b1700" offset="0" />
+				<rom name="cbug72.d80" size="533248" crc="139b2277" sha1="60f3f0715be52570ee3818df35704e81f28b1700"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1064,7 +1064,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug73.d80" size="533248" crc="8a3471d4" sha1="11da39924d388ae78256fbc9af8f8de7328dbdc0" offset="0" />
+				<rom name="cbug73.d80" size="533248" crc="8a3471d4" sha1="11da39924d388ae78256fbc9af8f8de7328dbdc0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1076,7 +1076,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug74.d80" size="533248" crc="3bf71436" sha1="e511252eb3561380c860469206378eff1146f546" offset="0" />
+				<rom name="cbug74.d80" size="533248" crc="3bf71436" sha1="e511252eb3561380c860469206378eff1146f546"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1088,7 +1088,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug75.d80" size="533248" crc="70ba78a1" sha1="d6b5ac7c3083c29086c2da0407b49057e51a6a3f" offset="0" />
+				<rom name="cbug75.d80" size="533248" crc="70ba78a1" sha1="d6b5ac7c3083c29086c2da0407b49057e51a6a3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1100,55 +1100,55 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.1.d80" size="533248" crc="00f00dd8" sha1="db518837e1bca45c954756d5fbdcf140e1a952f6" offset="0" />
+				<rom name="cbug76.1.d80" size="533248" crc="00f00dd8" sha1="db518837e1bca45c954756d5fbdcf140e1a952f6"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.2.d80" size="533248" crc="61e5db2d" sha1="83b5fad73da5e2a1b3a55975e69a0f522e67c117" offset="0" />
+				<rom name="cbug76.2.d80" size="533248" crc="61e5db2d" sha1="83b5fad73da5e2a1b3a55975e69a0f522e67c117"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.3.d80" size="533248" crc="7568be7a" sha1="eba13b375828ed48efda13847352a9544c748fc0" offset="0" />
+				<rom name="cbug76.3.d80" size="533248" crc="7568be7a" sha1="eba13b375828ed48efda13847352a9544c748fc0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.4.d80" size="533248" crc="e146653d" sha1="e270e63b96de455d8e01891433397a4162fc28a3" offset="0" />
+				<rom name="cbug76.4.d80" size="533248" crc="e146653d" sha1="e270e63b96de455d8e01891433397a4162fc28a3"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.5.d80" size="533248" crc="f851ad5c" sha1="6fc895feb89f103629cfec6460e768fb08d34133" offset="0" />
+				<rom name="cbug76.5.d80" size="533248" crc="f851ad5c" sha1="6fc895feb89f103629cfec6460e768fb08d34133"/>
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.6.d80" size="533248" crc="50700c4b" sha1="80570edb2fd9d961d4993da5678110656bea34fc" offset="0" />
+				<rom name="cbug76.6.d80" size="533248" crc="50700c4b" sha1="80570edb2fd9d961d4993da5678110656bea34fc"/>
 			</dataarea>
 		</part>
 
 		<part name="flop7" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.7.d80" size="533248" crc="1d6af3c3" sha1="f4512c2b01b6902471d402a3b57a551d0d30bdf1" offset="0" />
+				<rom name="cbug76.7.d80" size="533248" crc="1d6af3c3" sha1="f4512c2b01b6902471d402a3b57a551d0d30bdf1"/>
 			</dataarea>
 		</part>
 
 		<part name="flop8" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.8.d80" size="533248" crc="9b899f36" sha1="1b199b346bb0bffab17f0c694ae878985002967c" offset="0" />
+				<rom name="cbug76.8.d80" size="533248" crc="9b899f36" sha1="1b199b346bb0bffab17f0c694ae878985002967c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop9" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug76.9.d80" size="533248" crc="e50a1191" sha1="3b166981f8b83675ddd0c0ddb80fd34b200f1a0f" offset="0" />
+				<rom name="cbug76.9.d80" size="533248" crc="e50a1191" sha1="3b166981f8b83675ddd0c0ddb80fd34b200f1a0f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1160,25 +1160,25 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug77.1.d80" size="533248" crc="79b9eb2a" sha1="e017514c34e40df3b3c0f8ff6854684cbadf065c" offset="0" />
+				<rom name="cbug77.1.d80" size="533248" crc="79b9eb2a" sha1="e017514c34e40df3b3c0f8ff6854684cbadf065c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug77.2.d80" size="533248" crc="afc8b43e" sha1="692dce4b949401453d3a6596eaf612e2be900ba0" offset="0" />
+				<rom name="cbug77.2.d80" size="533248" crc="afc8b43e" sha1="692dce4b949401453d3a6596eaf612e2be900ba0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug77.3.d80" size="533248" crc="bc0b4e95" sha1="539a5c25b3834582201afbac18676d95592bac2c" offset="0" />
+				<rom name="cbug77.3.d80" size="533248" crc="bc0b4e95" sha1="539a5c25b3834582201afbac18676d95592bac2c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug77.4.d80" size="533248" crc="3cc1e0f2" sha1="066405ce32b7acc29094c97db9c622299db9e11d" offset="0" />
+				<rom name="cbug77.4.d80" size="533248" crc="3cc1e0f2" sha1="066405ce32b7acc29094c97db9c622299db9e11d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1190,7 +1190,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug78.d80" size="533248" crc="fe2acc67" sha1="c944bb91041de740ac6e4363935e55a78638fce2" offset="0" />
+				<rom name="cbug78.d80" size="533248" crc="fe2acc67" sha1="c944bb91041de740ac6e4363935e55a78638fce2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1202,7 +1202,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug79.d80" size="533248" crc="e47e202a" sha1="f23f98e4767124401f9c2818136422d8b64cb07d" offset="0" />
+				<rom name="cbug79.d80" size="533248" crc="e47e202a" sha1="f23f98e4767124401f9c2818136422d8b64cb07d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1214,7 +1214,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug81.d80" size="533248" crc="b9d5ef05" sha1="160719d5acb1423391848a5cd40d7a891b1a1efd" offset="0" />
+				<rom name="cbug81.d80" size="533248" crc="b9d5ef05" sha1="160719d5acb1423391848a5cd40d7a891b1a1efd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1226,7 +1226,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug83.d80" size="533248" crc="7fbeb655" sha1="ca9d1fa7f0eb78cd82f5a7ce8d5b437c417bb6e8" offset="0" />
+				<rom name="cbug83.d80" size="533248" crc="7fbeb655" sha1="ca9d1fa7f0eb78cd82f5a7ce8d5b437c417bb6e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1238,7 +1238,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug84.d80" size="533248" crc="f841161f" sha1="09f74868edd999ad9e1eb892da4329c1797f7510" offset="0" />
+				<rom name="cbug84.d80" size="533248" crc="f841161f" sha1="09f74868edd999ad9e1eb892da4329c1797f7510"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1250,7 +1250,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug85.d80" size="533248" crc="d3f2495f" sha1="cdb86446828a45ab84efb8278eeaab7afa9e40f4" offset="0" />
+				<rom name="cbug85.d80" size="533248" crc="d3f2495f" sha1="cdb86446828a45ab84efb8278eeaab7afa9e40f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1262,7 +1262,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug86.d80" size="533248" crc="632abcf0" sha1="11a75f25db6b868dc04e401ef72f6833c17b833c" offset="0" />
+				<rom name="cbug86.d80" size="533248" crc="632abcf0" sha1="11a75f25db6b868dc04e401ef72f6833c17b833c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1274,7 +1274,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug87.d80" size="533248" crc="a99d47ae" sha1="2fc8af3712449bde66d1da3f64072baf7b7e2939" offset="0" />
+				<rom name="cbug87.d80" size="533248" crc="a99d47ae" sha1="2fc8af3712449bde66d1da3f64072baf7b7e2939"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1286,7 +1286,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug88.d80" size="533248" crc="e40303fd" sha1="7cdc78236e4f0f59a43b3f1d3dea2a4306c2741c" offset="0" />
+				<rom name="cbug88.d80" size="533248" crc="e40303fd" sha1="7cdc78236e4f0f59a43b3f1d3dea2a4306c2741c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1298,7 +1298,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug89.d80" size="533248" crc="c5ccfe16" sha1="f45f6e96d050fae5edba0ed385c061016194f27d" offset="0" />
+				<rom name="cbug89.d80" size="533248" crc="c5ccfe16" sha1="f45f6e96d050fae5edba0ed385c061016194f27d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1310,7 +1310,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug90.d80" size="533248" crc="efe2b6e3" sha1="e8d47dbcff664f22b8c6f9c0dd3b6f69006b5eef" offset="0" />
+				<rom name="cbug90.d80" size="533248" crc="efe2b6e3" sha1="e8d47dbcff664f22b8c6f9c0dd3b6f69006b5eef"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1322,13 +1322,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug91-1.d80" size="533248" crc="13aeeb6f" sha1="b0d7d3b6e49e024cdd5c45c2e8506fa3c8023ece" offset="0" />
+				<rom name="cbug91-1.d80" size="533248" crc="13aeeb6f" sha1="b0d7d3b6e49e024cdd5c45c2e8506fa3c8023ece"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug91-2.d80" size="533248" crc="9f513dd1" sha1="8e54ff73b9c8940e3f85a5bf67a7d1e7a224ea29" offset="0" />
+				<rom name="cbug91-2.d80" size="533248" crc="9f513dd1" sha1="8e54ff73b9c8940e3f85a5bf67a7d1e7a224ea29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1340,7 +1340,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug92.d80" size="533248" crc="9229e68e" sha1="2441ca84b6f28e268cbe797409f7b900e1f9db7d" offset="0" />
+				<rom name="cbug92.d80" size="533248" crc="9229e68e" sha1="2441ca84b6f28e268cbe797409f7b900e1f9db7d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1352,7 +1352,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug93.d80" size="533248" crc="134c012b" sha1="6c34a4d619c3086bf9051c3279446474fb63d18c" offset="0" />
+				<rom name="cbug93.d80" size="533248" crc="134c012b" sha1="6c34a4d619c3086bf9051c3279446474fb63d18c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1364,7 +1364,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug94.d80" size="533248" crc="e8acf1f7" sha1="ff1ff521f5a6276af8f07946be282827de1bd26b" offset="0" />
+				<rom name="cbug94.d80" size="533248" crc="e8acf1f7" sha1="ff1ff521f5a6276af8f07946be282827de1bd26b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1376,7 +1376,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug95.d80" size="533248" crc="33a152fe" sha1="94b2ba626047d4ea14044c793f6b1386bf889784" offset="0" />
+				<rom name="cbug95.d80" size="533248" crc="33a152fe" sha1="94b2ba626047d4ea14044c793f6b1386bf889784"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1388,13 +1388,13 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug96-1.d80" size="533248" crc="01c863d4" sha1="531ee1aaaf1bab13228ef3ac702b9949f30ef593" offset="0" />
+				<rom name="cbug96-1.d80" size="533248" crc="01c863d4" sha1="531ee1aaaf1bab13228ef3ac702b9949f30ef593"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug96-2.d80" size="533248" crc="07d31e96" sha1="c5e2703627b81eb4aa94d62e29d86f6e182b842d" offset="0" />
+				<rom name="cbug96-2.d80" size="533248" crc="07d31e96" sha1="c5e2703627b81eb4aa94d62e29d86f6e182b842d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1406,7 +1406,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug97.d80" size="533248" crc="eb198d65" sha1="336d72e4a69eabe4a71ec5f2cb7a9124c8dc8ef9" offset="0" />
+				<rom name="cbug97.d80" size="533248" crc="eb198d65" sha1="336d72e4a69eabe4a71ec5f2cb7a9124c8dc8ef9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1418,7 +1418,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug98.d80" size="533248" crc="b38079ca" sha1="9ceafb8f97c417c6fcbe4ef3a0daebb609ab4bd7" offset="0" />
+				<rom name="cbug98.d80" size="533248" crc="b38079ca" sha1="9ceafb8f97c417c6fcbe4ef3a0daebb609ab4bd7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1430,7 +1430,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugm20.d80" size="533248" crc="ceb3b8e2" sha1="9812b638177bba8d9a59f996f092c88d1f75666f" offset="0" />
+				<rom name="cbugm20.d80" size="533248" crc="ceb3b8e2" sha1="9812b638177bba8d9a59f996f092c88d1f75666f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1442,7 +1442,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugm45.d80" size="533248" crc="44218c61" sha1="472120d840c0ff86dcd8097fa722abad150a6797" offset="0" />
+				<rom name="cbugm45.d80" size="533248" crc="44218c61" sha1="472120d840c0ff86dcd8097fa722abad150a6797"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1454,7 +1454,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugm54.d80" size="533248" crc="9b0b08b8" sha1="b532327f7dd8fbcf3217477449ee23f8eeae38b4" offset="0" />
+				<rom name="cbugm54.d80" size="533248" crc="9b0b08b8" sha1="b532327f7dd8fbcf3217477449ee23f8eeae38b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1466,7 +1466,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugm55.d80" size="533248" crc="ef671967" sha1="9d91a981984c797c42429f7c4b989b9bef8ae839" offset="0" />
+				<rom name="cbugm55.d80" size="533248" crc="ef671967" sha1="9d91a981984c797c42429f7c4b989b9bef8ae839"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1478,7 +1478,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugm80.d80" size="533248" crc="75076703" sha1="9a30721bffc6dd16b92372e99fd45339775a7b1a" offset="0" />
+				<rom name="cbugm80.d80" size="533248" crc="75076703" sha1="9a30721bffc6dd16b92372e99fd45339775a7b1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1490,7 +1490,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugm82.d80" size="533248" crc="57635ef8" sha1="8fe1d3b1611c213edf8317da521a87611180bc07" offset="0" />
+				<rom name="cbugm82.d80" size="533248" crc="57635ef8" sha1="8fe1d3b1611c213edf8317da521a87611180bc07"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1502,7 +1502,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr01.d80" size="533248" crc="e2557ef1" sha1="2cf49ce6d1ccd05777f3817b8bfbcc59f319d2a1" offset="0" />
+				<rom name="cbugpr01.d80" size="533248" crc="e2557ef1" sha1="2cf49ce6d1ccd05777f3817b8bfbcc59f319d2a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1514,7 +1514,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr02.d80" size="533248" crc="4abb4d1c" sha1="a67977ecf24c4965774cb53e71624e20adeaa95c" offset="0" />
+				<rom name="cbugpr02.d80" size="533248" crc="4abb4d1c" sha1="a67977ecf24c4965774cb53e71624e20adeaa95c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1526,7 +1526,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr03.d80" size="533248" crc="c273b68c" sha1="68c80f469783a1f12f71801ee7c1f36e1fafb5d0" offset="0" />
+				<rom name="cbugpr03.d80" size="533248" crc="c273b68c" sha1="68c80f469783a1f12f71801ee7c1f36e1fafb5d0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1538,7 +1538,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr04.d80" size="533248" crc="1ee15549" sha1="fcb967e3f6dadca1a52c567d5f397539b917e2a1" offset="0" />
+				<rom name="cbugpr04.d80" size="533248" crc="1ee15549" sha1="fcb967e3f6dadca1a52c567d5f397539b917e2a1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1550,7 +1550,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr05.d80" size="533248" crc="88362d70" sha1="d25163990e9086271e23ee889bee44334dbf7f2d" offset="0" />
+				<rom name="cbugpr05.d80" size="533248" crc="88362d70" sha1="d25163990e9086271e23ee889bee44334dbf7f2d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1562,7 +1562,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr06p.d80" size="533248" crc="f7abe7f4" sha1="bd14ff8f5bb5dd377efcb488357135305be716e0" offset="0" />
+				<rom name="cbugpr06p.d80" size="533248" crc="f7abe7f4" sha1="bd14ff8f5bb5dd377efcb488357135305be716e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1574,7 +1574,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr08.d80" size="533248" crc="08c64534" sha1="aa05cc0587cf9e80e72ea602a8786ed54c06a0be" offset="0" />
+				<rom name="cbugpr08.d80" size="533248" crc="08c64534" sha1="aa05cc0587cf9e80e72ea602a8786ed54c06a0be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1586,7 +1586,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr09.d80" size="533248" crc="9a8b1593" sha1="23307a90b46acd4c4ad5e97b5cb9418e06268948" offset="0" />
+				<rom name="cbugpr09.d80" size="533248" crc="9a8b1593" sha1="23307a90b46acd4c4ad5e97b5cb9418e06268948"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1598,7 +1598,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr10.d80" size="533248" crc="74d24f30" sha1="5af5e97e6c016e975ad9ba562d16112172fb2c42" offset="0" />
+				<rom name="cbugpr10.d80" size="533248" crc="74d24f30" sha1="5af5e97e6c016e975ad9ba562d16112172fb2c42"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1610,7 +1610,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr11.d80" size="533248" crc="77925f0b" sha1="6fc84c04f2ff91e3fd47b20394ecd90ce0e4239c" offset="0" />
+				<rom name="cbugpr11.d80" size="533248" crc="77925f0b" sha1="6fc84c04f2ff91e3fd47b20394ecd90ce0e4239c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1622,7 +1622,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr12.d80" size="533248" crc="2973a207" sha1="20227a8eaac113cfb883c4d96a9ee2c9acc42c02" offset="0" />
+				<rom name="cbugpr12.d80" size="533248" crc="2973a207" sha1="20227a8eaac113cfb883c4d96a9ee2c9acc42c02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1634,7 +1634,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr13.d80" size="533248" crc="ef25f030" sha1="97c1c44c47732e029cc95340667cae2f7e934807" offset="0" />
+				<rom name="cbugpr13.d80" size="533248" crc="ef25f030" sha1="97c1c44c47732e029cc95340667cae2f7e934807"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1646,7 +1646,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr14.d80" size="533248" crc="0099b0f4" sha1="0f6bf95c4250ccbb3b18b50ce21582543bd4a3a2" offset="0" />
+				<rom name="cbugpr14.d80" size="533248" crc="0099b0f4" sha1="0f6bf95c4250ccbb3b18b50ce21582543bd4a3a2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1658,7 +1658,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr15.d80" size="533248" crc="9ab8c99e" sha1="74a24eca548e92b51f30e3f52939738099efaacd" offset="0" />
+				<rom name="cbugpr15.d80" size="533248" crc="9ab8c99e" sha1="74a24eca548e92b51f30e3f52939738099efaacd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1670,7 +1670,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr16.d80" size="533248" crc="ecd40443" sha1="6b1c2cacadc2975f229c6351d44e9ab199e8ad77" offset="0" />
+				<rom name="cbugpr16.d80" size="533248" crc="ecd40443" sha1="6b1c2cacadc2975f229c6351d44e9ab199e8ad77"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1682,7 +1682,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr17.d80" size="533248" crc="e258a470" sha1="47d559570f7c1f6289b30261c87cdca8b55de56d" offset="0" />
+				<rom name="cbugpr17.d80" size="533248" crc="e258a470" sha1="47d559570f7c1f6289b30261c87cdca8b55de56d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1694,7 +1694,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr18.d80" size="533248" crc="89556c22" sha1="3a66495f676ba4faf4d7575b0da853a3b2f08a7f" offset="0" />
+				<rom name="cbugpr18.d80" size="533248" crc="89556c22" sha1="3a66495f676ba4faf4d7575b0da853a3b2f08a7f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1706,7 +1706,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr19.d80" size="533248" crc="c384cfde" sha1="2657e3bb8ee3f93550a40aa282e025537d69b669" offset="0" />
+				<rom name="cbugpr19.d80" size="533248" crc="c384cfde" sha1="2657e3bb8ee3f93550a40aa282e025537d69b669"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1718,7 +1718,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugpr20.d80" size="533248" crc="281e1c4b" sha1="bbf0a208c676dcb235af4861c9d8976fb88d4412" offset="0" />
+				<rom name="cbugpr20.d80" size="533248" crc="281e1c4b" sha1="bbf0a208c676dcb235af4861c9d8976fb88d4412"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1730,7 +1730,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbugrr01.d80" size="533248" crc="4185db5c" sha1="db1a991b884dda0f4426c5719e2d595d24d75694" offset="0" />
+				<rom name="cbugrr01.d80" size="533248" crc="4185db5c" sha1="db1a991b884dda0f4426c5719e2d595d24d75694"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1744,7 +1744,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="2031lp-demo.d64" size="174848" crc="9c697562" sha1="940da4a6638058d6899fb629738d7ad8605b3976" offset="0" />
+				<rom name="2031lp-demo.d64" size="174848" crc="9c697562" sha1="940da4a6638058d6899fb629738d7ad8605b3976"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1756,7 +1756,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
-				<rom name="8250lp-demo.d82" size="1066496" crc="cbd23e48" sha1="acedaa2e77f7a113bfe77760eb67ba45099b50db" offset="0" />
+				<rom name="8250lp-demo.d82" size="1066496" crc="cbd23e48" sha1="acedaa2e77f7a113bfe77760eb67ba45099b50db"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1768,7 +1768,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
-				<rom name="sfd1001-demo.d82" size="1066496" crc="83b12b13" sha1="316fa89b4553ff1d411dc14ffcdd477c1fb284da" offset="0" />
+				<rom name="sfd1001-demo.d82" size="1066496" crc="83b12b13" sha1="316fa89b4553ff1d411dc14ffcdd477c1fb284da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1780,7 +1780,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="sfdtest8050fmt.d80" size="533248" crc="3845c0b9" sha1="56473932a35f2caedf370c51f1debd8664a14b5b" offset="0" />
+				<rom name="sfdtest8050fmt.d80" size="533248" crc="3845c0b9" sha1="56473932a35f2caedf370c51f1debd8664a14b5b"/>
 			</dataarea>
 		</part>
 	</software>

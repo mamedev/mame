@@ -822,6 +822,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0xca:      compute_float(rn, rx); break;
 					case 0xd9:      compute_fix_scaled(rn, rx, ry); break;
 					case 0xda:      compute_float_scaled(rn, rx, ry); break;
+					case 0xe0:      compute_fcopysign(rn, rx, ry); break;
 					case 0xe1:      compute_fmin(rn, rx, ry); break;
 					case 0xe2:      compute_fmax(rn, rx, ry); break;
 					case 0xe3:      compute_fclip(rn, rx, ry); break;

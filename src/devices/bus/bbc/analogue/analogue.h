@@ -34,21 +34,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define BBC_ANALOGUE_SLOT_TAG      "analogue"
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_BBC_ANALOGUE_SLOT_ADD(_tag, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, BBC_ANALOGUE_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -60,7 +45,22 @@ class bbc_analogue_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	bbc_analogue_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	bbc_analogue_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&slot_options, const char *default_option)
+		: bbc_analogue_slot_device(mconfig, tag, owner)
+	{
+		option_reset();
+		slot_options(*this);
+		set_default_option(default_option);
+		set_fixed(false);
+	}
+
+	bbc_analogue_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
+
+	// callbacks
+	auto lpstb_handler() { return m_lpstb_handler.bind(); }
+
+	DECLARE_WRITE_LINE_MEMBER(lpstb_w) { m_lpstb_handler(state); }
 
 	uint8_t ch_r(int channel);
 	uint8_t pb_r();
@@ -72,6 +72,9 @@ protected:
 	virtual void device_reset() override;
 
 	device_bbc_analogue_interface *m_card;
+
+private:
+	devcb_write_line m_lpstb_handler;
 };
 
 
@@ -80,9 +83,6 @@ protected:
 class device_bbc_analogue_interface : public device_slot_card_interface
 {
 public:
-	// construction/destruction
-	virtual ~device_bbc_analogue_interface();
-
 	virtual uint8_t ch_r(int channel) { return 0x00; };
 	virtual uint8_t pb_r() { return 0x30; };
 

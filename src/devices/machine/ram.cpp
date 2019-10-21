@@ -148,7 +148,7 @@ void ram_device::device_start()
 				else
 					util::stream_format(output, "%s,%s).\n", m_default_size, m_extra_options_string);
 
-				osd_printf_error("%s", output.str().c_str());
+				osd_printf_error("%s", output.str());
 
 				osd_printf_warning("Setting value to default %s\n", m_default_size);
 
@@ -190,7 +190,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 
 		// report any errors
 		if (!bad_option.empty())
-			osd_printf_error("Invalid RAM option: %s\n", bad_option.c_str());
+			osd_printf_error("Invalid RAM option: %s\n", bad_option);
 
 		// report duplicates
 		using extra_option_ref_set = std::set<std::reference_wrapper<extra_option const>, bool (*)(extra_option const &, extra_option const &)>;
@@ -199,7 +199,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 		{
 			auto const ins(sorted.emplace(opt));
 			if (!ins.second)
-				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first.c_str(), opt.first.c_str(), opt.second);
+				osd_printf_error("Duplicate RAM options: %s == %s (%u)\n", ins.first->get().first, opt.first, opt.second);
 		}
 	}
 }

@@ -10,6 +10,7 @@
 
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/6821pia.h"
 #include "machine/input_merger.h"
@@ -54,7 +55,7 @@ public:
 	void init_osbexec();
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<mb8877_device>  m_mb8877;
 	required_device<ram_device> m_messram;
@@ -516,7 +517,7 @@ void osbexec_state::machine_reset()
 	m_video_timer->adjust( m_screen->time_until_pos( 0, 0 ) );
 
 	// D0 cleared on interrupt acknowledge cycle by TTL gates at UC21 and UA18
-	m_maincpu->set_input_line_vector(0, 0xfe);
+	m_maincpu->set_input_line_vector(0, 0xfe); // Z80
 }
 
 
@@ -527,25 +528,25 @@ static const z80_daisy_config osbexec_daisy_config[] =
 };
 
 
-MACHINE_CONFIG_START(osbexec_state::osbexec)
-	MCFG_DEVICE_ADD(m_maincpu, Z80, MAIN_CLOCK/6)
-	MCFG_DEVICE_PROGRAM_MAP(osbexec_mem)
-	MCFG_DEVICE_IO_MAP(osbexec_io)
-	MCFG_Z80_DAISY_CHAIN(osbexec_daisy_config)
+void osbexec_state::osbexec(machine_config &config)
+{
+	Z80(config, m_maincpu, MAIN_CLOCK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &osbexec_state::osbexec_mem);
+	m_maincpu->set_addrmap(AS_IO, &osbexec_state::osbexec_io);
+	m_maincpu->set_daisy_config(osbexec_daisy_config);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(osbexec_state::screen_update));
-	m_screen->set_raw(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240);    /* May not be correct */
+	m_screen->set_raw(MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240);    // May not be correct
 	m_screen->set_palette("palette");
 	m_screen->screen_vblank().set(m_pia[0], FUNC(pia6821_device::cb1_w));
 	m_screen->screen_vblank().append(m_rtc, FUNC(ripple_counter_device::clock_w)).invert();
 
-	MCFG_PALETTE_ADD_MONOCHROME_HIGHLIGHT("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME_HIGHLIGHT);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(m_speaker, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set(FUNC(osbexec_state::osbexec_pia0_a_r));
@@ -557,7 +558,7 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	m_pia[0]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<0>));
 	m_pia[0]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
-	MCFG_DEVICE_ADD(m_pia[1], PIA6821, 0)
+	PIA6821(config, m_pia[1], 0);
 	m_pia[1]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 	m_pia[1]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 
@@ -598,18 +599,17 @@ MACHINE_CONFIG_START(osbexec_state::osbexec)
 	printer_port.dcd_handler().set(m_sio, FUNC(z80sio_device::dcdb_w));
 	printer_port.cts_handler().set(m_sio, FUNC(z80sio_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("mb8877", MB8877, MAIN_CLOCK/24)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(m_pia[1], pia6821_device, cb1_w))
-	MCFG_FLOPPY_DRIVE_ADD("mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats)
+	MB8877(config, m_mb8877, MAIN_CLOCK/24);
+	m_mb8877->intrq_wr_callback().set(m_pia[1], FUNC(pia6821_device::cb1_w));
+	FLOPPY_CONNECTOR(config, "mb8877:0", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877:1", osborne2_floppies, "525ssdd", floppy_image_device::default_floppy_formats);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("136K")   /* 128KB Main RAM + RAM in ROM bank (8) */
+	RAM(config, RAM_TAG).set_default_size("136K"); /* 128KB Main RAM + RAM in ROM bank (8) */
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "osborne2")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("osborne2");
+}
 
 
 ROM_START( osbexec )

@@ -3,13 +3,24 @@
 
 <softwarelist name="hx20_rom" description="Epson HX-20 Optional ROMs">
 
-	<software name="skiwritr">
+	<software name="forth" supported="no">
+		<description>Forth</description>
+		<year>1982</year>
+		<publisher>HCCS Associates</publisher>
+		<part name="rom" interface="opt_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="forth.bin" size="8192" crc="1319f181" sha1="72af6cf0a30fee45aea31c8ae1031bba5ad9f62d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skiwritr" supported="no">
 		<description>SkiWriter</description>
 		<year>1983</year>
 		<publisher>SkiSoft</publisher>
 		<part name="rom" interface="opt_rom">
 			<dataarea name="rom" size="8192">
-				<rom name="skiwriter_1983.bin" size="8192" crc="28fe9f30" sha1="6c5f0a4d08cb347b87b57db8aef250b78343a81b" offset="0x0000" />
+				<rom name="skiwriter_1983.bin" size="8192" crc="28fe9f30" sha1="6c5f0a4d08cb347b87b57db8aef250b78343a81b"/>
 			</dataarea>
 		</part>
 	</software>

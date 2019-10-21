@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="abc800_hdd" description="Luxor ABC-800 hard disks">
+<softwarelist name="abc800_hdd" description="Luxor ABC 800 hard disks">
 
 	<software name="abc850">
 		<description>ABC 850</description>

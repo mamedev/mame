@@ -41,6 +41,9 @@ Racing Jam                Konami   1998
 Racing Jam : Chapter 2    Konami   1998
 Thrill Drive              Konami   1998
 
+Note: Thrill Drive was released as a conversion kit for Racing Jam. The kit came with a rom swap for CPU and CG boards
+and a different network board containing a SOIC8 serial pic.
+
 PCB Layouts
 -----------
 
@@ -147,15 +150,14 @@ Racing Jam 2 888A01  -    -     888A09  888A10  -       -       676A04  676A05  
 Thrill Drive 713BE01 -    -     713A09  713A10  -       -       713A04  713A05  -       -   713A08
 
 
-Network PCB
+Network PCB (Racing Jam)
 -----------
-GN676-PWB(H)B
+GN676-PWB(H)A
 MADE IN JAPAN
 (C)1998 KONAMI
-sticker - GC713AC
 |------------------------|
 |  CY7C199       N676H1  |
-|                      2G|
+|                        |
 |CN3                     |
 |  HYC2485S              |
 |   XC5204        XC5210 |
@@ -165,16 +167,33 @@ sticker - GC713AC
 Notes:
       CN1      - Connector joining to CPU board CN4
       CN2/3    - RCA jacks for network cable
-      2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
-                 *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
-                 On Hornet, the chip seems to refresh the data in the Timekeeper RAM when the battery
-                 dies and keeps the game working. It's purpose on the network board is unknown but it may
-                 'upgrade' the data in the NVRAM to the network version of the game for a twin cabinet set-up.
       HYC2485S - Hybrid ceramic module for RS485
       CY7C199  - 32k x8 SRAM
       XC5204   - Xilinx XC5204 FPGA
       XC5210   - Xilink XC5210 FPGA
       N676H1   - PALCE16V8Q-15 stamped 'N676H1'
+
+Network PCB (Racing Jam 2 and Thrill Drive)
+-----------
+GN676-PWB(H)B
+MADE IN JAPAN
+(C)1998 KONAMI
+|------------------------|
+|  CY7C199       N676H1  |
+|                      2G|
+|CN3                     |
+|  HYC2485S              |
+|   XC5204        XC5210 |
+|CN2                     |
+|         CN1            |
+|------------------------|
+This pcb is the same as the A version but with one added chip:
+      2G       - Small SOIC8 chip with number 0038323 at location 2G. An identical chip is present on
+                 *some* Hornet games on the GN715 CPU board at location 30C. It may be a PIC or EEPROM.
+                 The chip seems to refresh the data in the Timekeeper RAM when the battery dies and keeps
+                 the game working. Because Racing Jam 2 and Thrill Drive came in a conversion kit, the PIC
+                 would format all old timekeeper data on first power on. It's also possible the PIC was
+                 created as a security measure to prevent changing the game and region.
 
 
 Bottom Board (VIDEO PCB)
@@ -338,7 +357,7 @@ private:
 	DECLARE_WRITE16_MEMBER(soundtimer_count_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
-	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
+	double adc12138_input_callback(uint8_t input);
 
 	TIMER_CALLBACK_MEMBER(sound_irq);
 	virtual void machine_start() override;
@@ -426,7 +445,7 @@ READ32_MEMBER(nwktr_state::sysreg_r)
 		}
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= m_adc12138->do_r(space, 0) | (m_adc12138->eoc_r(space, 0) << 2);
+			r |= m_adc12138->do_r() | (m_adc12138->eoc_r() << 2);
 		}
 	}
 	else if (offset == 1)
@@ -462,10 +481,10 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 			int di = (data >> 25) & 0x1;
 			int sclk = (data >> 24) & 0x1;
 
-			m_adc12138->cs_w(space, 0, cs);
-			m_adc12138->conv_w(space, 0, conv);
-			m_adc12138->di_w(space, 0, di);
-			m_adc12138->sclk_w(space, 0, sclk);
+			m_adc12138->cs_w(cs);
+			m_adc12138->conv_w(conv);
+			m_adc12138->di_w(di);
+			m_adc12138->sclk_w(sclk);
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -766,9 +785,9 @@ static INPUT_PORTS_START( nwktr )
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x80, 0x00, "Test Mode" ) PORT_DIPLOCATION("SW:1")
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Skip Post" ) PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING( 0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, "Disable Machine Init" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
@@ -791,25 +810,24 @@ static INPUT_PORTS_START( nwktr )
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("ANALOG1")       // Steering
-	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG1")
+	PORT_BIT( 0xfff, 0x800, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG2")       // Acceleration pedal
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG2")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG3")       // Foot brake pedal
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG3")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG4")       // Hand brake lever
-	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_START("ANALOG4")
+	PORT_BIT( 0xfff, 0x000, IPT_AD_STICK_Y ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 
-	PORT_START("ANALOG5")       // Clutch pedal
-	PORT_BIT( 0xfff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_START("ANALOG5")
+	PORT_BIT( 0xfff, 0x000, IPT_PEDAL3 ) PORT_NAME("Clutch Pedal") PORT_MINMAX(0x000, 0xfff) PORT_SENSITIVITY(100) PORT_KEYDELTA(60)
 INPUT_PORTS_END
 
 
-ADC12138_IPT_CONVERT_CB(nwktr_state::adc12138_input_callback)
+double nwktr_state::adc12138_input_callback(uint8_t input)
 {
 	int value = 0;
 	switch (input)
@@ -830,98 +848,90 @@ void nwktr_state::machine_reset()
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(nwktr_state::nwktr)
-
+void nwktr_state::nwktr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_DEVICE_PROGRAM_MAP(nwktr_map)
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &nwktr_state::nwktr_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nwktr_state::sound_memmap);
 
-	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(sharc0_map)
+	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp->set_addrmap(AS_DATA, &nwktr_state::sharc0_map);
 
-	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(sharc1_map)
+	ADSP21062(config, m_dsp2, XTAL(36'000'000));
+	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp2->set_addrmap(AS_DATA, &nwktr_state::sharc1_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(9000))
+	config.m_minimum_quantum = attotime::from_hz(9000);
 
-	MCFG_DEVICE_ADD("m48t58", M48T58, 0)
+	M48T58(config, "m48t58", 0);
 
-	MCFG_DEVICE_ADD("adc12138", ADC12138, 0)
-	MCFG_ADC1213X_IPT_CONVERT_CB(nwktr_state, adc12138_input_callback)
+	ADC12138(config, m_adc12138, 0);
+	m_adc12138->set_ipt_convert_callback(FUNC(nwktr_state::adc12138_input_callback));
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
-
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("lscreen")
-	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state,voodoo_vblank_0))
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(2,2);
+	m_voodoo[0]->set_screen_tag("lscreen");
+	m_voodoo[0]->set_cpu_tag(m_dsp);
+	m_voodoo[0]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_0));
 
-	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2, 2)
-	MCFG_VOODOO_SCREEN_TAG("rscreen")
-	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, nwktr_state, voodoo_vblank_1))
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(2,2);
+	m_voodoo[1]->set_screen_tag("rscreen");
+	m_voodoo[1]->set_cpu_tag(m_dsp);
+	m_voodoo[1]->vblank_callback().set(FUNC(nwktr_state::voodoo_vblank_1));
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_lscreen)
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_size(512, 384);
+	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_screen_update(FUNC(nwktr_state::screen_update_lscreen));
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(nwktr_state, screen_update_rscreen)
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); //TODO: Remove. These games never ran on a dual screen setup.
+	rscreen.set_refresh_hz(60);
+	rscreen.set_size(512, 384);
+	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_screen_update(FUNC(nwktr_state::screen_update_rscreen));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette).set_entries(65536);
 
-	MCFG_DEVICE_ADD("k001604", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)  // correct?
-	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604, 0);
+	m_k001604->set_layer_size(0);
+	m_k001604->set_roz_size(1);
+	m_k001604->set_txt_mem_offset(0);  // correct?
+	m_k001604->set_roz_mem_offset(0);  // correct?
+	m_k001604->set_palette(m_palette);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_K056800_ADD("k056800", XTAL(16'934'400))
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(16'934'400));
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(16'934'400))  // as per Guru readme above
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));  // as per Guru readme above
+	rfsnd.add_route(0, "lspeaker", 1.0);
+	rfsnd.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
-	MCFG_KONPPC_CGBOARD_NUMBER(2)
-	MCFG_KONPPC_CGBOARD_TYPE(NWKTR)
-MACHINE_CONFIG_END
+	KONPPC(config, m_konppc, 0);
+	m_konppc->set_num_boards(2);
+	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_NWKTR);
+}
 
-MACHINE_CONFIG_START(nwktr_state::thrilld)
+void nwktr_state::thrilld(machine_config &config)
+{
 	nwktr(config);
 
-	MCFG_DEVICE_REMOVE("k001604")
-	MCFG_DEVICE_ADD("k001604", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(1)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)  // correct?
-	MCFG_K001604_ROZ_OFFSET(0)  // correct?
-	MCFG_K001604_PALETTE("palette")
-MACHINE_CONFIG_END
+	m_k001604->set_layer_size(1);
+}
 
 /*****************************************************************************/
 
@@ -1056,7 +1066,7 @@ ROM_START(thrilldb)
 	ROM_LOAD( "713jab_m48t58y.35d", 0x000000, 0x002000, CRC(5d8fbcb2) SHA1(74ad91544d2a200cf599a565005476623075e7d6) )
 ROM_END
 
-ROM_START(thrilldae)
+ROM_START(thrilldae) //incorrect version, supposed to be ver xxB and we already have that clone. May delete as games boots as JAB on rtc test.
 	ROM_REGION32_BE(0x200000, "user1", 0)   /* PowerPC program roms */
 	ROM_LOAD16_WORD_SWAP("713bb01.27p", 0x000000, 0x200000, CRC(535fe4e8) SHA1(acd8194a4dafce289dbdfd874f0b799f25aeb73f) )
 
@@ -1076,14 +1086,14 @@ ROM_START(thrilldae)
 	ROM_LOAD( "713a10.14p", 0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
 
 	ROM_REGION(0x2000, "m48t58",0)
-	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
+	ROM_LOAD( "713eaa_m48t58y.35d", 0x000000, 0x002000, BAD_DUMP CRC(056ea8fa) SHA1(23574e0c1d011dab8644f3d98763d4a2d11a05b3)  )
 ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam (JAC)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, racingj2,   racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (EAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, racingj2j,  racingj, nwktr,   nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Racing Jam: Chapter 2 (JAE)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, thrilld,    0,       thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAE)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, thrilldb,   thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (JAB)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1998, thrilldae,  thrilld, thrilld, nwktr, nwktr_state, init_nwktr, ROT0, "Konami", "Thrill Drive (EAA)",          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )

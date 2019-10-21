@@ -28,7 +28,6 @@
 constexpr int FRAMESKIP_LEVELS = 12;
 constexpr int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 
-#define LCD_FRAMES_PER_SECOND   30
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -74,6 +73,8 @@ public:
 	void toggle_record_mng() { toggle_record_movie(MF_MNG); }
 	void toggle_record_avi() { toggle_record_movie(MF_AVI); }
 	osd_file::error open_next(emu_file &file, const char *extension, uint32_t index = 0);
+	void compute_snapshot_size(s32 &width, s32 &height);
+	void pixels(u32 *buffer);
 
 	// render a frame
 	void frame_update(bool from_debugger = false);
@@ -81,6 +82,7 @@ public:
 	// current speed helpers
 	std::string speed_text();
 	double speed_percent() const { return m_speed_percent; }
+	int effective_frameskip() const;
 
 	// snapshots
 	void save_snapshot(screen_device *screen, emu_file &file);
@@ -107,7 +109,6 @@ public:
 	std::string &timecode_text(std::string &str);
 	std::string &timecode_total_text(std::string &str);
 
-
 private:
 	// internal helpers
 	void exit();
@@ -116,7 +117,6 @@ private:
 
 	// effective value helpers
 	bool effective_autoframeskip() const;
-	int effective_frameskip() const;
 	bool effective_throttle() const;
 
 	// speed and throttling helpers
@@ -222,7 +222,6 @@ private:
 	std::string         m_timecode_text;        // Message for that video part (intro, gameplay, extra)
 	attotime            m_timecode_start;       // Starting timer for that video part (intro, gameplay, extra)
 	attotime            m_timecode_total;       // Show/hide timer at left (total elapsed on resulting video preview)
-
 };
 
 #endif // MAME_EMU_VIDEO_H

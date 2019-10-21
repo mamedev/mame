@@ -1,6 +1,34 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 // Commodore PC 10 / PC 20 / PC 30
+/***************************************************************************
+Commodore PC10 / PC20 / PC30
+Links: http://www.zimmers.net/cbmpics/cpcs.html , https://de.wikipedia.org/wiki/Commodore_PC-10_bis_PC-60 , http://mingos-commodorepage.tumblr.com/post/123656301482/commodore-pc-20-beim-pc-20-handelt-es-sich-um
+http://www.richardlagendijk.nl/cip/computer/item/pc20ii/de
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 256K / 512K / 640K
+BUS: 5x ISA
+Video: MDA
+Mass storage: PC10: 1 or 2x 5.25" 360K , PC20: 1x 360K + 10MB HD, PC30: 1x 360K + 20MB HD
+On board ports: Floppy, serial, parallel, speaker
+Options: 8087 FPU
+
+
+Commodore PC-10 III
+=============
+Links: http://dostalgie.de/downloads/pc10III-20III/PC10III_OM_COMMODORE_EN_DE.pdf ; ftp://ftp.zimmers.net/pub/cbm-pc/documents/PC-8088-Information.txt
+Info: PC10-III and PC20-III are the same machines - PC10 has two floppies, PC20 one floppy and one harddisk
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz / 7.16 MHz / 9.54 MHz
+RAM: 640K
+Bus: 3x ISA
+Video: On board: MDA/CGA/Hercules/Plantronics
+Mass storage: 1x Floppy 5.25" 360K and (PC10) another 360K or (PC20) 3.5" harddisk
+On board ports: Floppy, XT-IDE Harddisk, Mouse, serial, parallel, RTC, Speaker
+Options: 8087 FPU
+***************************************************************************/
+
 #include "emu.h"
 
 #include "cpu/i86/i86.h"
@@ -34,6 +62,7 @@ public:
 
 	void compc(machine_config &config);
 	void pc10iii(machine_config &config);
+	void compc1(machine_config &config);
 	void compc_io(address_map &map);
 	void compc_map(address_map &map);
 	void compciii_io(address_map &map);
@@ -192,52 +221,54 @@ void compc_state::compciii_io(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(compc_state::pioiii_r), FUNC(compc_state::pioiii_w));
 }
 
-MACHINE_CONFIG_START(compc_state::compc)
-	MCFG_DEVICE_ADD("maincpu", I8088, 4772720*2)
-	MCFG_DEVICE_PROGRAM_MAP(compc_map)
-	MCFG_DEVICE_IO_MAP(compc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
+void compc_state::compc(machine_config &config)
+{
+	I8088(config, m_maincpu, 4772720*2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &compc_state::compc_map);
+	m_maincpu->set_addrmap(AS_IO, &compc_state::compc_io);
+	m_maincpu->set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
-	MCFG_PCNOPPI_MOTHERBOARD_ADD("mb", "maincpu")
-	MCFG_DEVICE_REMOVE("mb:pit8253")
-	MCFG_DEVICE_ADD("mb:pit8253", FE2010_PIT, 0)
-	MCFG_PIT8253_CLK0(XTAL(14'318'181)/12.0) /* heartbeat IRQ */
-	MCFG_PIT8253_OUT0_HANDLER(WRITELINE("mb:pic8259", pic8259_device, ir0_w))
-	MCFG_PIT8253_CLK1(XTAL(14'318'181)/12.0) /* dram refresh */
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE("mb", ibm5160_mb_device, pc_pit8253_out1_changed))
-	MCFG_PIT8253_CLK2(XTAL(14'318'181)/12.0) /* pio port c pin 4, and speaker polling enough */
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE("mb", ibm5160_mb_device, pc_pit8253_out2_changed))
+	PCNOPPI_MOTHERBOARD(config, "mb", 0).set_cputag(m_maincpu);
+	config.device_remove("mb:pit8253");
+	fe2010_pit_device &pit(FE2010_PIT(config, "mb:pit8253", 0));
+	pit.set_clk<0>(XTAL(14'318'181)/12.0); /* heartbeat IRQ */
+	pit.out_handler<0>().set("mb:pic8259", FUNC(pic8259_device::ir0_w));
+	pit.set_clk<1>(XTAL(14'318'181)/12.0); /* dram refresh */
+	pit.out_handler<1>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out1_changed));
+	pit.set_clk<2>(XTAL(14'318'181)/12.0); /* pio port c pin 4, and speaker polling enough */
+	pit.out_handler<2>().set(m_mb, FUNC(ibm5160_mb_device::pc_pit8253_out2_changed));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "mda", false)
-	MCFG_DEVICE_ADD("isa2", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "lpt", false)
-	MCFG_DEVICE_ADD("isa3", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "com", false)
-	MCFG_DEVICE_ADD("isa4", ISA8_SLOT, 0, "mb:isa", pc_isa8_cards, "fdc_xt", false)
+	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "mda", false);
+	ISA8_SLOT(config, "isa2", 0, "mb:isa", pc_isa8_cards, "lpt", false);
+	ISA8_SLOT(config, "isa3", 0, "mb:isa", pc_isa8_cards, "com", false);
+	ISA8_SLOT(config, "isa4", 0, "mb:isa", pc_isa8_cards, "fdc_xt", false);
 
-	MCFG_PC_KEYB_ADD("pc_keyboard", WRITELINE("mb:pic8259", pic8259_device, ir1_w))
+	PC_KEYB(config, m_keyboard);
+	m_keyboard->keypress().set("mb:pic8259", FUNC(pic8259_device::ir1_w));
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K, 640K")
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K, 640K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "ibm5150")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("ibm5150");
+}
 
-MACHINE_CONFIG_START(compc_state::pc10iii)
+void compc_state::pc10iii(machine_config &config)
+{
 	compc(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(compciii_io)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &compc_state::compciii_io);
+}
 
 ROM_START(compc10)
 	ROM_REGION(0x10000, "bios", 0)
 	ROM_DEFAULT_BIOS("v205")
-	ROM_SYSTEM_BIOS(0, "v203", "v2.03")
-	ROMX_LOAD("380258-03", 0xc000, 0x4000, CRC(fbe53865) SHA1(a6d6433c055d1c328f71403a2ed2fd5908c23d40), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "v205", "v2.05")
-	ROMX_LOAD("380258-04", 0xc000, 0x4000, CRC(e61084da) SHA1(dfb360a6ec6cb1250d8a6243f12a0d702e8479cb), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "v201", "v2.01")
+	ROMX_LOAD("bios2.01-380258-01.bin", 0xc000, 0x4000, CRC(921de6aa) SHA1(eb6c3fe4200cb40da20131b264521ba9f82021b2), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v203", "v2.03")
+	ROMX_LOAD("380258-03", 0xc000, 0x4000, CRC(fbe53865) SHA1(a6d6433c055d1c328f71403a2ed2fd5908c23d40), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "v205", "v2.05")
+	ROMX_LOAD("380258-04", 0xc000, 0x4000, CRC(e61084da) SHA1(dfb360a6ec6cb1250d8a6243f12a0d702e8479cb), ROM_BIOS(2))
 ROM_END
 
 // Note: Commodore PC20-III, PC10-III and COLT share the same BIOS
@@ -276,6 +307,34 @@ ROM_START(pc10iii)
 	ROMX_LOAD("318086-02.u607", 0x0000, 0x8000, CRC(b406651c) SHA1(856f58353391a74a06ebb8ec9f8333d7d69e5fd6), ROM_BIOS(8))
 ROM_END
 
+
+/*********************************************************** Commodore PC-1 ***
+
+Links: http://www.amiga-stuff.com/hardware/pc-i.html , http://www.zimmers.net/cbmpics/cpci.html
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 512K / 640K
+Bus: Proprietary expansion slot, carrying almost all ISA signals
+Video: On board, MDA/Hercules/CGA
+Mass storage: 1x 5.25" 360K
+On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse,
+Options: 8087 FPU
+Expansion: Expansion box: 2x ISA
+
+******************************************************************************/
+
+ROM_START( compc1 )
+	ROM_DEFAULT_BIOS("bios12")
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "bios11", "PC-1 BIOS Rev. 1.1")
+	ROMX_LOAD("pc1_bios.bin", 0xc000, 0x4000, CRC(e37367c8) SHA1(9aac9c38b4ebdb9a740e393199c2eff75a0bde03), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "bios12", "PC-1 BIOS Rev. 1.2")
+	ROMX_LOAD("cbm-pci-bios-v1.2-380270-02.bin", 0xc000, 0x4000, CRC(7f744f87) SHA1(07f94a7e8ca4ddd1c738b304d24358711b4cd2ca), ROM_BIOS(1))
+	ROM_REGION(0x8000, "gfx1", 0)
+	ROM_LOAD("pc1_char.bin", 0x0000, 0x4000, CRC(ee6c27f0) SHA1(e769cc3a49a1d708bd74eb4ac85bb6ea67220d38))
+ROM_END
+
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT     CLASS        INIT        COMPANY                        FULLNAME               FLAGS
 COMP( 1984, compc10, ibm5150, 0,      compc,   compc,    compc_state, empty_init, "Commodore Business Machines", "Commodore PC 10",     MACHINE_NOT_WORKING )
 COMP( 1987, pc10iii, ibm5150, 0,      pc10iii, compciii, compc_state, empty_init, "Commodore Business Machines", "Commodore PC-10 III", MACHINE_NOT_WORKING )
+COMP( 198?, compc1,  ibm5150, 0,      pc10iii, compciii, compc_state, empty_init, "Commodore Business Machines", "PC-1",                MACHINE_NOT_WORKING )

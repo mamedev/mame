@@ -95,6 +95,7 @@
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "sound/volt_reg.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -198,7 +199,7 @@ void aa310_state::aa310_mem(address_map &map)
 	map(0x00000000, 0x01ffffff).rw(FUNC(aa310_state::archimedes_memc_logical_r), FUNC(aa310_state::archimedes_memc_logical_w));
 	map(0x02000000, 0x02ffffff).ram().share("physicalram"); /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	map(0x03000000, 0x033fffff).rw(FUNC(aa310_state::archimedes_ioc_r), FUNC(aa310_state::archimedes_ioc_w));
-	map(0x03400000, 0x035fffff).rom().region("extension", 0x000000).w(FUNC(aa310_state::archimedes_vidc_w));
+	map(0x03400000, 0x035fffff).rom().region("extension", 0x000000).w(m_vidc, FUNC(acorn_vidc10_device::write));
 	map(0x03600000, 0x037fffff).rom().region("extension", 0x200000).w(FUNC(aa310_state::archimedes_memc_w));
 	map(0x03800000, 0x03ffffff).rom().region("maincpu", 0).w(FUNC(aa310_state::archimedes_memc_page_w));
 }
@@ -206,8 +207,8 @@ void aa310_state::aa310_mem(address_map &map)
 
 INPUT_CHANGED_MEMBER(aa310_state::key_stroke)
 {
-	uint8_t row_val = (uint8_t)(uintptr_t)(param) >> 4;
-	uint8_t col_val = (uint8_t)(uintptr_t)(param) & 0xf;
+	uint8_t row_val = uint8_t(param) >> 4;
+	uint8_t col_val = uint8_t(param) & 0xf;
 
 	if(newval && !oldval)
 		m_kart->send_keycode_down(row_val,col_val);
@@ -364,15 +365,25 @@ static INPUT_PORTS_START( aa310 )
 	PORT_START("MOUSEY")
 	PORT_BIT( 0xffff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(0)                 PORT_CHANGED_MEMBER(DEVICE_SELF, aa310_state, send_mouse_input, 0) PORT_RESET PORT_REVERSE
 
-	PORT_START("via1a") /* VIA #1 PORT A */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_4WAY
+	// standard Atari/Commodore DB9
+	// TODO: 10 different joystick configurations (!), some of them supports multiple buttons as well
+	PORT_START("joy_p1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("joy_p2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( aa310_state::floppy_formats )
@@ -405,192 +416,163 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 }
 
-MACHINE_CONFIG_START(aa310_state::aa310)
+void aa310_state::aa310(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ARM, 24_MHz_XTAL / 3)        /* ARM2 8 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(aa310_mem)
-	MCFG_ARM_COPRO(VL86C020)
+	ARM(config, m_maincpu, 24_MHz_XTAL / 3); /* ARM2 8 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &aa310_state::aa310_mem);
+	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
-	MCFG_DEVICE_ADD("kart", AAKART, 8000000/256)
-	MCFG_AAKART_OUT_TX_CB(WRITELINE(*this, archimedes_state, a310_kart_tx_w))
-	MCFG_AAKART_OUT_RX_CB(WRITELINE(*this, archimedes_state, a310_kart_rx_w))
+	AAKART(config, m_kart, 8000000/256);
+	m_kart->out_tx_callback().set(FUNC(archimedes_state::a310_kart_tx_w));
+	m_kart->out_rx_callback().set(FUNC(archimedes_state::a310_kart_rx_w));
 
-	MCFG_I2CMEM_ADD("i2cmem")
-	MCFG_I2CMEM_DATA_SIZE(0x100)
+	I2CMEM(config, "i2cmem", 0).set_data_size(0x100);
 
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(16_MHz_XTAL, 1024, 0, 735, 624/2, 0, 292) // RiscOS 3 default screen settings
-	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	ACORN_VIDC10(config, m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
+	RAM(config, m_ram).set_default_size("1M");
 
-	MCFG_DEVICE_ADD("fdc", WD1772, 8000000 / 1) // TODO: frequency
-	MCFG_WD_FDC_DISABLE_MOTOR_CONTROL
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, aa310_state, aa310_wd177x_drq_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats) // rarely had 2nd FDD installed, space was used for HDD
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	wd1772_device& fdc(WD1772(config, "fdc", 8000000 / 1)); // TODO: frequency
+	fdc.set_disable_motor_control(true);
+	fdc.intrq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_intrq_w));
+	fdc.drq_wr_callback().set(FUNC(aa310_state::aa310_wd177x_drq_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
+	// rarely had 2nd FDD installed, space was used for HDD
+	FLOPPY_CONNECTOR(config, "fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats).enable_sound(true);
 
-	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
+	SOFTWARE_LIST(config, "flop_list").set_original("archimedes");
 
 	/* Expansion slots - 2-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa305)
+void aa310_state::aa305(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_EXTRA_OPTIONS("1M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("512K").set_extra_options("1M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa440)
+void aa310_state::aa440(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
+	m_ram->set_default_size("4M");
 
 	/* 20MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa3000)
+void aa310_state::aa3000(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1M").set_extra_options("2M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4101)
+void aa310_state::aa4101(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M,4M")
+	m_ram->set_default_size("1M").set_extra_options("2M,4M");
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4201)
+void aa310_state::aa4201(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	/* 20MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4401)
+void aa310_state::aa4401(machine_config &config)
+{
 	aa310(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M")
+	m_ram->set_default_size("4M").set_extra_options("8M");
 
 	/* 50MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa540)
+void aa310_state::aa540(machine_config &config)
+{
 	aa310(config);
-	MCFG_DEVICE_MODIFY("maincpu") // ARM3
-	MCFG_DEVICE_CLOCK(52_MHz_XTAL / 2)
+	m_maincpu->set_clock(52_MHz_XTAL / 2); // ARM3
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4M")
-	MCFG_RAM_EXTRA_OPTIONS("8M,12M,16M")
+	m_ram->set_default_size("4M").set_extra_options("8M,12M,16M");
 
 	/* 100MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa5000)
+void aa310_state::aa5000(machine_config &config)
+{
 	aa310(config);
-	MCFG_DEVICE_MODIFY("maincpu") // ARM3
-	MCFG_DEVICE_CLOCK(50_MHz_XTAL / 2)
+	m_maincpu->set_clock(50_MHz_XTAL / 2); // ARM3
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	/* 80MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4)
+void aa310_state::aa4(machine_config &config)
+{
 	aa5000(config);
-	MCFG_DEVICE_MODIFY("maincpu") // ARM3
-	MCFG_DEVICE_CLOCK(24_MHz_XTAL)
+	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_TYPE(LCD)
+	SCREEN(config.replace(), "screen", SCREEN_TYPE_LCD);
+
+	ACORN_VIDC10_LCD(config.replace(), m_vidc, 24_MHz_XTAL);
+	m_vidc->set_screen("screen");
+	m_vidc->vblank().set(FUNC(aa310_state::vblank_irq));
+	m_vidc->sound_drq().set(FUNC(aa310_state::sound_drq));
 
 	/* 765 FDC */
 
 	/* 60MB HDD */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(aa310_state::aa5000a)
+void aa310_state::aa5000a(machine_config &config)
+{
 	aa5000(config);
-	MCFG_DEVICE_MODIFY("maincpu") // ARM3
-	MCFG_DEVICE_CLOCK(33000000)
-MACHINE_CONFIG_END
+	m_maincpu->set_clock(33000000); // ARM3
+}
 
-MACHINE_CONFIG_START(aa310_state::aa3010)
+void aa310_state::aa3010(machine_config &config)
+{
 	aa310(config);
-	MCFG_DEVICE_MODIFY("maincpu") // ARM250
-	MCFG_DEVICE_CLOCK(72_MHz_XTAL / 6)
+	m_maincpu->set_clock(72_MHz_XTAL / 6); // ARM250
 
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1M")
-	MCFG_RAM_EXTRA_OPTIONS("2M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1M").set_extra_options("2M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa3020)
+void aa310_state::aa3020(machine_config &config)
+{
 	aa3010(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("2M").set_extra_options("4M");
+}
 
-MACHINE_CONFIG_START(aa310_state::aa4000)
+void aa310_state::aa4000(machine_config &config)
+{
 	aa3010(config);
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("2M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	/* 80MB HDD */
 
 	/* Expansion slots - 4-card backplane */
-MACHINE_CONFIG_END
+}
 
 ROM_START( aa305 )
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -628,7 +610,7 @@ ROM_START( aa305 )
 	ROMX_LOAD( "0276,148-01.ic26", 0x000002, 0x10000, CRC(1ab02f2d) SHA1(dd7d216967524e64d1a03076a6081461ec8528c3), ROM_BIOS(8) | ROM_SKIP(3) )
 	ROMX_LOAD( "0276,149-01.ic27", 0x000003, 0x10000, CRC(5fd6a406) SHA1(790af8a4c74d0f6714d528f7502443ce5898a618), ROM_BIOS(8) | ROM_SKIP(3) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
@@ -672,7 +654,7 @@ ROM_START( aa3000 )
 	ROM_SYSTEM_BIOS( 5, "319", "RISC OS 3.19 (09 Jun 1993)" ) // Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01,
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(5) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
@@ -709,7 +691,7 @@ ROM_START( aa5000 )
 	ROM_SYSTEM_BIOS( 3, "319", "RISC OS 3.19 (09 Jun 1993)" ) // Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01,
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(3) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
@@ -723,7 +705,7 @@ ROM_START( aa4 )
 	ROM_LOAD32_WORD( "0296,061-01.ic4",  0x000000, 0x100000, CRC(b77fe215) SHA1(57b19ea4b97a9b6a240aa61211c2c134cb295aa0) )
 	ROM_LOAD32_WORD( "0296,062-01.ic15", 0x000002, 0x100000, CRC(d42e196e) SHA1(64243d39d1bca38b10761f66a8042c883bde87a4) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 	/* Power Management */
 	ROM_LOAD32_BYTE( "0296,063-01.ic38", 0x000003, 0x010000, CRC(9ca3a6be) SHA1(75905b031f49960605d55c3e7350d309559ed440) )
@@ -737,7 +719,7 @@ ROM_START( aa3010 )
 	ROM_LOAD32_WORD( "0296,061-02.ic17", 0x000000, 0x100000, CRC(552fc3aa) SHA1(b2f1911e53d7377f2e69e1a870139745d3df494b) )
 	ROM_LOAD32_WORD( "0296,062-02.ic18", 0x000002, 0x100000, CRC(308d5a4a) SHA1(b309e1dd85670a06d77ec504dbbec6c42336329f) )
 
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )

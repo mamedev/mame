@@ -143,26 +143,17 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		int32_t bpindex = -1;
-		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-				bp != nullptr;
-				bp = bp->next())
-		{
-			if (address == bp->address())
-			{
-				bpindex = bp->index();
-				break;
-			}
-		}
+		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		// If none exists, add a new one
-		if (bpindex == -1)
+		if (bp == nullptr)
 		{
-			bpindex = cpuinfo->breakpoint_set(address, nullptr, nullptr);
+			int32_t bpindex = cpuinfo->breakpoint_set(address, nullptr, nullptr);
 			m_machine->debugger().console().printf("Breakpoint %X set\n", bpindex);
 		}
 		else
 		{
+			int32_t bpindex = bp->index();
 			cpuinfo->breakpoint_clear(bpindex);
 			m_machine->debugger().console().printf("Breakpoint %X cleared\n", bpindex);
 		}
@@ -183,9 +174,7 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != nullptr) && (bp->address() != address))
-			bp = bp->next();
+		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{
@@ -241,9 +230,7 @@ void DasmWindow::dasmViewUpdated()
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != nullptr) && (bp->address() != address))
-			bp = bp->next();
+		const device_debug::breakpoint *bp = cpuinfo->breakpoint_find(address);
 
 		if (bp != nullptr)
 		{

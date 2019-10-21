@@ -350,8 +350,8 @@ void bublbobl_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram();
-	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym1", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym2", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
+	map(0x9000, 0x9001).mirror(0x0ffe).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xa000, 0xa001).mirror(0x0ffe).rw("ym3526", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
 	map(0xb000, 0xb000).mirror(0x0ffc).r(m_main_to_sound, FUNC(generic_latch_8_device::read)).w(m_sound_to_main, FUNC(generic_latch_8_device::write));
 	map(0xb001, 0xb001).mirror(0x0ffc).r(FUNC(bublbobl_state::common_sound_semaphores_r)).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0xb002, 0xb002).mirror(0x0ffc).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
@@ -437,7 +437,7 @@ void bublbobl_state::tokio_sound_map(address_map &map)
 	map(0x9800, 0x9800).r(FUNC(bublbobl_state::common_sound_semaphores_r));
 	map(0xa000, 0xa000).w(m_soundnmi, FUNC(input_merger_device::in_clear<0>));
 	map(0xa800, 0xa800).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
-	map(0xb000, 0xb001).rw("ymsnd", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+	map(0xb000, 0xb001).rw("ym2203", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xe000, 0xffff).rom(); // space for diagnostic ROM?
 }
 
@@ -732,8 +732,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_INCLUDE( tokio_base )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, host_semaphore_r)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("bmcu", taito68705_mcu_device, mcu_semaphore_r)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bublboblp )
@@ -847,83 +847,79 @@ MACHINE_RESET_MEMBER(bublbobl_state,tokio)
 	tokio_videoctrl_w(m_maincpu->space(AS_PROGRAM), 0, 0x00, 0xFF); // TODO: does /RESET clear this the same as above? probably yes, needs tracing...
 }
 
-MACHINE_CONFIG_START(bublbobl_state::tokio)
-
+void bublbobl_state::tokio(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_map_mcu)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map_mcu);
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_subcpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
+	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_sound_map); // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MAIN_XTAL/8) // 3 Mhz
+	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu") // is this necessary?
+	config.m_perfect_cpu_quantum = subtag("maincpu"); // is this necessary?
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, tokio)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	YM2203(config, m_ym2203, MAIN_XTAL/8);
+	m_ym2203->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2203->add_route(0, "mono", 0.08);
+	m_ym2203->add_route(1, "mono", 0.08);
+	m_ym2203->add_route(2, "mono", 0.08);
+	m_ym2203->add_route(3, "mono", 1.0);
+}
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.08)
-	MCFG_SOUND_ROUTE(1, "mono", 0.08)
-	MCFG_SOUND_ROUTE(2, "mono", 0.08)
-	MCFG_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bublbobl_state::bublboblp)
+void bublbobl_state::bublboblp(machine_config &config)
+{
 	tokio(config);
-	MCFG_DEVICE_REMOVE("bmcu") // no mcu, socket is empty
+	config.device_remove("bmcu"); // no mcu, socket is empty
 
 	// watchdog circuit is actually present on the prototype pcb, but is either
 	// hooked up wrong in MAME for tokio in general, or is disabled with a wire
 	// jumper under the epoxy
-	MCFG_DEVICE_REMOVE("watchdog")
-	MCFG_WATCHDOG_ADD("watchdog") // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
+	config.device_remove("watchdog");
+	WATCHDOG_TIMER(config, "watchdog"); // this adds back a watchdog, but due to the way MAME handles watchdogs, it will never fire unless it first gets at least one pulse, which it never will.
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_map) // no mcu or resistors at all
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map); // no mcu or resistors at all
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
+}
 
-MACHINE_CONFIG_START(bublbobl_state::tokiob)
+void bublbobl_state::tokiob(machine_config &config)
+{
 	tokio(config);
-	MCFG_DEVICE_REMOVE("bmcu") // no mcu, but see below...
+	config.device_remove("bmcu"); // no mcu, but see below...
 
-	MCFG_DEVICE_REPLACE("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(tokio_map_bootleg) // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
-MACHINE_CONFIG_END
+	Z80(config.replace(), m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::tokio_map_bootleg); // resistor tying mcu's footprint PA6 pin low so mcu reads always return 0xBF
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
+}
 
 
 MACHINE_START_MEMBER(bublbobl_state,bublbobl)
@@ -963,69 +959,61 @@ MACHINE_RESET_MEMBER(bublbobl_state,bublbobl)
 	m_port4_out = 0;
 }
 
-MACHINE_CONFIG_START(bublbobl_state::bublbobl_nomcu)
-
+void bublbobl_state::bublbobl_nomcu(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(bublbobl_maincpu_map)
+	Z80(config, m_maincpu, MAIN_XTAL/4); // 6 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::bublbobl_maincpu_map);
 
-	MCFG_DEVICE_ADD("subcpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_DEVICE_PROGRAM_MAP(subcpu_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
+	Z80(config, m_subcpu, MAIN_XTAL/4); // 6 MHz
+	m_subcpu->set_addrmap(AS_PROGRAM, &bublbobl_state::subcpu_map);
+	m_subcpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
-	MCFG_DEVICE_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
+	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, bublbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(bublbobl_state, screen_update_bublbobl)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bublbobl)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bublbobl);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 256).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_IRQ0))
+	INPUT_MERGER_ANY_HIGH(config, m_soundirq).output_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_main_to_sound).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<1>));
+	GENERIC_LATCH_8(config, m_sound_to_main);
 
-	MCFG_GENERIC_LATCH_8_ADD("main_to_sound")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<1>))
+	YM2203(config, m_ym2203, MAIN_XTAL/8);
+	m_ym2203->irq_handler().set("soundirq", FUNC(input_merger_device::in_w<0>));
+	m_ym2203->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_GENERIC_LATCH_8_ADD("sound_to_main")
+	YM3526(config, m_ym3526, MAIN_XTAL/8);
+	m_ym3526->irq_handler().set("soundirq", FUNC(input_merger_device::in_w<1>));
+	m_ym3526->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-	MCFG_DEVICE_ADD("ym1", YM2203, MAIN_XTAL/8)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<0>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_DEVICE_ADD("ym2", YM3526, MAIN_XTAL/8)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE("soundirq", input_merger_device, in_w<1>))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(bublbobl_state::bublbobl)
+void bublbobl_state::bublbobl(machine_config &config)
+{
 	bublbobl_nomcu(config);
-	MCFG_DEVICE_ADD("mcu", M6801, XTAL(4'000'000)) // actually 6801U4 - xtal is 4MHz, divided by 4 internally
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
+	M6801(config, m_mcu, XTAL(4'000'000)); // actually 6801U4 - xtal is 4MHz, divided by 4 internally
+	m_mcu->set_addrmap(AS_PROGRAM, &bublbobl_state::mcu_map);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("mcu", M6801_IRQ_LINE)) // same clock latches the INT pin on the second Z80
-MACHINE_CONFIG_END
+	m_screen->screen_vblank().set_inputline(m_mcu, M6801_IRQ_LINE); // same clock latches the INT pin on the second Z80
+}
 
 MACHINE_START_MEMBER(bublbobl_state,boblbobl)
 {
@@ -1044,17 +1032,17 @@ MACHINE_RESET_MEMBER(bublbobl_state,boblbobl)
 	m_ic43_b = 0;
 }
 
-MACHINE_CONFIG_START(bublbobl_state::boblbobl)
+void bublbobl_state::boblbobl(machine_config &config)
+{
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(bootleg_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold) // interrupt mode 1, unlike Bubble Bobble
+	m_maincpu->set_addrmap(AS_PROGRAM, &bublbobl_state::bootleg_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bublbobl_state::irq0_line_hold)); // interrupt mode 1, unlike Bubble Bobble
 
 	MCFG_MACHINE_START_OVERRIDE(bublbobl_state, boblbobl)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, boblbobl)
-MACHINE_CONFIG_END
+}
 
 
 MACHINE_START_MEMBER(bub68705_state, bub68705)
@@ -1079,19 +1067,20 @@ MACHINE_RESET_MEMBER(bub68705_state, bub68705)
 	m_latch = 0;
 }
 
-MACHINE_CONFIG_START(bub68705_state::bub68705)
+void bub68705_state::bub68705(machine_config &config)
+{
 	bublbobl_nomcu(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("mcu", M68705P3, XTAL(4'000'000)) // xtal is 4MHz, divided by 4 internally
-	MCFG_M68705_PORTC_R_CB(IOPORT("IN0"))
-	MCFG_M68705_PORTA_W_CB(WRITE8(*this, bub68705_state, port_a_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(*this, bub68705_state, port_b_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bub68705_state, bublbobl_m68705_interrupt) // ??? should come from the same clock which latches the INT pin on the second Z80
+	M68705P3(config, m_mcu, XTAL(4'000'000)); // xtal is 4MHz, divided by 4 internally
+	m_mcu->portc_r().set_ioport("IN0");
+	m_mcu->porta_w().set(FUNC(bub68705_state::port_a_w));
+	m_mcu->portb_w().set(FUNC(bub68705_state::port_b_w));
+	m_mcu->set_vblank_int("screen", FUNC(bub68705_state::bublbobl_m68705_interrupt)); // ??? should come from the same clock which latches the INT pin on the second Z80
 
 	MCFG_MACHINE_START_OVERRIDE(bub68705_state, bub68705)
 	MCFG_MACHINE_RESET_OVERRIDE(bub68705_state, bub68705)
-MACHINE_CONFIG_END
+}
 
 
 
@@ -1763,6 +1752,71 @@ ROM_START( sboblbobld )
 
 ROM_END
 
+ROM_START( sboblboble ) // identical to sboblbobld but for the first program ROM
+	ROM_REGION( 0x30000, "maincpu", 0 ) // on top board, these weren't labeled
+	ROM_LOAD( "1f",    0x00000, 0x08000, CRC(bde89043) SHA1(6f2d3d8db71d9f519e0b2aff22a4ea652d426655) )
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "1h",    0x10000, 0x08000, CRC(13118eb1) SHA1(5a5da40c2cc82420f70bc58ffa32de1088c6c82f) )
+	ROM_LOAD( "1l",    0x18000, 0x08000, CRC(13fe9baa) SHA1(ca1ca240d755621e533d9bbbdd8d953154670499) )
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x10000, "subcpu", 0 ) // on top board
+	ROM_LOAD( "b-1.3f",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on top board
+	ROM_LOAD( "b-2.1s",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) // on bottom board
+	ROM_LOAD( "b-6.6b",    0x00000, 0x8000, CRC(20358c22) SHA1(2297af6c53d5807bf90a8e081075b8c72a994fc5) )    /* 1st plane */
+	ROM_LOAD( "b-7.8b",    0x08000, 0x8000, CRC(930168a9) SHA1(fd358c3c3b424bca285f67a1589eb98a345ff670) )
+	ROM_LOAD( "b-8.9b",    0x10000, 0x8000, CRC(9773e512) SHA1(33c1687ee575d66bf0e98add45d06da827813765) )
+	ROM_LOAD( "b-9.11b",   0x18000, 0x8000, CRC(d045549b) SHA1(0c12077d3ddc2ce6aa45a0224ad5540f3f218446) )
+	ROM_LOAD( "b-10.12b",  0x20000, 0x8000, CRC(d0af35c5) SHA1(c5a89f4d73acc0db86654540b3abfd77b3757db5) )
+	ROM_LOAD( "b-11.14b",  0x28000, 0x8000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9) )
+	/* 0x30000-0x3ffff empty */
+	ROM_LOAD( "b-12.6d",   0x40000, 0x8000, CRC(6b61a413) SHA1(44eddf12fb46fceca2addbe6da929aaea7636b13) )    /* 2nd plane */
+	ROM_LOAD( "b-13.8d",   0x48000, 0x8000, CRC(b5492d97) SHA1(d5b045e3ebaa44809757a4220cefb3c6815470da) )
+	ROM_LOAD( "b-14.9d",   0x50000, 0x8000, CRC(d69762d5) SHA1(3326fef4e0bd86681a3047dc11886bb171ecb609) )
+	ROM_LOAD( "b-15.11d",  0x58000, 0x8000, CRC(9f243b68) SHA1(32dce8d311a4be003693182a999e4053baa6bb0a) )
+	ROM_LOAD( "b-16.12d",  0x60000, 0x8000, CRC(66e9438c) SHA1(b94e62b6fbe7f4e08086d0365afc5cff6e0ccafd) )
+	ROM_LOAD( "b-17.14d",  0x68000, 0x8000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8) )
+	/* 0x70000-0x7ffff empty */
+
+	ROM_REGION( 0x0100, "proms", 0 ) // not provided for this set
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+
+ROM_END
+
+ROM_START( sboblboblf ) // single layer PCB '8001 AX'
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "a2.bin",   0x00000, 0x08000, CRC(524cdc4f) SHA1(f778e53f664e911a5b992a4f85bcad1097eaa36f) ) // same as sboblbobld
+	/* ROMs banked at 8000-bfff */
+	ROM_LOAD( "a4.bin",   0x10000, 0x08000, CRC(13118eb1) SHA1(5a5da40c2cc82420f70bc58ffa32de1088c6c82f) ) // same as most bootlegs
+	ROM_LOAD( "a3.bin",   0x18000, 0x08000, CRC(94c75591) SHA1(7698bc4b7d20e554a73a489cd3a15ae61b350e37) ) // same as sboblboblb
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x10000, "subcpu", 0 )
+	ROM_LOAD( "a5.bin",    0x0000, 0x08000, CRC(ae11a07b) SHA1(af7a335c8da637103103cc274e077f123908ebb7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a1.bin",    0x0000, 0x08000, CRC(4f9a26e8) SHA1(3105b34b88a7134493c2b3f584729f8b0407a011) )
+
+// The following ROMs match the sboblbobl set, but are missing 0x10000 of GFX data. However the PCB has no empty sockets and the ROM sizes are verified.
+// The missing data is for the final boss. Did the bootleggers decide noone would ever get there and cut it out to spare some dollars? Doesn't make much sense.
+	ROM_REGION (0x80000, "gfx1", ROMREGION_INVERT)
+	ROM_LOAD ("a11.bin", 0x00000, 0x10000, CRC(76f2b367) SHA1(3e357a5642c8747df77a995057cecdf96f3130ab)) // 27512
+	ROM_LOAD ("a10.bin", 0x10000, 0x10000, CRC(d370f499) SHA1(94ce157ff1a53fabf08abe5467531b94a56666a5)) // 27512
+	// 0x20000-0x28000 missing compared to the sboblbobl set
+	ROM_LOAD ("a9.bin",  0x28000, 0x08000, CRC(7b5369a8) SHA1(1307b26d80e6f36ebe6c442bebec41d20066eaf9)) // 27256
+	ROM_LOAD ("a8.bin",  0x40000, 0x10000, CRC(677840e8) SHA1(995b2125ca18910d7d4b96078f4ecb17465c4151)) // 27512
+	ROM_LOAD ("a7.bin",  0x50000, 0x10000, CRC(702f61c0) SHA1(2f294ab2b0286736a64ea2bfc95d855aa5b41ada)) // 27512
+	// 0x60000-0x68000 missing compared to the sboblbobl set
+	ROM_LOAD ("a6.bin",  0x68000, 0x08000, CRC(9ef863ad) SHA1(29f91b5a3765e4d6e6c3382db1d8d8297b6e56c8)) // 27256
+
+	ROM_REGION( 0x0100, "proms", 0 ) // not dumped for this set
+	ROM_LOAD( "a71-25.41",    0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )    /* video timing */
+ROM_END
+
 ROM_START( bub68705 )
 	ROM_REGION( 0x30000, "maincpu", 0 ) /* Program roms match Bubble Bobble (older) */
 	ROM_LOAD( "2.bin",    0x00000, 0x08000, CRC(32c8305b) SHA1(6bf69b3edfbefd33cd670a762b4bf0b39629a220) )
@@ -2056,6 +2110,8 @@ GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_co
 GAME( 1986, sboblbobla, bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 2)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboblb, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 3)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobld, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 4)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboble, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 5)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, sboblboblf, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bobble Bobble (bootleg, set 6)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblboblc, bublbobl, boblbobl,  sboblboblb, bublbobl_state, init_common, ROT0,  "bootleg",         "Super Bubble Bobble (bootleg)",            MACHINE_SUPPORTS_SAVE ) // the title screen on this one isn't hacked
 GAME( 1986, bub68705,   bublbobl, bub68705,  bublbobl,   bub68705_state, init_common, ROT0,  "bootleg",         "Bubble Bobble (bootleg with 68705)",       MACHINE_SUPPORTS_SAVE )
 

@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "tilemap.h"
+
 #include "screen.h"
 
 
@@ -945,6 +947,8 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 
 g_profiler.start(PROFILER_TILEMAP_DRAW);
 	// configure the blit parameters based on the input parameters
+	assert(dest.cliprect().contains(cliprect));
+	assert(screen.cliprect().contains(cliprect));
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
 
@@ -952,16 +956,16 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 	realize_all_dirty_tiles();
 
 	// flip the tilemap around the center of the visible area
-	rectangle visarea = screen.visible_area();
-	u32 width = visarea.left() + visarea.right() + 1;
-	u32 height = visarea.top() + visarea.bottom() + 1;
+	rectangle const visarea = screen.visible_area();
+	u32 const xextent = visarea.right() + visarea.left() + 1; // x0 + x1 + 1 for calculating horizontal centre as (x0 + x1 + 1) >> 1
+	u32 const yextent = visarea.bottom() + visarea.top() + 1; // y0 + y1 + 1 for calculating vertical centre as (y0 + y1 + 1) >> 1
 
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)
 	{
 		// iterate to handle wraparound
-		int scrollx = effective_rowscroll(0, width);
-		int scrolly = effective_colscroll(0, height);
+		int scrollx = effective_rowscroll(0, xextent);
+		int scrolly = effective_colscroll(0, yextent);
 		for (int ypos = scrolly - m_height; ypos <= blit.cliprect.bottom(); ypos += m_height)
 			for (int xpos = scrollx - m_width; xpos <= blit.cliprect.right(); xpos += m_width)
 				draw_instance(screen, dest, blit, xpos, ypos);
@@ -974,7 +978,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 		// iterate over Y to handle wraparound
 		int rowheight = m_height / m_scrollrows;
-		int scrolly = effective_colscroll(0, height);
+		int scrolly = effective_colscroll(0, yextent);
 		for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
 		{
 			int const firstrow = std::max((original_cliprect.top() - ypos) / rowheight, 0);
@@ -985,9 +989,9 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 			for (int currow = firstrow; currow <= lastrow; currow = nextrow)
 			{
 				// scan forward until we find a non-matching row
-				int scrollx = effective_rowscroll(currow, width);
+				int scrollx = effective_rowscroll(currow, xextent);
 				for (nextrow = currow + 1; nextrow <= lastrow; nextrow++)
-					if (effective_rowscroll(nextrow, width) != scrollx)
+					if (effective_rowscroll(nextrow, xextent) != scrollx)
 						break;
 
 				// skip if disabled
@@ -1011,15 +1015,15 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		const rectangle original_cliprect = blit.cliprect;
 
 		// iterate over columns in the tilemap
-		int scrollx = effective_rowscroll(0, width);
+		int scrollx = effective_rowscroll(0, xextent);
 		int colwidth = m_width / m_scrollcols;
 		int nextcol;
 		for (int curcol = 0; curcol < m_scrollcols; curcol = nextcol)
 		{
 			// scan forward until we find a non-matching column
-			int scrolly = effective_colscroll(curcol, height);
+			int scrolly = effective_colscroll(curcol, yextent);
 			for (nextcol = curcol + 1; nextcol < m_scrollcols; nextcol++)
-				if (effective_colscroll(nextcol, height) != scrolly)
+				if (effective_colscroll(nextcol, yextent) != scrolly)
 					break;
 
 			// skip if disabled
@@ -1080,6 +1084,8 @@ void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const
 
 g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	// configure the blit parameters
+	assert(dest.cliprect().contains(cliprect));
+	assert(screen.cliprect().contains(cliprect));
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
 
@@ -1627,14 +1633,14 @@ tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, d
 //  write: Main memory writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(tilemap_device::write8)
+void tilemap_device::write8(offs_t offset, u8 data)
 {
 	m_basemem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tilemap_device::write16)
+void tilemap_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_basemem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
@@ -1643,7 +1649,7 @@ WRITE16_MEMBER(tilemap_device::write16)
 		mark_tile_dirty(offset + 1);
 }
 
-WRITE32_MEMBER(tilemap_device::write32)
+void tilemap_device::write32(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_basemem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;
@@ -1664,14 +1670,14 @@ WRITE32_MEMBER(tilemap_device::write32)
 //  write_entry_ext: Extension memory writes
 //-------------------------------------------------
 
-WRITE8_MEMBER(tilemap_device::write8_ext)
+void tilemap_device::write8_ext(offs_t offset, u8 data)
 {
 	m_extmem.write8(offset, data);
 	offset /= m_bytes_per_entry;
 	mark_tile_dirty(offset);
 }
 
-WRITE16_MEMBER(tilemap_device::write16_ext)
+void tilemap_device::write16_ext(offs_t offset, u16 data, u16 mem_mask)
 {
 	m_extmem.write16(offset, data, mem_mask);
 	offset = offset * 2 / m_bytes_per_entry;
@@ -1680,7 +1686,7 @@ WRITE16_MEMBER(tilemap_device::write16_ext)
 		mark_tile_dirty(offset + 1);
 }
 
-WRITE32_MEMBER(tilemap_device::write32_ext)
+void tilemap_device::write32_ext(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_extmem.write32(offset, data, mem_mask);
 	offset = offset * 4 / m_bytes_per_entry;

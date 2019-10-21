@@ -23,7 +23,7 @@ voltage_regulator_device::voltage_regulator_device(const machine_config &mconfig
 	device_t(mconfig, VOLTAGE_REGULATOR, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),
-	m_output(0)
+	m_output(0x7fff)
 {
 }
 

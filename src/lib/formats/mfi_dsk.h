@@ -1,7 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
-#ifndef MFI_DSK_H
-#define MFI_DSK_H
+#ifndef MAME_FORMATS_MFI_DSK_H
+#define MAME_FORMATS_MFI_DSK_H
+
+#pragma once
 
 #include "flopimg.h"
 
@@ -49,4 +51,4 @@ private:
 
 extern const floppy_format_type FLOPPY_MFI_FORMAT;
 
-#endif /* MFI_DSK_H */
+#endif // MAME_FORMATS_MFI_DSK_H

@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
@@ -73,8 +74,8 @@
 class apc_state : public driver_device
 {
 public:
-	apc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	apc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hgdc1(*this, "upd7220_chr"),
 		m_hgdc2(*this, "upd7220_btm"),
@@ -309,7 +310,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_pit->read(space, (offset & 6) >> 1);
+		res = m_pit->read((offset & 6) >> 1);
 	else
 	{
 		if(offset & 4)
@@ -318,7 +319,7 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 			res = 0xff;
 		}
 		else
-			res = m_i8259_s->read(space, (offset & 2) >> 1);
+			res = m_i8259_s->read((offset & 2) >> 1);
 	}
 
 	return res;
@@ -327,13 +328,13 @@ READ8_MEMBER(apc_state::apc_port_28_r)
 WRITE8_MEMBER(apc_state::apc_port_28_w)
 {
 	if(offset & 1)
-		m_pit->write(space, (offset & 6) >> 1, data);
+		m_pit->write((offset & 6) >> 1, data);
 	else
 	{
 		if(offset & 4)
 			printf("Write undefined port %02x\n",offset+0x28);
 		else
-			m_i8259_s->write(space, (offset & 2) >> 1, data);
+			m_i8259_s->write((offset & 2) >> 1, data);
 	}
 }
 
@@ -343,9 +344,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 	uint8_t res;
 
 	if(offset & 1)
-		res = m_hgdc2->read(space, (offset & 2) >> 1); // upd7220 bitmap port
+		res = m_hgdc2->read((offset & 2) >> 1); // upd7220 bitmap port
 	else
-		res = m_hgdc1->read(space, (offset & 2) >> 1); // upd7220 character port
+		res = m_hgdc1->read((offset & 2) >> 1); // upd7220 character port
 
 	return res;
 }
@@ -353,9 +354,9 @@ READ8_MEMBER(apc_state::apc_gdc_r)
 WRITE8_MEMBER(apc_state::apc_gdc_w)
 {
 	if(offset & 1)
-		m_hgdc2->write(space, (offset & 2) >> 1,data); // upd7220 bitmap port
+		m_hgdc2->write((offset & 2) >> 1,data); // upd7220 bitmap port
 	else
-		m_hgdc1->write(space, (offset & 2) >> 1,data); // upd7220 character port
+		m_hgdc1->write((offset & 2) >> 1,data); // upd7220 character port
 }
 
 READ8_MEMBER(apc_state::apc_kbd_r)
@@ -415,12 +416,12 @@ CH3_EXA ==      0X3E                      ; CH-3 extended address (W)
 
 READ8_MEMBER(apc_state::apc_dma_r)
 {
-	return m_dmac->read(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), 0xff);
+	return m_dmac->read(bitswap<4>(offset,2,1,0,3));
 }
 
 WRITE8_MEMBER(apc_state::apc_dma_w)
 {
-	m_dmac->write(space, bitswap<8>(offset,7,6,5,4,2,1,0,3), data, 0xff);
+	m_dmac->write(bitswap<4>(offset,2,1,0,3), data);
 }
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)
@@ -488,16 +489,16 @@ void apc_state::apc_map(address_map &map)
 {
 	map(0x00000, 0x9ffff).ram();
 	map(0xa0000, 0xa0fff).ram().share("cmos");
-//  AM_RANGE(0xa1000, 0xbffff) mirror CMOS
-//  AM_RANGE(0xc0000, 0xcffff) standard character ROM
+//  map(0xa1000, 0xbffff) mirror CMOS
+//  map(0xc0000, 0xcffff) standard character ROM
 	map(0xd8000, 0xd9fff).ram().region("aux_pcg", 0); // AUX character RAM
-//  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
+//  map(0xe0000, 0xeffff) Special Character RAM
 	map(0xfe000, 0xfffff).rom().region("ipl", 0);
 }
 
 void apc_state::apc_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0x00, 0x1f).rw(FUNC(apc_state::apc_dma_r), FUNC(apc_state::apc_dma_w)).umask16(0xff00);
 	map(0x20, 0x23).rw(m_i8259_m, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // i8259
 	map(0x28, 0x2f).rw(FUNC(apc_state::apc_port_28_r), FUNC(apc_state::apc_port_28_w)); // i8259 (even) / pit8253 (odd)
@@ -513,8 +514,8 @@ void apc_state::apc_io(address_map &map)
 //  0x5b, Power Off
 //  0x5e  APU status/command
 	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
-//  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
-//  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+//  map(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
+//  map(0x70, 0x76).rw("upd7220_btm", FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 //  0x71, 0x77 IDA Controller
 //  0x80, 0x90 Communication Adapter
 //  0xf0, 0xf6 ASOP Controller
@@ -525,7 +526,7 @@ INPUT_CHANGED_MEMBER(apc_state::key_stroke)
 {
 	if(newval && !oldval)
 	{
-		m_keyb.data = (uint8_t)(uintptr_t)(param) & 0xff;
+		m_keyb.data = uint8_t(param & 0xff);
 		//m_keyb.status &= ~1;
 		m_i8259_m->ir4_w(1);
 	}
@@ -935,13 +936,13 @@ static void apc_floppies(device_slot_interface &device)
 	device.option_add("8", FLOPPY_8_DSDD);
 }
 
-MACHINE_CONFIG_START(apc_state::apc)
-
+void apc_state::apc(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu,I8086,MAIN_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(apc_map)
-	MCFG_DEVICE_IO_MAP(apc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_master", pic8259_device, inta_cb)
+	I8086(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apc_state::apc_map);
+	m_maincpu->set_addrmap(AS_IO, &apc_state::apc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(MAIN_CLOCK); // heartbeat IRQ
@@ -970,15 +971,15 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_dmac->out_dack_callback<2>().set(FUNC(apc_state::apc_dack2_w));
 	m_dmac->out_dack_callback<3>().set(FUNC(apc_state::apc_dack3_w));
 
-	MCFG_NVRAM_ADD_1FILL(m_cmos)
-	MCFG_UPD1990A_ADD(m_rtc, XTAL(32'768), NOOP, NOOP)
+	NVRAM(config, m_cmos, nvram_device::DEFAULT_ALL_1);
+	UPD1990A(config, m_rtc);
 
-	MCFG_UPD765A_ADD(m_fdc, true, true)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_i8259_s, pic8259_device, ir4_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_dmac, am9517a_device, dreq1_w))
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats)
-	MCFG_SOFTWARE_LIST_ADD("disk_list","apc")
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	m_fdc->intrq_wr_callback().set(m_i8259_s, FUNC(pic8259_device::ir4_w));
+	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
+	FLOPPY_CONNECTOR(config, m_fdc_connector[0], apc_floppies, "8", apc_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_fdc_connector[1], apc_floppies, "8", apc_floppy_formats);
+	SOFTWARE_LIST(config, "disk_list").set_original("apc");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -988,23 +989,22 @@ MACHINE_CONFIG_START(apc_state::apc)
 	m_screen->set_size(640, 494);
 	m_screen->set_visarea(0*8, 640-1, 0*8, 494-1);
 
-	MCFG_PALETTE_ADD_3BIT_BRG(m_palette)
+	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_apc)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_apc);
 
-	MCFG_DEVICE_ADD(m_hgdc1, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_1_map)
-	MCFG_UPD7220_DRAW_TEXT_CALLBACK_OWNER(apc_state, hgdc_draw_text)
+	UPD7220(config, m_hgdc1, 3579545); // unk clock
+	m_hgdc1->set_addrmap(0, &apc_state::upd7220_1_map);
+	m_hgdc1->set_draw_text(FUNC(apc_state::hgdc_draw_text));
 
-	MCFG_DEVICE_ADD(m_hgdc2, UPD7220, 3579545) // unk clock
-	MCFG_DEVICE_ADDRESS_MAP(0, upd7220_2_map)
-	MCFG_UPD7220_DISPLAY_PIXELS_CALLBACK_OWNER(apc_state, hgdc_display_pixels)
+	UPD7220(config, m_hgdc2, 3579545); // unk clock
+	m_hgdc2->set_addrmap(0, &apc_state::upd7220_2_map);
+	m_hgdc2->set_display_pixels(FUNC(apc_state::hgdc_display_pixels));
 
 	/* sound hardware */
 	SPEAKER(config, m_speaker).front_center();
-	MCFG_DEVICE_ADD(m_sound, UPD1771C, MAIN_CLOCK) //uPD1771C-006
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_CONFIG_END
+	UPD1771C(config, m_sound, MAIN_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.00); //uPD1771C-006
+}
 
 
 /***************************************************************************

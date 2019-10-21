@@ -274,9 +274,8 @@ private:
 
 void omegrace_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
-	m_dvg->reset_w(space, 0, 0);
+	m_dvg->reset_w();
 }
 
 
@@ -289,7 +288,8 @@ void omegrace_state::machine_reset()
 
 READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
 {
-	m_dvg->go_w(space, 0, 0);
+	if (!machine().side_effects_disabled())
+		m_dvg->go_w();
 	return 0;
 }
 
@@ -356,7 +356,7 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 
 WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -373,7 +373,7 @@ void omegrace_state::main_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x4bff).ram();
 	map(0x5c00, 0x5cff).ram().share("nvram"); /* NVRAM */
-	map(0x8000, 0x8fff).ram().share("vectorram").region("maincpu", 0x8000); /* vector ram */
+	map(0x8000, 0x8fff).ram().share("dvg:vectorram").region("maincpu", 0x8000); /* vector ram */
 	map(0x9000, 0x9fff).rom(); /* vector rom */
 }
 
@@ -502,7 +502,7 @@ static INPUT_PORTS_START( omegrace )
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_COCKTAIL
 
 	PORT_START("AVGDVG")    /* port 0x0b */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("dvg", dvg_device, done_r)
 INPUT_PORTS_END
 
 
@@ -513,55 +513,53 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(omegrace_state::omegrace)
-
+void omegrace_state::omegrace(machine_config &config)
+{
 	/* basic machine hardware */
 
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'000'000)/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(port_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, irq0_line_hold, 250)
+	Z80(config, m_maincpu, XTAL(12'000'000)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &omegrace_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &omegrace_state::port_map);
+	m_maincpu->set_periodic_int(FUNC(omegrace_state::irq0_line_hold), attotime::from_hz(250));
 
 	/* audio CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_IO_MAP(sound_port)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(omegrace_state, nmi_line_pulse, 250)
+	Z80(config, m_audiocpu, XTAL(12'000'000)/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &omegrace_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &omegrace_state::sound_port);
+	m_audiocpu->set_periodic_int(FUNC(omegrace_state::nmi_line_pulse), attotime::from_hz(250));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_VECTOR_ADD("vector")
-	MCFG_SCREEN_ADD("screen", VECTOR)
-	MCFG_SCREEN_REFRESH_RATE(40)
-	MCFG_SCREEN_SIZE(400, 300)
-	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
-	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
+	VECTOR(config, "vector", 0);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_VECTOR));
+	screen.set_refresh_hz(40);
+	screen.set_size(400, 300);
+	screen.set_visarea(522, 1566, 522, 1566);
+	screen.set_screen_update("vector", FUNC(vector_device::screen_update));
 
-	MCFG_DEVICE_ADD("dvg", DVG, 0)
-	MCFG_AVGDVG_VECTOR("vector")
+	DVG(config, m_dvg, 0);
+	m_dvg->set_vector_tag("vector");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	MCFG_DEVICE_ADD("ay1", AY8912, XTAL(12'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, "ay1", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, XTAL(12'000'000)/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8912(config, "ay2", XTAL(12'000'000)/12).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 
@@ -583,7 +581,7 @@ ROM_START( omegrace )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -599,7 +597,7 @@ ROM_START( omegrace2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "o.r.r._audio_6-1-81.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -615,7 +613,7 @@ ROM_START( deltrace )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "sound.k5",     0x0000, 0x0800, CRC(7d426017) SHA1(370f0fb5608819de873c845f6010cbde75a9818e) )
 
-	ROM_REGION( 0x100, "user1", 0 )
+	ROM_REGION( 0x100, "dvg:prom", 0 )
 	ROM_LOAD( "dvgprom.bin",    0x0000, 0x0100, CRC(d481e958) SHA1(d8790547dc539e25984807573097b61ec3ffe614) )
 ROM_END
 
@@ -628,8 +626,8 @@ ROM_END
 
 void omegrace_state::init_omegrace()
 {
-	int len = memregion("user1")->bytes();
-	uint8_t *prom = memregion("user1")->base();
+	int len = memregion("dvg:prom")->bytes();
+	uint8_t *prom = memregion("dvg:prom")->base();
 
 	/* Omega Race has two pairs of the state PROM output
 	 * lines swapped before going into the decoder.

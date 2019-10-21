@@ -6,12 +6,13 @@
 
        Format code for gtp cassette files
 */
+#ifndef MAME_FORMATS_GTP_CAS_H
+#define MAME_FORMATS_GTP_CAS_H
 
-#ifndef GTP_CAS_H
-#define GTP_CAS_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(gtp_cassette_formats);
 
-#endif /* GTP_CAS_H */
+#endif // MAME_FORMATS_GTP_CAS_H

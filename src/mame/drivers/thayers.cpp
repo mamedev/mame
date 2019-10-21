@@ -52,8 +52,8 @@ public:
 
 	void thayers(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_enter_r);
+	DECLARE_READ_LINE_MEMBER(laserdisc_ready_r);
 
 private:
 	enum
@@ -133,7 +133,7 @@ void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		check_interrupt();
 		break;
 	default:
-		assert_always(false, "Unknown id in thayers_state::device_timer");
+		throw emu_fatalerror("Unknown id in thayers_state::device_timer");
 	}
 }
 
@@ -651,14 +651,14 @@ void thayers_state::thayers_io_map(address_map &map)
 
 /* Input Ports */
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
+READ_LINE_MEMBER(thayers_state::laserdisc_enter_r)
 {
 	if (m_pr7820 != nullptr) return m_pr7820_enter;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
+READ_LINE_MEMBER(thayers_state::laserdisc_ready_r)
 {
 	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;
@@ -702,8 +702,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(thayers_state, laserdisc_enter_r)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(thayers_state, laserdisc_ready_r)
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("1 YES") PORT_CODE(KEYCODE_1)
@@ -798,39 +798,42 @@ void thayers_state::machine_reset()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(thayers_state::thayers)
-
+void thayers_state::thayers(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(thayers_map)
-	MCFG_DEVICE_IO_MAP(thayers_io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &thayers_state::thayers_map);
+	m_maincpu->set_addrmap(AS_IO, &thayers_state::thayers_io_map);
 
-	MCFG_DEVICE_ADD("mcu", COP421, XTAL(4'000'000)/2) // COP421L-PCA/N
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false )
-	MCFG_COP400_READ_L_CB(READ8(*this, thayers_state, cop_l_r))
-	MCFG_COP400_WRITE_L_CB(WRITE8(*this, thayers_state, cop_l_w))
-	MCFG_COP400_READ_G_CB(READ8(*this, thayers_state, cop_g_r))
-	MCFG_COP400_WRITE_G_CB(WRITE8(*this, thayers_state, cop_g_w))
-	MCFG_COP400_WRITE_D_CB(WRITE8(*this, thayers_state, cop_d_w))
-	MCFG_COP400_READ_SI_CB(READLINE(*this, thayers_state, kbdata_r))
-	MCFG_COP400_WRITE_SO_CB(WRITELINE(*this, thayers_state, kbclk_w))
-
-	MCFG_LASERDISC_PR7820_ADD("laserdisc")
+	cop421_cpu_device &mcu(COP421(config, "mcu", XTAL(4'000'000)/2)); // COP421L-PCA/N
+	mcu.set_config(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false);
+	mcu.read_l().set(FUNC(thayers_state::cop_l_r));
+	mcu.write_l().set(FUNC(thayers_state::cop_l_w));
+	mcu.read_g().set(FUNC(thayers_state::cop_g_r));
+	mcu.write_g().set(FUNC(thayers_state::cop_g_w));
+	mcu.write_d().set(FUNC(thayers_state::cop_d_w));
+	mcu.read_si().set(FUNC(thayers_state::kbdata_r));
+	mcu.write_so().set(FUNC(thayers_state::kbclk_w));
 
 	/* video hardware */
-	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
+	PIONEER_PR7820(config, m_pr7820, 0);
+	m_pr7820->set_screen("screen");
 
-	MCFG_PALETTE_ADD("palette", 256)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	screen.set_screen_update("laserdisc", FUNC(laserdisc_device::screen_update));
+
+	PALETTE(config, "palette").set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 	// SSI 263 @ 2MHz
 
-	MCFG_DEVICE_MODIFY("laserdisc")
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	m_pr7820->add_route(0, "lspeaker", 1.0);
+	m_pr7820->add_route(1, "rspeaker", 1.0);
+}
 
 /* ROMs */
 

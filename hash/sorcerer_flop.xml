@@ -8,23 +8,24 @@
 		<publisher>Exidy</publisher>
 		<part name="flop1" interface="floppy_8"><!-- appears as "Inc. v2.1 (1978)(Digital Research)" in TOSEC -->
 			<dataarea name="flop" size="332640">
-				<rom name="cpm disk1.dsk" size="332640" crc="6e4f423c" sha1="debe6a5c92a639adb03a19baa41586c5ca6db025" offset="0" />
+				<rom name="cpm disk1.dsk" size="332640" crc="6e4f423c" sha1="debe6a5c92a639adb03a19baa41586c5ca6db025"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_8">
 			<dataarea name="flop" size="332640">
-				<rom name="cpm disk2.dsk" size="332640" crc="a0e6d67d" sha1="cd83048854ddfa86719c4834ba792be98c37b99b" offset="0" />
+				<rom name="cpm disk2.dsk" size="332640" crc="a0e6d67d" sha1="cd83048854ddfa86719c4834ba792be98c37b99b"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="remconv">
+	<!-- This is a text file, not a disk. To be removed when we figure out swlists for text files that paste in. -->
+	<software name="remconv" supported="no">
 		<description>REM Converted to Exidy Basic</description>
 		<year>19??</year>
 		<publisher>Pete Turnbull</publisher>
 		<part name="flop1" interface="floppy_8">
 			<dataarea name="flop" size="1287">
-				<rom name="rem converted to exidy basic (19xx)(pete turnbull).dsk" size="1287" crc="e9291825" sha1="6e0ebaefd0c0bfb731a0e28ae085e165a80aa8c8" offset="0" />
+				<rom name="rem converted to exidy basic (19xx)(pete turnbull).dsk" size="1287" crc="e9291825" sha1="6e0ebaefd0c0bfb731a0e28ae085e165a80aa8c8"/>
 			</dataarea>
 		</part>
 	</software>

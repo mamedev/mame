@@ -66,57 +66,6 @@
 #define SIO_CHANA_TAG   "cha"
 #define SIO_CHANB_TAG   "chb"
 
-/* Generic macros */
-#define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_int_callback(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_CPU(_cputag)                            \
-	downcast<z80sio_device &>(*device).set_cputag(_cputag);
-
-// Port A callbacks
-#define MCFG_Z80SIO_OUT_TXDA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txd_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_DTRA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_dtr_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RTSA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rts_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_WRDYA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_wrdy_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_SYNCA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_sync_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RXDRQA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rxdrq_callback<0>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_TXDRQA_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txdrq_callback<0>(DEVCB_##_devcb);
-
-// Port B callbacks
-#define MCFG_Z80SIO_OUT_TXDB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txd_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_DTRB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_dtr_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RTSB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rts_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_WRDYB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_wrdy_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_SYNCB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_sync_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RXDRQB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_rxdrq_callback<1>(DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_TXDRQB_CB(_devcb) \
-	downcast<z80sio_device &>(*device).set_out_txdrq_callback<1>(DEVCB_##_devcb);
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -218,8 +167,19 @@ protected:
 	enum : uint8_t
 	{
 		TX_FLAG_CRC     = 1U << 0,  // include in checksum calculation
-		TX_FLAG_FRAMING = 1U << 1,  // tranmitting framing bits
-		TX_FLAG_SPECIAL = 1U << 2   // transmitting checksum or abort sequence
+		TX_FLAG_FRAMING = 1U << 1,  // transmitting framing bits
+		TX_FLAG_ABORT_TX= 1U << 2,  // transmitting abort sequence
+		TX_FLAG_CRC_TX  = 1U << 3,  // transmitting CRC value
+		TX_FLAG_DATA_TX = 1U << 4   // transmitting frame data
+	};
+
+	// Sync/SDLC FSM states
+	enum
+	{
+		SYNC_FSM_HUNT = 0,  // Hunt for start sync/flag
+		SYNC_FSM_EVICT = 1, // Evict flag from sync SR
+		SYNC_FSM_1ST_CHAR = 2,  // Receiving 1st character
+		SYNC_FSM_IN_FRAME = 3   // Inside a frame
 	};
 
 	z80sio_channel(
@@ -242,7 +202,6 @@ protected:
 	int get_clock_mode();
 	int get_rx_word_length();
 	int get_tx_word_length() const;
-	int get_tx_word_length(uint8_t data) const;
 
 	// receiver state
 	int m_rx_fifo_depth;
@@ -251,26 +210,37 @@ protected:
 
 	int m_rx_clock;     // receive clock line state
 	int m_rx_count;     // clocks until next sample
+	bool m_dlyd_rxd;    // delayed RxD
 	int m_rx_bit;       // receive data bit (0 = start bit, 1 = LSB, etc.)
+	int m_rx_bit_limit; // bits to assemble for next character (sync/SDLC)
+	int m_rx_sync_fsm;  // Sync/SDLC FSM state
+	uint8_t m_rx_one_cnt;   // SDLC: counter to delete stuffed zeros
 	uint16_t m_rx_sr;   // receive shift register
+	uint8_t m_rx_sync_sr;   // rx sync SR
+	uint8_t m_rx_crc_delay; // rx CRC delay SR
+	uint16_t m_rx_crc;  // rx CRC accumulator
+	bool m_rx_crc_en;   // rx CRC enabled
+	bool m_rx_parity;   // accumulated parity
 
 	int m_rx_first;     // first character received
-	int m_rx_break;     // receive break condition
 
 	int m_rxd;
-	int m_sh;           // sync hunt
 
 	// transmitter state
 	uint8_t m_tx_data;
 
 	int m_tx_clock;     // transmit clock line state
 	int m_tx_count;     // clocks until next bit transition
-	int m_tx_bits;      // remaining bits in shift register
-	int m_tx_parity;    // parity bit position or zero if disabled
-	uint16_t m_tx_sr;   // transmit shift register
+	bool m_tx_phase;    // phase of bit clock
+	bool m_tx_parity;   // accumulated parity
+	bool m_tx_in_pkt;   // In active part of packet (sync mode)
+	bool m_tx_forced_sync;  // Force sync/flag
+	uint32_t m_tx_sr;   // transmit shift register
 	uint16_t m_tx_crc;  // calculated transmit checksum
 	uint8_t m_tx_hist;  // transmit history (for bitstuffing)
 	uint8_t m_tx_flags; // internal transmit control flags
+	uint8_t m_tx_delay; // 2-bit tx delay (4 half-bits)
+	uint8_t m_all_sent_delay;   // SR for all-sent delay
 
 	int m_txd;
 	int m_dtr;          // data terminal ready
@@ -298,17 +268,24 @@ private:
 	bool transmit_allowed() const;
 
 	void receive_enabled();
+	void enter_hunt_mode();
 	void sync_receive();
+	void sdlc_receive();
 	void receive_data();
 	void queue_received(uint16_t data, uint32_t error);
 	void advance_rx_fifo();
+	uint8_t get_special_rx_mask() const;
 
+	bool is_tx_idle() const;
 	void transmit_enable();
 	void transmit_complete();
 	void async_tx_setup();
 	void sync_tx_sr_empty();
-	void tx_setup(uint16_t data, int bits, int parity, bool framing, bool special);
+	void tx_setup(uint16_t data, int bits, bool framing, bool crc_tx, bool abort_tx);
 	void tx_setup_idle();
+	bool get_tx_empty() const;
+	void set_tx_empty(bool prev_state, bool new_state);
+	void update_crc(uint16_t& crc , bool bit);
 
 	void reset_ext_status();
 	void read_ext();
@@ -338,15 +315,6 @@ public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <unsigned N, class Object> devcb_base &set_out_txd_callback(Object &&cb) { return m_out_txd_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_dtr_callback(Object &&cb) { return m_out_dtr_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_rts_callback(Object &&cb) { return m_out_rts_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_wrdy_callback(Object &&cb) { return m_out_wrdy_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_sync_callback(Object &&cb) { return m_out_sync_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_int_callback(Object &&cb) { return m_out_int_cb.set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_rxdrq_callback(Object &&cb) { return m_out_rxdrq_cb[N].set_callback(std::forward<Object>(cb)); }
-	template <unsigned N, class Object> devcb_base &set_out_txdrq_callback(Object &&cb) { return m_out_txdrq_cb[N].set_callback(std::forward<Object>(cb)); }
-
 	auto out_txda_callback() { return m_out_txd_cb[0].bind(); }
 	auto out_txdb_callback() { return m_out_txd_cb[1].bind(); }
 	auto out_dtra_callback() { return m_out_dtr_cb[0].bind(); }
@@ -365,20 +333,20 @@ public:
 
 	template <typename T> void set_cputag(T &&tag) { m_hostcpu.set_tag(std::forward<T>(tag)); }
 
-	DECLARE_READ8_MEMBER( cd_ba_r );
-	DECLARE_WRITE8_MEMBER( cd_ba_w );
-	DECLARE_READ8_MEMBER( ba_cd_r );
-	DECLARE_WRITE8_MEMBER( ba_cd_w );
+	uint8_t cd_ba_r(offs_t offset);
+	void cd_ba_w(offs_t offset, uint8_t data);
+	uint8_t ba_cd_r(offs_t offset);
+	void ba_cd_w(offs_t offset, uint8_t data);
 
-	DECLARE_READ8_MEMBER( da_r ) { return m_chanA->data_read(); }
-	DECLARE_WRITE8_MEMBER( da_w ) { m_chanA->data_write(data); }
-	DECLARE_READ8_MEMBER( db_r ) { return m_chanB->data_read(); }
-	DECLARE_WRITE8_MEMBER( db_w ) { m_chanB->data_write(data); }
+	uint8_t da_r() { return m_chanA->data_read(); }
+	void da_w(uint8_t data) { m_chanA->data_write(data); }
+	uint8_t db_r() { return m_chanB->data_read(); }
+	void db_w(uint8_t data) { m_chanB->data_write(data); }
 
-	DECLARE_READ8_MEMBER( ca_r ) { return m_chanA->control_read(); }
-	DECLARE_WRITE8_MEMBER( ca_w ) { m_chanA->control_write(data); }
-	DECLARE_READ8_MEMBER( cb_r ) { return m_chanB->control_read(); }
-	DECLARE_WRITE8_MEMBER( cb_w ) { m_chanB->control_write(data); }
+	uint8_t ca_r() { return m_chanA->control_read(); }
+	void ca_w(uint8_t data) { m_chanA->control_write(data); }
+	uint8_t cb_r() { return m_chanB->control_read(); }
+	void cb_w(uint8_t data) { m_chanB->control_write(data); }
 
 	// interrupt acknowledge
 	virtual int m1_r();

@@ -18,49 +18,47 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(vulgus_state, vulgus)
+void vulgus_state::vulgus_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < 256;i++)
+	for (int i = 0; i < 256; i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0,bit1,bit2,bit3;
 
 		bit0 = (color_prom[0] >> 0) & 0x01;
 		bit1 = (color_prom[0] >> 1) & 0x01;
 		bit2 = (color_prom[0] >> 2) & 0x01;
 		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		bit0 = (color_prom[256] >> 0) & 0x01;
 		bit1 = (color_prom[256] >> 1) & 0x01;
 		bit2 = (color_prom[256] >> 2) & 0x01;
 		bit3 = (color_prom[256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 		bit0 = (color_prom[2*256] >> 0) & 0x01;
 		bit1 = (color_prom[2*256] >> 1) & 0x01;
 		bit2 = (color_prom[2*256] >> 2) & 0x01;
 		bit3 = (color_prom[2*256] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-		palette.set_indirect_color(i,rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 		color_prom++;
 	}
 
 	color_prom += 2*256;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
-
-	/* characters use colors 32-47 (?) */
-	for (i = 0;i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity();i++)
+	// characters use colors 32-47 (?)
+	for (int i = 0; i < m_gfxdecode->gfx(0)->colors() * m_gfxdecode->gfx(0)->granularity(); i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i, 32 + *color_prom++);
 
-	/* sprites use colors 16-31 */
-	for (i = 0;i < m_gfxdecode->gfx(2)->colors() * m_gfxdecode->gfx(2)->granularity();i++)
+	// sprites use colors 16-31
+	for (int i = 0; i < m_gfxdecode->gfx(2)->colors() * m_gfxdecode->gfx(2)->granularity(); i++)
 		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i, 16 + *color_prom++);
 
-	/* background tiles use colors 0-15, 64-79, 128-143, 192-207 in four banks */
-	for (i = 0;i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity() / 4;i++)
+	// background tiles use colors 0-15, 64-79, 128-143, 192-207 in four banks
+	for (int i = 0; i < m_gfxdecode->gfx(1)->colors() * m_gfxdecode->gfx(1)->granularity() / 4; i++)
 	{
 		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + 0*32*8 + i, *color_prom);
 		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + 1*32*8 + i, *color_prom + 64);

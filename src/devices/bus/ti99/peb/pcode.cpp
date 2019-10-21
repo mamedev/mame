@@ -93,14 +93,6 @@ namespace bus { namespace ti99 { namespace peb {
 #define PCODE_GROM_TAG "pcode_grom"
 #define PCODE_ROM_TAG "pcode_rom"
 
-#define PGROM0_TAG "grom0"
-#define PGROM1_TAG "grom1"
-#define PGROM2_TAG "grom2"
-#define PGROM3_TAG "grom3"
-#define PGROM4_TAG "grom4"
-#define PGROM5_TAG "grom5"
-#define PGROM6_TAG "grom6"
-#define PGROM7_TAG "grom7"
 #define ACTIVE_TAG "ACTIVE"
 
 #define CRU_BASE 0x1f00
@@ -108,8 +100,9 @@ namespace bus { namespace ti99 { namespace peb {
 ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_P_CODE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_rom(nullptr),
+	m_groms(*this, "grom%u", 0U),
 	m_crulatch(*this, "crulatch"),
+	m_rom(nullptr),
 	m_bank_select(0),
 	m_active(false),
 	m_clock_count(0),
@@ -144,12 +137,12 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 		line_state mline = (state!=0)? ASSERT_LINE : CLEAR_LINE;
 		line_state gsq = m_isgrom? ASSERT_LINE : CLEAR_LINE;
 
-		for (int i=0; i < 8; i++)
-			m_grom[i]->set_lines(mline, a14, gsq);
+		for (auto &grom : m_groms)
+			grom->set_lines(mline, a14, gsq);
 	}
 }
 
-void ti_pcode_card_device::debugger_read(address_space& space, uint16_t offset, uint8_t& value)
+void ti_pcode_card_device::debugger_read(uint16_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
 	if (m_active && ((offset & m_select_mask)==m_select_value))
@@ -167,7 +160,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 	// Care for debugger
 	if (machine().side_effects_disabled())
 	{
-		debugger_read(space, offset, *value);
+		debugger_read(offset, *value);
 	}
 
 	if (m_active && m_inDsrArea && m_selected)
@@ -181,7 +174,8 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 		{
 			if (m_isgrom)
 			{
-				for (auto& elem : m_grom) elem->readz(value);
+				for (auto &grom : m_groms)
+					grom->readz(value);
 				LOGMASKED(LOG_GROM, "Read from grom %04x: %02x\n", m_address&0xffff, *value);
 			}
 			else
@@ -206,12 +200,13 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
     Write a byte in P-Code ROM space. This is only used for setting the
     GROM address.
 */
-WRITE8_MEMBER( ti_pcode_card_device::write )
+void ti_pcode_card_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 	if (m_active && m_isgrom && m_selected)
 	{
-		for (auto & elem : m_grom) elem->write(data);
+		for (auto &grom : m_groms)
+			grom->write(data);
 	}
 }
 
@@ -235,7 +230,8 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
 	{
 		// Toggle
 		m_clockhigh = !m_clockhigh;
-		for (auto & elem : m_grom) elem->gclock_in(m_clockhigh? ASSERT_LINE : CLEAR_LINE);
+		for (auto &grom : m_groms)
+			grom->gclock_in(m_clockhigh ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -257,7 +253,7 @@ READ8Z_MEMBER(ti_pcode_card_device::crureadz)
     A8, A13, and A14 so bit 0 is at 0x1f00, but bit 4 is at 0x1f80. Accordingly,
     bit 7 would be 0x1f86 but it is not used.
 */
-WRITE8_MEMBER(ti_pcode_card_device::cruwrite)
+void ti_pcode_card_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==CRU_BASE)
 		m_crulatch->write_bit((offset & 0x80) >> 5 | (offset & 0x06) >> 1, data);
@@ -276,14 +272,6 @@ WRITE_LINE_MEMBER(ti_pcode_card_device::ekrpg_w)
 
 void ti_pcode_card_device::device_start()
 {
-	m_grom[0] = downcast<tmc0430_device*>(subdevice(PGROM0_TAG));
-	m_grom[1] = downcast<tmc0430_device*>(subdevice(PGROM1_TAG));
-	m_grom[2] = downcast<tmc0430_device*>(subdevice(PGROM2_TAG));
-	m_grom[3] = downcast<tmc0430_device*>(subdevice(PGROM3_TAG));
-	m_grom[4] = downcast<tmc0430_device*>(subdevice(PGROM4_TAG));
-	m_grom[5] = downcast<tmc0430_device*>(subdevice(PGROM5_TAG));
-	m_grom[6] = downcast<tmc0430_device*>(subdevice(PGROM6_TAG));
-	m_grom[7] = downcast<tmc0430_device*>(subdevice(PGROM7_TAG));
 	m_rom = memregion(PCODE_ROM_TAG)->base();
 
 	save_item(NAME(m_bank_select));
@@ -335,7 +323,7 @@ INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
 
 INPUT_PORTS_START( ti99_pcode )
 	PORT_START( ACTIVE_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, nullptr)
+	PORT_DIPNAME( 0x01, 0x00, "P-Code activation switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, ti_pcode_card_device, switch_changed, 0)
 		PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 		PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -358,20 +346,15 @@ ROM_START( ti99_pcode )
 	ROM_LOAD("pcode_rom1.u18", 0x1000, 0x2000, CRC(46a06b8b) SHA1(24e2608179921aef312cdee6f455e3f46deb30d0)) /* TI P-Code card rom4764 */
 ROM_END
 
-MACHINE_CONFIG_START(ti_pcode_card_device::device_add_mconfig)
-	MCFG_GROM_ADD( PGROM0_TAG, 0, PCODE_GROM_TAG, 0x0000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM1_TAG, 1, PCODE_GROM_TAG, 0x2000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM2_TAG, 2, PCODE_GROM_TAG, 0x4000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM3_TAG, 3, PCODE_GROM_TAG, 0x6000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM4_TAG, 4, PCODE_GROM_TAG, 0x8000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM5_TAG, 5, PCODE_GROM_TAG, 0xa000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM6_TAG, 6, PCODE_GROM_TAG, 0xc000, WRITELINE(*this, ti_pcode_card_device, ready_line))
-	MCFG_GROM_ADD( PGROM7_TAG, 7, PCODE_GROM_TAG, 0xe000, WRITELINE(*this, ti_pcode_card_device, ready_line))
+void ti_pcode_card_device::device_add_mconfig(machine_config &config)
+{
+	for (unsigned i = 0; m_groms.size() > i; ++i)
+		TMC0430(config, m_groms[i], PCODE_GROM_TAG, 0x2000 * i, i).ready_cb().set(FUNC(ti_pcode_card_device::ready_line));
 
-	MCFG_DEVICE_ADD("crulatch", LS259, 0) // U12
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, ti_pcode_card_device, pcpage_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, ti_pcode_card_device, ekrpg_w))
-MACHINE_CONFIG_END
+	LS259(config, m_crulatch); // U12
+	m_crulatch->q_out_cb<0>().set(FUNC(ti_pcode_card_device::pcpage_w));
+	m_crulatch->q_out_cb<4>().set(FUNC(ti_pcode_card_device::ekrpg_w));
+}
 
 const tiny_rom_entry *ti_pcode_card_device::device_rom_region() const
 {

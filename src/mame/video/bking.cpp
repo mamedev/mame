@@ -30,55 +30,50 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(bking_state, bking)
+void bking_state::bking_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances_rg[3] = { 220, 390, 820 };
-	static const int resistances_b [2] = { 220, 390 };
-	double rweights[3], gweights[3], bweights[2];
-	int i;
+	static constexpr int resistances_rg[3] = { 220, 390, 820 };
+	static constexpr int resistances_b [2] = { 220, 390 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[3], gweights[3], bweights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			3, &resistances_rg[0], rweights, 0, 0,
 			3, &resistances_rg[0], gweights, 0, 0,
 			2, &resistances_b[0],  bweights, 0, 0);
 
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		uint16_t pen;
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* color PROM A7-A8 is the palette select */
-		if (i < 0x20)
-			/* characters - image bits go to A0-A2 of the color PROM */
+		// color PROM A7-A8 is the palette select
+		if (i < 0x20) // characters - image bits go to A0-A2 of the color PROM
 			pen = (((i - 0x00) << 4) & 0x180) | ((i - 0x00) & 0x07);
-		else if (i < 0x30)
-			/* crow - image bits go to A5-A6. */
+		else if (i < 0x30) // crow - image bits go to A5-A6.
 			pen = (((i - 0x20) << 5) & 0x180) | (((i - 0x20) & 0x03) << 5);
-		else if (i < 0x38)
-			/* ball #1 - image bit goes to A3 */
+		else if (i < 0x38) // ball #1 - image bit goes to A3
 			pen = (((i - 0x30) << 6) & 0x180) | (((i - 0x30) & 0x01) << 3);
-		else
-			/* ball #2 - image bit goes to A4 */
+		else // ball #2 - image bit goes to A4
 			pen = (((i - 0x38) << 6) & 0x180) | (((i - 0x38) & 0x01) << 4);
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[pen] >> 0) & 0x01;
 		bit1 = (color_prom[pen] >> 1) & 0x01;
 		bit2 = (color_prom[pen] >> 2) & 0x01;
-		r = combine_3_weights(rweights, bit0, bit1, bit2);
+		int const r = combine_weights(rweights, bit0, bit1, bit2);
 
-		/* green component */
+		// green component
 		bit0 = (color_prom[pen] >> 3) & 0x01;
 		bit1 = (color_prom[pen] >> 4) & 0x01;
 		bit2 = (color_prom[pen] >> 5) & 0x01;
-		g = combine_3_weights(gweights, bit0, bit1, bit2);
+		int const g = combine_weights(gweights, bit0, bit1, bit2);
 
-		/* blue component */
+		// blue component
 		bit0 = (color_prom[pen] >> 6) & 0x01;
 		bit1 = (color_prom[pen] >> 7) & 0x01;
-		b = combine_2_weights(gweights, bit0, bit1);
+		int const b = combine_weights(gweights, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}

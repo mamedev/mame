@@ -45,15 +45,16 @@
 #include "h8.h"
 #include "h8_intc.h"
 
-#define MCFG_H8_WATCHDOG_ADD( _tag, intc, irq, type )   \
-	MCFG_DEVICE_ADD( _tag, H8_WATCHDOG, 0 ) \
-	downcast<h8_watchdog_device *>(device)->set_info(intc, irq, type);
-
 class h8_watchdog_device : public device_t {
 public:
 	enum { B, H, S };
 
 	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_watchdog_device(const machine_config &mconfig, const char *tag, device_t *owner, const char *intc, int irq, int type)
+		: h8_watchdog_device(mconfig, tag, owner, 0)
+	{
+		set_info(intc, irq, type);
+	}
 
 	void set_info(const char *intc, int irq, int type);
 

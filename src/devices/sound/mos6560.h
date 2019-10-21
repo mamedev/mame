@@ -87,9 +87,6 @@ class mos6560_device : public device_t,
 public:
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_potx_rd_callback(Object &&cb) { return m_read_potx.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_poty_rd_callback(Object &&cb) { return m_read_poty.set_callback(std::forward<Object>(cb)); }
-
 	auto potx_rd_callback() { return m_read_potx.bind(); }
 	auto poty_rd_callback() { return m_read_poty.bind(); }
 

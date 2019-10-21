@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* this should probably be k054156.c and k054156_device (the base management device) */
+/* this should probably be k054156.cpp and k054156_device (the base management device) */
 
 /***************************************************************************/
 /*                                                                         */
@@ -191,7 +191,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	//*m_pixmap[K056832_PAGE_COUNT],
 	//m_regs[0x20],
 	//m_regsb[4],
-	m_rombase(*this, finder_base::DUMMY_TAG),
+	m_rombase(*this, DEVICE_SELF),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
 	m_gfx_num(0),
@@ -327,9 +327,6 @@ void k056832_device::finalize_init()
 	save_item(NAME(m_use_ext_linescroll));
 	save_item(NAME(m_uses_tile_banks));
 	save_item(NAME(m_cur_tile_bank));
-
-
-	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
 }
 
 
@@ -635,7 +632,7 @@ int k056832_device::rom_read_b( int offset, int blksize, int blksize2, int zeros
 }
 
 
-READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
+u16 k056832_device::k_5bpp_rom_word_r(offs_t offset, u16 mem_mask)
 {
 	if (mem_mask == 0xff00)
 		return rom_read_b(offset * 2, 4, 5, 0)<<8;
@@ -646,7 +643,7 @@ READ16_MEMBER( k056832_device::k_5bpp_rom_word_r )
 	return 0;
 }
 
-READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
+u32 k056832_device::k_5bpp_rom_long_r(offs_t offset, u32 mem_mask)
 {
 	if (mem_mask == 0xff000000)
 		return rom_read_b(offset * 4, 4, 5, 0) << 24;
@@ -661,7 +658,7 @@ READ32_MEMBER( k056832_device::k_5bpp_rom_long_r )
 	return 0;
 }
 
-READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
+u32 k056832_device::k_6bpp_rom_long_r(offs_t offset, u32 mem_mask)
 {
 	if (mem_mask == 0xff000000)
 		return rom_read_b(offset * 4, 4, 6, 0) << 24;
@@ -676,7 +673,7 @@ READ32_MEMBER( k056832_device::k_6bpp_rom_long_r )
 	return 0;
 }
 
-READ8_MEMBER( k056832_device::konmedal_rom_r )
+u8 k056832_device::konmedal_rom_r(offs_t offset)
 {
 	uint32_t addr = ((m_regs[0x1b] << 7) | ((m_regs[0x1a] & 0xc) * 0x800)) + offset;
 
@@ -684,7 +681,7 @@ READ8_MEMBER( k056832_device::konmedal_rom_r )
 }
 
 
-READ16_MEMBER( k056832_device::piratesh_rom_r )
+u16 k056832_device::piratesh_rom_r(offs_t offset)
 {
 	uint32_t addr = 0x2000 * m_cur_gfx_banks + offset;
 
@@ -692,7 +689,7 @@ READ16_MEMBER( k056832_device::piratesh_rom_r )
 }
 
 
-READ16_MEMBER( k056832_device::rom_word_r )
+u16 k056832_device::rom_word_r(offs_t offset)
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
@@ -701,7 +698,7 @@ READ16_MEMBER( k056832_device::rom_word_r )
 
 // data is arranged like this:
 // 0000 1111 22 0000 1111 22
-READ16_MEMBER( k056832_device::mw_rom_word_r )
+u16 k056832_device::mw_rom_word_r(offs_t offset)
 {
 	int bank = 10240 * m_cur_gfx_banks;
 	int addr;
@@ -761,35 +758,29 @@ READ16_MEMBER( k056832_device::mw_rom_word_r )
 
 }
 
-READ16_MEMBER( k056832_device::bishi_rom_word_r )
+u16 k056832_device::bishi_rom_word_r(offs_t offset)
 {
 	int addr = 0x4000 * m_cur_gfx_banks + offset;
 
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
-READ16_MEMBER( k056832_device::rom_word_8000_r )
+u16 k056832_device::rom_word_8000_r(offs_t offset)
 {
 	int addr = 0x8000 * m_cur_gfx_banks + 2 * offset;
 
 	return m_rombase[addr + 2] | (m_rombase[addr] << 8);
 }
 
-READ16_MEMBER( k056832_device::old_rom_word_r )
+u16 k056832_device::old_rom_word_r(offs_t offset)
 {
 	int addr = 0x2000 * m_cur_gfx_banks + 2 * offset;
 
 	return m_rombase[addr + 1] | (m_rombase[addr] << 8);
 }
 
-READ32_MEMBER( k056832_device::rom_long_r )
-{
-	offset <<= 1;
-	return (rom_word_r(space, offset + 1, 0xffff) | (rom_word_r(space, offset, 0xffff) << 16));
-}
-
 /* only one page is mapped to videoram at a time through a window */
-READ16_MEMBER( k056832_device::ram_word_r )
+u16 k056832_device::ram_word_r(offs_t offset)
 {
 	// reading from tile RAM resets the ROM readback "half" offset
 	m_rom_half = 0;
@@ -797,65 +788,41 @@ READ16_MEMBER( k056832_device::ram_word_r )
 	return m_videoram[m_selected_page_x4096 + offset];
 }
 
-READ16_MEMBER( k056832_device::ram_half_word_r )
+u16 k056832_device::ram_half_word_r(offs_t offset)
 {
 	return m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | ((offset >> 11) ^ 1))];
 }
 
-
-
-
-
-READ32_MEMBER( k056832_device::ram_long_r )
+u16 k056832_device::unpaged_ram_word_r(offs_t offset)
 {
-	uint16_t *pMem = &m_videoram[m_selected_page_x4096 + offset * 2];
-
 	// reading from tile RAM resets the ROM readback "half" offset
 	m_rom_half = 0;
 
-	return (pMem[0]<<16 | pMem[1]);
-}
-
-READ32_MEMBER( k056832_device::unpaged_ram_long_r )
-{
-	uint16_t *pMem = &m_videoram[offset * 2];
-
-	// reading from tile RAM resets the ROM readback "half" offset
-	m_rom_half = 0;
-
-	return (pMem[0]<<16 | pMem[1]);
+	return m_videoram[offset];
 }
 
 /* special 8-bit handlers for Lethal Enforcers */
-READ8_MEMBER( k056832_device::ram_code_lo_r )
+u8 k056832_device::ram_code_lo_r(offs_t offset)
 {
-	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
-
-	return *adr & 0xff;
+	return m_videoram[m_selected_page_x4096 + (offset * 2) + 1] & 0xff;
 }
 
-READ8_MEMBER( k056832_device::ram_code_hi_r )
+u8 k056832_device::ram_code_hi_r(offs_t offset)
 {
-	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
-
-	return *adr >> 8;
+	return m_videoram[m_selected_page_x4096 + (offset * 2) + 1] >> 8;
 }
 
-READ8_MEMBER( k056832_device::ram_attr_lo_r )
+u8 k056832_device::ram_attr_lo_r(offs_t offset)
 {
-	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
-
-	return *adr & 0xff;
+	return m_videoram[m_selected_page_x4096 + (offset * 2)] & 0xff;
 }
 
-READ8_MEMBER( k056832_device::ram_attr_hi_r )
+u8 k056832_device::ram_attr_hi_r(offs_t offset)
 {
-	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
-
-	return *adr >> 8;
+	return m_videoram[m_selected_page_x4096 + (offset * 2)] >> 8;
 }
 
-WRITE8_MEMBER( k056832_device::ram_code_lo_w )
+void k056832_device::ram_code_lo_w(offs_t offset, u8 data)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
@@ -871,7 +838,7 @@ WRITE8_MEMBER( k056832_device::ram_code_lo_w )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::ram_code_hi_w )
+void k056832_device::ram_code_hi_w(offs_t offset, u8 data)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2) + 1];
 
@@ -887,7 +854,7 @@ WRITE8_MEMBER( k056832_device::ram_code_hi_w )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
+void k056832_device::ram_attr_lo_w(offs_t offset, u8 data)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
@@ -903,7 +870,7 @@ WRITE8_MEMBER( k056832_device::ram_attr_lo_w )
 	}
 }
 
-WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
+void k056832_device::ram_attr_hi_w(offs_t offset, u8 data)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (offset * 2)];
 
@@ -919,14 +886,11 @@ WRITE8_MEMBER( k056832_device::ram_attr_hi_w )
 	}
 }
 
-WRITE16_MEMBER( k056832_device::ram_word_w )
+void k056832_device::ram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t *tile_ptr;
-	uint16_t old_mask, old_data;
-
-	tile_ptr = &m_videoram[m_selected_page_x4096 + offset];
-	old_mask = ~mem_mask;
-	old_data = *tile_ptr;
+	uint16_t *tile_ptr = &m_videoram[m_selected_page_x4096 + offset];
+	const uint16_t old_mask = ~mem_mask;
+	const uint16_t old_data = *tile_ptr;
 	data = (data & mem_mask) | (old_data & old_mask);
 
 	if(data != old_data)
@@ -941,12 +905,10 @@ WRITE16_MEMBER( k056832_device::ram_word_w )
 	}
 }
 
-
-
-WRITE16_MEMBER( k056832_device::ram_half_word_w )
+void k056832_device::ram_half_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	uint16_t *adr = &m_videoram[m_selected_page_x4096 + (((offset << 1) & 0xffe) | 1)];
-	uint16_t old = *adr;
+	const uint16_t old = *adr;
 
 	COMBINE_DATA(adr);
 	if(*adr != old)
@@ -962,45 +924,18 @@ WRITE16_MEMBER( k056832_device::ram_half_word_w )
 	}
 }
 
-WRITE32_MEMBER( k056832_device::ram_long_w )
-{
-	uint16_t *tile_ptr;
-	uint32_t old_mask, old_data;
 
-	tile_ptr = &m_videoram[m_selected_page_x4096 + offset * 2];
-	old_mask = ~mem_mask;
-	old_data = (uint32_t)tile_ptr[0] << 16 | (uint32_t)tile_ptr[1];
+void k056832_device::unpaged_ram_word_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	uint16_t *tile_ptr = &m_videoram[offset];
+	const uint16_t old_mask = ~mem_mask;
+	const uint16_t old_data = *tile_ptr;
 	data = (data & mem_mask) | (old_data & old_mask);
 
 	if (data != old_data)
 	{
-		tile_ptr[0] = data >> 16;
-		tile_ptr[1] = data;
-
-		if (m_page_tile_mode[m_selected_page])
-			m_tilemap[m_selected_page]->mark_tile_dirty(offset);
-		else
-			mark_line_dirty(m_selected_page, offset);
-	}
-}
-
-
-
-
-WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
-{
-	uint16_t *tile_ptr;
-	uint32_t old_mask, old_data;
-
-	tile_ptr = &m_videoram[offset * 2];
-	old_mask = ~mem_mask;
-	old_data = (uint32_t)tile_ptr[0] << 16 | (uint32_t)tile_ptr[1];
-	data = (data & mem_mask) | (old_data & old_mask);
-
-	if (data != old_data)
-	{
-		tile_ptr[0] = data >> 16;
-		tile_ptr[1] = data;
+		offset >>= 1;
+		*tile_ptr = data;
 
 		if (m_page_tile_mode[offset/0x800])
 			m_tilemap[offset/0x800]->mark_tile_dirty(offset&0x7ff);
@@ -1009,14 +944,13 @@ WRITE32_MEMBER( k056832_device::unpaged_ram_long_w )
 	}
 }
 
-WRITE16_MEMBER( k056832_device::word_w )
+void k056832_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	int layer, flip, mask, i;
-	uint32_t old_data, new_data;
 
-	old_data = m_regs[offset];
+	const uint16_t old_data = m_regs[offset];
 	COMBINE_DATA(&m_regs[offset]);
-	new_data = m_regs[offset];
+	const uint16_t new_data = m_regs[offset];
 
 	if (new_data != old_data)
 	{
@@ -1130,18 +1064,7 @@ WRITE16_MEMBER( k056832_device::word_w )
 }
 
 
-WRITE32_MEMBER( k056832_device::long_w )
-{
-	// GX does access of all 3 widths (8/16/32) so we can't do the
-	// if (ACCESSING_xxx) trick.  in particular, 8-bit writes
-	// are used to the tilemap bank register.
-	offset <<= 1;
-	word_w(space, offset, data >> 16, mem_mask >> 16);
-	word_w(space, offset + 1, data, mem_mask);
-}
-
-
-WRITE16_MEMBER( k056832_device::b_word_w )
+void k056832_device::b_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	assert(offset < ARRAY_LENGTH(m_regsb));
 	COMBINE_DATA(&m_regsb[offset]);
@@ -1150,39 +1073,27 @@ WRITE16_MEMBER( k056832_device::b_word_w )
 
 
 
-WRITE8_MEMBER( k056832_device::write )
+void k056832_device::write(offs_t offset, u8 data)
 {
 	if (offset & 1)
 	{
-		word_w(space, (offset >> 1), data, 0x00ff);
+		word_w((offset >> 1), data, 0x00ff);
 	}
 	else
 	{
-		word_w(space, (offset >> 1), data << 8, 0xff00);
+		word_w((offset >> 1), data << 8, 0xff00);
 	}
 }
 
-WRITE8_MEMBER( k056832_device::b_w )
+void k056832_device::b_w(offs_t offset, u8 data)
 {
 	if (offset & 1)
 	{
-		b_word_w(space, (offset >> 1), data, 0x00ff);
+		b_word_w((offset >> 1), data, 0x00ff);
 	}
 	else
 	{
-		b_word_w(space, (offset >> 1), data<<8, 0xff00);
-	}
-}
-
-WRITE32_MEMBER( k056832_device::b_long_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		b_word_w(space, offset << 1, data >> 16, mem_mask >> 16);
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		b_word_w(space, (offset << 1) + 1, data, mem_mask);
+		b_word_w((offset >> 1), data<<8, 0xff00);
 	}
 }
 
@@ -1214,7 +1125,7 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 			m_all_lines_dirty[page] = 0;
 
 			// force tilemap into a clean, static state
-			// *really ugly but it minimizes alteration to tilemap.c
+			// *really ugly but it minimizes alteration to tilemap.cpp
 			memset(&zerorect, 0, sizeof(rectangle));    // zero dimension
 			tmap->draw(screen, bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
 			xprmap.fill(0);                     // reset pixel transparency_bitmap;
@@ -1942,7 +1853,7 @@ int k056832_device::read_register( int regnum )
 	return(m_regs[regnum]);
 }
 
-void k056832_device::postload()
+void k056832_device::device_post_load()
 {
 	update_page_layout();
 	change_rambank();
@@ -1951,18 +1862,12 @@ void k056832_device::postload()
 
 //misc debug handlers
 
-READ32_MEMBER( k056832_device::long_r )
-{
-	offset <<= 1;
-	return (word_r(space, offset + 1, 0xffff) | word_r(space, offset, 0xffff) << 16);
-}
-
-READ16_MEMBER( k056832_device::word_r )
+u16 k056832_device::word_r(offs_t offset)
 {
 	return (m_regs[offset]);
 }       // VACSET
 
-READ16_MEMBER( k056832_device::b_word_r )
+u16 k056832_device::b_word_r(offs_t offset)
 {
 	return (m_regsb[offset]);
 }   // VSCCS (board dependent)
@@ -2152,7 +2057,7 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 			m_all_lines_dirty[page] = 0;
 
 			// force tilemap into a clean, static state
-			// *really ugly but it minimizes alteration to tilemap.c
+			// *really ugly but it minimizes alteration to tilemap.cpp
 			memset (&zerorect, 0, sizeof(rectangle));   // zero dimension
 			tmap->draw(screen, bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
 			xprmap.fill(0);                     // reset pixel transparency_bitmap;

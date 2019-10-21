@@ -33,16 +33,14 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_WRITE8_MEMBER(pb_w) override;
+	virtual void pb_w(uint8_t data) override;
 
 private:
-	required_memory_region m_rom;
 	required_device<sp0256_device> m_nsp;
 };
 

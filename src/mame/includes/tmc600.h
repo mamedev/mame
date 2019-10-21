@@ -43,7 +43,7 @@ public:
 		m_page_ram(*this, "page_ram"),
 		m_color_ram(*this, "color_ram"),
 		m_run(*this, "RUN"),
-		m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
+		m_key_row(*this, "Y%u", 0)
 	{ }
 
 	void tmc600(machine_config &config);
@@ -75,6 +75,7 @@ private:
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_WRITE8_MEMBER( sc_w );
+	DECLARE_WRITE8_MEMBER( out3_w );
 	DECLARE_WRITE_LINE_MEMBER( prd_w );
 
 	uint8_t get_color(uint16_t pma);
@@ -85,6 +86,7 @@ private:
 	bool m_blink;                // cursor blink
 	int m_frame;
 	bool m_rtc_int;
+	u8 m_out3;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);

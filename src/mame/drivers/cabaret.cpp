@@ -30,6 +30,7 @@ are the same of IGS.  AMT may be previous IGS name.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class cabaret_state : public driver_device
@@ -365,47 +366,46 @@ INTERRUPT_GEN_MEMBER(cabaret_state::cabaret_interrupt)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(cabaret_state::cabaret)
+void cabaret_state::cabaret(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(cabaret_map)
-	MCFG_DEVICE_IO_MAP(cabaret_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cabaret_state, cabaret_interrupt)
+	Z80180(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &cabaret_state::cabaret_map);
+	m_maincpu->set_addrmap(AS_IO, &cabaret_state::cabaret_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(cabaret_state::cabaret_interrupt));
 
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS2"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("SERVICE"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("COINS"))
+	i8255_device &ppi1(I8255(config, "ppi1"));
+	ppi1.in_pa_callback().set_ioport("BUTTONS2");
+	ppi1.in_pb_callback().set_ioport("SERVICE");
+	ppi1.in_pc_callback().set_ioport("COINS");
 
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("BUTTONS1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cabaret_state, ppi2_b_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cabaret_state, ppi2_c_w))
+	i8255_device &ppi2(I8255(config, "ppi2"));
+	ppi2.in_pa_callback().set_ioport("BUTTONS1");
+	ppi2.out_pb_callback().set(FUNC(cabaret_state::ppi2_b_w));
+	ppi2.out_pc_callback().set(FUNC(cabaret_state::ppi2_c_w));
 
-	MCFG_DEVICE_ADD("ppi3", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, cabaret_state, nmi_and_coins_w))
-	MCFG_I8255_TRISTATE_PORTA_CB(CONSTANT(0xf0))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("DSW1"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW2"))
+	i8255_device &ppi3(I8255(config, "ppi3"));
+	ppi3.out_pa_callback().set(FUNC(cabaret_state::nmi_and_coins_w));
+	ppi3.tri_pa_callback().set_constant(0xf0);
+	ppi3.in_pb_callback().set_ioport("DSW1");
+	ppi3.in_pc_callback().set_ioport("DSW2");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cabaret_state, screen_update_cabaret)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(cabaret_state::screen_update_cabaret));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cabaret)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cabaret);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymsnd", YM2413, XTAL(3'579'545))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 void cabaret_state::init_cabaret()

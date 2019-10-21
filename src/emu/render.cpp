@@ -111,22 +111,6 @@ static const render_quad_texuv oriented_texcoords[8] =
 	{ { 1,1 }, { 1,0 }, { 0,1 }, { 0,0 } }      // ORIENTATION_SWAP_XY | ORIENTATION_FLIP_X | ORIENTATION_FLIP_Y
 };
 
-// layer orders
-static constexpr std::pair<item_layer, int> layer_order_standard[]{
-		{ ITEM_LAYER_SCREEN,    -1 }, // FIXME: invalid blend mode - we're relying on the goodness of the OSD
-		{ ITEM_LAYER_OVERLAY,   BLENDMODE_RGB_MULTIPLY },
-		{ ITEM_LAYER_BACKDROP,  BLENDMODE_ADD },
-		{ ITEM_LAYER_BEZEL,     BLENDMODE_ALPHA },
-		{ ITEM_LAYER_CPANEL,    BLENDMODE_ALPHA },
-		{ ITEM_LAYER_MARQUEE,   BLENDMODE_ALPHA } };
-static constexpr std::pair<item_layer, int> layer_order_alternate[]{
-		{ ITEM_LAYER_BACKDROP,  BLENDMODE_ALPHA },
-		{ ITEM_LAYER_SCREEN,    BLENDMODE_ADD },
-		{ ITEM_LAYER_OVERLAY,   BLENDMODE_RGB_MULTIPLY },
-		{ ITEM_LAYER_BEZEL,     BLENDMODE_ALPHA },
-		{ ITEM_LAYER_CPANEL,    BLENDMODE_ALPHA },
-		{ ITEM_LAYER_MARQUEE,   BLENDMODE_ALPHA } };
-
 
 
 //**************************************************************************
@@ -176,25 +160,6 @@ inline void normalize_bounds(render_bounds &bounds)
 		std::swap(bounds.y0, bounds.y1);
 }
 
-
-//-------------------------------------------------
-//  get_layer_and_blendmode - return the
-//  appropriate layer index and blendmode
-//-------------------------------------------------
-
-inline item_layer get_layer_and_blendmode(layout_view &view, int index, int &blendmode)
-{
-	//  if we have multiple backdrop pieces and no overlays, render:
-	//      backdrop (add) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
-	//  else render:
-	//      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
-
-	std::pair<item_layer, int> const *const layer_order(((view.items(ITEM_LAYER_BACKDROP).size() > 1) && view.items(ITEM_LAYER_OVERLAY).empty()) ? layer_order_alternate : layer_order_standard);
-
-	// select the layer and blend mode
-	blendmode = layer_order[index].second;
-	return layer_order[index].first;
-}
 
 //**************************************************************************
 //  RENDER PRIMITIVE
@@ -323,7 +288,8 @@ render_texture::render_texture()
 		m_next(nullptr),
 		m_bitmap(nullptr),
 		m_format(TEXFORMAT_ARGB32),
-		m_osddata(~0L),
+		m_id(~0ULL),
+		m_old_id(~0ULL),
 		m_scaler(nullptr),
 		m_param(nullptr),
 		m_curseq(0)
@@ -357,7 +323,8 @@ void render_texture::reset(render_manager &manager, texture_scaler_func scaler, 
 		m_scaler = scaler;
 		m_param = param;
 	}
-	m_osddata = ~0L;
+	m_old_id = m_id;
+	m_id = ~0L;
 }
 
 
@@ -394,7 +361,7 @@ void render_texture::set_bitmap(bitmap_t &bitmap, const rectangle &sbounds, text
 	assert(bitmap.cliprect().contains(sbounds));
 
 	// ensure we have a valid palette for palettized modes
-	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
+	if (format == TEXFORMAT_PALETTE16)
 		assert(bitmap.palette() != nullptr);
 
 	// invalidate references to the old bitmap
@@ -444,10 +411,13 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 	int sheight = m_sbounds.height();
 
 	// ensure height/width are non-zero
-	if (dwidth < 1) dwidth = 1;
-	if (dheight < 1) dheight = 1;
+	if (dwidth == 0) dwidth = 1;
+	if (dheight == 0) dheight = 1;
 
-	texinfo.osddata = m_osddata;
+	texinfo.unique_id = m_id;
+	texinfo.old_id = m_old_id;
+	if (m_old_id != ~0ULL)
+		m_old_id = ~0ULL;
 
 	// are we scaler-free? if so, just return the source bitmap
 	if (m_scaler == nullptr || (m_bitmap != nullptr && swidth == dwidth && sheight == dheight))
@@ -490,7 +460,8 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 			for (scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
 				if ((lowest == -1 || m_scaled[scalenum].seqid < m_scaled[lowest].seqid) && !primlist.has_reference(m_scaled[scalenum].bitmap))
 					lowest = scalenum;
-			assert_always(lowest != -1, "Too many live texture instances!");
+			if (-1 == lowest)
+				throw emu_fatalerror("render_texture::get_scaled: Too many live texture instances!");
 
 			// throw out any existing entries
 			scaled = &m_scaled[lowest];
@@ -525,18 +496,17 @@ void render_texture::get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo
 //  palette for a texture
 //-------------------------------------------------
 
-const rgb_t *render_texture::get_adjusted_palette(render_container &container)
+const rgb_t *render_texture::get_adjusted_palette(render_container &container, u32 &out_length)
 {
 	// override the palette with our adjusted palette
 	switch (m_format)
 	{
 		case TEXFORMAT_PALETTE16:
-		case TEXFORMAT_PALETTEA16:
 
 			assert(m_bitmap->palette() != nullptr);
 
 			// return our adjusted palette
-			return container.bcg_lookup_table(m_format, m_bitmap->palette());
+			return container.bcg_lookup_table(m_format, out_length, m_bitmap->palette());
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
@@ -545,7 +515,7 @@ const rgb_t *render_texture::get_adjusted_palette(render_container &container)
 			// if no adjustment necessary, return nullptr
 			if (!container.has_brightness_contrast_gamma_changes())
 				return nullptr;
-			return container.bcg_lookup_table(m_format);
+			return container.bcg_lookup_table(m_format, out_length);
 
 		default:
 			assert(false);
@@ -709,12 +679,11 @@ float render_container::apply_brightness_contrast_gamma_fp(float value)
 //  given texture mode
 //-------------------------------------------------
 
-const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palette)
+const rgb_t *render_container::bcg_lookup_table(int texformat, u32 &out_length, palette_t *palette)
 {
 	switch (texformat)
 	{
 		case TEXFORMAT_PALETTE16:
-		case TEXFORMAT_PALETTEA16:
 			if (m_palclient == nullptr) // if adjusted palette hasn't been created yet, create it
 			{
 				m_palclient = std::make_unique<palette_client>(*palette);
@@ -722,14 +691,17 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 				recompute_lookups();
 			}
 			assert (palette == &m_palclient->palette());
+			out_length = palette->max_index();
 			return &m_bcglookup[0];
 
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
+			out_length = 256;
 			return m_bcglookup256;
 
 		default:
+			out_length = 0;
 			return nullptr;
 	}
 }
@@ -936,11 +908,6 @@ template <typename T> render_target::render_target(render_manager &manager, T &&
 	, m_transform_container(true)
 {
 	// determine the base layer configuration based on options
-	m_base_layerconfig.set_backdrops_enabled(manager.machine().options().use_backdrops());
-	m_base_layerconfig.set_overlays_enabled(manager.machine().options().use_overlays());
-	m_base_layerconfig.set_bezels_enabled(manager.machine().options().use_bezels());
-	m_base_layerconfig.set_cpanels_enabled(manager.machine().options().use_cpanels());
-	m_base_layerconfig.set_marquees_enabled(manager.machine().options().use_marquees());
 	m_base_layerconfig.set_zoom_to_screen(manager.machine().options().artwork_crop());
 
 	// aspect and scale options
@@ -1291,40 +1258,38 @@ void render_target::compute_minimum_size(s32 &minwidth, s32 &minheight)
 		throw emu_fatalerror("Mandatory artwork is missing");
 
 	// scan the current view for all screens
-	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; ++layer)
+	for (layout_view::item &curitem : m_curview->items())
 	{
-		// iterate over items in the layer
-		for (layout_view::item &curitem : m_curview->items(layer))
-			if (curitem.screen())
+		if (curitem.screen())
+		{
+			// use a hard-coded default visible area for vector screens
+			screen_device *const screen = curitem.screen();
+			const rectangle vectorvis(0, 639, 0, 479);
+			const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
+
+			// apply target orientation to the bounds
+			render_bounds bounds = curitem.bounds();
+			apply_orientation(bounds, m_orientation);
+			normalize_bounds(bounds);
+
+			// based on the orientation of the screen container, check the bitmap
+			float xscale, yscale;
+			if (!(orientation_add(m_orientation, screen->container().orientation()) & ORIENTATION_SWAP_XY))
 			{
-				// use a hard-coded default visible area for vector screens
-				screen_device *const screen = curitem.screen();
-				const rectangle vectorvis(0, 639, 0, 479);
-				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
-
-				// apply target orientation to the bounds
-				render_bounds bounds = curitem.bounds();
-				apply_orientation(bounds, m_orientation);
-				normalize_bounds(bounds);
-
-				// based on the orientation of the screen container, check the bitmap
-				float xscale, yscale;
-				if (!(orientation_add(m_orientation, screen->container().orientation()) & ORIENTATION_SWAP_XY))
-				{
-					xscale = float(visarea.width()) / bounds.width();
-					yscale = float(visarea.height()) / bounds.height();
-				}
-				else
-				{
-					xscale = float(visarea.height()) / bounds.width();
-					yscale = float(visarea.width()) / bounds.height();
-				}
-
-				// pick the greater
-				maxxscale = std::max(xscale, maxxscale);
-				maxyscale = std::max(yscale, maxyscale);
-				screens_considered++;
+				xscale = float(visarea.width()) / bounds.width();
+				yscale = float(visarea.height()) / bounds.height();
 			}
+			else
+			{
+				xscale = float(visarea.height()) / bounds.width();
+				yscale = float(visarea.width()) / bounds.height();
+			}
+
+			// pick the greater
+			maxxscale = std::max(xscale, maxxscale);
+			maxyscale = std::max(yscale, maxyscale);
+			screens_considered++;
+		}
 	}
 
 	// if there were no screens considered, pick a nominal default
@@ -1373,42 +1338,33 @@ render_primitive_list &render_target::get_primitives()
 	root_xform.orientation = m_orientation;
 	root_xform.no_center = false;
 
-	// iterate over layers back-to-front, but only if we're running
+	// iterate over items in the view, but only if we're running
 	if (m_manager.machine().phase() >= machine_phase::RESET)
-		for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
+		for (layout_view::item &curitem : m_curview->items())
 		{
-			int blendmode;
-			item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
-			if (m_curview->layer_enabled(layer))
-			{
-				// iterate over items in the layer
-				for (layout_view::item &curitem : m_curview->items(layer))
-				{
-					// first apply orientation to the bounds
-					render_bounds bounds = curitem.bounds();
-					apply_orientation(bounds, root_xform.orientation);
-					normalize_bounds(bounds);
+			// first apply orientation to the bounds
+			render_bounds bounds = curitem.bounds();
+			apply_orientation(bounds, root_xform.orientation);
+			normalize_bounds(bounds);
 
-					// apply the transform to the item
-					object_transform item_xform;
-					item_xform.xoffs = root_xform.xoffs + bounds.x0 * root_xform.xscale;
-					item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
-					item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
-					item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-					item_xform.color.r = curitem.color().r * root_xform.color.r;
-					item_xform.color.g = curitem.color().g * root_xform.color.g;
-					item_xform.color.b = curitem.color().b * root_xform.color.b;
-					item_xform.color.a = curitem.color().a * root_xform.color.a;
-					item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
-					item_xform.no_center = false;
+			// apply the transform to the item
+			object_transform item_xform;
+			item_xform.xoffs = root_xform.xoffs + bounds.x0 * root_xform.xscale;
+			item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
+			item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
+			item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
+			item_xform.color.r = curitem.color().r * root_xform.color.r;
+			item_xform.color.g = curitem.color().g * root_xform.color.g;
+			item_xform.color.b = curitem.color().b * root_xform.color.b;
+			item_xform.color.a = curitem.color().a * root_xform.color.a;
+			item_xform.orientation = orientation_add(curitem.orientation(), root_xform.orientation);
+			item_xform.no_center = false;
 
-					// if there is no associated element, it must be a screen element
-					if (curitem.screen() != nullptr)
-						add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), blendmode);
-					else
-						add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), blendmode);
-				}
-			}
+			// if there is no associated element, it must be a screen element
+			if (curitem.screen() != nullptr)
+				add_container_primitives(list, root_xform, item_xform, curitem.screen()->container(), curitem.blend_mode());
+			else
+				add_element_primitives(list, item_xform, *curitem.element(), curitem.state(), curitem.blend_mode());
 		}
 
 	// if we are not in the running stage, draw an outer box
@@ -1723,15 +1679,6 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 	screen_device_iterator iter(m_manager.machine().root_device());
 	std::vector<screen_info> const screens(std::begin(iter), std::end(iter));
 
-	if (!have_default && !have_artwork)
-	{
-		if (screens.size() == 2U)
-		{
-			load_layout_file(nullptr, layout_dualhsxs);
-			if (m_filelist.empty())
-				throw emu_fatalerror("Couldn't parse default layout??");
-		}
-	}
 
 	if (screens.empty()) // ensure the fallback view for systems with no screens is loaded if necessary
 	{
@@ -1940,6 +1887,47 @@ void render_target::load_additional_layout_files(const char *basename, bool have
 			generate_view("Top-to-Bottom", 1U, false, [] (unsigned x, unsigned y) { return y; });
 			generate_view("Top-to-Bottom (Gapless)", 1U, true, [] (unsigned x, unsigned y) { return y; });
 
+			// generate fake cocktail view for systems with two screens
+			if (screens.size() == 2U)
+			{
+				float const height0(float(screens[0].physical_y()) / screens[0].physical_x());
+				float const height1(float(screens[1].physical_y()) / screens[1].physical_x());
+				float const minor_dim((std::max)((std::min)(height0, 1.0F), (std::min)(height1, 1.0F)));
+
+				util::xml::data_node *const viewnode(layoutnode->add_child("view", nullptr));
+				if (!viewnode)
+					throw emu_fatalerror("Couldn't create XML node??");
+				viewnode->set_attribute("name", "Cocktail");
+
+				util::xml::data_node *const mirrornode(viewnode->add_child("screen", nullptr));
+				if (!mirrornode)
+					throw emu_fatalerror("Couldn't create XML node??");
+				mirrornode->set_attribute_int("index", 1);
+				util::xml::data_node *const mirrorbounds(mirrornode->add_child("bounds", nullptr));
+				if (!mirrorbounds)
+					throw emu_fatalerror("Couldn't create XML node??");
+				mirrorbounds->set_attribute_int("x", 0);
+				mirrorbounds->set_attribute_float("y", (-0.01 * minor_dim) - height1);
+				mirrorbounds->set_attribute_int("width", 1);
+				mirrorbounds->set_attribute_float("height", height1);
+				util::xml::data_node *const flipper(mirrornode->add_child("orientation", nullptr));
+				if (!flipper)
+					throw emu_fatalerror("Couldn't create XML node??");
+				flipper->set_attribute_int("rotate", 180);
+
+				util::xml::data_node *const screennode(viewnode->add_child("screen", nullptr));
+				if (!screennode)
+					throw emu_fatalerror("Couldn't create XML node??");
+				screennode->set_attribute_int("index", 0);
+				util::xml::data_node *const screenbounds(screennode->add_child("bounds", nullptr));
+				if (!screenbounds)
+					throw emu_fatalerror("Couldn't create XML node??");
+				screenbounds->set_attribute_int("x", 0);
+				screenbounds->set_attribute_int("y", 0);
+				screenbounds->set_attribute_int("width", 1);
+				screenbounds->set_attribute_float("height", height0);
+			}
+
 			// generate tiled views
 			for (unsigned mindim = 2; ((screens.size() + mindim - 1) / mindim) >= mindim; ++mindim)
 			{
@@ -2073,7 +2061,27 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		return false;
 
 	// read the file
-	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, nullptr));
+	util::xml::parse_options parseopt;
+	util::xml::parse_error parseerr;
+	parseopt.error = &parseerr;
+	util::xml::file::ptr rootnode(util::xml::file::read(layoutfile, &parseopt));
+	if (!rootnode)
+	{
+		if (parseerr.error_message)
+		{
+			osd_printf_warning(
+					"Error parsing XML file '%s' at line %d column %d: %s, ignoring\n",
+					filename,
+					parseerr.error_line,
+					parseerr.error_column,
+					parseerr.error_message);
+		}
+		else
+		{
+			osd_printf_warning("Error parsing XML file '%s', ignorning\n", filename);
+		}
+		return false;
+	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
 	if (!load_layout_file(m_manager.machine().root_device(), dirname, *rootnode))
@@ -2262,7 +2270,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 					curitem.texture()->get_scaled(width, height, prim->texture, list, curitem.flags());
 
 					// set the palette
-					prim->texture.palette = curitem.texture()->get_adjusted_palette(container);
+					prim->texture.palette = curitem.texture()->get_adjusted_palette(container, prim->texture.palette_length);
 
 					// determine UV coordinates
 					prim->texcoords = oriented_texcoords[finalorient];
@@ -2484,38 +2492,30 @@ bool render_target::map_point_internal(s32 target_x, s32 target_y, render_contai
 		return false;
 	}
 
-	// loop through each layer
-	for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
+	// iterate over items in the view
+	for (layout_view::item &item : m_curview->items())
 	{
-		int blendmode;
-		item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
-		if (m_curview->layer_enabled(layer))
+		bool checkit;
+
+		// if we're looking for a particular container, verify that we have the right one
+		if (container != nullptr)
+			checkit = (item.screen() != nullptr && &item.screen()->container() == container);
+
+		// otherwise, assume we're looking for an input
+		else
+			checkit = item.has_input();
+
+		// this target is worth looking at; now check the point
+		if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
 		{
-			// iterate over items in the layer
-			for (layout_view::item &item : m_curview->items(layer))
-			{
-				bool checkit;
-
-				// if we're looking for a particular container, verify that we have the right one
-				if (container != nullptr)
-					checkit = (item.screen() != nullptr && &item.screen()->container() == container);
-
-				// otherwise, assume we're looking for an input
-				else
-					checkit = item.has_input();
-
-				// this target is worth looking at; now check the point
-				if (checkit && target_fx >= item.bounds().x0 && target_fx < item.bounds().x1 && target_fy >= item.bounds().y0 && target_fy < item.bounds().y1)
-				{
-					// point successfully mapped
-					mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
-					mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
-					mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
-					return true;
-				}
-			}
+			// point successfully mapped
+			mapped_x = (target_fx - item.bounds().x0) / (item.bounds().x1 - item.bounds().x0);
+			mapped_y = (target_fy - item.bounds().y0) / (item.bounds().y1 - item.bounds().y0);
+			mapped_input_port = item.input_tag_and_mask(mapped_input_mask);
+			return true;
 		}
 	}
+
 	return false;
 }
 
@@ -2566,6 +2566,8 @@ int render_target::view_index(layout_view &targetview) const
 
 void render_target::config_load(util::xml::data_node const &targetnode)
 {
+	int tmpint;
+
 	// find the view
 	const char *viewname = targetnode.get_attribute_string("view", nullptr);
 	if (viewname != nullptr)
@@ -2582,26 +2584,6 @@ void render_target::config_load(util::xml::data_node const &targetnode)
 		}
 
 	// modify the artwork config
-	int tmpint = targetnode.get_attribute_int("backdrops", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_backdrops_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("overlays", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_overlays_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("bezels", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_bezels_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("cpanels", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_cpanels_enabled(tmpint);
-
-	tmpint = targetnode.get_attribute_int("marquees", -1);
-	if (tmpint == 0 || tmpint == 1)
-		set_marquees_enabled(tmpint);
-
 	tmpint = targetnode.get_attribute_int("zoom", -1);
 	if (tmpint == 0 || tmpint == 1)
 		set_zoom_to_screen(tmpint);
@@ -2656,11 +2638,6 @@ bool render_target::config_save(util::xml::data_node &targetnode)
 	// output the layer config
 	if (m_layerconfig != m_base_layerconfig)
 	{
-		targetnode.set_attribute_int("backdrops", m_layerconfig.backdrops_enabled());
-		targetnode.set_attribute_int("overlays", m_layerconfig.overlays_enabled());
-		targetnode.set_attribute_int("bezels", m_layerconfig.bezels_enabled());
-		targetnode.set_attribute_int("cpanels", m_layerconfig.cpanels_enabled());
-		targetnode.set_attribute_int("marquees", m_layerconfig.marquees_enabled());
 		targetnode.set_attribute_int("zoom", m_layerconfig.zoom_to_screen());
 		changed = true;
 	}
@@ -2738,7 +2715,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 				// make a copy of this extent
 				memmove(&ext[ext[1] + 2], &ext[0], (last - ext) * sizeof(*ext));
 				last += ext[1] + 2;
-				assert_always(last < max, "Ran out of clear extents!\n");
+				if (last >= max)
+					throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 				// split the extent between pieces
 				ext[ext[1] + 2] = -(-ext[0] - diff);
@@ -2758,7 +2736,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 				// make a copy of this extent
 				memmove(&ext[ext[1] + 2], &ext[0], (last - ext) * sizeof(*ext));
 				last += ext[1] + 2;
-				assert_always(last < max, "Ran out of clear extents!\n");
+				if (last >= max)
+					throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 				// split the extent between pieces
 				ext[ext[1] + 2] = -diff;
@@ -2783,7 +2762,8 @@ bool render_target::remove_clear_extent(const render_bounds &bounds)
 					memmove(&xext[2], &xext[0], (last - xext) * sizeof(*xext));
 					last += 2;
 					linelast += 2;
-					assert_always(last < max, "Ran out of clear extents!\n");
+					if (last >= max)
+						throw emu_fatalerror("render_target::remove_clear_extent: Ran out of clear extents!");
 
 					// split this extent into three parts
 					xext[0] = boundsx0 - x0;
@@ -2911,7 +2891,7 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 			case render_primitive::QUAD:
 			{
 				// stop when we hit an alpha texture
-				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32 || PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_PALETTEA16)
+				if (PRIMFLAG_GET_TEXFORMAT(prim.flags) == TEXFORMAT_ARGB32)
 					goto done;
 
 				// if this quad can't be cleanly removed from the extents list, we're done
@@ -2964,6 +2944,7 @@ render_manager::render_manager(running_machine &machine)
 	: m_machine(machine),
 		m_ui_target(nullptr),
 		m_live_textures(0),
+		m_texture_id(0),
 		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
@@ -3128,6 +3109,8 @@ render_texture *render_manager::texture_alloc(texture_scaler_func scaler, void *
 	// allocate a new texture and reset it
 	render_texture *tex = m_texture_allocator.alloc();
 	tex->reset(*this, scaler, param);
+	tex->set_id(m_texture_id);
+	m_texture_id++;
 	m_live_textures++;
 	return tex;
 }

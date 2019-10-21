@@ -106,21 +106,21 @@ void senjyo_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 }
 
-PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
+rgb_t senjyo_state::IIBBGGRR(uint32_t raw)
 {
-	uint8_t i = (raw >> 6) & 3;
-	uint8_t r = (raw << 2) & 0x0c;
-	uint8_t g = (raw     ) & 0x0c;
-	uint8_t b = (raw >> 2) & 0x0c;
+	uint8_t const i = (raw >> 6) & 0x03;
+	uint8_t const r = (raw << 2) & 0x0c;
+	uint8_t const g = (raw     ) & 0x0c;
+	uint8_t const b = (raw >> 2) & 0x0c;
 
 	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
 }
 
-PALETTE_INIT_MEMBER( senjyo_state, radar )
+void senjyo_state::radar_palette(palette_device &palette) const
 {
 	// two colors for the radar dots (verified on the real board)
-	m_radar_palette->set_pen_color(0, rgb_t(0xff, 0x00, 0x00));  // red for enemies
-	m_radar_palette->set_pen_color(1, rgb_t(0xff, 0xff, 0x00));  // yellow for player
+	palette.set_pen_color(0, rgb_t(0xff, 0x00, 0x00));  // red for enemies
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00));  // yellow for player
 }
 
 
@@ -164,7 +164,9 @@ WRITE8_MEMBER(senjyo_state::bg3videoram_w)
 
 void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (m_bgstripes == 0xff) /* off */
+	// assume +1 from disabling layer being 0xff
+	uint8_t stripe_width = m_bgstripesram[0]+1;
+	if (stripe_width == 0)
 		bitmap.fill(m_palette->pen_color(0), cliprect);
 	else
 	{
@@ -172,7 +174,7 @@ void senjyo_state::draw_bgbitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 		int pen = 0;
 		int count = 0;
-		int strwid = m_bgstripes;
+		int strwid = stripe_width;
 		if (strwid == 0) strwid = 0x100;
 		if (flip) strwid ^= 0xff;
 

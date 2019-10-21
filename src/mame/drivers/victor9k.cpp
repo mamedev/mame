@@ -152,7 +152,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_b_w );
 	DECLARE_WRITE_LINE_MEMBER( mux_serial_a_w );
 
-	void palette_init(palette_device &palette);
+	void victor9k_palette(palette_device &palette) const;
 
 	// video state
 	int m_brt;
@@ -202,10 +202,10 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0xe0040, 0xe0043).mirror(0x7f00).rw(m_upd7201, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
 	map(0xe8000, 0xe8000).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe8001, 0xe8001).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe8020, 0xe802f).mirror(0x7f00).rw(m_via1, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0xe8040, 0xe804f).mirror(0x7f00).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe8020, 0xe802f).mirror(0x7f00).m(m_via1, FUNC(via6522_device::map));
+	map(0xe8040, 0xe804f).mirror(0x7f00).m(m_via2, FUNC(via6522_device::map));
 	map(0xe8060, 0xe8061).mirror(0x7f00).rw(m_ssda, FUNC(mc6852_device::read), FUNC(mc6852_device::write));
-	map(0xe8080, 0xe808f).mirror(0x7f00).rw(m_via3, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xe8080, 0xe808f).mirror(0x7f00).m(m_via3, FUNC(via6522_device::map));
 	map(0xe80a0, 0xe80af).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
 	map(0xe80c0, 0xe80cf).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
 	map(0xe80e0, 0xe80ef).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
@@ -251,7 +251,7 @@ MC6845_UPDATE_ROW( victor9k_state::crtc_update_row )
 	if (m_hires != hires)
 	{
 		m_hires = hires;
-		m_crtc->set_clock(XTAL(30'000'000) / width);
+		m_crtc->set_unscaled_clock(XTAL(30'000'000) / width);
 		m_crtc->set_hpixels_per_column(width);
 	}
 
@@ -608,7 +608,7 @@ WRITE_LINE_MEMBER( victor9k_state::fdc_irq_w )
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-void victor9k_state::palette_init(palette_device &palette)
+void victor9k_state::victor9k_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 
@@ -676,7 +676,7 @@ void victor9k_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( victor9k )
+//  machine_config( victor9k )
 //-------------------------------------------------
 
 void victor9k_state::victor9k(machine_config &config)
@@ -691,14 +691,13 @@ void victor9k_state::victor9k(machine_config &config)
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845_device::screen_update));
+	screen.set_screen_update(HD46505S_TAG, FUNC(hd6845s_device::screen_update));
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 
-	PALETTE(config, m_palette, 16);
-	m_palette->set_init(FUNC(victor9k_state::palette_init));
+	PALETTE(config, m_palette, FUNC(victor9k_state::victor9k_palette), 16);
 
-	HD6845(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
+	HD6845S(config, m_crtc, XTAL(30'000'000)/10); // HD6845 == HD46505S
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(10);

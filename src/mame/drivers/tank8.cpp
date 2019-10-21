@@ -8,6 +8,7 @@ Atari Tank 8 driver
 
 #include "emu.h"
 #include "includes/tank8.h"
+
 #include "cpu/m6800/m6800.h"
 #include "sound/discrete.h"
 #include "speaker.h"
@@ -48,17 +49,17 @@ WRITE8_MEMBER(tank8_state::int_reset_w)
 
 WRITE8_MEMBER(tank8_state::crash_w)
 {
-	m_discrete->write(space, TANK8_CRASH_EN, data);
+	m_discrete->write(TANK8_CRASH_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::explosion_w)
 {
-	m_discrete->write(space, TANK8_EXPLOSION_EN, data);
+	m_discrete->write(TANK8_EXPLOSION_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bugle_w)
 {
-	m_discrete->write(space, TANK8_BUGLE_EN, data);
+	m_discrete->write(TANK8_BUGLE_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::bug_w)
@@ -66,20 +67,20 @@ WRITE8_MEMBER(tank8_state::bug_w)
 	/* D0 and D1 determine the on/off time off the square wave */
 	switch(data & 3) {
 		case 0:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 		case 1:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,7.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,7.0);
 			break;
 		case 2:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,8.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,2.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,8.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,2.0);
 			break;
 		case 3:
-			m_discrete->write(space, TANK8_BUGLE_DATA1,16.0);
-			m_discrete->write(space, TANK8_BUGLE_DATA2,4.0);
+			m_discrete->write(TANK8_BUGLE_DATA1,16.0);
+			m_discrete->write(TANK8_BUGLE_DATA2,4.0);
 			break;
 	}
 
@@ -87,12 +88,12 @@ WRITE8_MEMBER(tank8_state::bug_w)
 
 WRITE8_MEMBER(tank8_state::attract_w)
 {
-	m_discrete->write(space, TANK8_ATTRACT_EN, data);
+	m_discrete->write(TANK8_ATTRACT_EN, data);
 }
 
 WRITE8_MEMBER(tank8_state::motor_w)
 {
-	m_discrete->write(space, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
+	m_discrete->write(NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
 void tank8_state::tank8_cpu_map(address_map &map)
@@ -327,35 +328,31 @@ static GFXDECODE_START( gfx_tank8 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(tank8_state::tank8)
-
+void tank8_state::tank8(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, 11055000 / 10) /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(tank8_cpu_map)
-
+	M6800(config, m_maincpu, 11055000 / 10); /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tank8_state::tank8_cpu_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(30 * 1000000 / 15681))
-	MCFG_SCREEN_SIZE(512, 524)
-	MCFG_SCREEN_VISIBLE_AREA(16, 495, 0, 463)
-	MCFG_SCREEN_UPDATE_DRIVER(tank8_state, screen_update)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, tank8_state, screen_vblank))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(30 * 1000000 / 15681));
+	m_screen->set_size(512, 524);
+	m_screen->set_visarea(16, 495, 0, 463);
+	m_screen->set_screen_update(FUNC(tank8_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(tank8_state::screen_vblank));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tank8)
-	MCFG_PALETTE_ADD("palette", 20)
-	MCFG_PALETTE_INDIRECT_ENTRIES(10)
-	MCFG_PALETTE_INIT_OWNER(tank8_state, tank8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tank8);
+	PALETTE(config, m_palette, FUNC(tank8_state::tank8_palette), 20, 10);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, tank8_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, tank8_discrete).add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 ROM_START( tank8a )

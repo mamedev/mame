@@ -101,12 +101,14 @@ DEFINE_DEVICE_TYPE(PANASONIC_MN63F805MNP, panasonic_mn63f805mnp_device, "panason
 DEFINE_DEVICE_TYPE(SANYO_LE26FV10N1TS,    sanyo_le26fv10n1ts_device,    "sanyo_le26fv10n1ts",    "Sanyo LE26FV10N1TS Flash")
 DEFINE_DEVICE_TYPE(SST_28SF040,           sst_28sf040_device,           "sst_28sf040",           "SST 28SF040 Flash")
 DEFINE_DEVICE_TYPE(SST_39VF020,           sst_39vf020_device,           "sst_39vf020",           "SST 39VF020 Flash")
+DEFINE_DEVICE_TYPE(SST_49LF020,           sst_49lf020_device,           "sst_49lf020",           "SST 49LF020 Flash")
 
 DEFINE_DEVICE_TYPE(SHARP_LH28F400,        sharp_lh28f400_device,        "sharp_lh28f400",        "Sharp LH28F400 Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F008SA,       intel_e28f008sa_device,       "intel_e28f008sa",       "Intel E28F008SA Flash")
 DEFINE_DEVICE_TYPE(INTEL_TE28F160,        intel_te28f160_device,        "intel_te28f160",        "Intel TE28F160 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,      sharp_lh28f160s3_device,      "sharp_lh28f160s3",      "Sharp LH28F160S3 Flash")
 DEFINE_DEVICE_TYPE(INTEL_TE28F320,        intel_te28f320_device,        "intel_te28f320",        "Intel TE28F320 Flash")
-DEFINE_DEVICE_TYPE(SHARP_UNK128MBIT,      sharp_unk128mbit_device,      "sharp_unk128mbit",      "Sharp Unknown 128Mbit Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F320BF,      sharp_lh28f320bf_device,      "sharp_lh28f320bf",      "Sharp LH28F320BFHE-PBTL Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J3D,       intel_28f320j3d_device,       "intel_28f320j3d",       "Intel 28F320J3D Flash")
 DEFINE_DEVICE_TYPE(INTEL_28F320J5,        intel_28f320j5_device,        "intel_28f320j5",        "Intel 28F320J5 Flash")
 
@@ -239,6 +241,13 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0xd6;
 		m_sector_is_4k = true;
 		break;
+	case FLASH_SST_49LF020:
+		m_bits = 8;
+		m_size = 0x40000;
+		m_maker_id = MFG_SST;
+		m_device_id = 0x61;
+		m_sector_is_4k = true;
+		break;
 	case FLASH_SST_39VF400A:
 		m_bits = 16;
 		m_size = 0x80000;
@@ -284,6 +293,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0xa2;
 		break;
 	case FLASH_INTEL_TE28F160:
+	case FLASH_SHARP_LH28F160S3:
 		m_bits = 16;
 		m_size = 0x200000;
 		m_maker_id = MFG_SHARP;
@@ -295,11 +305,11 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_maker_id = MFG_INTEL;
 		m_device_id = 0x8896;
 		break;
-	case FLASH_SHARP_UNK128MBIT:
+	case FLASH_SHARP_LH28F320BF:
 		m_bits = 16;
-		m_size = 0x800000;
+		m_size = 0x400000;
 		m_maker_id = MFG_SHARP;
-		m_device_id = 0xb0;
+		m_device_id = 0xb5;
 		break;
 	case FLASH_MACRONIX_29L001MC:
 		m_bits = 8;
@@ -422,11 +432,17 @@ sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char
 sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_39VF020, tag, owner, clock, FLASH_SST_39VF020) { }
 
+sst_49lf020_device::sst_49lf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, SST_49LF020, tag, owner, clock, FLASH_SST_49LF020) { }
+
 sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, SHARP_LH28F400, tag, owner, clock, FLASH_SHARP_LH28F400) { }
 
 intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F160, tag, owner, clock, FLASH_INTEL_TE28F160) { }
+
+sharp_lh28f160s3_device::sharp_lh28f160s3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, SHARP_LH28F160S3, tag, owner, clock, FLASH_SHARP_LH28F160S3) { }
 
 intel_te28f320_device::intel_te28f320_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F320, tag, owner, clock, FLASH_INTEL_TE28F320) { }
@@ -434,8 +450,8 @@ intel_te28f320_device::intel_te28f320_device(const machine_config &mconfig, cons
 intel_e28f400b_device::intel_e28f400b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_E28F400B, tag, owner, clock, FLASH_INTEL_E28F400B) { }
 
-sharp_unk128mbit_device::sharp_unk128mbit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, SHARP_UNK128MBIT, tag, owner, clock, FLASH_SHARP_UNK128MBIT) { }
+sharp_lh28f320bf_device::sharp_lh28f320bf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, SHARP_LH28F320BF, tag, owner, clock, FLASH_SHARP_LH28F320BF) { }
 
 intel_28f320j3d_device::intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_28F320J3D, tag, owner, clock, FLASH_INTEL_28F320J3D) { }
@@ -794,7 +810,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		{
 			m_flash_mode = FM_NORMAL;
 		}
-		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xb0 && m_maker_id == 0x62 && m_device_id == 0x13 )
+		else if( ( address & 0xffff ) == 0x5555 && ( data & 0xff ) == 0xb0 && m_maker_id == MFG_SANYO && m_device_id == 0x13 )
 		{
 			m_flash_mode = FM_BANKSELECT;
 		}

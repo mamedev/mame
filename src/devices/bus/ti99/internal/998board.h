@@ -101,7 +101,6 @@ public:
 	line_state ready();
 	void treset();
 
-	DECLARE_READ8_MEMBER( read );
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
 	DECLARE_READ_LINE_MEMBER( sprd_out );
@@ -248,7 +247,7 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(offs_t offset, uint8_t data);
 	DECLARE_SETADDRESS_DBIN_MEMBER( set_address );
 
 	// Debugger support
@@ -261,7 +260,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pmemen_in );
 	DECLARE_WRITE_LINE_MEMBER( skdrcs_in );
 
-	DECLARE_READ8_MEMBER( rom1cs_out );
 	DECLARE_READ_LINE_MEMBER( gromclk_out );
 
 	DECLARE_READ_LINE_MEMBER( alccs_out );
@@ -335,9 +333,9 @@ public:
 	void device_start() override;
 	void device_reset() override;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( set_address );
+	uint8_t read();
+	void write(uint8_t data);
+	uint8_t set_address(offs_t offset);
 
 	// Debugger support
 	int get_physical_address_debug(offs_t offset);
@@ -453,8 +451,8 @@ class oso_device : public bus::hexbus::hexbus_chained_device
 {
 public:
 	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 	void device_start() override;
 	void hexbus_value_changed(uint8_t data) override;
 
@@ -541,17 +539,17 @@ public:
 	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Memory space
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( setoffset );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	void setaddress(offs_t offset, uint8_t busctrl);
 
 	// Memory space for debugger access
-	DECLARE_READ8_MEMBER( debugger_read );
-	DECLARE_WRITE8_MEMBER( debugger_write );
+	uint8_t debugger_read(offs_t offset);
+	void debugger_write(offs_t offset, uint8_t data);
 
 	// I/O space
 	DECLARE_READ8Z_MEMBER( crureadz );
-	DECLARE_WRITE8_MEMBER( cruwrite );
+	void cruwrite(offs_t offset, uint8_t data);
 
 	// Control lines
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
@@ -565,9 +563,9 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( holda_line );
 
-	template<class Object> devcb_base &set_ready_wr_callback(Object &&cb) { return m_ready.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_console_reset.set_callback(std::forward<Object>(cb)); }
-	template<class Object> devcb_base &set_hold_wr_callback(Object &&cb) { return m_hold_line.set_callback(std::forward<Object>(cb)); }
+	auto ready_cb() { return m_ready.bind(); }
+	auto reset_cb() { return m_console_reset.bind(); }
+	auto hold_cb() { return m_hold_line.bind(); }
 
 	void set_paddress(int address);
 
@@ -597,9 +595,6 @@ private:
 
 	// Mapped physical address.
 	int     m_physical_address;
-
-	// Hold the address space value so that we can use it in other methods.
-	address_space*  m_space;
 
 	// Indicates that a byte is waiting on the data bus (see m_latched_data)
 	bool    m_pending_write;
@@ -700,18 +695,6 @@ private:
 };
 
 } } } // end namespace bus::ti99::internal
-
-#define MCFG_MAINBOARD8_READY_CALLBACK(_write) \
-	downcast<bus::ti99::internal::mainboard8_device &>(*device).set_ready_wr_callback(DEVCB_##_write);
-
-#define MCFG_MAINBOARD8_RESET_CALLBACK(_write) \
-	downcast<bus::ti99::internal::mainboard8_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
-
-#define MCFG_MAINBOARD8_HOLD_CALLBACK(_write) \
-	downcast<bus::ti99::internal::mainboard8_device &>(*device).set_hold_wr_callback(DEVCB_##_write);
-
-#define MCFG_OSO_INT_CALLBACK(_int) \
-	downcast<bus::ti99::internal::oso_device &>(*device).set_int_callback(DEVCB##_int);
 
 DECLARE_DEVICE_TYPE_NS(TI99_MAINBOARD8, bus::ti99::internal, mainboard8_device)
 DECLARE_DEVICE_TYPE_NS(TI99_VAQUERRO, bus::ti99::internal, vaquerro_device)

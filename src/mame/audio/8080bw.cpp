@@ -4,9 +4,11 @@
 /* 8080bw.c *******************************************/
 
 #include "emu.h"
+#include "includes/8080bw.h"
+
 #include "sound/samples.h"
 #include "sound/discrete.h"
-#include "includes/8080bw.h"
+#include "speaker.h"
 
 
 /*******************************************************/
@@ -20,6 +22,67 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 	save_item(NAME(m_port_1_last_extra));
 	save_item(NAME(m_port_2_last_extra));
 	save_item(NAME(m_port_3_last_extra));
+}
+
+
+
+/*************************************
+ *
+ *  Space Invaders
+ *
+ *  Author      : Tormod Tjaberg
+ *  Created     : 1997-04-09
+ *  Description : Sound routines for the 'invaders' games
+ *
+ *  Note:
+ *  The samples were taken from Michael Strutt's (mstrutt@pixie.co.za)
+ *  excellent space invader emulator and converted to signed samples so
+ *  they would work under SEAL. The port info was also gleaned from
+ *  his emulator. These sounds should also work on all the invader games.
+ *
+ *************************************/
+
+static const char *const invaders_sample_names[] =
+{
+	"*invaders",
+	"1",        /* shot/missle */
+	"2",        /* base hit/explosion */
+	"3",        /* invader hit */
+	"4",        /* fleet move 1 */
+	"5",        /* fleet move 2 */
+	"6",        /* fleet move 3 */
+	"7",        /* fleet move 4 */
+	"8",        /* UFO/saucer hit */
+	"9",        /* bonus base */
+	nullptr
+};
+
+
+/* left in for all games that hack into invaders samples for audio */
+void _8080bw_state::invaders_samples_audio(machine_config &config)
+{
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	m_sn->set_noise_params(0, 0, 0);
+	m_sn->set_decay_res(0);
+	m_sn->set_attack_params(0, RES_K(100));
+	m_sn->set_amp_res(RES_K(56));
+	m_sn->set_feedback_res(RES_K(10));
+	m_sn->set_vco_params(0, CAP_U(0.1), RES_K(8.2));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(120));
+	m_sn->set_oneshot_params(0, 0);
+	m_sn->set_vco_mode(1);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(1);
+	m_sn->add_route(ALL_OUTPUTS, "mono", 0.5);
+
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(6);
+	m_samples->set_samples_names(invaders_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -242,7 +305,7 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER( _8080bw_state::ballbomb_01_w )
 {
-	m_discrete->write(space, BALLBOMB_MUSIC_DATA, data|0x80);
+	m_discrete->write(BALLBOMB_MUSIC_DATA, data|0x80);
 }
 
 WRITE8_MEMBER(_8080bw_state::ballbomb_sh_port_1_w)
@@ -351,7 +414,7 @@ WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_2_w)
 
 WRITE8_MEMBER(_8080bw_state::indianbt_sh_port_3_w)
 {
-	m_discrete->write(space, INDIANBT_MUSIC_DATA, data);
+	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::indianbtbr_sh_port_1_w)
@@ -695,27 +758,27 @@ DISCRETE_SOUND_END
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_1_w)
 {
-	m_discrete->write(space, POLARIS_MUSIC_DATA, data);
+	m_discrete->write(POLARIS_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_2_w)
 {
 	/* 0x01 - SX0 - Shot */
-	m_discrete->write(space, POLARIS_SX0_EN, data & 0x01);
+	m_discrete->write(POLARIS_SX0_EN, data & 0x01);
 
 	/* 0x02 - SX1 - Ship Hit (Sub) */
-	m_discrete->write(space, POLARIS_SX1_EN, data & 0x02);
+	m_discrete->write(POLARIS_SX1_EN, data & 0x02);
 
 	/* 0x04 - SX2 - Ship */
-	m_discrete->write(space, POLARIS_SX2_EN, data & 0x04);
+	m_discrete->write(POLARIS_SX2_EN, data & 0x04);
 
 	/* 0x08 - SX3 - Explosion */
-	m_discrete->write(space, POLARIS_SX3_EN, data & 0x08);
+	m_discrete->write(POLARIS_SX3_EN, data & 0x08);
 
 	/* 0x10 - SX4 */
 
 	/* 0x20 - SX5 - Sound Enable */
-	m_discrete->write(space, POLARIS_SX5_EN, data & 0x20);
+	m_discrete->write(POLARIS_SX5_EN, data & 0x20);
 }
 
 WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
@@ -725,16 +788,16 @@ WRITE8_MEMBER(_8080bw_state::polaris_sh_port_3_w)
 	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2); /* SX11 */
 
 	/* 0x01 - SX6 - Plane Down */
-	m_discrete->write(space, POLARIS_SX6_EN, data & 0x01);
+	m_discrete->write(POLARIS_SX6_EN, data & 0x01);
 
 	/* 0x02 - SX7 - Plane Up */
-	m_discrete->write(space, POLARIS_SX7_EN, data & 0x02);
+	m_discrete->write(POLARIS_SX7_EN, data & 0x02);
 
 	/* 0x08 - SX9 - Hit */
-	m_discrete->write(space, POLARIS_SX9_EN, data & 0x08);
+	m_discrete->write(POLARIS_SX9_EN, data & 0x08);
 
 	/* 0x10 - SX10 - Hit */
-	m_discrete->write(space, POLARIS_SX10_EN, data & 0x10);
+	m_discrete->write(POLARIS_SX10_EN, data & 0x10);
 }
 
 
@@ -859,8 +922,8 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_1_w)
 	    Note that the schematic has SX2 and SX4 the wrong way around.
 	    See MT 2662 for video proof. */
 
-	m_discrete->write(space, SCHASER_DOT_EN, data & 0x01);
-	m_discrete->write(space, SCHASER_DOT_SEL, data & 0x02);
+	m_discrete->write(SCHASER_DOT_EN, data & 0x01);
+	m_discrete->write(SCHASER_DOT_SEL, data & 0x02);
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
 	 * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -921,9 +984,9 @@ WRITE8_MEMBER(_8080bw_state::schaser_sh_port_2_w)
 	   bit 4 - Field Control B (SX10)
 	   bit 5 - Flip Screen */
 
-	m_discrete->write(space, SCHASER_MUSIC_BIT, BIT(data, 0));
+	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 
-	m_discrete->write(space, SCHASER_SND_EN, BIT(data, 1));
+	m_discrete->write(SCHASER_SND_EN, BIT(data, 1));
 	machine().sound().system_enable(BIT(data, 1));
 
 	machine().bookkeeping().coin_lockout_global_w(BIT(data, 2));
@@ -1000,12 +1063,12 @@ MACHINE_RESET_MEMBER(_8080bw_state,schaser_sh)
 /*                                                     */
 /*******************************************************/
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_1_w)
+WRITE8_MEMBER(_8080bw_state::invrvnge_port03_w)
 {
-	// probably latch+irq to audiocpu
+	m_sound_data = data;
 }
 
-WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
+WRITE8_MEMBER(_8080bw_state::invrvnge_port05_w)
 {
 	/*
 	    00 - normal play
@@ -1020,6 +1083,12 @@ WRITE8_MEMBER(_8080bw_state::invrvnge_sh_port_2_w)
 		// no sound-related writes?
 }
 
+// The timer frequency controls the speed of the sounds
+TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::nmi_timer)
+{
+	m_timer_state ^= 1;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_timer_state ? ASSERT_LINE : CLEAR_LINE );
+}
 
 
 /****************************************************/
@@ -1061,7 +1130,7 @@ const char *const lupin3_sample_names[] =
 
 WRITE8_MEMBER( _8080bw_state::lupin3_00_w )
 {
-	m_discrete->write(space, INDIANBT_MUSIC_DATA, data);
+	m_discrete->write(INDIANBT_MUSIC_DATA, data);
 }
 
 WRITE8_MEMBER(_8080bw_state::lupin3_sh_port_1_w)
@@ -1151,10 +1220,10 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port03_w)
 	   bit 4 - Dot Sound Enable (SX0)
 	   bit 5 - Effect Sound C (SX4) */
 
-	m_discrete->write(space, SCHASER_SND_EN, BIT(data,5));
+	m_discrete->write(SCHASER_SND_EN, BIT(data,5));
 	machine().sound().system_enable(BIT(data,5));
-	m_discrete->write(space, SCHASER_DOT_EN, BIT(data, 4));
-	m_discrete->write(space, SCHASER_DOT_SEL, BIT(data, 0));
+	m_discrete->write(SCHASER_DOT_EN, BIT(data, 4));
+	m_discrete->write(SCHASER_DOT_SEL, BIT(data, 0));
 
 	/* The effect is a variable rate 555 timer.  A diode/resistor array is used to
 	 * select the frequency.  Because of the diode voltage drop, we can not use the
@@ -1210,7 +1279,7 @@ WRITE8_MEMBER(_8080bw_state::crashrd_port05_w)
 {
 	// bit 0 = bitstream audio
 	// bit 4 = not sure
-	m_discrete->write(space, SCHASER_MUSIC_BIT, BIT(data, 0));
+	m_discrete->write(SCHASER_MUSIC_BIT, BIT(data, 0));
 }
 
 

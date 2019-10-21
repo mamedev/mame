@@ -34,14 +34,14 @@ INPUT_PORTS_END
 
 
 
-MACHINE_CONFIG_START(bfmsys83_state::bfmsys83)
-	MCFG_DEVICE_ADD("maincpu", M6802, 40000000/4)
-	MCFG_DEVICE_PROGRAM_MAP(memmap)
+void bfmsys83_state::bfmsys83(machine_config &config)
+{
+	M6802(config, m_maincpu, 40000000/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfmsys83_state::memmap);
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd",AY8912, 40000000/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8912(config, "aysnd", 40000000/4).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 /*
 void bfmsys83_state::init_decode()

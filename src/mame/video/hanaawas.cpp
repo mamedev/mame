@@ -17,47 +17,44 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(hanaawas_state, hanaawas)
+void hanaawas_state::hanaawas_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = memregion("proms")->base();
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x10; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x10; i++)
 	{
 		int bit0, bit1, bit2;
-		int r, g, b;
 
 		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* green component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		/* blue component */
 		bit0 = 0;
-		bit1 = (color_prom[i] >> 6) & 0x01;
-		bit2 = (color_prom[i] >> 7) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit1 = BIT(color_prom[i], 6);
+		bit2 = BIT(color_prom[i], 7);
+		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x20;
 
-	/* character lookup table.  The 1bpp tiles really only use colors 0-0x0f and the
-	   3bpp ones 0x10-0x1f */
-	for (i = 0; i < 0x100; i++)
+	// character lookup table.  The 1bpp tiles really only use colors 0-0x0f and the 3bpp ones 0x10-0x1f
+	for (int i = 0; i < 0x100; i++)
 	{
-		int swapped_i = bitswap<8>(i,2,7,6,5,4,3,1,0);
-		uint8_t ctabentry = color_prom[swapped_i] & 0x0f;
+		int const swapped_i = bitswap<8>(i, 2,7,6,5,4,3,1,0);
+		uint8_t const ctabentry = color_prom[swapped_i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }

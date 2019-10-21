@@ -29,6 +29,7 @@ class tim100_state : public driver_device
 public:
 	tim100_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_charmap(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_maincpu(*this, "maincpu")
 		, m_palette(*this, "palette")
@@ -46,12 +47,13 @@ private:
 	void tim100_mem(address_map &map);
 
 	virtual void machine_start() override;
-	uint8_t *m_charmap;
+
 	uint16_t m_dma_adr;
+	required_region_ptr<uint8_t> m_charmap;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
-	required_device<i8275_device> m_crtc;
+	required_device<i8276_device> m_crtc;
 };
 
 void tim100_state::tim100_mem(address_map &map)
@@ -59,12 +61,10 @@ void tim100_state::tim100_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom(); // 2764 at U16
 	map(0x2000, 0x27ff).ram().share("videoram"); // 2KB static ram CDM6116A at U15
-	map(0x6000, 0x6000).rw("uart_u17", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x6001, 0x6001).rw("uart_u17", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
-	map(0x8000, 0x8000).rw("uart_u18", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x8001, 0x8001).rw("uart_u18", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x6000, 0x6001).rw("uart_u17", FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x8000, 0x8001).rw("uart_u18", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xa000, 0xa000).nopw();   // continuously writes 00 here
-	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8275_device::read), FUNC(i8275_device::write)); // i8276
+	map(0xc000, 0xc001).rw(m_crtc, FUNC(i8276_device::read), FUNC(i8276_device::write)); // i8276
 }
 
 void tim100_state::tim100_io(address_map &map)
@@ -95,8 +95,7 @@ static const rgb_t tim100_palette[3] = {
 
 void tim100_state::machine_start()
 {
-	m_charmap = memregion("chargen")->base();
-	m_palette->set_pen_colors(0, tim100_palette, ARRAY_LENGTH(tim100_palette));
+	m_palette->set_pen_colors(0, tim100_palette);
 }
 
 const gfx_layout tim100_charlayout =
@@ -144,10 +143,7 @@ I8275_DRAW_CHARACTER_MEMBER( tim100_state::crtc_display_pixels )
 WRITE_LINE_MEMBER( tim100_state::drq_w )
 {
 	if (state)
-	{
-		address_space& mem = m_maincpu->space(AS_PROGRAM);
-		m_crtc->dack_w(mem, 0, m_p_videoram[m_dma_adr++]);
-	}
+		m_crtc->dack_w(m_p_videoram[m_dma_adr++]);
 }
 
 WRITE_LINE_MEMBER( tim100_state::irq_w )
@@ -162,30 +158,31 @@ WRITE_LINE_MEMBER( tim100_state::irq_w )
 }
 
 
-MACHINE_CONFIG_START(tim100_state::tim100)
+void tim100_state::tim100(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8085A, XTAL(4'915'200)) // divider unknown
-	MCFG_DEVICE_PROGRAM_MAP(tim100_mem)
-	MCFG_DEVICE_IO_MAP(tim100_io)
+	I8085A(config, m_maincpu, XTAL(4'915'200)); // divider unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &tim100_state::tim100_mem);
+	m_maincpu->set_addrmap(AS_IO, &tim100_state::tim100_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(600, 352)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40*12-1, 0, 16*16-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(600, 352);
+	screen.set_visarea(0, 40*12-1, 0, 16*16-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tim100 )
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_tim100);
 
-	MCFG_DEVICE_ADD("crtc", I8275, XTAL(4'915'200))
-	MCFG_I8275_CHARACTER_WIDTH(12)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(tim100_state, crtc_display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE(*this, tim100_state, drq_w))
-	MCFG_I8275_IRQ_CALLBACK(WRITELINE(*this, tim100_state, irq_w))
-	MCFG_VIDEO_SET_SCREEN("screen")
+	I8276(config, m_crtc, XTAL(4'915'200));
+	m_crtc->set_character_width(12);
+	m_crtc->set_display_callback(FUNC(tim100_state::crtc_display_pixels), this);
+	m_crtc->drq_wr_callback().set(FUNC(tim100_state::drq_w));
+	m_crtc->irq_wr_callback().set(FUNC(tim100_state::irq_w));
+	m_crtc->set_screen("screen");
 
-	MCFG_PALETTE_ADD("palette", 3)
+	PALETTE(config, m_palette).set_entries(3);
 
 	i8251_device &uart_u17(I8251(config, "uart_u17", 0));
 	uart_u17.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -214,7 +211,7 @@ MACHINE_CONFIG_START(tim100_state::tim100)
 	uart_clock.signal_handler().append("uart_u17", FUNC(i8251_device::write_rxc));
 	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append("uart_u18", FUNC(i8251_device::write_rxc));
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( tim100 )

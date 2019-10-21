@@ -146,10 +146,6 @@ void itech8_state::video_start()
 	/* reset statics */
 	m_page_select = 0xc0;
 
-	/* fetch the GROM base */
-	m_grom_base = memregion("grom")->base();
-	m_grom_size = memregion("grom")->bytes();
-
 	save_item(NAME(m_blitter_data));
 	save_item(NAME(m_blit_in_progress));
 	save_item(NAME(m_page_select));
@@ -169,7 +165,7 @@ void itech8_state::video_start()
 
 WRITE8_MEMBER(itech8_state::palette_w)
 {
-	m_tlc34076->write(space, offset/2, data);
+	m_tlc34076->write(offset/2, data);
 }
 
 
@@ -180,7 +176,7 @@ WRITE8_MEMBER(itech8_state::palette_w)
  *
  *************************************/
 
-WRITE8_MEMBER(itech8_state::page_w)
+void itech8_state::page_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	logerror("%04x:display_page = %02X (%d)\n", m_maincpu->pc(), data, m_screen->vpos());
@@ -198,7 +194,7 @@ WRITE8_MEMBER(itech8_state::page_w)
 
 inline uint8_t itech8_state::fetch_next_raw()
 {
-	return m_grom_base[m_fetch_offset++ % m_grom_size];
+	return m_grom[m_fetch_offset++ % m_grom.length()];
 }
 
 
@@ -212,17 +208,17 @@ inline uint8_t itech8_state::fetch_next_rle()
 {
 	if (m_fetch_rle_count == 0)
 	{
-		m_fetch_rle_count = m_grom_base[m_fetch_offset++ % m_grom_size];
+		m_fetch_rle_count = m_grom[m_fetch_offset++ % m_grom.length()];
 		m_fetch_rle_literal = m_fetch_rle_count & 0x80;
 		m_fetch_rle_count &= 0x7f;
 
 		if (!m_fetch_rle_literal)
-			m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
+			m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 	}
 
 	m_fetch_rle_count--;
 	if (m_fetch_rle_literal)
-		m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
+		m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 
 	return m_fetch_rle_value;
 }
@@ -236,12 +232,12 @@ inline void itech8_state::consume_rle(int count)
 
 		if (m_fetch_rle_count == 0)
 		{
-			m_fetch_rle_count = m_grom_base[m_fetch_offset++ % m_grom_size];
+			m_fetch_rle_count = m_grom[m_fetch_offset++ % m_grom.length()];
 			m_fetch_rle_literal = m_fetch_rle_count & 0x80;
 			m_fetch_rle_count &= 0x7f;
 
 			if (!m_fetch_rle_literal)
-				m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
+				m_fetch_rle_value = m_grom[m_fetch_offset++ % m_grom.length()];
 		}
 
 		num_to_consume = (count < m_fetch_rle_count) ? count : m_fetch_rle_count;
@@ -261,7 +257,7 @@ inline void itech8_state::consume_rle(int count)
  *
  *************************************/
 
-void itech8_state::perform_blit(address_space &space)
+void itech8_state::perform_blit()
 {
 	offs_t addr = m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8);
 	uint8_t shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
@@ -270,7 +266,7 @@ void itech8_state::perform_blit(address_space &space)
 	int xdir = (BLITTER_FLAGS & BLITFLAG_XFLIP) ? -1 : 1;
 	int xflip = (BLITTER_FLAGS & BLITFLAG_XFLIP);
 	int rle = (BLITTER_FLAGS & BLITFLAG_RLE);
-	int color = m_tms34061->latch_r(space, 0);
+	int color = m_tms34061->latch_r();
 	int width = BLITTER_WIDTH;
 	int height = BLITTER_HEIGHT;
 	uint8_t transmaskhi, transmasklo;
@@ -472,7 +468,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 		}
 
 		/* perform the blit */
-		perform_blit(space);
+		perform_blit();
 		m_blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */
@@ -502,7 +498,7 @@ WRITE8_MEMBER(itech8_state::tms34061_w)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	m_tms34061->write(space, col, 0xff, func, data);
+	m_tms34061->write(col, 0xff, func, data);
 }
 
 
@@ -517,7 +513,7 @@ READ8_MEMBER(itech8_state::tms34061_r)
 		col ^= 2;
 
 	/* Row address (RA0-RA8) is not dependent on the offset */
-	return m_tms34061->read(space, col, 0xff, func);
+	return m_tms34061->read(col, 0xff, func);
 }
 
 

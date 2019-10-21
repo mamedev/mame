@@ -32,7 +32,7 @@ class er1400_device : public device_t, public device_nvram_interface
 {
 public:
 	// construction/destruction
-	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	er1400_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// line handlers
 	DECLARE_WRITE_LINE_MEMBER(data_w);
@@ -65,6 +65,9 @@ private:
 	void read_data();
 	void write_data();
 	void erase_data();
+
+	// optional default data
+	optional_region_ptr<u16> m_default_data;
 
 	// nonvolatile data
 	std::unique_ptr<u16[]> m_data_array;

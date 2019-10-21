@@ -87,17 +87,17 @@ static const uint8_t ds1315_pattern[] =
 ***************************************************************************/
 
 // automated read, does all the work the real Dallas chip does
-READ8_MEMBER( ds1315_device::read )
+uint8_t ds1315_device::read(offs_t offset)
 {
 	if (m_mode == DS_SEEK_MATCHING)
 	{
 		if (offset & 1)
 		{
-			read_1(space, 0);
+			read_1();
 		}
 		else
 		{
-			read_0(space, 0);
+			read_0();
 		}
 
 		if (offset & 4)
@@ -110,7 +110,7 @@ READ8_MEMBER( ds1315_device::read )
 	}
 	else if (m_mode == DS_CALENDAR_IO)
 	{
-		return read_data(space, offset);
+		return read_data();
 	}
 
 	return 0xff;    // shouldn't happen, but compilers don't know that
@@ -121,7 +121,7 @@ READ8_MEMBER( ds1315_device::read )
  read_0 (actual data)
  -------------------------------------------------*/
 
-READ8_MEMBER( ds1315_device::read_0 )
+uint8_t ds1315_device::read_0()
 {
 	if (ds1315_pattern[m_count++] == 0)
 	{
@@ -145,7 +145,7 @@ READ8_MEMBER( ds1315_device::read_0 )
     read_1 (actual data)
 -------------------------------------------------*/
 
-READ8_MEMBER( ds1315_device::read_1 )
+uint8_t ds1315_device::read_1()
 {
 	if (ds1315_pattern[m_count++] == 1)
 	{
@@ -163,7 +163,7 @@ READ8_MEMBER( ds1315_device::read_1 )
     read_data
 -------------------------------------------------*/
 
-READ8_MEMBER( ds1315_device::read_data )
+uint8_t ds1315_device::read_data()
 {
 	uint8_t result;
 
@@ -228,7 +228,7 @@ void ds1315_device::fill_raw_data()
 write_data
 -------------------------------------------------*/
 
-READ8_MEMBER(ds1315_device::write_data)
+uint8_t ds1315_device::write_data(offs_t offset)
 {
 	static int write_count;
 	if (write_count >= 64)

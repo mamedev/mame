@@ -1,12 +1,13 @@
 // license: GPL-2.0+
-// copyright-holders: Kevin Thacker, Dirk Best, Phill Harvey-Smith
+// copyright-holders: Kevin Thacker, Dirk Best, Phill Harvey-Smith, Nigel Barnes
 // thanks-to: Chris Coxall, Andrew Dunipace
 /******************************************************************************
 
     Tatung Einstein
 
-    TODO:
-    - Einstein 256 support (need bios dump)
+    TODO: Einstein 256
+    - interrupt priorities
+    - VAMP interface (probably never used)
 
  ******************************************************************************/
 
@@ -18,8 +19,9 @@
 #include "bus/einstein/pipe/pipe.h"
 #include "bus/einstein/userport/userport.h"
 #include "bus/rs232/rs232.h"
+#include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/adc0844.h"
-#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
@@ -28,6 +30,7 @@
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "video/tms9928a.h"
+#include "video/v9938.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "softlist.h"
@@ -67,6 +70,7 @@ public:
 		m_keyboard_daisy(*this, "keyboard_daisy"),
 		m_adc_daisy(*this, "adc_daisy"),
 		m_fire_daisy(*this, "fire_daisy"),
+		m_vdp_daisy(*this, "vdp_daisy"),
 		m_pipe(*this, "pipe"),
 		m_fdc(*this, IC_I042),
 		m_ram(*this, RAM_TAG),
@@ -77,17 +81,22 @@ public:
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
 		m_bank3(*this, "bank3"),
-		m_floppy{ { *this, IC_I042 ":0" }, { *this, IC_I042 ":1" }, { *this, IC_I042 ":2" }, { *this, IC_I042 ":3" } },
+		m_floppy(*this, IC_I042 ":%u", 0),
+		m_cassette(*this, "cassette"),
 		m_line(*this, "LINE%u", 0),
 		m_extra(*this, "EXTRA"),
 		m_buttons(*this, "BUTTONS"),
+		m_porta_joy(*this, "PORTA_JOY"),
+		m_portb_joy(*this, "PORTB_JOY"),
+		m_dips(*this, "DIPS"),
 		m_rom_enabled(0),
 		m_keyboard_line(0), m_keyboard_data(0xff),
-		m_centronics_busy(0), m_centronics_perror(0), m_centronics_fault(0), m_strobe(-1),
+		m_centronics_ack(0), m_centronics_busy(0), m_centronics_perror(0), m_centronics_fault(0), m_strobe(-1),
 		m_int(0)
 	{}
 
 	void einstein(machine_config &config);
+	void einst256(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(joystick_button);
 
@@ -104,26 +113,41 @@ private:
 	DECLARE_WRITE8_MEMBER(kybint_msk_w);
 	DECLARE_WRITE8_MEMBER(adcint_msk_w);
 	DECLARE_WRITE8_MEMBER(fireint_msk_w);
+	DECLARE_WRITE8_MEMBER(evdpint_msk_w);
 	DECLARE_WRITE8_MEMBER(drsel_w);
+	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
 	DECLARE_WRITE_LINE_MEMBER(ardy_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(strobe_callback);
 
+	DECLARE_READ8_MEMBER(system_r);
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_WRITE8_MEMBER(porta_w);
+	DECLARE_WRITE8_MEMBER(porta_int_w);
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_READ8_MEMBER(pseudo_adc_r);
+	DECLARE_WRITE8_MEMBER(pseudo_adc_w);
+	DECLARE_READ8_MEMBER(alpha_lock_r);
+	DECLARE_WRITE8_MEMBER(alpha_lock_w);
+
 	void einstein_io(address_map &map);
 	void einstein_mem(address_map &map);
+	void einst256_io(address_map &map);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	void einstein_scan_keyboard();
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80daisy_generic_device> m_keyboard_daisy;
 	required_device<z80daisy_generic_device> m_adc_daisy;
 	required_device<z80daisy_generic_device> m_fire_daisy;
-	required_device<tatung_pipe_device> m_pipe;
+	optional_device<z80daisy_generic_device> m_vdp_daisy;
+	optional_device<tatung_pipe_device> m_pipe;
 	required_device<wd1770_device> m_fdc;
 	required_device<ram_device> m_ram;
 	required_device<ay8910_device> m_psg;
@@ -133,20 +157,28 @@ private:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_device<floppy_connector> m_floppy[4];
+	optional_device_array<floppy_connector, 4> m_floppy;
+	optional_device<cassette_image_device> m_cassette;
 	required_ioport_array<8> m_line;
 	required_ioport m_extra;
-	required_ioport m_buttons;
+	optional_ioport m_buttons;
+	optional_ioport m_porta_joy;
+	optional_ioport m_portb_joy;
+	optional_ioport m_dips;
 
 	int m_rom_enabled;
 
 	uint8_t m_keyboard_line;
 	uint8_t m_keyboard_data;
+	uint8_t m_porta_int;
+	uint8_t m_pseudo_adc;
 
+	int m_centronics_ack;
 	int m_centronics_busy;
 	int m_centronics_perror;
 	int m_centronics_fault;
 	int m_strobe;
+	int m_alpha_lock_led;
 
 	int m_int;
 };
@@ -158,7 +190,12 @@ private:
 
 INPUT_CHANGED_MEMBER( einstein_state::joystick_button )
 {
-	int button_down = (m_buttons->read() & 0x03) != 0x03;
+	int button_down;
+	if (m_buttons)
+		button_down = (m_buttons->read() & 0x03) != 0x03;
+	else
+		button_down = (m_porta_joy->read() & m_portb_joy->read() & 0x10) != 0x10;
+
 	m_fire_daisy->int_w(button_down ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -222,10 +259,10 @@ WRITE8_MEMBER(einstein_state::drsel_w)
 
 	floppy_image_device *floppy = nullptr;
 
-	if (BIT(data, 0)) floppy = m_floppy[0]->get_device();
-	if (BIT(data, 1)) floppy = m_floppy[1]->get_device();
-	if (BIT(data, 2)) floppy = m_floppy[2]->get_device();
-	if (BIT(data, 3)) floppy = m_floppy[3]->get_device();
+	if (BIT(data, 0)) floppy = m_floppy[0] ? m_floppy[0]->get_device() : nullptr;
+	if (BIT(data, 1)) floppy = m_floppy[1] ? m_floppy[1]->get_device() : nullptr;
+	if (BIT(data, 2)) floppy = m_floppy[2] ? m_floppy[2]->get_device() : nullptr;
+	if (BIT(data, 3)) floppy = m_floppy[3] ? m_floppy[3]->get_device() : nullptr;
 
 	if (floppy)
 		floppy->ss_w(BIT(data, 4));
@@ -237,6 +274,11 @@ WRITE8_MEMBER(einstein_state::drsel_w)
 /***************************************************************************
     CENTRONICS
 ***************************************************************************/
+
+WRITE_LINE_MEMBER(einstein_state::write_centronics_ack)
+{
+	m_centronics_ack = state;
+}
 
 WRITE_LINE_MEMBER( einstein_state::write_centronics_busy )
 {
@@ -284,6 +326,16 @@ static const z80_daisy_config einstein_daisy_chain[] =
 	{ nullptr }
 };
 
+static const z80_daisy_config einst256_daisy_chain[] =
+{
+	{ "keyboard_daisy" },
+	{ IC_I058 },
+	{ "adc_daisy" },
+	{ "vdp_daisy" },
+	{ "fire_daisy" },
+	{ nullptr }
+};
+
 template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
 {
 	int old = m_int;
@@ -294,7 +346,7 @@ template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
 		if (!old)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-			m_pipe->host_int_w(ASSERT_LINE);
+			if (m_pipe) m_pipe->host_int_w(ASSERT_LINE);
 		}
 	}
 	else
@@ -303,7 +355,7 @@ template <int src> WRITE_LINE_MEMBER( einstein_state::int_w )
 		if (old && !m_int)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-			m_pipe->host_int_w(CLEAR_LINE);
+			if (m_pipe) m_pipe->host_int_w(CLEAR_LINE);
 		}
 	}
 }
@@ -316,7 +368,10 @@ READ8_MEMBER( einstein_state::kybint_msk_r )
 	m_keyboard_daisy->int_w(CLEAR_LINE);
 
 	/* bit 0 and 1: fire buttons on the joysticks */
-	data |= m_buttons->read() & 0x03;
+	if (m_buttons)
+		data |= m_buttons->read() & 0x03;
+	else
+		data |= (m_portb_joy->read() & 0x10) >> 4 | (m_porta_joy->read() & 0x10) >> 3;
 
 	/* bit 2 to 4: printer status */
 	data |= m_centronics_busy << 2;
@@ -348,6 +403,13 @@ WRITE8_MEMBER( einstein_state::fireint_msk_w )
 {
 	logerror("FIRE interrupt %s\n", BIT(data, 0) ? "disabled" : "enabled");
 	m_fire_daisy->mask_w(BIT(data, 0));
+}
+
+WRITE8_MEMBER(einstein_state::evdpint_msk_w)
+{
+	logerror("EVDP interrupt %s\n", BIT(data, 0) ? "disabled" : "enabled");
+	logerror("Printer STROBE %s\n", BIT(data, 1) ? "disabled" : "enabled");
+	m_vdp_daisy->mask_w(BIT(data, 0));
 }
 
 
@@ -390,10 +452,6 @@ void einstein_state::machine_start()
 	m_bank1->configure_entry(1, m_bios->base());
 	m_bank2->set_base(m_ram->pointer());
 	m_bank3->set_base(m_ram->pointer() + 0x8000);
-
-	// setup expansion slot
-	m_pipe->set_program_space(&m_maincpu->space(AS_PROGRAM));
-	m_pipe->set_io_space(&m_maincpu->space(AS_IO));
 }
 
 void einstein_state::machine_reset()
@@ -408,6 +466,128 @@ void einstein_state::machine_reset()
 	m_fire_daisy->mask_w(1);
 
 	m_strobe = -1;
+
+	// enable Alpha Lock LED
+	m_alpha_lock_led = 1;
+}
+
+
+/***************************************************************************
+    256 MACHINE EMULATION
+***************************************************************************/
+
+READ8_MEMBER(einstein_state::system_r)
+{
+	uint8_t data = 0;
+
+	// b0 1 = Alpha Lock key pressed
+	data |= !BIT(m_line[0]->read(), 4);
+	// b1 1 = ROM enabled
+	data |= m_rom_enabled << 1;
+	// b2 Dipswitch 1
+	// b3 Dipswitch 2
+	// b4 Dipswitch 3
+	// b5 Dipswitch 4
+	data |= (m_dips->read() & 0x0f) << 2;
+	// b6 0 = mouse connected
+	data |= 0x40;
+	// b7 cassette input
+	data |= (m_cassette->input() > 0.0 ? 1 : 0) << 7;
+
+	return data;
+}
+
+READ8_MEMBER(einstein_state::porta_r)
+{
+	uint8_t data = 0;
+
+	data |= m_porta_joy->read() & 0x1f;
+	data |= m_centronics_perror << 5;
+	data |= m_centronics_fault << 6;
+
+	return data;
+}
+
+WRITE8_MEMBER(einstein_state::porta_w)
+{
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_strobe(BIT(data, 4));
+}
+
+WRITE8_MEMBER(einstein_state::porta_int_w)
+{
+	// TODO: Implement Port A interrupts (not used for printing!)
+	logerror("Port A interrupt %s\n", BIT(data, 7) ? "enabled" : "disabled");
+	m_porta_int = data;
+}
+
+READ8_MEMBER(einstein_state::portb_r)
+{
+	uint8_t data = 0;
+
+	data |= m_portb_joy->read() & 0x1f;
+	data |= m_centronics_busy << 5;
+	data |= m_centronics_ack << 6;
+
+	return data;
+}
+
+WRITE8_MEMBER(einstein_state::portb_w)
+{
+	m_centronics->write_data4(BIT(data, 0));
+	m_centronics->write_data5(BIT(data, 1));
+	m_centronics->write_data6(BIT(data, 2));
+	m_centronics->write_data7(BIT(data, 3));
+}
+
+READ8_MEMBER(einstein_state::pseudo_adc_r)
+{
+	uint8_t data = 0x7f; // centre
+
+	uint8_t port = BIT(m_pseudo_adc, 1) ? m_porta_joy->read() : m_portb_joy->read();
+
+	m_adc_daisy->int_w(CLEAR_LINE);
+
+	switch (m_pseudo_adc & 0x05)
+	{
+	case 4:
+		switch (port & 0x0c)
+		{
+		case 0x04: data = 0xff; break; // right
+		case 0x08: data = 0x00; break; // left
+		}
+		break;
+	case 5:
+		switch (port & 0x03)
+		{
+		case 0x01: data = 0x00; break; // down
+		case 0x02: data = 0xff; break; // up
+		}
+		break;
+	}
+	return data;
+}
+
+WRITE8_MEMBER(einstein_state::pseudo_adc_w)
+{
+	m_pseudo_adc = data;
+	m_adc_daisy->int_w(ASSERT_LINE);
+}
+
+READ8_MEMBER(einstein_state::alpha_lock_r)
+{
+	m_alpha_lock_led ^= 1;
+	output().set_value("alpha_lock_led", m_alpha_lock_led);
+	return 0xff;
+}
+
+WRITE8_MEMBER(einstein_state::alpha_lock_w)
+{
+	m_alpha_lock_led ^= 1;
+	output().set_value("alpha_lock_led", m_alpha_lock_led);
 }
 
 
@@ -428,10 +608,8 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
 	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
-	map(0x08, 0x08).mirror(0xff06).rw("vdp", FUNC(tms9129_device::vram_r), FUNC(tms9129_device::vram_w));
-	map(0x09, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::register_r), FUNC(tms9129_device::register_w));
-	map(0x10, 0x10).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0x11, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
+	map(0x08, 0x09).mirror(0xff06).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
+	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
 	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
 	map(0x21, 0x21).mirror(0xff00).w(FUNC(einstein_state::adcint_msk_w));
@@ -443,17 +621,41 @@ void einstein_state::einstein_io(address_map &map)
 	map(0x38, 0x38).mirror(0xff07).rw("adc", FUNC(adc0844_device::read), FUNC(adc0844_device::write));
 }
 
+void einstein_state::einst256_io(address_map &map)
+{
+	map.unmap_value_high();
+	map(0x00, 0x00).mirror(0xff04).rw(FUNC(einstein_state::reset_r), FUNC(einstein_state::reset_w));
+	map(0x02, 0x02).mirror(0xff04).rw(m_psg, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x03, 0x03).mirror(0xff04).w(m_psg, FUNC(ay8910_device::data_w));
+	map(0x08, 0x0b).mirror(0xff04).rw("v9938", FUNC(v9938_device::read), FUNC(v9938_device::write));
+	map(0x10, 0x11).mirror(0xff06).rw(IC_I060, FUNC(i8251_device::read), FUNC(i8251_device::write));
+	map(0x18, 0x1b).mirror(0xff04).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write));
+	map(0x20, 0x20).mirror(0xff00).rw(FUNC(einstein_state::kybint_msk_r), FUNC(einstein_state::kybint_msk_w));
+	map(0x21, 0x21).mirror(0xff00).w(FUNC(einstein_state::adcint_msk_w));
+	map(0x22, 0x22).mirror(0xff00).rw(FUNC(einstein_state::alpha_lock_r), FUNC(einstein_state::alpha_lock_w));
+	map(0x23, 0x23).mirror(0xff00).w(FUNC(einstein_state::drsel_w));
+	map(0x24, 0x24).mirror(0xff00).rw(FUNC(einstein_state::rom_r), FUNC(einstein_state::rom_w));
+	map(0x25, 0x25).mirror(0xff00).w(FUNC(einstein_state::fireint_msk_w));
+	map(0x26, 0x26).mirror(0xff00).r(FUNC(einstein_state::system_r));
+	map(0x28, 0x2b).mirror(0xff04).rw(IC_I058, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
+	map(0x30, 0x30).mirror(0xff00).rw(FUNC(einstein_state::porta_r), FUNC(einstein_state::porta_w));
+	map(0x31, 0x31).mirror(0xff00).w(FUNC(einstein_state::porta_int_w));
+	map(0x32, 0x32).mirror(0xff00).rw(FUNC(einstein_state::portb_r), FUNC(einstein_state::portb_w));
+	map(0x38, 0x38).mirror(0xff07).rw(FUNC(einstein_state::pseudo_adc_r), FUNC(einstein_state::pseudo_adc_w));
+	map(0x80, 0x80).mirror(0xff00).w(FUNC(einstein_state::evdpint_msk_w));
+}
+
 
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
 
-static INPUT_PORTS_START( einstein )
+static INPUT_PORTS_START( keyboard )
 	PORT_START("LINE0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_LALT)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F0") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("?") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F8) PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -534,11 +736,15 @@ static INPUT_PORTS_START( einstein )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRPH")    PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CONTROL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( einstein )
+	PORT_INCLUDE(keyboard)
 
 	// fire buttons for analogue joysticks
 	PORT_START("BUTTONS")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 1 Button 1") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, nullptr)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 2 Button 1") PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, nullptr)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 1 Button 1") PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Joystick 2 Button 1") PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("analogue_1_x")
@@ -562,6 +768,40 @@ static INPUT_PORTS_START( einstein )
 	PORT_REVERSE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( einst256 )
+	PORT_INCLUDE(keyboard)
+
+	PORT_MODIFY("LINE0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ALPHA LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
+
+	PORT_START("PORTA_JOY")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
+
+	PORT_START("PORTB_JOY")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, einstein_state, joystick_button, 0)
+
+	PORT_START("DIPS")
+	PORT_DIPNAME(0x01, 0x00, "Line Standard") PORT_DIPLOCATION("S:1")
+	PORT_DIPSETTING(0x00, "525 lines 60Hz")
+	PORT_DIPSETTING(0x01, "625 lines 50Hz")
+	PORT_DIPNAME(0x02, 0x00, "Printer") PORT_DIPLOCATION("S:2")
+	PORT_DIPSETTING(0x00, "Parallel")
+	PORT_DIPSETTING(0x02, "Serial")
+	PORT_DIPNAME(0x0c, 0x00, "Language") PORT_DIPLOCATION("S:3,4")
+	PORT_DIPSETTING(0x00, "English (ISO646)")
+	PORT_DIPSETTING(0x04, "ASCII")
+	PORT_DIPSETTING(0x08, "German")
+	PORT_DIPSETTING(0x0c, "Spanish")
+INPUT_PORTS_END
+
 
 /***************************************************************************
     MACHINE DRIVERS
@@ -577,112 +817,147 @@ static void einstein_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
-MACHINE_CONFIG_START(einstein_state::einstein)
+void einstein_state::einstein(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(IC_I001, Z80, XTAL_X002 / 2)
-	MCFG_DEVICE_PROGRAM_MAP(einstein_mem)
-	MCFG_DEVICE_IO_MAP(einstein_io)
-	MCFG_Z80_DAISY_CHAIN(einstein_daisy_chain)
+	Z80(config, m_maincpu, XTAL_X002 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &einstein_state::einstein_mem);
+	m_maincpu->set_addrmap(AS_IO, &einstein_state::einstein_io);
+	m_maincpu->set_daisy_config(einstein_daisy_chain);
 
 	/* this is actually clocked at the system clock 4 MHz, but this would be too fast for our
 	driver. So we update at 50Hz and hope this is good enough. */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", einstein_state, keyboard_timer_callback, attotime::from_hz(50))
+	TIMER(config, "keyboard").configure_periodic(FUNC(einstein_state::keyboard_timer_callback), attotime::from_hz(50));
 
-	MCFG_DEVICE_ADD(IC_I063, Z80PIO, XTAL_X002 / 2)
-	MCFG_Z80PIO_OUT_INT_CB(WRITELINE(*this, einstein_state, int_w<0>))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8("cent_data_out", output_latch_device, bus_w))
-	MCFG_Z80PIO_OUT_ARDY_CB(WRITELINE(*this, einstein_state, ardy_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8("user", einstein_userport_device, read))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8("user", einstein_userport_device, write))
-	MCFG_Z80PIO_OUT_BRDY_CB(WRITELINE("user", einstein_userport_device, brdy_w))
+	z80pio_device& pio(Z80PIO(config, IC_I063, XTAL_X002 / 2));
+	pio.out_int_callback().set(FUNC(einstein_state::int_w<0>));
+	pio.out_pa_callback().set("cent_data_out", FUNC(output_latch_device::bus_w));
+	pio.out_ardy_callback().set(FUNC(einstein_state::ardy_w));
+	pio.in_pb_callback().set("user", FUNC(einstein_userport_device::read));
+	pio.out_pb_callback().set("user", FUNC(einstein_userport_device::write));
+	pio.out_brdy_callback().set("user", FUNC(einstein_userport_device::brdy_w));
 
-	MCFG_DEVICE_ADD(IC_I058, Z80CTC, XTAL_X002 / 2)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, einstein_state, int_w<1>))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(IC_I060, i8251_device, write_txc))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(IC_I060, i8251_device, write_rxc))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(IC_I058, z80ctc_device, trg3))
-
-	clock_device &ctc_trigger(CLOCK(config, "ctc_trigger", XTAL_X002 / 4));
-	ctc_trigger.signal_handler().set(IC_I058, FUNC(z80ctc_device::trg0));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg1));
-	ctc_trigger.signal_handler().append(IC_I058, FUNC(z80ctc_device::trg2));
+	z80ctc_device& ctc(Z80CTC(config, IC_I058, XTAL_X002 / 2));
+	ctc.intr_callback().set(FUNC(einstein_state::int_w<1>));
+	ctc.set_clk<0>(XTAL_X002 / 4);
+	ctc.set_clk<1>(XTAL_X002 / 4);
+	ctc.set_clk<2>(XTAL_X002 / 4);
+	ctc.zc_callback<0>().set(IC_I060, FUNC(i8251_device::write_txc));
+	ctc.zc_callback<1>().set(IC_I060, FUNC(i8251_device::write_rxc));
+	ctc.zc_callback<2>().set(IC_I058, FUNC(z80ctc_device::trg3));
 
 	/* Einstein daisy chain support for non-Z80 devices */
-	MCFG_Z80DAISY_GENERIC_ADD("keyboard_daisy", 0xf7)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<2>))
-	MCFG_Z80DAISY_GENERIC_ADD("adc_daisy", 0xfb)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<3>))
-	MCFG_Z80DAISY_GENERIC_ADD("fire_daisy", 0xfd)
-	MCFG_Z80DAISY_GENERIC_INT_CB(WRITELINE(*this, einstein_state, int_w<4>))
+	Z80DAISY_GENERIC(config, m_keyboard_daisy, 0xf7);
+	m_keyboard_daisy->int_handler().set(FUNC(einstein_state::int_w<2>));
+	Z80DAISY_GENERIC(config, m_adc_daisy, 0xfb);
+	m_adc_daisy->int_handler().set(FUNC(einstein_state::int_w<3>));
+	Z80DAISY_GENERIC(config, m_fire_daisy, 0xfd);
+	m_fire_daisy->int_handler().set(FUNC(einstein_state::int_w<4>));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("vdp", TMS9129, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000) // 16k RAM, provided by IC i040 and i041
-	MCFG_TMS9928A_SET_SCREEN("screen")
-	MCFG_TMS9928A_SCREEN_ADD_PAL("screen")
-	MCFG_SCREEN_UPDATE_DEVICE("vdp", tms9129_device, screen_update)
+	tms9129_device &vdp(TMS9129(config, "vdp", 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000); // 16k RAM, provided by IC i040 and i041
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(IC_I030, AY8910, XTAL_X002 / 4)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, einstein_state, keyboard_data_read))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, einstein_state, keyboard_line_write))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	AY8910(config, m_psg, XTAL_X002 / 4);
+	m_psg->port_b_read_callback().set(FUNC(einstein_state::keyboard_data_read));
+	m_psg->port_a_write_callback().set(FUNC(einstein_state::keyboard_line_write));
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(WRITELINE("adc_daisy", z80daisy_generic_device, int_w))
-	MCFG_ADC0844_CH1_CB(IOPORT("analogue_1_x"))
-	MCFG_ADC0844_CH2_CB(IOPORT("analogue_1_y"))
-	MCFG_ADC0844_CH3_CB(IOPORT("analogue_2_x"))
-	MCFG_ADC0844_CH4_CB(IOPORT("analogue_2_y"))
+	adc0844_device &adc(ADC0844(config, "adc"));
+	adc.intr_callback().set(m_adc_daisy, FUNC(z80daisy_generic_device::int_w));
+	adc.ch1_callback().set_ioport("analogue_1_x");
+	adc.ch2_callback().set_ioport("analogue_1_y");
+	adc.ch3_callback().set_ioport("analogue_2_x");
+	adc.ch4_callback().set_ioport("analogue_2_y");
 
 	/* printer */
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_ACK_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_a))
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, einstein_state, write_centronics_busy))
-	MCFG_CENTRONICS_PERROR_HANDLER(WRITELINE(*this, einstein_state, write_centronics_perror))
-	MCFG_CENTRONICS_FAULT_HANDLER(WRITELINE(*this, einstein_state, write_centronics_fault))
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->ack_handler().set(IC_I063, FUNC(z80pio_device::strobe_a));
+	m_centronics->busy_handler().set(FUNC(einstein_state::write_centronics_busy));
+	m_centronics->perror_handler().set(FUNC(einstein_state::write_centronics_perror));
+	m_centronics->fault_handler().set(FUNC(einstein_state::write_centronics_fault));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
-	MCFG_TIMER_DRIVER_ADD("strobe", einstein_state, strobe_callback)
+	TIMER(config, m_strobe_timer).configure_generic(FUNC(einstein_state::strobe_callback));
 
 	// uart
-	MCFG_DEVICE_ADD(IC_I060, I8251, XTAL_X002 / 4)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
+	i8251_device &ic_i060(I8251(config, IC_I060, XTAL_X002 / 4));
+	ic_i060.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	ic_i060.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	ic_i060.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
 
 	// rs232 port
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(IC_I060, i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(IC_I060, i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(IC_I060, i8251_device, write_cts))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(IC_I060, FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set(IC_I060, FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set(IC_I060, FUNC(i8251_device::write_cts));
 
 	// floppy
-	MCFG_DEVICE_ADD(IC_I042, WD1770, XTAL_X002)
+	WD1770(config, m_fdc, XTAL_X002);
 
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, IC_I042 ":0", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":1", einstein_floppies, "3ss", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":2", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, IC_I042 ":3", einstein_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","einstein")
+	SOFTWARE_LIST(config, "disk_list").set_original("einstein").set_filter("TC01");
 
 	/* RAM is provided by 8k DRAM ICs i009, i010, i011, i012, i013, i014, i015 and i016 */
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("64K")
+	RAM(config, RAM_TAG).set_default_size("64K");
 
 	// tatung pipe connector
-	MCFG_TATUNG_PIPE_ADD("pipe")
-	MCFG_TATUNG_PIPE_NMI_HANDLER(INPUTLINE(IC_I001, INPUT_LINE_NMI))
+	TATUNG_PIPE(config, m_pipe, XTAL_X002 / 2, tatung_pipe_cards, nullptr);
+	m_pipe->set_program_space(m_maincpu, AS_PROGRAM);
+	m_pipe->set_io_space(m_maincpu, AS_IO);
+	m_pipe->nmi_handler().set_inputline(IC_I001, INPUT_LINE_NMI);
 
 	// user port
-	MCFG_EINSTEIN_USERPORT_ADD("user")
-	MCFG_EINSTEIN_USERPORT_BSTB_HANDLER(WRITELINE(IC_I063, z80pio_device, strobe_b))
-MACHINE_CONFIG_END
+	EINSTEIN_USERPORT(config, "user").bstb_handler().set(IC_I063, FUNC(z80pio_device::strobe_b));
+}
+
+void einstein_state::einst256(machine_config &config)
+{
+	einstein(config);
+
+	/* remove components not present in TC256 */
+	config.device_remove(IC_I063);
+	config.device_remove("vdp");
+	config.device_remove("adc");
+	config.device_remove(IC_I042 ":2");
+	config.device_remove(IC_I042 ":3");
+	config.device_remove("pipe");
+	config.device_remove("user");
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_IO, &einstein_state::einst256_io);
+	m_maincpu->set_daisy_config(einst256_daisy_chain);
+
+	Z80DAISY_GENERIC(config, m_vdp_daisy, 0xfe);
+	m_vdp_daisy->int_handler().set(FUNC(einstein_state::int_w<5>));
+
+	/* video hardware */
+	v9938_device &v9938(V9938(config, "v9938", 21.477272_MHz_XTAL));
+	v9938.set_screen("screen");
+	v9938.set_vram_size(0x30000);
+	v9938.int_cb().set(m_vdp_daisy, FUNC(z80daisy_generic_device::int_w));
+
+	/* printer */
+	m_centronics->ack_handler().set(FUNC(einstein_state::write_centronics_ack));
+
+	/* cassette */
+	CASSETTE(config, m_cassette);
+
+	/* software lists */
+	subdevice<software_list_device>("disk_list")->set_filter("256");
+}
 
 
 /***************************************************************************
@@ -695,20 +970,19 @@ MACHINE_CONFIG_END
  * We are missing dumps of version MOS 1.1, possibly of 1.0 if it exists.
  */
 ROM_START( einstein )
-	ROM_REGION(0x8000, "bios", 0)
+	ROM_REGION(0x8000, "bios", ROMREGION_ERASEFF)
 	/* i023 */
 	ROM_SYSTEM_BIOS(0,  "mos12",  "MOS 1.2")
-	ROMX_LOAD("mos12.i023", 0, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(0))
+	ROMX_LOAD("mos12.i023", 0x0000, 0x2000, CRC(ec134953) SHA1(a02125d8ebcda48aa784adbb42a8b2d7ef3a4b77), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1,  "mos121",  "MOS 1.21")
-	ROMX_LOAD("mos121.i023", 0, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
+	ROMX_LOAD("mos121.i023", 0x0000, 0x2000, CRC(a746eeb6) SHA1(f75aaaa777d0fd92225acba291f6bf428b341d3e), ROM_BIOS(1))
 	ROM_RELOAD(0x2000, 0x2000)
-	/* i024 */
-	ROM_FILL(0x4000, 0x4000, 0xff)
 ROM_END
 
 ROM_START( einst256 )
-	ROM_REGION(0x8000, "bios", 0)
-	ROM_LOAD("tc256.rom", 0x0000, 0x4000, BAD_DUMP CRC(ef8dad88) SHA1(eb2102d3bef572db7161c26a7c68a5fcf457b4d0) )
+	ROM_REGION(0x8000, "bios", ROMREGION_ERASEFF)
+	/* i008 */
+	ROM_LOAD("mos21.i008", 0x0000, 0x4000, CRC(d1bb5efc) SHA1(9168df70af6746c88748049d1b9d119a29e605de) )
 ROM_END
 
 
@@ -718,4 +992,4 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY   FULLNAME          FLAGS
 COMP( 1984, einstein, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein TC-01", 0 )
-COMP( 1986, einst256, 0,      0,      einstein, einstein, einstein_state, empty_init, "Tatung", "Einstein 256",   MACHINE_NOT_WORKING )
+COMP( 1986, einst256, 0,      0,      einst256, einst256, einstein_state, empty_init, "Tatung", "Einstein 256",   0 )

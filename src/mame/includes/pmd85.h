@@ -5,9 +5,10 @@
  * includes/pmd85.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PMD85_H
 #define MAME_INCLUDES_PMD85_H
+
+#pragma once
 
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
@@ -53,7 +54,7 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void pmd85(machine_config &config);
+	void pmd85(machine_config &config, bool with_uart = true);
 	void pmd851(machine_config &config);
 	void pmd853(machine_config &config);
 	void pmd852a(machine_config &config);
@@ -64,6 +65,7 @@ public:
 	void init_mato();
 	void init_pmd852a();
 	void init_pmd851();
+	void init_pmd852();
 	void init_pmd853();
 	void init_alfa();
 	void init_c2717();
@@ -80,9 +82,9 @@ private:
 	uint8_t m_ppi_port_outputs[4][3];
 	uint8_t m_startup_mem_map;
 	uint8_t m_pmd853_memory_mapping;
-	int m_previous_level;
-	int m_clk_level;
-	int m_clk_level_tape;
+	bool m_previous_level;
+	bool m_clk_level;
+	bool m_clk_level_tape;
 	uint8_t m_model;
 	emu_timer * m_cassette_timer;
 	void (pmd85_state::*update_memory)();
@@ -94,7 +96,6 @@ private:
 	virtual void machine_reset() override;
 	uint32_t screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_porta_r);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_portb_r);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_portc_r);
@@ -174,7 +175,7 @@ private:
 	void pmd85_common_driver_init();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	int m_cas_tx;
+	bool m_txd, m_rts;
 };
 
 

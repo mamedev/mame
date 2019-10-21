@@ -107,6 +107,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
@@ -134,10 +139,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(imolagp);
+	void imolagp_palette(palette_device &palette) const;
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void imolagp_master_io(address_map &map);
 	void imolagp_master_map(address_map &map);
@@ -152,16 +154,16 @@ private:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(imolagp_state, imolagp)
+void imolagp_state::imolagp_palette(palette_device &palette) const
 {
 	// palette seems like 3bpp + intensity
 	// this still needs to be verified
 	for (int i = 0; i < 8; i++)
 	{
-		palette.set_pen_color(i*4+0, 0, 0, 0);
-		palette.set_pen_color(i*4+1, pal1bit(i >> 2)/2, pal1bit(i >> 1)/2, pal1bit(i >> 0)/2);
-		palette.set_pen_color(i*4+2, 0, 0, 0);
-		palette.set_pen_color(i*4+3, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
+		palette.set_pen_color(i*4 + 0, 0, 0, 0);
+		palette.set_pen_color(i*4 + 1, pal1bit(i >> 2) / 2, pal1bit(i >> 1) / 2, pal1bit(i >> 0) / 2);
+		palette.set_pen_color(i*4 + 2, 0, 0, 0);
+		palette.set_pen_color(i*4 + 3, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 	}
 }
 
@@ -179,19 +181,19 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			const uint8_t *source = &m_videoram[layer][(y & 0xff) * 0x40];
-			uint16_t *dest = &bitmap.pix16(y & 0xff);
+			uint8_t const *const source = &m_videoram[layer][(y & 0xff) * 0x40];
+			uint16_t *const dest = &bitmap.pix16(y & 0xff);
 			for (int i = 0; i < 0x40; i++)
 			{
-				uint8_t data = source[i];
-				if (data || layer == 0)
+				uint8_t const data = source[i];
+				if (data || !layer)
 				{
 					// one color per each 4 pixels
-					uint8_t color = (data & 0xf0) >> 3;
-					uint8_t x = (i << 2) - (m_scroll ^ 3);
+					uint8_t const color = (data & 0xf0) >> 3;
+					uint8_t const x = (i << 2) - (m_scroll ^ 3);
 					for (int x2 = 0; x2 < 4; x2++)
 					{
-						uint8_t offset = x + x2;
+						uint8_t const offset = x + x2;
 						if (offset >= cliprect.min_x && offset <= cliprect.max_x)
 							dest[offset] = color | (data >> x2 & 1);
 					}
@@ -350,7 +352,7 @@ void imolagp_state::imolagp_master_map(address_map &map)
 	map(0x2800, 0x2803).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x3000, 0x3000).w(FUNC(imolagp_state::vreg_control_w));
 	map(0x37f0, 0x37f0).w("aysnd", FUNC(ay8910_device::address_w));
-//  AM_RANGE(0x37f7, 0x37f7) AM_NOP
+//  map(0x37f7, 0x37f7).noprw();
 	map(0x3800, 0x3800).rw(FUNC(imolagp_state::vreg_data_r), FUNC(imolagp_state::vreg_data_w));
 	map(0x3810, 0x3810).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x4000, 0x4000).portr("DSWA");
@@ -448,7 +450,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -479,7 +481,7 @@ static INPUT_PORTS_START( imolagpo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(imolagp_state, imolagp_steerlatch_r)
 INPUT_PORTS_END
 
 
@@ -510,19 +512,19 @@ void imolagp_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(imolagp_state::imolagp)
-
+void imolagp_state::imolagp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3000000) // ? (assume slower than slave)
-	MCFG_DEVICE_PROGRAM_MAP(imolagp_master_map)
-	MCFG_DEVICE_IO_MAP(imolagp_master_io)
-	MCFG_TIMER_DRIVER_ADD("pot", imolagp_state, imolagp_pot_callback) // maincpu nmi
+	Z80(config, m_maincpu, 3000000); // ? (assume slower than slave)
+	m_maincpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_master_map);
+	m_maincpu->set_addrmap(AS_IO, &imolagp_state::imolagp_master_io);
+	TIMER(config, m_steer_pot_timer).configure_generic(FUNC(imolagp_state::imolagp_pot_callback)); // maincpu nmi
 
-	MCFG_DEVICE_ADD("slave", Z80, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(imolagp_slave_map)
-	MCFG_DEVICE_IO_MAP(imolagp_slave_io)
+	Z80(config, m_slavecpu, 4000000); // ?
+	m_slavecpu->set_addrmap(AS_PROGRAM, &imolagp_state::imolagp_slave_map);
+	m_slavecpu->set_addrmap(AS_IO, &imolagp_state::imolagp_slave_io);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	i8255_device &ppi(I8255A(config, "ppi8255", 0));
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
@@ -532,24 +534,22 @@ MACHINE_CONFIG_START(imolagp_state::imolagp)
 	ppi.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256,256)
-	MCFG_SCREEN_VISIBLE_AREA(0+48,255,0+16,255)
-	MCFG_SCREEN_UPDATE_DRIVER(imolagp_state, screen_update_imolagp)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, imolagp_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256,256);
+	screen.set_visarea(0+48,255,0+16,255);
+	screen.set_screen_update(FUNC(imolagp_state::screen_update_imolagp));
+	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(imolagp_state::vblank_irq));
 
-	MCFG_PALETTE_ADD("palette", 0x20)
-	MCFG_PALETTE_INIT_OWNER(imolagp_state, imolagp)
+	PALETTE(config, "palette", FUNC(imolagp_state::imolagp_palette), 0x20);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 2000000) // ?
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	AY8910(config, "aysnd", 2000000).add_route(ALL_OUTPUTS, "mono", 0.5); // ?
+}
 
 
 ROM_START( imolagp ) // same hardware, but larger video roms

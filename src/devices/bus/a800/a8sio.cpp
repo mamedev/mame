@@ -32,6 +32,8 @@
 
 #include "emu.h"
 #include "a8sio.h"
+#include "atari810.h"
+#include "atari1050.h"
 #include "cassette.h"
 
 
@@ -39,48 +41,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(A8SIO_SLOT, a8sio_slot_device, "a8sio_slot", "Atari 8 bit SIO Slot")
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  a8sio_slot_device - constructor
-//-------------------------------------------------
-a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a8sio_slot_device(mconfig, A8SIO_SLOT, tag, owner, clock)
-{
-}
-
-a8sio_slot_device::a8sio_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_slot_interface(mconfig, *this), m_a8sio_tag(nullptr), m_a8sio_slottag(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void a8sio_slot_device::device_start()
-{
-	device_a8sio_card_interface *dev = dynamic_cast<device_a8sio_card_interface *>(get_card_device());
-
-	if (dev)
-	{
-		dev->set_a8sio_tag(m_a8sio_tag, m_a8sio_slottag);
-	}
-}
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO")
-
+DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO Slot")
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -91,16 +52,38 @@ DEFINE_DEVICE_TYPE(A8SIO, a8sio_device, "a8sio", "Atari 8 bit SIO")
 //-------------------------------------------------
 
 a8sio_device::a8sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: a8sio_device(mconfig, A8SIO, tag, owner, clock)
+	: device_t(mconfig, A8SIO, tag, owner, clock)
+	, device_slot_interface(mconfig, *this)
+	, m_out_clock_in_cb(*this)
+	, m_out_data_in_cb(*this)
+	, m_out_proceed_cb(*this)
+	, m_out_audio_in_cb(*this)
+	, m_out_interrupt_cb(*this)
+	, m_device(nullptr)
 {
 }
 
-a8sio_device::a8sio_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, m_out_clock_in_cb(*this)
-	, m_out_data_in_cb(*this)
-	, m_out_audio_in_cb(*this), m_device(nullptr)
+//-------------------------------------------------
+//  device_resolve_objects - resolve objects that
+//  may be needed for other devices to set
+//  initial conditions at start time
+//-------------------------------------------------
+
+void a8sio_device::device_resolve_objects()
 {
+	m_device = dynamic_cast<device_a8sio_card_interface *>(get_card_device());
+
+	if (m_device)
+	{
+		m_device->set_a8sio_device(this);
+	}
+
+	// resolve callbacks
+	m_out_clock_in_cb.resolve_safe();
+	m_out_data_in_cb.resolve_safe();
+	m_out_proceed_cb.resolve_safe();
+	m_out_audio_in_cb.resolve_safe();
+	m_out_interrupt_cb.resolve_safe();
 }
 
 //-------------------------------------------------
@@ -109,13 +92,6 @@ a8sio_device::a8sio_device(const machine_config &mconfig, device_type type, cons
 
 void a8sio_device::device_start()
 {
-	// resolve callbacks
-	m_out_clock_in_cb.resolve_safe();
-	m_out_data_in_cb.resolve_safe();
-	m_out_audio_in_cb.resolve_safe();
-
-	// clear slot
-	m_device = nullptr;
 }
 
 //-------------------------------------------------
@@ -128,12 +104,7 @@ void a8sio_device::device_reset()
 
 device_a8sio_card_interface *a8sio_device::get_a8sio_card()
 {
-		return m_device;
-}
-
-void a8sio_device::add_a8sio_card(device_a8sio_card_interface *card)
-{
-	m_device = card;
+	return m_device;
 }
 
 WRITE_LINE_MEMBER( a8sio_device::clock_in_w )
@@ -141,22 +112,48 @@ WRITE_LINE_MEMBER( a8sio_device::clock_in_w )
 	m_out_clock_in_cb(state);
 }
 
+WRITE_LINE_MEMBER( a8sio_device::clock_out_w )
+{
+	if (m_device)
+		m_device->clock_out_w(state);
+}
+
 WRITE_LINE_MEMBER( a8sio_device::data_in_w )
 {
 	m_out_data_in_cb(state);
 }
 
+WRITE_LINE_MEMBER( a8sio_device::data_out_w )
+{
+	if (m_device)
+		m_device->data_out_w(state);
+}
+
+WRITE_LINE_MEMBER( a8sio_device::command_w )
+{
+	if (m_device)
+		m_device->command_w(state);
+}
+
 WRITE_LINE_MEMBER( a8sio_device::motor_w )
 {
 	if (m_device)
-	{
 		m_device->motor_w(state);
-	}
+}
+
+WRITE_LINE_MEMBER( a8sio_device::proceed_w )
+{
+	m_out_proceed_cb(state);
 }
 
 WRITE8_MEMBER( a8sio_device::audio_in_w )
 {
 	m_out_audio_in_cb(data);
+}
+
+WRITE_LINE_MEMBER( a8sio_device::interrupt_w )
+{
+	m_out_interrupt_cb(state);
 }
 
 
@@ -171,7 +168,6 @@ WRITE8_MEMBER( a8sio_device::audio_in_w )
 device_a8sio_card_interface::device_a8sio_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 	, m_a8sio(nullptr)
-	, m_a8sio_tag(nullptr), m_a8sio_slottag(nullptr)
 {
 }
 
@@ -184,10 +180,21 @@ device_a8sio_card_interface::~device_a8sio_card_interface()
 {
 }
 
-void device_a8sio_card_interface::set_a8sio_device()
+void device_a8sio_card_interface::set_a8sio_device(a8sio_device *sio)
 {
-	m_a8sio = dynamic_cast<a8sio_device *>(device().machine().device(m_a8sio_tag));
-	m_a8sio->add_a8sio_card(this);
+	m_a8sio = sio;
+}
+
+WRITE_LINE_MEMBER( device_a8sio_card_interface::clock_out_w )
+{
+}
+
+WRITE_LINE_MEMBER( device_a8sio_card_interface::data_out_w )
+{
+}
+
+WRITE_LINE_MEMBER( device_a8sio_card_interface::command_w )
+{
 }
 
 WRITE_LINE_MEMBER( device_a8sio_card_interface::motor_w )
@@ -195,8 +202,14 @@ WRITE_LINE_MEMBER( device_a8sio_card_interface::motor_w )
 	//printf("device_a8sio_card_interface::motor_w %d\n", state);
 }
 
+WRITE_LINE_MEMBER( device_a8sio_card_interface::ready_w )
+{
+}
+
 
 void a8sio_cards(device_slot_interface &device)
 {
+	device.option_add("a810", ATARI810);
+	device.option_add("a1050", ATARI1050);
 	device.option_add("cassette", A8SIO_CASSETTE);
 }

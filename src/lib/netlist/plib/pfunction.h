@@ -8,8 +8,8 @@
 #ifndef PFUNCTION_H_
 #define PFUNCTION_H_
 
-#include "pstring.h"
 #include "pstate.h"
+#include "pstring.h"
 
 #include <vector>
 
@@ -34,6 +34,7 @@ namespace plib {
 			SIN,
 			COS,
 			RAND, /* random number between 0 and 1 */
+			TRUNC,
 			PUSH_CONST,
 			PUSH_INPUT
 		};
@@ -112,6 +113,6 @@ namespace plib {
 	};
 
 
-}
+} // namespace plib
 
 #endif /* PEXCEPTION_H_ */

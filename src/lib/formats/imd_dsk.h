@@ -7,9 +7,8 @@
     IMD disk images
 
 *********************************************************************/
-
-#ifndef IMD_DSK_H
-#define IMD_DSK_H
+#ifndef MAME_FORMATS_IMD_DSK_H
+#define MAME_FORMATS_IMD_DSK_H
 
 #include "flopimg.h"
 
@@ -33,4 +32,4 @@ private:
 
 extern const floppy_format_type FLOPPY_IMD_FORMAT;
 
-#endif /* IMD_DSK_H */
+#endif // MAME_FORMATS_IMD_DSK_H

@@ -13,30 +13,12 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I82730_ADD(_tag, _cpu_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, I82730, _clock) \
-	downcast<i82730_device &>(*device).set_cpu_tag(_cpu_tag);
-
-#define MCFG_I82730_SINT_HANDLER(_devcb) \
-	downcast<i82730_device &>(*device).set_sint_handler(DEVCB_##_devcb);
-
-#define MCFG_I82730_UPDATE_ROW_CB(_class, _method) \
-	downcast<i82730_device &>(*device).set_update_row_callback(i82730_device::update_row_delegate(&_class::_method, #_class "::" #_method, this));
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 #define I82730_UPDATE_ROW(name) \
-	void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)
-
+	   void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)
 
 // ======================> i82730_device
 
@@ -46,14 +28,24 @@ public:
 	typedef device_delegate<void (bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)> update_row_delegate;
 
 	// construction/destruction
+	template <typename T>
+	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cpu_tag)
+		: i82730_device(mconfig, tag, owner, clock)
+	{
+		m_cpu.set_tag(std::forward<T>(cpu_tag));
+	}
 	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_sint_handler(Object &&cb) { return m_sint_handler.set_callback(std::forward<Object>(cb)); }
+	auto sint() { return m_sint_handler.bind(); }
 
 	// inline configuration
-	void set_cpu_tag(const char *tag) { m_cpu_tag = tag; }
-	template <typename Object> void set_update_row_callback(Object &&cb) { m_update_row_cb = std::forward<Object>(cb); }
+	void set_update_row_callback(update_row_delegate callback) { m_update_row_cb = callback; }
+	template <class FunctionClass> void set_update_row_callback(void (FunctionClass::*callback)(bitmap_rgb32 &, uint16_t *, uint8_t, uint16_t, int)
+		, const char *name)
+	{
+		set_update_row_callback(update_row_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -98,7 +90,7 @@ private:
 	devcb_write_line m_sint_handler;
 	update_row_delegate m_update_row_cb;
 
-	const char *m_cpu_tag;
+	required_device<cpu_device> m_cpu;
 	address_space *m_program;
 
 	emu_timer *m_row_timer;

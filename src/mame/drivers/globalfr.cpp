@@ -68,13 +68,14 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-MACHINE_CONFIG_START(globalfr_state::globalfr)
+void globalfr_state::globalfr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M37702S1, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(globalfr_map)
-	MCFG_S16LF01_ADD("vfd",0)
+	M37702S1(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &globalfr_state::globalfr_map);
+	S16LF01(config, m_vfd);
 	config.set_default_layout(layout_globalfr);
-MACHINE_CONFIG_END
+}
 
 /******************************************************************************/
 
@@ -230,4 +231,4 @@ GAME( 199?, gl_uyrp,    gl_uyr,   globalfr, globalfr, globalfr_state, empty_init
 GAME( 199?, gl_hbh,     0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel (Global) (v1.0) (Stealth)",               MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, gl_hbhcl,   0,        globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9) (Stealth)",          MACHINE_IS_SKELETON_MECHANICAL )
 GAME( 199?, gl_hbhclp,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (v1.9 Protocol) (Stealth)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME( 199?, gl_hbhcla,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (Set 2) (Stealth)",         MACHINE_IS_SKELETON_MECHANICAL )
+GAME( 199?, gl_hbhcla,  gl_hbhcl, globalfr, globalfr, globalfr_state, empty_init, ROT0, "Global", "Heartbreak Hotel Club (Global) (set 2) (Stealth)",         MACHINE_IS_SKELETON_MECHANICAL )

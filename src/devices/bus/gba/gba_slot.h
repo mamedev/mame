@@ -84,7 +84,17 @@ class gba_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	gba_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: gba_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~gba_cart_slot_device();
 
 	// device-level overrides
@@ -142,11 +152,6 @@ DECLARE_DEVICE_TYPE(GBA_CART_SLOT, gba_cart_slot_device)
 
 #define GBASLOT_ROM_REGION_TAG ":cart:rom"
 #define GBAHELP_ROM_REGION_TAG ":cart:romhlp"
-
-#define MCFG_GBA_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, GBA_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 
 
 //------------------------------------------------------------------------

@@ -105,6 +105,15 @@ public:
 		m_sysram[1] = nullptr;
 	}
 
+	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
+
+	void cc40(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
+	virtual void machine_start() override;
+
+private:
 	void postload();
 	void init_sysram(int chip, u16 size);
 	void update_lcd_indicator(u8 y, u8 x, int state);
@@ -123,18 +132,12 @@ public:
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 
-	DECLARE_PALETTE_INIT(cc40);
-	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
+	void cc40_palette(palette_device &palette) const;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
-	void cc40(machine_config &config);
+
 	void main_map(address_map &map);
 
-protected:
-	virtual void machine_reset() override;
-	virtual void machine_start() override;
-
-private:
 	required_device<tms70c20_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
@@ -165,7 +168,7 @@ private:
 
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
+DEVICE_IMAGE_LOAD_MEMBER(cc40_state::cart_load)
 {
 	u32 size = m_cart->common_get_size("rom");
 
@@ -190,7 +193,7 @@ DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(cc40_state, cc40)
+void cc40_state::cc40_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on
@@ -400,16 +403,16 @@ void cc40_state::main_map(address_map &map)
 
 INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 {
-	init_sysram((int)(uintptr_t)param, newval << 11);
+	init_sysram((int)param, newval << 11);
 }
 
 static INPUT_PORTS_START( cc40 )
 	PORT_START("RAMSIZE")
-	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)0)
+	PORT_CONFNAME( 0x07, 0x01, "RAM Chip 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, 0)
 	PORT_CONFSETTING(    0x00, "None" )
 	PORT_CONFSETTING(    0x01, "2KB" )
 	PORT_CONFSETTING(    0x04, "8KB" )
-	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, (void *)1)
+	PORT_CONFNAME( 0x70, 0x10, "RAM Chip 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cc40_state, sysram_size_changed, 1)
 	PORT_CONFSETTING(    0x00, "None" ) // note: invalid configuration, unless Chip 1 is also 0x00
 	PORT_CONFSETTING(    0x10, "2KB" )
 	PORT_CONFSETTING(    0x40, "8KB" )
@@ -582,48 +585,43 @@ void cc40_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cc40_state::postload), this));
 }
 
-MACHINE_CONFIG_START(cc40_state::cc40)
-
+void cc40_state::cc40(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS70C20, XTAL(5'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TMS7000_IN_PORTA_CB(READ8(*this, cc40_state, keyboard_r))
-	MCFG_TMS7000_OUT_PORTB_CB(WRITE8(*this, cc40_state, keyboard_w))
+	TMS70C20(config, m_maincpu, XTAL(5'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cc40_state::main_map);
+	m_maincpu->in_porta().set(FUNC(cc40_state::keyboard_r));
+	m_maincpu->out_portb().set(FUNC(cc40_state::keyboard_w));
 
-	MCFG_NVRAM_ADD_0FILL("sysram.0")
-	MCFG_NVRAM_ADD_0FILL("sysram.1")
-	MCFG_NVRAM_ADD_0FILL("sysram.2")
+	NVRAM(config, "sysram.0", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "sysram.1", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "sysram.2", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60) // arbitrary
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(6*31+1, 9*1+1+1)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*31, 0, 9*1+1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60); // arbitrary
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(6*31+1, 9*1+1+1);
+	screen.set_visarea_full();
 	config.set_default_layout(layout_cc40);
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cc40_state, cc40)
+	PALETTE(config, "palette", FUNC(cc40_state::cc40_palette), 3);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
+	hd44780_device &hd44780(HD44780(config, "hd44780", 0));
+	hd44780.set_lcd_size(2, 16); // 2*16 internal
+	hd44780.set_pixel_update_cb(FUNC(cc40_state::cc40_pixel_update), this);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.25);
+	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,256")
-	MCFG_GENERIC_LOAD(cc40_state, cc40_cartridge)
-
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "cc40_cart")
-MACHINE_CONFIG_END
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "cc40_cart", "bin,rom,256").set_device_load(FUNC(cc40_state::cart_load), this);
+	SOFTWARE_LIST(config, "cart_list").set_original("cc40_cart");
+}
 
 
 

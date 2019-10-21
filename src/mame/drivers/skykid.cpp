@@ -135,20 +135,6 @@ void skykid_state::mcu_map(address_map &map)
 }
 
 
-READ8_MEMBER(skykid_state::readFF)
-{
-	return 0xff;
-}
-
-void skykid_state::mcu_port_map(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).r(FUNC(skykid_state::inputport_r));         /* input ports read */
-	map(M6801_PORT1, M6801_PORT1).w(FUNC(skykid_state::inputport_select_w)); /* input port select */
-	map(M6801_PORT2, M6801_PORT2).r(FUNC(skykid_state::readFF));  /* leds won't work otherwise */
-	map(M6801_PORT2, M6801_PORT2).w(FUNC(skykid_state::skykid_led_w));           /* lamps */
-}
-
-
 
 static INPUT_PORTS_START( skykid )
 	PORT_START("DSWA")  /* DSW A */
@@ -435,42 +421,43 @@ WRITE_LINE_MEMBER(skykid_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(skykid_state::skykid)
-
+void skykid_state::skykid(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, XTAL(49'152'000)/32)
-	MCFG_DEVICE_PROGRAM_MAP(skykid_map)
+	MC6809E(config, m_maincpu, XTAL(49'152'000)/32);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skykid_state::skykid_map);
 
-	MCFG_DEVICE_ADD("mcu", HD63701, XTAL(49'152'000)/8) /* or compatible 6808 with extra instructions */
-	MCFG_DEVICE_PROGRAM_MAP(mcu_map)
-	MCFG_DEVICE_IO_MAP(mcu_port_map)
+	HD63701(config, m_mcu, XTAL(49'152'000)/8); /* or compatible 6808 with extra instructions */
+	m_mcu->set_addrmap(AS_PROGRAM, &skykid_state::mcu_map);
+	m_mcu->in_p1_cb().set(FUNC(skykid_state::inputport_r));         /* input ports read */
+	m_mcu->out_p1_cb().set(FUNC(skykid_state::inputport_select_w)); /* input port select */
+	m_mcu->in_p2_cb().set_constant(0xff);                           /* leds won't work otherwise */
+	m_mcu->out_p2_cb().set(FUNC(skykid_state::skykid_led_w));       /* lamps */
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* we need heavy synch */
+	config.m_minimum_quantum = attotime::from_hz(6000);  /* we need heavy synch */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60.606060)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(skykid_state, screen_update_skykid)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, skykid_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60.606060);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(36*8, 28*8);
+	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(skykid_state::screen_update_skykid));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(skykid_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skykid)
-	MCFG_PALETTE_ADD("palette", 64*4+128*4+64*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(skykid_state, skykid)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skykid);
+	PALETTE(config, m_palette, FUNC(skykid_state::skykid_palette), 64*4 + 128*4 + 64*8, 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	NAMCO_CUS30(config, m_cus30, 49152000/2048);
+	m_cus30->set_voices(8);
+	m_cus30->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 ROM_START( skykid ) // a PCB was found with ROM 4 and 6 labeled sk1, but hashes match the sk2 listed here and in other sets, while they differ from the sk1 ROMs in set skykidd?

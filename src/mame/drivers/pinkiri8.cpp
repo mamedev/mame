@@ -39,7 +39,7 @@ Dumped by Chackn
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
@@ -83,8 +83,8 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void init_ronjan();
 	void pinkiri8(machine_config &config);
+	void ronjan(machine_config &config);
 
 protected:
 	DECLARE_WRITE8_MEMBER(output_regs_w);
@@ -104,6 +104,7 @@ protected:
 
 	void pinkiri8_io(address_map &map);
 	void pinkiri8_map(address_map &map);
+	void ronjan_io(address_map &map);
 
 private:
 	required_shared_ptr<uint8_t> m_janshi_back_vram;
@@ -122,7 +123,7 @@ private:
 	uint8_t m_prot_char[5];
 	uint8_t m_prot_index;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<hd647180x_device> m_maincpu;
 	required_device<janshi_vdp_device> m_vdp;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -143,8 +144,8 @@ void janshi_vdp_device::map(address_map &map)
 
 	map(0xfc3800, 0xfc3fff).ram().share("vram2"); // y pos + unknown
 
-	map(0xff0000, 0xff07ff).ram().share("paletteram"); //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)
-	map(0xff2000, 0xff27ff).ram().share("paletteram2"); //AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)
+	map(0xff0000, 0xff07ff).ram().share("paletteram"); //ram().w(FUNC(janshi_vdp_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w));
+	map(0xff2000, 0xff27ff).ram().share("paletteram2"); //ram().w(FUNC(janshi_vdp_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w));
 
 	map(0xff6000, 0xff601f).ram().share("crtc_regs");
 }
@@ -480,7 +481,7 @@ void pinkiri8_state::pinkiri8_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x3f).ram(); //Z180 internal I/O
-	map(0x60, 0x60).w(FUNC(pinkiri8_state::output_regs_w));
+	map(0x60, 0x60).nopw();
 	map(0x80, 0x83).w(FUNC(pinkiri8_state::pinkiri8_vram_w));
 
 	map(0xa0, 0xa0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); //correct?
@@ -511,7 +512,13 @@ void pinkiri8_state::pinkiri8_io(address_map &map)
 
 	map(0xf3, 0xf3).nopw();
 	map(0xf7, 0xf7).nopw();
+}
 
+void pinkiri8_state::ronjan_io(address_map &map)
+{
+	pinkiri8_io(map);
+	map(0x90, 0x90).rw(FUNC(pinkiri8_state::ronjan_prot_r), FUNC(pinkiri8_state::ronjan_prot_w));
+	map(0x9f, 0x9f).r(FUNC(pinkiri8_state::ronjan_patched_prot_r));
 }
 
 static INPUT_PORTS_START( base_inputs )
@@ -1106,32 +1113,40 @@ static GFXDECODE_START( gfx_pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(pinkiri8_state::pinkiri8)
-	MCFG_DEVICE_ADD("maincpu",Z180,XTAL(32'000'000)/2)
-	MCFG_DEVICE_PROGRAM_MAP(pinkiri8_map)
-	MCFG_DEVICE_IO_MAP(pinkiri8_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pinkiri8_state, nmi_line_assert)
+void pinkiri8_state::pinkiri8(machine_config &config)
+{
+	HD647180X(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pinkiri8_state::pinkiri8_map);
+	m_maincpu->set_addrmap(AS_IO, &pinkiri8_state::pinkiri8_io);
+	m_maincpu->set_vblank_int("screen", FUNC(pinkiri8_state::nmi_line_assert));
+	m_maincpu->out_pa_callback().set(FUNC(pinkiri8_state::output_regs_w));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pinkiri8_state, screen_update_pinkiri8)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 62*8-1, 0*8, 32*8-1);
+	screen.set_screen_update(FUNC(pinkiri8_state::screen_update_pinkiri8));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pinkiri8)
-	MCFG_PALETTE_ADD("palette", 0x2000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pinkiri8);
+	PALETTE(config, m_palette).set_entries(0x2000);
 
-
-	MCFG_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
+	JANSHIVDP(config, m_vdp, 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // clock frequency & pin 7 not verified
+}
+
+void pinkiri8_state::ronjan(machine_config &config)
+{
+	pinkiri8(config);
+
+	m_maincpu->set_addrmap(AS_IO, &pinkiri8_state::ronjan_io);
+	m_maincpu->in_pg_callback().set(FUNC(pinkiri8_state::ronjan_prot_status_r));
+}
 
 /***************************************************************************
 
@@ -1243,14 +1258,7 @@ READ8_MEMBER(pinkiri8_state::ronjan_patched_prot_r)
 	return 0; //value is read then discarded
 }
 
-void pinkiri8_state::init_ronjan()
-{
-	m_maincpu->space(AS_IO).install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), this), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), this));
-}
-
-GAME( 1992,  janshi,   0,       pinkiri8, janshi,   pinkiri8_state, empty_init,  ROT0, "Eagle",         "Janshi",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1991,  ronjan,   ronjans, pinkiri8, ronjan,   pinkiri8_state, init_ronjan, ROT0, "Wing Co., Ltd", "Ron Jan",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1994,  ronjans,  0,       pinkiri8, ronjan,   pinkiri8_state, init_ronjan, ROT0, "Wing Co., Ltd", "Ron Jan Super", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
-GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, pinkiri8_state, empty_init,  ROT0, "Alta",          "Pinkiri 8",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1992,  janshi,   0,       pinkiri8, janshi,   pinkiri8_state, empty_init, ROT0, "Eagle",         "Janshi",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1991,  ronjan,   ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994,  ronjans,  0,       ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
+GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, pinkiri8_state, empty_init, ROT0, "Alta",          "Pinkiri 8",     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

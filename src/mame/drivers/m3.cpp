@@ -115,27 +115,29 @@ void m3_state::machine_reset()
 	m_maincpu->set_pc(0xf000);
 }
 
-MACHINE_CONFIG_START(m3_state::m3)
-	MCFG_DEVICE_ADD("maincpu", Z80, 2'000'000) // no idea of clock.
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+void m3_state::m3(machine_config &config)
+{
+	Z80(config, m_maincpu, 2'000'000); // no idea of clock.
+	m_maincpu->set_addrmap(AS_PROGRAM, &m3_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &m3_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_f4disp)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not correct
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_f4disp);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* Devices */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 2'000'000) // clk unknown
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(7)
-	MCFG_MC6845_UPDATE_ROW_CB(m3_state, crtc_update_row)
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", 2'000'000)); // clk unknown
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(7);
+	crtc.set_update_row_callback(FUNC(m3_state::crtc_update_row), this);
+}
 
 ROM_START( m3 )
 	ROM_REGION( 0x3000, "roms", 0 )

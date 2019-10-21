@@ -39,48 +39,47 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(timeplt_state, timeplt)
+void timeplt_state::timeplt_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
+
 	rgb_t palette_val[32];
-	int i;
-
-	for (i = 0; i < 32; i++)
+	for (int i = 0; i < 32; i++)
 	{
-		int bit0, bit1, bit2, bit3, bit4, r, g, b;
+		int bit0, bit1, bit2, bit3, bit4;
 
-		bit0 = (color_prom[i + 1 * 32] >> 1) & 0x01;
-		bit1 = (color_prom[i + 1 * 32] >> 2) & 0x01;
-		bit2 = (color_prom[i + 1 * 32] >> 3) & 0x01;
-		bit3 = (color_prom[i + 1 * 32] >> 4) & 0x01;
-		bit4 = (color_prom[i + 1 * 32] >> 5) & 0x01;
-		r = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
-		bit0 = (color_prom[i + 1 * 32] >> 6) & 0x01;
-		bit1 = (color_prom[i + 1 * 32] >> 7) & 0x01;
-		bit2 = (color_prom[i + 0 * 32] >> 0) & 0x01;
-		bit3 = (color_prom[i + 0 * 32] >> 1) & 0x01;
-		bit4 = (color_prom[i + 0 * 32] >> 2) & 0x01;
-		g = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
-		bit0 = (color_prom[i + 0 * 32] >> 3) & 0x01;
-		bit1 = (color_prom[i + 0 * 32] >> 4) & 0x01;
-		bit2 = (color_prom[i + 0 * 32] >> 5) & 0x01;
-		bit3 = (color_prom[i + 0 * 32] >> 6) & 0x01;
-		bit4 = (color_prom[i + 0 * 32] >> 7) & 0x01;
-		b = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
+		bit0 = BIT(color_prom[i + 1 * 32], 1);
+		bit1 = BIT(color_prom[i + 1 * 32], 2);
+		bit2 = BIT(color_prom[i + 1 * 32], 3);
+		bit3 = BIT(color_prom[i + 1 * 32], 4);
+		bit4 = BIT(color_prom[i + 1 * 32], 5);
+		int const r = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
+		bit0 = BIT(color_prom[i + 1 * 32], 6);
+		bit1 = BIT(color_prom[i + 1 * 32], 7);
+		bit2 = BIT(color_prom[i + 0 * 32], 0);
+		bit3 = BIT(color_prom[i + 0 * 32], 1);
+		bit4 = BIT(color_prom[i + 0 * 32], 2);
+		int const g = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
+		bit0 = BIT(color_prom[i + 0 * 32], 3);
+		bit1 = BIT(color_prom[i + 0 * 32], 4);
+		bit2 = BIT(color_prom[i + 0 * 32], 5);
+		bit3 = BIT(color_prom[i + 0 * 32], 6);
+		bit4 = BIT(color_prom[i + 0 * 32], 7);
+		int const b = 0x19 * bit0 + 0x24 * bit1 + 0x35 * bit2 + 0x40 * bit3 + 0x4d * bit4;
 
 		palette_val[i] = rgb_t(r, g, b);
 	}
 
 	color_prom += 2*32;
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 
 
-	/* sprites */
-	for (i = 0; i < 64 * 4; i++)
+	// sprites
+	for (int i = 0; i < 64 * 4; i++)
 		palette.set_pen_color(32 * 4 + i, palette_val[*color_prom++ & 0x0f]);
 
-	/* characters */
-	for (i = 0; i < 32 * 4; i++)
+	// characters
+	for (int i = 0; i < 32 * 4; i++)
 		palette.set_pen_color(i, palette_val[(*color_prom++ & 0x0f) + 0x10]);
 }
 

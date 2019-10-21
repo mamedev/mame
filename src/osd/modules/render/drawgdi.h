@@ -24,6 +24,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+/* renderer_gdi is the information for the current screen */
 class renderer_gdi : public osd_renderer
 {
 public:
@@ -46,7 +47,6 @@ public:
 	virtual void toggle_fsfx() override {};
 
 private:
-	/* gdi_info is the information for the current screen */
 	BITMAPINFO              m_bminfo;
 	uint8_t *                 m_bmdata;
 	size_t                  m_bmsize;

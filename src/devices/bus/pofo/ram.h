@@ -42,8 +42,8 @@ protected:
 	// device_portfolio_memory_card_slot_interface overrides
 	virtual bool cdet() override { return 0; }
 
-	virtual uint8_t nrdi_r(address_space &space, offs_t offset) override;
-	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t nrdi_r(offs_t offset) override;
+	virtual void nwri_w(offs_t offset, uint8_t data) override;
 };
 
 

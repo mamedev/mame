@@ -70,23 +70,24 @@ void superpet_device::superpet_mem(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(superpet_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(M6809_TAG, M6809, XTAL(16'000'000)/16)
-	MCFG_DEVICE_PROGRAM_MAP(superpet_mem)
+void superpet_device::device_add_mconfig(machine_config &config)
+{
+	MC6809E(config, m_maincpu, 16_MHz_XTAL / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &superpet_device::superpet_mem);
 
-	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL(16'000'000)/16)
+	MOS6702(config, m_dongle, 16_MHz_XTAL / 16);
 
-	MCFG_DEVICE_ADD(MOS6551_TAG, MOS6551, 0)
-	MCFG_MOS6551_XTAL(XTAL(1'843'200))
-	MCFG_MOS6551_IRQ_HANDLER(WRITELINE(*this, superpet_device, acia_irq_w))
-	MCFG_MOS6551_TXD_HANDLER(WRITELINE(RS232_TAG, rs232_port_device, write_txd))
+	MOS6551(config, m_acia, 0);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set(FUNC(superpet_device::acia_irq_w));
+	m_acia->txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
 
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_rxd))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dcd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(MOS6551_TAG, mos6551_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+}
 
 
 //-------------------------------------------------
@@ -224,7 +225,7 @@ void superpet_device::device_reset()
 //  pet_norom_r - NO ROM read
 //-------------------------------------------------
 
-int superpet_device::pet_norom_r(address_space &space, offs_t offset, int sel)
+int superpet_device::pet_norom_r(offs_t offset, int sel)
 {
 	return BIT(m_system, 0);
 }
@@ -234,9 +235,9 @@ int superpet_device::pet_norom_r(address_space &space, offs_t offset, int sel)
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel)
+uint8_t superpet_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
 {
-	int norom = pet_norom_r(space, offset, sel);
+	int norom = pet_norom_r(offset, sel);
 
 	switch (sel)
 	{
@@ -276,14 +277,14 @@ uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t d
 	case 0xefe1:
 	case 0xefe2:
 	case 0xefe3:
-		data = m_dongle->read(space, offset & 0x03);
+		data = m_dongle->read(offset & 0x03);
 		break;
 
 	case 0xeff0:
 	case 0xeff1:
 	case 0xeff2:
 	case 0xeff3:
-		data = m_acia->read(space, offset & 0x03);
+		data = m_acia->read(offset & 0x03);
 		break;
 	}
 
@@ -295,7 +296,7 @@ uint8_t superpet_device::pet_bd_r(address_space &space, offs_t offset, uint8_t d
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel)
+void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
 {
 	switch (sel)
 	{
@@ -313,7 +314,7 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data
 	case 0xefe1:
 	case 0xefe2:
 	case 0xefe3:
-		m_dongle->write(space, offset & 0x03, data);
+		m_dongle->write(offset & 0x03, data);
 		printf("6702 %u %02x\n", offset & 0x03, data);
 		break;
 
@@ -321,7 +322,7 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, uint8_t data
 	case 0xeff1:
 	case 0xeff2:
 	case 0xeff3:
-		m_acia->write(space, offset & 0x03, data);
+		m_acia->write(offset & 0x03, data);
 		break;
 
 	case 0xeff8:

@@ -15,18 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_Z80DAISY_GENERIC_ADD(_tag, _vector) \
-	MCFG_DEVICE_ADD(_tag, Z80DAISY_GENERIC, 0) \
-	downcast<z80daisy_generic_device &>(*device).set_vector(_vector); \
-
-#define MCFG_Z80DAISY_GENERIC_INT_CB(_devcb) \
-	downcast<z80daisy_generic_device &>(*device).set_int_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -37,7 +25,7 @@ public:
 	z80daisy_generic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_int_handler(Object &&cb) { return m_int_handler.set_callback(std::forward<Object>(cb)); }
+	auto int_handler() { return m_int_handler.bind(); }
 
 	// configuration
 	void set_vector(uint8_t vector) { m_vector = vector; }

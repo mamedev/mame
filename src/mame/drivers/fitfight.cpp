@@ -152,7 +152,7 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//      @0x000036bc/?: 0xF0FD when inserting coin
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
-//  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
+//  map(0x700000, 0x700001).r(FUNC(fitfight_state::xxxx)); /* see init */
 	map(0x700000, 0x700001).w(FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
 	//  kept at 0xe07900/0xe04c56
 
@@ -208,8 +208,7 @@ void fitfight_state::bbprot_main_map(address_map &map)
 	map(0xb08000, 0xb0bfff).ram().w(FUNC(fitfight_state::fof_mid_tileram_w)).share("fof_mid_tileram");
 	map(0xb0c000, 0xb0ffff).ram().w(FUNC(fitfight_state::fof_txt_tileram_w)).share("fof_txt_tileram");
 
-	map(0xc00000, 0xc00fff).readonly();
-	map(0xc00000, 0xc03fff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xc00000, 0xc03fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0xd00000, 0xd007ff).ram().share("spriteram");
 
@@ -720,11 +719,11 @@ void fitfight_state::machine_reset()
 	m_fof_700000_data = 0;
 }
 
-MACHINE_CONFIG_START(fitfight_state::fitfight)
-
-	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(fitfight_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
+void fitfight_state::fitfight(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fitfight_state::fitfight_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fitfight_state::irq2_line_hold));
 
 	upd7810_device &audiocpu(UPD7810(config, m_audiocpu, 12000000));
 	audiocpu.set_addrmap(AS_PROGRAM, &fitfight_state::snd_mem);
@@ -735,7 +734,7 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	audiocpu.pc_in_cb().set(FUNC(fitfight_state::snd_portc_r));
 	audiocpu.pc_out_cb().set(FUNC(fitfight_state::snd_portc_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fitfight)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fitfight);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -746,42 +745,35 @@ MACHINE_CONFIG_START(fitfight_state::fitfight)
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set([this] (int state) { if (state) m_audiocpu->pulse_input_line(UPD7810_INTF2, m_audiocpu->minimum_quantum_time()); });
 
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x800);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1333333, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // ~8080Hz ??? TODO: find out the real frequency
+}
 
-MACHINE_CONFIG_START(fitfight_state::bbprot)
+void fitfight_state::bbprot(machine_config &config)
+{
+	M68000(config, m_maincpu, 12000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fitfight_state::bbprot_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(fitfight_state::irq2_line_hold));
 
-	MCFG_DEVICE_ADD("maincpu",M68000, 12000000)
-	MCFG_DEVICE_PROGRAM_MAP(bbprot_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", fitfight_state,  irq2_line_hold)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_prot);
 
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(2*8, 39*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(fitfight_state::screen_update_fitfight));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_prot)
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(2*8, 39*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fitfight_state, screen_update_fitfight)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_PALETTE_ADD("palette", 0x2000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x2000);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1333333, okim6295_device::PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", 1333333, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.0); // ~8080Hz ??? TODO: find out the real frequency
+}
 
 /***
 

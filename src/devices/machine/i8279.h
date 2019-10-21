@@ -35,53 +35,12 @@
 
 #pragma once
 
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_I8279_OUT_IRQ_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_out_irq_callback(DEVCB_##_devcb);
-
-#define MCFG_I8279_OUT_SL_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_out_sl_callback(DEVCB_##_devcb);
-
-#define MCFG_I8279_OUT_DISP_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_out_disp_callback(DEVCB_##_devcb);
-
-#define MCFG_I8279_OUT_BD_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_out_bd_callback(DEVCB_##_devcb);
-
-#define MCFG_I8279_IN_RL_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_in_rl_callback(DEVCB_##_devcb);
-
-#define MCFG_I8279_IN_SHIFT_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_in_shift_callback(DEVCB_##_devcb);
-
-#define MCFG_I8279_IN_CTRL_CB(_devcb) \
-	downcast<i8279_device &>(*device).set_in_ctrl_callback(DEVCB_##_devcb);
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-// ======================> i8279_device
-
 class i8279_device :  public device_t
 {
 public:
 	// construction/destruction
 	i8279_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_irq_callback(Object &&cb) { return m_out_irq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_sl_callback(Object &&cb) { return m_out_sl_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_disp_callback(Object &&cb) { return m_out_disp_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_bd_callback(Object &&cb) { return m_out_bd_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_rl_callback(Object &&cb) { return m_in_rl_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_shift_callback(Object &&cb) { return m_in_shift_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_in_ctrl_callback(Object &&cb) { return m_in_ctrl_cb.set_callback(std::forward<Object>(cb)); }
 	auto out_irq_callback() { return m_out_irq_cb.bind(); }
 	auto out_sl_callback() { return m_out_sl_cb.bind(); }
 	auto out_disp_callback() { return m_out_disp_cb.bind(); }

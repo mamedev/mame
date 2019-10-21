@@ -36,9 +36,10 @@ void midway_cheap_squeak_deluxe_device::csdeluxe_map(address_map &map)
 //  machine configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(midway_cheap_squeak_deluxe_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu", M68000, DERIVED_CLOCK(1, 2))
-	MCFG_DEVICE_PROGRAM_MAP(csdeluxe_map)
+void midway_cheap_squeak_deluxe_device::device_add_mconfig(machine_config &config)
+{
+	M68000(config, m_cpu, DERIVED_CLOCK(1, 2));
+	m_cpu->set_addrmap(AS_PROGRAM, &midway_cheap_squeak_deluxe_device::csdeluxe_map);
 
 	PIA6821(config, m_pia, 0);
 	m_pia->writepa_handler().set(FUNC(midway_cheap_squeak_deluxe_device::porta_w));
@@ -46,10 +47,11 @@ MACHINE_CONFIG_START(midway_cheap_squeak_deluxe_device::device_add_mconfig)
 	m_pia->irqa_handler().set(FUNC(midway_cheap_squeak_deluxe_device::irq_w));
 	m_pia->irqb_handler().set(FUNC(midway_cheap_squeak_deluxe_device::irq_w));
 
-	MCFG_DEVICE_ADD("dac", AD7533, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, *this, 1.0)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	AD7533(config, m_dac, 0).add_route(ALL_OUTPUTS, *this, 1.0);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -116,7 +118,7 @@ void midway_cheap_squeak_deluxe_device::suspend_cpu()
 //  stat_r - return the status value
 //-------------------------------------------------
 
-READ8_MEMBER( midway_cheap_squeak_deluxe_device::stat_r )
+u8 midway_cheap_squeak_deluxe_device::stat_r()
 {
 	return m_status;
 }
@@ -125,7 +127,7 @@ READ8_MEMBER( midway_cheap_squeak_deluxe_device::stat_r )
 //  sr_w - external 4-bit write to the input latch
 //-------------------------------------------------
 
-WRITE8_MEMBER( midway_cheap_squeak_deluxe_device::sr_w )
+void midway_cheap_squeak_deluxe_device::sr_w(u8 data)
 {
 	m_pia->write_portb(data & 0x0f);
 }

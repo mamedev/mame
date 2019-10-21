@@ -133,7 +133,7 @@ DEFINE_DEVICE_TYPE(SAPPHIRE_IOGA, sapphire_ioga_device, "ioga_s", "I/O Gate Arra
 
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, m_memory_device(*this, finder_base::DUMMY_TAG)
+	, m_memory_space(*this, finder_base::DUMMY_TAG, -1, 32)
 	, m_memory(nullptr)
 	, m_out_nmi_func(*this)
 	, m_out_irq_func(*this)
@@ -168,12 +168,7 @@ sapphire_ioga_device::sapphire_ioga_device(const machine_config &mconfig, const 
 
 void interpro_ioga_device::device_start()
 {
-	// get the memory space
-	if (!m_memory_device->has_space(m_memory_spacenum))
-		fatalerror("%s: device %s (%s) doesn't have memory space %d\n",
-			tag(), m_memory_device->device().tag(), m_memory_device->device().name(), m_memory_spacenum);
-
-	m_memory = m_memory_device->space(m_memory_spacenum).cache<2, 0, ENDIANNESS_LITTLE>();
+	m_memory = m_memory_space->cache<2, 0, ENDIANNESS_LITTLE>();
 
 	// resolve callbacks
 	m_out_nmi_func.resolve();
@@ -374,7 +369,7 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::interrupt_check)
 			if (m_softint & (1 << i))
 			{
 				// check priority
-				if (m_active_interrupt_type == INT_NONE || (0x8f + i * 0x10) < irq_vector)
+				if ((m_active_interrupt_type == INT_NONE) || (0x8f + i * 0x10) < irq_vector)
 				{
 					m_active_interrupt_type = INT_SOFT;
 					m_active_interrupt_number = i;
@@ -467,7 +462,7 @@ void interpro_ioga_device::irq(int state, u8 irq_vector)
 	if (m_irq_state != state)
 	{
 		LOGIRQ(m_active_interrupt_number, "irq: %s interrupt type %d number %d\n",
-			state ? "asserting" : "clearing",m_active_interrupt_type, m_active_interrupt_number);
+			state ? "asserting" : "clearing", m_active_interrupt_type, m_active_interrupt_number);
 
 		m_irq_state = state;
 		m_out_irq_func(state);
@@ -714,13 +709,14 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::dma)
 				if (dma_channel.control & DMA_CTRL_VIRTUAL)
 				{
 					const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
-					dma_channel.virtual_address += 4;
 
 					// FIXME: ignore the page fault flag?
 					dma_channel.real_address = ptde & ~0xfff;
 
 					LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n",
 						dma_channel.virtual_address, dma_channel.real_address);
+
+					dma_channel.virtual_address += 4;
 				}
 			}
 		}
@@ -891,13 +887,14 @@ void interpro_ioga_device::dma_w(address_space &space, offs_t offset, u32 data, 
 		if (data & DMA_CTRL_VIRTUAL)
 		{
 			const u32 ptde = m_memory->read_dword(dma_channel.virtual_address);
-			dma_channel.virtual_address += 4;
 
 			// FIXME: ignore the page fault flag?
 			dma_channel.real_address = (ptde & ~0xfff) | (dma_channel.real_address & 0xfff);
 
 			LOGDMA(dma_channel.channel, "dma: translated virtual 0x%08x real 0x%08x\n",
 				dma_channel.virtual_address, dma_channel.real_address);
+
+			dma_channel.virtual_address += 4;
 		}
 
 		// (7.0272) if bus error flag is written, clear existing bus error (otherwise retain existing state)
@@ -929,12 +926,11 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 		// transfer from the memory to device or device to memory
 		while ((dma_channel.control & SDMA_COUNT) && dma_channel.drq_state)
 		{
-			// TODO: work out which control register bits indicate read from device
-			if (dma_channel.control & SDMA_SEND)
+			if (dma_channel.control & SDMA_WRITE)
 			{
-				u8 data = m_memory->read_byte(dma_channel.address);
+				u8 data = m_memory->read_byte(dma_channel.address++);
 
-				LOGMASKED(LOG_SERIALDMA, "dma: transmitting byte 0x%02x to serial channel %d\n",
+				LOGMASKED(LOG_SERIALDMA, "dma: writing byte 0x%02x to serial channel %d\n",
 					data, dma_channel.channel);
 
 				dma_channel.device_w(data);
@@ -943,24 +939,26 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::serial_dma)
 			{
 				u8 data = dma_channel.device_r();
 
-				LOGMASKED(LOG_SERIALDMA, "dma: receiving byte 0x%02x from serial channel %d\n",
+				LOGMASKED(LOG_SERIALDMA, "dma: reading byte 0x%02x from serial channel %d\n",
 					data, dma_channel.channel);
 
-				m_memory->write_byte(dma_channel.address, data);
+				m_memory->write_byte(dma_channel.address++, data);
 			}
 
-			// increment address and decrement count
-			dma_channel.address++;
-			dma_channel.control = (dma_channel.control & SDMA_CONTROL) | ((dma_channel.control & SDMA_COUNT) - 1);
+			// decrement transfer count
+			dma_channel.control = (dma_channel.control & ~SDMA_COUNT) | ((dma_channel.control & SDMA_COUNT) - 1);
 		}
 
 		if ((dma_channel.control & SDMA_COUNT) == 0)
 		{
 			// transfer count zero
 			dma_channel.control |= SDMA_TCZERO;
+			dma_channel.control &= ~SDMA_ENABLE;
 
 			// raise an interrupt
+			// FIXME: assume edge-triggered?
 			set_int_line(IRQ_SERDMA, ASSERT_LINE);
+			set_int_line(IRQ_SERDMA, CLEAR_LINE);
 		}
 	}
 }
@@ -974,7 +972,7 @@ void interpro_ioga_device::serial_drq(int state, int channel)
 	LOGMASKED(LOG_SERIALDMA, "dma: drq for serial channel %d %s count 0x%04x\n",
 		channel, state ? "asserted" : "deasserted", dma_channel.control & SDMA_COUNT);
 
-	if (state && (dma_channel.control & SDMA_COUNT))
+	if (state && (dma_channel.control & SDMA_ENABLE))
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
@@ -995,7 +993,7 @@ void interpro_ioga_device::serial_dma_ctrl_w(address_space &space, offs_t offset
 
 	COMBINE_DATA(&dma_channel.control);
 
-	if (dma_channel.control & SDMA_COUNT)
+	if (dma_channel.control & SDMA_ENABLE)
 		m_serial_dma_timer->adjust(attotime::zero);
 }
 
@@ -1070,6 +1068,12 @@ TIMER_CALLBACK_MEMBER(interpro_ioga_device::timer_60hz)
 {
 	set_int_line(IRQ_60HZ, ASSERT_LINE);
 	set_int_line(IRQ_60HZ, CLEAR_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(sapphire_ioga_device::timer_60hz)
+{
+	set_int_line(IRQ_TIMER0, ASSERT_LINE);
+	set_int_line(IRQ_TIMER0, CLEAR_LINE);
 }
 
 READ32_MEMBER(interpro_ioga_device::timer1_r)

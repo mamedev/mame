@@ -103,6 +103,7 @@ Stephh's notes (based on the game M68EC020 code and some tests) :
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include <algorithm>
 
@@ -112,12 +113,14 @@ public:
 	dreamwld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_spriteram(*this, "spriteram")
-		, m_vram(*this, "vram_%u", 0)
+		, m_vram(*this, "vram_%u", 0U, u8(32))
 		, m_vregs(*this, "vregs")
 		, m_workram(*this, "workram")
+		, m_lineram(*this, "lineram", 32)
 		, m_prot(*this, "prot")
 		, m_spritelut(*this, "spritelut")
 		, m_okibank(*this, "oki%ubank", 1)
+		, m_dsw(*this, "DSW")
 		, m_maincpu(*this, "maincpu")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
@@ -128,45 +131,50 @@ public:
 	void baryon(machine_config &config);
 	void dreamwld(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* memory pointers */
-	required_shared_ptr<uint32_t> m_spriteram;
-	required_shared_ptr_array<uint32_t, 2> m_vram;
-	required_shared_ptr<uint32_t> m_vregs;
-	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<u32> m_spriteram;
+	required_shared_ptr_array<u16, 2> m_vram;
+	required_shared_ptr<u32> m_vregs;
+	required_shared_ptr<u32> m_workram;
+	required_shared_ptr<u16> m_lineram;
 
 	optional_memory_region m_prot;
 	required_memory_region m_spritelut;
 	optional_memory_bank_array<2> m_okibank;
+	required_ioport m_dsw;
 
-	std::unique_ptr<uint16_t[]> m_lineram16;
-
-	DECLARE_READ16_MEMBER(lineram16_r) { return m_lineram16[offset]; }
-	DECLARE_WRITE16_MEMBER(lineram16_w) { COMBINE_DATA(&m_lineram16[offset]); }
+	u16 lineram_r(offs_t offset) { return m_lineram[offset]; }
+	void lineram_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_lineram[offset]); }
 
 	/* video-related */
-	tilemap_t  *m_tilemap[2][2];
-	int      m_tilebank[2];
-	int      m_tilebankold[2];
-	int      m_old_linescroll[2];
+	tilemap_t *m_tilemap[2][2];
+	int       m_tilebank[2];
+	int       m_tilebankold[2];
+	int       m_old_linescroll[2];
 
-	std::unique_ptr<uint32_t[]> m_spritebuf[2];
+	std::unique_ptr<u32[]> m_spritebuf[2];
 
 	/* misc */
-	int      m_protindex;
-	template<int Layer> DECLARE_WRITE32_MEMBER(vram_w);
-	DECLARE_READ32_MEMBER(protdata_r);
-	template<int Chip> DECLARE_WRITE32_MEMBER(okibank_w);
-	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	uint32_t screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_dreamwld);
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	int       m_protindex;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	template<int Layer> u16 vram_r(offs_t offset);
+	template<int Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u32 protdata_r();
+	template<int Chip> void okibank_w(u8 data);
+	template<int Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void baryon_map(address_map &map);
 	void dreamwld_map(address_map &map);
 	void oki1_map(address_map &map);
@@ -174,36 +182,28 @@ private:
 };
 
 
-
-void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void dreamwld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	uint32_t *source = m_spritebuf[0].get();
-	uint32_t *finish = m_spritebuf[0].get() + 0x1000 / 4;
-	uint16_t *redirect = (uint16_t *)m_spritelut->base();
-	int xoffset = 4;
+	const u32 *source = m_spritebuf[0].get();
+	const u32 *finish = m_spritebuf[0].get() + 0x1000 / 4;
+	const u16 *redirect = &m_spritelut->as_u16();
+	const int xoffset = 4;
 
 	while (source < finish)
 	{
-		int xpos, ypos, tileno;
-		int xsize, ysize, xinc, yinc;
-		int xct, yct;
-		int xflip;
-		int yflip;
-		int colour;
+		int xpos = (source[0] & 0x000001ff) >> 0;
+		int ypos = (source[0] & 0x01ff0000) >> 16;
+		u8 xsize = (source[0] & 0x00000e00) >> 9;
+		u8 ysize = (source[0] & 0x0e000000) >> 25;
 
-		xpos  = (source[0] & 0x000001ff) >> 0;
-		ypos  = (source[0] & 0x01ff0000) >> 16;
-		xsize = (source[0] & 0x00000e00) >> 9;
-		ysize = (source[0] & 0x0e000000) >> 25;
+		u32 tileno       = (source[1] & 0x0001ffff) >>0;
+		const u32 colour = (source[1] & 0x3f000000) >>24;
+		const bool xflip = (source[1] & 0x40000000);
+		const bool yflip = (source[1] & 0x80000000);
 
-		tileno = (source[1] & 0x0001ffff) >>0;
-		colour = (source[1] & 0x3f000000) >>24;
-		xflip  = (source[1] & 0x40000000);
-		yflip  = (source[1] & 0x80000000);
-
-		xinc = 16;
-		yinc = 16;
+		int xinc = 16;
+		int yinc = 16;
 
 		xpos += xoffset;
 		xpos &= 0x1ff;
@@ -224,10 +224,9 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 		xpos -=16;
 
-
-		for (yct = 0; yct < ysize; yct++)
+		for (int yct = 0; yct < ysize; yct++)
 		{
-			for (xct = 0; xct < xsize; xct++)
+			for (int xct = 0; xct < xsize; xct++)
 			{
 					gfx->transpen(bitmap,cliprect, redirect[tileno], colour, xflip, yflip, xpos + xct * xinc, ypos + yct * yinc, 0);
 					gfx->transpen(bitmap,cliprect, redirect[tileno], colour, xflip, yflip, (xpos + xct * xinc) - 0x200, ypos + yct * yinc, 0);
@@ -243,24 +242,27 @@ void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 template<int Layer>
-WRITE32_MEMBER(dreamwld_state::vram_w)
+u16 dreamwld_state::vram_r(offs_t offset)
+{
+	return m_vram[Layer][offset];
+}
+
+template<int Layer>
+void dreamwld_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	for (int size = 0; size < 2; size++)
 	{
-		m_tilemap[Layer][size]->mark_tile_dirty(offset * 2);
-		m_tilemap[Layer][size]->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap[Layer][size]->mark_tile_dirty(offset);
 	}
 }
 
 template<int Layer>
 TILE_GET_INFO_MEMBER(dreamwld_state::get_tile_info)
 {
-	int tileno, colour;
-	tileno = (tile_index & 1) ? (m_vram[Layer][tile_index >> 1] & 0xffff) : ((m_vram[Layer][tile_index >> 1] >> 16) & 0xffff);
-	colour = tileno >> 13;
-	tileno &= 0x1fff;
-	SET_TILE_INFO_MEMBER(1, tileno + m_tilebank[Layer] * 0x2000, (Layer * 0x40) + colour, 0);
+	const u16 tileno = m_vram[Layer][tile_index];
+	const u16 colour = tileno >> 13;
+	SET_TILE_INFO_MEMBER(1, (tileno & 0x1fff) | (m_tilebank[Layer] << 13), (Layer * 0x40) + colour, 0);
 }
 
 
@@ -282,17 +284,15 @@ void dreamwld_state::video_start()
 		}
 	}
 
-	m_spritebuf[0] = std::make_unique<uint32_t[]>(0x2000 / 4);
-	m_spritebuf[1] = std::make_unique<uint32_t[]>(0x2000 / 4);
-	m_lineram16 = make_unique_clear<uint16_t[]>(0x400 / 2);
+	m_spritebuf[0] = std::make_unique<u32[]>(0x2000 / 4);
+	m_spritebuf[1] = std::make_unique<u32[]>(0x2000 / 4);
 
 	save_pointer(NAME(m_spritebuf[0]), 0x2000 / 4, 0);
 	save_pointer(NAME(m_spritebuf[1]), 0x2000 / 4, 1);
-	save_pointer(NAME(m_lineram16), 0x400/2);
 
 }
 
-WRITE_LINE_MEMBER(dreamwld_state::screen_vblank_dreamwld)
+WRITE_LINE_MEMBER(dreamwld_state::screen_vblank)
 {
 	// rising edge
 	if (state)
@@ -303,15 +303,13 @@ WRITE_LINE_MEMBER(dreamwld_state::screen_vblank_dreamwld)
 }
 
 
-uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dreamwld_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	tilemap_t *tmptilemap[2];
 
-	uint32_t scrolly[2]{ m_vregs[(0x000 / 4)]+32, m_vregs[(0x008 / 4)]+32 };
-
-	uint32_t scrollx[2]{ m_vregs[(0x004 / 4)] + 0, m_vregs[(0x00c / 4)] + 2 };
-
-	uint32_t layer_ctrl[2]{ m_vregs[0x010 / 4], m_vregs[0x014 / 4] };
+	const u32 scrolly[2]{ m_vregs[(0x000 / 4)] + 32, m_vregs[(0x008 / 4)] + 32 };
+	const u32 scrollx[2]{ m_vregs[(0x004 / 4)] + 0, m_vregs[(0x00c / 4)] + 2 };
+	const u32 layer_ctrl[2]{ m_vregs[0x010 / 4], m_vregs[0x014 / 4] };
 
 	for (int layer = 0; layer < 2; layer++)
 	{
@@ -325,28 +323,31 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 		}
 
 		// Test mode only, Other size is enable?
-		int size = (layer_ctrl[layer] & 0x0400) >> 10;
+		const int size = (layer_ctrl[layer] & 0x0400) >> 10;
 		tmptilemap[layer] = m_tilemap[layer][size];
-		int row_mask = 0x3ff >> size;
+		const int row_mask = 0x3ff >> size;
 
 		tmptilemap[layer]->set_scrolly(0, scrolly[layer]);
 
 		if (layer_ctrl[layer] & 0x0300)
 		{
-			int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 7;
+			const int tile_rowscroll = (layer_ctrl[layer] & 0x0200) >> 7;
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(((64*16) >> size) >> tile_rowscroll);
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(((64 * 16) >> i));
+				}
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
-			uint16_t* linebase = &m_lineram16[(layer * 0x200) / 2];
-			for (int i = 0; i < (256 >> tile_rowscroll); i++)   /* 256 screen lines */
+			const u16* linebase = &m_lineram[(layer * 0x200) / 2];
+			for (int i = 0; i < 256; i++)   /* 256 screen lines */
 			{
 				/* per-line rowscroll */
-				int x0 = linebase[(i+32)&0xff];
+				const int x0 = linebase[((i + 32) & 0xff) >> tile_rowscroll];
 
 				tmptilemap[layer]->set_scrollx(
-						(i + scrolly[layer]) & (row_mask >> tile_rowscroll),
+						(i + scrolly[layer]) & row_mask,
 						scrollx[layer] + x0 );
 			}
 		}
@@ -354,7 +355,10 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 		{
 			if (m_old_linescroll[layer] != (layer_ctrl[layer] & 0x0300))
 			{
-				tmptilemap[layer]->set_scroll_rows(1);
+				for (int i = 0; i < 2; i++)
+				{
+					m_tilemap[layer][i]->set_scroll_rows(1);
+				}
 				m_old_linescroll[layer] = (layer_ctrl[layer] & 0x0300);
 			}
 
@@ -371,14 +375,15 @@ uint32_t dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_in
 }
 
 
-
-READ32_MEMBER(dreamwld_state::protdata_r)
+u32 dreamwld_state::protdata_r()
 {
 	//static int count = 0;
 
 	size_t protsize = m_prot->bytes();
-	uint8_t dat = m_prot->base()[(m_protindex++) % protsize];
+	const u8 dat = m_prot->base()[m_protindex];
 
+	if (!machine().side_effects_disabled())
+		m_protindex = (m_protindex + 1) % protsize;
 	//printf("protection read %04x %02x\n", count, dat);
 	//count++;
 
@@ -401,12 +406,9 @@ void dreamwld_state::oki2_map(address_map &map)
 }
 
 template<int Chip>
-WRITE32_MEMBER(dreamwld_state::okibank_w)
+void dreamwld_state::okibank_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-		m_okibank[Chip]->set_entry(data&3);
-	else
-		logerror("OKI%x: unk bank write %x mem_mask %8x\n", Chip, data, mem_mask);
+	m_okibank[Chip]->set_entry(data & 3);
 }
 
 
@@ -416,15 +418,15 @@ void dreamwld_state::baryon_map(address_map &map)
 
 	map(0x400000, 0x401fff).ram().share("spriteram");
 	map(0x600000, 0x601fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
-	map(0x800000, 0x801fff).ram().w(FUNC(dreamwld_state::vram_w<0>)).share("vram_0");
-	map(0x802000, 0x803fff).ram().w(FUNC(dreamwld_state::vram_w<1>)).share("vram_1");
-	map(0x804000, 0x8043ff).rw(FUNC(dreamwld_state::lineram16_r), FUNC(dreamwld_state::lineram16_w));  // linescroll
+	map(0x800000, 0x801fff).rw(FUNC(dreamwld_state::vram_r<0>), FUNC(dreamwld_state::vram_w<0>)).share("vram_0");
+	map(0x802000, 0x803fff).rw(FUNC(dreamwld_state::vram_r<1>), FUNC(dreamwld_state::vram_w<1>)).share("vram_1");
+	map(0x804000, 0x8043ff).rw(FUNC(dreamwld_state::lineram_r), FUNC(dreamwld_state::lineram_w)).share("lineram");  // linescroll
 	map(0x804400, 0x805fff).ram().share("vregs");
 
 	map(0xc00000, 0xc00003).portr("INPUTS");
-	map(0xc00004, 0xc00007).portr("c00004");
+	map(0xc00004, 0xc00007).lr16("c00004", [this]() { return u16(m_dsw->read()); });
 
-	map(0xc0000c, 0xc0000f).w(FUNC(dreamwld_state::okibank_w<0>)); // sfx
+	map(0xc0000f, 0xc0000f).w(FUNC(dreamwld_state::okibank_w<0>)); // sfx
 	map(0xc00018, 0xc00018).rw("oki1", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
 
 	map(0xc00030, 0xc00033).r(FUNC(dreamwld_state::protdata_r)); // it reads protection data (irq code) from here and puts it at ffd000
@@ -436,7 +438,7 @@ void dreamwld_state::dreamwld_map(address_map &map)
 {
 	baryon_map(map);
 
-	map(0xc0002c, 0xc0002f).w(FUNC(dreamwld_state::okibank_w<1>)); // sfx
+	map(0xc0002f, 0xc0002f).w(FUNC(dreamwld_state::okibank_w<1>)); // sfx
 	map(0xc00028, 0xc00028).rw("oki2", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // sfx
 }
 
@@ -462,10 +464,6 @@ static INPUT_PORTS_START( dreamwld )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
@@ -533,10 +531,6 @@ static INPUT_PORTS_START( rolcrush )
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
 	PORT_DIPUNUSED_DIPLOC( 0x0002, IP_ACTIVE_LOW, "SW2:2" ) /* These might have some use, requires investigation of code */
@@ -594,10 +588,6 @@ static INPUT_PORTS_START( cutefght )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SW2:1" ) /* As listed in service mode, but tested */
@@ -659,10 +649,6 @@ static INPUT_PORTS_START( gaialast )
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
-
-	PORT_START("c00004")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0003,  0x0001, DEF_STR( Lives )  )  PORT_DIPLOCATION("SW2:1,2")
@@ -727,13 +713,13 @@ void dreamwld_state::machine_start()
 {
 	if (m_okibank[0].found())
 	{
-		m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base()+0x30000, 0x10000);
+		m_okibank[0]->configure_entries(0, 4, memregion("oki1")->base() + 0x30000, 0x10000);
 		m_okibank[0]->set_entry(0);
 	}
 
 	if (m_okibank[1].found())
 	{
-		m_okibank[1]->configure_entries(0, 4, memregion("oki2")->base()+0x30000, 0x10000);
+		m_okibank[1]->configure_entries(0, 4, memregion("oki2")->base() + 0x30000, 0x10000);
 		m_okibank[1]->set_entry(0);
 	}
 
@@ -750,50 +736,46 @@ void dreamwld_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(dreamwld_state::baryon)
-
+void dreamwld_state::baryon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68EC020, XTAL(32'000'000)/2) /* 16MHz verified */
-	MCFG_DEVICE_PROGRAM_MAP(baryon_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+	M68EC020(config, m_maincpu, XTAL(32'000'000)/2); /* 16MHz verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreamwld_state::baryon_map);
+	m_maincpu->set_vblank_int("screen", FUNC(dreamwld_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("mcu", AT89C52, XTAL(32'000'000)/2) /* AT89C52 or 87(C)52, unknown clock (value from docs) */
-	MCFG_DEVICE_DISABLE()   /* Internal ROM aren't dumped */
+	AT89C52(config, "mcu", XTAL(32'000'000)/2).set_disable(); /* AT89C52 or 87(C)52, unknown clock (value from docs), internal ROMs aren't dumped */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57.793)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512,256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 308-1, 0, 224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(dreamwld_state, screen_update_dreamwld)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, dreamwld_state, screen_vblank_dreamwld))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57.793);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(512,256);
+	screen.set_visarea(0, 308-1, 0, 224-1);
+	screen.set_screen_update(FUNC(dreamwld_state::screen_update));
+	screen.screen_vblank().set(FUNC(dreamwld_state::screen_vblank));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 0x1000)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dreamwld)
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x1000);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dreamwld);
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki1", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki1_map)
-MACHINE_CONFIG_END
+	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'000'000)/32, okim6295_device::PIN7_LOW)); /* 1MHz verified */
+	oki1.add_route(ALL_OUTPUTS, "mono", 1.00);
+	oki1.set_addrmap(0, &dreamwld_state::oki1_map);
+}
 
-MACHINE_CONFIG_START(dreamwld_state::dreamwld)
+void dreamwld_state::dreamwld(machine_config &config)
+{
 	baryon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(dreamwld_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", dreamwld_state,  irq4_line_hold)
+	m_maincpu->set_addrmap(AS_PROGRAM, &dreamwld_state::dreamwld_map);
 
-	MCFG_DEVICE_ADD("oki2", OKIM6295, XTAL(32'000'000)/32, okim6295_device::PIN7_LOW) /* 1MHz verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_DEVICE_ADDRESS_MAP(0, oki2_map)
-MACHINE_CONFIG_END
+	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(32'000'000)/32, okim6295_device::PIN7_LOW)); /* 1MHz verified */
+	oki2.add_route(ALL_OUTPUTS, "mono", 1.00);
+	oki2.set_addrmap(0, &dreamwld_state::oki2_map);
+}
 
 
 /*
@@ -1029,7 +1011,7 @@ ROM_START( rolcrush )
 	ROM_LOAD( "mx27c4000_5.bin", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populared */
+	/* not populated */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "m27c160.8.bin", 0x000000, 0x200000, CRC(a509bc36) SHA1(aaa008e07e4b24ff9dbcee5925d6516d1662931c) )
@@ -1063,7 +1045,7 @@ ROM_START( rolcrusha )
 	ROM_LOAD( "5", 0x000000, 0x80000, CRC(7afa6adb) SHA1(d4049e1068a5f7abf0e14d0b9fbbbc6dfb5d0170) )
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populared */
+	/* not populated */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "8", 0x000000, 0x200000, CRC(01446191) SHA1(b106ed6c085fad617552972db78866a3346e4553) )
@@ -1225,7 +1207,7 @@ ROM_START( gaialast )
 	ROM_LOAD( "1", 0x000000, 0x80000, CRC(2dbad410) SHA1(bb788ea14bb605be9af9c8f8adec94ad1c17ab55) )
 
 	ROM_REGION( 0x80000, "oki2", ROMREGION_ERASE00 ) /* OKI Samples - 2nd chip (neither OKI or rom is present, empty sockets) */
-	/* not populared */
+	/* not populated */
 
 	ROM_REGION( 0x800000, "gfx1", 0 ) /* Sprite Tiles - decoded */
 	ROM_LOAD( "10", 0x000000, 0x200000, CRC(5822ef93) SHA1(8ce22c30f8027f35c5f72eb6ce57a74540dd55da) )

@@ -7,9 +7,10 @@
     asst128 format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ASST128_DSK_H
+#define MAME_FORMATS_ASST128_DSK_H
 
-#ifndef ASST128_DSK_H_
-#define ASST128_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
@@ -27,4 +28,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ASST128_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_ASST128_DSK_H

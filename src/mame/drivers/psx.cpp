@@ -23,25 +23,25 @@
 #include "video/psx.h"
 
 #include "debugger.h"
+#include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
 
 #include <zlib.h>
 
-#define PSXCD_TAG   "psxcd"
-
 class psx1_state : public driver_device
 {
 public:
-	psx1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	psx1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, "maincpu:ram"),
 		m_parallel(*this, "parallel"),
-		m_psxcd(*this, PSXCD_TAG)
+		m_psxcd(*this, "psxcd")
 	{
 	}
 
+	void psx_base(machine_config &config);
 	void pse(machine_config &config);
 	void psu(machine_config &config);
 	void psj(machine_config &config);
@@ -66,7 +66,7 @@ protected:
 	int load_psf(std::vector<uint8_t> buffer);
 	DECLARE_READ16_MEMBER(parallel_r);
 	DECLARE_WRITE16_MEMBER(parallel_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(psx_exe_load);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_exe);
 	void cd_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void cd_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	required_device<psxcpu_device> m_maincpu;
@@ -482,7 +482,7 @@ WRITE16_MEMBER(psx1_state::parallel_w)
 	}
 }
 
-QUICKLOAD_LOAD_MEMBER(psx1_state, psx_exe_load)
+QUICKLOAD_LOAD_MEMBER(psx1_state::quickload_exe)
 {
 	m_exe_buffer.resize(quickload_size);
 
@@ -516,102 +516,70 @@ void psx1_state::subcpu_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-MACHINE_CONFIG_START(psx1_state::psj)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530CQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map )
+void psx1_state::psx_base(machine_config &config)
+{
+	m_maincpu->set_addrmap(AS_PROGRAM, &psx1_state::psx_map);
+	m_maincpu->cd_read().set(m_psxcd, FUNC(psxcd_device::read));
+	m_maincpu->cd_write().set(m_psxcd, FUNC(psxcd_device::write));
+	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
+	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers", 0));
+	controllers.rxd().set("maincpu:sio0", FUNC(psxsio0_device::write_rxd));
+	controllers.dsr().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
+	PSX_CONTROLLER_PORT(config, "port1", psx_controllers, "digital_pad");
+	PSX_CONTROLLER_PORT(config, "port2", psx_controllers, "digital_pad");
 
-	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
-	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
-	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
+	auto &sio0(*m_maincpu->subdevice<psxsio0_device>("sio0"));
+	sio0.dtr_handler().set("controllers", FUNC(psxcontrollerports_device::write_dtr));
+	sio0.sck_handler().set("controllers", FUNC(psxcontrollerports_device::write_sck));
+	sio0.txd_handler().set("controllers", FUNC(psxcontrollerports_device::write_txd));
 
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
-
-	/* video hardware */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
+	spu.add_route(0, "lspeaker", 1.00);
+	spu.add_route(1, "rspeaker", 1.00);
 
-	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
+	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe), this);
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+	PSX_PARALLEL_SLOT(config, "parallel", psx_parallel_devices, nullptr);
 
-	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
+	PSXCD(config, m_psxcd, m_maincpu, "spu");
+	m_psxcd->irq_handler().set("maincpu:irq", FUNC(psxirq_device::intin2));
+	subdevice<psxdma_device>("maincpu:dma")->install_read_handler(3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this));
+	subdevice<psxdma_device>("maincpu:dma")->install_write_handler(3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this));
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
-	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
+	SOFTWARE_LIST(config, "cd_list").set_original("psx");
+}
 
-	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, "maincpu", "spu")
-	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
-MACHINE_CONFIG_END
+void psx1_state::psj(machine_config &config)
+{
+	CXD8530CQ(config, m_maincpu, XTAL(67'737'600));
 
-MACHINE_CONFIG_START(psx1_state::psu)
-	psj(config);
-	MCFG_DEVICE_ADD( "subcpu", HD63705, 4166667 ) // MC68HC05G6
-	MCFG_DEVICE_PROGRAM_MAP( subcpu_map )
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(psx1_state::pse)
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD( "maincpu", CXD8530AQ, XTAL(67'737'600) )
-	MCFG_DEVICE_PROGRAM_MAP( psx_map)
-
-	MCFG_RAM_MODIFY("maincpu:ram")
-	MCFG_RAM_DEFAULT_SIZE("2M")
-
-	MCFG_DEVICE_ADD("controllers", PSXCONTROLLERPORTS, 0)
-	MCFG_PSX_CONTROLLER_PORTS_RXD_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_rxd))
-	MCFG_PSX_CONTROLLER_PORTS_DSR_HANDLER(WRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_PSX_CTRL_PORT_ADD("port1", psx_controllers, "digital_pad")
-	MCFG_PSX_CTRL_PORT_ADD("port2", psx_controllers, "digital_pad")
-
-	MCFG_DEVICE_MODIFY("maincpu:sio0")
-	MCFG_PSX_SIO_DTR_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_dtr))
-	MCFG_PSX_SIO_SCK_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_sck))
-	MCFG_PSX_SIO_TXD_HANDLER(WRITELINE("controllers", psxcontrollerports_device, write_txd))
-
-	/* video hardware */
 	/* TODO: visible area and refresh rate */
-	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL(53'693'175) )
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
-	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_SPU_ADD( "spu", XTAL(67'737'600)/2 )
-	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	psx_base(config);
+}
 
-	MCFG_QUICKLOAD_ADD("quickload", psx1_state, psx_exe_load, "cpe,exe,psf,psx", 0)
+void psx1_state::psu(machine_config &config)
+{
+	psj(config);
+	HD63705(config, "subcpu", 4166667).set_addrmap(AS_PROGRAM, &psx1_state::subcpu_map); // MC68HC05G6
+}
 
-	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
+void psx1_state::pse(machine_config &config)
+{
+	CXD8530AQ(config, m_maincpu, XTAL(67'737'600));
 
-	MCFG_PSX_PARALLEL_SLOT_ADD("parallel", psx_parallel_devices, nullptr)
+	/* TODO: visible area and refresh rate */
+	CXD8561Q(config, "gpu", XTAL(53'693'175), 0x100000, m_maincpu.target()).set_screen("screen");
 
-	MCFG_DEVICE_MODIFY( "maincpu" )
-	MCFG_PSX_CD_READ_HANDLER( READ8( PSXCD_TAG, psxcd_device, read ) )
-	MCFG_PSX_CD_WRITE_HANDLER( WRITE8( PSXCD_TAG, psxcd_device, write ) )
-
-	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, "maincpu", "spu")
-	MCFG_PSXCD_IRQ_HANDLER(WRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psxdma_device::read_delegate(&psx1_state::cd_dma_read, this ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psxdma_device::write_delegate(&psx1_state::cd_dma_write, this ) )
-MACHINE_CONFIG_END
+	psx_base(config);
+}
 
 ROM_START( psj )
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 )
@@ -741,7 +709,7 @@ Version 4.3 E
 */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                            FULLNAME                            FLAGS
-CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,  psj,    0,      pse,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,  psj,    0,      psu,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,  psj,    0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 1994, psj,  0,      0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, pse,  psj,    0,      pse,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, psu,  psj,    0,      psu,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 1995, psa,  psj,    0,      psj,     0,     psx1_state, empty_init, "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

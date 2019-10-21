@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Manuel Abadia
+#ifndef MAME_INCLUDES_AJAX_H
+#define MAME_INCLUDES_AJAX_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
@@ -71,3 +75,5 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 	output_finder<8> m_lamps;
 };
+
+#endif // MAME_INCLUDES_AJAX_H

@@ -100,8 +100,8 @@ WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
 	int c;
 
 	/* first blend the data */
-	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	data = m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_paletteram[offset]);
+	data = m_paletteram[offset];
 
 	/* now generate colors at all 16 intensities */
 	for (c = 0; c < 8; c++)
@@ -171,7 +171,7 @@ void vindictr_state::scanline_update(screen_device &screen, int scanline)
 				break;
 
 			case 6:     /* /VIRQ */
-				scanline_int_gen(*m_maincpu);
+				scanline_int_write_line(1);
 				break;
 
 			case 7:     /* /PFVS */

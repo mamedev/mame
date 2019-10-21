@@ -80,6 +80,31 @@
 			nosharedlibs    = true,
 			namestyle       = "windows",
 		},
+		TegraAndroid =
+		{
+			cfgsuffix       = "tegraandroid",
+			iscrosscompiler = true,
+			namestyle       = "TegraAndroid",
+		},
+		NX32 =
+		{
+			cfgsuffix       = "nx32",
+			iscrosscompiler = true,
+			namestyle       = "NX",
+		},
+		NX64 =
+		{
+			cfgsuffix       = "nx64",
+			iscrosscompiler = true,
+			namestyle       = "NX",
+		},
+		Emscripten =
+		{
+			cfgsuffix       = "emscripten",
+			iscrosscompiler = true,
+			nosharedlibs    = true,
+			namestyle       = "Emscripten",
+		},
 	}
 
 

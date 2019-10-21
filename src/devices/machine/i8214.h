@@ -26,34 +26,12 @@
 
 #pragma once
 
-
-
-///*************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-///*************************************************************************
-
-#define MCFG_I8214_INT_CALLBACK(_write) \
-	downcast<i8214_device &>(*device).set_int_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8214_ENLG_CALLBACK(_write) \
-	downcast<i8214_device &>(*device).set_enlg_wr_callback(DEVCB_##_write);
-
-
-
-///*************************************************************************
-//  TYPE DEFINITIONS
-///*************************************************************************
-
-// ======================> i8214_device
-
 class i8214_device : public device_t
 {
 public:
 	// construction/destruction
 	i8214_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_int_wr_callback(Object &&cb) { return m_write_int.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_enlg_wr_callback(Object &&cb) { return m_write_enlg.set_callback(std::forward<Object>(cb)); }
 	auto int_wr_callback() { return m_write_int.bind(); }
 	auto enlg_wr_callback() { return m_write_enlg.bind(); }
 

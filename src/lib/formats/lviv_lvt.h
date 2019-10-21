@@ -7,12 +7,13 @@
     Format code for Lviv cassette files
 
 *********************************************************************/
+#ifndef MAME_FORMATS_LVIV_LVT_H
+#define MAME_FORMATS_LVIV_LVT_H
 
-#ifndef LVIV_LVT_H
-#define LVIV_LVT_H
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN(lviv_lvt_format);
 
-#endif /* LVIV_LVT_H */
+#endif // MAME_FORMATS_LVIV_LVT_H

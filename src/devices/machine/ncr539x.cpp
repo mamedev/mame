@@ -56,7 +56,7 @@ enum
 #define CR2_GENERATE_REGISTER_PARITY    0x02
 #define CR2_GENERATE_DATA_PARITY    0x01
 
-static const char *rdregs[16] = {
+static char const *const rdregs[16] = {
 	"Transfer count LSB",   // 0
 	"Transfer count MSB",   // 1
 	"FIFO",                 // 2
@@ -75,7 +75,7 @@ static const char *rdregs[16] = {
 	"0xF"
 };
 
-static const char *wrregs[16] = {
+static char const *const wrregs[16] = {
 	"Start Transfer count LSB",
 	"Start Transfer count MSB",
 	"FIFO",
@@ -280,7 +280,7 @@ void ncr539x_device::device_timer(emu_timer &timer, device_timer_id tid, int par
 	}
 }
 
-READ8_MEMBER( ncr539x_device::read )
+uint8_t ncr539x_device::read(offs_t offset)
 {
 	uint8_t rv = 0;
 
@@ -412,7 +412,7 @@ READ8_MEMBER( ncr539x_device::read )
 	return rv;
 }
 
-WRITE8_MEMBER( ncr539x_device::write )
+void ncr539x_device::write(offs_t offset, uint8_t data)
 {
 	//if (offset != 2)
 		LOG("539x: Write %02x @ %s (%02x) (%s)\n", data, wrregs[offset], offset, machine().describe_context());

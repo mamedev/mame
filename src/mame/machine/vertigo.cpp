@@ -19,12 +19,12 @@
  *
  *************************************/
 
-TTL74148_OUTPUT_CB(vertigo_state::update_irq)
+WRITE8_MEMBER(vertigo_state::update_irq)
 {
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, CLEAR_LINE);
 
-	m_irq_state = m_ttl74148->output_r();
+	m_irq_state = data;
 
 	if (m_irq_state < 7)
 		m_maincpu->set_input_line(m_irq_state ^ 7, ASSERT_LINE);
@@ -69,7 +69,7 @@ WRITE_LINE_MEMBER( vertigo_state::adc_eoc_w )
 
 READ16_MEMBER(vertigo_state::vertigo_io_convert)
 {
-	m_adc->address_offset_start_w(space, offset, 0);
+	m_adc->address_offset_start_w(offset, 0);
 	return 0;
 }
 

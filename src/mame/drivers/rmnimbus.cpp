@@ -14,7 +14,7 @@
 #include "machine/rmnkbd.h"
 
 #include "cpu/mcs51/mcs51.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 
 #include "bus/isa/fdc.h"
 #include "bus/rs232/rs232.h"
@@ -63,7 +63,7 @@ void rmnimbus_state::nimbus_io(address_map &map)
 	map(0x0400, 0x0400).w(FUNC(rmnimbus_state::fdc_ctl_w));
 	map(0x0408, 0x040f).rw(m_fdc, FUNC(wd2793_device::read), FUNC(wd2793_device::write)).umask16(0x00ff);
 	map(0x0410, 0x041f).rw(FUNC(rmnimbus_state::scsi_r), FUNC(rmnimbus_state::scsi_w)).umask16(0x00ff);
-	map(0x0480, 0x049f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff);
+	map(0x0480, 0x049f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff);
 }
 
 
@@ -127,10 +127,10 @@ void rmnimbus_state::nimbus(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(4.433619_MHz_XTAL * 2, 650, 0, 640, 260, 0, 250);
 	m_screen->set_screen_update(FUNC(rmnimbus_state::screen_update_nimbus));
-	//MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	/* Backing storage */
 	WD2793(config, m_fdc, 1000000);
@@ -183,7 +183,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	rs232b.ri_handler().set(Z80SIO_TAG, FUNC(z80dart_device::rib_w));
 	rs232b.cts_handler().set(Z80SIO_TAG, FUNC(z80dart_device::ctsb_w));
 
-	EEPROM_SERIAL_93C06_16BIT(config, m_eeprom);
+	EEPROM_93C06_16BIT(config, m_eeprom);
 
 	VIA6522(config, m_via, 1000000);
 	m_via->writepa_handler().set("cent_data_out", FUNC(output_latch_device::bus_w));

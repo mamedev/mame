@@ -8,8 +8,7 @@
  *
  *  Adapted February 19, 2012 for general MAME/MESS standards by R. Belmont
  *
- *  TODO: use MESS ram device and MCFG_RAM_* to handle RAM sizing.
- *        Remove need for instruction hook.
+ *  TODO: Remove need for instruction hook.
  *        Convert to modern address map.
  *
  *  see also:
@@ -30,14 +29,12 @@
 #include "includes/apollo.h"
 
 #include "cpu/m68000/m68000.h"
-#include "sound/beep.h"
 
 // we use set_verbose
 #include "bus/isa/omti8621.h"
 #include "bus/isa/3c505.h"
 
 #include "debugger.h"
-#include "speaker.h"
 
 #include "apollo_dsp.lh"
 
@@ -130,20 +127,12 @@ static uint32_t log_line_counter = 0;
  cpu_context - return a string describing which CPU is currently executing and their PC
  ***************************************************************************/
 
-const char *apollo_cpu_context(device_t *cpu) {
-	static char statebuf[64]; /* string buffer containing state description */
+std::string apollo_cpu_context(running_machine &machine) {
+	osd_ticks_t t = osd_ticks();
+	int s = (t / osd_ticks_per_second()) % 3600;
+	int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
 
-	/* if we have an executing CPU, output data */
-	if (cpu != nullptr) {
-		osd_ticks_t t = osd_ticks();
-		int s = (t / osd_ticks_per_second()) % 3600;
-		int ms = (t / (osd_ticks_per_second() / 1000)) % 1000;
-
-		sprintf(statebuf, "%s %d.%03d", cpu->machine().describe_context().c_str(), s, ms);
-	} else {
-		strcpy(statebuf, "(no context)");
-	}
-	return statebuf;
+	return util::string_format("%s %d.%03d", machine.describe_context().c_str(), s, ms);
 }
 
 /*-------------------------------------------------
@@ -279,18 +268,21 @@ void apollo_state::apollo_bus_error()
 	apollo_csr_set_status_register(APOLLO_CSR_SR_CPU_TIMEOUT, APOLLO_CSR_SR_CPU_TIMEOUT);
 }
 
-IRQ_CALLBACK_MEMBER(apollo_state::apollo_irq_acknowledge)
+void apollo_state::cpu_space_map(address_map &map)
 {
-	int result = M68K_INT_ACK_AUTOVECTOR;
+	map(0xfffffff2, 0xffffffff).r(FUNC(apollo_state::apollo_irq_acknowledge));
+}
 
-	m_maincpu->set_input_line(irqline, CLEAR_LINE);
+u16 apollo_state::apollo_irq_acknowledge(offs_t offset)
+{
+	m_maincpu->set_input_line(offset+1, CLEAR_LINE);
 
-	MLOG2(("apollo_irq_acknowledge: interrupt level=%d", irqline));
+	MLOG2(("apollo_irq_acknowledge: interrupt level=%d", offset+1));
 
-	if (irqline == 6) {
-		result = apollo_pic_acknowledge(device, irqline);
-	}
-	return result;
+	if (offset+1 == 6)
+		return apollo_pic_get_vector();
+	else
+		return m68000_base_device::autovector(offset+1);
 }
 
 /***************************************************************************
@@ -425,7 +417,7 @@ READ32_MEMBER(apollo_state::ram_with_parity_r){
 
 		if (apollo_csr_get_control_register() & APOLLO_CSR_CR_INTERRUPT_ENABLE) {
 			// force parity error (if NMI is enabled)
-			m_maincpu->set_input_line_and_vector(7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+			m_maincpu->set_input_line(7, ASSERT_LINE);
 
 		}
 	}
@@ -707,20 +699,20 @@ void apollo_state::dn3500_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM /* 8MB RAM */
-		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		// map(DN3500_RAM_BASE, DN3500_RAM_END).ram(); /* 8MB RAM */
+		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-		map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+		map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-		map(0x05e800, 0x05ec07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-		map(0x0a0000, 0x0bffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//      AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//      AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
-//      AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//      map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//      map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//      map(0x0e000000, 0x0fffffff) FPA address space
 
-//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp3500_map(address_map &map)
@@ -749,11 +741,11 @@ void apollo_state::dsp3500_map(address_map &map)
 
 		map(ATBUS_IO_BASE, ATBUS_IO_END).rw(FUNC(apollo_state::apollo_atbus_io_r), FUNC(apollo_state::apollo_atbus_io_w));
 
-		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		map(DN3500_RAM_BASE, DN3500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
-//      AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//      map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dn3000_map(address_map &map)
@@ -779,14 +771,14 @@ void apollo_state::dn3000_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
-		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
+		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-		map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-		map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+		map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+		map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-		map(0x05e800, 0x05ec07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-		map(0x0a0000, 0x0bffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+		map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+		map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 }
 
 void apollo_state::dsp3000_map(address_map &map)
@@ -813,8 +805,8 @@ void apollo_state::dsp3000_map(address_map &map)
 		map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 		// FIXME: must match with RAM size in driver/apollo_sio.c
-		// AM_RANGE(DN3000_RAM_BASE, DN3000_RAM_END) AM_RAM  /* 8MB RAM */
-		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+		// map(DN3000_RAM_BASE, DN3000_RAM_END).ram();  /* 8MB RAM */
+		map(DN3000_RAM_BASE, DN3000_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 }
 
@@ -849,21 +841,21 @@ void apollo_state::dn5500_map(address_map &map)
 	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 	// FIXME: must match with RAM size in driver/apollo_sio.c
-	// AM_RANGE(DN3500_RAM_BASE, DN3500_RAM_END) AM_RAM  /* 8MB RAM */
-	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+	// map(DN3500_RAM_BASE, DN3500_RAM_END).ram();  /* 8MB RAM */
+	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
-	map(0x05d800, 0x05dc07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
-	map(0xfa0000, 0xfdffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
+	map(0x05d800, 0x05dc07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mcr_r), FUNC(apollo_graphics_15i::apollo_mcr_w));
+	map(0xfa0000, 0xfdffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_mgm_r), FUNC(apollo_graphics_15i::apollo_mgm_w));
 
-	map(0x05e800, 0x05ec07).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
-	map(0x0a0000, 0x0bffff).rw(APOLLO_SCREEN_TAG, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
+	map(0x05e800, 0x05ec07).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_ccr_r), FUNC(apollo_graphics_15i::apollo_ccr_w));
+	map(0x0a0000, 0x0bffff).rw(m_graphics, FUNC(apollo_graphics_15i::apollo_cgm_r), FUNC(apollo_graphics_15i::apollo_cgm_w));
 
-//  AM_RANGE(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
-//  AM_RANGE(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
+//  map(0x03020000, 0x0303ffff) Cache Tag Store (DN4500 only)
+//  map(0x04000000, 0x0400ffff) Cache Tag Data (DN4500 only)
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
-//  AM_RANGE(0x0e000000, 0x0fffffff) FPA address space
+//  map(0x0e000000, 0x0fffffff) FPA address space
 
-//  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 void apollo_state::dsp5500_map(address_map &map)
@@ -896,10 +888,10 @@ void apollo_state::dsp5500_map(address_map &map)
 	map(ATBUS_MEMORY_BASE, ATBUS_MEMORY_END).rw(FUNC(apollo_state::apollo_atbus_memory_r), FUNC(apollo_state::apollo_atbus_memory_w));
 
 	// FIXME: must match with RAM size in driver/apollo_sio.c
-	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share("messram");
+	map(DN5500_RAM_BASE, DN5500_RAM_END).ram().w(FUNC(apollo_state::ram_with_parity_w)).share(RAM_TAG);
 
 	map(0x07000000, 0x0700FFFF).rw(FUNC(apollo_state::dn5500_io_protection_map_r), FUNC(apollo_state::dn5500_io_protection_map_w));
-//  AM_RANGE(0xf8000000, 0xffffffff) AM_READWRITE(apollo_f8_r, apollo_f8_w)
+//  map(0xf8000000, 0xffffffff).rw(FUNC(apollo_state::apollo_f8_r), FUNC(apollo_state::apollo_f8_w));
 }
 
 /***************************************************************************
@@ -941,8 +933,8 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
 
 	if (!apollo_is_dsp3x00())
 	{
-		machine().device(APOLLO_SCREEN_TAG)->reset();
-		machine().device(APOLLO_KBD_TAG )->reset();
+		m_graphics->reset();
+		m_keyboard->reset();
 #ifdef APOLLO_XXL
 		machine().device(APOLLO_STDIO_TAG )->reset();
 #endif
@@ -954,7 +946,7 @@ WRITE_LINE_MEMBER(apollo_state::apollo_reset_instr_callback)
  ***************************************************************************/
 
 void apollo_state::machine_start(){
-	memory_share *messram = memshare("messram");
+	memory_share *messram = memshare(RAM_TAG);
 	//MLOG1(("machine_start_dn3500: ram size is %d MB", (int)messram->bytes()/(1024*1024)));
 
 	// clear ram
@@ -1053,170 +1045,156 @@ READ_LINE_MEMBER( apollo_state::apollo_kbd_is_german )
  MACHINE DRIVERS
  ***************************************************************************/
 
-MACHINE_CONFIG_START(apollo_state::dn3500)
+void apollo_state::dn3500(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
-	MCFG_DEVICE_PROGRAM_MAP(dn3500_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
+	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3500_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo(config);
 
-	/* keyboard beeper */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep", BEEP, 1000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
+	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 #ifdef APOLLO_XXL
-	MCFG_DEVICE_ADD(APOLLO_STDIO_TAG, APOLLO_STDIO, 0)
-	MCFG_APOLLO_STDIO_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_b_w))
+	apollo_stdio_device &stdio(APOLLO_STDIO(config, APOLLO_STDIO_TAG, 0));
+	stdio.tx_cb().set(m_sio, FUNC(apollo_sio::rx_b_w));
 #endif
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apollo_state::dsp3500)
-	MCFG_DEVICE_ADD(MAINCPU, M68030, 25000000) /* 25 MHz 68030 */
-	MCFG_DEVICE_PROGRAM_MAP(dsp3500_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+void apollo_state::dsp3500(machine_config &config)
+{
+	M68030(config, m_maincpu, 25000000); /* 25 MHz 68030 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3500_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
 
-	/* keyboard beeper */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep", BEEP, 1000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M,8M,16M,32M")
+	RAM(config, RAM_TAG).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3500_19i)
+void apollo_state::dn3500_19i(machine_config &config)
+{
 	dn3500(config);
 	/* video hardware 19" monochrome */
-	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_MONO19I(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3500_15i)
+void apollo_state::dn3500_15i(machine_config &config)
+{
 	dn3500(config);
 	/* video hardware is 15" monochrome or color */
-	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_GRAPHICS(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3000)
+void apollo_state::dn3000(machine_config &config)
+{
 	dn3500(config);
-	MCFG_DEVICE_REPLACE(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
-	MCFG_DEVICE_PROGRAM_MAP(dn3000_map)
-	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
-	MCFG_RAM_MODIFY("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	M68020PMMU(config.replace(), m_maincpu, 12000000); /* 12 MHz */
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn3000_map);
+	config.device_remove( APOLLO_SIO2_TAG );
+	m_ram->set_default_size("8M").set_extra_options("4M");
 
 	// FIXME: is this interrupt really only connected on DN3000?
-	MCFG_DEVICE_MODIFY(APOLLO_RTC_TAG)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, apollo_state, apollo_rtc_irq_function))
-MACHINE_CONFIG_END
+	m_rtc->irq().set(FUNC(apollo_state::apollo_rtc_irq_function));
+}
 
-MACHINE_CONFIG_START(apollo_state::dsp3000)
-	MCFG_DEVICE_ADD(MAINCPU, M68020PMMU, 12000000) /* 12 MHz */
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
-	MCFG_DEVICE_PROGRAM_MAP(dsp3000_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+void apollo_state::dsp3000(machine_config &config)
+{
+	M68020PMMU(config, m_maincpu, 12000000); /* 12 MHz */
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp3000_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
-
-	/* keyboard beeper */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep", BEEP, 1000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* internal ram */
-	MCFG_RAM_ADD("messram")
-	MCFG_RAM_DEFAULT_SIZE("8M")
-	MCFG_RAM_EXTRA_OPTIONS("4M")
+	RAM(config, m_ram).set_default_size("8M").set_extra_options("4M");
 
-	MCFG_DEVICE_REMOVE( APOLLO_SIO2_TAG )
-	MCFG_RAM_MODIFY("messram")
+	config.device_remove( APOLLO_SIO2_TAG );
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3000_19i)
+void apollo_state::dn3000_19i(machine_config &config)
+{
 	dn3000(config);
 	/* video hardware 19" monochrome */
-	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_MONO19I(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn3000_15i)
+void apollo_state::dn3000_15i(machine_config &config)
+{
 	dn3000(config);
 	/* video hardware 15" monochrome */
-	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_GRAPHICS(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn5500)
+void apollo_state::dn5500(machine_config &config)
+{
 	dn3500(config);
-	MCFG_DEVICE_REPLACE(MAINCPU, M68040, 25000000) /* 25 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(dn5500_map)
-MACHINE_CONFIG_END
+	M68040(config.replace(), m_maincpu, 25000000); /* 25 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dn5500_map);
+}
 
-MACHINE_CONFIG_START(apollo_state::dsp5500)
-	MCFG_DEVICE_ADD(MAINCPU, M68040, 25000000) /* 25 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(dsp5500_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(apollo_state,apollo_irq_acknowledge)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+void apollo_state::dsp5500(machine_config &config)
+{
+	M68040(config, m_maincpu, 25000000); /* 25 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &apollo_state::dsp5500_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &apollo_state::cpu_space_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	apollo_terminal(config);
 
-	/* keyboard beeper */
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("beep", BEEP, 1000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	/* internal ram */
+	// FIXME: guess, to fix validation
+	RAM(config, RAM_TAG).set_default_size("8M").set_extra_options("4M,8M,16M,32M");
 
 	/* terminal hardware */
 	config.set_default_layout(layout_apollo_dsp);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(apollo_state::dn5500_19i)
+void apollo_state::dn5500_19i(machine_config &config)
+{
 	dn5500(config);
 	/* video hardware 19" monochrome */
-	MCFG_APOLLO_MONO19I_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_MONO19I(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
-MACHINE_CONFIG_START(apollo_state::dn5500_15i)
+void apollo_state::dn5500_15i(machine_config &config)
+{
 	dn5500(config);
 	/* video hardware 15" monochrome */
-	MCFG_APOLLO_GRAPHICS_ADD(APOLLO_SCREEN_TAG)
-	MCFG_DEVICE_ADD(APOLLO_KBD_TAG, APOLLO_KBD, 0)
-	MCFG_APOLLO_KBD_TX_CALLBACK(WRITELINE(APOLLO_SIO_TAG, apollo_sio, rx_a_w))
-	MCFG_APOLLO_KBD_GERMAN_CALLBACK(READLINE(*this, apollo_state, apollo_kbd_is_german))
-MACHINE_CONFIG_END
+	APOLLO_GRAPHICS(config, m_graphics, 0);
+	APOLLO_KBD(config, m_keyboard, 0);
+	m_keyboard->tx_cb().set(m_sio, FUNC(apollo_sio::rx_a_w));
+	m_keyboard->german_cb().set(FUNC(apollo_state::apollo_kbd_is_german));
+}
 
 /***************************************************************************
  ROM Definitions

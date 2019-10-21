@@ -69,7 +69,7 @@ void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		snes_hblank_tick(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in snes_state::device_timer");
+		throw emu_fatalerror("Unknown id in snes_state::device_timer");
 	}
 }
 
@@ -230,14 +230,12 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 	/* draw a scanline */
 	if (m_ppu->current_vert() <= m_ppu->last_visible_line())
 	{
-		if (m_screen->vpos() > 0)
-		{
-			/* Do HDMA */
-			if (SNES_CPU_REG(HDMAEN))
-				hdma(cpu0space);
+		/* Do HDMA */
+		if (SNES_CPU_REG(HDMAEN))
+			hdma(cpu0space);
 
-			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert() - 1);
-		}
+		if (m_screen->vpos() > 0)
+			m_screen->update_partial((m_ppu->interlace() == 2) ? (m_ppu->current_vert() * m_ppu->interlace()) : m_ppu->current_vert());
 	}
 
 	// signal hblank
@@ -259,11 +257,6 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
     Input Handlers
 
 *************************************/
-
-READ8_MEMBER( snes_state::snes_open_bus_r )
-{
-	return snes_open_bus_r();
-}
 
 uint8_t snes_state::snes_open_bus_r()
 {
@@ -404,7 +397,7 @@ READ8_MEMBER( snes_state::snes_r_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-		return m_spc700->spc_port_out(space, offset & 0x3);
+		return m_spc700->spc_port_out(offset & 0x3);
 	}
 
 	// DMA accesses are from 4300 to 437f
@@ -494,7 +487,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 	if (offset >= APU00 && offset < WMDATA)
 	{
 //      printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,m_maincpu->pc());
-		m_spc700->spc_port_in(space, offset & 0x3, data);
+		m_spc700->spc_port_in(offset & 0x3, data);
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 		return;
 	}
@@ -565,7 +558,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 			SNES_CPU_REG(MDMAEN) = 0;   /* Once DMA is done we need to reset all bits to 0 */
 			return;
 		case HDMAEN:    /* HDMA channel designation */
-			if (data) //if a HDMA is enabled, data is inited at the next scanline
+			if (data != SNES_CPU_REG(HDMAEN)) //if a HDMA is enabled, data is inited at the next scanline
 				timer_set(m_screen->time_until_pos(m_ppu->current_vert() + 1), TIMER_RESET_HDMA);
 			SNES_CPU_REG(HDMAEN) = data;
 			return;
@@ -1042,7 +1035,7 @@ void snes_state::snes_init_timers()
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
-	m_hblank_offset = 274;
+	m_hblank_offset = 128;
 	m_hblank_timer->adjust(m_screen->time_until_pos(m_ppu->vtotal() - 1, m_hblank_offset));
 }
 
@@ -1069,7 +1062,7 @@ void snes_state::snes_init_ram()
 	SNES_CPU_REG(WRIO) = 0xff;
 
 	// init frame counter so first line is 0
-	if (ATTOSECONDS_TO_HZ(m_screen->frame_period().attoseconds()) >= 59)
+	if (m_screen->frame_period().as_hz() >= 59.0)
 		m_ppu->set_current_vert(SNES_VTOTAL_NTSC);
 	else
 		m_ppu->set_current_vert(SNES_VTOTAL_PAL);

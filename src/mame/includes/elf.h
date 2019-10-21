@@ -57,13 +57,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	template <unsigned N> DECLARE_WRITE8_MEMBER( digit_w ) { m_7segs[N] = data; }
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
+	DECLARE_QUICKLOAD_LOAD_MEMBER( quickload_cb );
 	void elf2_io(address_map &map);
 	void elf2_mem(address_map &map);
 
 	virtual void machine_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
 	required_device<mm74c922_device> m_kb;
 	required_device<dm9368_device> m_led_l;

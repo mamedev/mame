@@ -157,30 +157,29 @@ void dec8_state::allocate_buffered_spriteram16()
 /******************************************************************************/
 
 
-void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void dec8_state::srdarwin_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap)
 {
 	uint8_t *buffered_spriteram = m_spriteram->buffer();
-	int offs;
 
 	/* Sprites */
-	for (offs = 0; offs < 0x200; offs += 4)
+	for (int offs = 0x200 - 4; offs >= 0; offs -= 4)
 	{
-		int multi, fx, sx, sy, sy2, code, color;
+		u32 pri_mask = 0;
+		int sy2;
 
-		color = (buffered_spriteram[offs + 1] & 0x03) + ((buffered_spriteram[offs + 1] & 0x08) >> 1);
-		if (pri == 0 && color != 0) continue;
-		if (pri == 1 && color == 0) continue;
+		const u32 color = (buffered_spriteram[offs + 1] & 0x03) + ((buffered_spriteram[offs + 1] & 0x08) >> 1);
+		if (color == 0) pri_mask |= GFX_PMASK_2;
 
-		code = buffered_spriteram[offs + 3] + ((buffered_spriteram[offs + 1] & 0xe0) << 3);
+		const u32 code = buffered_spriteram[offs + 3] + ((buffered_spriteram[offs + 1] & 0xe0) << 3);
 		if (!code) continue;
 
-		sy = buffered_spriteram[offs];
+		int sy = buffered_spriteram[offs];
 		if (sy == 0xf8) continue;
 
-		sx = (241 - buffered_spriteram[offs + 2]);
+		int sx = (241 - buffered_spriteram[offs + 2]);
 
-		fx = buffered_spriteram[offs + 1] & 0x04;
-		multi = buffered_spriteram[offs + 1] & 0x10;
+		int fx = buffered_spriteram[offs + 1] & 0x04;
+		const bool multi = buffered_spriteram[offs + 1] & 0x10;
 
 		if (flip_screen())
 		{
@@ -191,34 +190,43 @@ void dec8_state::srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &
 		}
 		else sy2 = sy + 16;
 
-		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
-					code,
+		m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
+				code,
 				color,
 				fx,flip_screen(),
-				sx,sy,0);
+				sx,sy,primap,pri_mask,0);
 		if (multi)
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(1)->prio_transpen(bitmap,cliprect,
 				code+1,
 				color,
 				fx,flip_screen(),
-				sx,sy2,0);
+				sx,sy2,primap,pri_mask,0);
 	}
 }
 
 /******************************************************************************/
 
+void dec8_state::cobracom_colpri_cb(u32 &colour, u32 &pri_mask)
+{
+	pri_mask = 0; // above foreground, background
+	if ((colour & 4) == 0)
+		pri_mask |= GFX_PMASK_2; // behind foreground, above background
+
+	colour &= 3;
+}
+
 uint32_t dec8_state::screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0,cliprect);
 	bool flip = m_tilegen[0]->get_flip_state();
 	m_tilegen[0]->set_flip_screen(flip);
 	m_tilegen[1]->set_flip_screen(flip);
 	m_spritegen_mxc->set_flip_screen(flip);
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x04, 0x00, 0x03);
-	m_tilegen[1]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x04, 0x04, 0x03);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 1);
+	m_tilegen[1]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00, 2);
+	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -254,8 +262,8 @@ VIDEO_START_MEMBER(dec8_state,cobracom)
 
 uint32_t dec8_state::screen_update_ghostb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x400, 0);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -294,10 +302,10 @@ uint32_t dec8_state::screen_update_oscar(screen_device &screen, bitmap_ind16 &bi
 	m_spritegen_mxc->set_flip_screen(flip);
 	m_fix_tilemap->set_flip(flip ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
-	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	m_spritegen_mxc->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x00, 0x00, 0x0f);
-	m_tilegen[0]->deco_bac06_pf_draw(bitmap,cliprect,0, 0x08,0x08,0x08,0x08);
+	// we mimic the priority scheme in dec0.cpp, this was originally a bit different, so this could be wrong
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00, 0);
+	m_spritegen_mxc->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x800/2);
+	m_tilegen[0]->deco_bac06_pf_draw(screen,bitmap,cliprect,0, 0x08,0x08,0x08,0x08, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -333,7 +341,7 @@ uint32_t dec8_state::screen_update_lastmisn(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8)+ m_scroll2[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x400, 0);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -346,7 +354,7 @@ uint32_t dec8_state::screen_update_shackled(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 0, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1 | 1, 0);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 0);
-	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x400, 0);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 1, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -412,12 +420,12 @@ VIDEO_START_MEMBER(dec8_state,shackled)
 
 uint32_t dec8_state::screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	m_bg_tilemap->set_scrollx(0, (m_scroll2[0] << 8) + m_scroll2[1]);
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	srdarwin_draw_sprites(bitmap, cliprect, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	srdarwin_draw_sprites(bitmap, cliprect, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 2);
+	srdarwin_draw_sprites(bitmap, cliprect, screen.priority());
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -465,15 +473,22 @@ VIDEO_START_MEMBER(dec8_state,srdarwin)
 
 /******************************************************************************/
 
+void dec8_state::gondo_colpri_cb(u32 &colour, u32 &pri_mask)
+{
+	pri_mask = 0; // above foreground, background
+	if (colour & 8)
+		pri_mask |= GFX_PMASK_2; // behind foreground, above background
+}
+
 uint32_t dec8_state::screen_update_gondo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	screen.priority().fill(0, cliprect);
 	m_bg_tilemap->set_scrollx(0, ((m_scroll2[0] << 8) + m_scroll2[1]));
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
 
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x400, 2);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x400, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 2);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -484,7 +499,7 @@ uint32_t dec8_state::screen_update_garyoret(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrolly(0, ((m_scroll2[2] << 8) + m_scroll2[3]));
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_spritegen_krn->draw_sprites(bitmap, cliprect, m_buffered_spriteram16.get(), 0x400, 0);
+	m_spritegen_krn->draw_sprites(screen, bitmap, cliprect, m_gfxdecode->gfx(1), m_buffered_spriteram16.get(), 0x400);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	m_fix_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

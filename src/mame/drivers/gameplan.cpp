@@ -167,8 +167,7 @@ WRITE_LINE_MEMBER(gameplan_state::r6532_irq)
 
 WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 {
-	address_space &progspace = m_maincpu->space(AS_PROGRAM);
-	m_soundlatch->write(progspace, 0, data);
+	m_soundlatch->write(data);
 }
 
 
@@ -181,9 +180,9 @@ WRITE8_MEMBER(gameplan_state::r6532_soundlatch_w)
 void gameplan_state::gameplan_main_map(address_map &map)
 {
 	map(0x0000, 0x03ff).mirror(0x1c00).ram();
-	map(0x2000, 0x200f).mirror(0x07f0).rw(m_via_0, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 1 */
-	map(0x2800, 0x280f).mirror(0x07f0).rw(m_via_1, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 2 */
-	map(0x3000, 0x300f).mirror(0x07f0).rw(m_via_2, FUNC(via6522_device::read), FUNC(via6522_device::write));    /* VIA 3 */
+	map(0x2000, 0x200f).mirror(0x07f0).m(m_via_0, FUNC(via6522_device::map));    /* VIA 1 */
+	map(0x2800, 0x280f).mirror(0x07f0).m(m_via_1, FUNC(via6522_device::map));    /* VIA 2 */
+	map(0x3000, 0x300f).mirror(0x07f0).m(m_via_2, FUNC(via6522_device::map));    /* VIA 3 */
 	map(0x8000, 0xffff).rom();
 }
 
@@ -970,9 +969,6 @@ void gameplan_state::gameplan(machine_config &config)
 	RIOT6532(config, m_riot, GAMEPLAN_AUDIO_CPU_CLOCK);
 	m_riot->out_pb_callback().set(FUNC(gameplan_state::r6532_soundlatch_w));
 	m_riot->irq_callback().set(FUNC(gameplan_state::r6532_irq));
-
-	MCFG_MACHINE_START_OVERRIDE(gameplan_state,gameplan)
-	MCFG_MACHINE_RESET_OVERRIDE(gameplan_state,gameplan)
 
 	/* video hardware */
 	gameplan_video(config);

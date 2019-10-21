@@ -84,6 +84,7 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pturn_state : public driver_device
@@ -512,52 +513,50 @@ void pturn_state::machine_start()
 
 void pturn_state::machine_reset()
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_soundlatch->clear_w(space,0,0);
+	m_soundlatch->clear_w();
 	m_nmi_sub = false;
 }
 
-MACHINE_CONFIG_START(pturn_state::pturn)
-	MCFG_DEVICE_ADD("maincpu", Z80, 12000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pturn_state,  main_intgen)
+void pturn_state::pturn(machine_config &config)
+{
+	Z80(config, m_maincpu, 12000000/3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pturn_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pturn_state::main_intgen));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 12000000/3)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(pturn_state, sub_intgen, 3*60)
+	Z80(config, m_audiocpu, 12000000/3);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &pturn_state::sub_map);
+	m_audiocpu->set_periodic_int(FUNC(pturn_state::sub_intgen), attotime::from_hz(3*60));
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, pturn_state, flip_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, pturn_state, nmi_main_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, pturn_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, pturn_state, bgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, pturn_state, fgbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // toggles frequently during gameplay
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(pturn_state::flip_w));
+	mainlatch.q_out_cb<1>().set(FUNC(pturn_state::nmi_main_enable_w));
+	mainlatch.q_out_cb<2>().set(FUNC(pturn_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(pturn_state::coin_counter_2_w));
+	mainlatch.q_out_cb<4>().set(FUNC(pturn_state::bgbank_w));
+	mainlatch.q_out_cb<5>().set(FUNC(pturn_state::fgbank_w));
+	mainlatch.q_out_cb<6>().set_nop(); // toggles frequently during gameplay
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pturn_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(pturn_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x100)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x100);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pturn)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pturn);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 ROM_START( pturn )

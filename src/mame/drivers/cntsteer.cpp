@@ -11,7 +11,7 @@
 
     todo:
     both games
-        - correct roz rotation;
+        - correct ROZ rotation (single register that controls both);
         - flip screen support;
         - according to a side-by-side test, sound should be "darker" by some octaves,
           likely that a sound filter is needed;
@@ -22,7 +22,12 @@
     - Understand how irq communication works between CPUs. Buffer $415-6 seems involved in the protocol.
       We currently have slave CPU irq hooked up to vblank, might or might not be correct.
     - invert order between maincpu and subcpu, subcpu is clearly the master CPU here.
-    - understand why background mirroring causes wrong gfxs on title screen (wrong tilemap paging, missing video bit or it's actually a RMW thing);
+    - understand why background mirroring causes wrong gfxs on title screen_device.
+      Probably area 0x2000-0x2fff enables tile bank bit 8 and write addresses have same mapping as reading.
+      A preliminary decoding is in tilelayout_swap;
+    - tilemap flashing when gameplay timer is running out;
+    - tilemap scrolling, correct only for title screen.
+      Maybe upper scroll bits also controls startdx/dy?
     cleanup
         - split into driver/video;
 
@@ -39,6 +44,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class cntsteer_state : public driver_device
@@ -114,7 +120,8 @@ public:
 	DECLARE_MACHINE_START(zerotrgt);
 	DECLARE_MACHINE_RESET(zerotrgt);
 	DECLARE_VIDEO_START(zerotrgt);
-	DECLARE_PALETTE_INIT(zerotrgt);
+	void cntsteer_palette(palette_device &palette) const;
+	void zerotrgt_palette(palette_device &palette) const;
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(subcpu_vblank_irq);
@@ -132,31 +139,44 @@ public:
 };
 
 
-PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::cntsteer_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		// same as Chanbara
+		int const r = pal4bit((color_prom[i + 0x000] & 7) << 1);
+		int const g = pal4bit((color_prom[i + 0x100] & 7) << 1);
+		int const b = pal4bit((color_prom[i + 0x200] & 7) << 1);
 
-		/* red component */
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+void cntsteer_state::zerotrgt_palette(palette_device &palette) const
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int bit0, bit1, bit2;
+
+		// red component
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
-		g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		/* green component */
+		int const g = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		// green component
 		bit0 = (color_prom[i] >> 4) & 0x01;
 		bit1 = (color_prom[i] >> 5) & 0x01;
 		bit2 = (color_prom[i] >> 6) & 0x01;
-		r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
-		/* blue component */
+		int const r = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		// blue component
 		bit0 = (color_prom[i + 256] >> 0) & 0x01;
 		bit1 = (color_prom[i + 256] >> 1) & 0x01;
 		bit2 = (color_prom[i + 256] >> 2) & 0x01;
-		b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
+		int const b = (0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2);
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -264,7 +284,7 @@ void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangl
      ---- -x-- flipy
 
 [80] -xxx ---- palette entry
-     ---- --xx tile bank
+     ---- --xx upper tile bank
 */
 
 void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -273,20 +293,23 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 	for (offs = 0; offs < 0x80; offs += 4)
 	{
-		int multi, fx, fy, sx, sy, code, color;
+		int multi, fx, fy, sx, sy, code, color, magnify, region, tile_size;
 
 		if ((m_spriteram[offs + 0] & 1) == 0)
 			continue;
 
 		code = m_spriteram[offs + 1] + ((m_spriteram[offs + 0x80] & 0x03) << 8);
 		sx = 0x100 - m_spriteram[offs + 3];
-		sy = 0x100 - m_spriteram[offs + 2];
+		sy = 0xe8 - m_spriteram[offs + 2];
 		color = 0x10 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
 
 		fx = (m_spriteram[offs + 0] & 0x04);
 		fy = (m_spriteram[offs + 0] & 0x02);
 
 		multi = m_spriteram[offs + 0] & 0x10;
+		magnify =  (m_spriteram[offs + 0] & 0x20) >> 5;
+		region = magnify ? 3 : 1;
+		tile_size = magnify ? 32 : 16;
 
 		if (m_flipscreen)
 		{
@@ -301,17 +324,17 @@ void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 		{
 			if (fy)
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - 16, 0);
+				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy - tile_size, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - 16, 0);
-				m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
+				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy - tile_size, 0);
+				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			m_gfxdecode->gfx(1)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
+			m_gfxdecode->gfx(region)->transpen(bitmap,cliprect, code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -459,11 +482,8 @@ WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 	{
 		case 0: m_scrolly = data; break;
 		case 1: m_scrollx = data; break;
-		case 2: m_bg_bank = (data & 0x01) << 8;
-				m_bg_color_bank = (data & 6) >> 1;
-				// TODO: of course this just inibits bus request for master.
-				// TODO: after further investigation, this isn't right, it disables once that player insert a coin.
-
+		case 2: m_bg_bank = (data & 0x01) << 9;
+				m_bg_color_bank = (data & 7);
 				m_bg_tilemap->mark_all_dirty();
 				break;
 		case 3: m_rotation_sign = (data & 7);
@@ -500,6 +520,8 @@ READ8_MEMBER(cntsteer_state::cntsteer_background_mirror_r)
 	return m_videoram2[bitswap<16>(offset,15,14,13,12,5,4,3,2,1,0,11,10,9,8,7,6)];
 }
 
+// TODO: on write prolly selects bit 8 of tile bank (which needs better decoding too)
+
 /*************************************
  *
  * CPU comms
@@ -513,7 +535,7 @@ WRITE8_MEMBER(cntsteer_state::gekitsui_sub_irq_ack)
 
 WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -663,11 +685,11 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
 void cntsteer_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
-//  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
-	map(0x2000, 0x2000).w("ay1", FUNC(ay8910_device::data_w));
-	map(0x4000, 0x4000).w("ay1", FUNC(ay8910_device::address_w));
-	map(0x6000, 0x6000).w("ay2", FUNC(ay8910_device::data_w));
-	map(0x8000, 0x8000).w("ay2", FUNC(ay8910_device::address_w));
+//  map(0x1000, 0x1000).w(FUNC(cntsteer_state::nmiack_w));
+	map(0x2000, 0x2000).w("ay1", FUNC(ym2149_device::data_w));
+	map(0x4000, 0x4000).w("ay1", FUNC(ym2149_device::address_w));
+	map(0x6000, 0x6000).w("ay2", FUNC(ym2149_device::data_w));
+	map(0x8000, 0x8000).w("ay2", FUNC(ym2149_device::address_w));
 	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xd000, 0xd000).w(FUNC(cntsteer_state::nmimask_w));
 	map(0xe000, 0xffff).rom();
@@ -840,7 +862,23 @@ static const gfx_layout sprites =
 	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
 	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
 		0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 ,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+	  8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8 },
+	16*16
+};
+
+static const gfx_layout sprites_magnify =
+{
+	16,32,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ 16*8, 1+16*8, 2+16*8, 3+16*8, 4+16*8, 5+16*8, 6+16*8, 7+16*8,
+		0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 0*8, 1*8, 1*8, 2*8, 2*8, 3*8, 3*8,
+	  4*8, 4*8, 5*8, 5*8, 6*8, 6*8, 7*8, 7*8,
+	  8*8, 8*8, 9*8, 9*8, 10*8,10*8,11*8,11*8,
+	  12*8,12*8,13*8,13*8,14*8,14*8,15*8,15*8 },
 	16*16
 };
 
@@ -860,17 +898,35 @@ static const gfx_layout tilelayout =
 	8*16
 };
 
+static const gfx_layout tilelayout_swap =
+{
+	16,16,
+	0x400,
+	3,  /* 3 bits per pixel */
+	{ RGN_FRAC(4,8)+4, 0, 4 },
+	{
+		RGN_FRAC(0,8)+0*8,  RGN_FRAC(1,8)+0*8, RGN_FRAC(2,8)+0*8, RGN_FRAC(3,8)+0*8,
+		RGN_FRAC(0,8)+4*8,  RGN_FRAC(1,8)+4*8, RGN_FRAC(2,8)+4*8, RGN_FRAC(3,8)+4*8,
+		RGN_FRAC(0,8)+8*8,  RGN_FRAC(1,8)+8*8, RGN_FRAC(2,8)+8*8, RGN_FRAC(3,8)+8*8,
+		RGN_FRAC(0,8)+12*8, RGN_FRAC(1,8)+12*8,RGN_FRAC(2,8)+12*8,RGN_FRAC(3,8)+12*8
+	},
+	{ 27, 26, 25, 24, 19, 18, 17, 16, 11, 10, 9, 8, 3, 2, 1, 0 },
+	8*16
+};
+
 static GFXDECODE_START( gfx_cntsteer )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 256 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, cntsteer_charlayout, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,             0, 0x20 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,          0, 0x20 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites_magnify,     0, 0x20 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout_swap,     0, 0x20 )
 GFXDECODE_END
 
 
 static GFXDECODE_START( gfx_zerotrgt )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 256 ) /* Only 1 used so far :/ */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,            0, 256 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,         0, 256 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, zerotrgt_charlayout, 0, 0x40 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, sprites,             0, 0x20 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, tilelayout,          0, 0x20 )
 GFXDECODE_END
 
 /***************************************************************************/
@@ -920,19 +976,19 @@ MACHINE_RESET_MEMBER(cntsteer_state,cntsteer)
 	MACHINE_RESET_CALL_MEMBER(zerotrgt);
 }
 
-MACHINE_CONFIG_START(cntsteer_state::cntsteer)
-
+void cntsteer_state::cntsteer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* MC68B09E */
-	MCFG_DEVICE_PROGRAM_MAP(cntsteer_cpu1_map)
+	MC6809E(config, m_maincpu, 2000000);      /* MC68B09E */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu1_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* MC68B09E */
-	MCFG_DEVICE_PROGRAM_MAP(cntsteer_cpu2_map)
-//  MCFG_DEVICE_DISABLE()
+	MC6809E(config, m_subcpu, 2000000);       /* MC68B09E */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::cntsteer_cpu2_map);
+//  m_subcpu->set_disable();
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
+	M6502(config, m_audiocpu, XTAL(12'000'000)/8);        /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(960));
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,cntsteer)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,cntsteer)
@@ -948,12 +1004,11 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
 	screen.screen_vblank().append(FUNC(cntsteer_state::subcpu_vblank_irq)); // ?
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_QUANTUM_PERFECT_CPU("subcpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.m_perfect_cpu_quantum = subtag("subcpu");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cntsteer)
-	MCFG_PALETTE_ADD("palette", 256)
-//  MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cntsteer);
+	PALETTE(config, m_palette, FUNC(cntsteer_state::cntsteer_palette), 256);
 
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,cntsteer)
 
@@ -962,63 +1017,60 @@ MACHINE_CONFIG_START(cntsteer_state::cntsteer)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	ay8910_device &ay1(YM2149(config, "ay1", XTAL(12'000'000)/8));
+	ay1.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	YM2149(config, "ay2", XTAL(12'000'000)/8).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // labeled DAC-08CQ
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(cntsteer_state::zerotrgt)
-
+void cntsteer_state::zerotrgt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, 2000000)      /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu1_map)
+	MC6809E(config, m_maincpu, 2000000);      /* ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu1_map);
 
-	MCFG_DEVICE_ADD("subcpu", MC6809E, 2000000)       /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(gekitsui_cpu2_map)
+	MC6809E(config, m_subcpu, 2000000);       /* ? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &cntsteer_state::gekitsui_cpu2_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(cntsteer_state, sound_interrupt,  480)
+	M6502(config, m_audiocpu, 1500000);        /* ? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cntsteer_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(cntsteer_state::sound_interrupt), attotime::from_hz(480));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	MCFG_MACHINE_START_OVERRIDE(cntsteer_state,zerotrgt)
 	MCFG_MACHINE_RESET_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cntsteer_state, screen_update_zerotrgt)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI)) // ?
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(cntsteer_state::screen_update_zerotrgt));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI); // ?
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_zerotrgt)
-	MCFG_PALETTE_ADD("palette", 256)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_zerotrgt);
+	PALETTE(config, m_palette, FUNC(cntsteer_state::zerotrgt_palette), 256);
 
-	MCFG_PALETTE_INIT_OWNER(cntsteer_state,zerotrgt)
 	MCFG_VIDEO_START_OVERRIDE(cntsteer_state,zerotrgt)
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	YM2149(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-MACHINE_CONFIG_END
+	YM2149(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+}
 
 /***************************************************************************/
 
@@ -1039,12 +1091,12 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by09", 0x0000, 0x2000, CRC(273eddae) SHA1(4b5450407217d9110acb85e02ea9a6584552362e) )
 
 	ROM_REGION( 0x18000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD( "by03", 0x00000, 0x4000, CRC(d9537d33) SHA1(7d2af2eb0386ce695f2d9c7b71a72d2d8ef257e7) )
-	ROM_LOAD( "by04", 0x04000, 0x4000, CRC(4f4e9d6f) SHA1(b590aeb5efa2afa50ef202191a88bcf6894f4b8e) )
+	ROM_LOAD( "by03", 0x10000, 0x4000, CRC(d9537d33) SHA1(7d2af2eb0386ce695f2d9c7b71a72d2d8ef257e7) )
+	ROM_LOAD( "by04", 0x14000, 0x4000, CRC(4f4e9d6f) SHA1(b590aeb5efa2afa50ef202191a88bcf6894f4b8e) )
 	ROM_LOAD( "by05", 0x08000, 0x4000, CRC(592481a7) SHA1(2d412d525b04ed228a345918129b25a13286d957) )
 	ROM_LOAD( "by06", 0x0c000, 0x4000, CRC(9366e9d5) SHA1(a6a137416eaee3becae657c287fff7d974bcf68f) )
-	ROM_LOAD( "by07", 0x10000, 0x4000, CRC(8321e332) SHA1(a7aed12cb718526b0a1c5b4ae069c7973600204d) )
-	ROM_LOAD( "by08", 0x14000, 0x4000, CRC(a24bcfef) SHA1(b4f06dfb85960668ca199cfb1b6c56ccdad9e33d) )
+	ROM_LOAD( "by07", 0x00000, 0x4000, CRC(8321e332) SHA1(a7aed12cb718526b0a1c5b4ae069c7973600204d) )
+	ROM_LOAD( "by08", 0x04000, 0x4000, CRC(a24bcfef) SHA1(b4f06dfb85960668ca199cfb1b6c56ccdad9e33d) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 ) /* Tiles */
 	ROM_LOAD( "by13", 0x00000, 0x4000, CRC(d38e94fd) SHA1(bcf61b2c509f923ef2e52051a1c0e0a63bedf7a3) )
@@ -1059,10 +1111,11 @@ ROM_START( cntsteer )
 	ROM_LOAD( "by18", 0x20000, 0x2000, CRC(1e9ce047) SHA1(7579ba6b401eb1bfc7d2d9311ebab623bd1095a2) )
 	ROM_LOAD( "by20", 0x30000, 0x2000, CRC(e2198c9e) SHA1(afea262db9154301f4b9e53e1fc91985dd934170) )
 
+	 /* All 82s129 or equivalent */
 	ROM_REGION( 0x300, "proms", ROMREGION_ERASE00 )
-	ROM_LOAD( "by21.j4",  0x0000, 0x100, NO_DUMP ) /* All 82s129 or equivalent */
-	ROM_LOAD( "by22.j5",  0x0100, 0x100, NO_DUMP )
-	ROM_LOAD( "by23.j6",  0x0200, 0x100, NO_DUMP )
+	ROM_LOAD( "by21.j4",  0x0200, 0x100, CRC(10e2cab4) SHA1(c266cb26b9aa3df9385605bd75a37a66ab946051) )
+	ROM_LOAD( "by22.j5",  0x0100, 0x100, CRC(8676ad80) SHA1(891c85a88fda27e7a984eec1011ef931605a443f) )
+	ROM_LOAD( "by23.j6",  0x0000, 0x100, CRC(08dfd511) SHA1(45d107533864bd21d0c4bad9f16cf75bc5e5e6a2) )
 ROM_END
 
 ROM_START( zerotrgt )

@@ -22,7 +22,7 @@
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="45446">
-				<rom name="crazyrider_bbcmaster(1987)(superior).uef" size="45446" crc="42b7b61d" sha1="45bb11e0889452ea4dcd896b96a2c584483900d0" offset="0" />
+				<rom name="crazyrider_bbcmaster(1987)(superior).uef" size="45446" crc="42b7b61d" sha1="45bb11e0889452ea4dcd896b96a2c584483900d0" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="53768">
-				<rom name="exile_bbcmaster(1988)(superior).uef" size="53768" crc="25060f4d" sha1="ecdf9a346a6c536a15b4341d5a31eb72a3779ba8" offset="0" />
+				<rom name="exile_bbcmaster(1988)(superior).uef" size="53768" crc="25060f4d" sha1="ecdf9a346a6c536a15b4341d5a31eb72a3779ba8" />
 			</dataarea>
 		</part>
 	</software>
@@ -44,7 +44,7 @@
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="118611">
-				<rom name="reptoninfinity_bbcmaster(1988)(superior).uef" size="118611" crc="0e0ab9ad" sha1="5d7dde6d9738bdd0cdda7bbdcbc8edccc3fb2d58" offset="0" />
+				<rom name="reptoninfinity_bbcmaster(1988)(superior).uef" size="118611" crc="0e0ab9ad" sha1="5d7dde6d9738bdd0cdda7bbdcbc8edccc3fb2d58" />
 			</dataarea>
 		</part>
 	</software>
@@ -55,7 +55,7 @@
 		<publisher>Superior Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="46446">
-				<rom name="strykersrun_bbcmaster(1986)(superior).uef" size="46446" crc="5f20d209" sha1="440f88ca522cb550d9ebb8127c0826c424fcf0de" offset="0" />
+				<rom name="strykersrun_bbcmaster(1986)(superior).uef" size="46446" crc="5f20d209" sha1="440f88ca522cb550d9ebb8127c0826c424fcf0de" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,13 +67,13 @@
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Welcome"/>
 			<dataarea name="cass" size="28803">
-				<rom name="welcome-bbcmaster-side1_bm.uef" size="28803" crc="29076f21" sha1="d56ddebc09166687e89fd1210d87a98ddaf37272" offset="0" />
+				<rom name="welcome-bbcmaster-side1_bm.uef" size="28803" crc="29076f21" sha1="d56ddebc09166687e89fd1210d87a98ddaf37272" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="bbc_cass">
 			<feature name="part_id" value="Utilities"/>
 			<dataarea name="cass" size="38565">
-				<rom name="welcome-bbcmaster-side2_bm.uef" size="38565" crc="ac51d83c" sha1="c6cfd8ddbff42f983fbf0aa341cd49844025995b" offset="0" />
+				<rom name="welcome-bbcmaster-side2_bm.uef" size="38565" crc="ac51d83c" sha1="c6cfd8ddbff42f983fbf0aa341cd49844025995b" />
 			</dataarea>
 		</part>
 	</software>

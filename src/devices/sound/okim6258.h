@@ -7,20 +7,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_OKIM6258_DIVIDER(div) \
-	downcast<okim6258_device &>(*device).set_start_div((okim6258_device::div));
-
-#define MCFG_OKIM6258_ADPCM_TYPE(type) \
-	downcast<okim6258_device &>(*device).set_type((okim6258_device::type));
-
-#define MCFG_OKIM6258_OUT_BITS(bits) \
-	downcast<okim6258_device &>(*device).set_outbits((okim6258_device::bits));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -47,9 +33,9 @@ public:
 	void set_type(int type) { m_adpcm_type = type; }
 	void set_outbits(int outbit) { m_output_bits = outbit; }
 
-	DECLARE_READ8_MEMBER( status_r );
-	DECLARE_WRITE8_MEMBER( data_w );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	uint8_t status_r();
+	void data_w(uint8_t data);
+	void ctrl_w(uint8_t data);
 
 	void set_divider(int val);
 	int get_vclk();

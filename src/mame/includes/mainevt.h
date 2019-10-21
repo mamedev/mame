@@ -5,6 +5,11 @@
     The Main Event / Devastators
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MAINEVT_H
+#define MAME_INCLUDES_MAINEVT_H
+
+#pragma once
+
 #include "sound/upd7759.h"
 #include "sound/k007232.h"
 #include "video/k052109.h"
@@ -44,7 +49,6 @@ private:
 	DECLARE_WRITE8_MEMBER(dv_sh_bankswitch_w);
 	uint32_t screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mainevt_interrupt);
 	INTERRUPT_GEN_MEMBER(dv_interrupt);
 	INTERRUPT_GEN_MEMBER(mainevt_sound_timer_irq);
 	INTERRUPT_GEN_MEMBER(devstors_sound_timer_irq);
@@ -76,3 +80,5 @@ private:
 	required_memory_bank m_rombank;
 	output_finder<4> m_leds;
 };
+
+#endif // MAME_INCLUDES_MAINEVT_H

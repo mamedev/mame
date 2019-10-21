@@ -300,11 +300,11 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 
-private:
-	required_device<cpu_device> m_maincpu;
-
+protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
@@ -327,6 +327,13 @@ private:
 	DECLARE_WRITE8_MEMBER( bank6_w );
 	DECLARE_WRITE8_MEMBER( bank7_w );
 
+	void nakajies_palette(palette_device &palette) const;
+	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
+	void nakajies_io_map(address_map &map);
+	void nakajies_map(address_map &map);
+
+	required_device<cpu_device> m_maincpu;
+
 	/* IRQ handling */
 	uint8_t   m_irq_enabled;
 	uint8_t   m_irq_active;
@@ -346,10 +353,6 @@ private:
 	/* Banking */
 	uint8_t   m_bank[8];
 	uint8_t   *m_bank_base[8];
-	DECLARE_PALETTE_INIT(nakajies);
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
-	void nakajies_io_map(address_map &map);
-	void nakajies_map(address_map &map);
 };
 
 
@@ -437,7 +440,7 @@ void nakajies_state::nakajies_update_irqs()
 
 	if ( vector >= 0xf8 )
 	{
-		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector );
+		m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector ); // V20
 	}
 	else
 	{
@@ -528,14 +531,14 @@ INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 
 static INPUT_PORTS_START( nakajies )
 	PORT_START( "debug" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "irq 0xff" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME( "irq 0xfe" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F3 ) PORT_NAME( "irq 0xfd" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F4 ) PORT_NAME( "irq 0xfc" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F5 ) PORT_NAME( "irq 0xfb" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F6 ) PORT_NAME( "irq 0xfa" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F7 ) PORT_NAME( "irq 0xf9" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F8 ) PORT_NAME( "irq 0xf8" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, nullptr )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F1 ) PORT_NAME( "irq 0xff" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F2 ) PORT_NAME( "irq 0xfe" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F3 ) PORT_NAME( "irq 0xfd" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F4 ) PORT_NAME( "irq 0xfc" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F5 ) PORT_NAME( "irq 0xfb" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F6 ) PORT_NAME( "irq 0xfa" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F7 ) PORT_NAME( "irq 0xf9" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE( KEYCODE_F8 ) PORT_NAME( "irq 0xf8" ) PORT_CHANGED_MEMBER(DEVICE_SELF, nakajies_state,  trigger_irq, 0 )
 
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Left Shift")  PORT_CODE( KEYCODE_LSHIFT )
@@ -710,7 +713,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 }
 
 
-PALETTE_INIT_MEMBER(nakajies_state, nakajies)
+void nakajies_state::nakajies_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -747,50 +750,51 @@ static GFXDECODE_START( gfx_drwrt400 )
 	GFXDECODE_ENTRY( "bios", 0x580b6, nakajies_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(nakajies_state::nakajies210)
-	MCFG_DEVICE_ADD( "v20hl", V20, X301 / 2 )
-	MCFG_DEVICE_PROGRAM_MAP( nakajies_map)
-	MCFG_DEVICE_IO_MAP( nakajies_io_map)
+void nakajies_state::nakajies210(machine_config &config)
+{
+	V20(config, m_maincpu, X301 / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nakajies_state::nakajies_map);
+	m_maincpu->set_addrmap(AS_IO, &nakajies_state::nakajies_io_map);
 
-	MCFG_SCREEN_ADD( "screen", LCD )
-	MCFG_SCREEN_REFRESH_RATE( 50 )  /* Wild guess */
-	MCFG_SCREEN_UPDATE_DRIVER( nakajies_state, screen_update )
-	MCFG_SCREEN_SIZE( 80 * 6, 8 * 8 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 8 * 8 - 1 )
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);  /* Wild guess */
+	screen.set_screen_update(FUNC(nakajies_state::screen_update));
+	screen.set_size(80 * 6, 8 * 8);
+	screen.set_visarea(0, 6 * 80 - 1, 0, 8 * 8 - 1);
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wales210)
-	MCFG_PALETTE_ADD( "palette", 2 )
-	MCFG_PALETTE_INIT_OWNER(nakajies_state, nakajies)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_wales210);
+	PALETTE(config, "palette", FUNC(nakajies_state::nakajies_palette), 2);
 
 	/* sound */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD( "speaker", SPEAKER_SOUND )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* rtc */
-	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL(32'768))
+	RP5C01(config, "rtc", XTAL(32'768));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("kb_timer", nakajies_state, kb_timer, attotime::from_hz(250))
-MACHINE_CONFIG_END
+	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(250));
+}
 
-MACHINE_CONFIG_START(nakajies_state::dator3k)
+void nakajies_state::dator3k(machine_config &config)
+{
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_dator3k)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_dator3k);
+}
 
-MACHINE_CONFIG_START(nakajies_state::nakajies220)
+void nakajies_state::nakajies220(machine_config &config)
+{
 	nakajies210(config);
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt400)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_drwrt400);
+}
 
-MACHINE_CONFIG_START(nakajies_state::nakajies250)
+void nakajies_state::nakajies250(machine_config &config)
+{
 	nakajies210(config);
-	MCFG_SCREEN_MODIFY( "screen" )
-	MCFG_SCREEN_SIZE( 80 * 6, 16 * 8 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 6 * 80 - 1, 0, 16 * 8 - 1 )
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_drwrt200)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_size(80 * 6, 16 * 8);
+	subdevice<screen_device>("screen")->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_drwrt200);
+}
 
 
 ROM_START(wales210)

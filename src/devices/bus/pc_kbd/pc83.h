@@ -50,7 +50,7 @@ private:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ_LINE_MEMBER( t0_r );
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8048_device> m_maincpu;
 	required_ioport_array<24> m_dr;
 
 	uint8_t m_cnt;

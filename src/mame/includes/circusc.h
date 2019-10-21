@@ -5,17 +5,22 @@
     Circus Charlie
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_CIRCUSC_H
+#define MAME_INCLUDES_CIRCUSC_H
+
+#pragma once
 
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class circusc_state : public driver_device
 {
 public:
-	circusc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	circusc_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_scroll(*this, "scroll"),
 		m_colorram(*this, "colorram"),
 		m_videoram(*this, "videoram"),
@@ -28,7 +33,8 @@ public:
 		m_discrete(*this, "fltdisc"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_scroll;
@@ -68,7 +74,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(circusc);
+	void circusc_palette(palette_device &palette) const;
 	uint32_t screen_update_circusc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -79,3 +85,5 @@ public:
 	void circusc_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_CIRCUSC_H

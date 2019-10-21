@@ -49,7 +49,7 @@ eeprom_base_device::eeprom_base_device(const machine_config &mconfig, device_typ
 //  to set the default data
 //-------------------------------------------------
 
-void eeprom_base_device::set_size(int cells, int cellbits)
+eeprom_base_device& eeprom_base_device::size(int cells, int cellbits)
 {
 	m_cells = cells;
 	m_data_bits = cellbits;
@@ -62,6 +62,8 @@ void eeprom_base_device::set_size(int cells, int cellbits)
 		cells >>= 1;
 		m_address_bits++;
 	}
+
+	return *this;
 }
 
 
@@ -70,18 +72,20 @@ void eeprom_base_device::set_size(int cells, int cellbits)
 //  to set the default data
 //-------------------------------------------------
 
-void eeprom_base_device::set_default_data(const uint8_t *data, uint32_t size)
+eeprom_base_device& eeprom_base_device::default_data(const uint8_t *data, uint32_t size)
 {
 	assert(m_data_bits == 8);
 	m_default_data = data;
 	m_default_data_size = size;
+	return *this;
 }
 
-void eeprom_base_device::set_default_data(const uint16_t *data, uint32_t size)
+eeprom_base_device& eeprom_base_device::default_data(const uint16_t *data, uint32_t size)
 {
 	assert(m_data_bits == 16);
 	m_default_data = data;
 	m_default_data_size = size / 2;
+	return *this;
 }
 
 

@@ -205,17 +205,6 @@ void eeprom_serial_base_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_address));
 	save_item(NAME(m_shift_register));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void eeprom_serial_base_device::device_reset()
-{
-	// reset the base class
-	eeprom_base_device::device_reset();
 
 	// reset the state
 	set_state(STATE_IN_RESET);
@@ -1099,18 +1088,18 @@ WRITE_LINE_MEMBER(eeprom_serial_x24c44_device::di_write) { base_di_write(state);
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
 eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming) \
-	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner, enable_streaming) \
+	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, enable_streaming) \
 { \
-	set_size(_cells, _bits); \
+	size(_cells, _bits); \
 	set_address_bits(_addrbits); \
 } \
 eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) \
-	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_SERIAL_##_uppercase##_##_bits##BIT, tag, owner, eeprom_serial_streaming::DISABLE) \
+	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, eeprom_serial_streaming::DISABLE) \
 { \
-	set_size(_cells, _bits); \
+	size(_cells, _bits); \
 	set_address_bits(_addrbits); \
 } \
-DEFINE_DEVICE_TYPE(EEPROM_SERIAL_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
+DEFINE_DEVICE_TYPE(EEPROM_##_uppercase##_##_bits##BIT, eeprom_serial_##_lowercase##_##_bits##bit_device, #_lowercase "_" #_bits, "Serial EEPROM " #_uppercase " (" #_cells "x" #_bits ")")
 
 // standard 93CX6 class of 16-bit EEPROMs
 DEFINE_SERIAL_EEPROM_DEVICE(93cxx, 93c06, 93C06, 16, 16, 6)

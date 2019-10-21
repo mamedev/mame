@@ -307,7 +307,7 @@ void m6805_base_device::device_reset()
 	/* IRQ disabled */
 	SEI;
 
-	rm16(0xfffe, m_pc);
+	rm16(0xfffe & m_params.m_vector_mask, m_pc);
 }
 
 
@@ -356,7 +356,7 @@ bool m6805_base_device::test_il()
 
 void m6805_base_device::interrupt_vector()
 {
-	rm16(0xfffa, m_pc);
+	rm16(0xfffa & m_params.m_vector_mask, m_pc);
 }
 
 /* Generate interrupts */
@@ -517,17 +517,6 @@ void m6805_base_device::execute_set_input(int inputnum, int state)
 }
 
 
-m6805_device::m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: m6805_base_device(
-			mconfig,
-			tag,
-			owner,
-			clock,
-			M6805,
-			{ s_hmos_ops, s_hmos_cycles, 12, 0x007f, 0x0060, 0xfffc })
-{
-}
-
 /****************************************************************************
  * M68HC05EG section
  ****************************************************************************/
@@ -667,6 +656,5 @@ void hd63705_device::interrupt_vector()
 }
 
 
-DEFINE_DEVICE_TYPE(M6805,     m6805_device,     "m6805",     "Motorola M6805")
 DEFINE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device, "m68hc05eg", "Motorola MC68HC05EG")
 DEFINE_DEVICE_TYPE(HD63705,   hd63705_device,   "hd63705",   "Hitachi HD63705")

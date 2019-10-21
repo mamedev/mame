@@ -10,25 +10,25 @@
 #include "includes/sprint2.h"
 
 
-PALETTE_INIT_MEMBER(sprint2_state, sprint2)
+void sprint2_state::sprint2_palette(palette_device &palette) const
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
 	palette.set_indirect_color(2, rgb_t(0xa4, 0xa4, 0xa4));
 	palette.set_indirect_color(3, rgb_t(0xff, 0xff, 0xff));
 
-	palette.set_pen_indirect(0x0, 1);   /* black playfield */
+	palette.set_pen_indirect(0x0, 1);   // black playfield
 	palette.set_pen_indirect(0x1, 0);
-	palette.set_pen_indirect(0x2, 1);   /* white playfield */
+	palette.set_pen_indirect(0x2, 1);   // white playfield
 	palette.set_pen_indirect(0x3, 3);
 
-	palette.set_pen_indirect(0x4, 1);   /* car #1 */
+	palette.set_pen_indirect(0x4, 1);   // car #1
 	palette.set_pen_indirect(0x5, 3);
-	palette.set_pen_indirect(0x6, 1);   /* car #2 */
+	palette.set_pen_indirect(0x6, 1);   // car #2
 	palette.set_pen_indirect(0x7, 0);
-	palette.set_pen_indirect(0x8, 1);   /* car #3 */
+	palette.set_pen_indirect(0x8, 1);   // car #3
 	palette.set_pen_indirect(0x9, 2);
-	palette.set_pen_indirect(0xa, 1);   /* car #4 */
+	palette.set_pen_indirect(0xa, 1);   // car #4
 	palette.set_pen_indirect(0xb, 2);
 }
 

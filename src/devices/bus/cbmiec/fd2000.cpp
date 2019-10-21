@@ -92,7 +92,7 @@ const tiny_rom_entry *fd4000_device::device_rom_region() const
 void fd2000_device::fd2000_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x400f).mirror(0xbf0).rw(G65SC22P2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4000, 0x400f).mirror(0xbf0).m(G65SC22P2_TAG, FUNC(via6522_device::map));
 	map(0x4e00, 0x4e07).mirror(0x1f8).m(DP8473V_TAG, FUNC(dp8473_device::map));
 	map(0x5000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom().region(G65SC02PI2_TAG, 0);
@@ -106,7 +106,7 @@ void fd2000_device::fd2000_mem(address_map &map)
 void fd4000_device::fd4000_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).ram();
-	map(0x4000, 0x400f).mirror(0xbf0).rw(G65SC22P2_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x4000, 0x400f).mirror(0xbf0).m(G65SC22P2_TAG, FUNC(via6522_device::map));
 	map(0x4e00, 0x4e07).mirror(0x1f8).m(PC8477AV1_TAG, FUNC(pc8477a_device::map));
 	map(0x5000, 0x7fff).ram();
 	map(0x8000, 0xffff).rom().region(R65C02P4_TAG, 0);
@@ -217,9 +217,9 @@ FLOPPY_FORMATS_END
 
 void fd2000_device::add_common_devices(machine_config &config)
 {
-	M65C02(config, m_maincpu, XTAL(24'000'000)/12);
+	M65C02(config, m_maincpu, 24_MHz_XTAL / 12);
 
-	via6522_device &via(VIA6522(config, G65SC22P2_TAG, XTAL(24'000'000)/12));
+	via6522_device &via(VIA6522(config, G65SC22P2_TAG, 24_MHz_XTAL / 12));
 	via.readpa_handler().set(FUNC(fd2000_device::via_pa_r));
 	via.readpb_handler().set(FUNC(fd2000_device::via_pb_r));
 	via.writepa_handler().set(FUNC(fd2000_device::via_pa_w));
@@ -230,7 +230,7 @@ void fd2000_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd2000_device::fd2000_mem);
-	DP8473(config, m_fdc, 0);
+	DP8473(config, m_fdc, 24_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, DP8473V_TAG":0", fd2000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
@@ -238,8 +238,8 @@ void fd4000_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &fd4000_device::fd4000_mem);
-	PC8477A(config, m_fdc, 0);
-	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35hd", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
+	PC8477A(config, m_fdc, 24_MHz_XTAL);
+	FLOPPY_CONNECTOR(config, PC8477AV1_TAG":0", fd4000_floppies, "35ed", floppy_image_device::default_floppy_formats, true);//fd2000_device::floppy_formats);
 }
 
 

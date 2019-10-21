@@ -9,9 +9,10 @@
     Disk is PC MFM, 80 tracks, double-sided, with 10 sectors per track
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ESQ16_DSK_H
+#define MAME_FORMATS_ESQ16_DSK_H
 
-#ifndef ESQ16_DSK_H_
-#define ESQ16_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -37,4 +38,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ESQIMG_FORMAT;
 
-#endif /* ESQ16_DSK_H_ */
+#endif // MAME_FORMATS_ESQ16_DSK_H

@@ -74,7 +74,7 @@ WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -115,7 +115,7 @@ void pokechmp_state::pokechmp_sound_map(address_map &map)
 	map(0x2000, 0x2000).w(FUNC(pokechmp_state::pokechmp_sound_bank_w)); /* sound rom bank seems to be replaced with OKI bank */
 	map(0x2800, 0x2800).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // extra
 	map(0x3000, 0x3000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r) /* not on here */
+//  map(0x3400, 0x3400).r(FUNC(pokechmp_state::pokechmp_adpcm_reset_r)); /* not on here */
 	map(0x4000, 0x7fff).bankr("bank3");
 	map(0x8000, 0xffff).rom();
 }
@@ -226,8 +226,8 @@ WRITE_LINE_MEMBER(pokechmp_state::sound_irq)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(pokechmp_state::pokechmp)
-
+void pokechmp_state::pokechmp(machine_config &config)
+{
 	/* basic machine hardware */
 	M6502(config, m_maincpu, 4_MHz_XTAL/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pokechmp_state::pokechmp_map);
@@ -242,30 +242,27 @@ MACHINE_CONFIG_START(pokechmp_state::pokechmp)
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(pokechmp_state::screen_update_pokechmp));
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	screen.screen_vblank().append(FUNC(pokechmp_state::sound_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pokechmp)
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pokechmp);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x400);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(4'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	YM2203(config, "ym1", XTAL(4'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(24'000'000)/16)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	YM3812(config, "ym2", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(24'000'000)/16, okim6295_device::PIN7_LOW)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* sound fx */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADDRESS_MAP(0, pokechmp_oki_map)
-MACHINE_CONFIG_END
+	okim6295_device &oki(OKIM6295(config, "oki", XTAL(24'000'000)/16, okim6295_device::PIN7_LOW));
+	oki.add_route(ALL_OUTPUTS, "mono", 0.50); /* sound fx */
+	oki.add_route(ALL_OUTPUTS, "mono", 0.50);
+	oki.set_addrmap(0, &pokechmp_state::pokechmp_oki_map);
+}
 
 void pokechmp_state::init_pokechmp()
 {

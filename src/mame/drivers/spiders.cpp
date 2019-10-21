@@ -209,18 +209,6 @@
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-
-
-
-
-
-
-/*************************************
- *
  *  PIA1 - Main CPU
  *
  *************************************/
@@ -516,32 +504,31 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(spiders_state::spiders)
-
+void spiders_state::spiders(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, 2800000)
-	MCFG_DEVICE_PROGRAM_MAP(spiders_main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(spiders_state, update_pia_1,  25)
+	MC6809(config, m_maincpu, 2800000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spiders_state::spiders_main_map);
+	m_maincpu->set_periodic_int(FUNC(spiders_state::update_pia_1), attotime::from_hz(25));
 
-	MCFG_DEVICE_ADD("audiocpu", M6802, 3000000)
-	MCFG_DEVICE_PROGRAM_MAP(spiders_audio_map)
+	M6802(config, m_audiocpu, 3000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &spiders_state::spiders_audio_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_PALETTE_ADD_3BIT_RGB("palette")
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(spiders_state, crtc_update_row)
-	MCFG_MC6845_OUT_DE_CB(WRITELINE("ic60", ttl74123_device, a_w))
-
-	/* 74LS123 */
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row), this);
+	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
 	PIA6821(config, m_pia[0], 0);
 	m_pia[0]->readpa_handler().set_ioport("IN0");
@@ -562,27 +549,25 @@ MACHINE_CONFIG_START(spiders_state::spiders)
 	m_pia[2]->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<3>));
 	m_pia[2]->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<4>));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	PIA6821(config, m_pia[3], 0);
 	m_pia[3]->writepa_handler().set(FUNC(spiders_state::spiders_audio_a_w));
 	m_pia[3]->writepb_handler().set(FUNC(spiders_state::spiders_audio_b_w));
 	m_pia[3]->irqa_handler().set_inputline("audiocpu", M6802_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ic60", TTL74123, 0)
-	MCFG_TTL74123_CONNECTION_TYPE(TTL74123_GROUNDED)    /* the hook up type */
-	MCFG_TTL74123_RESISTOR_VALUE(RES_K(22))               /* resistor connected to RCext */
-	MCFG_TTL74123_CAPACITOR_VALUE(CAP_U(0.01))               /* capacitor connected to Cext and RCext */
-	MCFG_TTL74123_A_PIN_VALUE(1)                  /* A pin - driven by the CRTC */
-	MCFG_TTL74123_B_PIN_VALUE(1)                  /* B pin - pulled high */
-	MCFG_TTL74123_CLEAR_PIN_VALUE(1)                  /* Clear pin - pulled high */
-	MCFG_TTL74123_OUTPUT_CHANGED_CB(WRITELINE(*this, spiders_state, ic60_74123_output_changed))
+	ttl74123_device &ic60(TTL74123(config, "ic60", 0));
+	ic60.set_connection_type(TTL74123_GROUNDED);    /* the hook up type */
+	ic60.set_resistor_value(RES_K(22));             /* resistor connected to RCext */
+	ic60.set_capacitor_value(CAP_U(0.01));          /* capacitor connected to Cext and RCext */
+	ic60.set_a_pin_value(1);                        /* A pin - driven by the CRTC */
+	ic60.set_b_pin_value(1);                        /* B pin - pulled high */
+	ic60.set_clear_pin_value(1);                    /* Clear pin - pulled high */
+	ic60.out_cb().set(FUNC(spiders_state::ic60_74123_output_changed));
 
 	/* audio hardware */
 	spiders_audio(config);
-
-MACHINE_CONFIG_END
+}
 
 
 

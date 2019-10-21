@@ -5,17 +5,22 @@
     Time Pilot
 
 ***************************************************************************/
+#ifndef MAME_INCLUDES_TIMEPLT_H
+#define MAME_INCLUDES_TIMEPLT_H
+
+#pragma once
 
 #include "machine/74259.h"
 #include "sound/tc8830f.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class timeplt_state : public driver_device
 {
 public:
-	timeplt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	timeplt_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_tc8830f(*this, "tc8830f"),
 		m_mainlatch(*this, "mainlatch"),
@@ -33,7 +38,7 @@ public:
 	void psurge(machine_config &config);
 	void bikkuric(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
+	DECLARE_READ_LINE_MEMBER(chkun_hopper_status_r);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -81,7 +86,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(timeplt);
+	void timeplt_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(chkun);
 	DECLARE_VIDEO_START(psurge);
 
@@ -94,3 +99,5 @@ private:
 	void psurge_main_map(address_map &map);
 	void timeplt_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_TIMEPLT_H

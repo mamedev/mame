@@ -60,11 +60,7 @@ public:
 	auto fdc_tc_callback() { return m_fdc_tc_func.bind(); }
 	auto eth_ca_callback() { return m_eth_ca_func.bind(); }
 
-	template <typename T> void set_memory(T &&tag, int spacenum)
-	{
-		m_memory_device.set_tag(std::forward<T>(tag));
-		m_memory_spacenum = spacenum;
-	}
+	template <typename T> void set_memory(T &&tag, int spacenum) { m_memory_space.set_tag(std::forward<T>(tag), spacenum); }
 
 	virtual void map(address_map &map) = 0;
 
@@ -79,7 +75,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_int_line(IRQ_7, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_int_line(IRQ_CBUS3, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_int_line(IRQ_RTC, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(IRQ_60HZ, state); }
+	//DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_int_line(IRQ_60HZ, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_int_line(IRQ_SERIAL, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_int_line(IRQ_ETHERNET, state); }
 
@@ -246,8 +242,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	required_device<device_memory_interface> m_memory_device;
-	int m_memory_spacenum;
+	required_address_space m_memory_space;
 	memory_access_cache<2, 0, ENDIANNESS_LITTLE> *m_memory;
 
 	// callbacks
@@ -265,7 +260,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(serial_dma);
 	TIMER_CALLBACK_MEMBER(timer0);
 	TIMER_CALLBACK_MEMBER(timer1);
-	TIMER_CALLBACK_MEMBER(timer_60hz);
+	virtual TIMER_CALLBACK_MEMBER(timer_60hz);
 
 	virtual TIMER_CALLBACK_MEMBER(eth_reset) = 0;
 
@@ -296,12 +291,18 @@ private:
 	u32 dma_r(address_space &space, offs_t offset, u32 mem_mask, dma_channel channel) const;
 	void dma_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, dma_channel channel);
 
-	enum serial_dma_ctrl_mask
+	enum serial_dma_ctrl_mask : u32
 	{
-		SDMA_COUNT   = 0x0000ffff,
+		SDMA_COUNT   = 0x000000ff,
+		SDMA_TAG     = 0x0000ff00, // bus tag?
+
 		SDMA_TCZERO  = 0x00200000,
-		SDMA_SEND    = 0x04000000, // transfer from memory to device
-		SDMA_CONTROL = 0xffff0000,
+
+		SDMA_WRITE   = 0x01000000, // transfer from memory to device
+		SDMA_ENABLE  = 0x02000000,
+		SDMA_0400    = 0x04000000,
+
+		SDMA_1000    = 0x10000000, // set on Sapphire systems?
 	};
 	u32 serial_dma_addr_r(address_space &space, offs_t offset, u32 mem_mask, int channel) const { return m_serial_dma_channel[channel].address; }
 	void serial_dma_addr_w(address_space &space, offs_t offset, u32 data, u32 mem_mask, int channel);
@@ -463,6 +464,8 @@ public:
 	sapphire_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void map(address_map &map) override;
+
+	virtual TIMER_CALLBACK_MEMBER(timer_60hz) override;
 
 	DECLARE_WRITE16_MEMBER(eth_w);
 	DECLARE_READ16_MEMBER(eth_r);

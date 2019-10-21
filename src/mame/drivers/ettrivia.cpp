@@ -34,6 +34,7 @@ Notes:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class ettrivia_state : public driver_device
@@ -50,6 +51,9 @@ public:
 	}
 
 	void ettrivia(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	int m_palreg;
@@ -71,8 +75,7 @@ private:
 	DECLARE_WRITE8_MEMBER(b800_w);
 	TILE_GET_INFO_MEMBER(get_tile_info_bg);
 	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ettrivia);
+	void ettrivia_palette(palette_device &palette) const;
 	uint32_t screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint8_t *vidram, int gfx_code);
@@ -136,20 +139,20 @@ WRITE8_MEMBER(ettrivia_state::b800_w)
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0: break;
-		case 0xc4: m_b000_ret = m_ay[0]->data_r(space, 0);    break;
-		case 0x94: m_b000_ret = m_ay[1]->data_r(space, 0);    break;
-		case 0x86: m_b000_ret = m_ay[2]->data_r(space, 0);    break;
+		case 0xc4: m_b000_ret = m_ay[0]->data_r();    break;
+		case 0x94: m_b000_ret = m_ay[1]->data_r();    break;
+		case 0x86: m_b000_ret = m_ay[2]->data_r();    break;
 
 		case 0x80:
 			switch(m_b800_prev)
 			{
-				case 0xe0: m_ay[0]->address_w(space,0,m_b000_val);    break;
-				case 0x98: m_ay[1]->address_w(space,0,m_b000_val);    break;
-				case 0x83: m_ay[2]->address_w(space,0,m_b000_val);    break;
+				case 0xe0: m_ay[0]->address_w(m_b000_val);    break;
+				case 0x98: m_ay[1]->address_w(m_b000_val);    break;
+				case 0x83: m_ay[2]->address_w(m_b000_val);    break;
 
-				case 0xa0: m_ay[0]->data_w(space,0,m_b000_val);   break;
-				case 0x88: m_ay[1]->data_w(space,0,m_b000_val);   break;
-				case 0x81: m_ay[2]->data_w(space,0,m_b000_val);   break;
+				case 0xa0: m_ay[0]->data_w(m_b000_val);   break;
+				case 0x88: m_ay[1]->data_w(m_b000_val);   break;
+				case 0x81: m_ay[2]->data_w(m_b000_val);   break;
 
 			}
 		break;
@@ -237,38 +240,36 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 	get_tile_info(tileinfo, tile_index, m_fg_videoram, 1);
 }
 
-PALETTE_INIT_MEMBER(ettrivia_state, ettrivia)
+void ettrivia_state::ettrivia_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[2] = { 270, 130 };
-	double weights[2];
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances[2] = { 270, 130 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights[2];
 	compute_resistor_weights(0, 255, -1.0,
 			2, resistances, weights, 0, 0,
 			2, resistances, weights, 0, 0,
 			0, nullptr, nullptr, 0, 0);
 
-	for (i = 0;i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
 		int bit0, bit1;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 0) & 0x01;
-		r = combine_2_weights(weights, bit0, bit1);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i+0x100], 0);
+		int const r = combine_weights(weights, bit0, bit1);
 
-		/* green component */
-		bit0 = (color_prom[i] >> 2) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 2) & 0x01;
-		g = combine_2_weights(weights, bit0, bit1);
+		// green component
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i+0x100], 2);
+		int const g = combine_weights(weights, bit0, bit1);
 
-		/* blue component */
-		bit0 = (color_prom[i] >> 1) & 0x01;
-		bit1 = (color_prom[i+0x100] >> 1) & 0x01;
-		b = combine_2_weights(weights, bit0, bit1);
+		// blue component
+		bit0 = BIT(color_prom[i], 1);
+		bit1 = BIT(color_prom[i+0x100], 1);
+		int const b = combine_weights(weights, bit0, bit1);
 
 		palette.set_pen_color(bitswap<8>(i,5,7,6,2,1,0,4,3), rgb_t(r, g, b));
 	}
@@ -297,41 +298,40 @@ INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-MACHINE_CONFIG_START(ettrivia_state::ettrivia)
-	MCFG_DEVICE_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
-	MCFG_DEVICE_PROGRAM_MAP(cpu_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", ettrivia_state,  ettrivia_interrupt)
+void ettrivia_state::ettrivia(machine_config &config)
+{
+	Z80(config, m_maincpu, 12000000/4-48000); //should be ok, it gives the 300 interrupts expected
+	m_maincpu->set_addrmap(AS_PROGRAM, &ettrivia_state::cpu_map);
+	m_maincpu->set_addrmap(AS_IO, &ettrivia_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(ettrivia_state::ettrivia_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(ettrivia_state, screen_update_ettrivia)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	screen.set_screen_update(FUNC(ettrivia_state::screen_update_ettrivia));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ettrivia)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(ettrivia_state, ettrivia)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_ettrivia);
+	PALETTE(config, "palette", FUNC(ettrivia_state::ettrivia_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8912, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[0], 1500000).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config, m_ay[1], 1500000);
+	m_ay[1]->port_a_read_callback().set_ioport("IN1");
+	m_ay[1]->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay3", AY8912, 1500000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("IN0"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8912(config, m_ay[2], 1500000);
+	m_ay[2]->port_a_read_callback().set_ioport("IN0");
+	m_ay[2]->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 ROM_START( promutrv )
 	ROM_REGION( 0x10000, "maincpu", 0 )

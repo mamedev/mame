@@ -1,20 +1,25 @@
+#
+# FIXME: This file produces errors and needs to be fixed.
+#
+
+[SDL2]
 # MAME/MESS keymap for British QWERTY 105-keys keyboard (Linux)
 #
 # Row 1
 #
-ITEM_ID_TILDE      SDLK_BACKQUOTE 0x31 0x60 `
+ITEM_ID_TILDE      SDL_SCANCODE_BACKQUOTE `
 #
 # Row 2
 #
 #
 # Row 3
 #
-ITEM_ID_BACKSLASH  SDLK_HASH      0x33 0x23 #
+ITEM_ID_BACKSLASH  SDL_SCANCODE_HASH      #
 #
 # Row 4
 #
-ITEM_ID_BACKSLASH2 SDLK_BACKSLASH 0x5e 0x5c \
+ITEM_ID_BACKSLASH2 SDL_SCANCODE_BACKSLASH \
 #
 # Row 5
 #
-ITEM_ID_RALT       SDLK_MODE      0x71 0x00 ALTGR
+ITEM_ID_RALT       SDL_SCANCODE_MODE      ALTGR

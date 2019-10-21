@@ -19,7 +19,6 @@ protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
-	inline uint32_t imm_length(opcode_desc &desc, uint16_t op);
 	inline uint16_t read_word(opcode_desc &desc);
 	inline uint16_t read_imm1(opcode_desc &desc);
 	inline uint16_t read_imm2(opcode_desc &desc);

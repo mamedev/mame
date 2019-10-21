@@ -810,14 +810,14 @@ bool cheat_entry::activate()
 		// if we're a oneshot cheat, execute the "on" script and indicate change
 		execute_on_script();
 		changed = true;
-		m_manager.machine().popmessage("Activated %s", m_description.c_str());
+		m_manager.machine().popmessage("Activated %s", m_description);
 	}
 	else if (is_oneshot_parameter() && (m_state != SCRIPT_STATE_OFF))
 	{
 		// if we're a oneshot parameter cheat and we're active, execute the "state change" script and indicate change
 		execute_change_script();
 		changed = true;
-		m_manager.machine().popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
+		m_manager.machine().popmessage("Activated\n %s = %s", m_description, m_parameter->text());
 	}
 
 	return changed;
@@ -1061,8 +1061,14 @@ cheat_manager::cheat_manager(running_machine &machine)
 	if (!machine.options().cheat())
 		return;
 
-	m_output.resize(UI_TARGET_FONT_ROWS * 2);
-	m_justify.resize(UI_TARGET_FONT_ROWS * 2);
+	// in its current form, cheat_manager is tightly coupled to mame_ui_manager; therefore we
+	// expect this call to succeed
+	mame_ui_manager *ui = dynamic_cast<mame_ui_manager *>(&machine.ui());
+	assert(ui);
+
+	int target_font_rows = ui->options().font_rows();
+	m_output.resize(target_font_rows * 2);
+	m_justify.resize(target_font_rows * 2);
 
 	// request a callback
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&cheat_manager::frame_update, this));

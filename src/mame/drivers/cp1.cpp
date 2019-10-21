@@ -17,6 +17,7 @@
 #include "machine/i8155.h"
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
+#include "speaker.h"
 #include "cp1.lh"
 
 class cp1_state : public driver_device
@@ -44,7 +45,7 @@ private:
 	DECLARE_READ8_MEMBER(port2_r);
 	DECLARE_WRITE8_MEMBER(port1_w);
 	DECLARE_WRITE8_MEMBER(port2_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	DECLARE_READ8_MEMBER(i8155_read);
 	DECLARE_WRITE8_MEMBER(i8155_write);
@@ -122,14 +123,14 @@ READ8_MEMBER(cp1_state::i8155_read)
 
 	if (!(m_port2 & 0x10))
 	{
-		m_i8155->ale_w(space, BIT(m_port2, 7), offset);
-		data |= m_i8155->read(space, offset);
+		m_i8155->ale_w(BIT(m_port2, 7), offset);
+		data |= m_i8155->data_r();
 	}
 	if ((m_io_config->read() & 0x02) && !(m_port2 & 0x20))
 	{
 		// CP3 RAM expansion
-		m_i8155_cp3->ale_w(space, BIT(m_port2, 7), offset);
-		data |= m_i8155_cp3->read(space, offset);
+		m_i8155_cp3->ale_w(BIT(m_port2, 7), offset);
+		data |= m_i8155_cp3->data_r();
 	}
 
 	return data;
@@ -139,14 +140,14 @@ WRITE8_MEMBER(cp1_state::i8155_write)
 {
 	if (!(m_port2 & 0x10))
 	{
-		m_i8155->ale_w(space, BIT(m_port2, 7), offset);
-		m_i8155->write(space, offset, data);
+		m_i8155->ale_w(BIT(m_port2, 7), offset);
+		m_i8155->data_w(data);
 	}
 	if ((m_io_config->read() & 0x02) && !(m_port2 & 0x20))
 	{
 		// CP3 RAM expansion
-		m_i8155_cp3->ale_w(space, BIT(m_port2, 7), offset);
-		m_i8155_cp3->write(space, offset, data);
+		m_i8155_cp3->ale_w(BIT(m_port2, 7), offset);
+		m_i8155_cp3->data_w(data);
 	}
 }
 
@@ -242,9 +243,8 @@ void cp1_state::machine_reset()
 	m_cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
-QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
+QUICKLOAD_LOAD_MEMBER(cp1_state::quickload_cb)
 {
-	uint8_t *dest = (uint8_t*)m_i8155->space().get_read_ptr(0);
 	char line[0x10];
 	int addr = 0;
 	while (image.fgets(line, 10) && addr < 0x100)
@@ -252,8 +252,8 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 		int op = 0, arg = 0;
 		if (sscanf(line, "%d.%d", &op, &arg) == 2)
 		{
-			dest[addr++] = op;
-			dest[addr++] = arg;
+			m_i8155->memory_w(addr++, op);
+			m_i8155->memory_w(addr++, arg);
 		}
 		else
 		{
@@ -264,7 +264,8 @@ QUICKLOAD_LOAD_MEMBER( cp1_state, quickload )
 	return image_init_result::PASS;
 }
 
-MACHINE_CONFIG_START(cp1_state::cp1)
+void cp1_state::cp1(machine_config &config)
+{
 	/* basic machine hardware */
 	i8049_device &maincpu(I8049(config, m_maincpu, 6_MHz_XTAL));
 	maincpu.set_addrmap(AS_IO, &cp1_state::cp1_io);
@@ -277,20 +278,24 @@ MACHINE_CONFIG_START(cp1_state::cp1)
 	maincpu.t0_in_cb().set_log("t0_r");
 	maincpu.t1_in_cb().set_log("t1_r");
 
-	MCFG_DEVICE_ADD("i8155", I8155, 0)
-	MCFG_I8155_OUT_PORTA_CB(WRITE8(*this, cp1_state, i8155_porta_w))
-	MCFG_I8155_IN_PORTB_CB(READ8(*this, cp1_state, i8155_portb_r))
-	MCFG_I8155_OUT_PORTB_CB(WRITE8(*this, cp1_state, i8155_portb_w))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(*this, cp1_state, i8155_portc_w))
+	i8155_device &i8155(I8155(config, "i8155", 0));
+	i8155.out_pa_callback().set(FUNC(cp1_state::i8155_porta_w));
+	i8155.in_pb_callback().set(FUNC(cp1_state::i8155_portb_r));
+	i8155.out_pb_callback().set(FUNC(cp1_state::i8155_portb_w));
+	i8155.out_pc_callback().set(FUNC(cp1_state::i8155_portc_w));
 
-	MCFG_DEVICE_ADD("i8155_cp3", I8155, 0)
+	I8155(config, "i8155_cp3", 0);
 
 	config.set_default_layout(layout_cp1);
 
-	MCFG_CASSETTE_ADD("cassette")
+	SPEAKER(config, "mono").front_center();
 
-	MCFG_QUICKLOAD_ADD("quickload", cp1_state, quickload, "obj", 1)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+
+	QUICKLOAD(config, "quickload", "obj", attotime::from_seconds(1)).set_load_callback(FUNC(cp1_state::quickload_cb), this);
+}
 
 /* ROM definition */
 /*

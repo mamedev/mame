@@ -1,8 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Farfetch'd, David Haywood
-
 #ifndef MAME_INCLUDES_GSTRIKER_H
 #define MAME_INCLUDES_GSTRIKER_H
+
+#pragma once
 
 #include "machine/6850acia.h"
 #include "machine/gen_latch.h"
@@ -18,8 +19,8 @@
 class gstriker_state : public driver_device
 {
 public:
-	gstriker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	gstriker_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_spr(*this, "vsystem_spr"),
@@ -45,6 +46,10 @@ public:
 	void init_twcup94();
 	void init_twcup94a();
 	void init_twcup94b();
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -84,9 +89,6 @@ private:
 	DECLARE_READ16_MEMBER(vbl_toggle_r);
 	DECLARE_WRITE16_MEMBER(vbl_toggle_w);
 
-	virtual void machine_start() override;
-	virtual void video_start() override;
-
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
@@ -97,4 +99,4 @@ private:
 	void twcup94_map(address_map &map);
 };
 
-#endif
+#endif // MAME_INCLUDES_GSTRIKER_H

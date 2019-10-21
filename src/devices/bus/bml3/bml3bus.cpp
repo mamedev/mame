@@ -102,13 +102,13 @@ bml3bus_device::bml3bus_device(const machine_config &mconfig, const char *tag, d
 
 bml3bus_device::bml3bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_space(*this, finder_base::DUMMY_TAG, -1, 8),
 	m_out_nmi_cb(*this),
 	m_out_irq_cb(*this),
-	m_out_firq_cb(*this),
-	m_cputag(nullptr)
+	m_out_firq_cb(*this)
 {
 }
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

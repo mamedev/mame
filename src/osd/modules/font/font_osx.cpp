@@ -54,7 +54,7 @@ private:
 
 bool osd_font_osx::open(std::string const &font_path, std::string const &name, int &height)
 {
-	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", name.c_str());
+	osd_printf_verbose("osd_font_osx::open: name=\"%s\"\n", name);
 	CFStringRef const font_name(CFStringCreateWithCString(nullptr, name.c_str(), kCFStringEncodingUTF8));
 	if (!font_name)
 	{
@@ -73,7 +73,7 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &name, i
 	CFRelease(font_name);
 	if (!font_descriptor)
 	{
-		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font descriptor for \"%s\"\n", name.c_str());
+		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font descriptor for \"%s\"\n", name);
 		return false;
 	}
 
@@ -81,7 +81,7 @@ bool osd_font_osx::open(std::string const &font_path, std::string const &name, i
 	CFRelease(font_descriptor);
 	if (!ct_font)
 	{
-		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font for \"%s\"\n", name.c_str());
+		osd_printf_verbose("osd_font_osx::open: failed to create CoreText font for \"%s\"\n", name);
 		return false;
 	}
 

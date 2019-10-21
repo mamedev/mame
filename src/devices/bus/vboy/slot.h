@@ -62,7 +62,16 @@ class vboy_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	vboy_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: vboy_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~vboy_cart_slot_device();
 
 	// image-level overrides
@@ -109,9 +118,5 @@ DECLARE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device)
  ***************************************************************************/
 
 #define VBOYSLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_VBOY_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, VBOY_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #endif // MAME_BUS_VBOY_SLOT_H

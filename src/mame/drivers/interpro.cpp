@@ -529,14 +529,14 @@ void interpro_state::interpro_common_map(address_map &map)
 	map(0x7f000308, 0x7f000309).rw(FUNC(interpro_state::ctrl1_r), FUNC(interpro_state::ctrl1_w));
 	map(0x7f00030c, 0x7f00030d).rw(FUNC(interpro_state::ctrl2_r), FUNC(interpro_state::ctrl2_w));
 
-	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
-	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ba_cd_inv_r), FUNC(z80scc_device::ba_cd_inv_w)).umask32(0x000000ff);
+	map(0x7f000400, 0x7f00040f).rw(m_scc1, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
+	map(0x7f000410, 0x7f00041f).rw(m_scc2, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0x000000ff);
 	map(0x7f000500, 0x7f000503).lrw8("rtc_rw",
-									 [this](address_space &space, offs_t offset, u8 mem_mask) {
-										 return m_rtc->read(space, offset^1, mem_mask);
+									 [this](offs_t offset) {
+										 return m_rtc->read(offset^1);
 									 },
-									 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-										 m_rtc->write(space, offset^1, data, mem_mask);
+									 [this](offs_t offset, u8 data) {
+										 m_rtc->write(offset^1, data);
 									 }).umask32(0x000000ff);
 	map(0x7f000600, 0x7f000600).w(m_rtc, FUNC(mc146818_device::write));
 
@@ -702,46 +702,52 @@ FLOPPY_FORMATS_MEMBER(interpro_state::floppy_formats)
 	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
-static void interpro_floppies(device_slot_interface &device)
+void interpro_state::interpro_serial(machine_config &config)
 {
-	device.option_add("525hd", FLOPPY_525_HD);
-	device.option_add("35hd", FLOPPY_35_HD);
+	/*
+	 * Documentation states that all three serial ports have RxD, TxD, CTS and
+	 * RTS signals connected, and serial port 0 also has RI, DTR and DTS(?).
+	 * Serial diagnostics pass all tests (except internal loopback which is not
+	 * supported by z80scc_device) when a dec_loopback device is installed. The
+	 * diagnostic tests also indicate that DCD is connected on all three ports.
+	 *
+	 * The documentation consistently refers to a DTS signal on serial port 0,
+	 * but this appears to be an error or typo, as it doesn't match any known
+	 * RS-232 signal; possibly it should be DSR?
+	 */
+	// scc1 channel A (serial port 1)
+	rs232_port_device &port1(RS232_PORT(config, INTERPRO_SERIAL_PORT1_TAG, default_rs232_devices, nullptr));
+	port1.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsa_w));
+	port1.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcda_w));
+	port1.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
+	m_scc1->out_rtsa_callback().set(port1, FUNC(rs232_port_device::write_rts));
+	m_scc1->out_txda_callback().set(port1, FUNC(rs232_port_device::write_txd));
+	m_scc1->out_wreqa_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial1)).invert();
+
+	// scc1 channel B (serial port 2)
+	rs232_port_device &port2(RS232_PORT(config, INTERPRO_SERIAL_PORT2_TAG, default_rs232_devices, nullptr));
+	port2.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsb_w));
+	port2.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcdb_w));
+	port2.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
+	m_scc1->out_rtsb_callback().set(port2, FUNC(rs232_port_device::write_rts));
+	m_scc1->out_txdb_callback().set(port2, FUNC(rs232_port_device::write_txd));
+	m_scc1->out_wreqb_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial2)).invert();
+
+	m_scc1->out_int_callback().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
+
+	// scc2 channel B (serial port 0)
+	rs232_port_device &port0(RS232_PORT(config, INTERPRO_SERIAL_PORT0_TAG, default_rs232_devices, nullptr));
+	port0.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
+	port0.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
+	port0.ri_handler().set(m_scc2, FUNC(z80scc_device::syncb_w));
+	port0.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
+	m_scc2->out_dtrb_callback().set(port0, FUNC(rs232_port_device::write_dtr));
+	m_scc2->out_rtsb_callback().set(port0, FUNC(rs232_port_device::write_rts));
+	m_scc2->out_txdb_callback().set(port0, FUNC(rs232_port_device::write_txd));
+	m_scc2->out_wreqb_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial0)).invert();
+
+	m_scc2->out_int_callback().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
 }
-
-MACHINE_CONFIG_START(interpro_state::interpro_scc1)
-	MCFG_DEVICE_MODIFY(INTERPRO_SCC1_TAG)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(INTERPRO_SERIAL_PORT1_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(INTERPRO_SERIAL_PORT2_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(m_ioga, interpro_ioga_device, ir11_w))
-	MCFG_Z80SCC_OUT_WREQA_CB(WRITELINE(m_ioga, interpro_ioga_device, drq_serial1))
-	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(m_ioga, interpro_ioga_device, drq_serial2))
-
-	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT1_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxa_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcda_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsa_w))
-
-	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT2_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc1, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc1, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc1, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(interpro_state::interpro_scc2)
-	MCFG_DEVICE_MODIFY(INTERPRO_SCC2_TAG)
-	MCFG_Z80SCC_OUT_TXDA_CB(WRITELINE(m_keyboard, interpro_keyboard_port_device, write_txd))
-	MCFG_Z80SCC_OUT_TXDB_CB(WRITELINE(INTERPRO_SERIAL_PORT0_TAG, rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(m_ioga, interpro_ioga_device, ir11_w))
-	MCFG_Z80SCC_OUT_WREQB_CB(WRITELINE(m_ioga, interpro_ioga_device, drq_serial0))
-
-	INTERPRO_KEYBOARD_PORT(config, m_keyboard, interpro_keyboard_devices, "lle_en_us");
-	m_keyboard->rxd_handler_cb().set(m_scc2, FUNC(z80scc_device::rxa_w));
-
-	MCFG_DEVICE_ADD(INTERPRO_SERIAL_PORT0_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE(m_scc2, z80scc_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE(m_scc2, z80scc_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE(m_scc2, z80scc_device, ctsb_w))
-MACHINE_CONFIG_END
 
 static void interpro_scsi_devices(device_slot_interface &device)
 {
@@ -749,28 +755,14 @@ static void interpro_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
-static void emerald_scsi_devices(device_slot_interface &device)
-{
-	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
-}
-
-static void turquoise_scsi_devices(device_slot_interface &device)
-{
-	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
-}
-
-static void sapphire_scsi_devices(device_slot_interface &device)
-{
-	device.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94);
-}
-
 void interpro_state::interpro_scsi_adapter(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(24_MHz_XTAL)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(":" INTERPRO_IOGA_TAG, interpro_ioga_device, drq_scsi))
+	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+
+	adapter.set_clock(24_MHz_XTAL);
+
+	adapter.irq_handler_cb().set(":" INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::ir0_w));
+	adapter.drq_handler_cb().set(":" INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::drq_scsi));
 }
 
 void interpro_state::interpro_cdrom(device_t *device)
@@ -786,10 +778,10 @@ void interpro_state::ioga(machine_config &config)
 
 	// ioga dma and serial dma channels
 	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
-	m_ioga->dma_r_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::mdma_r));
-	m_ioga->dma_w_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::mdma_w));
-	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_r));
-	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::mdma_w));
+	m_ioga->dma_r_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(INTERPRO_SCSI_DEVICE_TAG, FUNC(ncr53c90a_device::dma_w));
+	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_r));
+	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
 	m_ioga->serial_dma_w_callback<0>().set(m_scc2, FUNC(z80scc_device::db_w));
 	m_ioga->serial_dma_r_callback<1>().set(m_scc1, FUNC(z80scc_device::da_r));
@@ -802,10 +794,8 @@ void interpro_state::ioga(machine_config &config)
 	m_ioga->eth_ca_callback().set(m_eth, FUNC(i82586_base_device::ca));
 }
 
-static INPUT_PORTS_START(interpro)
-INPUT_PORTS_END
-
-MACHINE_CONFIG_START(interpro_state::interpro)
+void interpro_state::interpro(machine_config &config)
+{
 	RAM(config, m_ram, 0);
 	m_ram->set_default_size("16M");
 	m_ram->set_extra_options("32M,64M,128M,256M");
@@ -821,44 +811,48 @@ MACHINE_CONFIG_START(interpro_state::interpro)
 	// serial
 
 	// real-time clock/non-volatile memory
-	MCFG_DEVICE_ADD(m_rtc, MC146818, 32.768_kHz_XTAL)
-	MCFG_MC146818_UTC(true)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(m_ioga, interpro_ioga_device, ir9_w))
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	m_rtc->set_use_utc(true);
+	m_rtc->irq().set(m_ioga, FUNC(interpro_ioga_device::ir9_w));
 
-	// scsi
-	MCFG_DEVICE_ADD(m_scsibus, NSCSI_BUS, 0)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":0", interpro_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":1", interpro_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":2", interpro_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":3", interpro_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":4", interpro_scsi_devices, "cdrom", false)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", interpro_cdrom)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":5", interpro_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":6", interpro_scsi_devices, nullptr, false)
+	// scsi bus and devices
+	NSCSI_BUS(config, m_scsibus, 0);
+
+	nscsi_connector &harddisk(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":0", 0));
+	interpro_scsi_devices(harddisk);
+	harddisk.set_default_option("harddisk");
+
+	nscsi_connector &cdrom(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":4", 0));
+	interpro_scsi_devices(cdrom);
+	cdrom.set_default_option("cdrom");
+	cdrom.set_option_machine_config("cdrom", interpro_cdrom);
+
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":1", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":2", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":3", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":5", 0));
+	interpro_scsi_devices(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":6", 0));
 
 	// ethernet
 
 	// i/o gate array
 
-	// mouse
-	interpro_mouse_port_device &mouse(INTERPRO_MOUSE_PORT(config, INTERPRO_MOUSE_PORT_TAG, interpro_mouse_devices, "interpro_mouse"));
-	mouse.state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
-
 	// system layout
 	config.set_default_layout(layout_interpro);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("softlist", "interpro")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, m_softlist).set_type("interpro", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+}
 
-MACHINE_CONFIG_START(emerald_state::emerald)
+void emerald_state::emerald(machine_config &config)
+{
 	interpro(config);
 
-	MCFG_DEVICE_ADD(m_maincpu, CLIPPER_C300, 12.5_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(0, emerald_main_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, emerald_io_map)
-	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
+	CLIPPER_C300(config, m_maincpu, 12.5_MHz_XTAL); // 40MHz?
+	m_maincpu->set_addrmap(0, &emerald_state::emerald_main_map);
+	m_maincpu->set_addrmap(1, &emerald_state::emerald_io_map);
+	m_maincpu->set_addrmap(2, &emerald_state::interpro_boot_map);
+	m_maincpu->set_irq_acknowledge_callback(INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	CAMMU_C3(config, m_i_cammu, 0);
 	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
@@ -874,24 +868,26 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	INTERPRO_MCGA(config, m_mcga, 0);
 
 	// floppy controller
-	MCFG_I82072_ADD(m_fdc, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_ioga, interpro_ioga_device, ir1_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_ioga, interpro_ioga_device, drq_floppy))
+	I82072(config, m_fdc, 24_MHz_XTAL);
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->intrq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::ir1_w));
+	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	//MCFG_FLOPPY_DRIVE_ADD(INTERPRO_FDC_TAG ":2", interpro_floppies, "525hd", interpro_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(INTERPRO_FDC_TAG ":3", interpro_floppies, "35hd", interpro_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(false)
+	//FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":2", "525hd", FLOPPY_525_HD, true, interpro_state::floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
-	interpro_scc1(config);
 	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
-	interpro_scc2(config);
+	interpro_serial(config);
 
-	// scsi controller
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", emerald_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	// scsi host adapter
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":7", 0));
+	adapter.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
+	adapter.set_default_option(INTERPRO_SCSI_ADAPTER_TAG);
+	adapter.set_fixed(true);
+	adapter.set_option_machine_config(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter);
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -902,16 +898,27 @@ MACHINE_CONFIG_START(emerald_state::emerald)
 	EMERALD_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(turquoise_state::turquoise)
+	// srx bus
+	SRX_BUS(config, m_bus, 0);
+	m_bus->set_main_space(m_maincpu, 0);
+	m_bus->set_io_space(m_maincpu, 1);
+
+	m_bus->out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
+	m_bus->out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
+	m_bus->out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
+	m_bus->out_irq3_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+}
+
+void turquoise_state::turquoise(machine_config &config)
+{
 	interpro(config);
 
-	MCFG_DEVICE_ADD(m_maincpu, CLIPPER_C300, 12.5_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(0, turquoise_main_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, turquoise_io_map)
-	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
+	CLIPPER_C300(config, m_maincpu, 12.5_MHz_XTAL); // 40Mhz?
+	m_maincpu->set_addrmap(0, &turquoise_state::turquoise_main_map);
+	m_maincpu->set_addrmap(1, &turquoise_state::turquoise_io_map);
+	m_maincpu->set_addrmap(2, &turquoise_state::interpro_boot_map);
+	m_maincpu->set_irq_acknowledge_callback(INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	CAMMU_C3(config, m_i_cammu, 0);
 	m_i_cammu->exception_callback().set(m_maincpu, FUNC(clipper_device::set_exception));
@@ -927,23 +934,34 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 	INTERPRO_MCGA(config, m_mcga, 0);
 
 	// floppy controller
-	MCFG_I82072_ADD(m_fdc, false)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_ioga, interpro_ioga_device, ir1_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_ioga, interpro_ioga_device, drq_floppy))
+	I82072(config, m_fdc, 24_MHz_XTAL);
+	m_fdc->set_ready_line_connected(false);
+	m_fdc->intrq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::ir1_w));
+	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 3
-	MCFG_FLOPPY_DRIVE_ADD(INTERPRO_FDC_TAG ":3", interpro_floppies, "35hd", interpro_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(false)
+	FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":3", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
 
 	// serial controllers and ports
 	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
-	interpro_scc1(config);
 	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
-	interpro_scc2(config);
+	interpro_serial(config);
 
-	// scsi controller
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", turquoise_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	// keyboard port
+	INTERPRO_KEYBOARD_PORT(config, m_kbd_port, interpro_keyboard_devices, nullptr);
+	m_kbd_port->rxd_handler_cb().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	m_scc2->out_txda_callback().set(m_kbd_port, FUNC(interpro_keyboard_port_device::write_txd));
+
+	// mouse port
+	INTERPRO_MOUSE_PORT(config, m_mse_port, interpro_mouse_devices, nullptr);
+	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
+
+	// scsi host adapter
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":7", 0));
+	adapter.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C90A);
+	adapter.set_default_option(INTERPRO_SCSI_ADAPTER_TAG);
+	adapter.set_fixed(true);
+	adapter.set_option_machine_config(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter);
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -954,15 +972,27 @@ MACHINE_CONFIG_START(turquoise_state::turquoise)
 	TURQUOISE_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(sapphire_state::sapphire)
+	// cbus bus
+	CBUS_BUS(config, m_bus, 0);
+	m_bus->set_main_space(m_maincpu, 0);
+	m_bus->set_io_space(m_maincpu, 1);
+
+	m_bus->out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
+	m_bus->out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
+	m_bus->out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
+	m_bus->out_irq3_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+}
+
+void sapphire_state::sapphire(machine_config &config)
+{
 	interpro(config);
-	MCFG_DEVICE_ADD(m_maincpu, CLIPPER_C400, 12.5_MHz_XTAL)
-	MCFG_DEVICE_ADDRESS_MAP(0, sapphire_main_map)
-	MCFG_DEVICE_ADDRESS_MAP(1, sapphire_io_map)
-	MCFG_DEVICE_ADDRESS_MAP(2, interpro_boot_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, acknowledge_interrupt)
+
+	CLIPPER_C400(config, m_maincpu, 12.5_MHz_XTAL);
+	m_maincpu->set_addrmap(0, &sapphire_state::sapphire_main_map);
+	m_maincpu->set_addrmap(1, &sapphire_state::sapphire_io_map);
+	m_maincpu->set_addrmap(2, &sapphire_state::interpro_boot_map);
+	m_maincpu->set_irq_acknowledge_callback(INTERPRO_IOGA_TAG, FUNC(interpro_ioga_device::acknowledge_interrupt));
 
 	// FIXME: 2400/6400 should be C4T cammu?
 	CAMMU_C4I(config, m_mmu, 0);
@@ -972,26 +1002,28 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	INTERPRO_FMCC(config, m_mcga, 0);
 
 	// floppy controller
-	MCFG_N82077AA_ADD(m_fdc, n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(m_ioga, interpro_ioga_device, ir1_w))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(m_ioga, interpro_ioga_device, drq_floppy))
+	N82077AA(config, m_fdc, 24_MHz_XTAL);
+	m_fdc->set_mode(n82077aa_device::mode_t::PS2);
+	m_fdc->intrq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::ir1_w));
+	m_fdc->drq_wr_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_floppy));
 
 	// connect a 3.5" drive at id 1
-	MCFG_FLOPPY_DRIVE_ADD(INTERPRO_FDC_TAG ":1", interpro_floppies, "35hd", interpro_state::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(false)
+	FLOPPY_CONNECTOR(config, INTERPRO_FDC_TAG ":1", "35hd", FLOPPY_35_HD, true, interpro_state::floppy_formats).enable_sound(false);
 
 	// srx arbiter gate array
 	INTERPRO_ARBGA(config, m_arbga, 0);
 
 	// serial controllers and ports
 	SCC85230(config, m_scc1, 4.9152_MHz_XTAL);
-	interpro_scc1(config);
 	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
-	interpro_scc2(config);
+	interpro_serial(config);
 
-	// scsi controller
-	MCFG_NSCSI_ADD(INTERPRO_SCSI_TAG ":7", sapphire_scsi_devices, INTERPRO_SCSI_ADAPTER_TAG, true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter)
+	// scsi host adapter
+	nscsi_connector &adapter(NSCSI_CONNECTOR(config, INTERPRO_SCSI_TAG ":7", 0));
+	adapter.option_add_internal(INTERPRO_SCSI_ADAPTER_TAG, NCR53C94);
+	adapter.set_default_option(INTERPRO_SCSI_ADAPTER_TAG);
+	adapter.set_fixed(true);
+	adapter.set_option_machine_config(INTERPRO_SCSI_ADAPTER_TAG, interpro_scsi_adapter);
 
 	// ethernet controller
 	I82596_LE16(config, m_eth, 20_MHz_XTAL);
@@ -1006,214 +1038,197 @@ MACHINE_CONFIG_START(sapphire_state::sapphire)
 	// flash memory
 	INTEL_28F010(config, m_flash_lsb);
 	INTEL_28F010(config, m_flash_msb);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(turquoise_state::ip2000)
+void turquoise_state::ip2000(machine_config &config)
+{
 	turquoise(config);
-	//m_maincpu->set_clock(40_MHz_XTAL);
 
-	// bus and slots (default to 2020 with GT graphics)
-	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
+	// default is 2020 with GT graphics
+	m_kbd_port->set_default_option("lle_en_us");
+	m_mse_port->set_default_option("interpro_mouse");
 
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "mpcb963", false);
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, bus, cbus_cards, "mpcb963", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, cbus_cards, nullptr, false);
+	m_softlist->set_filter("2000");
+}
 
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "2000")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sapphire_state::ip2400)
+void cbus_sapphire_state::cbus_sapphire(machine_config &config)
+{
 	sapphire(config);
+
+	// keyboard port
+	INTERPRO_KEYBOARD_PORT(config, m_kbd_port, interpro_keyboard_devices, nullptr);
+	m_kbd_port->rxd_handler_cb().set(m_scc2, FUNC(z80scc_device::rxa_w));
+	m_scc2->out_txda_callback().set(m_kbd_port, FUNC(interpro_keyboard_port_device::write_txd));
+
+	// mouse port
+	INTERPRO_MOUSE_PORT(config, m_mse_port, interpro_mouse_devices, nullptr);
+	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
+
+	// cbus bus
+	CBUS_BUS(config, m_bus, 0);
+	m_bus->set_main_space(m_maincpu, 0);
+	m_bus->set_io_space(m_maincpu, 1);
+
+	m_bus->out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
+	m_bus->out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
+	m_bus->out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
+	m_bus->out_irq3_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+}
+
+void srx_sapphire_state::srx_sapphire(machine_config &config)
+{
+	sapphire(config);
+
+	// srx bus
+	SRX_BUS(config, m_bus, 0);
+	m_bus->set_main_space(m_maincpu, 0);
+	m_bus->set_io_space(m_maincpu, 1);
+
+	m_bus->out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
+	m_bus->out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
+	m_bus->out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
+	m_bus->out_irq3_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+}
+
+void cbus_sapphire_state::ip2400(machine_config &config)
+{
+	cbus_sapphire(config);
+
 	//m_maincpu->set_clock(50_MHz_XTAL);
-
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
-	// bus and slots (default to 2430 with GT+ graphics)
-	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
+	// default is 2430 with GT+ graphics
+	m_kbd_port->set_default_option("lle_en_us");
+	m_mse_port->set_default_option("interpro_mouse");
 
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
 
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, cbus_cards, nullptr, false);
+	m_softlist->set_filter("2400");
+}
 
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "2400")
-MACHINE_CONFIG_END
+void cbus_sapphire_state::ip2500(machine_config &config)
+{
+	cbus_sapphire(config);
 
-MACHINE_CONFIG_START(sapphire_state::ip2500)
-	sapphire(config);
 	//m_maincpu->set_clock(?);
-
-	// FIXME: don't know which cammu revision
-	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
-
-	// bus and slots (default to 2530 with GT+ graphics)
-	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
-
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
-
-	// GT II graphics (msmt135)?
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, cbus_cards, nullptr, false);
-
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "2500")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sapphire_state::ip2700)
-	sapphire(config);
-	//m_maincpu->set_clock(?);
-
-	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
-
-	// bus and slots (default to 2730 with GT+ graphics)
-	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
-
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
-
-	// GT II graphics (msmt135)?
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, cbus_cards, nullptr, false);
-
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "2700")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sapphire_state::ip2800)
-	sapphire(config);
-	//m_maincpu->set_clock(?);
-
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
-	// bus and slots (default to 2830 with GT+ graphics)
-	cbus_bus_device &bus(CBUS_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
+	// default is 2530 with GT+ graphics
+	m_kbd_port->set_default_option("lle_en_us");
+	m_mse_port->set_default_option("interpro_mouse");
 
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
 
-	// GT II graphics (msmt135)?
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, bus, cbus_cards, "msmt070", false);
-	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, cbus_cards, nullptr, false);
+	m_softlist->set_filter("2500");
+}
 
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "2800")
-MACHINE_CONFIG_END
+void cbus_sapphire_state::ip2700(machine_config &config)
+{
+	cbus_sapphire(config);
 
-MACHINE_CONFIG_START(emerald_state::ip6000)
+	//m_maincpu->set_clock(?);
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
+
+	// default is 2730 with GT+ graphics
+	m_kbd_port->set_default_option("lle_en_us");
+	m_mse_port->set_default_option("interpro_mouse");
+
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+
+	m_softlist->set_filter("2700");
+}
+
+void cbus_sapphire_state::ip2800(machine_config &config)
+{
+	cbus_sapphire(config);
+
+	//m_maincpu->set_clock(?);
+	// FIXME: don't know which cammu revision
+	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
+
+	// default is 2830 with GT+ graphics
+	m_kbd_port->set_default_option("lle_en_us");
+	m_mse_port->set_default_option("interpro_mouse");
+
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":0", 0, m_bus, cbus_cards, "msmt070", false);
+	CBUS_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, cbus_cards, nullptr, false);
+
+	m_softlist->set_filter("2800");
+}
+
+void emerald_state::ip6000(machine_config &config)
+{
 	emerald(config);
-	//m_maincpu->set_clock(80_MHz_XTAL / 2);
 
-	// EDGE systems use graphics keyboard
-	m_keyboard->set_default_option(nullptr);
+	// default is 6040 with EDGE-1 graphics
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcb828", false);
 
-	// bus and slots (default to 6040 with EDGE-1 graphics)
-	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
+	m_softlist->set_filter("6000");
+}
 
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+void srx_sapphire_state::ip6400(machine_config &config)
+{
+	srx_sapphire(config);
 
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, srx_cards, "mpcb828", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, bus, srx_cards, nullptr, false);
-
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "6000")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sapphire_state::ip6400)
-	sapphire(config);
 	//m_maincpu->set_clock(36_MHz_XTAL);
-
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR0);
 
-	// bus and slots (default to 6450 with GT II graphics)
-	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
-
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
-
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, srx_cards, "mpcbb92", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, bus, srx_cards, nullptr, false);
-
-	// EDGE systems use graphics keyboard
-	//m_keyboard->set_default_option(nullptr);
+	// default is 6450 with GT II graphics
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcbb68", false);
 
 	// EDGE-2 graphics (6480)
-	//SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, srx_cards, "mpcb030", false);
-	//SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, bus, srx_cards, "mpcba63", false);
+	//SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, "mpcb030", false);
+	//SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcba63", false);
 
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "6400")
-MACHINE_CONFIG_END
+	m_softlist->set_filter("6400");
+}
 
-MACHINE_CONFIG_START(sapphire_state::ip6700)
-	sapphire(config);
+void srx_sapphire_state::ip6700(machine_config &config)
+{
+	srx_sapphire(config);
+
 	//m_maincpu->set_clock(?);
-
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
-	// EDGE systems use graphics keyboard
-	m_keyboard->set_default_option(nullptr);
+	// default is 6780 with EDGE-2 Plus graphics
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, "msmt094", false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcb896", false);
 
-	// bus and slots (default to 6780 with EDGE-2 Plus graphics)
-	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
+	m_softlist->set_filter("6700");
+}
 
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
+void srx_sapphire_state::ip6800(machine_config &config)
+{
+	srx_sapphire(config);
 
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, srx_cards, "msmt094", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, bus, srx_cards, "mpcb896", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, bus, srx_cards, nullptr, false);
-
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "6700")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(sapphire_state::ip6800)
-	sapphire(config);
 	//m_maincpu->set_clock(?);
-
 	// FIXME: don't know which cammu revision
 	m_mmu->set_cammu_id(cammu_c4i_device::CID_C4IR2);
 
-	// EDGE systems use graphics keyboard
-	m_keyboard->set_default_option(nullptr);
+	// default is 6880 with EDGE-2 Plus graphics
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, m_bus, srx_cards, nullptr, false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, m_bus, srx_cards, "msmt094", false);
+	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, m_bus, srx_cards, "mpcb896", false);
 
-	// bus and slots (default to 6880 with EDGE-2 Plus graphics)
-	srx_bus_device &bus(SRX_BUS(config, INTERPRO_SLOT_TAG, 0, m_maincpu));
-
-	bus.out_irq0_cb().set(m_ioga, FUNC(interpro_ioga_device::ir3_w));
-	bus.out_irq1_cb().set(m_ioga, FUNC(interpro_ioga_device::ir4_w));
-	bus.out_irq2_cb().set(m_ioga, FUNC(interpro_ioga_device::ir5_w));
-	bus.out_vblank_cb().set(m_ioga, FUNC(interpro_ioga_device::ir6_w));
-
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":1", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":2", 0, bus, srx_cards, nullptr, false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":3", 0, bus, srx_cards, "msmt094", false);
-	SRX_SLOT(config, INTERPRO_SLOT_TAG ":4", 0, bus, srx_cards, "mpcb896", false);
-
-	MCFG_SOFTWARE_LIST_FILTER("softlist", "6800")
-MACHINE_CONFIG_END
+	m_softlist->set_filter("6800");
+}
 
 ROM_START(ip2000)
 	ROM_REGION(0x80, INTERPRO_NODEID_TAG, 0)
@@ -1223,17 +1238,18 @@ ROM_START(ip2000)
 	ROM_LOAD32_BYTE("mpcb962a.bin", 0x0, 0x20, CRC(e391342c) SHA1(02e03aad760b6651b8599c3a41c7c457983ee97d))
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro 2000 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro/InterServe 20x0 EPROM")
 	ROMX_LOAD("mprgm530e__26_apr_91k.u171", 0x00001, 0x20000, CRC(e4c470cb) SHA1(ff1917bfa963988d739a9dbf0b8f034fe49f2f8c), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgm540e__06_may_91k.u172", 0x00000, 0x20000, CRC(03225843) SHA1(03cfcd5b8ae0057240ef808a40108cb5d082eb63), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip2400)
+	// feature[0] & 0x02: C4I cammu if set
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt0470.bin", 0x0, 0x20, CRC(498c80df) SHA1(18a49732ac9d04b20a77747c1b946c2e88abb087))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro 2400 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro/InterServe 24x0 EPROM")
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1248,7 +1264,7 @@ ROM_START(ip2500)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro 2500 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1259,11 +1275,12 @@ ROM_START(ip2500)
 ROM_END
 
 ROM_START(ip2700)
+	// feature[0] & 0x04: supports RETRY if clear
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt1280.bin", 0x0, 0x20, CRC(32d833af) SHA1(7225c5f5670fe49d86556a2cb453ae6fe09e3e19))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro 2700 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro/InterServe 27x0 EPROM")
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1278,7 +1295,7 @@ ROM_START(ip2800)
 	ROM_LOAD32_BYTE("msmt1450.bin", 0x0, 0x20, CRC(61c7a305) SHA1(efcd045cbdfda8df44eaad761b0ba99367973cd7))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro 2800 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro/InterServe 28x0 EPROM")
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1292,11 +1309,13 @@ ROM_START(ip6000)
 	ROM_REGION(0x80, INTERPRO_NODEID_TAG, 0)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
+	// feature[0] & 0x01: 1/4 bus clock if clear
+	// feature[0] & 0x02: configurable console port if clear
 	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
-	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(100f4f94) SHA1(64242eadd40ce5b9d12625db8707a07ff9e4d05c))
+	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(6da05794) SHA1(fef8a9c17491f3d3ceb35c56a628f47d49166b57))
 
 	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro 6000 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro/InterServe 60x0 EPROM")
 	ROMX_LOAD("mprgg360f__04_may_90v.u336", 0x00001, 0x20000, CRC(9e8b798b) SHA1(54412e26a468e038fb44ffa322ed3ddfae423c17), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgg350f__04_may_90v.u349", 0x00000, 0x20000, CRC(32ab99fd) SHA1(202a6082bade8a084b8cd25109daff8443f6a5c7), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
@@ -1307,7 +1326,7 @@ ROM_START(ip6400)
 
 	// FIXME: use 2400 eprom until we have a 6400 dump
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro 6400 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro/InterServe 64x0 EPROM")
 	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1322,7 +1341,7 @@ ROM_START(ip6700)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro 6700 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro/InterServe 67x0 EPROM")
 	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1337,7 +1356,7 @@ ROM_START(ip6800)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
 	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
-	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro 6800 EPROM")
+	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro/InterServe 68x0 EPROM")
 	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
 	ROM_REGION(0x20000, INTERPRO_FLASH_TAG "_lsb", 0)
@@ -1347,13 +1366,13 @@ ROM_START(ip6800)
 	ROM_LOAD_OPTIONAL("y226.u130", 0x00000, 0x20000, CRC(54d95730) SHA1(a4e114dee1567d8aa31eed770f7cc366588f395c))
 ROM_END
 
-/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY        FULLNAME         FLAGS */
-COMP( 1990,  ip2000,  0,      0,      ip2000,  interpro, turquoise_state,init_common,"Intergraph",  "InterPro 2000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip2400,  0,      0,      ip2400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2500,  0,      0,      ip2500,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip2700,  0,      0,      ip2700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1994,  ip2800,  0,      0,      ip2800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 2800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1990,  ip6000,  0,      0,      ip6000,  interpro, emerald_state,  init_common,"Intergraph",  "InterPro 6000", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1992,  ip6400,  0,      0,      ip6400,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6700,  0,      0,      ip6700,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6700", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
-COMP( 1993,  ip6800,  0,      0,      ip6800,  interpro, sapphire_state, init_common,"Intergraph",  "InterPro 6800", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+/*    YEAR   NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS                INIT        COMPANY        FULLNAME                    FLAGS */
+COMP( 1990,  ip2000,  0,      0,      ip2000,  0,     turquoise_state,     init_common,"Intergraph",  "InterPro/InterServe 20x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip2400,  0,      0,      ip2400,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 24x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2500,  0,      0,      ip2500,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 25x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip2700,  0,      0,      ip2700,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 27x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1994,  ip2800,  0,      0,      ip2800,  0,     cbus_sapphire_state, init_common,"Intergraph",  "InterPro/InterServe 28x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1990,  ip6000,  0,      0,      ip6000,  0,     emerald_state,       init_common,"Intergraph",  "InterPro/InterServe 60x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1992,  ip6400,  0,      0,      ip6400,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 64x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6700,  0,      0,      ip6700,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 67x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1993,  ip6800,  0,      0,      ip6800,  0,     srx_sapphire_state,  init_common,"Intergraph",  "InterPro/InterServe 68x0", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

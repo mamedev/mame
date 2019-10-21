@@ -18,13 +18,13 @@ void maple_dc_device::amap(address_map &map)
 }
 
 maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, MAPLE_DC, tag, owner, clock)
+	: device_t(mconfig, MAPLE_DC, tag, owner, clock),
+	cpu(*this, finder_base::DUMMY_TAG),
+	irq_cb(*this)
 {
 	// Do not move that in device_start or there will be a race
 	// condition with the maple devices call to register_port.
 	memset(devices, 0, sizeof(devices));
-	cpu = nullptr;
-	irq_cb = nullptr;
 }
 
 void maple_dc_device::register_port(int port, maple_device *device)
@@ -38,8 +38,8 @@ void maple_dc_device::register_port(int port, maple_device *device)
 void maple_dc_device::device_start()
 {
 	logerror("maple_dc_device started\n");
-	cpu = machine().device<sh4_device>(maincpu_tag);
 	timer = timer_alloc(0);
+	irq_cb.resolve_safe();
 
 	mdstar = 0;
 
@@ -86,8 +86,7 @@ void maple_dc_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case DMA_DONE:
 		dma_state = DMA_IDLE;
 		mdst = 0;
-		if(irq_cb)
-			irq_cb(machine());
+		irq_cb(DMA_MAPLE_IRQ);
 		break;
 
 	default:

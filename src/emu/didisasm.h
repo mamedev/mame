@@ -18,9 +18,6 @@
 #include <utility>
 
 
-#define MCFG_DEVICE_DISASSEMBLE_OVERRIDE(_class, _func) \
-		dynamic_cast<device_disasm_interface *>(device)->set_dasm_override(dasm_override_delegate(&_class::_func, #_class "::" #_func, nullptr, (_class *)nullptr));
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************

@@ -7,13 +7,15 @@
     Scandia Metric ABC FD2 disk image formats
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ABCFD2_DSK_H
+#define MAME_FORMATS_ABCFD2_DSK_H
 
-#ifndef ABC_FD2_DSK_H_
-#define ABC_FD2_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class abc_fd2_format : public wd177x_format {
+class abc_fd2_format : public wd177x_format
+{
 public:
 	abc_fd2_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ABC_FD2_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_ABCFD2_DSK_H

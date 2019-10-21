@@ -1,7 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Roberto Fresca
+#ifndef MAME_INCLUDES_SDERBY_H
+#define MAME_INCLUDES_SDERBY_H
+
+#pragma once
 
 #include "emupal.h"
+#include "tilemap.h"
 
 class sderby_state : public driver_device
 {
@@ -69,3 +74,5 @@ private:
 	required_device<palette_device> m_palette;
 	output_finder<7> m_lamps;
 };
+
+#endif // MAME_INCLUDES_SDERBY_H

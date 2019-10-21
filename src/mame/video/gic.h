@@ -16,18 +16,6 @@
 
 #pragma once
 
-#include "emupal.h"
-
-
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_GIC_ADD(tag, clock, screen_tag, ram_cb) \
-	MCFG_DEVICE_ADD(tag, GIC, clock) \
-	MCFG_VIDEO_SET_SCREEN(screen_tag) \
-	downcast<gic_device &>(*device).set_ram(DEVCB_##ram_cb);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -59,9 +47,7 @@ public:
 	gic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
-	template <typename Obj> void set_ram(Obj &&cb) { m_ram.set_callback(std::forward<Obj>(cb)); }
-
-	DECLARE_PALETTE_INIT(gic);
+	auto ram_callback() { return m_ram.bind(); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

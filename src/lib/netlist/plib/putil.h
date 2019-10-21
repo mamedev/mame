@@ -5,27 +5,147 @@
  *
  */
 
-#ifndef P_UTIL_H_
-#define P_UTIL_H_
+#ifndef PUTIL_H_
+#define PUTIL_H_
 
+#include "pexception.h"
 #include "pstring.h"
+#include "palloc.h"
 
-#include <initializer_list>
 #include <algorithm>
-#include <vector> // <<= needed by windows build
+#include <initializer_list>
+#include <iostream>
+#include <locale>
+#include <sstream>
+#include <vector>
+
+#define PSTRINGIFY_HELP(y) # y
+#define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
+
 
 namespace plib
 {
+
+	// ----------------------------------------------------------------------------------------
+	// A Generic netlist sources implementation
+	// ----------------------------------------------------------------------------------------
+
+	class psource_t
+	{
+	public:
+
+		using stream_ptr = plib::unique_ptr<std::istream>;
+
+		psource_t()
+		{}
+
+		COPYASSIGNMOVE(psource_t, delete)
+
+		virtual ~psource_t() noexcept = default;
+
+		virtual stream_ptr stream(const pstring &name) = 0;
+	private:
+	};
+
+	/**! Generic string source
+	 *
+	 * Will return the given string when name matches.
+	 * Is used in preprocessor code to eliminate inclusion of certain files.
+	 *
+	 * @tparam TS base stream class. Default is psource_t
+	 */
+	template <typename TS = psource_t>
+	class psource_str_t : public TS
+	{
+	public:
+		psource_str_t(pstring name, pstring str)
+		: m_name(name), m_str(str)
+		{}
+
+		COPYASSIGNMOVE(psource_str_t, delete)
+		virtual ~psource_str_t() noexcept = default;
+
+		typename TS::stream_ptr stream(const pstring &name) override
+		{
+			if (name == m_name)
+				return plib::make_unique<std::stringstream>(m_str);
+			else
+				return typename TS::stream_ptr(nullptr);
+		}
+	private:
+		pstring m_name;
+		pstring m_str;
+	};
+
+	/**! Generic sources collection
+	 *
+	 * @tparam TS base stream class. Default is psource_t
+	 */
+	template <typename TS = psource_t>
+	class psource_collection_t
+	{
+	public:
+		using source_type = plib::unique_ptr<TS>;
+		using list_t = std::vector<source_type>;
+
+		psource_collection_t()
+		{}
+
+		COPYASSIGNMOVE(psource_collection_t, delete)
+		virtual ~psource_collection_t() noexcept = default;
+
+		void add_source(source_type &&src)
+		{
+			m_collection.push_back(std::move(src));
+		}
+
+		template <typename S = TS>
+		typename S::stream_ptr get_stream(pstring name)
+		{
+			for (auto &s : m_collection)
+			{
+				auto source(dynamic_cast<S *>(s.get()));
+				if (source)
+				{
+					auto strm = source->stream(name);
+					if (strm)
+						return strm;
+				}
+			}
+			return typename S::stream_ptr(nullptr);
+		}
+
+		template <typename S, typename F>
+		bool for_all(pstring name, F lambda)
+		{
+			for (auto &s : m_collection)
+			{
+				auto source(dynamic_cast<S *>(s.get()));
+				if (source)
+				{
+					if (lambda(source))
+						return true;
+				}
+			}
+			return false;
+		}
+
+	private:
+		list_t m_collection;
+	};
+
 	namespace util
 	{
-		const pstring buildpath(std::initializer_list<pstring> list );
-		const pstring environment(const pstring &var, const pstring &default_val);
-	}
+		pstring basename(pstring filename);
+		pstring path(pstring filename);
+		pstring buildpath(std::initializer_list<pstring> list );
+		pstring environment(const pstring &var, const pstring &default_val);
+	} // namespace util
 
 	namespace container
 	{
-		template <class C>
-		bool contains(C &con, const typename C::value_type &elem)
+		template <class C, class T>
+		bool contains(C &con, const T &elem)
 		{
 			return std::find(con.begin(), con.end(), elem) != con.end();
 		}
@@ -51,7 +171,53 @@ namespace plib
 		{
 			con.erase(std::remove(con.begin(), con.end(), elem), con.end());
 		}
-	}
+	} // namespace container
+
+	/* May be further specialized .... This is the generic version */
+	template <typename T>
+	struct constants
+	{
+		static inline constexpr T zero()   noexcept { return static_cast<T>(0); }
+		static inline constexpr T one()    noexcept { return static_cast<T>(1); }
+		static inline constexpr T two()    noexcept { return static_cast<T>(2); }
+		static inline constexpr T sqrt2()  noexcept { return static_cast<T>(1.414213562373095048801688724209); }
+		static inline constexpr T pi()     noexcept { return static_cast<T>(3.14159265358979323846264338327950); }
+
+		/*!
+		 * \brief Electric constant of vacuum
+		 */
+		static inline constexpr T eps_0() noexcept { return static_cast<T>(8.854187817e-12); }
+		/*!
+		 * \brief Relative permittivity of Silicon dioxide
+		 */
+		static inline constexpr T eps_SiO2() noexcept { return static_cast<T>(3.9); }
+		/*!
+		 * \brief Relative permittivity of Silicon
+		 */
+		static inline constexpr T eps_Si() noexcept { return static_cast<T>(11.7); }
+		/*!
+		 * \brief Boltzmann constant
+		 */
+		static inline constexpr T k_b() noexcept { return static_cast<T>(1.38064852e-23); }
+		/*!
+		 * \brief room temperature (gives VT = 0.02585 at T=300)
+		 */
+		static inline constexpr T T0() noexcept { return static_cast<T>(300); }
+		/*!
+		 * \brief Elementary charge
+		 */
+		static inline constexpr T Q_e() noexcept { return static_cast<T>(1.6021765314e-19); }
+		/*!
+		 * \brief Intrinsic carrier concentration in 1/m^3 of Silicon
+		 */
+		static inline constexpr T NiSi() noexcept { return static_cast<T>(1.45e16); }
+
+		template <typename V>
+		static inline constexpr const T cast(V &&v) noexcept { return static_cast<T>(v); }
+	};
+
+	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
+
 
 	template <class C>
 	struct indexed_compare
@@ -69,7 +235,140 @@ namespace plib
 
 	std::vector<pstring> psplit(const pstring &str, const pstring &onstr, bool ignore_empty = false);
 	std::vector<pstring> psplit(const pstring &str, const std::vector<pstring> &onstrl);
+	std::vector<std::string> psplit_r(const std::string &stri,
+			const std::string &token,
+			const std::size_t maxsplit);
 
-}
+	// ----------------------------------------------------------------------------------------
+	// number conversions
+	// ----------------------------------------------------------------------------------------
 
-#endif /* P_UTIL_H_ */
+	template <typename T, typename S>
+	T pstonum_locale(const std::locale &loc, const S &arg, std::size_t *idx)
+	{
+		std::stringstream ss;
+		ss.imbue(loc);
+		ss << arg;
+		auto len(ss.tellp());
+		T x(constants<T>::zero());
+		if (ss >> x)
+		{
+			auto pos(ss.tellg());
+			if (pos == static_cast<decltype(pos)>(-1))
+				pos = len;
+			*idx = static_cast<std::size_t>(pos);
+		}
+		else
+			*idx = constants<std::size_t>::zero();
+		//printf("%s, %f, %lu %ld\n", arg, (double)x, *idx, (long int) ss.tellg());
+		return x;
+	}
+
+	template <typename T, typename E = void>
+	struct pstonum_helper;
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value && std::is_signed<T>::value>::type>
+	{
+		template <typename S>
+		long long operator()(std::locale loc, const S &arg, std::size_t *idx)
+		{
+			//return std::stoll(arg, idx);
+			return pstonum_locale<long long>(loc, arg, idx);
+		}
+	};
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type>
+	{
+		template <typename S>
+		unsigned long long operator()(std::locale loc, const S &arg, std::size_t *idx)
+		{
+			//return std::stoll(arg, idx);
+			return pstonum_locale<unsigned long long>(loc, arg, idx);
+		}
+	};
+
+	template<typename T>
+	struct pstonum_helper<T, typename std::enable_if<std::is_floating_point<T>::value>::type>
+	{
+		template <typename S>
+		long double operator()(std::locale loc, const S &arg, std::size_t *idx)
+		{
+			return pstonum_locale<long double>(loc, arg, idx);
+		}
+	};
+
+	template<typename T, typename S>
+	T pstonum(const S &arg, const std::locale &loc = std::locale::classic())
+	{
+		decltype(arg.c_str()) cstr = arg.c_str();
+		std::size_t idx(0);
+		auto ret = pstonum_helper<T>()(loc, cstr, &idx);
+		using ret_type = decltype(ret);
+		if (ret >= static_cast<ret_type>(std::numeric_limits<T>::lowest())
+			&& ret <= static_cast<ret_type>(std::numeric_limits<T>::max()))
+			//&& (ret == T(0) || std::abs(ret) >= std::numeric_limits<T>::min() ))
+		{
+			if (cstr[idx] != 0)
+				throw pexception(pstring("Continuation after numeric value ends: ") + pstring(cstr));
+		}
+		else
+		{
+			throw pexception(pstring("Out of range: ") + pstring(cstr));
+		}
+		return static_cast<T>(ret);
+	}
+
+	template<typename R, bool CLOCALE, typename T>
+	R pstonum_ne(const T &str, bool &err, std::locale loc = std::locale::classic()) noexcept
+	{
+		try
+		{
+			err = false;
+			return pstonum<R>(str, loc);
+		}
+		catch (...)
+		{
+			err = true;
+			return R(0);
+		}
+	}
+
+	//============================================================
+	//  penum - strongly typed enumeration
+	//============================================================
+
+	struct penum_base
+	{
+	protected:
+		static int from_string_int(const pstring &str, const pstring &x);
+		static std::string nthstr(int n, const pstring &str);
+	};
+
+} // namespace plib
+
+#define P_ENUM(ename, ...) \
+	struct ename : public plib::penum_base { \
+		enum E { __VA_ARGS__ }; \
+		ename (E v) : m_v(v) { } \
+		template <typename T> explicit ename(T val) { m_v = static_cast<E>(val); } \
+		bool set_from_string (const pstring &s) { \
+			int f = from_string_int(strings(), s); \
+			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
+		} \
+		operator E() const {return m_v;} \
+		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
+		bool operator==(const E &rhs) const {return m_v == rhs;} \
+		std::string name() const { \
+			return nthstr(static_cast<int>(m_v), strings()); \
+		} \
+		private: E m_v; \
+		static pstring strings() {\
+			static const pstring lstrings = # __VA_ARGS__; \
+			return lstrings; \
+		} \
+	};
+
+
+#endif /* PUTIL_H_ */

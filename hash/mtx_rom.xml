@@ -4,7 +4,7 @@
 <softwarelist name="mtx_rom" description="Memotech MTX ROM extensions">
 
 	<software name="newword">
-		<description>MTX NewWord</description>
+		<description>MTX Colour NewWord</description>
 		<year>1984</year>
 		<publisher>NewStar Software</publisher>
 		<info name="usage" value="ROM 2" />

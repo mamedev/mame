@@ -73,9 +73,6 @@
 #define OP_USERFLAG_CALL                    0x10000000
 
 
-#define MCFG_SHARC_BOOT_MODE(boot_mode) \
-	downcast<adsp21062_device &>(*device).set_boot_mode(adsp21062_device::boot_mode);
-
 class sharc_frontend;
 
 class adsp21062_device : public cpu_device
@@ -569,6 +566,7 @@ private:
 	inline void compute_fabs_plus(int rn, int rx, int ry);
 	inline void compute_fmax(int rn, int rx, int ry);
 	inline void compute_fmin(int rn, int rx, int ry);
+	inline void compute_fcopysign(int rn, int rx, int ry);
 	inline void compute_fclip(int rn, int rx, int ry);
 	inline void compute_recips(int rn, int rx);
 	inline void compute_rsqrts(int rn, int rx);

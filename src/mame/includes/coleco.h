@@ -11,7 +11,7 @@
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "machine/coleco.h"
-#include "bus/coleco/exp.h"
+#include "bus/coleco/cartridge/exp.h"
 
 class coleco_state : public driver_device
 {

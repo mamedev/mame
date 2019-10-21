@@ -708,9 +708,20 @@
 # if !defined(ASIO_DISABLE_STD_STRING_VIEW)
 #  if defined(__clang__)
 #   if (__cplusplus >= 201103)
-#    if __has_include(<experimental/string_view>)
+#    ifdef _LIBCPP_VERSION
+#     if _LIBCPP_VERSION >= 8000
+#      define ASIO_HAS_STD_STRING_VIEW 1
+#     endif
+#    endif
+#    if !defined(ASIO_HAS_STD_STRING_VIEW) && __has_include(<experimental/string_view>)
 #     define ASIO_HAS_STD_STRING_VIEW 1
-#     define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
+#     if defined(__APPLE__)
+#      if ((__clang_major__ < 10) || ((__clang_major__ == 10) && (__clang_minor__ == 0) && (__clang_patchlevel__ < 1)))
+#        define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
+#       endif // clang < 10.0.1
+#      else // for non-Xcode Clang
+#        define ASIO_HAS_STD_EXPERIMENTAL_STRING_VIEW 1
+#      endif
 #    endif // __has_include(<experimental/string_view>)
 #   endif // (__cplusplus >= 201103)
 #  endif // defined(__clang__)

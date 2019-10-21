@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
-#include "audio/nl_cheekyms.h"
 #include "netlist/devices/net_lib.h"
 
 
@@ -241,7 +240,7 @@ NETLIST_END()
 
 static NETLIST_START(NOISE)
 	CS(FC, 0)
-	PARAM(FC.FUNC, "0.0000001 rand *")
+	PARAM(FC.FUNC, "0.0000001 * rand()")
 
 	ALIAS(E, FC.P)
 	ALIAS(B, FC.N)

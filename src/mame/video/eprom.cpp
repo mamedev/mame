@@ -23,7 +23,7 @@ void eprom_state::update_palette()
 	for (color = 0; color < 0x800; ++color)
 	{
 		int i, r, g, b;
-		uint16_t const data = m_generic_paletteram_16[color];
+		uint16_t const data = m_paletteram[color];
 
 		/* FIXME this is only a very crude approximation of the palette output.
 		 * The circuit involves a dozen transistors and probably has an output

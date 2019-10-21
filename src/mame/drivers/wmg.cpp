@@ -97,18 +97,18 @@ public:
 
 	void init_wmg();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
+	template <int N> DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
 
 private:
-	DECLARE_READ8_MEMBER(wmg_nvram_r);
-	DECLARE_WRITE8_MEMBER(wmg_nvram_w);
-	DECLARE_READ8_MEMBER(wmg_pia_0_r);
-	DECLARE_WRITE8_MEMBER(wmg_c400_w);
-	DECLARE_WRITE8_MEMBER(wmg_d000_w);
+	u8 wmg_nvram_r(offs_t offset);
+	void wmg_nvram_w(offs_t offset, u8 data);
+	u8 wmg_pia_0_r(offs_t offset);
+	void wmg_c400_w(u8 data);
+	void wmg_d000_w(u8 data);
 	DECLARE_WRITE8_MEMBER(wmg_blitter_w);
 	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
-	DECLARE_WRITE8_MEMBER(wmg_sound_reset_w);
-	DECLARE_WRITE8_MEMBER(wmg_vram_select_w);
+	void wmg_sound_reset_w(u8 data);
+	void wmg_vram_select_w(u8 data);
 
 	void wmg_cpu1(address_map &map);
 	void wmg_cpu2(address_map &map);
@@ -179,10 +179,10 @@ void wmg_state::wmg_banked_map(address_map &map)
  ***************************************************************/
 static INPUT_PORTS_START( wmg )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "0")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wmg_state, wmg_mux_r<0>)
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wmg_state, wmg_mux_r, "1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(wmg_state, wmg_mux_r<1>)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Auto Up / Manual Down") PORT_TOGGLE
@@ -325,12 +325,12 @@ INPUT_PORTS_END
  *  NVRAM (8k x 8), banked
  *
  *************************************/
-READ8_MEMBER( wmg_state::wmg_nvram_r )
+u8 wmg_state::wmg_nvram_r(offs_t offset)
 {
 	return m_p_ram[offset+(m_wmg_c400<<10)];
 }
 
-WRITE8_MEMBER( wmg_state::wmg_nvram_w )
+void wmg_state::wmg_nvram_w(offs_t offset, u8 data)
 {
 	m_p_ram[offset+(m_wmg_c400<<10)] = data;
 }
@@ -355,7 +355,7 @@ WRITE8_MEMBER( wmg_state::wmg_blitter_w )
 /* switches the banks around when given a game number.
    The hardware has a lock feature, so that once a bank is selected, the next choice must be the menu */
 
-WRITE8_MEMBER( wmg_state::wmg_c400_w )
+void wmg_state::wmg_c400_w(u8 data)
 {
 	data &= 7;
 	if (m_wmg_c400 == data)
@@ -364,7 +364,7 @@ WRITE8_MEMBER( wmg_state::wmg_c400_w )
 	if ((data == 0) || (m_wmg_c400 == 0))   // we must be going to/from the menu
 	{
 		m_wmg_c400 = data;
-		wmg_d000_w( space, 0, 0); // select i/o
+		wmg_d000_w(0); // select i/o
 		m_mainbank->set_entry(m_wmg_vram_bank ? (1+m_wmg_c400) : 0);      // Gfx etc
 		m_codebank->set_entry(data);      // Code
 		m_soundbank->set_entry(data);      // Sound
@@ -372,13 +372,13 @@ WRITE8_MEMBER( wmg_state::wmg_c400_w )
 	}
 }
 
-WRITE8_MEMBER( wmg_state::wmg_sound_reset_w )
+void wmg_state::wmg_sound_reset_w(u8 data)
 {
 	/* This resets the sound card when bit 0 is low */
 	if (!BIT(data, 0)) m_soundcpu->reset();
 }
 
-WRITE8_MEMBER( wmg_state::wmg_vram_select_w )
+void wmg_state::wmg_vram_select_w(u8 data)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_wmg_vram_bank = BIT(data, 0);
@@ -390,7 +390,7 @@ WRITE8_MEMBER( wmg_state::wmg_vram_select_w )
 
 
 // if defender, choose a rom, else enable i/o
-WRITE8_MEMBER( wmg_state::wmg_d000_w )
+void wmg_state::wmg_d000_w(u8 data)
 {
 	data &= 15;
 	if (m_wmg_d000 == data)
@@ -446,12 +446,11 @@ void wmg_state::machine_start()
 
 void wmg_state::machine_reset()
 {
-	address_space &space1 = m_maincpu->space(AS_PROGRAM);
 	m_wmg_c400=0xff;
 	m_wmg_d000=0xff;
 	m_wmg_port_select=0;
 	m_wmg_vram_bank=0;
-	wmg_c400_w( space1, 0, 0);
+	wmg_c400_w(0);
 	m_maincpu->reset();
 }
 
@@ -466,11 +465,10 @@ WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
 	m_wmg_port_select = state | (m_wmg_c400 << 1);
 }
 
+template <int N>
 CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 {
-	const char *port = (const char *)param;
-
-	if (port[0] == '0')
+	if (N == 0)
 	{
 		uint8_t ports[17] = { 0,0,2,2,5,4,7,7,9,9,11,11,14,13,9,9 };
 		return m_keyboard[ports[m_wmg_port_select]]->read();
@@ -482,17 +480,17 @@ CUSTOM_INPUT_MEMBER(wmg_state::wmg_mux_r)
 	}
 }
 
-READ8_MEMBER( wmg_state::wmg_pia_0_r )
+u8 wmg_state::wmg_pia_0_r(offs_t offset)
 {
 /* if player presses P1 and P2 in a game, return to the menu.
     Since there is no code in rom to handle this, it must be a hardware feature
     which probably just resets the cpu. */
 
-	uint8_t data = m_pia[0]->read(space, offset);
+	uint8_t data = m_pia[0]->read(offset);
 
 	if ((m_wmg_c400) && (offset == 0) && ((data & 0x30) == 0x30))   // P1 and P2 pressed
 	{
-		wmg_c400_w( space, 0, 0);
+		wmg_c400_w(0);
 		m_maincpu->reset();
 	}
 
@@ -515,56 +513,49 @@ void wmg_state::init_wmg()
  *  Machine Driver
  *
  *************************************/
-MACHINE_CONFIG_START(wmg_state::wmg)
-
+void wmg_state::wmg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809E, MASTER_CLOCK/3/4)
-	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu1)
+	MC6809E(config, m_maincpu, MASTER_CLOCK/3/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu1);
 
-	MCFG_DEVICE_ADD("soundcpu", M6808, SOUND_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(wmg_cpu2)
+	M6808(config, m_soundcpu, SOUND_CLOCK);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &wmg_state::wmg_cpu2);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("bankc000", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(wmg_banked_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(16)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x1000)
+	ADDRESS_MAP_BANK(config, "bankc000").set_map(&wmg_state::wmg_banked_map).set_options(ENDIANNESS_BIG, 8, 16, 0x1000);
 
 	// set a timer to go off every 32 scanlines, to toggle the VA11 line and update the screen
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scan_timer", williams_state, williams_va11_callback, "screen", 0, 32)
+	TIMER(config, "scan_timer").configure_scanline(FUNC(williams_state::williams_va11_callback), "screen", 0, 32);
 
 	// also set a timer to go off on scanline 240
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("240_timer", williams_state, williams_count240_callback, "screen", 0, 240)
+	TIMER(config, "240_timer").configure_scanline(FUNC(williams_state::williams_count240_callback), "screen", 0, 240);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(williams_state, screen_update_williams)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE);
+	m_screen->set_raw(MASTER_CLOCK*2/3, 512, 6, 298, 260, 7, 247);
+	m_screen->set_screen_update(FUNC(williams_state::screen_update_williams));
 
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(williams_state,williams)
+	PALETTE(config, m_palette, FUNC(williams_state::williams_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* pia */
-	MCFG_INPUT_MERGER_ANY_HIGH("mainirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_INPUT_MERGER_ANY_HIGH("soundirq")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("soundcpu", M6808_IRQ_LINE))
+	INPUT_MERGER_ANY_HIGH(config, "soundirq").output_handler().set_inputline(m_soundcpu, M6808_IRQ_LINE);
 
 	pia6821_device &pia0(PIA6821(config, "pia_0", 0));
 	pia0.readpa_handler().set_ioport("IN0");
@@ -581,7 +572,7 @@ MACHINE_CONFIG_START(wmg_state::wmg)
 	pia2.writepa_handler().set("dac", FUNC(dac_byte_interface::data_w));
 	pia2.irqa_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<0>));
 	pia2.irqb_handler().set("soundirq", FUNC(input_merger_any_high_device::in_w<1>));
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

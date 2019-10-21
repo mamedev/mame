@@ -28,8 +28,8 @@
 #include "emu.h"
 #include "includes/next.h"
 
-#include "machine/nscsi_cd.h"
-#include "machine/nscsi_hd.h"
+#include "bus/nscsi/cd.h"
+#include "bus/nscsi/hd.h"
 #include "screen.h"
 #include "softlist.h"
 
@@ -253,24 +253,24 @@ void next_state::irq_check()
 
 	if(level != irq_level) {
 		maincpu->set_input_line(irq_level, CLEAR_LINE);
-		maincpu->set_input_line_and_vector(level, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		maincpu->set_input_line(level, ASSERT_LINE);
 		irq_level = level;
 	}
 }
 
-const char *next_state::dma_targets[0x20] = {
+char const *const next_state::dma_targets[0x20] = {
 	nullptr, "scsi", nullptr, nullptr, "soundout", "disk", nullptr, nullptr,
 	"soundin", "printer", nullptr, nullptr, "scc", "dsp", nullptr, nullptr,
 	"s-enetx", "enetx", nullptr, nullptr, "s-enetr", "enetr", nullptr, nullptr,
 	"video", nullptr, nullptr, nullptr, "r2m", "m2r", nullptr, nullptr
 };
 
-const int next_state::dma_irqs[0x20] = {
+int const next_state::dma_irqs[0x20] = {
 	-1, 26, -1, -1, 23, 25, -1, -1, 22, 24, -1, -1, 21, 20, -1, -1,
 	-1, 28, -1, -1, -1, 27, -1, -1,  5, -1, -1, -1, 18, 19, -1, -1
 };
 
-const bool next_state::dma_has_saved[0x20] = {
+bool const next_state::dma_has_saved[0x20] = {
 	false, false, false, false, false, false, false, false,
 	false, false, false, false, false, false, false, false,
 	false, true,  false, false, false, true,  false, false,
@@ -557,7 +557,7 @@ void next_state::dma_do_ctrl_w(int slot, uint8_t data)
 	}
 }
 
-const int next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
+int const next_state::scsi_clocks[4] = { 10000000, 12000000, 20000000, 16000000 };
 
 READ32_MEMBER( next_state::scsictrl_r )
 {
@@ -899,38 +899,38 @@ void next_state::next_mem(address_map &map)
 	map(0x02000000, 0x020001ff).mirror(0x300200).rw(FUNC(next_state::dma_ctrl_r), FUNC(next_state::dma_ctrl_w));
 	map(0x02004000, 0x020041ff).mirror(0x300200).rw(FUNC(next_state::dma_regs_r), FUNC(next_state::dma_regs_w));
 	map(0x02006000, 0x0200600f).mirror(0x300000).m(net, FUNC(mb8795_device::map));
-//  AM_RANGE(0x02006010, 0x02006013) AM_MIRROR(0x300000) memory timing
+//  map(0x02006010, 0x02006013).mirror(0x300000); memory timing
 	map(0x02007000, 0x02007003).mirror(0x300000).r(FUNC(next_state::irq_status_r));
 	map(0x02007800, 0x02007803).mirror(0x300000).rw(FUNC(next_state::irq_mask_r), FUNC(next_state::irq_mask_w));
 	map(0x02008000, 0x02008003).mirror(0x300000).r(FUNC(next_state::dsp_r));
 	map(0x0200c000, 0x0200c003).mirror(0x300000).r(FUNC(next_state::scr1_r));
 	map(0x0200c800, 0x0200c803).mirror(0x300000).r(FUNC(next_state::rom_map_r));
 	map(0x0200d000, 0x0200d003).mirror(0x300000).rw(FUNC(next_state::scr2_r), FUNC(next_state::scr2_w));
-//  AM_RANGE(0x0200d800, 0x0200d803) AM_MIRROR(0x300000) RMTINT
+//  map(0x0200d800, 0x0200d803).mirror(0x300000); RMTINT
 	map(0x0200e000, 0x0200e00b).mirror(0x300000).m(keyboard, FUNC(nextkbd_device::amap));
-//  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
-//  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
+//  map(0x0200f000, 0x0200f003).mirror(0x300000); printer
+//  map(0x02010000, 0x02010003).mirror(0x300000); brightness
 	map(0x02012000, 0x0201201f).mirror(0x300000).m(mo, FUNC(nextmo_device::map));
 	map(0x02014000, 0x0201400f).mirror(0x300000).m(scsi, FUNC(ncr5390_device::map));
 	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
 	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
 	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
 	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w));
-//  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
-//  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
-//  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
+//  map(0x02018004, 0x02018007).mirror(0x300000); SCC CLK
+//  map(0x02018190, 0x02018197).mirror(0x300000); warp 9c DRAM timing
+//  map(0x02018198, 0x0201819f).mirror(0x300000); warp 9c VRAM timing
 	map(0x0201a000, 0x0201a003).mirror(0x300000).r(FUNC(next_state::event_counter_r)); // EVENTC
-//  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
+//  map(0x020c0000, 0x020c0004).mirror(0x300000); BMAP
 	map(0x020c0030, 0x020c0037).mirror(0x300000).rw(FUNC(next_state::phy_r), FUNC(next_state::phy_w));
 	map(0x04000000, 0x07ffffff).ram(); //work ram
-//  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
-//  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
-//  AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
-//  AM_RANGE(0x0f000000, 0x0f03ffff) video RAM w AB function
-//  AM_RANGE(0x10000000, 0x1003ffff) main RAM w A+B-AB function
-//  AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
-//  AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
-//  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
+//  map(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
+//  map(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
+//  map(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
+//  map(0x0f000000, 0x0f03ffff) video RAM w AB function
+//  map(0x10000000, 0x1003ffff) main RAM w A+B-AB function
+//  map(0x14000000, 0x1403ffff) main RAM w (1-A)B function
+//  map(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
+//  map(0x1c000000, 0x1c03ffff) main RAM w AB function
 }
 
 void next_state::next_0b_m_nofdc_mem(address_map &map)
@@ -995,116 +995,127 @@ static void next_scsi_devices(device_slot_interface &device)
 
 void next_state::ncr5390(device_t *device)
 {
-	devcb_base *devcb;
-	(void)devcb;
-	MCFG_DEVICE_CLOCK(10000000)
-	MCFG_NCR5390_IRQ_HANDLER(WRITELINE(*this, next_state, scsi_irq))
-	MCFG_NCR5390_DRQ_HANDLER(WRITELINE(*this, next_state, scsi_drq))
+	ncr5390_device &adapter = downcast<ncr5390_device &>(*device);
+
+	adapter.set_clock(10000000);
+	adapter.irq_handler_cb().set(*this, FUNC(next_state::scsi_irq));
+	adapter.drq_handler_cb().set(*this, FUNC(next_state::scsi_drq));
 }
 
-MACHINE_CONFIG_START(next_state::next_base)
-
+void next_state::next_base(machine_config &config)
+{
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(next_state, screen_update)
-	MCFG_SCREEN_SIZE(1120, 900)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1120-1, 0, 832-1)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, next_state, vblank_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(next_state::screen_update));
+	screen.set_size(1120, 900);
+	screen.set_visarea(0, 1120-1, 0, 832-1);
+	screen.screen_vblank().set(FUNC(next_state::vblank_w));
 
 	// devices
-	MCFG_NSCSI_BUS_ADD("scsibus")
-	MCFG_DEVICE_ADD("rtc", MCCS1850, XTAL(32'768))
-	MCFG_DEVICE_ADD("scc", SCC8530, XTAL(25'000'000))
-	MCFG_Z8530_INTRQ_CALLBACK(WRITELINE(*this, next_state, scc_irq))
-	MCFG_DEVICE_ADD("keyboard", NEXTKBD, 0)
-	MCFG_NEXTKBD_INT_CHANGE_CALLBACK(WRITELINE(*this, next_state, keyboard_irq))
-	MCFG_NEXTKBD_INT_POWER_CALLBACK(WRITELINE(*this, next_state, power_irq))
-	MCFG_NEXTKBD_INT_NMI_CALLBACK(WRITELINE(*this, next_state, nmi_irq))
-	MCFG_NSCSI_ADD("scsibus:0", next_scsi_devices, "harddisk", false)
-	MCFG_NSCSI_ADD("scsibus:1", next_scsi_devices, "cdrom", false)
-	MCFG_NSCSI_ADD("scsibus:2", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:3", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:4", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:5", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:6", next_scsi_devices, nullptr, false)
-	MCFG_NSCSI_ADD("scsibus:7", next_scsi_devices, "ncr5390", true)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("ncr5390", [this] (device_t *device) { ncr5390(device); })
+	NSCSI_BUS(config, "scsibus");
 
-	MCFG_DEVICE_ADD("net", MB8795, 0)
-	MCFG_MB8795_TX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_irq))
-	MCFG_MB8795_RX_IRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_irq))
-	MCFG_MB8795_TX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_tx_drq))
-	MCFG_MB8795_RX_DRQ_CALLBACK(WRITELINE(*this, next_state, net_rx_drq))
+	MCCS1850(config, rtc, XTAL(32'768));
 
-	MCFG_DEVICE_ADD("mo", NEXTMO, 0)
-	MCFG_NEXTMO_IRQ_CALLBACK(WRITELINE(*this, next_state, mo_irq))
-	MCFG_NEXTMO_DRQ_CALLBACK(WRITELINE(*this, next_state, mo_drq))
-MACHINE_CONFIG_END
+	SCC8530(config, scc, XTAL(25'000'000));
+	scc->intrq_callback().set(FUNC(next_state::scc_irq));
 
-MACHINE_CONFIG_START(next_state::next)
+	NEXTKBD(config, keyboard, 0);
+	keyboard->int_change_wr_callback().set(FUNC(next_state::keyboard_irq));
+	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
+	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
+
+	NSCSI_CONNECTOR(config, "scsibus:0", next_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsibus:1", next_scsi_devices, "cdrom");
+	NSCSI_CONNECTOR(config, "scsibus:2", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:3", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:4", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:5", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:6", next_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsibus:7", next_scsi_devices, "ncr5390", true).set_option_machine_config("ncr5390", [this] (device_t *device) { ncr5390(device); });
+
+	MB8795(config, net, 0);
+	net->tx_irq().set(FUNC(next_state::net_tx_irq));
+	net->rx_irq().set(FUNC(next_state::net_rx_irq));
+	net->tx_drq().set(FUNC(next_state::net_tx_drq));
+	net->rx_drq().set(FUNC(next_state::net_rx_drq));
+
+	NEXTMO(config, mo, 0);
+	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
+	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
+}
+
+void next_state::next(machine_config &config)
+{
 	next_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68030, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_nofdc_mem)
-MACHINE_CONFIG_END
+	M68030(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_nofdc_mem);
+}
 
-MACHINE_CONFIG_START(next_state::next_fdc_base)
+void next_state::next_fdc_base(machine_config &config)
+{
 	next_base(config);
-	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
-	MCFG_UPD765_INTRQ_CALLBACK(WRITELINE(*this, next_state, fdc_irq))
-	MCFG_UPD765_DRQ_CALLBACK(WRITELINE(*this, next_state, fdc_drq))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", next_state::floppy_formats)
+
+	N82077AA(config, fdc, n82077aa_device::mode_t::PS2);
+	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
+	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
+	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("next");
+}
 
-MACHINE_CONFIG_START(next_state::nexts)
+void next_state::nexts(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nexts2)
+void next_state::nexts2(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextsc)
+void next_state::nextsc(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(25'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_2c_c_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(25'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_2c_c_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextst)
+void next_state::nextst(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0b_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextstc)
+void next_state::nextstc(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0c_c_mem)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_c_mem);
+	subdevice<screen_device>("screen")->set_visarea(0, 832-1, 0, 624-1);
+}
 
-MACHINE_CONFIG_START(next_state::nextct)
+void next_state::nextct(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0c_m_mem)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_m_mem);
+}
 
-MACHINE_CONFIG_START(next_state::nextctc)
+void next_state::nextctc(machine_config &config)
+{
 	next_fdc_base(config);
-	MCFG_DEVICE_ADD("maincpu", M68040, XTAL(33'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(next_0c_c_mem)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, 832-1, 0, 624-1)
-MACHINE_CONFIG_END
+	M68040(config, maincpu, XTAL(33'000'000));
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_c_mem);
+	subdevice<screen_device>("screen")->set_visarea(0, 832-1, 0, 624-1);
+}
 
 /* ROM definition */
 #define ROM_NEXT_V1 \

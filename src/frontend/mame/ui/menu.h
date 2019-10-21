@@ -27,6 +27,7 @@
 
 
 namespace ui {
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -35,18 +36,17 @@ class menu
 {
 public:
 	// flags for menu items
-	enum
+	enum : unsigned
 	{
-		FLAG_LEFT_ARROW     = (1 << 0),
-		FLAG_RIGHT_ARROW    = (1 << 1),
-		FLAG_INVERT         = (1 << 2),
-		FLAG_MULTILINE      = (1 << 3),
-		FLAG_REDTEXT        = (1 << 4),
-		FLAG_DISABLE        = (1 << 5),
-		FLAG_UI_DATS        = (1 << 6),
-		FLAG_UI_FAVORITE    = (1 << 7),
-		FLAG_UI_HEADING     = (1 << 8),
-		FLAG_COLOR_BOX      = (1 << 9)
+		FLAG_LEFT_ARROW     = 1U << 0,
+		FLAG_RIGHT_ARROW    = 1U << 1,
+		FLAG_INVERT         = 1U << 2,
+		FLAG_MULTILINE      = 1U << 3,
+		FLAG_REDTEXT        = 1U << 4,
+		FLAG_DISABLE        = 1U << 5,
+		FLAG_UI_DATS        = 1U << 6,
+		FLAG_UI_HEADING     = 1U << 7,
+		FLAG_COLOR_BOX      = 1U << 8
 	};
 
 	virtual ~menu();
@@ -130,16 +130,6 @@ protected:
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
 	};
 
-	int                     hover;        // which item is being hovered over
-	std::vector<menu_item>  item;         // array of items
-
-	int top_line;           // main box top line
-	int skip_main_items;
-	int selected;           // which item is selected
-
-	int m_visible_lines;    // main box visible lines
-	int m_visible_items;    // number of visible items
-
 	menu(mame_ui_manager &mui, render_container &container);
 
 	mame_ui_manager &ui() const { return m_ui; }
@@ -151,7 +141,6 @@ protected:
 
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
-	void reset_topmost(reset_options options) { m_global_state->reset_topmost(options); }
 
 	template <typename T> T *topmost_menu() const { return m_global_state->topmost_menu<T>(); }
 	template <typename T> static T *topmost_menu(running_machine &machine) { return get_global_state(machine)->topmost_menu<T>(); }
@@ -168,22 +157,33 @@ protected:
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
 
-	// retrieves the ref of the currently selected menu item or nullptr
-	void *get_selection_ref() const { return selection_valid() ? item[selected].ref : nullptr; }
+	menu_item &item(int index) { return m_items[index]; }
+	menu_item const &item(int index) const { return m_items[index]; }
+	int item_count() const { return m_items.size(); }
 
-	menu_item &selected_item() { return item[selected]; }
-	menu_item const &selected_item() const { return item[selected]; }
-	int selected_index() const { return selected; }
-	bool selection_valid() const { return (0 <= selected) && (item.size() > selected); }
-	bool is_selected(int index) const { return selection_valid() && (selected == index); }
-	bool is_first_selected() const { return 0 == selected; }
-	bool is_last_selected() const { return (item.size() - 1) == selected; }
+	// retrieves the ref of the currently selected menu item or nullptr
+	void *get_selection_ref() const { return selection_valid() ? m_items[m_selected].ref : nullptr; }
+
+	menu_item &selected_item() { return m_items[m_selected]; }
+	menu_item const &selected_item() const { return m_items[m_selected]; }
+	int selected_index() const { return m_selected; }
+	bool selection_valid() const { return (0 <= m_selected) && (m_items.size() > m_selected); }
+	bool is_selected(int index) const { return selection_valid() && (m_selected == index); }
+	bool is_first_selected() const { return 0 == m_selected; }
+	bool is_last_selected() const { return (m_items.size() - 1) == m_selected; }
 
 	// changes the index of the currently selected menu item
 	void set_selection(void *selected_itemref);
+	void set_selected_index(int index) { m_selected = index; }
+	void select_first_item();
+	void select_last_item();
+
+	int hover() const { return m_hover; }
+	void set_hover(int index) { m_hover = index; }
+	void clear_hover() { m_hover = m_items.size() + 1; }
 
 	// scroll position control
-	void centre_selection() { top_line = selected - (m_visible_lines / 2); }
+	void centre_selection() { top_line = m_selected - (m_visible_lines / 2); }
 
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
@@ -222,7 +222,7 @@ protected:
 					0.0f, 0.0f, 1.0f, justify, wrap,
 					mame_ui_manager::NONE, rgb_t::black(), rgb_t::white(),
 					&width, nullptr, text_size);
-			width += 2.0f * UI_BOX_LR_BORDER;
+			width += 2.0f * ui().box_lr_border();
 			maxwidth = (std::max)(maxwidth, width);
 		}
 		if (scale && ((origx2 - origx1) < maxwidth))
@@ -237,16 +237,16 @@ protected:
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, bgcolor);
 
 		// inset box and draw content
-		x1 += UI_BOX_LR_BORDER;
-		x2 -= UI_BOX_LR_BORDER;
-		y1 += UI_BOX_TB_BORDER;
-		y2 -= UI_BOX_TB_BORDER;
+		x1 += ui().box_lr_border();
+		x2 -= ui().box_lr_border();
+		y1 += ui().box_tb_border();
+		y2 -= ui().box_tb_border();
 		for (Iter it = begin; it != end; ++it)
 		{
 			ui().draw_text_full(
 					container(), get_c_str(*it),
 					x1, y1, x2 - x1, justify, wrap,
-					mame_ui_manager::NORMAL, fgcolor, UI_TEXT_BG_COLOR,
+					mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color(),
 					nullptr, nullptr, text_size);
 			y1 += ui().get_line_height();
 		}
@@ -310,8 +310,6 @@ private:
 		bitmap_argb32 *bgrnd_bitmap() { return m_bgrnd_bitmap.get(); }
 		render_texture *bgrnd_texture() { return m_bgrnd_texture.get(); }
 
-		void reset_topmost(reset_options options) { if (m_stack) m_stack->reset(options); }
-
 		template <typename T>
 		T *topmost_menu() const { return dynamic_cast<T *>(m_stack.get()); }
 
@@ -359,7 +357,7 @@ private:
 	void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction);
 
 	bool first_item_visible() const { return top_line <= 0; }
-	bool last_item_visible() const { return (top_line + m_visible_lines) >= item.size(); }
+	bool last_item_visible() const { return (top_line + m_visible_lines) >= m_items.size(); }
 
 	static void exit(running_machine &machine);
 	static global_state_ptr get_global_state(running_machine &machine);
@@ -367,6 +365,16 @@ private:
 	static char const *get_c_str(std::string const &str) { return str.c_str(); }
 	static char const *get_c_str(char const *str) { return str; }
 
+	int                     m_selected;   // which item is selected
+	int                     m_hover;      // which item is being hovered over
+	std::vector<menu_item>  m_items;      // array of items
+
+protected: // TODO: remove need to expose these
+	int top_line;           // main box top line
+	int m_visible_lines;    // main box visible lines
+	int m_visible_items;    // number of visible items
+
+private:
 	global_state_ptr const  m_global_state;
 	bool                    m_special_main_menu;
 	mame_ui_manager         &m_ui;              // UI we are attached to

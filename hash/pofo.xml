@@ -58,7 +58,7 @@
 
 		<part name="card" interface="pofo_card">
 			<dataarea name="rom" size="0x20000">
-				<rom name="ca400702-001 rev. b" size="0x20000" crc="924ab9f5" sha1="9b0de07a28ce058fc125d4fd7ea65074440d8393" offset="0" />
+				<rom name="ca400702-001 rev. b" size="0x20000" crc="924ab9f5" sha1="9b0de07a28ce058fc125d4fd7ea65074440d8393"/>
 			</dataarea>
 		</part>
 	</software>

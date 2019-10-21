@@ -92,24 +92,24 @@ private:
 
 	// internal state
 	sound_stream *m_stream;
-	slot_t *m_slots;
+	std::unique_ptr<slot_t[]> m_slots;
 	uint32_t m_cur_slot;
 	uint32_t m_address;
 	float m_rate;
 
-	uint32_t *m_attack_step;
-	uint32_t *m_decay_release_step;   // Envelope step tables
-	uint32_t *m_freq_step_table;      // Frequency step table
+	std::unique_ptr<uint32_t[]> m_attack_step;
+	std::unique_ptr<uint32_t[]> m_decay_release_step;   // Envelope step tables
+	std::unique_ptr<uint32_t[]> m_freq_step_table;      // Frequency step table
 
-	int32_t *m_left_pan_table;
-	int32_t *m_right_pan_table;
-	int32_t *m_linear_to_exp_volume;
-	int32_t *m_total_level_steps;
+	std::unique_ptr<int32_t[]> m_left_pan_table;
+	std::unique_ptr<int32_t[]> m_right_pan_table;
+	std::unique_ptr<int32_t[]> m_linear_to_exp_volume;
+	std::unique_ptr<int32_t[]> m_total_level_steps;
 
-	int32_t *m_pitch_table;
-	int32_t **m_pitch_scale_tables;
-	int32_t *m_amplitude_table;
-	int32_t **m_amplitude_scale_tables;
+	std::unique_ptr<int32_t[]> m_pitch_table;
+	std::unique_ptr<int32_t[]> m_pitch_scale_tables[8];
+	std::unique_ptr<int32_t[]> m_amplitude_table;
+	std::unique_ptr<int32_t[]> m_amplitude_scale_tables[8];
 
 	uint32_t value_to_fixed(const uint32_t bits, const float value);
 
@@ -117,16 +117,16 @@ private:
 
 	// Internal LFO functions
 	void lfo_init();
-	void lfo_compute_step(lfo_t *lfo, uint32_t lfo_frequency, uint32_t LFOS, int32_t amplitude_lfo);
-	int32_t pitch_lfo_step(lfo_t *lfo);
-	int32_t amplitude_lfo_step(lfo_t *lfo);
+	void lfo_compute_step(lfo_t &lfo, uint32_t lfo_frequency, uint32_t LFOS, int32_t amplitude_lfo);
+	int32_t pitch_lfo_step(lfo_t &lfo);
+	int32_t amplitude_lfo_step(lfo_t &lfo);
 
 	// Internal envelope functions
-	int32_t envelope_generator_update(slot_t *slot);
-	void envelope_generator_calc(slot_t *slot);
+	int32_t envelope_generator_update(slot_t &slot);
+	void envelope_generator_calc(slot_t &slot);
 	uint32_t get_rate(uint32_t *steps, uint32_t rate, uint32_t val);
 
-	void write_slot(slot_t *slot, int32_t reg, uint8_t data);
+	void write_slot(slot_t &slot, int32_t reg, uint8_t data);
 
 	int16_t clamp_to_int16(int32_t value);
 

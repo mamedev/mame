@@ -180,7 +180,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
 {
 	uint8_t data = 0;
 	if (m_cart->exists())
-		data = m_cart->read_rom(space, offset);
+		data = m_cart->read_rom(offset);
 
 	return data ^ m_scrambler;
 }
@@ -219,7 +219,7 @@ void aquarius_state::aquarius_mem(address_map &map)
 
 void aquarius_state::aquarius_io(address_map &map)
 {
-//  AM_RANGE(0x7e, 0x7f) AM_MIRROR(0xff00) AM_READWRITE(modem_r, modem_w)
+//  map(0x7e, 0x7f).mirror(0xff00).rw(FUNC(aquarius_state::modem_r), FUNC(aquarius_state::modem_w));
 	map(0xf6, 0xf6).mirror(0xff00).rw("ay8910", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xf7, 0xf7).mirror(0xff00).w("ay8910", FUNC(ay8910_device::address_w));
 	map(0xfc, 0xfc).mirror(0xff00).rw(FUNC(aquarius_state::cassette_r), FUNC(aquarius_state::cassette_w));
@@ -349,53 +349,50 @@ GFXDECODE_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-MACHINE_CONFIG_START(aquarius_state::aquarius)
+void aquarius_state::aquarius(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545)) // ???
-	MCFG_DEVICE_PROGRAM_MAP(aquarius_mem)
-	MCFG_DEVICE_IO_MAP(aquarius_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", aquarius_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(3'579'545)); // ???
+	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
+	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
+	m_maincpu->set_vblank_int("screen", FUNC(aquarius_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2800))
-	MCFG_SCREEN_SIZE(40 * 8, 25 * 8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(aquarius_state, screen_update_aquarius)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2800));
+	m_screen->set_size(40 * 8, 25 * 8);
+	m_screen->set_visarea(0, 40 * 8 - 1, 0 * 8, 25 * 8 - 1);
+	m_screen->set_screen_update(FUNC(aquarius_state::screen_update_aquarius));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_aquarius)
-	MCFG_TEA1002_ADD("encoder", XTAL(8'867'238))
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(aquarius_state, aquarius)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarius);
+	TEA1002(config, m_tea1002, XTAL(8'867'238));
+	PALETTE(config, m_palette, FUNC(aquarius_state::aquarius_palette), 512, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, XTAL(3'579'545)/2) // ??? AY-3-8914
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("RIGHT"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("LEFT"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay8910(AY8910(config, "ay8910", XTAL(3'579'545)/2)); // ??? AY-3-8914
+	ay8910.port_a_read_callback().set_ioport("RIGHT");
+	ay8910.port_b_read_callback().set_ioport("LEFT");
+	ay8910.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_linear_slot, "aquarius_cart")
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "aquarius_cart");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-	MCFG_RAM_EXTRA_OPTIONS("8K,20K,36K")
+	RAM(config, RAM_TAG).set_default_size("4K").set_extra_options("8K,20K,36K");
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","aquarius")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("aquarius");
+}
 
 
 /***************************************************************************

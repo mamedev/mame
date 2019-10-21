@@ -7,9 +7,10 @@
     DIM disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_DIM_DSK_H
+#define MAME_FORMATS_DIM_DSK_H
 
-#ifndef DIM_DSK_H
-#define DIM_DSK_H
+#pragma once
 
 #include "flopimg.h"
 
@@ -36,4 +37,4 @@ public:
 
 extern const floppy_format_type FLOPPY_DIM_FORMAT;
 
-#endif /* DIM_DSK_H */
+#endif // MAME_FORMATS_DIM_DSK_H

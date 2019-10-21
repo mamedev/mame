@@ -8,30 +8,6 @@
 #include "diserial.h"
 
 
-#define MCFG_RS232_RXD_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_rxd_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_DCD_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_dcd_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_DSR_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_dsr_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_RI_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_ri_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_SI_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_si_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_CTS_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_cts_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_RXC_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_rxc_handler(DEVCB_##_devcb);
-
-#define MCFG_RS232_TXC_HANDLER(_devcb) \
-	downcast<rs232_port_device &>(*device).set_txc_handler(DEVCB_##_devcb);
-
 #define RS232_BAUD_110 (0x00)
 #define RS232_BAUD_150 (0x01)
 #define RS232_BAUD_300 (0x02)
@@ -46,8 +22,9 @@
 #define RS232_BAUD_38400 (0x0b)
 #define RS232_BAUD_57600 (0x0c)
 #define RS232_BAUD_115200 (0x0d)
+#define RS232_BAUD_7200 (0x0e)
 
-#define MCFG_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
+#define PORT_RS232_BAUD(_tag, _default_baud, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_baud, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_BAUD_110, "110") \
@@ -57,6 +34,7 @@
 	PORT_CONFSETTING( RS232_BAUD_1200, "1200") \
 	PORT_CONFSETTING( RS232_BAUD_2400, "2400") \
 	PORT_CONFSETTING( RS232_BAUD_4800, "4800") \
+	PORT_CONFSETTING( RS232_BAUD_7200, "7200") \
 	PORT_CONFSETTING( RS232_BAUD_9600, "9600") \
 	PORT_CONFSETTING( RS232_BAUD_14400, "14400") \
 	PORT_CONFSETTING( RS232_BAUD_19200, "19200") \
@@ -68,7 +46,7 @@
 #define RS232_STARTBITS_0 (0x00)
 #define RS232_STARTBITS_1 (0x01)
 
-#define MCFG_RS232_STARTBITS(_tag, _default_startbits, _description, _class, _write_line) \
+#define PORT_RS232_STARTBITS(_tag, _default_startbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_startbits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_STARTBITS_0, "0") \
@@ -79,7 +57,7 @@
 #define RS232_DATABITS_7 (0x02)
 #define RS232_DATABITS_8 (0x03)
 
-#define MCFG_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
+#define PORT_RS232_DATABITS(_tag, _default_databits, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_databits, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_DATABITS_5, "5") \
@@ -93,7 +71,7 @@
 #define RS232_PARITY_MARK (0x03)
 #define RS232_PARITY_SPACE (0x04)
 
-#define MCFG_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
+#define PORT_RS232_PARITY(_tag, _default_parity, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, _default_parity, "Parity") PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_PARITY_NONE, "None") \
@@ -107,7 +85,7 @@
 #define RS232_STOPBITS_1_5 (0x02)
 #define RS232_STOPBITS_2 (0x03)
 
-#define MCFG_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
+#define PORT_RS232_STOPBITS(_tag, _default_stopbits, _description, _class, _write_line) \
 	PORT_START(_tag) \
 	PORT_CONFNAME(0xff, 0x01, _description) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, _class, _write_line) \
 	PORT_CONFSETTING( RS232_STOPBITS_0, "0") \
@@ -135,14 +113,6 @@ public:
 	virtual ~rs232_port_device();
 
 	// static configuration helpers
-	template <class Object> devcb_base &set_rxd_handler(Object &&cb) { return m_rxd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dcd_handler(Object &&cb) { return m_dcd_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dsr_handler(Object &&cb) { return m_dsr_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ri_handler(Object &&cb) { return m_ri_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_si_handler(Object &&cb) { return m_si_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cts_handler(Object &&cb) { return m_cts_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_rxc_handler(Object &&cb) { return m_rxc_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_txc_handler(Object &&cb) { return m_txc_handler.set_callback(std::forward<Object>(cb)); }
 	auto rxd_handler() { return m_rxd_handler.bind(); }
 	auto dcd_handler() { return m_dcd_handler.bind(); }
 	auto dsr_handler() { return m_dsr_handler.bind(); }
@@ -171,6 +141,7 @@ protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override;
+	virtual void device_reset() override;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 
@@ -240,7 +211,8 @@ protected:
 			28800,
 			38400,
 			57600,
-			115200
+			115200,
+			7200
 		};
 
 		return values[baud];

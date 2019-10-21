@@ -99,16 +99,16 @@ Notes:
       SW4     : 8 position Dip Switch
       U30,U31,
       U32,U33 : Macronix MX27C4000 512k x8 EPROM (DIP32, PCB labelled 'RPRO0', 'RPRO1', 'RPRO2', 'RPRO3')
-      U34,U35 : 8M MASKROM (DIP42, PCB labelled 'RD0', 'RD1')
-      U70     : 16M MASKROM (DIP42, PCB labelled 'ZPRO0')
-      *       : Unpopulated position for 16M DIP42 MASKROM (PCB labelled 'ZPRO1')
+      U34,U35 : 8M mask ROM (DIP42, PCB labelled 'RD0', 'RD1')
+      U70     : 16M mask ROM (DIP42, PCB labelled 'ZPRO0')
+      *       : Unpopulated position for 16M DIP42 mask ROM (PCB labelled 'ZPRO1')
 
 */
 
 #include "emu.h"
 #include "emupal.h"
 #include "machine/st0016.h"
-#include "cpu/mips/r3000.h"
+#include "cpu/mips/mips1.h"
 #include <algorithm>
 
 class speglsht_state : public driver_device
@@ -132,7 +132,7 @@ public:
 private:
 	required_device<palette_device> m_palette;
 	required_device<st0016_cpu_device> m_maincpu;
-	required_device<cpu_device> m_subcpu;
+	required_device<r3051_device> m_subcpu;
 
 	required_shared_ptr<uint8_t> m_shared;
 	required_shared_ptr<uint32_t> m_framebuffer;
@@ -166,13 +166,13 @@ void speglsht_state::st0016_mem(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("st0016_bank");
-	//AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	//AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
+	//map(0xc000, 0xcfff).rw(FUNC(speglsht_state::st0016_sprite_ram_r), FUNC(speglsht_state::st0016_sprite_ram_w));
+	//map(0xd000, 0xdfff).rw(FUNC(speglsht_state::st0016_sprite2_ram_r), FUNC(speglsht_state::st0016_sprite2_ram_w));
 	map(0xe000, 0xe7ff).ram();
 	map(0xe800, 0xe87f).ram();
-	//AM_RANGE(0xe900, 0xe9ff) // sound - internal
-	//AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	//AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	//map(0xe900, 0xe9ff) // sound - internal
+	//map(0xea00, 0xebff).rw(FUNC(speglsht_state::st0016_palette_ram_r), FUNC(speglsht_state::st0016_palette_ram_w));
+	//map(0xec00, 0xec1f).rw(FUNC(speglsht_state::st0016_character_ram_r), FUNC(speglsht_state::st0016_character_ram_w));
 	map(0xf000, 0xffff).ram().share("shared");
 }
 
@@ -191,14 +191,14 @@ WRITE8_MEMBER(speglsht_state::st0016_rom_bank_w)
 void speglsht_state::st0016_io(address_map &map)
 {
 	map.global_mask(0xff);
-	//AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
+	//map(0x00, 0xbf).rw(FUNC(speglsht_state::st0016_vregs_r), FUNC(speglsht_state::st0016_vregs_w));
 	map(0xe1, 0xe1).w(FUNC(speglsht_state::st0016_rom_bank_w));
-	//AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	//AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	//AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
+	//map(0xe2, 0xe2).w(FUNC(speglsht_state::st0016_sprite_bank_w));
+	//map(0xe3, 0xe4).w(FUNC(speglsht_state::st0016_character_bank_w));
+	//map(0xe5, 0xe5).w(FUNC(speglsht_state::st0016_palette_bank_w));
 	map(0xe6, 0xe6).nopw();
 	map(0xe7, 0xe7).nopw();
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	//map(0xf0, 0xf0).r(FUNC(speglsht_state::st0016_dma_r));
 }
 
 READ32_MEMBER(speglsht_state::shared_r)
@@ -264,7 +264,7 @@ READ32_MEMBER(speglsht_state::cop_r)
 
 READ32_MEMBER(speglsht_state::irq_ack_clear)
 {
-	m_subcpu->set_input_line(R3000_IRQ4, CLEAR_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -368,7 +368,7 @@ MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 
 VIDEO_START_MEMBER(speglsht_state,speglsht)
 {
-	m_bitmap = std::make_unique<bitmap_ind16>(512, 5122 );
+	m_bitmap = std::make_unique<bitmap_ind16>(512, 512);
 //  VIDEO_START_CALL_MEMBER(st0016);
 }
 
@@ -413,35 +413,35 @@ uint32_t speglsht_state::screen_update_speglsht(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-MACHINE_CONFIG_START(speglsht_state::speglsht)
+void speglsht_state::speglsht(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",ST0016_CPU, 8000000) /* 8 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(st0016_mem)
-	MCFG_DEVICE_IO_MAP(st0016_io)
+	ST0016_CPU(config, m_maincpu, 8000000); /* 8 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &speglsht_state::st0016_mem);
+	m_maincpu->set_addrmap(AS_IO, &speglsht_state::st0016_io);
+	m_maincpu->set_vblank_int("screen", FUNC(speglsht_state::irq0_line_hold));
 
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
+	R3051(config, m_subcpu, 25000000);
+	m_subcpu->set_endianness(ENDIANNESS_LITTLE);
+	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
+	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
-	MCFG_DEVICE_ADD("sub", R3051, 25000000)
-	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_DEVICE_PROGRAM_MAP(speglsht_mem)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 239-8)
-	MCFG_SCREEN_UPDATE_DRIVER(speglsht_state, screen_update_speglsht)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 512);
+	screen.set_visarea(0, 319, 8, 239-8);
+	screen.set_screen_update(FUNC(speglsht_state::screen_update_speglsht));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_speglsht)
-	MCFG_PALETTE_ADD("palette", 16*16*4+1)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_speglsht);
+	PALETTE(config, m_palette).set_entries(16*16*4+1);
 
 	MCFG_VIDEO_START_OVERRIDE(speglsht_state,speglsht)
-MACHINE_CONFIG_END
+}
 
 ROM_START( speglsht )
 	ROM_REGION( 0x400000, "maincpu", 0 )

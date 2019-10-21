@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk1.cpm" size="819200" crc="086d41b5" sha1="9e6f97364865abef31fd99e232da53541d545e03" offset="0" />
+				<rom name="disk1.cpm" size="819200" crc="086d41b5" sha1="9e6f97364865abef31fd99e232da53541d545e03"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk2.cpm" size="819200" crc="45d0f9fa" sha1="f10b54cf4c5b67725b35aeadf526c0ce2c2a5ac4" offset="0" />
+				<rom name="disk2.cpm" size="819200" crc="45d0f9fa" sha1="f10b54cf4c5b67725b35aeadf526c0ce2c2a5ac4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="newgames.cpm" size="819200" crc="d6b4b9dc" sha1="fe2b5f25f0721e9acbe3046f702589da6357d23c" offset="0" />
+				<rom name="newgames.cpm" size="819200" crc="d6b4b9dc" sha1="fe2b5f25f0721e9acbe3046f702589da6357d23c"/>
 			</dataarea>
 		</part>
 	</software>

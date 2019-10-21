@@ -35,7 +35,6 @@ public:
 
 private:
 	void ace_sp_map(address_map &map);
-	void ace_sp_portmap(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -74,25 +73,26 @@ void ace_sp_state::ace_sp_map(address_map &map)
 }
 
 
+#if 0
 void ace_sp_state::ace_sp_portmap(address_map &map)
 {
-	//AM_RANGE(0x02, 0x02) // misc
-	//AM_RANGE(0x05, 0x06) // AYs
+	//map(0x02, 0x02) // misc
+	//map(0x05, 0x06) // AYs
 }
+#endif
 
 
 static INPUT_PORTS_START( ace_sp )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(ace_sp_state::ace_sp)
-	MCFG_DEVICE_ADD("maincpu", HD6303Y, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(ace_sp_map)
-	MCFG_DEVICE_IO_MAP(ace_sp_portmap)
+void ace_sp_state::ace_sp(machine_config &config)
+{
+	HD6303Y(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ace_sp_state::ace_sp_map);
 
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-
-MACHINE_CONFIG_END
+	PIA6821(config, "pia0", 0);
+}
 
 
 #define SP_CBOWL_SOUND \

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:hap, Sean Riddle
+// copyright-holders:hap
+// thanks-to:Sean Riddle
 /***************************************************************************
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
@@ -69,8 +70,8 @@
 class tispellb_state : public hh_tms1k_state
 {
 public:
-	tispellb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: hh_tms1k_state(mconfig, type, tag),
+	tispellb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_tms1k_state(mconfig, type, tag),
 		m_subcpu(*this, "subcpu"),
 		m_tms6100(*this, "tms6100")
 	{ }
@@ -82,7 +83,7 @@ public:
 
 private:
 	// devices
-	optional_device<cpu_device> m_subcpu;
+	optional_device<tms1k_base_device> m_subcpu;
 	optional_device<tms6100_device> m_tms6100;
 
 	u8 m_rev1_ctl;
@@ -90,8 +91,8 @@ private:
 	u16 m_sub_r;
 
 	virtual void power_off() override;
-	void prepare_display();
-	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
+	void power_subcpu();
+	void update_display();
 
 	DECLARE_READ8_MEMBER(main_read_k);
 	DECLARE_WRITE16_MEMBER(main_write_o);
@@ -108,7 +109,6 @@ private:
 
 	virtual void machine_start() override;
 };
-
 
 void tispellb_state::machine_start()
 {
@@ -135,27 +135,30 @@ void tispellb_state::machine_start()
 
 // common
 
+void tispellb_state::power_subcpu()
+{
+	if (m_subcpu)
+		m_subcpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
+}
+
 void tispellb_state::power_off()
 {
 	hh_tms1k_state::power_off();
-
-	if (m_subcpu)
-		m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	power_subcpu();
 }
 
-void tispellb_state::prepare_display()
+void tispellb_state::update_display()
 {
 	// almost same as snspell
-	u16 gridmask = vfd_filament_on() ? 0xffff : 0x8000;
-	set_display_segmask(0xff, 0x3fff);
-	display_matrix(16+1, 16, m_plate | 1<<16, m_grid & gridmask);
+	u16 gridmask = m_display->row_on(15) ? 0xffff : 0x8000;
+	m_display->matrix(m_grid & gridmask, m_plate);
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_o)
 {
 	// reorder opla to led14seg, plus DP as d14 and AP as d15, same as snspell
 	m_plate = bitswap<16>(data,12,15,10,7,8,9,11,6,13,3,14,0,1,2,4,5);
-	prepare_display();
+	update_display();
 }
 
 WRITE16_MEMBER(tispellb_state::main_write_r)
@@ -170,13 +173,13 @@ WRITE16_MEMBER(tispellb_state::main_write_r)
 	m_r = data;
 	m_inp_mux = data & 0x7f;
 	m_grid = data & 0x80ff;
-	prepare_display();
+	update_display();
 }
 
 READ8_MEMBER(tispellb_state::main_read_k)
 {
 	// K: multiplexed inputs (note: the Vss row is always on)
-	return m_inp_matrix[7]->read() | read_inputs(7);
+	return m_inputs[7]->read() | read_inputs(7);
 }
 
 
@@ -249,18 +252,8 @@ WRITE16_MEMBER(tispellb_state::rev2_write_r)
 
 INPUT_CHANGED_MEMBER(tispellb_state::power_button)
 {
-	int on = (int)(uintptr_t)param;
-
-	if (on && !m_power_on)
-	{
-		m_power_on = true;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-
-		if (m_subcpu)
-			m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-	}
-	else if (!on && m_power_on)
-		power_off();
+	hh_tms1k_state::power_button(field, param, oldval, newval);
+	power_subcpu();
 }
 
 static INPUT_PORTS_START( spellb )
@@ -317,7 +310,7 @@ static INPUT_PORTS_START( spellb )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Missing Letter")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Mystery Word")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Scramble")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Spelling B/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Starts With")
 INPUT_PORTS_END
 
@@ -333,7 +326,7 @@ static INPUT_PORTS_START( mrchalgr )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_NAME("Crazy Letters")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_NAME("Letter Guesser")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_NAME("Word Challenge")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, (void *)true)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_PGUP) PORT_NAME("Mystery Word/On") PORT_CHANGED_MEMBER(DEVICE_SELF, tispellb_state, power_button, true)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_NAME("Replay")
 INPUT_PORTS_END
 
@@ -345,51 +338,54 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-MACHINE_CONFIG_START(tispellb_state::rev1)
-
+void tispellb_state::rev1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0270, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, main_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, main_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, main_write_r))
-	MCFG_TMS0270_READ_CTL_CB(READ8(*this, tispellb_state, rev1_ctl_r))
-	MCFG_TMS0270_WRITE_CTL_CB(WRITE8(*this, tispellb_state, rev1_ctl_w))
+	TMS0270(config, m_maincpu, 350000); // approximation
+	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
+	m_maincpu->o().set(FUNC(tispellb_state::main_write_o));
+	m_maincpu->r().set(FUNC(tispellb_state::main_write_r));
+	m_maincpu->read_ctl().set(FUNC(tispellb_state::rev1_ctl_r));
+	m_maincpu->write_ctl().set(FUNC(tispellb_state::rev1_ctl_w));
 
-	MCFG_DEVICE_ADD("subcpu", TMS1980, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, sub_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, sub_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, sub_write_r))
+	TMS1980(config, m_subcpu, 350000); // approximation
+	m_subcpu->k().set(FUNC(tispellb_state::sub_read_k));
+	m_subcpu->o().set(FUNC(tispellb_state::sub_write_o));
+	m_subcpu->r().set(FUNC(tispellb_state::sub_write_r));
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
 	/* no sound! */
-MACHINE_CONFIG_END
+}
 
 
-MACHINE_CONFIG_START(tispellb_state::rev2)
-
+void tispellb_state::rev2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS0270, 350000) // approximation
-	MCFG_TMS1XXX_READ_K_CB(READ8(*this, tispellb_state, main_read_k))
-	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(*this, tispellb_state, rev2_write_o))
-	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(*this, tispellb_state, rev2_write_r))
-	MCFG_TMS0270_READ_CTL_CB(READ8("tms6100", tms6100_device, data_r))
-	MCFG_TMS0270_WRITE_CTL_CB(WRITE8("tms6100", tms6100_device, add_w))
+	TMS0270(config, m_maincpu, 350000); // approximation
+	m_maincpu->k().set(FUNC(tispellb_state::main_read_k));
+	m_maincpu->o().set(FUNC(tispellb_state::rev2_write_o));
+	m_maincpu->r().set(FUNC(tispellb_state::rev2_write_r));
+	m_maincpu->read_ctl().set(m_tms6100, FUNC(tms6100_device::data_r));
+	m_maincpu->write_ctl().set(m_tms6100, FUNC(tms6100_device::add_w));
 
-	MCFG_DEVICE_ADD("tms6100", TMS6100, 350000)
-	MCFG_TMS6100_4BIT_MODE()
+	TMS6100(config, m_tms6100, 350000);
+	m_tms6100->enable_4bit_mode(true);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	/* video hardware */
+	PWM_DISPLAY(config, m_display).set_size(16, 16);
+	m_display->set_segmask(0xff, 0x3fff);
 	config.set_default_layout(layout_spellb);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
 

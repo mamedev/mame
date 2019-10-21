@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -11,10 +11,10 @@
 #define BX_ARCH_64BIT 0
 
 // Compiler
-#define BX_COMPILER_CLANG           0
-#define BX_COMPILER_CLANG_ANALYZER  0
-#define BX_COMPILER_GCC             0
-#define BX_COMPILER_MSVC            0
+#define BX_COMPILER_CLANG          0
+#define BX_COMPILER_CLANG_ANALYZER 0
+#define BX_COMPILER_GCC            0
+#define BX_COMPILER_MSVC           0
 
 // Endianess
 #define BX_CPU_ENDIAN_BIG    0
@@ -48,13 +48,13 @@
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_BSD        0
 #define BX_PLATFORM_EMSCRIPTEN 0
+#define BX_PLATFORM_HAIKU      0
 #define BX_PLATFORM_HURD       0
 #define BX_PLATFORM_IOS        0
 #define BX_PLATFORM_LINUX      0
 #define BX_PLATFORM_NX         0
 #define BX_PLATFORM_OSX        0
 #define BX_PLATFORM_PS4        0
-#define BX_PLATFORM_QNX        0
 #define BX_PLATFORM_RPI        0
 #define BX_PLATFORM_STEAMLINK  0
 #define BX_PLATFORM_WINDOWS    0
@@ -81,34 +81,34 @@
 #endif //
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
-#if defined(__arm__)     || \
-	defined(__aarch64__) || \
-	defined(_M_ARM)
+#if defined(__arm__)     \
+ || defined(__aarch64__) \
+ || defined(_M_ARM)
 #	undef  BX_CPU_ARM
 #	define BX_CPU_ARM 1
 #	define BX_CACHE_LINE_SIZE 64
-#elif defined(__MIPSEL__)     || \
-	  defined(__mips_isa_rev) || \
-	  defined(__mips64)
+#elif defined(__MIPSEL__)     \
+ ||   defined(__mips_isa_rev) \
+ ||   defined(__mips64)
 #	undef  BX_CPU_MIPS
 #	define BX_CPU_MIPS 1
 #	define BX_CACHE_LINE_SIZE 64
-#elif defined(_M_PPC)        || \
-	  defined(__powerpc__)   || \
-	  defined(__powerpc64__)
+#elif defined(_M_PPC)        \
+ ||   defined(__powerpc__)   \
+ ||   defined(__powerpc64__)
 #	undef  BX_CPU_PPC
 #	define BX_CPU_PPC 1
 #	define BX_CACHE_LINE_SIZE 128
-#elif defined(__riscv)   || \
-	  defined(__riscv__) || \
-	  defined(RISCVEL)
+#elif defined(__riscv)   \
+ ||   defined(__riscv__) \
+ ||   defined(RISCVEL)
 #	undef  BX_CPU_RISCV
 #	define BX_CPU_RISCV 1
 #	define BX_CACHE_LINE_SIZE 64
-#elif defined(_M_IX86)    || \
-	  defined(_M_X64)     || \
-	  defined(__i386__)   || \
-	  defined(__x86_64__)
+#elif defined(_M_IX86)    \
+ ||   defined(_M_X64)     \
+ ||   defined(__i386__)   \
+ ||   defined(__x86_64__)
 #	undef  BX_CPU_X86
 #	define BX_CPU_X86 1
 #	define BX_CACHE_LINE_SIZE 64
@@ -118,14 +118,14 @@
 #	define BX_CACHE_LINE_SIZE 64
 #endif //
 
-#if defined(__x86_64__)    || \
-	defined(_M_X64)        || \
-	defined(__aarch64__)   || \
-	defined(__64BIT__)     || \
-	defined(__mips64)      || \
-	defined(__powerpc64__) || \
-	defined(__ppc64__)     || \
-	defined(__LP64__)
+#if defined(__x86_64__)    \
+ || defined(_M_X64)        \
+ || defined(__aarch64__)   \
+ || defined(__64BIT__)     \
+ || defined(__mips64)      \
+ || defined(__powerpc64__) \
+ || defined(__ppc64__)     \
+ || defined(__LP64__)
 #	undef  BX_ARCH_64BIT
 #	define BX_ARCH_64BIT 64
 #else
@@ -134,8 +134,14 @@
 #endif //
 
 #if BX_CPU_PPC
-#	undef  BX_CPU_ENDIAN_BIG
-#	define BX_CPU_ENDIAN_BIG 1
+// _LITTLE_ENDIAN exists on ppc64le.
+#	if _LITTLE_ENDIAN
+#		undef  BX_CPU_ENDIAN_LITTLE
+#		define BX_CPU_ENDIAN_LITTLE 1
+#	else
+#		undef  BX_CPU_ENDIAN_BIG
+#		define BX_CPU_ENDIAN_BIG 1
+#	endif
 #else
 #	undef  BX_CPU_ENDIAN_LITTLE
 #	define BX_CPU_ENDIAN_LITTLE 1
@@ -201,9 +207,6 @@
 #elif defined(__ORBIS__)
 #	undef  BX_PLATFORM_PS4
 #	define BX_PLATFORM_PS4 1
-#elif defined(__QNX__)
-#	undef  BX_PLATFORM_QNX
-#	define BX_PLATFORM_QNX 1
 #elif  defined(__FreeBSD__)        \
 	|| defined(__FreeBSD_kernel__) \
 	|| defined(__NetBSD__)         \
@@ -215,8 +218,11 @@
 #	undef  BX_PLATFORM_HURD
 #	define BX_PLATFORM_HURD 1
 #elif defined(__NX__)
-# undef BX_PLATFORM_NX
-# define BX_PLATFORM_NX 1
+#	undef  BX_PLATFORM_NX
+#	define BX_PLATFORM_NX 1
+#elif defined(__HAIKU__)
+#	undef  BX_PLATFORM_HAIKU
+#	define BX_PLATFORM_HAIKU 1
 #endif //
 
 #if !BX_CRT_NONE
@@ -233,7 +239,7 @@
 #	elif defined(__MINGW32__) || defined(__MINGW64__)
 #		undef  BX_CRT_MINGW
 #		define BX_CRT_MINGW 1
-#	elif defined(__apple_build_version__) || defined(__ORBIS__) || defined(__EMSCRIPTEN__) || defined(__llvm__)
+#	elif defined(__apple_build_version__) || defined(__ORBIS__) || defined(__EMSCRIPTEN__) || defined(__llvm__) || defined(__HAIKU__)
 #		undef  BX_CRT_LIBCXX
 #		define BX_CRT_LIBCXX 1
 #	endif //
@@ -250,51 +256,91 @@
 #	endif // BX_CRT_*
 #endif // !BX_CRT_NONE
 
-#define BX_PLATFORM_POSIX (0      \
-		|| BX_PLATFORM_ANDROID    \
-		|| BX_PLATFORM_BSD        \
-		|| BX_PLATFORM_EMSCRIPTEN \
-		|| BX_PLATFORM_HURD       \
-		|| BX_PLATFORM_IOS        \
-		|| BX_PLATFORM_LINUX      \
-		|| BX_PLATFORM_NX         \
-		|| BX_PLATFORM_OSX        \
-		|| BX_PLATFORM_PS4        \
-		|| BX_PLATFORM_QNX        \
-		|| BX_PLATFORM_RPI        \
-		|| BX_PLATFORM_STEAMLINK  \
-		)
+///
+#define BX_PLATFORM_POSIX (0   \
+	||  BX_PLATFORM_ANDROID    \
+	||  BX_PLATFORM_BSD        \
+	||  BX_PLATFORM_EMSCRIPTEN \
+	||  BX_PLATFORM_HAIKU      \
+	||  BX_PLATFORM_HURD       \
+	||  BX_PLATFORM_IOS        \
+	||  BX_PLATFORM_LINUX      \
+	||  BX_PLATFORM_NX         \
+	||  BX_PLATFORM_OSX        \
+	||  BX_PLATFORM_PS4        \
+	||  BX_PLATFORM_RPI        \
+	||  BX_PLATFORM_STEAMLINK  \
+	)
 
-#define BX_PLATFORM_NONE !(0      \
-		|| BX_PLATFORM_ANDROID    \
-		|| BX_PLATFORM_BSD        \
-		|| BX_PLATFORM_EMSCRIPTEN \
-		|| BX_PLATFORM_HURD       \
-		|| BX_PLATFORM_IOS        \
-		|| BX_PLATFORM_LINUX      \
-		|| BX_PLATFORM_NX         \
-		|| BX_PLATFORM_OSX        \
-		|| BX_PLATFORM_PS4        \
-		|| BX_PLATFORM_QNX        \
-		|| BX_PLATFORM_RPI        \
-		|| BX_PLATFORM_STEAMLINK  \
-		|| BX_PLATFORM_WINDOWS    \
-		|| BX_PLATFORM_WINRT      \
-		|| BX_PLATFORM_XBOXONE    \
-		)
+///
+#define BX_PLATFORM_NONE !(0   \
+	||  BX_PLATFORM_ANDROID    \
+	||  BX_PLATFORM_BSD        \
+	||  BX_PLATFORM_EMSCRIPTEN \
+	||  BX_PLATFORM_HAIKU      \
+	||  BX_PLATFORM_HURD       \
+	||  BX_PLATFORM_IOS        \
+	||  BX_PLATFORM_LINUX      \
+	||  BX_PLATFORM_NX         \
+	||  BX_PLATFORM_OSX        \
+	||  BX_PLATFORM_PS4        \
+	||  BX_PLATFORM_RPI        \
+	||  BX_PLATFORM_STEAMLINK  \
+	||  BX_PLATFORM_WINDOWS    \
+	||  BX_PLATFORM_WINRT      \
+	||  BX_PLATFORM_XBOXONE    \
+	)
 
+///
+#define BX_PLATFORM_OS_CONSOLE  (0 \
+	||  BX_PLATFORM_NX             \
+	||  BX_PLATFORM_PS4            \
+	||  BX_PLATFORM_WINRT          \
+	||  BX_PLATFORM_XBOXONE        \
+	)
+
+///
+#define BX_PLATFORM_OS_DESKTOP  (0 \
+	||  BX_PLATFORM_BSD            \
+	||  BX_PLATFORM_HAIKU          \
+	||  BX_PLATFORM_HURD           \
+	||  BX_PLATFORM_LINUX          \
+	||  BX_PLATFORM_OSX            \
+	||  BX_PLATFORM_WINDOWS        \
+	)
+
+///
+#define BX_PLATFORM_OS_EMBEDDED (0 \
+	||  BX_PLATFORM_RPI            \
+	||  BX_PLATFORM_STEAMLINK      \
+	)
+
+///
+#define BX_PLATFORM_OS_MOBILE   (0 \
+	||  BX_PLATFORM_ANDROID        \
+	||  BX_PLATFORM_IOS            \
+	)
+
+///
+#define BX_PLATFORM_OS_WEB      (0 \
+	||  BX_PLATFORM_EMSCRIPTEN     \
+	)
+
+///
 #if BX_COMPILER_GCC
-#	define BX_COMPILER_NAME "GCC " \
-				BX_STRINGIZE(__GNUC__) "." \
-				BX_STRINGIZE(__GNUC_MINOR__) "." \
-				BX_STRINGIZE(__GNUC_PATCHLEVEL__)
+#	define BX_COMPILER_NAME "GCC "       \
+		BX_STRINGIZE(__GNUC__) "."       \
+		BX_STRINGIZE(__GNUC_MINOR__) "." \
+		BX_STRINGIZE(__GNUC_PATCHLEVEL__)
 #elif BX_COMPILER_CLANG
-#	define BX_COMPILER_NAME "Clang " \
-				BX_STRINGIZE(__clang_major__) "." \
-				BX_STRINGIZE(__clang_minor__) "." \
-				BX_STRINGIZE(__clang_patchlevel__)
+#	define BX_COMPILER_NAME "Clang "      \
+		BX_STRINGIZE(__clang_major__) "." \
+		BX_STRINGIZE(__clang_minor__) "." \
+		BX_STRINGIZE(__clang_patchlevel__)
 #elif BX_COMPILER_MSVC
-#	if BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
+#	if BX_COMPILER_MSVC >= 1920 // Visual Studio 2019
+#		define BX_COMPILER_NAME "MSVC 16.0"
+#	elif BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
 #		define BX_COMPILER_NAME "MSVC 15.0"
 #	elif BX_COMPILER_MSVC >= 1900 // Visual Studio 2015
 #		define BX_COMPILER_NAME "MSVC 14.0"
@@ -317,10 +363,12 @@
 #elif BX_PLATFORM_BSD
 #	define BX_PLATFORM_NAME "BSD"
 #elif BX_PLATFORM_EMSCRIPTEN
-#	define BX_PLATFORM_NAME "asm.js " \
-				BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
-				BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
-				BX_STRINGIZE(__EMSCRIPTEN_tiny__)
+#	define BX_PLATFORM_NAME "asm.js "          \
+		BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
+		BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
+		BX_STRINGIZE(__EMSCRIPTEN_tiny__)
+#elif BX_PLATFORM_HAIKU
+#	define BX_PLATFORM_NAME "Haiku"
 #elif BX_PLATFORM_HURD
 #	define BX_PLATFORM_NAME "Hurd"
 #elif BX_PLATFORM_IOS
@@ -335,8 +383,6 @@
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_PS4
 #	define BX_PLATFORM_NAME "PlayStation 4"
-#elif BX_PLATFORM_QNX
-#	define BX_PLATFORM_NAME "QNX"
 #elif BX_PLATFORM_RPI
 #	define BX_PLATFORM_NAME "RaspberryPi"
 #elif BX_PLATFORM_STEAMLINK
@@ -390,5 +436,24 @@
 #elif BX_ARCH_64BIT
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
+
+#if BX_COMPILER_MSVC
+#	define BX_CPP_NAME "C++MsvcUnknown"
+#elif defined(__cplusplus)
+#	if __cplusplus < 201103L
+#		error "Pre-C++11 compiler is not supported!"
+#	elif __cplusplus < 201402L
+#		define BX_CPP_NAME "C++11"
+#	elif __cplusplus < 201703L
+#		define BX_CPP_NAME "C++14"
+#	elif __cplusplus < 201704L
+#		define BX_CPP_NAME "C++17"
+#	else
+// See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
+#		define BX_CPP_NAME "C++WayTooModern"
+#	endif // BX_CPP_NAME
+#else
+#	define BX_CPP_NAME "C++Unknown"
+#endif // defined(__cplusplus)
 
 #endif // BX_PLATFORM_H_HEADER_GUARD

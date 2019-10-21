@@ -11,32 +11,7 @@ No information has been found. All code is guesswork.
 2011-12-29 Skeleton driver.
 2016-07-15 Added terminal and uart.
 
-'maincpu' (0384): unmapped i/o memory write to 00F8 = 56 & FF
-'maincpu' (0388): unmapped i/o memory write to 00F8 = B6 & FF
-'maincpu' (038C): unmapped i/o memory write to 0024 = 00 & FF
-'maincpu' (0A0B): unmapped i/o memory write to 0080 = BE & FF
-'maincpu' (0A0F): unmapped i/o memory write to 0080 = 08 & FF
-'maincpu' (0A13): unmapped i/o memory write to 0080 = 0C & FF
-'maincpu' (0A15): unmapped i/o memory read from 0082 & FF
-'maincpu' (0A19): unmapped i/o memory write to 0080 = 05 & FF
-'maincpu' (04DE): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (04E2): unmapped i/o memory write to 00F6 = 40 & FF
-'maincpu' (04E6): unmapped i/o memory write to 00F6 = CE & FF
-'maincpu' (04EA): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (043B): unmapped i/o memory write to 00F8 = B6 & FF
-'maincpu' (043F): unmapped i/o memory write to 00F6 = 27 & FF
-'maincpu' (2AA3): unmapped i/o memory write to 00F8 = 14 & FF
-'maincpu' (2AA7): unmapped i/o memory write to 00FB = C0 & FF
-'maincpu' (2AC2): unmapped i/o memory write to 00F8 = 56 & FF
-'maincpu' (2AC6): unmapped i/o memory write to 00FA = 03 & FF
-'maincpu' (0082): unmapped i/o memory write to 0024 = 06 & FF
-
-Debug stuff:
-- Start it up
-- Write FF to 7D57 to see some messages
-- Write 00 to 7D57 to silence it
-
-Even though it gives an input prompt, there's no code to accept anything
+Press E to see some messages.
 
 Terminal settings: 8 data bits, 2 stop bits, no parity @ 9600
 
@@ -106,21 +81,13 @@ void konin_state::konin_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
 	map(0x80, 0x83).lrw8("ioppi_rw",
-						 [this](address_space &space, offs_t offset, u8 mem_mask) {
-							 return m_ioppi->read(space, offset^3, mem_mask);
-						 },
-						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-							 m_ioppi->write(space, offset^3, data, mem_mask);
-						 });
+		[this](offs_t offset) { return m_ioppi->read(offset^3); },
+		[this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); });
 	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
 	map(0xf8, 0xfb).lrw8("iopit_rw",
-						 [this](address_space &space, offs_t offset, u8 mem_mask) {
-							 return m_iopit->read(space, offset^3, mem_mask);
-						 },
-						 [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-							 m_iopit->write(space, offset^3, data, mem_mask);
-						 });
+		[this](offs_t offset) { return m_iopit->read(offset^3); },
+		[this](offs_t offset, u8 data) { m_iopit->write(offset^3, data); });
 }
 
 /* Input ports */
@@ -132,21 +99,22 @@ void konin_state::machine_start()
 {
 }
 
-MACHINE_CONFIG_START(konin_state::konin)
+void konin_state::konin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(konin_mem)
-	MCFG_DEVICE_IO_MAP(konin_io)
-	MCFG_I8085A_INTE(WRITELINE("picu", i8214_device, inte_w))
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("intlatch", i8212_device, inta_cb)
+	i8080_cpu_device &maincpu(I8080(config, m_maincpu, XTAL(4'000'000)));
+	maincpu.set_addrmap(AS_PROGRAM, &konin_state::konin_mem);
+	maincpu.set_addrmap(AS_IO, &konin_state::konin_io);
+	maincpu.out_inte_func().set(m_picu, FUNC(i8214_device::inte_w));
+	maincpu.set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i8212_device::inta_cb), "intlatch", (i8212_device*)nullptr));
 
-	MCFG_DEVICE_ADD("intlatch", I8212, 0)
-	MCFG_I8212_MD_CALLBACK(CONSTANT(0))
-	MCFG_I8212_DI_CALLBACK(READ8("picu", i8214_device, vector_r))
-	MCFG_I8212_INT_CALLBACK(INPUTLINE("maincpu", I8085_INTR_LINE))
+	i8212_device &intlatch(I8212(config, "intlatch", 0));
+	intlatch.md_rd_callback().set_constant(0);
+	intlatch.di_rd_callback().set(m_picu, FUNC(i8214_device::vector_r));
+	intlatch.int_wr_callback().set_inputline("maincpu", I8085_INTR_LINE);
 
-	MCFG_DEVICE_ADD("picu", I8214, XTAL(4'000'000))
-	MCFG_I8214_INT_CALLBACK(WRITELINE("intlatch", i8212_device, stb_w))
+	I8214(config, m_picu, XTAL(4'000'000));
+	m_picu->int_wr_callback().set("intlatch", FUNC(i8212_device::stb_w));
 
 	pit8253_device &mainpit(PIT8253(config, "mainpit", 0));
 	// wild guess at UART clock and source
@@ -160,17 +128,17 @@ MACHINE_CONFIG_START(konin_state::konin)
 
 	I8255(config, m_ioppi, 0);
 
-	MCFG_DEVICE_ADD("uart", I8251, 0)
-	MCFG_I8251_TXD_HANDLER(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_I8251_DTR_HANDLER(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_I8251_RTS_HANDLER(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(WRITELINE(*this, konin_state, picu_r3_w))
+	i8251_device &uart(I8251(config, "uart", 0));
+	uart.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+	uart.dtr_handler().set("rs232", FUNC(rs232_port_device::write_dtr));
+	uart.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
+	uart.rxrdy_handler().set(FUNC(konin_state::picu_r3_w));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("uart", i8251_device, write_rxd))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("uart", i8251_device, write_dsr))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("uart", i8251_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("uart", FUNC(i8251_device::write_rxd));
+	rs232.dsr_handler().set("uart", FUNC(i8251_device::write_dsr));
+	rs232.cts_handler().set("uart", FUNC(i8251_device::write_cts));
+}
 
 /* ROM definition */
 ROM_START( konin )

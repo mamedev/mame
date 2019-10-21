@@ -15,38 +15,24 @@
 
 #pragma once
 
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DS1315_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, DS1315, 0)
-
-#define MCFG_DS1315_BACKING_HANDLER(_devcb) \
-	downcast<ds1315_device &>(*device).set_backing_handler(DEVCB_##_devcb);
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
 class ds1315_device : public device_t
 {
 public:
 	ds1315_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~ds1315_device() {}
 
-	// this handler automates the bits 0/2 stuff
-	DECLARE_READ8_MEMBER(read);
+	auto read_backing() { return m_backing_read.bind(); }
 
-	DECLARE_READ8_MEMBER(read_0);
-	DECLARE_READ8_MEMBER(read_1);
-	DECLARE_READ8_MEMBER(read_data);
-	DECLARE_READ8_MEMBER(write_data);
+	// this handler automates the bits 0/2 stuff
+	uint8_t read(offs_t offset);
+
+	uint8_t read_0();
+	uint8_t read_1();
+	uint8_t read_data();
+	uint8_t write_data(offs_t offset);
 
 	bool chip_enable();
 	void chip_reset();
-
-	template <class Object> devcb_base &set_backing_handler(Object &&cb) { return m_backing_read.set_callback(std::forward<Object>(cb)); }
 
 protected:
 	// device-level overrides

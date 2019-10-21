@@ -21,47 +21,47 @@ public:
 private:
 	READ m_delegate;
 
-    template<typename R>
-        std::enable_if_t<std::is_same<R, read8_delegate>::value ||
-                         std::is_same<R, read16_delegate>::value ||
-                         std::is_same<R, read32_delegate>::value ||
-                         std::is_same<R, read64_delegate>::value,
-	                     uX> read_impl(offs_t offset, uX mem_mask);
+	template<typename R>
+		std::enable_if_t<std::is_same<R, read8_delegate>::value ||
+						 std::is_same<R, read16_delegate>::value ||
+						 std::is_same<R, read32_delegate>::value ||
+						 std::is_same<R, read64_delegate>::value,
+						 uX> read_impl(offs_t offset, uX mem_mask);
 
-    template<typename R>
-        std::enable_if_t<std::is_same<R, read8m_delegate>::value ||
-                         std::is_same<R, read16m_delegate>::value ||
-                         std::is_same<R, read32m_delegate>::value ||
-                         std::is_same<R, read64m_delegate>::value,
-	                     uX> read_impl(offs_t offset, uX mem_mask);
+	template<typename R>
+		std::enable_if_t<std::is_same<R, read8m_delegate>::value ||
+						 std::is_same<R, read16m_delegate>::value ||
+						 std::is_same<R, read32m_delegate>::value ||
+						 std::is_same<R, read64m_delegate>::value,
+						 uX> read_impl(offs_t offset, uX mem_mask);
 
-    template<typename R>
-        std::enable_if_t<std::is_same<R, read8s_delegate>::value ||
-                         std::is_same<R, read16s_delegate>::value ||
-                         std::is_same<R, read32s_delegate>::value ||
-                         std::is_same<R, read64s_delegate>::value,
-	                     uX> read_impl(offs_t offset, uX mem_mask);
+	template<typename R>
+		std::enable_if_t<std::is_same<R, read8s_delegate>::value ||
+						 std::is_same<R, read16s_delegate>::value ||
+						 std::is_same<R, read32s_delegate>::value ||
+						 std::is_same<R, read64s_delegate>::value,
+						 uX> read_impl(offs_t offset, uX mem_mask);
 
-    template<typename R>
-        std::enable_if_t<std::is_same<R, read8sm_delegate>::value ||
-                         std::is_same<R, read16sm_delegate>::value ||
-                         std::is_same<R, read32sm_delegate>::value ||
-                         std::is_same<R, read64sm_delegate>::value,
-	                     uX> read_impl(offs_t offset, uX mem_mask);
+	template<typename R>
+		std::enable_if_t<std::is_same<R, read8sm_delegate>::value ||
+						 std::is_same<R, read16sm_delegate>::value ||
+						 std::is_same<R, read32sm_delegate>::value ||
+						 std::is_same<R, read64sm_delegate>::value,
+						 uX> read_impl(offs_t offset, uX mem_mask);
 
-    template<typename R>
-        std::enable_if_t<std::is_same<R, read8mo_delegate>::value ||
-                         std::is_same<R, read16mo_delegate>::value ||
-                         std::is_same<R, read32mo_delegate>::value ||
-                         std::is_same<R, read64mo_delegate>::value,
-	                     uX> read_impl(offs_t offset, uX mem_mask);
+	template<typename R>
+		std::enable_if_t<std::is_same<R, read8mo_delegate>::value ||
+						 std::is_same<R, read16mo_delegate>::value ||
+						 std::is_same<R, read32mo_delegate>::value ||
+						 std::is_same<R, read64mo_delegate>::value,
+						 uX> read_impl(offs_t offset, uX mem_mask);
 
-    template<typename R>
-        std::enable_if_t<std::is_same<R, read8smo_delegate>::value ||
-                         std::is_same<R, read16smo_delegate>::value ||
-                         std::is_same<R, read32smo_delegate>::value ||
-                         std::is_same<R, read64smo_delegate>::value,
-	                     uX> read_impl(offs_t offset, uX mem_mask);
+	template<typename R>
+		std::enable_if_t<std::is_same<R, read8smo_delegate>::value ||
+						 std::is_same<R, read16smo_delegate>::value ||
+						 std::is_same<R, read32smo_delegate>::value ||
+						 std::is_same<R, read64smo_delegate>::value,
+						 uX> read_impl(offs_t offset, uX mem_mask);
 };
 
 template<int Width, int AddrShift, int Endian, typename WRITE> class handler_entry_write_delegate : public handler_entry_write_address<Width, AddrShift, Endian>
@@ -80,47 +80,47 @@ public:
 private:
 	WRITE m_delegate;
 
-    template<typename W>
-        std::enable_if_t<std::is_same<W, write8_delegate>::value ||
-                         std::is_same<W, write16_delegate>::value ||
-                         std::is_same<W, write32_delegate>::value ||
-                         std::is_same<W, write64_delegate>::value,
-	                     void> write_impl(offs_t offset, uX data, uX mem_mask);
+	template<typename W>
+		std::enable_if_t<std::is_same<W, write8_delegate>::value ||
+						 std::is_same<W, write16_delegate>::value ||
+						 std::is_same<W, write32_delegate>::value ||
+						 std::is_same<W, write64_delegate>::value,
+						 void> write_impl(offs_t offset, uX data, uX mem_mask);
 
-    template<typename W>
-        std::enable_if_t<std::is_same<W, write8m_delegate>::value ||
-                         std::is_same<W, write16m_delegate>::value ||
-                         std::is_same<W, write32m_delegate>::value ||
-                         std::is_same<W, write64m_delegate>::value,
-	                     void> write_impl(offs_t offset, uX data, uX mem_mask);
+	template<typename W>
+		std::enable_if_t<std::is_same<W, write8m_delegate>::value ||
+						 std::is_same<W, write16m_delegate>::value ||
+						 std::is_same<W, write32m_delegate>::value ||
+						 std::is_same<W, write64m_delegate>::value,
+						 void> write_impl(offs_t offset, uX data, uX mem_mask);
 
-    template<typename W>
-        std::enable_if_t<std::is_same<W, write8s_delegate>::value ||
-                         std::is_same<W, write16s_delegate>::value ||
-                         std::is_same<W, write32s_delegate>::value ||
-                         std::is_same<W, write64s_delegate>::value,
-	                     void> write_impl(offs_t offset, uX data, uX mem_mask);
+	template<typename W>
+		std::enable_if_t<std::is_same<W, write8s_delegate>::value ||
+						 std::is_same<W, write16s_delegate>::value ||
+						 std::is_same<W, write32s_delegate>::value ||
+						 std::is_same<W, write64s_delegate>::value,
+						 void> write_impl(offs_t offset, uX data, uX mem_mask);
 
-    template<typename W>
-        std::enable_if_t<std::is_same<W, write8sm_delegate>::value ||
-                         std::is_same<W, write16sm_delegate>::value ||
-                         std::is_same<W, write32sm_delegate>::value ||
-                         std::is_same<W, write64sm_delegate>::value,
-	                     void> write_impl(offs_t offset, uX data, uX mem_mask);
+	template<typename W>
+		std::enable_if_t<std::is_same<W, write8sm_delegate>::value ||
+						 std::is_same<W, write16sm_delegate>::value ||
+						 std::is_same<W, write32sm_delegate>::value ||
+						 std::is_same<W, write64sm_delegate>::value,
+						 void> write_impl(offs_t offset, uX data, uX mem_mask);
 
-    template<typename W>
-        std::enable_if_t<std::is_same<W, write8mo_delegate>::value ||
-                         std::is_same<W, write16mo_delegate>::value ||
-                         std::is_same<W, write32mo_delegate>::value ||
-                         std::is_same<W, write64mo_delegate>::value,
-	                     void> write_impl(offs_t offset, uX data, uX mem_mask);
+	template<typename W>
+		std::enable_if_t<std::is_same<W, write8mo_delegate>::value ||
+						 std::is_same<W, write16mo_delegate>::value ||
+						 std::is_same<W, write32mo_delegate>::value ||
+						 std::is_same<W, write64mo_delegate>::value,
+						 void> write_impl(offs_t offset, uX data, uX mem_mask);
 
-    template<typename W>
-        std::enable_if_t<std::is_same<W, write8smo_delegate>::value ||
-                         std::is_same<W, write16smo_delegate>::value ||
-                         std::is_same<W, write32smo_delegate>::value ||
-                         std::is_same<W, write64smo_delegate>::value,
-	                     void> write_impl(offs_t offset, uX data, uX mem_mask);
+	template<typename W>
+		std::enable_if_t<std::is_same<W, write8smo_delegate>::value ||
+						 std::is_same<W, write16smo_delegate>::value ||
+						 std::is_same<W, write32smo_delegate>::value ||
+						 std::is_same<W, write64smo_delegate>::value,
+						 void> write_impl(offs_t offset, uX data, uX mem_mask);
 };
 
 

@@ -163,7 +163,6 @@ uint32_t rungun_state::screen_update_rng_dual_right(screen_device &screen, bitma
 
 void rungun_state::sprite_dma_trigger(void)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t src_address;
 
 	if(m_single_screen_mode == true)
@@ -173,5 +172,5 @@ void rungun_state::sprite_dma_trigger(void)
 
 	// TODO: size could be programmable somehow.
 	for(int i=0;i<0x1000;i+=2)
-		m_k055673->k053247_word_w(space,i/2,m_banked_ram[(i + src_address) /2],0xffff);
+		m_k055673->k053247_word_w(i/2, m_banked_ram[(i + src_address) /2]);
 }

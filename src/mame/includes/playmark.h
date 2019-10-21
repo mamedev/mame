@@ -1,22 +1,29 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
+#ifndef MAME_INCLUDES_PLAYMARK_H
+#define MAME_INCLUDES_PLAYMARK_H
+
+#pragma once
+
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class playmark_state : public driver_device
 {
 public:
-	playmark_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	playmark_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_bgvideoram(*this, "bgvideoram"),
 		m_videoram1(*this, "videoram1"),
 		m_videoram2(*this, "videoram2"),
 		m_videoram3(*this, "videoram3"),
 		m_spriteram(*this, "spriteram"),
 		m_rowscroll(*this, "rowscroll"),
+		m_sprtranspen(0),
 		m_oki(*this, "oki"),
 		m_okibank(*this, "okibank"),
 		m_eeprom(*this, "eeprom"),
@@ -25,7 +32,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
-		m_token(*this, "token") { }
+		m_token(*this, "token")
+	{ }
 
 	void wbeachvl(machine_config &config);
 	void hrdtimes(machine_config &config);
@@ -61,6 +69,7 @@ protected:
 	int         m_yoffset;
 	int         m_pri_masks[3];
 	uint16_t      m_scroll[7];
+	int         m_sprtranspen;
 
 	/* misc */
 	uint16_t      m_snd_command;
@@ -142,3 +151,5 @@ protected:
 	void oki_map(address_map &map);
 	void wbeachvl_main_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_PLAYMARK_H

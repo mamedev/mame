@@ -335,7 +335,7 @@ WRITE8_MEMBER( gts80a_state::port3b_w )
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);
 	if (m_r1_sound)
-		m_r1_sound->write(space, offset, sndcmd);
+		m_r1_sound->write(sndcmd);
 }
 
 void gts80a_state::machine_reset()
@@ -347,12 +347,13 @@ void gts80a_state::init_gts80a()
 }
 
 /* with Sound Board */
-MACHINE_CONFIG_START(gts80a_state::gts80a)
+void gts80a_state::gts80a(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, XTAL(3'579'545)/4)
-	MCFG_DEVICE_PROGRAM_MAP(gts80a_map)
+	M6502(config, m_maincpu, XTAL(3'579'545)/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gts80a_state::gts80a_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram") // must be 1
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // must be 1
 
 	/* Video */
 	config.set_default_layout(layout_gts80a);
@@ -382,21 +383,21 @@ MACHINE_CONFIG_START(gts80a_state::gts80a)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "speaker").front_center();
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(gts80a_state::gts80a_s)
+void gts80a_state::gts80a_s(machine_config &config)
+{
 	gts80a(config);
-	MCFG_DEVICE_ADD("r0sound", GOTTLIEB_SOUND_REV0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
+	GOTTLIEB_SOUND_REV0(config, m_r0_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+}
 
-MACHINE_CONFIG_START(gts80a_state::gts80a_ss)
+
+void gts80a_state::gts80a_ss(machine_config &config)
+{
 	gts80a(config);
-	MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1)
-	//MCFG_DEVICE_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
+	GOTTLIEB_SOUND_REV1(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	//GOTTLIEB_SOUND_REV1_VOTRAX(config, m_r1_sound, 0).add_route(ALL_OUTPUTS, "speaker", 1.0);  // votrax crashes
+}
 
 
 class caveman_state : public gts80a_state
@@ -452,35 +453,35 @@ void caveman_state::video_map(address_map &map)
 
 void caveman_state::video_io_map(address_map &map)
 {
-//  AM_RANGE(0x000, 0x002) AM_READWRITE() // 8259 irq controller
-//  AM_RANGE(0x100, 0x102) AM_READWRITE() // HD46505
-//  AM_RANGE(0x200, 0x200) AM_READWRITE() // 8212 in, ?? out
-//  AM_RANGE(0x300, 0x300) AM_READWRITE() // soundlatch (command?) in, ?? out
+//  map(0x000, 0x002).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // 8259 irq controller
+//  map(0x100, 0x102).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // HD46505
+//  map(0x200, 0x200).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // 8212 in, ?? out
+//  map(0x300, 0x300).rw(FUNC(caveman_state::), FUNC(caveman_state::)); // soundlatch (command?) in, ?? out
 
-//  AM_RANGE(0x400, 0x400) AM_READ() // joystick inputs
-//  AM_RANGE(0x500, 0x506) AM_WRITE() // palette
+//  map(0x400, 0x400).r(FUNC(caveman_state::)); // joystick inputs
+//  map(0x500, 0x506).w(FUNC(caveman_state::)); // palette
 
 }
 
-MACHINE_CONFIG_START(caveman_state::caveman)
+void caveman_state::caveman(machine_config &config)
+{
 	gts80a_ss(config);
-	MCFG_DEVICE_ADD("video_cpu", I8088, 5000000)
-	MCFG_DEVICE_PROGRAM_MAP(video_map)
-	MCFG_DEVICE_IO_MAP(video_io_map)
+	I8088(config, m_videocpu, 5000000);
+	m_videocpu->set_addrmap(AS_PROGRAM, &caveman_state::video_map);
+	m_videocpu->set_addrmap(AS_IO, &caveman_state::video_io_map);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 248-1)
-	MCFG_SCREEN_UPDATE_DRIVER(caveman_state, screen_update_caveman)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 0, 248-1);
+	screen.set_screen_update(FUNC(caveman_state::screen_update_caveman));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 16)
+	PALETTE(config, "palette").set_entries(16);
 
 	config.set_default_layout(layout_gts80a_caveman);
-
-MACHINE_CONFIG_END
+}
 
 static INPUT_PORTS_START( caveman )
 	PORT_INCLUDE(gts80a)

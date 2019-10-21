@@ -1524,6 +1524,12 @@ WRITE8_MEMBER(mac_state::mac_via_out_b_bbadb)
 {
 //  printf("%s VIA1 OUT B: %02x\n", machine().describe_context().c_str(), data);
 
+	if (AUDIO_IS_CLASSIC)
+	{
+		m_snd_enable = (data & 0x80) == 0;
+		update_volume();
+	}
+
 	// SE and Classic have SCSI enable/disable here
 	if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
 	{

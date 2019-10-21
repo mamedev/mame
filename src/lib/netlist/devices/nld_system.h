@@ -9,7 +9,7 @@
 #ifndef NLD_SYSTEM_H_
 #define NLD_SYSTEM_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 // -----------------------------------------------------------------------------
 // Macros
@@ -35,6 +35,10 @@
 #define CLOCK(name, freq)                                                       \
 		NET_REGISTER_DEV(CLOCK, name)                                           \
 		PARAM(name.FREQ, freq)
+
+#define VARCLOCK(name, func)                                                    \
+		NET_REGISTER_DEV(VARCLOCK, name)                                        \
+		PARAM(name.FUNC, func)
 
 #define EXTCLOCK(name, freq, pattern)                                           \
 		NET_REGISTER_DEV(EXTCLOCK, name)                                        \

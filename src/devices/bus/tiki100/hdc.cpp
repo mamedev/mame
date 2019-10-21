@@ -27,21 +27,22 @@ DEFINE_DEVICE_TYPE(TIKI100_HDC, tiki100_hdc_device, "tiki100_hdc", "TIKI-100 Win
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_START( tiki100_hdc )
+//  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(tiki100_hdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(WD1010_TAG, WD2010, 5000000)
-	//MCFG_WD2010_OUT_INTRQ_CB()
-	MCFG_WD2010_IN_DRDY_CB(CONSTANT(1))
-	MCFG_WD2010_IN_INDEX_CB(CONSTANT(1))
-	MCFG_WD2010_IN_WF_CB(CONSTANT(1))
-	MCFG_WD2010_IN_TK000_CB(CONSTANT(1))
-	MCFG_WD2010_IN_SC_CB(CONSTANT(1))
+void tiki100_hdc_device::device_add_mconfig(machine_config & config)
+{
+	WD2010(config, m_hdc, 5000000);
+	//m_hdc->out_intr_callback().set();
+	m_hdc->in_drdy_callback().set_constant(1);
+	m_hdc->in_index_callback().set_constant(1);
+	m_hdc->in_wf_callback().set_constant(1);
+	m_hdc->in_tk000_callback().set_constant(1);
+	m_hdc->in_sc_callback().set_constant(1);
 
-	MCFG_HARDDISK_ADD("hard0")
-	MCFG_HARDDISK_ADD("hard1")
-MACHINE_CONFIG_END
+	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hard1", 0);
+}
 
 
 
@@ -84,11 +85,11 @@ void tiki100_hdc_device::device_reset()
 //  tiki100bus_iorq_r - I/O read
 //-------------------------------------------------
 
-uint8_t tiki100_hdc_device::iorq_r(address_space &space, offs_t offset, uint8_t data)
+uint8_t tiki100_hdc_device::iorq_r(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf8) == 0x20)
 	{
-		data = m_hdc->read(space, offset & 0x07);
+		data = m_hdc->read(offset & 0x07);
 	}
 
 	return data;
@@ -99,10 +100,10 @@ uint8_t tiki100_hdc_device::iorq_r(address_space &space, offs_t offset, uint8_t 
 //  tiki100bus_iorq_w - I/O write
 //-------------------------------------------------
 
-void tiki100_hdc_device::iorq_w(address_space &space, offs_t offset, uint8_t data)
+void tiki100_hdc_device::iorq_w(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xf8) == 0x20)
 	{
-		m_hdc->write(space, offset, data);
+		m_hdc->write(offset, data);
 	}
 }

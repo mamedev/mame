@@ -597,8 +597,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_flags(0),
 		m_impulse(0),
 		m_name(name),
-		m_read_param(nullptr),
-		m_write_param(nullptr),
+		m_write_param(0),
 		m_digital_value(false),
 		m_min(0),
 		m_max(maskbits),
@@ -1210,7 +1209,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 
 	// apply custom mapping if necessary
 	if (!m_crosshair_mapper.isnull())
-		value = m_crosshair_mapper(*this, value);
+		value = m_crosshair_mapper(value);
 
 	// handle X axis
 	if (m_crosshair_axis == CROSSHAIR_AXIS_X)
@@ -1457,7 +1456,7 @@ ioport_field *ioport_port::field(ioport_value mask) const
 {
 	// if we got the port, look for the field
 	for (ioport_field &field : fields())
-		if ((field.mask() & mask) != 0)
+		if ((field.mask() & mask) != 0 && field.enabled())
 			return &field;
 	return nullptr;
 }
@@ -1469,7 +1468,8 @@ ioport_field *ioport_port::field(ioport_value mask) const
 
 ioport_value ioport_port::read()
 {
-	assert_always(manager().safe_to_read(), "Input ports cannot be read at init time!");
+	if (!manager().safe_to_read())
+		throw emu_fatalerror("Input ports cannot be read at init time!");
 
 	// start with the digital state
 	ioport_value result = m_live->digital;
@@ -1706,7 +1706,7 @@ time_t ioport_manager::initialize()
 		std::string errors;
 		m_portlist.append(device, errors);
 		if (!errors.empty())
-			osd_printf_error("Input port errors:\n%s", errors.c_str());
+			osd_printf_error("Input port errors:\n%s", errors);
 	}
 
 	// renumber player numbers for controller ports
@@ -2558,12 +2558,12 @@ time_t ioport_manager::playback_init()
 	osd_printf_info("INP version %u.%u\n", header.get_majversion(), header.get_minversion());
 	time_t basetime = header.get_basetime();
 	osd_printf_info("Created %s\n", ctime(&basetime));
-	osd_printf_info("Recorded using %s\n", header.get_appdesc().c_str());
+	osd_printf_info("Recorded using %s\n", header.get_appdesc());
 
 	// verify the header against the current game
 	std::string const sysname = header.get_sysname();
 	if (sysname != machine().system().name)
-		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname.c_str(), machine().system().name);
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname, machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -2717,7 +2717,8 @@ void ioport_manager::record_init()
 
 	// open the record file
 	osd_file::error filerr = m_record_file.open(filename);
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for recording");
+	if (filerr != osd_file::error::NONE)
+		throw emu_fatalerror("ioport_manager::record_init: Failed to open file for recording");
 
 	// get the base time
 	system_time systime;
@@ -2739,15 +2740,18 @@ void ioport_manager::record_init()
 }
 
 
-void ioport_manager::timecode_init() {
+void ioport_manager::timecode_init()
+{
 	// check if option -record_timecode is enabled
-	if (!machine().options().record_timecode()) {
+	if (!machine().options().record_timecode())
+	{
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
 	// if no file, nothing to do
 	const char *record_filename = machine().options().record();
-	if (record_filename[0] == 0) {
+	if (record_filename[0] == 0)
+	{
 		machine().video().set_timecode_enabled(false);
 		return;
 	}
@@ -2760,7 +2764,8 @@ void ioport_manager::timecode_init() {
 	osd_printf_info("Record input timecode file: %s\n", record_filename);
 
 	osd_file::error filerr = m_timecode_file.open(filename.c_str());
-	assert_always(filerr == osd_file::error::NONE, "Failed to open file for input timecode recording");
+	if (filerr != osd_file::error::NONE)
+		throw emu_fatalerror("ioport_manager::timecode_init: Failed to open file for input timecode recording");
 
 	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
 	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
@@ -2902,15 +2907,15 @@ void ioport_manager::record_frame(const attotime &curtime)
 			timecode_key = string_format("EXTRA_STOP_%03d", (m_timecode_count-4)/2);
 		}
 
-		osd_printf_info("%s \n", message.c_str());
-		machine().popmessage("%s \n", message.c_str());
+		osd_printf_info("%s \n", message);
+		machine().popmessage("%s \n", message);
 
 		m_timecode_file.printf(
 				"%-19s %s %s %s %s %s %s\n",
-				timecode_key.c_str(),
-				current_time_str.c_str(), elapsed_time_str.c_str(),
-				mseconds_start_str.c_str(), mseconds_elapsed_str.c_str(),
-				frame_start_str.c_str(), frame_elapsed_str.c_str());
+				timecode_key,
+				current_time_str, elapsed_time_str,
+				mseconds_start_str, mseconds_elapsed_str,
+				frame_start_str, frame_elapsed_str);
 
 		machine().video().set_timecode_write(false);
 		machine().video().set_timecode_text(timecode_text);
@@ -3189,7 +3194,7 @@ void dynamic_field::read(ioport_value &result)
 		return;
 
 	// call the callback to read a new value
-	ioport_value newval = m_field.m_read(m_field, m_field.m_read_param);
+	ioport_value newval = m_field.m_read();
 	m_oldval = newval;
 
 	// merge in the bits (don't invert yet, as all digitals are inverted together)

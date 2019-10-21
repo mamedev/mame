@@ -174,7 +174,7 @@ void nes_cony_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-WRITE8_MEMBER(nes_cony_device::write_l)
+void nes_cony_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("cony write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -182,7 +182,7 @@ WRITE8_MEMBER(nes_cony_device::write_l)
 		m_low_reg[offset & 0x03] = data;
 }
 
-READ8_MEMBER(nes_cony_device::read_l)
+uint8_t nes_cony_device::read_l(offs_t offset)
 {
 	LOG_MMC(("cony read_l, offset: %04x\n", offset));
 
@@ -229,7 +229,7 @@ void nes_cony_device::set_chr()
 	}
 }
 
-WRITE8_MEMBER(nes_cony_device::write_h)
+void nes_cony_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("cony write_h, offset: %04x, data: %02x\n", offset, data));
 
@@ -310,7 +310,7 @@ WRITE8_MEMBER(nes_cony_device::write_h)
 
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_yoko_device::write_l)
+void nes_yoko_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("yoko write_l, offset: %04x, data: %02x\n", offset, data));
 
@@ -318,7 +318,7 @@ WRITE8_MEMBER(nes_yoko_device::write_l)
 		m_low_reg[offset & 0x03] = data;
 }
 
-READ8_MEMBER(nes_yoko_device::read_l)
+uint8_t nes_yoko_device::read_l(offs_t offset)
 {
 	LOG_MMC(("yoko read_l, offset: %04x\n", offset));
 
@@ -359,7 +359,7 @@ void nes_yoko_device::set_chr()
 	chr2_6(m_reg[7], CHRROM);
 }
 
-WRITE8_MEMBER(nes_yoko_device::write_h)
+void nes_yoko_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("yoko write_h, offset: %04x, data: %02x\n", offset, data));
 

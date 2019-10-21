@@ -151,7 +151,7 @@ enum
 
 #include "logmacro.h"
 
-constexpr int tms9995_device::AS_SETOFFSET;
+constexpr int tms9995_device::AS_SETADDRESS;
 
 /****************************************************************************
     Constructor
@@ -168,17 +168,16 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		m_state_any(0),
 		PC(0),
 		PC_debug(0),
+		m_iaq(false),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
-		m_setoffset_config("setoffset", ENDIANNESS_BIG, 8, 16),
-		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
+		m_setaddress_config("setaddress", ENDIANNESS_BIG, 8, 16),  // see tms9900.cpp
+		m_io_config("cru", ENDIANNESS_LITTLE, 8, 16, 1),
 		m_prgspace(nullptr),
-		m_sospace(nullptr),
+		m_setaddr(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
-		m_iaq_line(*this),
 		m_clock_out_line(*this),
-		m_holda_line(*this),
-		m_dbin_line(*this)
+		m_holda_line(*this)
 {
 	m_check_overflow = false;
 }
@@ -198,15 +197,13 @@ void tms9995_device::device_start()
 	// TODO: Restore save state suport
 
 	m_prgspace = &space(AS_PROGRAM);
-	m_sospace = has_space(AS_SETOFFSET) ? &space(AS_SETOFFSET) : nullptr;
+	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
 
 	// Resolve our external connections
 	m_external_operation.resolve();
-	m_iaq_line.resolve();
 	m_clock_out_line.resolve();
 	m_holda_line.resolve();
-	m_dbin_line.resolve();
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -288,8 +285,6 @@ void tms9995_device::device_start()
 	save_item(NAME(m_cru_address));
 	save_item(NAME(m_cru_value));
 	save_item(NAME(m_cru_first_read));
-	save_item(NAME(m_cru_bits_left));
-	save_item(NAME(m_cru_read));
 	save_pointer(NAME(m_flag),16);
 	save_item(NAME(IR));
 	save_item(NAME(m_pre_IR));
@@ -305,7 +300,7 @@ void tms9995_device::device_start()
 	// save_item(NAME(m_first_cycle)); // only for log output
 }
 
-const char* tms9995_device::s_statename[20] =
+char const *const tms9995_device::s_statename[20] =
 {
 	"PC",  "WP",  "ST",  "IR",
 	"R0",  "R1",  "R2",  "R3",
@@ -384,7 +379,7 @@ void tms9995_device::state_export(const device_state_entry &entry)
 */
 void tms9995_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
-	static const char *statestr = "LAECOPX-----IIII";
+	static char const statestr[] = "LAECOPX-----IIII";
 	char flags[17];
 	memset(flags, 0x00, ARRAY_LENGTH(flags));
 	uint16_t val = 0x8000;
@@ -443,12 +438,18 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 	m_icount = temp;
 }
 
+/*
+    The setaddress space is used to implement a split-phase memory access
+    where the address bus is first set, then the CPU samples the READY line,
+    (when low, enters wait states,) then the CPU reads the address bus. See
+    tms9900.cpp for more information.
+*/
 device_memory_interface::space_config_vector tms9995_device::memory_space_config() const
 {
-	if (has_configured_map(AS_SETOFFSET))
+	if (has_configured_map(AS_SETADDRESS))
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM,   &m_program_config),
-			std::make_pair(AS_SETOFFSET, &m_setoffset_config),
+			std::make_pair(AS_SETADDRESS, &m_setaddress_config),
 			std::make_pair(AS_IO,        &m_io_config)
 		};
 	else
@@ -1510,10 +1511,13 @@ void tms9995_device::int_prefetch_and_decode()
 			// If the current command is XOP or BLWP, ignore the interrupt
 			if (m_command != XOP && m_command != BLWP)
 			{
-				if (m_flag[2] && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
+				// The actual interrupt trigger is an OR of the latch and of
+				// the interrupt line (for INT1 and INT4); see [1],
+				// section 2.3.2.1.3
+				if ((m_int1_active || m_flag[2]) && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
 				if (m_int_overflow && intmask >= 2) m_int_pending |= PENDING_OVERFLOW;
 				if (m_flag[3] && intmask >= 3) m_int_pending |= PENDING_DECR;
-				if (m_flag[4] && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
+				if ((m_int4_active || m_flag[4]) && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
 			}
 
 			if (m_int_pending!=0)
@@ -1560,9 +1564,9 @@ void tms9995_device::prefetch_and_decode()
 		// Save these values; they have been computed during the current instruction execution
 		m_address_copy = m_address;
 		m_value_copy = m_current_value;
-		if (!m_iaq_line.isnull()) m_iaq_line(ASSERT_LINE);
+		m_iaq = true;
 		m_address = PC;
-		LOGMASKED(LOG_DETAIL, "**** Prefetching new instruction at %04x ****\n", PC);
+		LOGMASKED(LOG_DETAIL, "** Prefetching new instruction at %04x **\n", PC);
 	}
 
 	word_read(); // changes m_mem_phase
@@ -1574,8 +1578,8 @@ void tms9995_device::prefetch_and_decode()
 		m_address = m_address_copy;     // restore m_address
 		m_current_value = m_value_copy; // restore m_current_value
 		PC = (PC + 2) & 0xfffe;     // advance PC
-		if (!m_iaq_line.isnull()) m_iaq_line(CLEAR_LINE);
-		LOGMASKED(LOG_DETAIL, "++++ Prefetch done ++++\n");
+		m_iaq = false;
+		LOGMASKED(LOG_DETAIL, "++ Prefetch done ++\n");
 	}
 }
 
@@ -1688,7 +1692,7 @@ void tms9995_device::service_interrupt()
 			vectorpos = 0x0008;
 			m_intmask = 0x0001;
 			PC = (PC + 2) & 0xfffe;
-			LOGMASKED(LOG_INT, "***** MID pending\n");
+			LOGMASKED(LOG_INT, "** MID pending\n");
 			m_mid_active = false;
 		}
 		else
@@ -1698,7 +1702,7 @@ void tms9995_device::service_interrupt()
 				vectorpos = 0xfffc;
 				m_int_pending &= ~PENDING_NMI;
 				m_intmask = 0;
-				LOGMASKED(LOG_INT, "***** NMI pending\n");
+				LOGMASKED(LOG_INT, "** NMI pending\n");
 			}
 			else
 			{
@@ -1706,9 +1710,12 @@ void tms9995_device::service_interrupt()
 				{
 					vectorpos = 0x0004;
 					m_int_pending &= ~PENDING_LEVEL1;
-					if (!m_int1_active) m_flag[2] = false;
+					// Latches must be reset when the interrupt is serviced
+					// Since the latch is edge-triggered, we should be allowed
+					// to clear it right here, without considering the line state
+					m_flag[2] = false;
 					m_intmask = 0;
-					LOGMASKED(LOG_INT, "***** INT1 pending\n");
+					LOGMASKED(LOG_INT, "** INT1 pending\n");
 				}
 				else
 				{
@@ -1717,7 +1724,7 @@ void tms9995_device::service_interrupt()
 						vectorpos = 0x0008;
 						m_int_pending &= ~PENDING_OVERFLOW;
 						m_intmask = 0x0001;
-						LOGMASKED(LOG_INT, "***** OVERFL pending\n");
+						LOGMASKED(LOG_INT, "** OVERFL pending\n");
 					}
 					else
 					{
@@ -1727,15 +1734,16 @@ void tms9995_device::service_interrupt()
 							m_intmask = 0x0002;
 							m_int_pending &= ~PENDING_DECR;
 							m_flag[3] = false;
-							LOGMASKED(LOG_DEC, "***** DECR pending\n");
+							LOGMASKED(LOG_DEC, "** DECR pending\n");
 						}
 						else
 						{
 							vectorpos = 0x0010;
 							m_intmask = 0x0003;
 							m_int_pending &= ~PENDING_LEVEL4;
-							if (!m_int4_active) m_flag[4] = false;
-							LOGMASKED(LOG_INT, "***** INT4 pending\n");
+							// See above for clearing the latch
+							m_flag[4] = false;
+							LOGMASKED(LOG_INT, "** INT4 pending\n");
 						}
 					}
 				}
@@ -1743,7 +1751,7 @@ void tms9995_device::service_interrupt()
 		}
 	}
 
-	LOGMASKED(LOG_INT, "********* triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
+	LOGMASKED(LOG_INTD, "*** triggered an interrupt with vector %04x/%04x\n", vectorpos, vectorpos+2);
 
 	// just for debugging purposes
 	if (!m_reset) m_log_interrupt = true;
@@ -1840,7 +1848,6 @@ void tms9995_device::mem_read()
 		case 1:
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
-			if (!m_dbin_line.isnull()) m_dbin_line(ASSERT_LINE);
 			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
@@ -1850,9 +1857,9 @@ void tms9995_device::mem_read()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & ~1);
-			if (m_sospace)
-				m_sospace->read_byte(address);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & 0xfffe);
+			if (m_setaddr)
+				m_setaddr->write_byte(address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1860,14 +1867,14 @@ void tms9995_device::mem_read()
 			// Sample the value on the data bus (high byte)
 			if (m_word_access || !m_byteop) address &= 0xfffe;
 			value = m_prgspace->read_byte(address);
-			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & ~1, value);
+			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & 0xfffe, value);
 			m_current_value = (value << 8) & 0xff00;
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_sospace)
-				m_sospace->read_byte(m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_byte(m_address | 1, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
@@ -1974,8 +1981,6 @@ void tms9995_device::mem_write()
 		case 1:
 			// Set address
 			// If this is a word access, 4 passes, else 2 passes
-			if (!m_dbin_line.isnull()) m_dbin_line(CLEAR_LINE);
-
 			if (m_word_access || !m_byteop)
 			{
 				m_pass = 4;
@@ -1985,8 +1990,8 @@ void tms9995_device::mem_write()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
-			if (m_sospace)
-				m_sospace->read_byte(address);
+			if (m_setaddr)
+				m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
 			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -1999,8 +2004,8 @@ void tms9995_device::mem_write()
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_sospace)
-				m_sospace->read_byte(m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_byte(m_address | 1, TMS99xx_BUS_WRITE);
 			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
 			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
 			m_request_auto_wait_state = m_auto_wait;
@@ -2080,8 +2085,7 @@ void tms9995_device::return_with_address_copy()
     1FDA MID flag (only indication, does not trigger when set)
 
     The TMS9995 allows for wait states during external CRU access. Therefore
-    we read one block of 8 bits in one go (as given by the MESS architecture)
-    but we do iterations for each bit, checking every time for the READY line
+    we do iterations for each bit, checking every time for the READY line
     in the main loop.
 
         (write)
@@ -2092,8 +2096,8 @@ void tms9995_device::return_with_address_copy()
 
 */
 
-#define CRUREADMASK 0x0fff
-#define CRUWRITEMASK 0x7fff
+#define CRUREADMASK 0xfffe
+#define CRUWRITEMASK 0xfffe
 
 void tms9995_device::cru_output_operation()
 {
@@ -2129,7 +2133,7 @@ void tms9995_device::cru_output_operation()
 	// of the CPU. However, no wait states are generated for internal
 	// accesses. ([1], section 2.3.3.2)
 
-	m_cru->write_byte((m_cru_address >> 1)& CRUWRITEMASK, (m_cru_value & 0x01));
+	m_cru->write_byte(m_cru_address & CRUWRITEMASK, (m_cru_value & 0x01));
 	m_cru_value >>= 1;
 	m_cru_address = (m_cru_address + 2) & 0xfffe;
 	m_count--;
@@ -2150,55 +2154,29 @@ void tms9995_device::cru_output_operation()
 
 void tms9995_device::cru_input_operation()
 {
-	uint16_t crubit;
-	uint8_t crubyte;
-
-	// Reading is different, since MESS uses 8 bit transfers
-	// We read 8 bits in one go, then iterate another min(n-1,7) times to allow
-	// for wait states.
-
-	// read_byte for CRU delivers the first bit on the rightmost position
-
-	int offset = (m_cru_address>>1) & 0x07;
-
-	if (m_cru_first_read || m_cru_bits_left == 0)
+	if (m_cru_first_read)
 	{
-		// Read next 8 bits
-		// 00000000 0rrrrrrr r
-		//                   v
-		// ........ ........ X....... ........
-		//
-		crubyte = m_cru->read_byte((m_cru_address >> 4)& CRUREADMASK);
-		LOGMASKED(LOG_DETAIL, "Need to get next 8 bits (addresses %04x-%04x): %02x\n", (m_cru_address&0xfff0)+14, m_cru_address&0xfff0, crubyte);
-		m_cru_read = crubyte << 15;
-		m_cru_bits_left = 8;
-
-		if (m_cru_first_read)
-		{
-			m_cru_read >>= offset;
-			m_cru_bits_left -= offset;
-			m_cru_value = 0;
-			m_cru_first_read = false;
-			m_pass = m_count;
-		}
-		LOGMASKED(LOG_DETAIL, "adjusted value for shift: %06x\n", m_cru_read);
+		m_cru_value = 0;
+		m_cru_first_read = false;
+		m_pass = m_count;
 	}
 
-	crubit = (m_cru_read & 0x8000);
+	// Read a single CRU bit
+	bool crubit = BIT(m_cru->read_byte(m_cru_address & CRUREADMASK), 0);
 	m_cru_value = (m_cru_value >> 1) & 0x7fff;
 
 	// During internal reading, the CRUIN line will be ignored. We emulate this
 	// by overwriting the bit which we got from outside. Also, READY is ignored.
 	if (m_cru_address == 0x1fda)
 	{
-		crubit = m_mid_flag? 0x8000 : 0x0000;
+		crubit = m_mid_flag;
 		m_check_ready = false;
 	}
 	else
 	{
 		if ((m_cru_address & 0xffe0)==0x1ee0)
 		{
-			crubit = (m_flag[(m_cru_address>>1)&0x000f]==true)? 0x8000 : 0x0000;
+			crubit = m_flag[(m_cru_address>>1)&0x000f];
 			m_check_ready = false;
 		}
 		else
@@ -2207,18 +2185,14 @@ void tms9995_device::cru_input_operation()
 		}
 	}
 
-	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, (crubit & 0x8000)>>15);
+	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, crubit ? 1 : 0);
 
-	m_cru_value |= crubit;
+	if (crubit)
+		m_cru_value |= 0x8000;
 
 	m_cru_address = (m_cru_address + 2) & 0xfffe;
-	m_cru_bits_left--;
 
-	if (m_pass > 1)
-	{
-		m_cru_read >>= 1;
-	}
-	else
+	if (m_pass == 1)
 	{
 		// This is the final shift. For both byte and word length transfers,
 		// the first bit is always m_cru_value & 0x0001.
@@ -3116,6 +3090,7 @@ void tms9995_device::alu_shift()
 	uint16_t sign = 0;
 	uint32_t value;
 	int count;
+	bool check_ov = false;
 
 	switch (m_inst_state)
 	{
@@ -3164,6 +3139,7 @@ void tms9995_device::alu_shift()
 			case SLA:
 				carry = ((value & 0x8000)!=0);
 				value <<= 1;
+				check_ov = true;
 				if (carry != ((value&0x8000)!=0)) overflow = true;
 				break;
 			case SRC:
@@ -3176,7 +3152,7 @@ void tms9995_device::alu_shift()
 
 		m_current_value = value & 0xffff;
 		set_status_bit(ST_C, carry);
-		set_status_bit(ST_OV, overflow);
+		if (check_ov) set_status_bit(ST_OV, overflow); // only SLA
 		compare_and_set_lae(m_current_value, 0);
 		m_address = m_address_saved;        // Register address
 		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
@@ -3194,6 +3170,7 @@ void tms9995_device::alu_single_arithm()
 	uint32_t src_val = m_current_value & 0x0000ffff;
 	uint16_t sign = 0;
 	bool check_ov = true;
+	bool check_c = true;
 
 	switch (m_command)
 	{
@@ -3244,6 +3221,7 @@ void tms9995_device::alu_single_arithm()
 		// LAE
 		dest_new = ~src_val & 0xffff;
 		check_ov = false;
+		check_c = false;
 		break;
 	case NEG:
 		// LAECO
@@ -3271,7 +3249,7 @@ void tms9995_device::alu_single_arithm()
 	}
 
 	if (check_ov) set_status_bit(ST_OV, ((src_val & 0x8000)==sign) && ((dest_new & 0x8000)!=sign));
-	set_status_bit(ST_C, (dest_new & 0x10000) != 0);
+	if (check_c) set_status_bit(ST_C, (dest_new & 0x10000) != 0);
 	m_current_value = dest_new & 0xffff;
 	compare_and_set_lae(m_current_value, 0);
 
@@ -3499,14 +3477,22 @@ void tms9995_device::alu_int()
 }
 
 /**************************************************************************/
+/*
+    The minimum number of cycles applies to a command like SETO R0 with
+    R0 in on-chip RAM.
+*/
 uint32_t tms9995_device::execute_min_cycles() const
 {
-	return 2;
+	return 3;
 }
 
+/*
+    The maximum number of cycles applies to a STCR command with the destination
+    operand off-chip and 16 bits of transfer.
+*/
 uint32_t tms9995_device::execute_max_cycles() const
 {
-	return 44;
+	return 47;
 }
 
 uint32_t tms9995_device::execute_input_lines() const

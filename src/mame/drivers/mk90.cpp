@@ -26,17 +26,21 @@ class mk90_state : public driver_device
 {
 public:
 	mk90_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void mk90(machine_config &config);
 
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+
 	void mk90_mem(address_map &map);
+
+	uint32_t screen_update_mk90(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	required_device<k1801vm2_device> m_maincpu;
 };
 
 
@@ -46,13 +50,13 @@ void mk90_state::mk90_mem(address_map &map)
 	map(0x0000, 0x3fff).ram(); // RAM
 	map(0x4000, 0x7fff).rom(); // Extension ROM
 	map(0x8000, 0xffff).rom(); // Main ROM
-//  AM_RANGE(0xe800, 0xe801) LCD address
-//  AM_RANGE(0xe802, 0xe803) LCD data
-//  AM_RANGE(0xe810, 0xe810) serial bus controller data
-//  AM_RANGE(0xe812, 0xe813) serial bus controller transfer rate
-//  AM_RANGE(0xe814, 0xe814) serial bus controller control/status
-//  AM_RANGE(0xe816, 0xe816) serial bus controller command
-//  AM_RANGE(0xea00, 0xea7e) RTC
+//  map(0xe800, 0xe801) LCD address
+//  map(0xe802, 0xe803) LCD data
+//  map(0xe810, 0xe810) serial bus controller data
+//  map(0xe812, 0xe813) serial bus controller transfer rate
+//  map(0xe814, 0xe814) serial bus controller control/status
+//  map(0xe816, 0xe816) serial bus controller command
+//  map(0xea00, 0xea7e) RTC
 }
 
 /* Input ports */
@@ -73,24 +77,24 @@ uint32_t mk90_state::screen_update_mk90(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-MACHINE_CONFIG_START(mk90_state::mk90)
+void mk90_state::mk90(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", K1801VM2, XTAL(4'000'000))
-	MCFG_T11_INITIAL_MODE(0x8000)
-	MCFG_DEVICE_PROGRAM_MAP(mk90_mem)
-
+	K1801VM2(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_initial_mode(0x8000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mk90_state::mk90_mem);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mk90_state, screen_update_mk90)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(mk90_state::screen_update_mk90));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-MACHINE_CONFIG_END
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+}
 
 /* ROM definition */
 ROM_START( mk90 )

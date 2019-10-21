@@ -666,23 +666,23 @@ void tmmjprd_state::main_map(address_map &map)
 	map(0x000000, 0x1fffff).rom();
 	map(0x200010, 0x200013).r(FUNC(tmmjprd_state::randomtmmjprds)); // gfx chip status?
 	/* check these are used .. */
-//  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_SHARE("viewregs0")
+//  map(0x200010, 0x200013).writeonly().share("viewregs0");
 	map(0x200100, 0x200117).writeonly().share(m_tilemap_regs[0]); // tilemap regs1
 	map(0x200120, 0x200137).writeonly().share(m_tilemap_regs[1]); // tilemap regs2
 	map(0x200140, 0x200157).writeonly().share(m_tilemap_regs[2]); // tilemap regs3
 	map(0x200160, 0x200177).writeonly().share(m_tilemap_regs[3]); // tilemap regs4
 	map(0x200200, 0x20021b).writeonly().share(m_spriteregs); // sprregs?
-//  AM_RANGE(0x200300, 0x200303) AM_WRITE(rombank_w) // used during rom testing, rombank/area select + something else?
+//  map(0x200300, 0x200303).w(FUNC(tmmjprd_state::rombank_w)); // used during rom testing, rombank/area select + something else?
 	map(0x20040c, 0x20040f).w(FUNC(tmmjprd_state::brt_w<0>));
 	map(0x200410, 0x200413).w(FUNC(tmmjprd_state::brt_w<1>));
-//  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_SHARE("viewregs7")
+//  map(0x200500, 0x200503).writeonly().share("viewregs7");
 #if EMULATE_BLITTER
 	map(0x200700, 0x20070f).w(FUNC(tmmjprd_state::blitter_w)).share(m_blitterregs);
 #endif
-//  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_SHARE("viewregs9") // never changes?
+//  map(0x200800, 0x20080f).writeonly().share("viewregs9"); // never changes?
 	map(0x200900, 0x2009ff).rw("i5000snd", FUNC(i5000snd_device::read), FUNC(i5000snd_device::write));
 	/* hmm */
-//  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_SHARE("viewregs10")
+//  map(0x279700, 0x279713).writeonly().share("viewregs10");
 	/* tilemaps */
 	map(0x280000, 0x283fff).rw(FUNC(tmmjprd_state::tilemap_r<0>), FUNC(tmmjprd_state::tilemap_w<0>));
 	map(0x284000, 0x287fff).rw(FUNC(tmmjprd_state::tilemap_r<1>), FUNC(tmmjprd_state::tilemap_w<1>));
@@ -739,60 +739,50 @@ TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
 
 }
 
-MACHINE_CONFIG_START(tmmjprd_state::tmpdoki)
-	MCFG_DEVICE_ADD(m_maincpu,M68EC020,24000000) /* 24 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmmjprd_state, scanline, "lscreen", 0, 1)
+void tmmjprd_state::tmpdoki(machine_config &config)
+{
+	M68EC020(config, m_maincpu, 24000000); /* 24 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &tmmjprd_state::main_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(tmmjprd_state::scanline), "lscreen", 0, 1);
 
-	MCFG_DEVICE_ADD(m_eeprom, EEPROM_SERIAL_93C46_16BIT, eeprom_serial_streaming::ENABLE)
+	EEPROM_93C46_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_tmmjprd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tmmjprd);
+	PALETTE(config, m_palette).set_format(palette_device::xGRB_888, 0x1000);
 
-//  MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-//  MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update)
-//  MCFG_SCREEN_SIZE(64*16, 64*16)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	MCFG_PALETTE_ADD(m_palette, 0x1000)
-	MCFG_PALETTE_FORMAT(XGRB)
-
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_left)
-	MCFG_SCREEN_PALETTE(m_palette)
-
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	lscreen.set_size(64*16, 64*16);
+	lscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	//lscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
+	lscreen.set_screen_update(FUNC(tmmjprd_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_I5000_SND_ADD("i5000snd", XTAL(40'000'000))
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_CONFIG_END
+	i5000snd_device &i5000snd(I5000_SND(config, "i5000snd", XTAL(40'000'000)));
+	i5000snd.add_route(0, "rspeaker", 1.0);
+	i5000snd.add_route(1, "lspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(tmmjprd_state::tmmjprd)
+void tmmjprd_state::tmmjprd(machine_config &config)
+{
 	tmpdoki(config);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*16, 64*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 28*8-1)
-	//MCFG_SCREEN_VISIBLE_AREA(0*8, 64*16-1, 0*8, 64*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tmmjprd_state, screen_update_right)
-	MCFG_SCREEN_PALETTE(m_palette)
-MACHINE_CONFIG_END
-
-
-
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	rscreen.set_size(64*16, 64*16);
+	rscreen.set_visarea(0*8, 40*8-1, 0*8, 28*8-1);
+	//rscreen.set_visarea(0*8, 64*16-1, 0*8, 64*16-1);
+	rscreen.set_screen_update(FUNC(tmmjprd_state::screen_update_right));
+	rscreen.set_palette(m_palette);
+}
 
 ROM_START( tmmjprd )
 	ROM_REGION( 0x200000, "maincpu", 0 )

@@ -129,6 +129,7 @@
 #include "sound/tms5220.h"
 #include "sound/ym2151.h"
 #include "sound/pokey.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -147,13 +148,11 @@ void gauntlet_state::update_interrupts()
 
 void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 {
-	address_space &space = m_audiocpu->space(AS_PROGRAM);
-
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		m_soundcomm->sound_irq_gen(*m_audiocpu);
 	else
-		m_soundcomm->sound_irq_ack_r(space, 0);
+		m_soundcomm->sound_irq_ack_w();
 }
 
 
@@ -300,7 +299,7 @@ void gauntlet_state::main_map(address_map &map)
 	map(0x905000, 0x905f7f).mirror(0x2c8000).ram().w(m_alpha_tilemap, FUNC(tilemap_device::write16)).share("alpha");
 	map(0x905f6e, 0x905f6f).mirror(0x2c8000).ram().w(FUNC(gauntlet_state::gauntlet_yscroll_w)).share("yscroll");
 	map(0x905f80, 0x905fff).mirror(0x2c8000).ram().share("mob:slip");
-	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x910000, 0x9107ff).mirror(0x2cf800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x930000, 0x930001).mirror(0x2cfffe).w(FUNC(gauntlet_state::gauntlet_xscroll_w)).share("xscroll");
 }
 
@@ -487,91 +486,93 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet_base)
-
+void gauntlet_state::gauntlet_base(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68010(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gauntlet_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	M6502(config, m_audiocpu, ATARI_CLOCK_14MHz/8);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gauntlet_state::sound_map);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gauntlet)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gauntlet);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+	PALETTE(config, "palette").set_format(palette_device::IRGB_4444, 1024);
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, gauntlet_state, get_playfield_tile_info, 8,8, SCAN_COLS, 64,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, gauntlet_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", gauntlet_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_COLS, 64,64).set_info_callback(FUNC(gauntlet_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,32, 0).set_info_callback(FUNC(gauntlet_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, gauntlet_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(gauntlet_state, screen_update_gauntlet)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, gauntlet_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(gauntlet_state::screen_update_gauntlet));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(gauntlet_state::video_int_write_line));
 
 	/* sound hardware */
-	MCFG_ATARI_SOUND_COMM_ADD("soundcomm", "audiocpu", INPUTLINE("maincpu", M68K_IRQ_6))
+	ATARI_SOUND_COMM(config, m_soundcomm, m_audiocpu)
+		.int_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.48)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.48)
+	YM2151(config, m_ym2151, ATARI_CLOCK_14MHz/4);
+	m_ym2151->add_route(1, "lspeaker", 0.48);
+	m_ym2151->add_route(0, "rspeaker", 0.48);
 
-	MCFG_DEVICE_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.32)
+	POKEY(config, m_pokey, ATARI_CLOCK_14MHz/8);
+	m_pokey->add_route(ALL_OUTPUTS, "lspeaker", 0.32);
+	m_pokey->add_route(ALL_OUTPUTS, "rspeaker", 0.32);
 
-	MCFG_DEVICE_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11) /* potentially ATARI_CLOCK_14MHz/2/9 as well */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	TMS5220C(config, m_tms5220, ATARI_CLOCK_14MHz/2/11); /* potentially ATARI_CLOCK_14MHz/2/9 as well */
+	m_tms5220->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
+	m_tms5220->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
 
-	MCFG_DEVICE_ADD("soundctl", LS259, 0) // 16T/U
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE("ymsnd", ym2151_device, reset_w)) // music reset, low reset
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE("tms", tms5220_device, wsq_w)) // speech write, active low
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE("tms", tms5220_device, rsq_w)) // speech reset, active low
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, gauntlet_state, speech_squeak_w)) // speech squeak, low = 650 Hz
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, gauntlet_state, coin_counter_right_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, gauntlet_state, coin_counter_left_w))
-MACHINE_CONFIG_END
+	LS259(config, m_soundctl); // 16T/U
+	m_soundctl->q_out_cb<0>().set(m_ym2151, FUNC(ym2151_device::reset_w)); // music reset, low reset
+	m_soundctl->q_out_cb<1>().set(m_tms5220, FUNC(tms5220_device::wsq_w)); // speech write, active low
+	m_soundctl->q_out_cb<2>().set(m_tms5220, FUNC(tms5220_device::rsq_w)); // speech reset, active low
+	m_soundctl->q_out_cb<3>().set(FUNC(gauntlet_state::speech_squeak_w)); // speech squeak, low = 650 Hz
+	m_soundctl->q_out_cb<4>().set(FUNC(gauntlet_state::coin_counter_right_w));
+	m_soundctl->q_out_cb<5>().set(FUNC(gauntlet_state::coin_counter_left_w));
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet)
+void gauntlet_state::gauntlet(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 104, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 104, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gaunt2p)
+void gauntlet_state::gaunt2p(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 107, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::gauntlet2)
+void gauntlet_state::gauntlet2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 106, true)
-MACHINE_CONFIG_END
+	SLAPSTIC(config, m_slapstic_device, 106, true);
+}
 
 
-MACHINE_CONFIG_START(gauntlet_state::vindctr2)
+void gauntlet_state::vindctr2(machine_config & config)
+{
 	gauntlet_base(config);
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 118, true)
-MACHINE_CONFIG_END
-
-
+	SLAPSTIC(config, m_slapstic_device, 118, true);
+}
 
 
 /*************************************
@@ -1256,7 +1257,7 @@ ROM_START( gaunt2 )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136043-1104.6p",  0x000000, 0x002000, CRC(1343cf6f) SHA1(4a9542bc8ede305e7e8f860eb4b47ca2f3017275) )
+	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
 	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
@@ -1277,9 +1278,9 @@ ROM_START( gaunt2 )
 	ROM_RELOAD(                  0x05c000, 0x004000 )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
-	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
-	ROM_LOAD( "74s287-136037-103.4r", 0x400, 0x100, CRC(6c5ccf08) SHA1(ff5dbadd85aa2e07b383a302fa399e875db8f84f) ) /* MO position/size */
+	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200,  CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
+	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200,  CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
+	ROM_LOAD( "82s129-136043-1103.4r", 0x400, 0x100, CRC(32ae1fa9) SHA1(09eb56a0798456d73015909973ce2ba9660c1164) ) /* MO position/size */
 ROM_END
 
 
@@ -1299,7 +1300,7 @@ ROM_START( gaunt2g )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136043-1104.6p",  0x000000, 0x002000, CRC(1343cf6f) SHA1(4a9542bc8ede305e7e8f860eb4b47ca2f3017275) )
+	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
 	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
@@ -1320,9 +1321,9 @@ ROM_START( gaunt2g )
 	ROM_RELOAD(                  0x05c000, 0x004000 )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
-	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
-	ROM_LOAD( "74s287-136037-103.4r", 0x400, 0x100, CRC(6c5ccf08) SHA1(ff5dbadd85aa2e07b383a302fa399e875db8f84f) ) /* MO position/size */
+	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200,  CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
+	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200,  CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
+	ROM_LOAD( "82s129-136043-1103.4r", 0x400, 0x100, CRC(32ae1fa9) SHA1(09eb56a0798456d73015909973ce2ba9660c1164) ) /* MO position/size */
 ROM_END
 
 
@@ -1342,7 +1343,7 @@ ROM_START( gaunt22p )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136043-1104.6p",  0x000000, 0x002000, CRC(1343cf6f) SHA1(4a9542bc8ede305e7e8f860eb4b47ca2f3017275) )
+	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
 	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
@@ -1363,9 +1364,9 @@ ROM_START( gaunt22p )
 	ROM_RELOAD(                  0x05c000, 0x004000 )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
-	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
-	ROM_LOAD( "74s287-136037-103.4r", 0x400, 0x100, CRC(6c5ccf08) SHA1(ff5dbadd85aa2e07b383a302fa399e875db8f84f) ) /* MO position/size */
+	ROM_LOAD( "74s472-136037-101.7u",  0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
+	ROM_LOAD( "74s472-136037-102.5l",  0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
+	ROM_LOAD( "82s129-136043-1103.4r", 0x400, 0x100, CRC(32ae1fa9) SHA1(09eb56a0798456d73015909973ce2ba9660c1164) ) /* MO position/size */
 ROM_END
 
 
@@ -1385,7 +1386,7 @@ ROM_START( gaunt22p1 )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136043-1104.6p",  0x000000, 0x002000, CRC(1343cf6f) SHA1(4a9542bc8ede305e7e8f860eb4b47ca2f3017275) )
+	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
 	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
@@ -1406,9 +1407,9 @@ ROM_START( gaunt22p1 )
 	ROM_RELOAD(                  0x05c000, 0x004000 )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
-	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
-	ROM_LOAD( "74s287-136037-103.4r", 0x400, 0x100, CRC(6c5ccf08) SHA1(ff5dbadd85aa2e07b383a302fa399e875db8f84f) ) /* MO position/size */
+	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200,  CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
+	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200,  CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
+	ROM_LOAD( "82s129-136043-1103.4r", 0x400, 0x100, CRC(32ae1fa9) SHA1(09eb56a0798456d73015909973ce2ba9660c1164) ) /* MO position/size */
 ROM_END
 
 
@@ -1428,7 +1429,7 @@ ROM_START( gaunt22pg )
 	ROM_LOAD( "136043-1119.16s", 0x008000, 0x008000, CRC(dc3591e7) SHA1(6d0d8493609974bd5a63be858b045fe4db35d8df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "136043-1104.6p",  0x000000, 0x002000, CRC(1343cf6f) SHA1(4a9542bc8ede305e7e8f860eb4b47ca2f3017275) )
+	ROM_LOAD( "136043-1104.6p",  0x000000, 0x004000, CRC(bddc3dfc) SHA1(2e1279041ed62fb28ac8a8909e8fedab2556f39e) ) // second half 0x00
 
 	ROM_REGION( 0x60000, "gfx2", ROMREGION_INVERT )
 	ROM_LOAD( "136043-1111.1a",  0x000000, 0x008000, CRC(09df6e23) SHA1(726984275c6a338c12ec0c4cc449f92f4a7a138c) )
@@ -1449,9 +1450,9 @@ ROM_START( gaunt22pg )
 	ROM_RELOAD(                  0x05c000, 0x004000 )
 
 	ROM_REGION( 0x500, "proms", 0 )
-	ROM_LOAD( "74s472-136037-101.7u", 0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
-	ROM_LOAD( "74s472-136037-102.5l", 0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
-	ROM_LOAD( "74s287-136037-103.4r", 0x400, 0x100, CRC(6c5ccf08) SHA1(ff5dbadd85aa2e07b383a302fa399e875db8f84f) ) /* MO position/size */
+	ROM_LOAD( "74s472-136037-101.7u",  0x000, 0x200, CRC(2964f76f) SHA1(da966c35557ec1b95e1c39cd950c38a19bce2d67) ) /* MO timing */
+	ROM_LOAD( "74s472-136037-102.5l",  0x200, 0x200, CRC(4d4fec6c) SHA1(3541b5c6405ad5742a3121dfd6acb227933de25a) ) /* MO flip control */
+	ROM_LOAD( "82s129-136043-1103.4r", 0x400, 0x100, CRC(32ae1fa9) SHA1(09eb56a0798456d73015909973ce2ba9660c1164) ) /* MO position/size */
 ROM_END
 
 

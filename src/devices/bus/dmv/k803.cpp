@@ -75,10 +75,11 @@ void dmv_k803_device::device_reset()
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(dmv_k803_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("rtc", MM58167, XTAL(32'768))
-	MCFG_MM58167_IRQ_CALLBACK(WRITELINE(*this, dmv_k803_device, rtc_irq_w))
-MACHINE_CONFIG_END
+void dmv_k803_device::device_add_mconfig(machine_config &config)
+{
+	MM58167(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set(FUNC(dmv_k803_device::rtc_irq_w));
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -89,23 +90,23 @@ ioport_constructor dmv_k803_device::device_input_ports() const
 	return INPUT_PORTS_NAME( dmv_k803 );
 }
 
-void dmv_k803_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
+void dmv_k803_device::io_read(int ifsel, offs_t offset, uint8_t &data)
 {
 	uint8_t dsw = m_dsw->read() & 0x0f;
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
-			data = m_rtc->read(space, ((m_latch & 0x07) << 2) | (offset & 0x03));
+			data = m_rtc->read(((m_latch & 0x07) << 2) | (offset & 0x03));
 	}
 }
 
-void dmv_k803_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmv_k803_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	uint8_t dsw = m_dsw->read() & 0x0f;
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
-			m_rtc->write(space, ((m_latch & 0x07) << 2) | (offset & 0x03), data);
+			m_rtc->write(((m_latch & 0x07) << 2) | (offset & 0x03), data);
 		else
 		{
 			m_latch = data;

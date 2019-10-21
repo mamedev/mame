@@ -6,12 +6,13 @@
 
         08/11/2008 Preliminary driver.
 
+        Need to press capslock twice to get caps to engage - bug?
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/pecom.h"
 
-#include "sound/wave.h"
 #include "softlist.h"
 #include "speaker.h"
 
@@ -54,7 +55,7 @@ mappings, this is another situation where natural keyboard comes very handy!    
 
 INPUT_CHANGED_MEMBER(pecom_state::ef_w)
 {
-	m_cdp1802->set_input_line((int)(uintptr_t)param, newval);
+	m_cdp1802->set_input_line((int)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )
@@ -163,39 +164,38 @@ static INPUT_PORTS_START( pecom )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del") PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_MAMEKEY(DEL))
 
 	PORT_START("CNT")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_2) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Shift") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, (void*)COSMAC_INPUT_LINE_EF4)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Caps") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_MINUS) PORT_CHANGED_MEMBER(DEVICE_SELF, pecom_state, ef_w, COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 /* Machine driver */
-MACHINE_CONFIG_START(pecom_state::pecom64)
+void pecom_state::pecom64(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, cdp1869_device::DOT_CLK_PAL/3)
-	MCFG_DEVICE_PROGRAM_MAP(pecom64_mem)
-	MCFG_DEVICE_IO_MAP(pecom64_io)
-	MCFG_COSMAC_WAIT_CALLBACK(CONSTANT(1))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, pecom_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, pecom_state, ef2_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, pecom_state, q_w))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, pecom_state, sc_w))
+	CDP1802(config, m_cdp1802, cdp1869_device::DOT_CLK_PAL);
+	m_cdp1802->set_addrmap(AS_PROGRAM, &pecom_state::pecom64_mem);
+	m_cdp1802->set_addrmap(AS_IO, &pecom_state::pecom64_io);
+	m_cdp1802->wait_cb().set_constant(1);
+	m_cdp1802->clear_cb().set(FUNC(pecom_state::clear_r));
+	m_cdp1802->ef2_cb().set(FUNC(pecom_state::ef2_r));
+	m_cdp1802->q_cb().set(FUNC(pecom_state::q_w));
+	m_cdp1802->sc_cb().set(FUNC(pecom_state::sc_w));
 
 	// sound and video hardware
 	pecom_video(config);
 
 	// devices
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("pecom_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("pecom_cass");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list","pecom_cass")
+	SOFTWARE_LIST(config, "cass_list").set_original("pecom_cass");
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0x00)
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
+}
 
 /* ROM definition */
 ROM_START( pecom32 )

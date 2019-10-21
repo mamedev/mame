@@ -27,7 +27,8 @@ public:
 		m_usb(*this, "usbsnd"),
 		m_aysnd(*this, "aysnd"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"){ }
+		m_screen(*this, "screen")
+	{ }
 
 	void g80v_base(machine_config &config);
 	void tacscan(machine_config &config);
@@ -44,7 +45,7 @@ public:
 	void init_spacfury();
 
 	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
-	DECLARE_CUSTOM_INPUT_MEMBER(elim4_joint_coin_r);
+	DECLARE_READ_LINE_MEMBER(elim4_joint_coin_r);
 
 private:
 	required_shared_ptr<uint8_t> m_mainram;

@@ -19,7 +19,7 @@
 		<publisher>Atari</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Wilmunder_Star_Raiders_II_8-2.atr" size="92176" crc="fd4e3401" sha1="90a53c361bb3a89f6c5db93b0441d04feccc6d90" offset="0" />
+				<rom name="Wilmunder_Star_Raiders_II_8-2.atr" size="92176" crc="fd4e3401" sha1="90a53c361bb3a89f6c5db93b0441d04feccc6d90"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>Don't Ask</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="sam.atr" size="92176" crc="a5895d13" sha1="da2118f26dd46b0435ba6a486f17069734bad812" offset="0" />
+				<rom name="sam.atr" size="92176" crc="a5895d13" sha1="da2118f26dd46b0435ba6a486f17069734bad812"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,17 +41,17 @@
 		<publisher>Sierra On-Line</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Ulysses And The Golden Fleece [Rel. 1] [Side A].atr" size="92176" crc="e16b8dc8" sha1="4e55312b5259c96138f48703fcaa58a6edd0d922" offset="0" />
+				<rom name="Ulysses And The Golden Fleece [Rel. 1] [Side A].atr" size="92176" crc="e16b8dc8" sha1="4e55312b5259c96138f48703fcaa58a6edd0d922"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Ulysses And The Golden Fleece [Side B].atr" size="92176" crc="40915a46" sha1="a0c539aba57f93a44e23fd20bf444b0ae59c582c" offset="0" />
+				<rom name="Ulysses And The Golden Fleece [Side B].atr" size="92176" crc="40915a46" sha1="a0c539aba57f93a44e23fd20bf444b0ae59c582c"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Ulysses And The Golden Fleece [Side C].atr" size="92176" crc="525a47fb" sha1="6afd6d46af274d96a3cce97dfb4ec7776fe47a6b" offset="0" />
+				<rom name="Ulysses And The Golden Fleece [Side C].atr" size="92176" crc="525a47fb" sha1="6afd6d46af274d96a3cce97dfb4ec7776fe47a6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -62,7 +62,7 @@
 		<publisher>Tynesoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Tagalon.ATR" size="92176" crc="f1d7bc3b" sha1="ced50da056a9fc208b613dbf1a51c0053ec251d1" offset="0" />
+				<rom name="Tagalon.ATR" size="92176" crc="f1d7bc3b" sha1="ced50da056a9fc208b613dbf1a51c0053ec251d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -73,7 +73,7 @@
 		<publisher>Mastertronic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Ninja (v1).atr" size="92176" crc="54c732ed" sha1="8cd6d106904d62bb417acc0c58928dc40e10c462" offset="0" />
+				<rom name="Ninja (v1).atr" size="92176" crc="54c732ed" sha1="8cd6d106904d62bb417acc0c58928dc40e10c462"/>
 			</dataarea>
 		</part>
 	</software>
@@ -84,7 +84,7 @@
 		<publisher>Synapse</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Countdown.atr" size="92176" crc="0471796a" sha1="d02b8ad67b2f1f27b340e6fa94aa0c9bc03d2ad7" offset="0" />
+				<rom name="Countdown.atr" size="92176" crc="0471796a" sha1="d02b8ad67b2f1f27b340e6fa94aa0c9bc03d2ad7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@
 		<publisher>Microprose</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Silent Service.atr" size="92176" crc="bda9ac46" sha1="312c76e40f0941749e3909afd4a7d7a83f398210" offset="0" />
+				<rom name="Silent Service.atr" size="92176" crc="bda9ac46" sha1="312c76e40f0941749e3909afd4a7d7a83f398210"/>
 			</dataarea>
 		</part>
 	</software>
@@ -106,7 +106,7 @@
 		<publisher>Epyx</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Temple of Apshai Trilogy (The).atr" size="92176" crc="a5cdca88" sha1="e9955303ba855beeafb0e5bf9b5b683d0fbb8701" offset="0" />
+				<rom name="Temple of Apshai Trilogy (The).atr" size="92176" crc="a5cdca88" sha1="e9955303ba855beeafb0e5bf9b5b683d0fbb8701"/>
 			</dataarea>
 		</part>
 	</software>
@@ -117,7 +117,7 @@
 		<publisher>Synapse</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Necromancer (v3).atr" size="92176" crc="e88a29c6" sha1="2445a652bb2980b7def4b189718332997f9fa584" offset="0" />
+				<rom name="Necromancer (v3).atr" size="92176" crc="e88a29c6" sha1="2445a652bb2980b7def4b189718332997f9fa584"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,7 +128,7 @@
 		<publisher>Synapse</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Shamus - Case II.atr" size="92176" crc="2b6696c6" sha1="f3079c19f54ae5dc6fc9de6ca80341e9a2527c05" offset="0" />
+				<rom name="Shamus - Case II.atr" size="92176" crc="2b6696c6" sha1="f3079c19f54ae5dc6fc9de6ca80341e9a2527c05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@
 		<publisher>Epyx</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="133136">
-				<rom name="World Karate Championship (v4).atr" size="133136" crc="a89bf1e6" sha1="97fbaf575d9f9ddbecd1528c7d5090d2fdac6f3e" offset="0" />
+				<rom name="World Karate Championship (v4).atr" size="133136" crc="a89bf1e6" sha1="97fbaf575d9f9ddbecd1528c7d5090d2fdac6f3e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -150,7 +150,7 @@
 		<publisher>Broderbund</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Lode Runner (1983)(Broderbund).atr" size="92176" crc="3a6f19ae" sha1="1add070c088b73488fb83e815294cd1d0e38e039" offset="0" />
+				<rom name="Lode Runner (1983)(Broderbund).atr" size="92176" crc="3a6f19ae" sha1="1add070c088b73488fb83e815294cd1d0e38e039"/>
 			</dataarea>
 		</part>
 	</software>
@@ -161,7 +161,7 @@
 		<publisher>Broderbund</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Championship Lode Runner.atr" size="92176" crc="53e02689" sha1="dc92e8616fa2e00432b388df97d508c1a0b6db3c" offset="0" />
+				<rom name="Championship Lode Runner.atr" size="92176" crc="53e02689" sha1="dc92e8616fa2e00432b388df97d508c1a0b6db3c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@
 		<publisher>Antic</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Mars Mission II.atr" size="92176" crc="59694595" sha1="4b2ad8bdcbbd4c8f5aef154e55bf4950b15798f3" offset="0" />
+				<rom name="Mars Mission II.atr" size="92176" crc="59694595" sha1="4b2ad8bdcbbd4c8f5aef154e55bf4950b15798f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -183,7 +183,7 @@
 		<publisher>Cosmi</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Caverns of Khafka.atr" size="92176" crc="587862ff" sha1="53ec7aa10e7f7231b4cc7d194b21fda735135263" offset="0" />
+				<rom name="Caverns of Khafka.atr" size="92176" crc="587862ff" sha1="53ec7aa10e7f7231b4cc7d194b21fda735135263"/>
 			</dataarea>
 		</part>
 	</software>
@@ -194,7 +194,7 @@
 		<publisher>Datasoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Bruce Lee (v1).atr" size="92176" crc="5870eb7f" sha1="789b4c0ce4ade89559179999751a29f250325787" offset="0" />
+				<rom name="Bruce Lee (v1).atr" size="92176" crc="5870eb7f" sha1="789b4c0ce4ade89559179999751a29f250325787"/>
 			</dataarea>
 		</part>
 	</software>
@@ -205,7 +205,7 @@
 		<publisher>First Star</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Boulder Dash II (v4).atr" size="92176" crc="1145500d" sha1="6cbbe6c497f6462b1e3aabaa72a91ce5daa35fb6" offset="0" />
+				<rom name="Boulder Dash II (v4).atr" size="92176" crc="1145500d" sha1="6cbbe6c497f6462b1e3aabaa72a91ce5daa35fb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -216,7 +216,7 @@
 		<publisher>Synapse</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65552">
-				<rom name="Blue Max 2001.atr" size="65552" crc="e8fb6d8f" sha1="2b3fe701ea1a7d4660d5d6d403228fbabf4cc711" offset="0" />
+				<rom name="Blue Max 2001.atr" size="65552" crc="e8fb6d8f" sha1="2b3fe701ea1a7d4660d5d6d403228fbabf4cc711"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,7 +227,7 @@
 		<publisher>Cosmi</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="13584">
-				<rom name="Aztec Challenge.atr" size="13584" crc="ea4be8e7" sha1="bd9362aa4023a54a35ef2c3f3c7100523100820b" offset="0" />
+				<rom name="Aztec Challenge.atr" size="13584" crc="ea4be8e7" sha1="bd9362aa4023a54a35ef2c3f3c7100523100820b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -238,7 +238,7 @@
 		<publisher>First Star</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Spy Vs Spy (1984)(First Star).atr" size="92176" crc="91940f40" sha1="d57d8ecbb0b14987c8fc64b27fe1511779c62f4d" offset="0" />
+				<rom name="Spy Vs Spy (1984)(First Star).atr" size="92176" crc="91940f40" sha1="d57d8ecbb0b14987c8fc64b27fe1511779c62f4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 		<publisher>First Star</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Spy Vs Spy - Arctic Antics (1987)(First Star).atr" size="92176" crc="0bd44669" sha1="e6fe39584e5facc62116c7c4f5952e4d5046323a" offset="0" />
+				<rom name="Spy Vs Spy - Arctic Antics (1987)(First Star).atr" size="92176" crc="0bd44669" sha1="e6fe39584e5facc62116c7c4f5952e4d5046323a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -260,7 +260,7 @@
 		<publisher>First Star Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Spy Vs Spy - The Island Caper (1985)(First Star).atr" size="92176" crc="7ac8a99a" sha1="ce4241641a3d0981beaa766f01bf0093552c70de" offset="0" />
+				<rom name="Spy Vs Spy - The Island Caper (1985)(First Star).atr" size="92176" crc="7ac8a99a" sha1="ce4241641a3d0981beaa766f01bf0093552c70de"/>
 			</dataarea>
 		</part>
 	</software>
@@ -271,7 +271,7 @@
 		<publisher>Parker Brothers</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="Montezuma's Revenge _ Parker Brothers.atr" size="92176" crc="3ec0b7e2" sha1="3535dfc1cf25f59c8bdc050689bb89877fef9da0" offset="0" />
+				<rom name="Montezuma's Revenge _ Parker Brothers.atr" size="92176" crc="3ec0b7e2" sha1="3535dfc1cf25f59c8bdc050689bb89877fef9da0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -282,7 +282,7 @@
 		<publisher>Utopia Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="34960">
-				<rom name="Montezuma's Revenge!.atr" size="34960" crc="fd7387dd" sha1="563832104dd0658d09411b24cc0c251be5041d33" offset="0" />
+				<rom name="Montezuma's Revenge!.atr" size="34960" crc="fd7387dd" sha1="563832104dd0658d09411b24cc0c251be5041d33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +294,7 @@
 		<publisher>Datamost</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="mr robot and his robot factory.atr" size="92176" crc="36f3bdb0" sha1="8bb1f04783e883bb20aec5b83e3493632d9dd0bd" offset="0" />
+				<rom name="mr robot and his robot factory.atr" size="92176" crc="36f3bdb0" sha1="8bb1f04783e883bb20aec5b83e3493632d9dd0bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +305,7 @@
 		<publisher>Muse Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="castle wolfenstein.atr" size="92176" crc="7745cd05" sha1="03ba4218d20f260f3e17c7ce540c952cd071bdf5" offset="0" />
+				<rom name="castle wolfenstein.atr" size="92176" crc="7745cd05" sha1="03ba4218d20f260f3e17c7ce540c952cd071bdf5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -316,7 +316,7 @@
 		<publisher>Muse Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="beyond castle wolfenstein.atr" size="92176" crc="78ef8db7" sha1="a0916bd0dde1b748834411c96cb2ae058b38f3c2" offset="0" />
+				<rom name="beyond castle wolfenstein.atr" size="92176" crc="78ef8db7" sha1="a0916bd0dde1b748834411c96cb2ae058b38f3c2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -327,7 +327,7 @@
 		<publisher>Synapse</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="27024">
-				<rom name="quasmodo.atr" size="27024" crc="0a2e0469" sha1="ae973c2b8f7863ce7b519a2a4dd689ad1a4b20a3" offset="0" />
+				<rom name="quasmodo.atr" size="27024" crc="0a2e0469" sha1="ae973c2b8f7863ce7b519a2a4dd689ad1a4b20a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@
 		<publisher>Datasoft</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="zorro.atr" size="92176" crc="df552763" sha1="c219f6eb373df61e620b40d19aef66f8f03e7356" offset="0" />
+				<rom name="zorro.atr" size="92176" crc="df552763" sha1="c219f6eb373df61e620b40d19aef66f8f03e7356"/>
 			</dataarea>
 		</part>
 	</software>
@@ -349,7 +349,7 @@
 		<publisher>Synapse</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="65552">
-				<rom name="alleycat.atr" size="65552" crc="12e2eb0d" sha1="a99e131f024e5df10316860b6d174a16aadc8651" offset="0" />
+				<rom name="alleycat.atr" size="65552" crc="12e2eb0d" sha1="a99e131f024e5df10316860b6d174a16aadc8651"/>
 			</dataarea>
 		</part>
 	</software>
@@ -360,7 +360,7 @@
 		<publisher>Atari Program Exchange</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="galahad.atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5" offset="0" />
+				<rom name="galahad.atr" size="92176" crc="d575a0bb" sha1="9f03ddbd745919e93113daed1117a59751f22ae5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -371,7 +371,7 @@
 		<publisher>Epyx</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="jumpman.atr" size="92176" crc="290a9e56" sha1="96c411a65cfd0b45ac68603021793701d27244b9" offset="0" />
+				<rom name="jumpman.atr" size="92176" crc="290a9e56" sha1="96c411a65cfd0b45ac68603021793701d27244b9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -385,7 +385,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92160">
-				<rom name="elektraglide.xfd" size="92160" crc="96185b1c" sha1="fb9825a432b83a2a7e623a2f617d0fa11de08158" offset="0" />
+				<rom name="elektraglide.xfd" size="92160" crc="96185b1c" sha1="fb9825a432b83a2a7e623a2f617d0fa11de08158"/>
 			</dataarea>
 		</part>
 	</software>
@@ -399,7 +399,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92160">
-				<rom name="koalapainter.xfd" size="92160" crc="f1447be4" sha1="834d906748f9f4f089912289ab592cf091456d49" offset="0" />
+				<rom name="koalapainter.xfd" size="92160" crc="f1447be4" sha1="834d906748f9f4f089912289ab592cf091456d49"/>
 			</dataarea>
 		</part>
 	</software>
@@ -411,7 +411,7 @@
 		<sharedfeat name="requirement" value="a800:basicb"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="b-1 nuclear bomber (1981)(avalon hill)(us)[!][basic].atr" size="92176" crc="1d4a3876" sha1="aba9f4e932cf0d15d9752b385e016c795c8411ba" offset="0" />  <!-- Verified -->
+				<rom name="b-1 nuclear bomber (1981)(avalon hill)(us)[!][basic].atr" size="92176" crc="1d4a3876" sha1="aba9f4e932cf0d15d9752b385e016c795c8411ba"/>  <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -424,7 +424,7 @@
 		<sharedfeat name="requirement" value="a800:basicb"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="crush, crumble and chomp! (1981)(epyx)(us)[!][basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6" offset="0" /> <!-- Verified -->
+				<rom name="crush, crumble and chomp! (1981)(epyx)(us)[!][basic][os-b].atr" size="92176" crc="419fce77" sha1="513ff8617ebf45e95d19a1ec9e067d1a3121ecf6"/> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +437,7 @@
 		<part name="flop1" interface="floppy_5_25">
 		<!-- Adds 10 more BASIC commands that could not fit on the cartridge. -->
 			<dataarea name="flop" size="92176">
-				<rom name="microsoft basic ii extension disk.atr" size="92176" crc="9d6c44ea" sha1="8f305bf916fc6df9cf469a413686de8933ac36e8" offset="0" />
+				<rom name="microsoft basic ii extension disk.atr" size="92176" crc="9d6c44ea" sha1="8f305bf916fc6df9cf469a413686de8933ac36e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -451,7 +451,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<!-- Adds BASIC commands for Player/Missile graphics control. -->
 			<dataarea name="flop" size="92176">
-				<rom name="basic xe v4.1 extension disk.atr" size="92176" crc="e1c6d065" sha1="8749107e28cfa7add26a5628562c708fa62e0ce0" offset="0" />
+				<rom name="basic xe v4.1 extension disk.atr" size="92176" crc="e1c6d065" sha1="8749107e28cfa7add26a5628562c708fa62e0ce0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -463,12 +463,12 @@
 		<sharedfeat name="requirement" value="a800:writerd"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="writer's tool.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64" offset="0" />
+				<rom name="writer's tool.atr" size="92176" crc="5a6e2133" sha1="c6d4c49fb53a41b28634b209176c74ed86fbfc64"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="92176">
-				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9" offset="0" />
+				<rom name="writer's tool dictionary.atr" size="92176" crc="18c875b0" sha1="7c727bcc488892dfd83cfbc09b3e1e642d1beff9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +481,7 @@
 		<sharedfeat name="requirement" value="a800:spectra2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="183952">
-				<rom name="spectraview-ii demo disk.atr" size="183952" crc="50b3fb52" sha1="d3bc5b6bb03ad648b79ebb536dba4af4af078bdc" offset="0" />
+				<rom name="spectraview-ii demo disk.atr" size="183952" crc="50b3fb52" sha1="d3bc5b6bb03ad648b79ebb536dba4af4af078bdc"/>
 			</dataarea>
 		</part>
 	</software>

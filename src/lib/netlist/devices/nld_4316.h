@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 /*
- * nld_4136.h
+ * nld_4316.h
  *
  *  CD4066: Quad Analog Switch with Level Translation
  *
@@ -25,7 +25,7 @@
 #ifndef NLD_4316_H_
 #define NLD_4316_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define CD4316_GATE(name)                                                       \
 		NET_REGISTER_DEV(CD4316_GATE, name)

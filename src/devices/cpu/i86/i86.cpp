@@ -88,8 +88,8 @@ const uint8_t i8086_cpu_device::m_i8086_timing[] =
 
 /***************************************************************************/
 
-DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel I8086")
-DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel I8088")
+DEFINE_DEVICE_TYPE(I8086, i8086_cpu_device, "i8086", "Intel 8086")
+DEFINE_DEVICE_TYPE(I8088, i8088_cpu_device, "i8088", "Intel 8088")
 
 i8088_cpu_device::i8088_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i8086_cpu_device(mconfig, I8088, tag, owner, clock, 8)
@@ -317,7 +317,7 @@ void i8086_cpu_device::execute_run()
 			case 0xdd:
 			case 0xde:
 			case 0xdf:
-				m_esc_opcode_handler(m_pc - 1);
+				m_esc_opcode_handler(m_pc);
 				m_modrm = fetch();
 				if(m_modrm < 0xc0)
 					m_esc_data_handler(get_ea(1, I8086_READ));
@@ -2437,6 +2437,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 
 		case 0xfb: // i_sti
 			m_IF = 1;
+			m_no_interrupt = 1;
 			CLK(FLAG_OPS);
 			break;
 

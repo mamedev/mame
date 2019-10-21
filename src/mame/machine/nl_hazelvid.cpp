@@ -20,6 +20,10 @@ NETLIST_START(hazelvid)
 	PARAM(NETLIST.USE_DEACTIVATE, 1)
 
 	ANALOG_INPUT(V5, 5)
+	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!
+
+	ALIAS(VSS, V5)  // CMOS/MOS default +
+	ALIAS(VDD, GND) // CMOS/MOS default -
 
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)

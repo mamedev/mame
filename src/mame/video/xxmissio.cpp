@@ -77,37 +77,34 @@ void xxmissio_state::video_start()
 	save_item(NAME(m_flipscreen));
 }
 
-PALETTE_DECODER_MEMBER( xxmissio_state, BBGGRRII )
+rgb_t xxmissio_state::BBGGRRII(uint32_t raw)
 {
-	uint8_t i = raw & 3;
-	uint8_t r = (raw >> 0) & 0x0c;
-	uint8_t g = (raw >> 2) & 0x0c;
-	uint8_t b = (raw >> 4) & 0x0c;
+	uint8_t const i = raw & 3;
+	uint8_t const r = ((raw >> 0) & 0x0c) | i;
+	uint8_t const g = ((raw >> 2) & 0x0c) | i;
+	uint8_t const b = ((raw >> 4) & 0x0c) | i;
 
-	return rgb_t(pal4bit(r | i), pal4bit(g | i), pal4bit(b | i));
+	return rgb_t(r | (r << 4), g | (g << 4), b | (b << 4));
 }
 
 void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
 {
-	int offs;
-	int chr,col;
-	int x,y,px,py,fx,fy;
-
-	for (offs=0; offs<0x800; offs +=0x20)
+	for (int offs = 0; offs < 0x800; offs += 0x20)
 	{
-		chr = m_spriteram[offs];
-		col = m_spriteram[offs+3];
+		int chr = m_spriteram[offs];
+		int col = m_spriteram[offs+3];
 
-		fx = ((col & 0x10) >> 4) ^ m_flipscreen;
-		fy = ((col & 0x20) >> 5) ^ m_flipscreen;
+		int const fx = BIT(col, 4) ^ m_flipscreen;
+		int const fy = BIT(col, 5) ^ m_flipscreen;
 
-		x = m_spriteram[offs+1]*2;
-		y = m_spriteram[offs+2];
+		int const x = m_spriteram[offs+1]*2;
+		int const y = m_spriteram[offs+2];
 
-		chr = chr + ((col & 0x40) << 2);
-		col = col & 0x07;
+		chr += (col & 0x40) << 2;
+		col &= 0x07;
 
-		if (m_flipscreen==0)
+		int px, py;
+		if (!m_flipscreen)
 		{
 			px = x-8;
 			py = y;
@@ -126,7 +123,7 @@ void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			fx,fy,
 			px,py,0);
 
-		if (px>0x1e0)
+		if (px > 0x1e0)
 			gfx->transpen(bitmap,cliprect,
 				chr,
 				col,

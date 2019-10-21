@@ -65,7 +65,17 @@ class o2_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	o2_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: o2_cart_slot_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+
+	o2_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~o2_cart_slot_device();
 
 	// device-level overrides
@@ -113,10 +123,6 @@ DECLARE_DEVICE_TYPE(O2_CART_SLOT, o2_cart_slot_device)
  ***************************************************************************/
 
 #define O2SLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_O2_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, O2_CART_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 void o2_cart(device_slot_interface &device);
 

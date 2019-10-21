@@ -50,11 +50,12 @@ static void laser_floppies(device_slot_interface &device)
 	device.option_add("525", FLOPPY_525_SSSD);
 }
 
-MACHINE_CONFIG_START(vtech_floppy_controller_device::device_add_mconfig)
-	MCFG_MEMEXP_SLOT_ADD("mem")
-	MCFG_FLOPPY_DRIVE_ADD("0", laser_floppies, "525", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("1", laser_floppies, "525", floppy_image_device::default_floppy_formats)
-MACHINE_CONFIG_END
+void vtech_floppy_controller_device::device_add_mconfig(machine_config &config)
+{
+	VTECH_MEMEXP_SLOT(config, m_memexp);
+	FLOPPY_CONNECTOR(config, m_floppy0, laser_floppies, "525", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, laser_floppies, "525", floppy_image_device::default_floppy_formats);
+}
 
 
 //**************************************************************************
@@ -106,9 +107,6 @@ void vtech_floppy_controller_device::device_start()
 
 void vtech_floppy_controller_device::device_reset()
 {
-	m_memexp->set_io_space(&io_space());
-	m_memexp->set_program_space(&program_space());
-
 	program_space().install_rom(0x4000, 0x5fff, memregion("software")->base());
 
 	io_space().install_device(0x10, 0x1f, *this, &vtech_floppy_controller_device::map);

@@ -203,42 +203,42 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(toobin_state::toobin)
-
+void toobin_state::toobin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68010(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &toobin_state::main_map);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, "watchdog").set_vblank_count(m_screen, 8);
 
 	/* video hardware */
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 4, toobin_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 128,64)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, toobin_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,48, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", toobin_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 4, 8,8, TILEMAP_SCAN_ROWS, 128,64).set_info_callback(FUNC(toobin_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64,48, 0).set_info_callback(FUNC(toobin_state::get_alpha_tile_info));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384)
-	MCFG_SCREEN_UPDATE_DRIVER(toobin_state, screen_update)
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, toobin_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_toobin)
-	MCFG_PALETTE_ADD("palette", 1024)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
+	m_screen->set_raw(MASTER_CLOCK/2, 640, 0, 512, 416, 0, 384);
+	m_screen->set_screen_update(FUNC(toobin_state::screen_update));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_toobin);
+	PALETTE(config, m_palette).set_entries(1024);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", WRITELINE(*this, toobin_state, sound_int_write_line))
-	MCFG_ATARI_JSA_TEST_PORT("FF9000", 12)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:tms")
-MACHINE_CONFIG_END
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set(FUNC(toobin_state::sound_int_write_line));
+	m_jsa->test_read_cb().set_ioport("FF9000").bit(12);
+	m_jsa->add_route(0, "lspeaker", 1.0);
+	m_jsa->add_route(1, "rspeaker", 1.0);
+	config.device_remove("jsa:tms");
+}
 
 
 

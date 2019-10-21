@@ -11,6 +11,7 @@
 
 #include "imagedev/harddriv.h"
 #include "machine/idectrl.h"
+#include "sound/cdda.h"
 #include "speaker.h"
 
 
@@ -48,9 +49,9 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 
 void isa16_ide_device::cdrom_headphones(device_t *device)
 {
-	device = device->subdevice("cdda");
-	MCFG_SOUND_ROUTE(0, "^^lheadphone", 1.0)
-	MCFG_SOUND_ROUTE(1, "^^rheadphone", 1.0)
+	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "^^lheadphone", 1.0);
+	cdda->add_route(1, "^^rheadphone", 1.0);
 }
 
 static INPUT_PORTS_START( ide )
@@ -70,18 +71,17 @@ DEFINE_DEVICE_TYPE(ISA16_IDE, isa16_ide_device, "isa_ide", "IDE Fixed Drive Adap
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(isa16_ide_device::device_add_mconfig)
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, isa16_ide_device, ide_interrupt))
+void isa16_ide_device::device_add_mconfig(machine_config &config)
+{
+	IDE_CONTROLLER(config, m_ide).options(ata_devices, "hdd", nullptr, false);
+	m_ide->irq_handler().set(FUNC(isa16_ide_device::ide_interrupt));
 
 	SPEAKER(config, "lheadphone").front_left();
 	SPEAKER(config, "rheadphone").front_right();
 
-	MCFG_DEVICE_MODIFY("ide:0")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
-	MCFG_DEVICE_MODIFY("ide:1")
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
-MACHINE_CONFIG_END
+	m_ide->slot(0).set_option_machine_config("cdrom", cdrom_headphones);
+	m_ide->slot(1).set_option_machine_config("cdrom", cdrom_headphones);
+}
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports

@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
@@ -42,7 +43,7 @@ public:
 
 	void init_altos5();
 
-	DECLARE_QUICKLOAD_LOAD_MEMBER(altos5);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 private:
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -69,7 +70,7 @@ private:
 	uint8_t convert(offs_t offset, bool state);
 	void setup_banks(uint8_t source);
 	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80pio_device> m_pio0;
 	required_device<z80dma_device> m_dma;
 	required_device<fd1797_device> m_fdc;
@@ -109,7 +110,7 @@ void altos5_state::io_map(address_map &map)
 	map(0x10, 0x13).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).w(FUNC(altos5_state::port14_w));
 	map(0x1c, 0x1f).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	//AM_RANGE(0x20, 0x23) // Hard drive
+	//map(0x20, 0x23) // Hard drive
 	map(0x2c, 0x2f).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
 
@@ -320,7 +321,7 @@ WRITE8_MEMBER( altos5_state::port09_w )
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( altos5_state, altos5 )
+QUICKLOAD_LOAD_MEMBER(altos5_state::quickload_cb)
 {
 	address_space& prog_space = m_maincpu->space(AS_PROGRAM);
 
@@ -408,54 +409,53 @@ void altos5_state::init_altos5()
 	membank("bankwf")->configure_entries(0, 50, &RAM[0], 0x1000);
 }
 
-MACHINE_CONFIG_START(altos5_state::altos5)
+void altos5_state::altos5(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 8_MHz_XTAL / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
-
-	clock_device &ctc_clock(CLOCK(config, "ctc_clock", 8_MHz_XTAL / 4)); // 2MHz
-	ctc_clock.signal_handler().set("ctc", FUNC(z80ctc_device::trg0));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg1));
-	ctc_clock.signal_handler().append("ctc", FUNC(z80ctc_device::trg2));
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &altos5_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &altos5_state::io_map);
+	m_maincpu->set_daisy_config(daisy_chain_intf);
 
 	/* devices */
-	MCFG_DEVICE_ADD("dma", Z80DMA, 8_MHz_XTAL / 2)
-	MCFG_Z80DMA_OUT_BUSREQ_CB(WRITELINE(*this, altos5_state, busreq_w))
-	MCFG_Z80DMA_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80DMA(config, m_dma, 8_MHz_XTAL / 2);
+	m_dma->out_busreq_callback().set(FUNC(altos5_state::busreq_w));
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	// BAO, not used
-	MCFG_Z80DMA_IN_MREQ_CB(READ8(*this, altos5_state, memory_read_byte))
-	MCFG_Z80DMA_OUT_MREQ_CB(WRITE8(*this, altos5_state, memory_write_byte))
-	MCFG_Z80DMA_IN_IORQ_CB(READ8(*this, altos5_state, io_read_byte))
-	MCFG_Z80DMA_OUT_IORQ_CB(WRITE8(*this, altos5_state, io_write_byte))
+	m_dma->in_mreq_callback().set(FUNC(altos5_state::memory_read_byte));
+	m_dma->out_mreq_callback().set(FUNC(altos5_state::memory_write_byte));
+	m_dma->in_iorq_callback().set(FUNC(altos5_state::io_read_byte));
+	m_dma->out_iorq_callback().set(FUNC(altos5_state::io_write_byte));
 
-	MCFG_DEVICE_ADD("pio0", Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PA_CB(READ8(*this, altos5_state, port08_r))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, altos5_state, port08_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, altos5_state, port09_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, altos5_state, port09_w))
+	Z80PIO(config, m_pio0, 8_MHz_XTAL / 2);
+	m_pio0->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio0->in_pa_callback().set(FUNC(altos5_state::port08_r));
+	m_pio0->out_pa_callback().set(FUNC(altos5_state::port08_w));
+	m_pio0->in_pb_callback().set(FUNC(altos5_state::port09_r));
+	m_pio0->out_pb_callback().set(FUNC(altos5_state::port09_w));
 
-	MCFG_DEVICE_ADD("pio1", Z80PIO, 8_MHz_XTAL / 2)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	z80pio_device& pio1(Z80PIO(config, "pio1", 8_MHz_XTAL / 2));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("dart", Z80DART, 8_MHz_XTAL / 2)
+	z80dart_device& dart(Z80DART(config, "dart", 8_MHz_XTAL / 2));
 	// Channel A - console #3
 	// Channel B - printer
-	MCFG_Z80DART_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	MCFG_DEVICE_ADD("sio", Z80SIO, 8_MHz_XTAL / 2)
+	z80sio_device& sio(Z80SIO(config, "sio", 8_MHz_XTAL / 2));
 	// Channel A - console #2
 	// WRDY connects to (altos5_state, fdc_intrq_w)
 	// Channel B - console #1
-	MCFG_Z80SIO_OUT_TXDB_CB(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_Z80SIO_OUT_DTRB_CB(WRITELINE("rs232", rs232_port_device, write_dtr))
-	MCFG_Z80SIO_OUT_RTSB_CB(WRITELINE("rs232", rs232_port_device, write_rts))
-	MCFG_Z80SIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	sio.out_txdb_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	sio.out_dtrb_callback().set("rs232", FUNC(rs232_port_device::write_dtr));
+	sio.out_rtsb_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	sio.out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
 	z80ctc_device &ctc(Z80CTC(config, "ctc", 8_MHz_XTAL / 2));
 	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.set_clk<0>(8_MHz_XTAL / 4); // 2MHz
+	ctc.set_clk<1>(8_MHz_XTAL / 4); // 2MHz
+	ctc.set_clk<2>(8_MHz_XTAL / 4); // 2MHz
 	ctc.zc_callback<0>().set("sio", FUNC(z80sio_device::rxtxcb_w));    // SIO Ch B
 	ctc.zc_callback<1>().set("dart", FUNC(z80dart_device::txca_w));    // Z80DART Ch A, SIO Ch A
 	ctc.zc_callback<1>().append("dart", FUNC(z80dart_device::rxca_w));
@@ -463,22 +463,20 @@ MACHINE_CONFIG_START(altos5_state::altos5)
 	ctc.zc_callback<1>().append("sio", FUNC(z80sio_device::rxca_w));
 	ctc.zc_callback<2>().set("dart", FUNC(z80dart_device::rxtxcb_w));  // Z80DART Ch B
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("sio", z80sio_device, rxb_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("sio", z80sio_device, dcdb_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("sio", z80sio_device, ctsb_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("sio", FUNC(z80sio_device::rxb_w));
+	rs232.dcd_handler().set("sio", FUNC(z80sio_device::dcdb_w));
+	rs232.cts_handler().set("sio", FUNC(z80sio_device::ctsb_w));
 
-	MCFG_DEVICE_ADD("fdc", FD1797, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, altos5_state, fdc_intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("dma", z80dma_device, rdy_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FD1797(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(altos5_state::fdc_intrq_w));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "altos5")
-	MCFG_QUICKLOAD_ADD("quickload", altos5_state, altos5, "com,cpm", 3)
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("altos5");
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(altos5_state::quickload_cb), this);
+}
 
 
 /* ROM definition */

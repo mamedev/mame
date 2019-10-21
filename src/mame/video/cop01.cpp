@@ -12,43 +12,41 @@
 #include "includes/cop01.h"
 
 
-PALETTE_INIT_MEMBER(cop01_state, cop01)
+void cop01_state::cop01_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		int const r = pal4bit(color_prom[i + 0x000]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* characters use colors 0x00-0x0f (or 0x00-0x7f, but the eight rows are identical) */
-	for (i = 0; i < 0x10; i++)
+	// characters use colors 0x00-0x0f (or 0x00-0x7f, but the eight rows are identical)
+	for (int i = 0; i < 0x10; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* background tiles use colors 0xc0-0xff */
-	/* I don't know how much of the lookup table PROM is hooked up, */
-	/* I'm only using the first 32 bytes because the rest is empty. */
-	for (i = 0x10; i < 0x90; i++)
+	// background tiles use colors 0xc0-0xff
+	// I don't know how much of the lookup table PROM is hooked up,
+	// I'm only using the first 32 bytes because the rest is empty.
+	for (int i = 0; i < 0x80; i++)
 	{
-		uint8_t ctabentry = 0xc0 | ((i - 0x10) & 0x30) |
-							(color_prom[(((i - 0x10) & 0x40) >> 2) | ((i - 0x10) & 0x0f)] & 0x0f);
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t const ctabentry = 0xc0 | (i & 0x30) | (color_prom[((i & 0x40) >> 2) | (i & 0x0f)] & 0x0f);
+		palette.set_pen_indirect(i + 0x10, ctabentry);
 	}
 
-	/* sprites use colors 0x80-0x8f (or 0x80-0xbf, but the four rows are identical) */
-	for (i = 0x90; i < 0x190; i++)
+	// sprites use colors 0x80-0x8f (or 0x80-0xbf, but the four rows are identical)
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = 0x80 | (color_prom[i - 0x90 + 0x100] & 0x0f);
-		palette.set_pen_indirect(i, ctabentry);
+		uint8_t ctabentry = 0x80 | (color_prom[i + 0x100] & 0x0f);
+		palette.set_pen_indirect(i + 0x90, ctabentry);
 	}
 }
 

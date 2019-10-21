@@ -475,7 +475,7 @@ void softlist_parser::parse_root_start(const char *tagname, const char **attribu
 	// <softwarelist name='' description=''>
 	if (strcmp(tagname, "softwarelist") == 0)
 	{
-		static const char *attrnames[] = { "name", "description" };
+		static char const *const attrnames[] = { "name", "description" };
 		const auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[1].empty())
@@ -496,7 +496,7 @@ void softlist_parser::parse_main_start(const char *tagname, const char **attribu
 	// <software name='' cloneof='' supported=''>
 	if (strcmp(tagname, "software") == 0)
 	{
-		static const char *attrnames[] = { "name", "cloneof", "supported" };
+		static char const *const attrnames[] = { "name", "cloneof", "supported" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty())
@@ -563,7 +563,7 @@ void softlist_parser::parse_soft_start(const char *tagname, const char **attribu
 	// <part name='' interface=''>
 	else if (strcmp(tagname, "part" ) == 0)
 	{
-		static const char *attrnames[] = { "name", "interface" };
+		static char const *const attrnames[] = { "name", "interface" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
@@ -596,7 +596,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	// <dataarea name='' size=''>
 	if (strcmp(tagname, "dataarea") == 0)
 	{
-		static const char *attrnames[] = { "name", "size", "width", "endianness" };
+		static char const *const attrnames[] = { "name", "size", "width", "endianness" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty() && !attrvalues[1].empty())
@@ -638,7 +638,7 @@ void softlist_parser::parse_part_start(const char *tagname, const char **attribu
 	// <diskarea name=''>
 	else if (strcmp(tagname, "diskarea") == 0)
 	{
-		static const char *attrnames[] = { "name" };
+		static char const *const attrnames[] = { "name" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		if (!attrvalues[0].empty())
@@ -683,7 +683,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 	// <rom name='' size='' crc='' sha1='' offset='' value='' status='' loadflag=''>
 	if (strcmp(tagname, "rom") == 0)
 	{
-		static const char *attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
+		static char const *const attrnames[] = { "name", "size", "crc", "sha1", "offset", "value", "status", "loadflag" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		std::string &name = attrvalues[0];
@@ -694,10 +694,10 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 		std::string &value = attrvalues[5];
 		const std::string &status = attrvalues[6];
 		const std::string &loadflag = attrvalues[7];
-		if (!sizestr.empty() && !offsetstr.empty())
+		if (!sizestr.empty())
 		{
 			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			u32 offset = strtol(offsetstr.c_str(), nullptr, 0);
+			u32 offset = offsetstr.empty() ? 0 : strtol(offsetstr.c_str(), nullptr, 0);
 
 			if (loadflag == "reload")
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS);
@@ -707,6 +707,8 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 				add_rom_entry("", "", offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS);
 			else if (loadflag == "fill")
 				add_rom_entry("", std::move(value), offset, length, ROMENTRYTYPE_FILL);
+			else if (loadflag == "ignore")
+				add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
 			else if (!name.empty())
 			{
 				bool baddump = (status == "baddump");
@@ -745,11 +747,6 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 			else
 				parse_error("Rom name missing");
 		}
-		else if (!sizestr.empty() && !loadflag.empty() && loadflag == "ignore")
-		{
-			u32 length = strtol(sizestr.c_str(), nullptr, 0);
-			add_rom_entry("", "", 0, length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS);
-		}
 		else
 			parse_error("Incomplete rom definition");
 	}
@@ -757,7 +754,7 @@ void softlist_parser::parse_data_start(const char *tagname, const char **attribu
 	// <rom name='' sha1='' status='' writeable=''>
 	else if (strcmp(tagname, "disk") == 0)
 	{
-		static const char *attrnames[] = { "name", "sha1", "status", "writeable" };
+		static char const *const attrnames[] = { "name", "sha1", "status", "writeable" };
 		auto attrvalues = parse_attributes(attributes, attrnames);
 
 		std::string &name = attrvalues[0];

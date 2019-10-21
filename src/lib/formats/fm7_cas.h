@@ -3,12 +3,13 @@
 /*
  * Fujitsu FM-7 cassette format handling
  */
+#ifndef MAME_FORMATS_FM7_CAS_H
+#define MAME_FORMATS_FM7_CAS_H
 
-#ifndef FM7_CAS_H_
-#define FM7_CAS_H_
+#pragma once
 
 #include "cassimg.h"
 
 CASSETTE_FORMATLIST_EXTERN( fm7_cassette_formats );
 
-#endif /*FM7_CAS_H_*/
+#endif // MAME_FORMATS_FM7_CAS_H

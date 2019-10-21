@@ -220,7 +220,7 @@ void chsuper_state::chsuper_prg_map(address_map &map)
 	map(0xfb000, 0xfbfff).ram().share("nvram");
 }
 
-//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+//  map(0xaff8, 0xaff8).w("oki", FUNC(okim6295_device::write));
 
 void chsuper_state::chsuper_portmap(address_map &map)
 {
@@ -364,37 +364,39 @@ void chsuper_state::ramdac_map(address_map &map)
 *     Machine Drivers      *
 ***************************/
 
-MACHINE_CONFIG_START(chsuper_state::chsuper)
-
+void chsuper_state::chsuper(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z180, XTAL(12'000'000) / 4)   /* HD64180RP8, 8 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(chsuper_prg_map)
-	MCFG_DEVICE_IO_MAP(chsuper_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", chsuper_state,  irq0_line_hold)
+	Z80180(config, m_maincpu, 16_MHz_XTAL); // Z8018006VSC (but can actually take 8 MHz?)
+	m_maincpu->set_addrmap(AS_PROGRAM, &chsuper_state::chsuper_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &chsuper_state::chsuper_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(chsuper_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(chsuper_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(57);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_screen_update(FUNC(chsuper_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 48*8-1, 0, 30*8-1);
+	screen.set_palette(m_palette);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_chsuper)
-	MCFG_PALETTE_ADD("palette", 0x100)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_chsuper);
+	PALETTE(config, m_palette).set_entries(0x100);
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette)); // ADV476KP50
+	ramdac.set_addrmap(0, &chsuper_state::ramdac_map);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // 74HC273 latch + R2R network (unknown values)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 /***************************

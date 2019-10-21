@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// currently used by gstriker.c, apparently inufuku uses the same chip
+// currently used by gstriker.cpp, apparently inufuku uses the same chip
 
 /*** VS920A (score tilemap) **********************************************/
 

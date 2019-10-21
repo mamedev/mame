@@ -2,11 +2,12 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-        BOB85 driver by Miodrag Milanovic
+BOB85 driver by Miodrag Milanovic
 
-        2008-05-24 Preliminary driver.
-        2009-05-12 Skeleton driver.
-        2013-06-02 Working driver.
+2008-05-24 Preliminary driver.
+2009-05-12 Skeleton driver.
+2013-06-02 Working driver.
+2019-07-14 Fixed cassette load - it loads correctly then says EEEE
 
 Pasting:
         0-F : as is
@@ -23,7 +24,9 @@ Test Paste:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/timer.h"
 #include "imagedev/cassette.h"
+#include "speaker.h"
 #include "bob85.lh"
 
 
@@ -41,19 +44,22 @@ public:
 		{ }
 
 	void bob85(machine_config &config);
+
+private:
 	void bob85_io(address_map &map);
 	void bob85_mem(address_map &map);
 	DECLARE_READ8_MEMBER(bob85_keyboard_r);
 	DECLARE_WRITE8_MEMBER(bob85_7seg_w);
 	DECLARE_WRITE_LINE_MEMBER(sod_w);
 	DECLARE_READ_LINE_MEMBER(sid_r);
-
-private:
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_r);
 	uint8_t m_prev_key;
 	uint8_t m_count_key;
+	u16 m_casscnt;
+	bool m_cassold, m_cassbit;
 	virtual void machine_reset() override;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<i8085a_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_ioport m_line0;
 	required_ioport m_line1;
@@ -132,14 +138,6 @@ READ8_MEMBER(bob85_state::bob85_keyboard_r)
 		else
 			return 0;
 	}
-
-	if (retVal == 0)
-	{
-		m_prev_key = 0;
-		m_count_key = 0;
-	}
-
-	return retVal;
 }
 
 WRITE8_MEMBER(bob85_state::bob85_7seg_w)
@@ -197,6 +195,26 @@ void bob85_state::machine_reset()
 {
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER( bob85_state::kansas_r )
+{
+	/* cassette - turn pulses into a bit */
+	bool cass_ws = (m_cass->input() > +0.04) ? 1 : 0;
+	m_casscnt++;
+
+	if (cass_ws != m_cassold)
+	{
+		m_cassold = cass_ws;
+		m_cassbit = (m_casscnt < 12) ? 1 : 0;
+		m_casscnt = 0;
+	}
+	else
+	if (m_casscnt > 32)
+	{
+		m_casscnt = 32;
+		m_cassbit = 0;
+	}
+}
+
 WRITE_LINE_MEMBER( bob85_state::sod_w )
 {
 	m_cass->output(state ? +1.0 : -1.0);
@@ -204,24 +222,28 @@ WRITE_LINE_MEMBER( bob85_state::sod_w )
 
 READ_LINE_MEMBER( bob85_state::sid_r )
 {
-	return m_cass->input() > 0.0;
+	return m_cassbit;
 }
 
-MACHINE_CONFIG_START(bob85_state::bob85)
+void bob85_state::bob85(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8085A, XTAL(5'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(bob85_mem)
-	MCFG_DEVICE_IO_MAP(bob85_io)
-	MCFG_I8085A_SID(READLINE(*this, bob85_state, sid_r))
-	MCFG_I8085A_SOD(WRITELINE(*this, bob85_state, sod_w))
+	I8085A(config, m_maincpu, XTAL(5'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &bob85_state::bob85_mem);
+	m_maincpu->set_addrmap(AS_IO, &bob85_state::bob85_io);
+	m_maincpu->in_sid_func().set(FUNC(bob85_state::sid_r));
+	m_maincpu->out_sod_func().set(FUNC(bob85_state::sod_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_bob85);
 
+	SPEAKER(config, "mono").front_center();
+
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass).set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_r").configure_periodic(FUNC(bob85_state::kansas_r), attotime::from_hz(40000));
+}
 
 /* ROM definition */
 ROM_START( bob85 )

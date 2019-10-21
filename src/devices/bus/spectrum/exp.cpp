@@ -32,15 +32,6 @@ device_spectrum_expansion_interface::device_spectrum_expansion_interface(const m
 }
 
 
-//-------------------------------------------------
-//  ~device_spectrum_expansion_interface - destructor
-//-------------------------------------------------
-
-device_spectrum_expansion_interface::~device_spectrum_expansion_interface()
-{
-}
-
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -55,15 +46,6 @@ spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_con
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
-{
-}
-
-
-//-------------------------------------------------
-//  expansion_slot_device - destructor
-//-------------------------------------------------
-
-spectrum_expansion_slot_device::~spectrum_expansion_slot_device()
 {
 }
 
@@ -104,18 +86,6 @@ void spectrum_expansion_slot_device::device_reset()
 }
 
 //-------------------------------------------------
-//  port_fe_r
-//-------------------------------------------------
-
-READ8_MEMBER(spectrum_expansion_slot_device::port_fe_r)
-{
-	if (m_card)
-		return m_card->port_fe_r(space, offset);
-	else
-		return 0xff;
-}
-
-//-------------------------------------------------
 //  romcs
 //-------------------------------------------------
 
@@ -128,13 +98,63 @@ READ_LINE_MEMBER(spectrum_expansion_slot_device::romcs)
 }
 
 //-------------------------------------------------
+// fetch_r
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::pre_opcode_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->pre_opcode_fetch(offset);
+}
+
+void spectrum_expansion_slot_device::post_opcode_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->post_opcode_fetch(offset);
+}
+
+void spectrum_expansion_slot_device::pre_data_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->pre_data_fetch(offset);
+}
+
+void spectrum_expansion_slot_device::post_data_fetch(offs_t offset)
+{
+	if (m_card)
+		 m_card->post_data_fetch(offset);
+}
+
+//-------------------------------------------------
+//  iorq_r
+//-------------------------------------------------
+
+uint8_t spectrum_expansion_slot_device::iorq_r(offs_t offset)
+{
+	if (m_card)
+		return m_card->iorq_r(offset);
+	else
+		return 0xff;
+}
+
+//-------------------------------------------------
+//  iorq_w
+//-------------------------------------------------
+
+void spectrum_expansion_slot_device::iorq_w(offs_t offset, uint8_t data)
+{
+	if (m_card)
+		m_card->iorq_w(offset, data);
+}
+
+//-------------------------------------------------
 //  mreq_r
 //-------------------------------------------------
 
-READ8_MEMBER(spectrum_expansion_slot_device::mreq_r)
+uint8_t spectrum_expansion_slot_device::mreq_r(offs_t offset)
 {
 	if (m_card)
-		return m_card->mreq_r(space, offset);
+		return m_card->mreq_r(offset);
 	else
 		return 0xff;
 }
@@ -143,10 +163,10 @@ READ8_MEMBER(spectrum_expansion_slot_device::mreq_r)
 //  mreq_w
 //-------------------------------------------------
 
-WRITE8_MEMBER(spectrum_expansion_slot_device::mreq_w)
+void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_card)
-		m_card->mreq_w(space, offset, data);
+		m_card->mreq_w(offset, data);
 }
 
 
@@ -156,44 +176,71 @@ WRITE8_MEMBER(spectrum_expansion_slot_device::mreq_w)
 
 
 // slot devices
+#include "beta.h"
+#include "beta128.h"
+//#include "disciple.h"
 #include "intf1.h"
 #include "intf2.h"
 #include "fuller.h"
 #include "kempjoy.h"
 #include "melodik.h"
+#include "mface.h"
 #include "mikroplus.h"
+#include "opus.h"
 #include "plus2test.h"
+//#include "plusd.h"
 #include "protek.h"
+#include "specdrum.h"
 #include "uslot.h"
 #include "usource.h"
 #include "uspeech.h"
-
+#include "wafa.h"
 
 void spectrum_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("betav2", SPECTRUM_BETAV2);
+	device.option_add("betav3", SPECTRUM_BETAV3);
+	device.option_add("betaplus", SPECTRUM_BETAPLUS);
+	device.option_add("beta128", SPECTRUM_BETA128);
+	//device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
 	device.option_add("intf2", SPECTRUM_INTF2);
 	device.option_add("fuller", SPECTRUM_FULLER);
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
 	device.option_add("melodik", SPECTRUM_MELODIK);
+	device.option_add("mface1", SPECTRUM_MFACE1);
+	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
+	device.option_add("mprint", SPECTRUM_MPRINT);
+	device.option_add("opus", SPECTRUM_OPUS);
+	//device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("specdrum", SPECTRUM_SPECDRUM);
 	device.option_add("uslot", SPECTRUM_USLOT);
 	device.option_add("usource", SPECTRUM_USOURCE);
 	device.option_add("uspeech", SPECTRUM_USPEECH);
+	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 
 void spec128_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("beta128", SPECTRUM_BETA128);
+	//device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
 	device.option_add("intf2", SPECTRUM_INTF2);
 	device.option_add("kempjoy", SPECTRUM_KEMPJOY);
+	device.option_add("mface128", SPECTRUM_MFACE128);
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
+	device.option_add("mprint", SPECTRUM_MPRINT);
+	device.option_add("opus", SPECTRUM_OPUS);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
+	device.option_add("specdrum", SPECTRUM_SPECDRUM);
+	device.option_add("wafadrive", SPECTRUM_WAFA);
 }
 
 void specpls3_expansion_devices(device_slot_interface &device)
 {
+	device.option_add("mface3", SPECTRUM_MFACE3);
 }
 

@@ -1464,14 +1464,12 @@ bool input_manager::seq_poll()
 
 
 //-------------------------------------------------
-//  seq_name - generate the friendly name of a
-//  sequence
+//  seq_clean - clean the sequence, removing
+//  any invalid bits
 //-------------------------------------------------
 
-std::string input_manager::seq_name(const input_seq &seq) const
+input_seq input_manager::seq_clean(const input_seq &seq) const
 {
-	// make a copy of our sequence, removing any invalid bits
-	input_code clean_codes[sizeof(seq) / sizeof(input_code)];
 	int clean_index = 0;
 	for (int codenum = 0; seq[codenum] != input_seq::end_code; codenum++)
 	{
@@ -1479,29 +1477,46 @@ std::string input_manager::seq_name(const input_seq &seq) const
 		input_code code = seq[codenum];
 		if (!code.internal() && code_name(code).empty())
 		{
-			while (clean_index > 0 && clean_codes[clean_index - 1].internal())
+			while (clean_index > 0 && seq[clean_index - 1].internal())
 				clean_index--;
 		}
 		else if (clean_index > 0 || !code.internal())
-			clean_codes[clean_index++] = code;
+			clean_index++;
 	}
 
+	input_seq cleaned_seq;
+	for (int i = 0; i < clean_index; i++)
+		cleaned_seq += seq[i];
+	return cleaned_seq;
+}
+
+
+//-------------------------------------------------
+//  seq_name - generate the friendly name of a
+//  sequence
+//-------------------------------------------------
+
+std::string input_manager::seq_name(const input_seq &seq) const
+{
+	// make a copy of our sequence, removing any invalid bits
+	input_seq cleaned_seq = seq_clean(seq);
+
 	// special case: empty
-	if (clean_index == 0)
+	if (cleaned_seq[0] == input_seq::end_code)
 		return std::string((seq.length() == 0) ? "None" : "n/a");
 
 	// start with an empty buffer
 	std::string str;
 
 	// loop until we hit the end
-	for (int codenum = 0; codenum < clean_index; codenum++)
+	for (int codenum = 0; cleaned_seq[codenum] != input_seq::end_code; codenum++)
 	{
 		// append a space if not the first code
 		if (codenum != 0)
 			str.append(" ");
 
 		// handle OR/NOT codes here
-		input_code code = clean_codes[codenum];
+		input_code code = cleaned_seq[codenum];
 		if (code == input_seq::or_code)
 			str.append("or");
 		else if (code == input_seq::not_code)

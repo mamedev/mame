@@ -24,7 +24,7 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		timer_newkb(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in mbee_state::device_timer");
+		throw emu_fatalerror("Unknown id in mbee_state::device_timer");
 	}
 }
 
@@ -233,17 +233,17 @@ READ8_MEMBER( mbee_state::speed_high_r )
 
 WRITE8_MEMBER( mbee_state::port04_w )  // address
 {
-	m_rtc->write(space, 0, data);
+	m_rtc->write(0, data);
 }
 
 WRITE8_MEMBER( mbee_state::port06_w )  // write
 {
-	m_rtc->write(space, 1, data);
+	m_rtc->write(1, data);
 }
 
 READ8_MEMBER( mbee_state::port07_r )   // read
 {
-	return m_rtc->read(space, 1);
+	return m_rtc->read(1);
 }
 
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
@@ -622,7 +622,7 @@ void mbee_state::init_mbeett()
 
 ************************************************************/
 
-QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
+QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bee)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint16_t i, j;
@@ -712,10 +712,10 @@ QUICKLOAD_LOAD_MEMBER( mbee_state, mbee )
 
 
 /*-------------------------------------------------
-    QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
+    QUICKLOAD_LOAD_MEMBER( mbee_state::quickload_bin )
 -------------------------------------------------*/
 
-QUICKLOAD_LOAD_MEMBER( mbee_state, mbee_z80bin )
+QUICKLOAD_LOAD_MEMBER(mbee_state::quickload_bin)
 {
 	uint16_t execute_address, start_addr, end_addr;
 	int autorun;

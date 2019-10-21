@@ -25,9 +25,10 @@ void psx_controller_port_device::device_config_complete()
 	m_dev = dynamic_cast<device_psx_controller_interface *>(get_card_device());
 }
 
-MACHINE_CONFIG_START(psx_controller_port_device::device_add_mconfig)
-	MCFG_PSXCARD_ADD("card")
-MACHINE_CONFIG_END
+void psx_controller_port_device::device_add_mconfig(machine_config &config)
+{
+	PSXCARD(config, m_card, 0);
+}
 
 void psx_controller_port_device::disable_card(bool state)
 {

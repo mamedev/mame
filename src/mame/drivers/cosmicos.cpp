@@ -6,6 +6,10 @@
 
     http://retro.hansotten.nl/index.php?page=1802-cosmicos
 
+    Press G to start, and to enable the debugger (if -debug used).
+    The video options include 8-digit LEDs, 2-digit LEDs, and CRT,
+    of which the default is the 8-digit LEDs. Unknown how to enable
+    the others.
 
     HEX-monitor
 
@@ -36,6 +40,7 @@
 #include "emu.h"
 #include "includes/cosmicos.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 #include "cosmicos.lh"
@@ -53,7 +58,7 @@ enum
 
 READ8_MEMBER( cosmicos_state::read )
 {
-	if (m_boot) offset |= 0xc0c0;
+	if (m_boot) offset |= 0xc000;
 
 	uint8_t data = 0;
 
@@ -75,7 +80,7 @@ READ8_MEMBER( cosmicos_state::read )
 
 WRITE8_MEMBER( cosmicos_state::write )
 {
-	if (m_boot) offset |= 0xc0c0;
+	if (m_boot) offset |= 0xc000;
 
 	if (offset < 0xc000)
 	{
@@ -186,11 +191,11 @@ void cosmicos_state::cosmicos_mem(address_map &map)
 
 void cosmicos_state::cosmicos_io(address_map &map)
 {
-//  AM_RANGE(0x00, 0x00)
+//  map(0x00, 0x00)
 	map(0x01, 0x01).r(FUNC(cosmicos_state::video_on_r));
 	map(0x02, 0x02).rw(FUNC(cosmicos_state::video_off_r), FUNC(cosmicos_state::audio_latch_w));
-//  AM_RANGE(0x03, 0x03)
-//  AM_RANGE(0x04, 0x04)
+//  map(0x03, 0x03)
+//  map(0x04, 0x04)
 	map(0x05, 0x05).rw(FUNC(cosmicos_state::hex_keyboard_r), FUNC(cosmicos_state::hex_keylatch_w));
 	map(0x06, 0x06).rw(FUNC(cosmicos_state::reset_counter_r), FUNC(cosmicos_state::segment_w));
 	map(0x07, 0x07).rw(FUNC(cosmicos_state::data_r), FUNC(cosmicos_state::display_w));
@@ -358,11 +363,9 @@ INPUT_PORTS_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::digit_tick)
 {
-// commented this out because (a) m_digit isn't initialised anywhere,
-// and (b) writing to a negative digit is not a good idea.
-//  m_digit = !m_digit;
+	m_digit ^= 1;
 
-//  m_digits[m_digit] = m_segment;
+	m_digits[m_digit] = m_segment;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmicos_state::int_tick)
@@ -493,7 +496,7 @@ void cosmicos_state::machine_reset()
 
 /* Quickload */
 
-QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
+QUICKLOAD_LOAD_MEMBER(cosmicos_state::quickload_cb)
 {
 	uint8_t *ptr = m_rom->base();
 	int size = image.length();
@@ -506,50 +509,54 @@ QUICKLOAD_LOAD_MEMBER( cosmicos_state, cosmicos )
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(cosmicos_state::cosmicos)
+void cosmicos_state::cosmicos(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(CDP1802_TAG, CDP1802, XTAL(1'750'000))
-	MCFG_DEVICE_PROGRAM_MAP(cosmicos_mem)
-	MCFG_DEVICE_IO_MAP(cosmicos_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, cosmicos_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, cosmicos_state, clear_r))
-	MCFG_COSMAC_EF1_CALLBACK(READLINE(*this, cosmicos_state, ef1_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, cosmicos_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, cosmicos_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, cosmicos_state, ef4_r))
-	MCFG_COSMAC_Q_CALLBACK(WRITELINE(*this, cosmicos_state, q_w))
-	MCFG_COSMAC_DMAR_CALLBACK(READ8(*this, cosmicos_state, dma_r))
-	MCFG_COSMAC_SC_CALLBACK(WRITE8(*this, cosmicos_state, sc_w))
+	CDP1802(config, m_maincpu, 1.75_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmicos_state::cosmicos_mem);
+	m_maincpu->set_addrmap(AS_IO, &cosmicos_state::cosmicos_io);
+	m_maincpu->wait_cb().set(FUNC(cosmicos_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(cosmicos_state::clear_r));
+	m_maincpu->ef1_cb().set(FUNC(cosmicos_state::ef1_r));
+	m_maincpu->ef2_cb().set(FUNC(cosmicos_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(cosmicos_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(cosmicos_state::ef4_r));
+	m_maincpu->q_cb().set(FUNC(cosmicos_state::q_w));
+	m_maincpu->dma_rd_cb().set(FUNC(cosmicos_state::dma_r));
+	m_maincpu->sc_cb().set(FUNC(cosmicos_state::sc_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_cosmicos);
-	MCFG_DEVICE_ADD(DM9368_TAG, DM9368, 0)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("digit", cosmicos_state, digit_tick, attotime::from_hz(100))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("interrupt", cosmicos_state, int_tick, attotime::from_hz(1000))
+	DM9368(config, m_led, 0);
+	TIMER(config, "digit").configure_periodic(FUNC(cosmicos_state::digit_tick), attotime::from_hz(100));
+	TIMER(config, "interrupt").configure_periodic(FUNC(cosmicos_state::int_tick), attotime::from_hz(1000));
 
-	MCFG_CDP1864_SCREEN_ADD(SCREEN_TAG, XTAL(1'750'000))
-	MCFG_SCREEN_UPDATE_DEVICE(CDP1864_TAG, cdp1864_device, screen_update)
+	SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL(1'750'000), CONSTANT(0), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), WRITELINE(*this, cosmicos_state, dmaout_w), WRITELINE(*this, cosmicos_state, efx_w), NOOP, CONSTANT(1), CONSTANT(1), CONSTANT(1))
-	MCFG_CDP1864_CHROMINANCE(RES_K(2), 0, 0, 0) // R2
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
+	m_cti->dma_out_cb().set(FUNC(cosmicos_state::dmaout_w));
+	m_cti->efx_cb().set(FUNC(cosmicos_state::efx_w));
+	m_cti->rdata_cb().set_constant(1);
+	m_cti->gdata_cb().set_constant(1);
+	m_cti->bdata_cb().set_constant(1);
+	m_cti->set_chrominance(RES_K(2), 0, 0, 0); // R2
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_QUICKLOAD_ADD("quickload", cosmicos_state, cosmicos, "bin", 0)
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(cosmicos_state::quickload_cb), this);
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256")
-	MCFG_RAM_EXTRA_OPTIONS("4K,48K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("256").set_extra_options("4K,48K");
+}
 
 /* ROMs */
 

@@ -470,39 +470,39 @@ WRITE_LINE_MEMBER( play_1_state::clock_w )
 	}
 }
 
-MACHINE_CONFIG_START(play_1_state::play_1)
+void play_1_state::play_1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", CDP1802, 400000) // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
-	MCFG_DEVICE_PROGRAM_MAP(play_1_map)
-	MCFG_DEVICE_IO_MAP(play_1_io)
-	MCFG_COSMAC_WAIT_CALLBACK(READLINE(*this, play_1_state, wait_r))
-	MCFG_COSMAC_CLEAR_CALLBACK(READLINE(*this, play_1_state, clear_r))
-	MCFG_COSMAC_EF2_CALLBACK(READLINE(*this, play_1_state, ef2_r))
-	MCFG_COSMAC_EF3_CALLBACK(READLINE(*this, play_1_state, ef3_r))
-	MCFG_COSMAC_EF4_CALLBACK(READLINE(*this, play_1_state, ef4_r))
+	CDP1802(config, m_maincpu, 400000); // 2 gates, 1 cap, 1 resistor oscillating somewhere between 350 to 450 kHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_1_state::play_1_map);
+	m_maincpu->set_addrmap(AS_IO, &play_1_state::play_1_io);
+	m_maincpu->wait_cb().set(FUNC(play_1_state::wait_r));
+	m_maincpu->clear_cb().set(FUNC(play_1_state::clear_r));
+	m_maincpu->ef2_cb().set(FUNC(play_1_state::ef2_r));
+	m_maincpu->ef3_cb().set(FUNC(play_1_state::ef3_r));
+	m_maincpu->ef4_cb().set(FUNC(play_1_state::ef4_r));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	config.set_default_layout(layout_play_1);
 
-	MCFG_DEVICE_ADD("xpoint", CLOCK, 100) // crossing-point detector
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(*this, play_1_state, clock_w))
+	clock_device &xpoint(CLOCK(config, "xpoint", 100)); // crossing-point detector
+	xpoint.signal_handler().set(FUNC(play_1_state::clock_w));
 
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_DEVICE_ADD("monotone", CLOCK, 0) // sound device
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE("speaker", speaker_sound_device, level_w))
-MACHINE_CONFIG_END
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
+	CLOCK(config, m_monotone, 0); // sound device
+	m_monotone->signal_handler().set("speaker", FUNC(speaker_sound_device::level_w));
+}
 
-MACHINE_CONFIG_START(play_1_state::chance)
+void play_1_state::chance(machine_config &config)
+{
 	play_1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(chance_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &play_1_state::chance_map);
+}
 
 /*-------------------------------------------------------------------
 / Space Gambler (03/78)

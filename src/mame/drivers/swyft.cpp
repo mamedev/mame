@@ -326,6 +326,11 @@ public:
 
 	void swyft(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	required_device<m68008_device> m_maincpu;
 	optional_device<centronics_device> m_ctx;
@@ -343,10 +348,6 @@ private:
 	optional_ioport m_y5;
 	optional_ioport m_y6;
 	optional_ioport m_y7;*/
-
-	DECLARE_MACHINE_START(swyft);
-	DECLARE_MACHINE_RESET(swyft);
-	DECLARE_VIDEO_START(swyft);
 
 	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -577,7 +578,7 @@ void swyft_state::swyft_mem(address_map &map)
 	map(0x0e4000, 0x0e4fff).rw(FUNC(swyft_state::swyft_via1_r), FUNC(swyft_state::swyft_via1_w));
 }
 
-MACHINE_START_MEMBER(swyft_state,swyft)
+void swyft_state::machine_start()
 {
 	for (auto &via : m_via)
 	{
@@ -588,11 +589,11 @@ MACHINE_START_MEMBER(swyft_state,swyft)
 	}
 }
 
-MACHINE_RESET_MEMBER(swyft_state,swyft)
+void swyft_state::machine_reset()
 {
 }
 
-VIDEO_START_MEMBER(swyft_state,swyft)
+void swyft_state::video_start()
 {
 }
 
@@ -757,17 +758,13 @@ void swyft_state::swyft(machine_config &config)
 	M68008(config, m_maincpu, XTAL(15'897'600)/2); //MC68008P8, Y1=15.8976Mhz, clock GUESSED at Y1 / 2
 	m_maincpu->set_addrmap(AS_PROGRAM, &swyft_state::swyft_mem);
 
-	MCFG_MACHINE_START_OVERRIDE(swyft_state,swyft)
-	MCFG_MACHINE_RESET_OVERRIDE(swyft_state,swyft)
-	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
-
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(15.8976_MHz_XTAL / 2, 500, 0, 320, 265, 0, 242); // total guess
 	screen.set_screen_update(FUNC(swyft_state::screen_update_swyft));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", 2).set_init("palette", FUNC(palette_device::palette_init_monochrome));
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	ACIA6850(config, m_acia6850, 0);
 	// acia rx and tx clocks come from one of the VIA pins and are tied together, fix this below? acia e clock comes from 68008

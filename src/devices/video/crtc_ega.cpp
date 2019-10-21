@@ -51,13 +51,13 @@ void crtc_ega_device::device_post_load()
 }
 
 
-WRITE8_MEMBER( crtc_ega_device::address_w )
+void crtc_ega_device::address_w(uint8_t data)
 {
 	m_register_address_latch = data & 0x1f;
 }
 
 
-READ8_MEMBER( crtc_ega_device::register_r )
+uint8_t crtc_ega_device::register_r()
 {
 	uint8_t ret = 0;
 
@@ -78,7 +78,7 @@ READ8_MEMBER( crtc_ega_device::register_r )
 }
 
 
-WRITE8_MEMBER( crtc_ega_device::register_w )
+void crtc_ega_device::register_w(uint8_t data)
 {
 	LOG("%s CRTC_EGA: reg 0x%02x = 0x%02x\n", machine().describe_context(), m_register_address_latch, data);
 

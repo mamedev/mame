@@ -85,7 +85,6 @@
 #include "imagedev/cassette.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "dolphunk.lh"
@@ -106,21 +105,20 @@ public:
 
 private:
 	DECLARE_READ_LINE_MEMBER(cass_r);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_READ8_MEMBER(port07_r);
 	DECLARE_WRITE8_MEMBER(port00_w);
 	DECLARE_WRITE8_MEMBER(port06_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
+	TIMER_DEVICE_CALLBACK_MEMBER(kansas_w);
 	void dauphin_io(address_map &map);
 	void dauphin_mem(address_map &map);
 
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
-	bool m_cass_state;
+	bool m_cassbit;
 	bool m_cassold;
 	bool m_speaker_state;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	output_finder<4> m_digits;
@@ -129,11 +127,6 @@ private:
 READ_LINE_MEMBER( dauphin_state::cass_r )
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
-}
-
-WRITE_LINE_MEMBER( dauphin_state::cass_w )
-{
-	m_cass_state = state; // get flag bit
 }
 
 WRITE8_MEMBER( dauphin_state::port00_w )
@@ -173,17 +166,17 @@ READ8_MEMBER( dauphin_state::port07_r )
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
+TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::kansas_w)
 {
 	m_cass_data++;
 
-	if (m_cass_state != m_cassold)
+	if (m_cassbit != m_cassold)
 	{
 		m_cass_data = 0;
-		m_cassold = m_cass_state;
+		m_cassold = m_cassbit;
 	}
 
-	if (m_cass_state)
+	if (m_cassbit)
 		m_cass->output(BIT(m_cass_data, 1) ? -1.0 : +1.0); // 1000Hz
 	else
 		m_cass->output(BIT(m_cass_data, 0) ? -1.0 : +1.0); // 2000Hz
@@ -233,26 +226,27 @@ static INPUT_PORTS_START( dauphin )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(dauphin_state::dauphin)
+void dauphin_state::dauphin(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(dauphin_mem)
-	MCFG_DEVICE_IO_MAP(dauphin_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, dauphin_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, dauphin_state, cass_w))
+	S2650(config, m_maincpu, XTAL(1'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &dauphin_state::dauphin_mem);
+	m_maincpu->set_addrmap(AS_IO, &dauphin_state::dauphin_io);
+	m_maincpu->sense_handler().set(FUNC(dauphin_state::cass_r));
+	m_maincpu->flag_handler().set([this] (bool state) { m_cassbit = state; });
 
 	/* video hardware */
 	config.set_default_layout(layout_dolphunk);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("dauphin_c", dauphin_state, dauphin_c, attotime::from_hz(4000))
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	TIMER(config, "kansas_w").configure_periodic(FUNC(dauphin_state::kansas_w), attotime::from_hz(4000));
+}
 
 /* ROM definition */
 ROM_START( dauphin )

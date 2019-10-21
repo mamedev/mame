@@ -153,11 +153,11 @@ public:
 	friend class device_univ_card_interface;
 
 	// address space configuration
-	template <typename T> void set_rom_space(T &&tag, int space) { m_rom_device.set_tag(std::forward<T>(tag)); m_rom_space = space; }
-	template <typename T> void set_rom_ports_space(T &&tag, int space) { m_rom_ports_device.set_tag(std::forward<T>(tag)); m_rom_ports_space = space; }
-	template <typename T> void set_memory_space(T &&tag, int space) { m_memory_device.set_tag(std::forward<T>(tag)); m_memory_space = space; }
-	template <typename T> void set_status_space(T &&tag, int space) { m_status_device.set_tag(std::forward<T>(tag)); m_status_space = space; }
-	template <typename T> void set_ram_ports_space(T &&tag, int space) { m_ram_ports_device.set_tag(std::forward<T>(tag)); m_ram_ports_space = space; }
+	template <typename T> void set_rom_space(T &&tag, int space) { m_rom_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_rom_ports_space(T &&tag, int space) { m_rom_ports_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_memory_space(T &&tag, int space) { m_memory_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_status_space(T &&tag, int space) { m_status_space.set_tag(std::forward<T>(tag), space); }
+	template <typename T> void set_ram_ports_space(T &&tag, int space) { m_ram_ports_space.set_tag(std::forward<T>(tag), space); }
 
 	// callback configuration
 	auto stop_out_cb() { return m_stop_out_cb.bind(); }
@@ -183,7 +183,6 @@ public:
 
 protected:
 	// device_t implementation
-	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_start() override;
 
 private:
@@ -195,10 +194,8 @@ private:
 	void set_user_reset(unsigned index, int state);
 
 	// finding address spaces
-	required_device<device_memory_interface>    m_rom_device, m_rom_ports_device;
-	required_device<device_memory_interface>    m_memory_device, m_status_device, m_ram_ports_device;
-	int                                         m_rom_space, m_rom_ports_space;
-	int                                         m_memory_space, m_status_space, m_ram_ports_space;
+	required_address_space                      m_rom_space, m_rom_ports_space;
+	required_address_space                      m_memory_space, m_status_space, m_ram_ports_space;
 
 	// output line callbacks
 	devcb_write_line    m_test_out_cb;
@@ -225,11 +222,11 @@ protected:
 	// device_interface implementation
 	void interface_pre_start() override;
 
-	address_space &rom_space()          { return m_bus->m_rom_device->space(m_bus->m_rom_space); }
-	address_space &rom_ports_space()    { return m_bus->m_rom_ports_device->space(m_bus->m_rom_ports_space); }
-	address_space &memory_space()       { return m_bus->m_memory_device->space(m_bus->m_memory_space); }
-	address_space &status_space()       { return m_bus->m_status_device->space(m_bus->m_status_space); }
-	address_space &ram_ports_space()    { return m_bus->m_ram_ports_device->space(m_bus->m_ram_ports_space); }
+	address_space &rom_space()          { return *m_bus->m_rom_space; }
+	address_space &rom_ports_space()    { return *m_bus->m_rom_ports_space; }
+	address_space &memory_space()       { return *m_bus->m_memory_space; }
+	address_space &status_space()       { return *m_bus->m_status_space; }
+	address_space &ram_ports_space()    { return *m_bus->m_ram_ports_space; }
 
 	DECLARE_WRITE_LINE_MEMBER(test_out)         { m_bus->set_test(m_index, state); }
 	DECLARE_WRITE_LINE_MEMBER(stop_out)         { m_bus->set_stop(m_index, state); }

@@ -11,58 +11,136 @@
 
 #pragma once
 
-#include "cpu/mips/mips3.h"
-#include "machine/ioc2.h"
-#include "machine/wd33c93.h"
+#include "machine/hal2.h"
 
-class hpc3_device : public device_t
+class hpc3_device : public device_t, public device_memory_interface
 {
 public:
-	template <typename T, typename U, typename V>
-	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&scsi_tag, V &&ioc2_tag)
-		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
+	enum pbus_space
 	{
-		m_maincpu.set_tag(std::forward<T>(cpu_tag));
-		m_wd33c93.set_tag(std::forward<U>(scsi_tag));
-		m_ioc2.set_tag(std::forward<V>(ioc2_tag));
-	}
+		AS_PIO0 = 0,
+		AS_PIO1,
+		AS_PIO2,
+		AS_PIO3,
+		AS_PIO4,
+		AS_PIO5,
+		AS_PIO6,
+		AS_PIO7,
+		AS_PIO8,
+		AS_PIO9
+	};
 
 	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER(hd_enet_r);
-	DECLARE_WRITE32_MEMBER(hd_enet_w);
-	DECLARE_READ32_MEMBER(hd0_r);
-	DECLARE_WRITE32_MEMBER(hd0_w);
-	DECLARE_READ32_MEMBER(pbus4_r);
-	DECLARE_WRITE32_MEMBER(pbus4_w);
-	DECLARE_READ32_MEMBER(pbusdma_r);
-	DECLARE_WRITE32_MEMBER(pbusdma_w);
-	DECLARE_READ32_MEMBER(unkpbus0_r);
-	DECLARE_WRITE32_MEMBER(unkpbus0_w);
+	template <typename T>
+	hpc3_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&hal2_tag)
+		: hpc3_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		set_hal2_tag(std::forward<T>(hal2_tag));
+	}
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	template <typename T> void set_gio64_space(T &&tag, int spacenum) { m_gio64_space.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_hal2_tag(T &&tag) { m_hal2.set_tag(std::forward<T>(tag)); }
 
-	TIMER_CALLBACK_MEMBER(do_dma);
+	auto enet_rd_cb() { return m_enet_rd_cb.bind(); }
+	auto enet_wr_cb() { return m_enet_wr_cb.bind(); }
+	auto enet_rxrd_cb() { return m_enet_rxrd_cb.bind(); }
+	auto enet_txwr_cb() { return m_enet_txwr_cb.bind(); }
+	auto enet_d8_rd_cb() { return m_enet_d8_rd_cb.bind(); }
+	auto enet_d8_wr_cb() { return m_enet_d8_wr_cb.bind(); }
+	auto enet_reset_cb() { return m_enet_reset_cb.bind(); }
+	auto enet_loopback_cb() { return m_enet_loopback_cb.bind(); }
+	auto enet_intr_out_cb() { return m_enet_intr_out_cb.bind(); }
+	template <int N> auto hd_rd_cb() { return m_hd_rd_cb[N].bind(); }
+	template <int N> auto hd_wr_cb() { return m_hd_wr_cb[N].bind(); }
+	template <int N> auto hd_dma_rd_cb() { return m_hd_dma_rd_cb[N].bind(); }
+	template <int N> auto hd_dma_wr_cb() { return m_hd_dma_wr_cb[N].bind(); }
+	template <int N> auto hd_reset_cb() { return m_hd_reset_cb[N].bind(); }
+	auto bbram_rd_cb() { return m_bbram_rd_cb.bind(); }
+	auto bbram_wr_cb() { return m_bbram_wr_cb.bind(); }
+	auto eeprom_dati_cb() { return m_eeprom_dati_cb.bind(); }
+	auto eeprom_dato_cb() { return m_eeprom_dato_cb.bind(); }
+	auto eeprom_clk_cb() { return m_eeprom_clk_cb.bind(); }
+	auto eeprom_cs_cb() { return m_eeprom_cs_cb.bind(); }
+	auto eeprom_pre_cb() { return m_eeprom_pre_cb.bind(); }
+	auto dma_complete_int_cb() { return m_dma_complete_int_cb.bind(); }
+
+	void map(address_map &map);
+
+	DECLARE_WRITE_LINE_MEMBER(enet_txrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_rxrdy_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_rxdc_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_txret_w);
+	DECLARE_WRITE_LINE_MEMBER(enet_intr_in_w);
+
+	DECLARE_WRITE_LINE_MEMBER(scsi0_drq);
+	DECLARE_WRITE_LINE_MEMBER(scsi1_drq);
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_resolve_objects() override;
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	void dump_chain(address_space &space, uint32_t ch_base);
+	virtual space_config_vector memory_space_config() const override;
+
+	enum fifo_type_t : uint32_t
+	{
+		FIFO_PBUS,
+		FIFO_SCSI0,
+		FIFO_SCSI1,
+		FIFO_ENET_RECV,
+		FIFO_ENET_XMIT
+	};
+
+	DECLARE_READ32_MEMBER(enet_r);
+	DECLARE_WRITE32_MEMBER(enet_w);
+	DECLARE_READ32_MEMBER(hd_enet_r);
+	DECLARE_WRITE32_MEMBER(hd_enet_w);
+	template <uint32_t index> DECLARE_READ32_MEMBER(hd_r);
+	template <uint32_t index> DECLARE_WRITE32_MEMBER(hd_w);
+	template <fifo_type_t Type> DECLARE_READ32_MEMBER(fifo_r);
+	template <fifo_type_t Type> DECLARE_WRITE32_MEMBER(fifo_w);
+	DECLARE_READ32_MEMBER(intstat_r);
+	uint32_t misc_r();
+	void misc_w(uint32_t data);
+	uint32_t eeprom_r();
+	void eeprom_w(uint32_t data);
+	uint32_t pio_data_r(offs_t offset);
+	void pio_data_w(offs_t offset, uint32_t data);
+	DECLARE_READ32_MEMBER(pbusdma_r);
+	DECLARE_WRITE32_MEMBER(pbusdma_w);
+
+	DECLARE_READ32_MEMBER(dma_config_r);
+	DECLARE_WRITE32_MEMBER(dma_config_w);
+	DECLARE_READ32_MEMBER(pio_config_r);
+	DECLARE_WRITE32_MEMBER(pio_config_w);
+	uint32_t bbram_r(offs_t offset);
+	void bbram_w(offs_t offset, uint32_t data);
+
+	void do_pbus_dma(uint32_t channel);
+	void do_scsi_dma(int channel);
+
+	void dump_chain(uint32_t base);
+	void fetch_chain(int channel);
+	void decrement_chain(int channel);
+	void scsi_fifo_flush(int channel);
+	void scsi_drq(bool state, int channel);
+	//void scsi_dma(int channel);
+
+	static const device_timer_id TIMER_PBUS_DMA = 0;
 
 	struct pbus_dma_t
 	{
-		uint8_t m_active;
+		bool m_active;
 		uint32_t m_cur_ptr;
 		uint32_t m_desc_ptr;
+		uint32_t m_desc_flags;
 		uint32_t m_next_ptr;
-		uint32_t m_words_left;
-	};
-
-	enum
-	{
-		TIMER_DMA
+		uint32_t m_bytes_left;
+		uint32_t m_config;
+		uint32_t m_control;
+		emu_timer *m_timer;
 	};
 
 	enum
@@ -93,29 +171,89 @@ protected:
 		HPC3_DMACTRL_IRQ    = 0x01,
 		HPC3_DMACTRL_ENDIAN = 0x02,
 		HPC3_DMACTRL_DIR    = 0x04,
+		HPC3_DMACTRL_FLUSH  = 0x08,
 		HPC3_DMACTRL_ENABLE = 0x10,
+		HPC3_DMACTRL_WRMASK = 0x20,
 	};
 
-	required_device<mips3_device> m_maincpu;
-	required_device<wd33c93_device> m_wd33c93;
-	required_device<ioc2_device> m_ioc2;
-	required_shared_ptr<uint32_t> m_mainram;
-	required_shared_ptr<uint32_t> m_unkpbus0;
+	enum
+	{
+		ENET_RECV = 0,
+		ENET_XMIT = 1
+	};
 
-	uint32_t m_enetr_nbdp;
-	uint32_t m_enetr_cbp;
-	uint32_t m_unk0;
-	uint32_t m_unk1;
-	uint32_t m_ic_unk0;
-	uint32_t m_scsi0_desc;
-	uint32_t m_scsi0_dma_ctrl;
-	pbus_dma_t m_pbus_dma;
+	const address_space_config m_pio_space_config[10];
 
-	uint8_t m_dma_buffer[4096];
+	required_address_space m_gio64_space;
+	address_space *m_pio_space[10];
+	required_device<hal2_device> m_hal2;
 
-	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
+	devcb_read8 m_enet_rd_cb;
+	devcb_write8 m_enet_wr_cb;
+	devcb_read8 m_enet_rxrd_cb;
+	devcb_write8 m_enet_txwr_cb;
+	devcb_read_line m_enet_d8_rd_cb;
+	devcb_write_line m_enet_d8_wr_cb;
+	devcb_write_line m_enet_reset_cb;
+	devcb_write_line m_enet_loopback_cb;
+	devcb_write_line m_enet_intr_out_cb;
+	devcb_read8 m_hd_rd_cb[2];
+	devcb_write8 m_hd_wr_cb[2];
+	devcb_read8 m_hd_dma_rd_cb[2];
+	devcb_write8 m_hd_dma_wr_cb[2];
+	devcb_write_line m_hd_reset_cb[2];
+	devcb_read8 m_bbram_rd_cb;
+	devcb_write8 m_bbram_wr_cb;
+	devcb_read_line m_eeprom_dati_cb;
+	devcb_write_line m_eeprom_dato_cb;
+	devcb_write_line m_eeprom_clk_cb;
+	devcb_write_line m_eeprom_cs_cb;
+	devcb_write_line m_eeprom_pre_cb;
+	devcb_write_line m_dma_complete_int_cb;
+
+	uint32_t m_intstat;
+	uint32_t m_misc;
+	uint32_t m_cpu_aux_ctrl;
+
+	struct scsi_dma_t
+	{
+		uint32_t m_cbp;
+		uint32_t m_nbdp;
+		uint8_t m_ctrl;
+		uint32_t m_bc;
+		uint16_t m_count;
+		uint32_t m_dmacfg;
+		uint32_t m_piocfg;
+		bool m_drq;
+		bool m_big_endian;
+		bool m_to_device;
+		bool m_active;
+	};
+
+	struct enet_dma_t
+	{
+		uint32_t m_cbp;
+		uint32_t m_nbdp;
+		uint32_t m_bc;
+		uint32_t m_ctrl;
+		uint32_t m_gio_fifo_ptr;
+		uint32_t m_dev_fifo_ptr;
+	};
+
+	enet_dma_t m_enet_dma[2];
+	uint32_t m_enet_reset;
+	uint32_t m_enet_dmacfg;
+	uint32_t m_enet_piocfg;
+
+	scsi_dma_t m_scsi_dma[2];
+	pbus_dma_t m_pbus_dma[8];
+	uint32_t m_pio_config[10];
+
+	std::unique_ptr<uint32_t[]> m_pbus_fifo;
+	std::unique_ptr<uint32_t[]> m_scsi_fifo[2];
+	std::unique_ptr<uint32_t[]> m_enet_fifo[2];
 };
 
 DECLARE_DEVICE_TYPE(SGI_HPC3, hpc3_device)
 
-#endif // MAME_MACHINE_HAL2_H
+#endif // MAME_MACHINE_HPC3_H

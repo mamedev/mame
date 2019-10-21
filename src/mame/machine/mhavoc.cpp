@@ -139,14 +139,14 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 
 WRITE8_MEMBER(mhavoc_state::mhavoc_gamma_w)
 {
-	logerror("  writing to gamma processor: %02x (%d %d)\n", data, m_gamma_rcvd, m_alpha_xmtd);
+	//logerror("  writing to gamma processor: %02x (%d %d)\n", data, m_gamma_rcvd, m_alpha_xmtd);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mhavoc_state::delayed_gamma_w),this), data);
 }
 
 
 READ8_MEMBER(mhavoc_state::mhavoc_alpha_r)
 {
-	logerror("\t\t\t\t\treading from alpha processor: %02x (%d %d)\n", m_alpha_data, m_gamma_rcvd, m_alpha_xmtd);
+	//logerror("\t\t\t\t\treading from alpha processor: %02x (%d %d)\n", m_alpha_data, m_gamma_rcvd, m_alpha_xmtd);
 	m_gamma_rcvd = 1;
 	m_alpha_xmtd = 0;
 	return m_alpha_data;
@@ -162,7 +162,7 @@ READ8_MEMBER(mhavoc_state::mhavoc_alpha_r)
 
 WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_w)
 {
-	logerror("\t\t\t\t\twriting to alpha processor: %02x %d %d\n", data, m_alpha_rcvd, m_gamma_xmtd);
+	//logerror("\t\t\t\t\twriting to alpha processor: %02x %d %d\n", data, m_alpha_rcvd, m_gamma_xmtd);
 	m_alpha_rcvd = 0;
 	m_gamma_xmtd = 1;
 	m_gamma_data = data;
@@ -171,7 +171,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_alpha_w)
 
 READ8_MEMBER(mhavoc_state::mhavoc_gamma_r)
 {
-	logerror("  reading from gamma processor: %02x (%d %d)\n", m_gamma_data, m_alpha_rcvd, m_gamma_xmtd);
+	//logerror("  reading from gamma processor: %02x (%d %d)\n", m_gamma_data, m_alpha_rcvd, m_gamma_xmtd);
 	m_alpha_rcvd = 1;
 	m_gamma_xmtd = 0;
 	return m_gamma_data;
@@ -204,37 +204,30 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_rom_banksel_w)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::tms5220_r)
+CUSTOM_INPUT_MEMBER(mhavoc_state::coin_service_r)
 {
-	return m_tms->readyq_r() ? 1 : 0;
+	return (m_player_1 ? m_service : m_coin)->read() & 0x03;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::mhavoc_bit67_r)
-{
-	const char *tag1 = (const char *)param;
-	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return ioport(m_player_1 ? tag2 : tag1)->read() & 0x03;
-}
-
-CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_rcvd_r)
+READ_LINE_MEMBER(mhavoc_state::gamma_rcvd_r)
 {
 	/* Gamma rcvd flag */
 	return m_gamma_rcvd;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_xmtd_r)
+READ_LINE_MEMBER(mhavoc_state::gamma_xmtd_r)
 {
 	/* Gamma xmtd flag */
 	return m_gamma_xmtd;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_rcvd_r)
+READ_LINE_MEMBER(mhavoc_state::alpha_rcvd_r)
 {
 	/* Alpha rcvd flag */
 	return (m_has_gamma_cpu && m_alpha_rcvd);
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_xmtd_r)
+READ_LINE_MEMBER(mhavoc_state::alpha_xmtd_r)
 {
 	/* Alpha xmtd flag */
 	return (m_has_gamma_cpu && m_alpha_xmtd);
@@ -258,7 +251,7 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 	m_gamma->set_input_line(INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x08))
 	{
-		logerror("\t\t\t\t*** resetting gamma processor. ***\n");
+		//logerror("\t\t\t\t*** resetting gamma processor. ***\n");
 		m_alpha_rcvd = 0;
 		m_alpha_xmtd = 0;
 		m_gamma_rcvd = 0;
@@ -287,7 +280,7 @@ WRITE8_MEMBER(mhavoc_state::alphaone_out_0_w)
 	/* Bit 0 = left coin counter */
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 
-logerror("alphaone_out_0_w(%02X)\n", data);
+	//logerror("alphaone_out_0_w(%02X)\n", data);
 }
 
 
@@ -314,7 +307,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_data_w)
 
 WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 {
-	m_tms->data_w(space, 0, m_speech_write_buffer);
+	m_tms->data_w(m_speech_write_buffer);
 }
 
 /*************************************
@@ -325,8 +318,7 @@ WRITE8_MEMBER(mhavoc_state::mhavocrv_speech_strobe_w)
 
 void mhavoc_state::init_mhavocrv()
 {
-	/* install the speech support that was only optionally stuffed for use */
-	/* in the Return to Vax hack */
+	// For Return to Vax, add support for the normally-unused speech module.
 	m_gamma->space(AS_PROGRAM).install_write_handler(0x5800, 0x5800, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_data_w),this));
 	m_gamma->space(AS_PROGRAM).install_write_handler(0x5900, 0x5900, write8_delegate(FUNC(mhavoc_state::mhavocrv_speech_strobe_w),this));
 }

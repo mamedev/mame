@@ -26,20 +26,6 @@
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_74157_A_IN_CB(_devcb) \
-	downcast<ls157_device &>(*device).set_a_in_callback(DEVCB_##_devcb);
-
-#define MCFG_74157_B_IN_CB(_devcb) \
-	downcast<ls157_device &>(*device).set_b_in_callback(DEVCB_##_devcb);
-
-#define MCFG_74157_OUT_CB(_devcb) \
-	downcast<ls157_device &>(*device).set_out_callback(DEVCB_##_devcb);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -51,25 +37,16 @@ public:
 	// construction/destruction
 	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	// static configuration
-	template <class Object> devcb_base &set_a_in_callback(Object &&cb) { return m_a_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_b_in_callback(Object &&cb) { return m_b_in_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_out_callback(Object &&cb) { return m_out_cb.set_callback(std::forward<Object>(cb)); }
 	auto a_in_callback() { return m_a_in_cb.bind(); }
 	auto b_in_callback() { return m_b_in_cb.bind(); }
 	auto out_callback() { return m_out_cb.bind(); }
 
 	// data writes
-	DECLARE_WRITE8_MEMBER(a_w) { write_a(data); }
-	void write_a(u8 data);
-	DECLARE_WRITE8_MEMBER(b_w) { write_b(data); }
-	void write_b(u8 data);
-	DECLARE_WRITE8_MEMBER(ab_w) { write_ab(data); }
-	void write_ab(u8 data);
-	DECLARE_WRITE8_MEMBER(ba_w) { write_ba(data); }
-	void write_ba(u8 data);
-	DECLARE_WRITE8_MEMBER(interleave_w) { write_interleave(data); }
-	void write_interleave(u8 data);
+	void a_w(u8 data);
+	void b_w(u8 data);
+	void ab_w(u8 data);
+	void ba_w(u8 data);
+	void interleave_w(u8 data);
 
 	// data line writes
 	DECLARE_WRITE_LINE_MEMBER(a0_w);
@@ -86,7 +63,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(strobe_w);
 
 	// output read
-	DECLARE_READ8_MEMBER(output_r);
+	u8 output_r();
 
 protected:
 	ls157_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 mask);

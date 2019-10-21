@@ -20,6 +20,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 class markham_state : public driver_device
 {
@@ -88,7 +89,7 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 
-	DECLARE_PALETTE_INIT(markham);
+	void markham_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(strnskil);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -97,7 +98,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<mb8841_cpu_device> m_mcu;
 	required_device_array<sn76496_device, 2> m_sn;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;

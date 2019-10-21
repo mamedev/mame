@@ -22,12 +22,12 @@ public:
 	virtual ~device_generic_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom) { return 0xff; }
-	virtual DECLARE_READ16_MEMBER(read16_rom) { return 0xffff; }
-	virtual DECLARE_READ32_MEMBER(read32_rom) { return 0xffffffff; }
+	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
+	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask) { return 0xffff; }
+	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask) { return 0xffffffff; }
 
-	virtual DECLARE_READ8_MEMBER(read_ram) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_ram) {};
+	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
+	virtual void write_ram(offs_t offset, uint8_t data) {}
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end, const char *tag);
 	virtual void ram_alloc(uint32_t size);
@@ -67,32 +67,6 @@ enum
 
 
 
-#define MCFG_GENERIC_MANDATORY       \
-	static_cast<generic_slot_device *>(device)->set_must_be_loaded(true);
-
-#define MCFG_GENERIC_WIDTH(_width)       \
-	static_cast<generic_slot_device *>(device)->set_width(_width);
-
-#define MCFG_GENERIC_ENDIAN(_endianness)       \
-	static_cast<generic_slot_device *>(device)->set_endian(_endianness);
-
-#define MCFG_GENERIC_DEFAULT_CARD(_def_card)      \
-	static_cast<generic_slot_device *>(device)->set_default_card(_def_card);
-
-#define MCFG_GENERIC_INTERFACE(_intf)       \
-	static_cast<generic_slot_device *>(device)->set_interface(_intf);
-
-#define MCFG_GENERIC_EXTENSIONS(_ext)       \
-	static_cast<generic_slot_device *>(device)->set_extensions(_ext);
-
-#define MCFG_GENERIC_LOAD(_class, _method)                                \
-	downcast<generic_slot_device &>(*device).set_device_load(device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), this));
-
-#define MCFG_GENERIC_UNLOAD(_class, _method)                            \
-	downcast<generic_slot_device &>(*device).set_device_unload(device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), this));
-
-
-
 // ======================> generic_slot_device
 
 class generic_slot_device : public device_t,
@@ -104,8 +78,8 @@ public:
 	generic_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~generic_slot_device();
 
-	template <typename Object> void set_device_load(Object &&cb) { m_device_image_load = std::forward<Object>(cb); }
-	template <typename Object> void set_device_unload(Object &&cb) { m_device_image_unload = std::forward<Object>(cb); }
+	template <typename... T> void set_device_load(T &&... args) { m_device_image_load = load_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload = unload_delegate(std::forward<T>(args)...); }
 
 	void set_interface(const char * interface) { m_interface = interface; }
 	void set_default_card(const char * def) { m_default_card = def; }
@@ -138,12 +112,12 @@ public:
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_rom);
-	virtual DECLARE_READ16_MEMBER(read16_rom);
-	virtual DECLARE_READ32_MEMBER(read32_rom);
+	virtual uint8_t read_rom(offs_t offset);
+	virtual uint16_t read16_rom(offs_t offset, uint16_t mem_mask = 0xffff);
+	virtual uint32_t read32_rom(offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	virtual DECLARE_READ8_MEMBER(read_ram);
-	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	virtual uint8_t read_ram(offs_t offset);
+	virtual void write_ram(offs_t offset, uint8_t data);
 
 	virtual void rom_alloc(size_t size, int width, endianness_t end) { if (m_cart) m_cart->rom_alloc(size, width, end, tag()); }
 	virtual void ram_alloc(uint32_t size)  { if (m_cart) m_cart->ram_alloc(size); }
@@ -182,14 +156,25 @@ protected:
 	int         m_width;
 	endianness_t m_endianness;
 	device_generic_cart_interface  *m_cart;
-	device_image_load_delegate      m_device_image_load;
-	device_image_func_delegate      m_device_image_unload;
+	load_delegate   m_device_image_load;
+	unload_delegate m_device_image_unload;
 };
 
 class generic_socket_device : public generic_slot_device
 {
 public:
-	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts = nullptr)
+		: generic_socket_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		opts(*this);
+		set_fixed(false);
+		set_interface(intf);
+		if (exts)
+			set_extensions(exts);
+	}
+
+	generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	virtual iodevice_t image_type() const override { return IO_ROM; }
 };
@@ -198,13 +183,14 @@ class generic_cartslot_device : public generic_slot_device
 {
 public:
 	template <typename T>
-	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts)
+	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *intf, const char *exts = nullptr)
 		: generic_cartslot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		opts(*this);
 		set_fixed(false);
 		set_interface(intf);
-		set_extensions(exts);
+		if (exts)
+			set_extensions(exts);
 	}
 
 	generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -221,23 +207,5 @@ DECLARE_DEVICE_TYPE(GENERIC_CARTSLOT, generic_cartslot_device)
 /***************************************************************************
  DEVICE CONFIGURATION MACROS
  ***************************************************************************/
-
-#define MCFG_GENERIC_CARTSLOT_ADD(_tag, _slot_intf, _dev_intf) \
-	MCFG_DEVICE_ADD(_tag, GENERIC_CARTSLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
-	MCFG_GENERIC_INTERFACE(_dev_intf)
-#define MCFG_GENERIC_SOCKET_ADD(_tag, _slot_intf, _dev_intf) \
-	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false) \
-	MCFG_GENERIC_INTERFACE(_dev_intf)
-
-#define MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
-	MCFG_DEVICE_ADD(_tag, GENERIC_CARTSLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
-	MCFG_GENERIC_INTERFACE(_dev_intf)
-#define MCFG_GENERIC_SOCKET_ADD_WITH_DEFAULT(_tag, _slot_intf, _dev_intf, _default) \
-	MCFG_DEVICE_ADD(_tag, GENERIC_SOCKET, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _default, false) \
-	MCFG_GENERIC_INTERFACE(_dev_intf)
 
 #endif // MAME_BUS_GENERIC_SLOT_H

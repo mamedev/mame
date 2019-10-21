@@ -55,7 +55,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(irq_reset_w);
 	DECLARE_WRITE8_MEMBER(crowd_w);
 	DECLARE_WRITE8_MEMBER(led_w);
-	DECLARE_PALETTE_INIT(boxer);
+	void boxer_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
@@ -103,7 +103,7 @@ void boxer_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		periodic_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in boxer_state::device_timer");
+		throw emu_fatalerror("Unknown id in boxer_state::device_timer");
 	}
 }
 
@@ -161,7 +161,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(boxer_state, boxer)
+void boxer_state::boxer_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1, rgb_t(0xff,0xff,0xff));
@@ -491,28 +491,27 @@ void boxer_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(boxer_state::boxer)
-
+void boxer_state::boxer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK / 16)
-	MCFG_DEVICE_PROGRAM_MAP(boxer_map)
+	M6502(config, m_maincpu, MASTER_CLOCK / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &boxer_state::boxer_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(8, 247, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(boxer_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(8, 247, 0, 239);
+	m_screen->set_screen_update(FUNC(boxer_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_boxer)
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(boxer_state, boxer)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_boxer);
+	PALETTE(config, m_palette, FUNC(boxer_state::boxer_palette), 4);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 /*************************************

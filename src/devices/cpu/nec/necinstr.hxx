@@ -45,8 +45,8 @@ OP( 0x0f, i_pre_nec  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x2a : ModRM = fetch(); tmp = GetRMByte(ModRM); tmp2 = (Breg(AL) & 0xf)<<4; Breg(AL) = (Breg(AL) & 0xf0) | (tmp&0xf); tmp = tmp2 | (tmp>>4);   PutbackRMByte(ModRM,tmp); CLKM(17,17,13,32,32,19); break;
 		case 0x31 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield INS\n",PC()); break;
 		case 0x33 : ModRM = fetch(); ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",PC()); break;
-		case 0xe0 : ModRM = fetch(); ModRM=0; logerror("%06x: V33 unimplemented BRKXA (break to expansion address)\n",PC()); break;
-		case 0xf0 : ModRM = fetch(); ModRM=0; logerror("%06x: V33 unimplemented RETXA (return from expansion address)\n",PC()); break;
+		case 0xe0 : BRKXA(true); CLK(12); break;
+		case 0xf0 : BRKXA(false); CLK(12); break;
 		case 0xff : ModRM = fetch(); ModRM=0; logerror("%06x: unimplemented BRKEM (break to 8080 emulation mode)\n",PC()); break;
 		default:    logerror("%06x: Unknown V20 instruction\n",PC()); break;
 	}

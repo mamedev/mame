@@ -17,8 +17,11 @@
 
 #include "video/mc6847.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/kr2376.h"
+#include "machine/ram.h"
 #include "machine/wd_fdc.h"
 
 /***************************************************************************
@@ -67,10 +70,12 @@ public:
 		m_vdg(*this, "mc6847"),
 		m_videoram(*this, "videoram"),
 		m_uart(*this, "uart"),
+		m_uart_clock(*this, "uart_clock"),
 		m_lx387_kr2376(*this, "lx387_kr2376"),
 		m_maincpu(*this, "z80ne"),
 		m_cassette1(*this, "cassette"),
 		m_cassette2(*this, "cassette2"),
+		m_ram(*this, RAM_TAG),
 		m_region_z80ne(*this, "z80ne"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -87,6 +92,7 @@ public:
 	{
 	}
 
+	void lx387(machine_config &config);
 	void z80net(machine_config &config);
 	void z80ne(machine_config &config);
 	void z80netb(machine_config &config);
@@ -106,6 +112,7 @@ protected:
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<uint8_t> m_videoram;
 	required_device<ay31015_device> m_uart;
+	required_device<clock_device> m_uart_clock;
 	optional_device<kr2376_device> m_lx387_kr2376;
 	uint8_t m_lx383_scan_counter;
 	uint8_t m_lx383_key[LX383_KEYS];
@@ -118,6 +125,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(lx383_w);
 	DECLARE_READ8_MEMBER(lx385_ctrl_r);
 	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
+	DECLARE_WRITE_LINE_MEMBER(lx385_uart_tx_clock_w);
 	DECLARE_READ_LINE_MEMBER(lx387_shift_r);
 	DECLARE_READ_LINE_MEMBER(lx387_control_r);
 	DECLARE_READ8_MEMBER(lx387_data_r);
@@ -144,6 +152,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;
 	required_device<cassette_image_device> m_cassette2;
+	required_device<ram_device> m_ram;
 	required_memory_region m_region_z80ne;
 	optional_memory_bank m_bank1;
 	optional_memory_bank m_bank2;

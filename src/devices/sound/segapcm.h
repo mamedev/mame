@@ -11,17 +11,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_SEGAPCM_BANK(bank) \
-	downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank));
-
-#define MCFG_SEGAPCM_BANK_MASK(bank, mask) \
-	downcast<segapcm_device &>(*device).set_bank((segapcm_device::bank) | (segapcm_device::mask));
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

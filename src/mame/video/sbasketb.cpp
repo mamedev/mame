@@ -28,67 +28,63 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(sbasketb_state, sbasketb)
+void sbasketb_state::sbasketb_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[4] = { 2000, 1000, 470, 220 };
-	double rweights[4], gweights[4], bweights[4];
-	int i;
+	static constexpr int resistances[4] = { 2000, 1000, 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
 	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, rweights, 1000, 0,
 			4, resistances, gweights, 1000, 0,
 			4, resistances, bweights, 1000, 0);
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2, bit3;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
-		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+		// red component
+		bit0 = BIT(color_prom[i | 0x000], 0);
+		bit1 = BIT(color_prom[i | 0x000], 1);
+		bit2 = BIT(color_prom[i | 0x000], 2);
+		bit3 = BIT(color_prom[i | 0x000], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
-		/* green component */
-		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
-		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+		// green component
+		bit0 = BIT(color_prom[i | 0x100], 0);
+		bit1 = BIT(color_prom[i | 0x100], 1);
+		bit2 = BIT(color_prom[i | 0x100], 2);
+		bit3 = BIT(color_prom[i | 0x100], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
-		/* blue component */
-		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
-		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		// blue component
+		bit0 = BIT(color_prom[i | 0x200], 0);
+		bit1 = BIT(color_prom[i | 0x200], 1);
+		bit2 = BIT(color_prom[i | 0x200], 2);
+		bit3 = BIT(color_prom[i | 0x200], 3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table,*/
+	// color_prom now points to the beginning of the lookup table
 	color_prom += 0x300;
 
-	/* characters use colors 0xf0-0xff */
-	for (i = 0; i < 0x100; i++)
+	// characters use colors 0xf0-0xff
+	for (int i = 0; i < 0x100; i++)
 	{
-		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0xf0;
+		uint8_t const ctabentry = (color_prom[i] & 0x0f) | 0xf0;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
-	/* sprites use colors 0-256 (?) in 16 banks */
-	for (i = 0; i < 0x100; i++)
+	// sprites use colors 0-256 (?) in 16 banks
+	for (int i = 0; i < 0x100; i++)
 	{
-		int j;
-
-		for (j = 0; j < 0x10; j++)
+		for (int j = 0; j < 0x10; j++)
 		{
-			uint8_t ctabentry = (j << 4) | (color_prom[i + 0x100] & 0x0f);
+			uint8_t const ctabentry = (j << 4) | (color_prom[i + 0x100] & 0x0f);
 			palette.set_pen_indirect(0x100 + ((j << 8) | i), ctabentry);
 		}
 	}

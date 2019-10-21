@@ -12,6 +12,7 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
+#define A800SLOT_ROM_REGION_TAG ":cart:rom"
 
 /* PCB */
 enum
@@ -90,7 +91,16 @@ class a800_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	template <typename T>
+	a800_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: a800_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
+	a800_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~a800_cart_slot_device();
 
 	// image-level overrides
@@ -141,6 +151,15 @@ class a5200_cart_slot_device : public a800_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	a5200_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: a5200_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	a5200_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a5200_cart_slot_device();
 
@@ -156,6 +175,15 @@ class xegs_cart_slot_device : public a800_cart_slot_device
 {
 public:
 	// construction/destruction
+	template <typename T>
+	xegs_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+		: xegs_cart_slot_device(mconfig, tag, owner, (uint32_t)0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(false);
+	}
 	xegs_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~xegs_cart_slot_device();
 
@@ -169,25 +197,5 @@ public:
 DECLARE_DEVICE_TYPE(A800_CART_SLOT,  a800_cart_slot_device)
 DECLARE_DEVICE_TYPE(A5200_CART_SLOT, a5200_cart_slot_device)
 DECLARE_DEVICE_TYPE(XEGS_CART_SLOT,  xegs_cart_slot_device)
-
-
-/***************************************************************************
- DEVICE CONFIGURATION MACROS
- ***************************************************************************/
-
-#define A800SLOT_ROM_REGION_TAG ":cart:rom"
-
-#define MCFG_A800_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, A800_CART_SLOT, 0)  \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_A5200_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, A5200_CART_SLOT, 0)  \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_XEGS_CARTRIDGE_ADD(_tag,_slot_intf,_def_slot) \
-	MCFG_DEVICE_ADD(_tag, XEGS_CART_SLOT, 0)  \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
 
 #endif // MAME_BUS_A800_A800_SLOT_H

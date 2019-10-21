@@ -32,7 +32,6 @@ For BIOS CRC confirmation
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/tms9928a.h"
 #include "imagedev/cassette.h"
 #include "bus/generic/slot.h"
@@ -72,7 +71,7 @@ private:
 	uint8_t m_cass_conf;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 	void pv2000_io_map(address_map &map);
 	void pv2000_map(address_map &map);
 };
@@ -184,12 +183,11 @@ void pv2000_state::pv2000_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 
-	map(0x4000, 0x4000).rw("tms9928a", FUNC(tms9928a_device::vram_r), FUNC(tms9928a_device::vram_w));
-	map(0x4001, 0x4001).rw("tms9928a", FUNC(tms9928a_device::register_r), FUNC(tms9928a_device::register_w));
+	map(0x4000, 0x4001).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 
 	map(0x7000, 0x7fff).ram();
-	//AM_RANGE(0x8000, 0xbfff) ext ram?
-	//AM_RANGE(0xc000, 0xffff)      // mapped by the cartslot
+	//map(0x8000, 0xbfff) ext ram?
+	//map(0xc000, 0xffff)      // mapped by the cartslot
 }
 
 
@@ -205,7 +203,7 @@ void pv2000_state::pv2000_io_map(address_map &map)
 	map(0x20, 0x20).rw(FUNC(pv2000_state::keys_lo_r), FUNC(pv2000_state::keys_w));
 
 	//sn76489a
-	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::command_w));
+	map(0x40, 0x40).r(FUNC(pv2000_state::keys_mod_r)).w("sn76489a", FUNC(sn76489a_device::write));
 
 	/* Cassette input. Gets hit a lot after a GLOAD command */
 	map(0x60, 0x60).rw(FUNC(pv2000_state::cass_in), FUNC(pv2000_state::cass_out));
@@ -356,7 +354,7 @@ WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
 void pv2000_state::machine_start()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void pv2000_state::machine_reset()
@@ -365,11 +363,11 @@ void pv2000_state::machine_reset()
 	m_key_pressed = 0;
 	m_keyb_column = 0;
 
-	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff);
+	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff); // Z80
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pv2000_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -386,40 +384,35 @@ DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 }
 
 /* Machine Drivers */
-MACHINE_CONFIG_START(pv2000_state::pv2000)
-
+void pv2000_state::pv2000(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(7'159'090)/2) // 3.579545 MHz
-	MCFG_DEVICE_PROGRAM_MAP(pv2000_map)
-	MCFG_DEVICE_IO_MAP(pv2000_io_map)
+	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &pv2000_state::pv2000_map);
+	m_maincpu->set_addrmap(AS_IO, &pv2000_state::pv2000_io_map);
 
 	// video hardware
-	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL(10'738'635) / 2 )
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(*this, pv2000_state, pv2000_vdp_interrupt))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
-	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+	tms9928a_device &vdp(TMS9928A(config, "tms9928a", XTAL(10'738'635)));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set(FUNC(pv2000_state::pv2000_vdp_interrupt));
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-
-	MCFG_DEVICE_ADD("sn76489a", SN76489A, XTAL(7'159'090)/2) /* 3.579545 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
+	SN76489A(config, "sn76489a", XTAL(7'159'090)/2).add_route(ALL_OUTPUTS, "mono", 1.00); /* 3.579545 MHz */
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED)
+	CASSETTE(config, m_cass);
+	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "pv2000_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom,col")
-	MCFG_GENERIC_LOAD(pv2000_state, pv2000_cart)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pv2000_cart", "bin,rom,col").set_device_load(FUNC(pv2000_state::cart_load), this);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","pv2000")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("pv2000");
+}
 
 
 

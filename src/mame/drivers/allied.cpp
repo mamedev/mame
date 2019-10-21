@@ -622,10 +622,11 @@ void allied_state::machine_reset()
 	m_leds[0] = 1;
 }
 
-MACHINE_CONFIG_START(allied_state::allied)
+void allied_state::allied(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6504, 3572549/4)
-	MCFG_DEVICE_PROGRAM_MAP(allied_map)
+	M6504(config, m_maincpu, 3572549/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &allied_state::allied_map);
 
 	/* Video */
 	config.set_default_layout(layout_allied);
@@ -684,23 +685,23 @@ MACHINE_CONFIG_START(allied_state::allied)
 	m_ic8->irqa_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 	m_ic8->irqb_handler().set_inputline("maincpu", M6504_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("ic3", MOS6530, 3572549/4) // unknown where the ram and i/o is located
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, allied_state, ic3_b_w))
+	mos6530_device &ic3(MOS6530(config, "ic3", 3572549/4)); // unknown where the ram and i/o is located
+	ic3.out_pb_callback().set(FUNC(allied_state::ic3_b_w));
 
-	MCFG_DEVICE_ADD("ic5", MOS6530, 3572549/4)
-	MCFG_MOS6530_IN_PA_CB(READ8(*this, allied_state, ic5_a_r))
-	//MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, allied_state, ic5_a_w))
-	//MCFG_MOS6530_IN_PB_CB(READ8(*this, allied_state, ic5_b_r))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, allied_state, ic5_b_w))
+	MOS6530(config, m_ic5, 3572549/4);
+	m_ic5->in_pa_callback().set(FUNC(allied_state::ic5_a_r));
+	//m_ic5->out_pa_callback().set(FUNC(allied_state::ic5_a_w));
+	//m_ic5->in_pb_callback().set(FUNC(allied_state::ic5_b_r));
+	m_ic5->out_pb_callback().set(FUNC(allied_state::ic5_b_w));
 
-	MCFG_DEVICE_ADD("ic6", MOS6530, 3572549/4)
-	MCFG_MOS6530_IN_PA_CB(READ8(*this, allied_state, ic6_a_r))
-	//MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, allied_state, ic6_a_w))
-	MCFG_MOS6530_IN_PB_CB(READ8(*this, allied_state, ic6_b_r))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, allied_state, ic6_b_w))
+	MOS6530(config, m_ic6, 3572549/4);
+	m_ic6->in_pa_callback().set(FUNC(allied_state::ic6_a_r));
+	//m_ic6->out_pa_callback().set(FUNC(allied_state::ic6_a_w));
+	m_ic6->in_pb_callback().set(FUNC(allied_state::ic6_b_r));
+	m_ic6->out_pb_callback().set(FUNC(allied_state::ic6_b_w));
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_a", allied_state, timer_a, attotime::from_hz(50))
-MACHINE_CONFIG_END
+	TIMER(config, "timer_a").configure_periodic(FUNC(allied_state::timer_a), attotime::from_hz(50));
+}
 
 
 ROM_START( allied )

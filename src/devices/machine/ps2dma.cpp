@@ -604,7 +604,7 @@ READ32_MEMBER(ps2_dmac_device::channel_r)
 
 WRITE32_MEMBER(ps2_dmac_device::channel_w)
 {
-	static const char* mode_strings[4] = { "Normal", "Chain", "Interleave", "Undefined" };
+	static char const *const mode_strings[4] = { "Normal", "Chain", "Interleave", "Undefined" };
 
 	switch (offset + 0x8000/8)
 	{

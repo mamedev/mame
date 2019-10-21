@@ -885,28 +885,27 @@ const tiny_rom_entry *hp9895_device::device_rom_region() const
 	return ROM_NAME(hp9895);
 }
 
-MACHINE_CONFIG_START(hp9895_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("cpu" , Z80 , 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(z80_program_map)
-	MCFG_DEVICE_IO_MAP(z80_io_map)
-	MCFG_Z80_SET_REFRESH_CALLBACK(WRITE8(*this, hp9895_device , z80_m1_w))
+void hp9895_device::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_cpu, 4000000);
+	m_cpu->set_addrmap(AS_PROGRAM, &hp9895_device::z80_program_map);
+	m_cpu->set_addrmap(AS_IO, &hp9895_device::z80_io_map);
+	m_cpu->refresh_cb().set(FUNC(hp9895_device::z80_m1_w));
 
 	PHI(config, m_phi, 0);
-	m_phi->signal_write_cb<phi_device::PHI_488_EOI>().set(FUNC(hp9895_device::phi_eoi_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_DAV>().set(FUNC(hp9895_device::phi_dav_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NRFD>().set(FUNC(hp9895_device::phi_nrfd_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_NDAC>().set(FUNC(hp9895_device::phi_ndac_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_IFC>().set(FUNC(hp9895_device::phi_ifc_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_SRQ>().set(FUNC(hp9895_device::phi_srq_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_ATN>().set(FUNC(hp9895_device::phi_atn_w));
-	m_phi->signal_write_cb<phi_device::PHI_488_REN>().set(FUNC(hp9895_device::phi_ren_w));
+	m_phi->eoi_write_cb().set(FUNC(hp9895_device::phi_eoi_w));
+	m_phi->dav_write_cb().set(FUNC(hp9895_device::phi_dav_w));
+	m_phi->nrfd_write_cb().set(FUNC(hp9895_device::phi_nrfd_w));
+	m_phi->ndac_write_cb().set(FUNC(hp9895_device::phi_ndac_w));
+	m_phi->ifc_write_cb().set(FUNC(hp9895_device::phi_ifc_w));
+	m_phi->srq_write_cb().set(FUNC(hp9895_device::phi_srq_w));
+	m_phi->atn_write_cb().set(FUNC(hp9895_device::phi_atn_w));
+	m_phi->ren_write_cb().set(FUNC(hp9895_device::phi_ren_w));
 	m_phi->dio_read_cb().set(FUNC(hp9895_device::phi_dio_r));
 	m_phi->dio_write_cb().set(FUNC(hp9895_device::phi_dio_w));
 	m_phi->int_write_cb().set(FUNC(hp9895_device::phi_int_w));
 	m_phi->sys_cntrl_read_cb().set_constant(0);
 
-	MCFG_FLOPPY_DRIVE_ADD("floppy0" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
-	MCFG_SLOT_FIXED(true)
-	MCFG_FLOPPY_DRIVE_ADD("floppy1" , hp9895_floppies , "8dsdd" , hp9895_floppy_formats)
-	MCFG_SLOT_FIXED(true)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "floppy0", hp9895_floppies, "8dsdd", hp9895_floppy_formats).set_fixed(true);
+	FLOPPY_CONNECTOR(config, "floppy1", hp9895_floppies, "8dsdd", hp9895_floppy_formats).set_fixed(true);
+}

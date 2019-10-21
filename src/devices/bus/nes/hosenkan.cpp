@@ -105,7 +105,7 @@ void nes_hosenkan_device::hblank_irq( int scanline, int vblank, int blanked )
 	m_irq_clear = 0;
 }
 
-WRITE8_MEMBER(nes_hosenkan_device::write_h)
+void nes_hosenkan_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("hosenkan write_h, offset: %04x, data: %02x\n", offset, data));
 

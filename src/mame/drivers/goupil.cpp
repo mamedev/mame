@@ -24,6 +24,7 @@
 #include "emu.h"
 
 #include "cpu/m6800/m6800.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
@@ -133,7 +134,6 @@ private:
 class goupil_g2_state : public goupil_base_state
 {
 public:
-
 	goupil_g2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: goupil_base_state(mconfig, type, tag)
 		, m_visu24x80_ram(*this, RAM_TAG)
@@ -174,7 +174,7 @@ void goupil_g1_state::device_timer(emu_timer &timer, device_timer_id id, int par
 		m_scanline_timer->adjust(m_screen->time_until_pos(m_screen->vpos() + 10));
 		break;
 	default:
-		assert_always(false, "Unknown id in goupil_g1_state::device_timer");
+		throw emu_fatalerror("Unknown id in goupil_g1_state::device_timer");
 	}
 }
 
@@ -187,7 +187,7 @@ void goupil_g1_state::mem(address_map &map)
 
 	map(0xE400, 0xE7FF).ram();
 	map(0xE800, 0xE80F).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
-	map(0xE810, 0xE81F).rw(m_via_video, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE810, 0xE81F).m(m_via_video, FUNC(via6522_device::map));
 
 	map(0xE820, 0xE820).rw("i8279_kb1", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE821, 0xE821).rw("i8279_kb1", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
@@ -195,9 +195,9 @@ void goupil_g1_state::mem(address_map &map)
 	map(0xE830, 0xE830).rw("i8279_kb2", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE831, 0xE831).rw("i8279_kb2", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	map(0xE840, 0xE84F).rw(m_via_keyb, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE840, 0xE84F).m(m_via_keyb, FUNC(via6522_device::map));
 
-	map(0xE860, 0xE86F).rw(m_via_modem, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE860, 0xE86F).m(m_via_modem, FUNC(via6522_device::map));
 
 	map(0xE8F0, 0xE8FF).rw(m_fdc, FUNC(fd1791_device::read), FUNC(fd1791_device::write));
 
@@ -216,7 +216,7 @@ void goupil_g2_state::mem(address_map &map)
 	map(0xE400, 0xE7FF).ram();
 
 	map(0xE800, 0xE80F).rw(m_acia, FUNC(acia6850_device::data_r), FUNC(acia6850_device::data_w));
-	map(0xE810, 0xE81F).rw(m_via_video, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE810, 0xE81F).m(m_via_video, FUNC(via6522_device::map));
 
 	map(0xE820, 0xE820).rw("i8279_kb1", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE821, 0xE821).rw("i8279_kb1", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
@@ -224,9 +224,9 @@ void goupil_g2_state::mem(address_map &map)
 	map(0xE830, 0xE830).rw("i8279_kb2", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));
 	map(0xE831, 0xE831).rw("i8279_kb2", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));
 
-	map(0xE840, 0xE84F).rw(m_via_keyb, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE840, 0xE84F).m(m_via_keyb, FUNC(via6522_device::map));
 
-	map(0xE860, 0xE86F).rw(m_via_modem, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0xE860, 0xE86F).m(m_via_modem, FUNC(via6522_device::map));
 
 	map(0xE870, 0xE870).rw("crtc", FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xE871, 0xE871).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -551,15 +551,15 @@ void goupil_base_state::base(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy1, goupil_floppies, "525qd", floppy_image_device::default_floppy_formats);
 
 	i8279_device &i8279_kb1(I8279(config, "i8279_kb1", CPU_CLOCK));
-	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));	// scan SL lines
-	i8279_kb1.in_rl_callback().set(FUNC(goupil_g1_state::kbd1_r));				// kbd RL lines
+	i8279_kb1.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd1_w));   // scan SL lines
+	i8279_kb1.in_rl_callback().set(FUNC(goupil_g1_state::kbd1_r));              // kbd RL lines
 	i8279_kb1.in_shift_callback().set(FUNC(goupil_g1_state::shift_kb1_r));
 	i8279_kb1.in_ctrl_callback().set(FUNC(goupil_g1_state::ctrl_kb1_r));
 	i8279_kb1.out_irq_callback().set(m_via_keyb, FUNC(via6522_device::write_ca1));
 
 	i8279_device &i8279_kb2(I8279(config, "i8279_kb2", CPU_CLOCK));
-	i8279_kb2.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd2_w));	// scan SL lines
-	i8279_kb2.in_rl_callback().set(FUNC(goupil_g1_state::kbd2_r));				// kbd RL lines
+	i8279_kb2.out_sl_callback().set(FUNC(goupil_g1_state::scanlines_kbd2_w));   // scan SL lines
+	i8279_kb2.in_rl_callback().set(FUNC(goupil_g1_state::kbd2_r));              // kbd RL lines
 	i8279_kb2.in_shift_callback().set_constant(1);
 	i8279_kb2.in_ctrl_callback().set_constant(1);
 }
@@ -573,7 +573,7 @@ void goupil_g1_state::goupil_g1(machine_config &config)
 	m_screen->set_size(64*8, 16*(8+4));
 	m_screen->set_visarea(0, 64*8-1, 0, 16*(8+4)-1);
 
-	PALETTE(config, m_palette, 16);
+	PALETTE(config, m_palette).set_entries(16);
 
 	EF9364(config, m_ef9364, VIDEO_CLOCK);
 	m_ef9364->set_palette_tag("palette");
@@ -597,8 +597,7 @@ void goupil_g2_state::goupil_g2(machine_config &config)
 	m_screen->set_size((80*8), (24*(8+4)));
 	m_screen->set_visarea(0, (80*8)-1, 0, (24*(8+4))-1);
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_monochrome_highlight));
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
 
 	mc6845_device &crtc(MC6845(config, "crtc", 14.318181_MHz_XTAL / 8));
 	crtc.set_show_border_area(false);

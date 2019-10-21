@@ -402,10 +402,12 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/adc0808.h"
 #include "sound/2610intf.h"
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
 void wgp_state::parse_control()
 {
@@ -417,7 +419,7 @@ void wgp_state::parse_control()
 	/* bit 1 is "vibration" acc. to test mode */
 }
 
-WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
+void wgp_state::cpua_ctrl_w(u16 data)/* assumes Z80 sandwiched between 68Ks */
 {
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;   /* for Wgp */
@@ -441,15 +443,12 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	case TIMER_INTERRUPT4:
 		m_maincpu->set_input_line(4, HOLD_LINE);
 		break;
-	case TIMER_INTERRUPT6:
-		m_maincpu->set_input_line(6, HOLD_LINE);
-		break;
 	/* 68000 B */
 	case TIMER_CPUB_INTERRUPT6:
 		m_subcpu->set_input_line(6, HOLD_LINE); /* assumes Z80 sandwiched between the 68Ks */
 		break;
 	default:
-		assert_always(false, "Unknown id in wgp_state::device_timer");
+		throw emu_fatalerror("Unknown id in wgp_state::device_timer");
 	}
 }
 
@@ -470,14 +469,14 @@ INTERRUPT_GEN_MEMBER(wgp_state::cpub_interrupt)
                          GAME INPUTS
 **********************************************************/
 
-READ16_MEMBER(wgp_state::lan_status_r)
+u16 wgp_state::lan_status_r()
 {
 	logerror("CPU #2 PC %06x: warning - read lan status\n",m_subcpu->pc());
 
 	return  (0x4 << 8); /* CPUB expects this in code at $104d0 (Wgp) */
 }
 
-WRITE16_MEMBER(wgp_state::rotate_port_w)
+void wgp_state::rotate_port_w(offs_t offset, u16 data)
 {
 	/* This port may be for piv/sprite layer rotation.
 
@@ -512,82 +511,66 @@ WRITE16_MEMBER(wgp_state::rotate_port_w)
 	}
 }
 
+u8 wgp_state::accel_r()
+{
+	if (m_fake.read_safe(0) & 0x40)    // pressing accel
+		return 0xff;
+	else
+		return 0x00;
+}
 
-#define STEER_PORT_TAG   "STEER"
-#define UNKNOWN_PORT_TAG "UNKNOWN"
-#define FAKE_PORT_TAG    "FAKE"
-
-READ16_MEMBER(wgp_state::adinput_r)
+u8 wgp_state::steer_r()
 {
 	int steer = 0x40;
 	int fake = m_fake.read_safe(0);
 
-	if (!(fake & 0x10)) /* Analogue steer (the real control method) */
+	if (!(fake & 0x10)) // Analogue steer (the real control method)
 	{
-		/* Reduce span to 0x80 */
+		// Reduce span to 0x80
 		steer = (m_steer.read_safe(0) * 0x80) / 0x100;
 	}
-	else    /* Digital steer */
+	else    // Digital steer
 	{
-		if (fake & 0x08)    /* pressing down */
+		if (fake & 0x08)    // pressing down
 			steer = 0x20;
 
-		if (fake & 0x04)    /* pressing up */
+		if (fake & 0x04)    // pressing up
 			steer = 0x60;
 
-		if (fake & 0x02)    /* pressing right */
+		if (fake & 0x02)    // pressing right
 			steer = 0x00;
 
-		if (fake & 0x01)    /* pressing left */
+		if (fake & 0x01)    // pressing left
 			steer = 0x80;
 	}
 
-	switch (offset)
-	{
-		case 0x00:
-		{
-			if (fake & 0x40)    /* pressing accel */
-				return 0xff;
-			else
-				return 0x00;
-		}
-
-		case 0x01:
-			return steer;
-
-		case 0x02:
-			return 0xc0;    /* steer offset, correct acc. to service mode */
-
-		case 0x03:
-			return 0xbf;    /* accel offset, correct acc. to service mode */
-
-		case 0x04:
-		{
-			if (fake & 0x80)    /* pressing brake */
-				return 0xcf;
-			else
-				return 0xff;
-		}
-
-		case 0x05:
-			return m_unknown.read_safe(0);   /* unknown */
-	}
-
-logerror("CPU #0 PC %06x: warning - read unmapped a/d input offset %06x\n",m_maincpu->pc(),offset);
-
-	return 0xff;
+	return steer;
 }
 
-WRITE16_MEMBER(wgp_state::adinput_w)
+u8 wgp_state::steer_offset_r()
 {
-	/* Each write invites a new interrupt as soon as the
-	   hardware has got the next a/d conversion ready. We set a token
-	   delay of 10000 cycles although our inputs are always ready. */
-
-	m_int6_timer->adjust(m_maincpu->cycles_to_attotime(10000));
+	return 0xc0;    // steer offset, correct acc. to service mode
 }
 
-WRITE8_MEMBER(wgp_state::coins_w)
+u8 wgp_state::accel_offset_r()
+{
+	return 0xbf;    // accel offset, correct acc. to service mode
+}
+
+u8 wgp_state::brake_r()
+{
+	if (m_fake.read_safe(0) & 0x80)    // pressing brake
+		return 0xcf;
+	else
+		return 0xff;
+}
+
+u8 wgp_state::unknown_r()
+{
+	return m_unknown.read_safe(0);   // unknown
+}
+
+void wgp_state::coins_w(u8 data)
 {
 	machine().bookkeeping().coin_lockout_w(0, ~data & 0x01);
 	machine().bookkeeping().coin_lockout_w(1, ~data & 0x02);
@@ -600,7 +583,7 @@ WRITE8_MEMBER(wgp_state::coins_w)
                           SOUND
 **********************************************************/
 
-WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
+void wgp_state::sound_bankswitch_w(u8 data)
 {
 	m_z80bank->set_entry(data & 3);
 }
@@ -616,9 +599,9 @@ void wgp_state::main_map(address_map &map)
 	map(0x140000, 0x143fff).ram().share("sharedram");
 	map(0x180000, 0x18000f).rw(m_tc0220ioc, FUNC(tc0220ioc_device::read), FUNC(tc0220ioc_device::write)).umask16(0xff00);
 	map(0x1c0000, 0x1c0001).w(FUNC(wgp_state::cpua_ctrl_w));
-	map(0x200000, 0x20000f).rw(FUNC(wgp_state::adinput_r), FUNC(wgp_state::adinput_w));
-	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::word_r), FUNC(tc0100scn_device::word_w));            /* tilemaps */
-	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_word_r), FUNC(tc0100scn_device::ctrl_word_w));
+	map(0x200000, 0x20000f).rw("adc", FUNC(adc0809_device::data_r), FUNC(adc0809_device::address_offset_start_w)).umask16(0x00ff);
+	map(0x300000, 0x30ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));            /* tilemaps */
+	map(0x320000, 0x32000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
 	map(0x400000, 0x40bfff).ram().share("spritemap");   /* sprite tilemaps */
 	map(0x40c000, 0x40dfff).ram().share("spriteram");   /* sprite ram */
 	map(0x40fff0, 0x40fff1).nopw();    /* ?? (writes 0x8000 and 0 alternately - Wgp2 just 0) */
@@ -636,8 +619,7 @@ void wgp_state::cpu2_map(address_map &map)
 	map(0x140000, 0x143fff).ram().share("sharedram");
 	map(0x200001, 0x200001).w(m_tc0140syt, FUNC(tc0140syt_device::master_port_w));
 	map(0x200003, 0x200003).rw(m_tc0140syt, FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
-//  AM_RANGE(0x380000, 0x383fff) AM_READONLY       // LAN RAM
-//  AM_RANGE(0x380000, 0x383fff) AM_WRITEONLY    // LAN RAM
+//  map(0x380000, 0x383fff).ram();    // LAN RAM
 	map(0x380000, 0x380001).r(FUNC(wgp_state::lan_status_r));  // ??
 	// a lan input area is read somewhere above the status
 	// (make the status return 0 and log)...
@@ -757,14 +739,14 @@ static INPUT_PORTS_START( wgp_no_joy_generic )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START(STEER_PORT_TAG)
+	PORT_START("STEER")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(25) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START(UNKNOWN_PORT_TAG)
+	PORT_START("UNKNOWN")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
 	/* fake inputs, allowing digital steer etc. */
-	PORT_START(FAKE_PORT_TAG)
+	PORT_START("FAKE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)
@@ -830,44 +812,9 @@ INPUT_PORTS_END
                         GFX DECODING
 ***********************************************************/
 
-static const gfx_layout wgp_tilelayout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 1*4, 0*4, 5*4, 4*4, 3*4, 2*4, 7*4, 6*4, 9*4, 8*4, 13*4, 12*4, 11*4, 10*4, 15*4, 14*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout wgp_tile2layout =
-{
-	16,16,  /* 16*16 sprites */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 7*4, 6*4, 15*4, 14*4, 5*4, 4*4, 13*4, 12*4, 3*4, 2*4, 11*4, 10*4, 1*4, 0*4, 9*4, 8*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8   /* every sprite takes 128 consecutive bytes */
-};
-
-static const gfx_layout charlayout =
-{
-	8,8,    /* 8*8 characters */
-	RGN_FRAC(1,1),
-	4,  /* 4 bits per pixel */
-	{ 0, 1, 2, 3 },
-	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8    /* every sprite takes 32 consecutive bytes */
-};
-
-/* taitoic.c TC0100SCN routines expect scr stuff to be in second gfx slot */
 static GFXDECODE_START( gfx_wgp )
-	GFXDECODE_ENTRY( "gfx3", 0x0, wgp_tilelayout,  0, 256 )     /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0x0, charlayout,  0, 256 )     /* sprites & playfield */
-	GFXDECODE_ENTRY( "gfx2", 0x0, wgp_tile2layout,  0, 256 )    /* piv */
+	GFXDECODE_ENTRY( "sprites", 0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* sprites */
+	GFXDECODE_ENTRY( "piv",     0x0, gfx_16x16x4_packed_lsb, 0, 256 )    /* piv */
 GFXDECODE_END
 
 
@@ -879,7 +826,7 @@ However sync to vblank is lacking, which is causing the
 graphics glitches.
 ***********************************************************/
 
-void wgp_state::postload()
+void wgp_state::device_post_load()
 {
 	parse_control();
 }
@@ -897,37 +844,34 @@ void wgp_state::machine_reset()
 		m_piv_scrolly[i] = 0;
 	}
 
-	memset(m_rotate_ctrl, 0, 8 * sizeof(uint16_t));
+	std::fill(std::begin(m_rotate_ctrl), std::end(m_rotate_ctrl), 0);
 }
 
 void wgp_state::machine_start()
 {
 	m_z80bank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
 
-	m_int6_timer = timer_alloc(TIMER_INTERRUPT6);
 	m_cpub_int6_timer = timer_alloc(TIMER_CPUB_INTERRUPT6);
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_port_sel));
-	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::postload), this));
 }
 
-MACHINE_CONFIG_START(wgp_state::wgp)
-
+void wgp_state::wgp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wgp_state, irq4_line_hold)
+	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &wgp_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wgp_state::irq4_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 16000000/4)   /* 4 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(z80_sound_map)
+	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wgp_state::z80_sound_map);
 
-	MCFG_DEVICE_ADD("sub", M68000, 12000000)   /* 12 MHz ??? */
-	MCFG_DEVICE_PROGRAM_MAP(cpu2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wgp_state, cpub_interrupt)
+	M68000(config, m_subcpu, 12000000);     /* 12 MHz ??? */
+	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
+	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(30000))
+	config.m_minimum_quantum = attotime::from_hz(30000);
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -937,54 +881,57 @@ MACHINE_CONFIG_START(wgp_state::wgp)
 	m_tc0220ioc->write_4_callback().set(FUNC(wgp_state::coins_w));
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
+	adc0809_device &adc(ADC0809(config, "adc", 16_MHz_XTAL / 32)); // TODO: verify divider
+	adc.eoc_ff_callback().set_inputline(m_maincpu, M68K_IRQ_6);
+	adc.in_callback<0>().set(FUNC(wgp_state::accel_r));
+	adc.in_callback<1>().set(FUNC(wgp_state::steer_r));
+	adc.in_callback<2>().set(FUNC(wgp_state::steer_offset_r));
+	adc.in_callback<3>().set(FUNC(wgp_state::accel_offset_r));
+	adc.in_callback<4>().set(FUNC(wgp_state::brake_r));
+	adc.in_callback<5>().set(FUNC(wgp_state::unknown_r));
+
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wgp_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 32*8-1);
+	screen.set_screen_update(FUNC(wgp_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wgp)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(RRRRGGGGBBBBxxxx)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wgp);
+	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 4096);
 
-	MCFG_DEVICE_ADD("tc0100scn", TC0100SCN, 0)
-	MCFG_TC0100SCN_GFX_REGION(1)
-	MCFG_TC0100SCN_TX_REGION(3)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
+	TC0100SCN(config, m_tc0100scn, 0);
+	m_tc0100scn->set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // assumes Z80 sandwiched between 68Ks
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // assumes Z80 sandwiched between 68Ks
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("sub")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	TC0140SYT(config, m_tc0140syt, 0);
+	m_tc0140syt->set_master_tag(m_subcpu);
+	m_tc0140syt->set_slave_tag(m_audiocpu);
+}
 
-
-MACHINE_CONFIG_START(wgp_state::wgp2)
+void wgp_state::wgp2(machine_config &config)
+{
 	wgp(config);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
+	config.m_minimum_quantum = attotime::from_hz(12000);
+
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(wgp_state, wgp2)
 
-	MCFG_DEVICE_MODIFY("tc0100scn")
-	MCFG_TC0100SCN_OFFSETS(4, 2)
-	MCFG_TC0100SCN_GFXDECODE("gfxdecode")
-	MCFG_TC0100SCN_PALETTE("palette")
-MACHINE_CONFIG_END
+	m_tc0100scn->set_offsets(4, 2);
+}
 
 
 /***************************************************************************
@@ -1004,20 +951,20 @@ ROM_START( wgp ) // labels actually have the character * instead of +
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "c32-24.34",   0x00000, 0x10000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
-	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
-	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
-	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+	ROM_REGION( 0x200000, "piv", 0 )
+	ROM_LOAD64_WORD( "c32-04.9",  0x000006, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD64_WORD( "c32-03.10", 0x000004, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD64_WORD( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD64_WORD( "c32-01.12", 0x000000, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
-	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
-	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
-	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD32_WORD( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD32_WORD( "c32-06.70", 0x000002, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8",  0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
@@ -1056,20 +1003,20 @@ ROM_START( wgpu )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "c32-24.34",   0x00000, 0x10000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
-	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
-	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
-	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+	ROM_REGION( 0x200000, "piv", 0 )
+	ROM_LOAD64_WORD( "c32-04.9",  0x000006, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD64_WORD( "c32-03.10", 0x000004, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD64_WORD( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD64_WORD( "c32-01.12", 0x000000, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
-	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
-	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
-	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD32_WORD( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD32_WORD( "c32-06.70", 0x000002, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8",  0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
@@ -1108,20 +1055,20 @@ ROM_START( wgpj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "c32-24.34",   0x00000, 0x10000, CRC(e9adb447) SHA1(8b7044b6ea864e4cfd60b87abd28c38caecb147d) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
-	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
-	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
-	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+	ROM_REGION( 0x200000, "piv", 0 )
+	ROM_LOAD64_WORD( "c32-04.9",  0x000006, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD64_WORD( "c32-03.10", 0x000004, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD64_WORD( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD64_WORD( "c32-01.12", 0x000000, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
-	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
-	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
-	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD32_WORD( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD32_WORD( "c32-06.70", 0x000002, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
@@ -1143,20 +1090,20 @@ ROM_START( wgpjoy )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "c32-61.34",   0x00000, 0x10000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
-	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
-	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
-	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+	ROM_REGION( 0x200000, "piv", 0 )
+	ROM_LOAD64_WORD( "c32-04.9",  0x000006, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD64_WORD( "c32-03.10", 0x000004, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD64_WORD( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD64_WORD( "c32-01.12", 0x000000, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
-	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
-	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
-	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD32_WORD( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD32_WORD( "c32-06.70", 0x000002, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
@@ -1178,20 +1125,20 @@ ROM_START( wgpjoya )    /* Older joystick version ??? */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "c32-61.34",   0x00000, 0x10000, CRC(2fcad5a3) SHA1(f0f658490655b521af631af763c07e37834dc5a0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
-	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
-	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
-	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+	ROM_REGION( 0x200000, "piv", 0 )
+	ROM_LOAD64_WORD( "c32-04.9",  0x000006, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD64_WORD( "c32-03.10", 0x000004, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD64_WORD( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD64_WORD( "c32-01.12", 0x000000, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
-	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
-	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
-	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD32_WORD( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD32_WORD( "c32-06.70", 0x000002, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
@@ -1213,20 +1160,20 @@ ROM_START( wgp2 )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "c73-05.34",   0x00000, 0x10000, CRC(7e00a299) SHA1(93696a229f17a15a92a8d9ef3b34d340de5dec44) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
-	ROM_LOAD( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c32-09.16", 0x00000, 0x80000, CRC(96495f35) SHA1(ce99b4d8aeb98304e8ae3aa4966289c76ae4ff69) ) /* SCR */
 
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "c32-04.9",  0x000000, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
-	ROM_LOAD32_BYTE( "c32-03.10", 0x000001, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
-	ROM_LOAD32_BYTE( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
-	ROM_LOAD32_BYTE( "c32-01.12", 0x000003, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
+	ROM_REGION( 0x200000, "piv", 0 )
+	ROM_LOAD64_WORD( "c32-04.9",  0x000006, 0x80000, CRC(473a19c9) SHA1(4c632f4d5b725790a1be9d1143318d2f682fe9be) ) /* PIV */
+	ROM_LOAD64_WORD( "c32-03.10", 0x000004, 0x80000, CRC(9ec3e134) SHA1(e82a50927e10e551124a3b81399b052974cfba12) )
+	ROM_LOAD64_WORD( "c32-02.11", 0x000002, 0x80000, CRC(c5721f3a) SHA1(4a8e9412de23001b09eb3425ba6006b4c09a907b) )
+	ROM_LOAD64_WORD( "c32-01.12", 0x000000, 0x80000, CRC(d27d7d93) SHA1(82ae5856bbdb49cb8c2ca20eef86f6b617ea2c45) )
 
-	ROM_REGION( 0x200000, "gfx3", 0 )
-	ROM_LOAD16_BYTE( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
-	ROM_LOAD16_BYTE( "c32-06.70", 0x000001, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
-	ROM_LOAD16_BYTE( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
-	ROM_LOAD16_BYTE( "c32-08.68", 0x100001, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD32_WORD( "c32-05.71", 0x000000, 0x80000, CRC(3698d47a) SHA1(71978f9e1f58fa1259e67d8a7ea68e3ec1314c6b) ) /* OBJ */
+	ROM_LOAD32_WORD( "c32-06.70", 0x000002, 0x80000, CRC(f0267203) SHA1(7fd7b8d7a9efa405fc647c16fb99ffcb1fe985c5) )
+	ROM_LOAD32_WORD( "c32-07.69", 0x100000, 0x80000, CRC(743d46bd) SHA1(6b655b3fbfad8b52e38d7388aab564f5fa3e778c) )
+	ROM_LOAD32_WORD( "c32-08.68", 0x100002, 0x80000, CRC(faab63b0) SHA1(6e1aaf2642bee7d7bc9e21a7bf7f81d9ff766c50) )
 
 	ROM_REGION( 0x80000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c32-11.8", 0x00000, 0x80000, CRC(2b326ff0) SHA1(3c442e3c97234e4514a7bed31644212586869bd0) )
@@ -1244,7 +1191,7 @@ void wgp_state::init_wgp()
 #if 0
 	/* Patch for coding error that causes corrupt data in
 	   sprite tilemapping area from $4083c0-847f */
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	u16 *ROM = (u16 *)memregion("maincpu")->base();
 	ROM[0x25dc / 2] = 0x0602;   // faulty value is 0x0206
 #endif
 }
@@ -1252,7 +1199,7 @@ void wgp_state::init_wgp()
 void wgp_state::init_wgp2()
 {
 	/* Code patches to prevent failure in memory checks */
-	uint16_t *ROM = (uint16_t *)memregion("sub")->base();
+	u16 *ROM = (u16 *)memregion("sub")->base();
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
 }

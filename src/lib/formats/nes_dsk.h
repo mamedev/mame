@@ -7,12 +7,13 @@
     NES disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_NES_DSK_H
+#define MAME_FORMATS_NES_DSK_H
 
-#ifndef NES_DSK_H_
-#define NES_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
 LEGACY_FLOPPY_OPTIONS_EXTERN(nes_only);
 
-#endif /*NES_DSK_H_*/
+#endif // MAME_FORMATS_NES_DSK_H

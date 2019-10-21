@@ -165,23 +165,23 @@ http://www.z88forever.org.uk/zxplus3e/
 /* TS2048 specific functions */
 
 
-READ8_MEMBER( spectrum_state::ts2068_port_f4_r )
+READ8_MEMBER( timex_state::ts2068_port_f4_r )
 {
 	return m_port_f4_data;
 }
 
-WRITE8_MEMBER( spectrum_state::ts2068_port_f4_w )
+WRITE8_MEMBER( timex_state::ts2068_port_f4_w )
 {
 	m_port_f4_data = data;
 	ts2068_update_memory();
 }
 
-READ8_MEMBER( spectrum_state::ts2068_port_ff_r )
+READ8_MEMBER( timex_state::ts2068_port_ff_r )
 {
 	return m_port_ff_data;
 }
 
-WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
+WRITE8_MEMBER( timex_state::ts2068_port_ff_w )
 {
 		/* Bits 0-2 Video Mode Select
 		   Bits 3-5 64 column mode ink/paper selection
@@ -212,7 +212,7 @@ WRITE8_MEMBER( spectrum_state::ts2068_port_ff_w )
  *      at the same time.
  *
  *******************************************************************/
-void spectrum_state::ts2068_update_memory()
+void timex_state::ts2068_update_memory()
 {
 	uint8_t *messram = nullptr;
 	if (m_ram) messram = m_ram->pointer();
@@ -525,16 +525,16 @@ void spectrum_state::ts2068_update_memory()
 	}
 }
 
-void spectrum_state::ts2068_io(address_map &map)
+void timex_state::ts2068_io(address_map &map)
 {
-	map(0xf4, 0xf4).rw(FUNC(spectrum_state::ts2068_port_f4_r), FUNC(spectrum_state::ts2068_port_f4_w)).mirror(0xff00);
+	map(0xf4, 0xf4).rw(FUNC(timex_state::ts2068_port_f4_r), FUNC(timex_state::ts2068_port_f4_w)).mirror(0xff00);
 	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
 	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xff00);
-	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::ts2068_port_ff_w)).mirror(0xff00);
+	map(0xfe, 0xfe).rw(FUNC(timex_state::spectrum_port_fe_r), FUNC(timex_state::spectrum_port_fe_w)).select(0xff00);
+	map(0xff, 0xff).rw(FUNC(timex_state::ts2068_port_ff_r), FUNC(timex_state::ts2068_port_ff_w)).mirror(0xff00);
 }
 
-void spectrum_state::ts2068_mem(address_map &map)
+void timex_state::ts2068_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).bankr("bank1").bankw("bank9");
 	map(0x2000, 0x3fff).bankr("bank2").bankw("bank10");
@@ -547,7 +547,7 @@ void spectrum_state::ts2068_mem(address_map &map)
 }
 
 
-MACHINE_RESET_MEMBER(spectrum_state,ts2068)
+MACHINE_RESET_MEMBER(timex_state,ts2068)
 {
 	m_port_ff_data = 0;
 	m_port_f4_data = 0;
@@ -565,25 +565,25 @@ MACHINE_RESET_MEMBER(spectrum_state,ts2068)
 /* TC2048 specific functions */
 
 
-WRITE8_MEMBER( spectrum_state::tc2048_port_ff_w )
+WRITE8_MEMBER( timex_state::tc2048_port_ff_w )
 {
 	m_port_ff_data = data;
 	logerror("Port %04x write %02x\n", offset, data);
 }
 
-void spectrum_state::tc2048_io(address_map &map)
+void timex_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(spectrum_state::spectrum_port_fe_r), FUNC(spectrum_state::spectrum_port_fe_w)).select(0xfffe);
-	map(0xff, 0xff).rw(FUNC(spectrum_state::ts2068_port_ff_r), FUNC(spectrum_state::tc2048_port_ff_w)).mirror(0xff00);
+	map(0x00, 0x00).rw(FUNC(timex_state::spectrum_port_fe_r), FUNC(timex_state::spectrum_port_fe_w)).select(0xfffe);
+	map(0xff, 0xff).rw(FUNC(timex_state::ts2068_port_ff_r), FUNC(timex_state::tc2048_port_ff_w)).mirror(0xff00);
 }
 
-void spectrum_state::tc2048_mem(address_map &map)
+void timex_state::tc2048_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0xffff).bankr("bank1").bankw("bank2");
 }
 
-MACHINE_RESET_MEMBER(spectrum_state,tc2048)
+MACHINE_RESET_MEMBER(timex_state,tc2048)
 {
 	uint8_t *messram = m_ram->pointer();
 
@@ -595,7 +595,7 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
+DEVICE_IMAGE_LOAD_MEMBER( timex_state::cart_load )
 {
 	uint32_t size = m_dock->common_get_size("rom");
 
@@ -686,75 +686,70 @@ static GFXDECODE_START( gfx_ts2068 )
 	GFXDECODE_ENTRY( "maincpu", 0x13d00, ts2068_charlayout, 0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(spectrum_state::ts2068)
+void timex_state::ts2068(machine_config &config)
+{
 	spectrum_128(config);
-	MCFG_DEVICE_REPLACE("maincpu", Z80, XTAL(14'112'000)/4)        /* From Schematic; 3.528 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ts2068_mem)
-	MCFG_DEVICE_IO_MAP(ts2068_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", spectrum_state,  spec_interrupt)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, ts2068 )
+	Z80(config.replace(), m_maincpu, XTAL(14'112'000)/4);        /* From Schematic; 3.528 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &timex_state::ts2068_mem);
+	m_maincpu->set_addrmap(AS_IO, &timex_state::ts2068_io);
+	m_maincpu->set_vblank_int("screen", FUNC(timex_state::spec_interrupt));
+	config.m_minimum_quantum = attotime::from_hz(60);
+
+	MCFG_MACHINE_RESET_OVERRIDE(timex_state, ts2068 )
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_ts2068)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(TS2068_SCREEN_WIDTH, TS2068_SCREEN_HEIGHT);
+	m_screen->set_visarea(0, TS2068_SCREEN_WIDTH-1, 0, TS2068_SCREEN_HEIGHT-1);
+	m_screen->set_screen_update(FUNC(timex_state::screen_update_ts2068));
+	m_screen->screen_vblank().set(FUNC(timex_state::screen_vblank_timex));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_ts2068)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ts2068);
 
-	MCFG_VIDEO_START_OVERRIDE(spectrum_state, ts2068 )
+	MCFG_VIDEO_START_OVERRIDE(timex_state, ts2068 )
 
 	/* sound */
-	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'112'000)/8)        /* From Schematic; 1.764 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config.replace(), "ay8912", XTAL(14'112'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);        /* From Schematic; 1.764 MHz */
 
 	/* cartridge */
-	MCFG_GENERIC_CARTSLOT_ADD("dockslot", generic_plain_slot, "timex_cart")
-	MCFG_GENERIC_EXTENSIONS("dck,bin")
-	MCFG_GENERIC_LOAD(spectrum_state, timex_cart)
+	GENERIC_CARTSLOT(config, "dockslot", generic_plain_slot, "timex_cart", "dck,bin").set_device_load(FUNC(timex_state::cart_load), this);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "timex_dock")
+	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("48K");
+}
 
 
-MACHINE_CONFIG_START(spectrum_state::uk2086)
+void timex_state::uk2086(machine_config &config)
+{
 	ts2068(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-MACHINE_CONFIG_END
+	m_screen->set_refresh_hz(50);
+}
 
 
-MACHINE_CONFIG_START(spectrum_state::tc2048)
+void timex_state::tc2048(machine_config &config)
+{
 	spectrum(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(tc2048_mem)
-	MCFG_DEVICE_IO_MAP(tc2048_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &timex_state::tc2048_mem);
+	m_maincpu->set_addrmap(AS_IO, &timex_state::tc2048_io);
 
-	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, tc2048 )
+	MCFG_MACHINE_RESET_OVERRIDE(timex_state, tc2048 )
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1)
-	MCFG_SCREEN_UPDATE_DRIVER(spectrum_state, screen_update_tc2048)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, spectrum_state, screen_vblank_timex))
+	m_screen->set_refresh_hz(50);
+	m_screen->set_size(TS2068_SCREEN_WIDTH, SPEC_SCREEN_HEIGHT);
+	m_screen->set_visarea(0, TS2068_SCREEN_WIDTH-1, 0, SPEC_SCREEN_HEIGHT-1);
+	m_screen->set_screen_update(FUNC(timex_state::screen_update_tc2048));
+	m_screen->screen_vblank().set(FUNC(timex_state::screen_vblank_timex));
 
-	MCFG_VIDEO_START_OVERRIDE(spectrum_state, spectrum_128 )
+	MCFG_VIDEO_START_OVERRIDE(timex_state, spectrum_128 )
 
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("48K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("48K");
+}
 
 
 
@@ -781,7 +776,7 @@ ROM_START(uk2086)
 	ROM_LOAD("ts2068_x.rom",0x14000,0x2000, CRC(ae16233a) SHA1(7e265a2c1f621ed365ea23bdcafdedbc79c1299c))
 ROM_END
 
-//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY              FULLNAME             FLAGS
-COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, spectrum_state, empty_init, "Timex of Portugal", "TC-2048" ,          0 )
-COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, spectrum_state, empty_init, "Timex Sinclair",    "TS-2068" ,          0 )
-COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, spectrum_state, empty_init, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )
+//    YEAR  NAME    PARENT    COMPAT  MACHINE  INPUT     CLASS        INIT        COMPANY              FULLNAME             FLAGS
+COMP( 1984, tc2048, spectrum, 0,      tc2048,  spectrum, timex_state, empty_init, "Timex of Portugal", "TC-2048" ,          0 )
+COMP( 1983, ts2068, spectrum, 0,      ts2068,  spectrum, timex_state, empty_init, "Timex Sinclair",    "TS-2068" ,          0 )
+COMP( 1986, uk2086, spectrum, 0,      uk2086,  spectrum, timex_state, empty_init, "Unipolbrit",        "UK-2086 ver. 1.2" , 0 )

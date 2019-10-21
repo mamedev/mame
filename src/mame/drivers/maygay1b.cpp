@@ -73,72 +73,18 @@
 ******************************************************************************************/
 #include "emu.h"
 #include "includes/maygay1b.h"
+
 #include "machine/74259.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 #include "maygay1b.lh"
 
-#include "m1albsqp.lh"
-#include "m1apollo2.lh"
-#include "m1bargnc.lh"
-#include "m1bghou.lh"
-#include "m1bigdel.lh"
-#include "m1calypsa.lh"
-#include "m1casclb.lh"
-#include "m1casroy1.lh"
-#include "m1chain.lh"
-#include "m1cik51o.lh"
-#include "m1clbfvr.lh"
-#include "m1cluecb1.lh"
-#include "m1cluedo4.lh"
-#include "m1cluessf.lh"
-#include "m1coro21n.lh"
-#include "m1cororrk.lh"
-#include "m1dkong91n.lh"
-#include "m1dxmono51o.lh"
-#include "m1eastndl.lh"
-#include "m1eastqv3.lh"
-#include "m1fantfbb.lh"
-#include "m1fightb.lh"
-#include "m1frexplc.lh"
-#include "m1gladg.lh"
-#include "m1grescb.lh"
-#include "m1guvnor.lh"
-#include "m1hotpoth.lh"
-#include "m1htclb.lh"
-#include "m1imclb.lh"
-#include "m1infern.lh"
-#include "m1inwinc.lh"
-#include "m1itjobc.lh"
-#include "m1itskob.lh"
-#include "m1jpmult.lh"
-#include "m1lucknon.lh"
-#include "m1luxorb.lh"
-#include "m1manhat.lh"
-#include "m1monclb.lh"
-#include "m1mongam.lh"
-#include "m1monmon.lh"
-#include "m1monou.lh"
-#include "m1nhp.lh"
-#include "m1nudbnke.lh"
-#include "m1omega.lh"
-#include "m1onbusa.lh"
-#include "m1pinkpc.lh"
-#include "m1przeeb.lh"
-#include "m1retpp.lh"
-#include "m1search.lh"
-#include "m1sptlgtc.lh"
-#include "m1startr.lh"
-#include "m1sudnima.lh"
-#include "m1taknot.lh"
-#include "m1thatlfc.lh"
-#include "m1topstr.lh"
-#include "m1triviax.lh"
-#include "m1trtr.lh"
-#include "m1ttcash.lh"
-#include "m1wldzner.lh"
-#include "m1wotwa.lh"
 
+#define M1_MASTER_CLOCK (XTAL(8'000'000))
+#define M1_DUART_CLOCK  (XTAL(3'686'400))
 
 // not yet working
 //#define USE_MCU
@@ -439,7 +385,7 @@ WRITE_LINE_MEMBER(maygay1b_state::srsel_w)
 
 WRITE8_MEMBER(maygay1b_state::latch_ch2_w)
 {
-	m_msm6376->write(space, 0, data&0x7f);
+	m_msm6376->write(data&0x7f);
 	m_msm6376->ch2_w(data&0x80);
 }
 
@@ -494,7 +440,7 @@ void maygay1b_state::m1_memmap(address_map &map)
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  map(0x2050, 0x2050)// SCAN on M1B
 #endif
 
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
@@ -548,16 +494,16 @@ READ8_MEMBER(maygay1b_state::nec_reset_r)
 
 WRITE8_MEMBER(maygay1b_state::nec_bank0_w)
 {
-	m_upd7759->set_bank_base(0x00000);
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->set_rom_bank(0);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
 
 WRITE8_MEMBER(maygay1b_state::nec_bank1_w)
 {
-	m_upd7759->set_bank_base(0x20000);
-	m_upd7759->port_w(space, 0, data);
+	m_upd7759->set_rom_bank(1);
+	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
 	m_upd7759->start_w(1);
 }
@@ -580,7 +526,7 @@ void maygay1b_state::m1_nec_memmap(address_map &map)
 #else
 	//8051
 	map(0x2040, 0x2041).rw("i8279_2", FUNC(i8279_device::read), FUNC(i8279_device::write));
-//  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
+//  map(0x2050, 0x2050)// SCAN on M1B
 #endif
 
 	map(0x2070, 0x207f).rw(m_duart68681, FUNC(mc68681_device::read), FUNC(mc68681_device::write));
@@ -762,104 +708,104 @@ READ8_MEMBER(maygay1b_state::mcu_port2_r)
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1)
+void maygay1b_state::maygay_m1(machine_config &config)
+{
+	MC6809(config, m_maincpu, M1_MASTER_CLOCK/2); // claimed to be 4 MHz
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_memmap);
 
-	MCFG_DEVICE_ADD("maincpu", MC6809, M1_MASTER_CLOCK/2) // claimed to be 4 MHz
-	MCFG_DEVICE_PROGRAM_MAP(m1_memmap)
+	I80C51(config, m_mcu, 2000000); //  EP840034.A-P-80C51AVW
+	m_mcu->port_in_cb<0>().set(FUNC(maygay1b_state::mcu_port0_r));
+	m_mcu->port_out_cb<0>().set(FUNC(maygay1b_state::mcu_port0_w));
+	m_mcu->port_out_cb<1>().set(FUNC(maygay1b_state::mcu_port1_w));
+	m_mcu->port_in_cb<2>().set(FUNC(maygay1b_state::mcu_port2_r));
+	m_mcu->port_out_cb<2>().set(FUNC(maygay1b_state::mcu_port2_w));
+	m_mcu->port_out_cb<3>().set(FUNC(maygay1b_state::mcu_port3_w));
 
-	MCFG_DEVICE_ADD("mcu", I80C51, 2000000) //  EP840034.A-P-80C51AVW
-	MCFG_MCS51_PORT_P0_IN_CB(READ8(*this, maygay1b_state, mcu_port0_r))
-	MCFG_MCS51_PORT_P0_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port0_w))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port1_w))
-	MCFG_MCS51_PORT_P2_IN_CB(READ8(*this, maygay1b_state, mcu_port2_r))
-	MCFG_MCS51_PORT_P2_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port2_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, maygay1b_state, mcu_port3_w))
-
-	MCFG_DEVICE_ADD("duart68681", MC68681, M1_DUART_CLOCK)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, maygay1b_state, duart_irq_handler))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, maygay1b_state, m1_duart_r))
+	MC68681(config, m_duart68681, M1_DUART_CLOCK);
+	m_duart68681->irq_cb().set(FUNC(maygay1b_state::duart_irq_handler));
+	m_duart68681->inport_cb().set(FUNC(maygay1b_state::m1_duart_r));;
 
 	pia6821_device &pia(PIA6821(config, "pia", 0));
 	pia.writepa_handler().set(FUNC(maygay1b_state::m1_pia_porta_w));
 	pia.writepb_handler().set(FUNC(maygay1b_state::m1_pia_portb_w));
 
-	MCFG_DEVICE_ADD("mainlatch", HC259, 0) // U29
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, maygay1b_state, ramen_w))  // m_RAMEN
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, maygay1b_state, alarmen_w)) // AlarmEn
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, maygay1b_state, nmien_w)) // Enable
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, maygay1b_state, rts_w)) // RTS
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, maygay1b_state, psurelay_w)) // PSURelay
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, maygay1b_state, wdog_w)) // WDog
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, maygay1b_state, srsel_w)) // Srsel
+	hc259_device &mainlatch(HC259(config, "mainlatch")); // U29
+	mainlatch.q_out_cb<0>().set(FUNC(maygay1b_state::ramen_w));     // m_RAMEN
+	mainlatch.q_out_cb<1>().set(FUNC(maygay1b_state::alarmen_w));   // AlarmEn
+	mainlatch.q_out_cb<2>().set(FUNC(maygay1b_state::nmien_w));     // Enable
+	mainlatch.q_out_cb<3>().set(FUNC(maygay1b_state::rts_w));       // RTS
+	mainlatch.q_out_cb<4>().set(FUNC(maygay1b_state::psurelay_w));  // PSURelay
+	mainlatch.q_out_cb<5>().set(FUNC(maygay1b_state::wdog_w));      // WDog
+	mainlatch.q_out_cb<6>().set(FUNC(maygay1b_state::srsel_w));     // Srsel
 
-	MCFG_S16LF01_ADD("vfd",0)
+	S16LF01(config, m_vfd);
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("aysnd", YM2149, M1_MASTER_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, maygay1b_state, m1_meter_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, maygay1b_state, m1_lockout_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	YM2149(config, m_ay, M1_MASTER_CLOCK);
+	m_ay->port_a_write_callback().set(FUNC(maygay1b_state::m1_meter_w));
+	m_ay->port_b_write_callback().set(FUNC(maygay1b_state::m1_lockout_w));
+	m_ay->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_ay->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, M1_MASTER_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", M1_MASTER_CLOCK/4));
+	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("msm6376", OKIM6376, 102400) //? Seems to work well with samples, but unconfirmed
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	OKIM6376(config, m_msm6376, 102400); //? Seems to work well with samples, but unconfirmed
+	m_msm6376->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_msm6376->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmitimer", maygay1b_state, maygay1b_nmitimer_callback, attotime::from_hz(75)) // freq?
+	TIMER(config, "nmitimer").configure_periodic(FUNC(maygay1b_state::maygay1b_nmitimer_callback), attotime::from_hz(75)); // freq?
 
-	MCFG_DEVICE_ADD("i8279", I8279, M1_MASTER_CLOCK/4)    // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, maygay1b_state, scanlines_w))   // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygay1b_state, lamp_data_w))     // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, maygay1b_state, kbd_r))           // kbd RL lines
+	i8279_device &kbdc(I8279(config, "i8279", M1_MASTER_CLOCK/4));      // unknown clock
+	kbdc.out_sl_callback().set(FUNC(maygay1b_state::scanlines_w));      // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(maygay1b_state::lamp_data_w));    // display A&B
+	kbdc.in_rl_callback().set(FUNC(maygay1b_state::kbd_r));             // kbd RL lines
 
 #ifndef USE_MCU
 	// on M1B there is a 2nd i8279, on M1 / M1A a 8051 handles this task!
-	MCFG_DEVICE_ADD("i8279_2", I8279, M1_MASTER_CLOCK/4)        // unknown clock
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, maygay1b_state, scanlines_2_w))   // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, maygay1b_state, lamp_data_2_w))       // display A&B
+	i8279_device &kbdc2(I8279(config, "i8279_2", M1_MASTER_CLOCK/4));   // unknown clock
+	kbdc2.out_sl_callback().set(FUNC(maygay1b_state::scanlines_2_w));   // scan SL lines
+	kbdc2.out_disp_callback().set(FUNC(maygay1b_state::lamp_data_2_w)); // display A&B
 #endif
 
-	MCFG_DEVICE_ADD("reel0", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<0>))
-	MCFG_DEVICE_ADD("reel1", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<1>))
-	MCFG_DEVICE_ADD("reel2", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<2>))
-	MCFG_DEVICE_ADD("reel3", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<3>))
-	MCFG_DEVICE_ADD("reel4", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<4>))
-	MCFG_DEVICE_ADD("reel5", REEL, STARPOINT_48STEP_REEL, 1, 3, 0x09, 4)
-	MCFG_STEPPER_OPTIC_CALLBACK(WRITELINE(*this, maygay1b_state, reel_optic_cb<5>))
+	REEL(config, m_reels[0], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[0]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<0>));
+	REEL(config, m_reels[1], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[1]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<1>));
+	REEL(config, m_reels[2], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[2]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<2>));
+	REEL(config, m_reels[3], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[3]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<3>));
+	REEL(config, m_reels[4], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[4]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<4>));
+	REEL(config, m_reels[5], STARPOINT_48STEP_REEL, 1, 3, 0x09, 4);
+	m_reels[5]->optic_handler().set(FUNC(maygay1b_state::reel_optic_cb<5>));
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(8)
+	METERS(config, m_meters, 0).set_number(8);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	config.set_default_layout(layout_maygay1b);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_no_oki)
+void maygay1b_state::maygay_m1_no_oki(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_REMOVE("msm6376")
-MACHINE_CONFIG_END
+	config.device_remove("msm6376");
+}
 
-MACHINE_CONFIG_START(maygay1b_state::maygay_m1_nec)
+void maygay1b_state::maygay_m1_nec(machine_config &config)
+{
 	maygay_m1(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(m1_nec_memmap)
+	m_maincpu->set_addrmap(AS_PROGRAM, &maygay1b_state::m1_nec_memmap);
 
-	MCFG_DEVICE_REMOVE("msm6376")
+	config.device_remove("msm6376");
 
-	MCFG_DEVICE_ADD("upd", UPD7759)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	UPD7759(config, m_upd7759);
+	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+}
 
 WRITE8_MEMBER(maygay1b_state::m1ab_no_oki_w)
 {
@@ -910,12 +856,10 @@ void maygay1b_state::init_m1()
 {
 	init_m1common();
 
-	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
+	//map(0x2420, 0x2421).w(FUNC(maygay1b_state::latch_ch2_w)); // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
 	if (m_oki_region == nullptr) {
 		m_maincpu->space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
 	}
 }
-
-#include "maygay1b.hxx"

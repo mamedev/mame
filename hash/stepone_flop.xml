@@ -3,7 +3,7 @@
 <softwarelist name="stepone_flop" description="Ericsson PC step/one diskettes">
 
 	<!-- OS -->
-	<!-- https://www.youtube.com/watch?v=0EzeMt2F-kU -->
+	<!-- https://youtu.be/BMvwbZyB3bQ -->
 	<software name="dos125">
 		<description>MS-DOS v1.25</description>
 		<year>1982</year>

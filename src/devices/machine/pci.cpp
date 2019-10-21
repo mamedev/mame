@@ -189,9 +189,13 @@ READ16_MEMBER(pci_device::command_r)
 
 WRITE16_MEMBER(pci_device::command_w)
 {
+	uint16_t old = command;
+
 	mem_mask &= command_mask;
 	COMBINE_DATA(&command);
 	logerror("command = %04x\n", command);
+	if ((old ^ command) & 3)
+		remap_cb();
 }
 
 READ16_MEMBER(pci_device::status_r)
@@ -300,8 +304,15 @@ void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window
 {
 	for(int i=0; i<bank_count; i++) {
 		bank_info &bi = bank_infos[i];
-		if(uint32_t(bi.adr) == 0xffffffff)
+		if(uint32_t(bi.adr) >= 0xfffffffc)
 			continue;
+		if (bi.flags & M_IO) {
+			if (~command & 1)
+				continue;
+		} else {
+			if (~command & 2)
+				continue;
+		}
 		if(!bi.size || (bi.flags & M_DISABLED))
 			continue;
 
@@ -361,6 +372,7 @@ void pci_device::skip_map_regs(int count)
 void pci_device::add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to)
 {
 	assert(bank_count < 6);
+	assert((size & 3) == 0);
 	int bid = bank_count++;
 	bank_infos[bid].map = map;
 	bank_infos[bid].device = relative_to ? relative_to : this;

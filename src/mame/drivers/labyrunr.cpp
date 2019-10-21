@@ -164,53 +164,52 @@ void labyrunr_state::machine_start()
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
-MACHINE_CONFIG_START(labyrunr_state::labyrunr)
-
+void labyrunr_state::labyrunr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309, 3000000*4)      /* 24MHz/8? */
-	MCFG_DEVICE_PROGRAM_MAP(labyrunr_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(labyrunr_state, labyrunr_timer_interrupt,  4*60)
+	HD6309(config, m_maincpu, 3000000*4);      /* 24MHz/8? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &labyrunr_state::labyrunr_map);
+	m_maincpu->set_periodic_int(FUNC(labyrunr_state::labyrunr_timer_interrupt), attotime::from_hz(4*60));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(37*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 35*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(labyrunr_state, screen_update_labyrunr)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, labyrunr_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(37*8, 32*8);
+	screen.set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(labyrunr_state::screen_update_labyrunr));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(labyrunr_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_labyrunr)
-	MCFG_PALETTE_ADD("palette", 2*8*16*16)
-	MCFG_PALETTE_INDIRECT_ENTRIES(128)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
-	MCFG_PALETTE_INIT_OWNER(labyrunr_state, labyrunr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_labyrunr);
+	PALETTE(config, m_palette, FUNC(labyrunr_state::labyrunr_palette));
+	m_palette->set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
-	MCFG_K007121_ADD("k007121")
-	MCFG_K007121_PALETTE("palette")
-	MCFG_K051733_ADD("k051733")
+	K007121(config, m_k007121, 0);
+	m_k007121->set_palette_tag(m_palette);
+
+	K051733(config, "k051733", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
+	ym1.port_a_read_callback().set_ioport("DSW1");
+	ym1.port_b_read_callback().set_ioport("DSW2");
+	ym1.add_route(0, "mono", 0.40);
+	ym1.add_route(1, "mono", 0.40);
+	ym1.add_route(2, "mono", 0.40);
+	ym1.add_route(3, "mono", 0.80);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, 3000000)
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW3"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-	MCFG_SOUND_ROUTE(2, "mono", 0.40)
-	MCFG_SOUND_ROUTE(3, "mono", 0.80)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
+	ym2.port_b_read_callback().set_ioport("DSW3");
+	ym2.add_route(0, "mono", 0.40);
+	ym2.add_route(1, "mono", 0.40);
+	ym2.add_route(2, "mono", 0.40);
+	ym2.add_route(3, "mono", 0.80);
+}
 
 
 /***************************************************************************

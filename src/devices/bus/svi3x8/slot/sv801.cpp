@@ -31,16 +31,17 @@ static void svi_floppies(device_slot_interface &device)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(sv801_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, sv801_device, intrq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, sv801_device, drq_w))
+void sv801_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
+	m_fdc->intrq_wr_callback().set(FUNC(sv801_device::intrq_w));
+	m_fdc->drq_wr_callback().set(FUNC(sv801_device::drq_w));
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", svi_floppies, "dd", sv801_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", svi_floppies, "dd", sv801_device::floppy_formats)
+	FLOPPY_CONNECTOR(config, m_floppy0, svi_floppies, "dd", sv801_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy1, svi_floppies, "dd", sv801_device::floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "svi318_flop")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "disk_list").set_original("svi318_flop");
+}
 
 
 //**************************************************************************
@@ -96,7 +97,7 @@ WRITE_LINE_MEMBER( sv801_device::drq_w )
 	m_drq = state;
 }
 
-WRITE8_MEMBER( sv801_device::motor_w )
+void sv801_device::motor_w(uint8_t data)
 {
 	m_floppy = nullptr;
 
@@ -111,7 +112,7 @@ WRITE8_MEMBER( sv801_device::motor_w )
 		m_floppy1->get_device()->mon_w(!BIT(data, 3));
 }
 
-READ8_MEMBER( sv801_device::iorq_r )
+uint8_t sv801_device::iorq_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -125,7 +126,7 @@ READ8_MEMBER( sv801_device::iorq_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( sv801_device::iorq_w )
+void sv801_device::iorq_w(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -133,7 +134,7 @@ WRITE8_MEMBER( sv801_device::iorq_w )
 	case 0x31: m_fdc->track_w(data); break;
 	case 0x32: m_fdc->sector_w(data); break;
 	case 0x33: m_fdc->data_w(data); break;
-	case 0x34: motor_w(space, 0, data); break;
+	case 0x34: motor_w(data); break;
 	case 0x38:
 		m_fdc->dden_w(BIT(data, 0));
 		if (m_floppy)

@@ -51,25 +51,24 @@ static const floppy_interface agat840k_hle_floppy_interface =
 	"floppy_5_25"
 };
 
-MACHINE_CONFIG_START(a2bus_agat840k_hle_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FLOPPY_0, LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_0_w))
-	MCFG_DEVICE_ADD(FLOPPY_1, LEGACY_FLOPPY, 0)
-	MCFG_LEGACY_FLOPPY_CONFIG(agat840k_hle_floppy_interface)
-	MCFG_LEGACY_FLOPPY_IDX_CB(WRITELINE(*this, a2bus_agat840k_hle_device, index_1_w))
+void a2bus_agat840k_hle_device::device_add_mconfig(machine_config &config)
+{
+	legacy_floppy_image_device &floppy0(LEGACY_FLOPPY(config, FLOPPY_0, 0, &agat840k_hle_floppy_interface));
+	floppy0.out_idx_cb().set(FUNC(a2bus_agat840k_hle_device::index_0_w));
+	legacy_floppy_image_device &floppy1(LEGACY_FLOPPY(config, FLOPPY_1, 0, &agat840k_hle_floppy_interface));
+	floppy1.out_idx_cb().set(FUNC(a2bus_agat840k_hle_device::index_1_w));
 
-	MCFG_DEVICE_ADD("d14", I8255, 0)
+	I8255(config, m_d14);
 	// PA not connected
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, a2bus_agat840k_hle_device, d14_i_b)) // status signals from drive
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a2bus_agat840k_hle_device, d14_o_c)) // control
+	m_d14->in_pb_callback().set(FUNC(a2bus_agat840k_hle_device::d14_i_b)); // status signals from drive
+	m_d14->out_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d14_o_c)); // control
 
-	MCFG_DEVICE_ADD("d15", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, a2bus_agat840k_hle_device, d15_i_a)) // read data
-//  MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, a2bus_agat840k_hle_device, d15_o_b)) // write data
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, a2bus_agat840k_hle_device, d15_i_c))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, a2bus_agat840k_hle_device, d15_o_c))
-MACHINE_CONFIG_END
+	I8255(config, m_d15);
+	m_d15->in_pa_callback().set(FUNC(a2bus_agat840k_hle_device::d15_i_a)); // read data
+//  m_d15->out_pb_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_b)); // write data
+	m_d15->in_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_i_c));
+	m_d15->out_pc_callback().set(FUNC(a2bus_agat840k_hle_device::d15_o_c));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -264,11 +263,11 @@ uint8_t a2bus_agat840k_hle_device::read_c0nx(uint8_t offset)
 	switch (offset)
 	{
 	case 0: case 1: case 2: case 3:
-		data = m_d14->read(machine().dummy_space(), offset);
+		data = m_d14->read(offset);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		data = m_d15->read(machine().dummy_space(), offset - 4);
+		data = m_d15->read(offset - 4);
 		break;
 
 	default:
@@ -289,11 +288,11 @@ void a2bus_agat840k_hle_device::write_c0nx(uint8_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0: case 1: case 2: case 3:
-		m_d14->write(machine().dummy_space(), offset, data);
+		m_d14->write(offset, data);
 		break;
 
 	case 4: case 5: case 6: case 7:
-		m_d15->write(machine().dummy_space(), offset - 4, data);
+		m_d15->write(offset - 4, data);
 		break;
 
 	case 8: // write desync
@@ -327,24 +326,28 @@ uint8_t a2bus_agat840k_hle_device::read_cnxx(uint8_t offset)
 
 legacy_floppy_image_device *a2bus_agat840k_hle_device::floppy_image(int drive)
 {
-	const char *floppy_name = nullptr;
-
-	switch (drive)
-	{
-	case 0:
-		floppy_name = FLOPPY_0;
-		break;
-	case 1:
-		floppy_name = FLOPPY_1;
-		break;
+	switch(drive) {
+		case 0 : return subdevice<legacy_floppy_image_device>(FLOPPY_0);
+		case 1 : return subdevice<legacy_floppy_image_device>(FLOPPY_1);
 	}
-	return subdevice<legacy_floppy_image_device>(floppy_name);
+	return nullptr;
 }
 
-// all signals active low.  write support not implemented; WPT is always active.
+/*
+ * all signals active low.  write support not implemented; WPT is always active.
+ *
+ * b0-b1    type of drive 2: 00 - ES 5323.01 "1000 KB", 01 - "500 KB", 10 - "250 KB", 11 - not present
+ * b2-b3    type of drive 1: -""-
+ * b4       INDEX/SECTOR
+ * b5       WRITE PROTECT
+ * b6       TRACK 0
+ * b7       READY
+ *
+ * C0x1
+ */
 READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
 {
-	u8 data = 0x03; // one drive present, because drive select is broken
+	u8 data = 0x3;
 
 	m_floppy->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 1);
 
@@ -374,7 +377,6 @@ READ8_MEMBER(a2bus_agat840k_hle_device::d14_i_b)
  */
 WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 {
-	// drive select is broken in legacy flopdrv.cpp -- floppy_get_drive
 	m_unit = BIT(data, 3);
 	m_floppy = floppy_image(m_unit);
 	if (m_unit)
@@ -403,6 +405,8 @@ WRITE8_MEMBER(a2bus_agat840k_hle_device::d14_o_c)
 		data, m_unit, m_side, !BIT(data, 2), !BIT(data, 6), !BIT(data, 7));
 }
 
+// C0x4
+//
 // data are latched in by write to PC4
 READ8_MEMBER(a2bus_agat840k_hle_device::d15_i_a)
 {

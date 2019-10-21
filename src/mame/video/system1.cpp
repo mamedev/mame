@@ -340,7 +340,7 @@ WRITE8_MEMBER(system1_state::system1_paletteram_w)
 	}
 	else
 	{
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 	}
 }
 

@@ -29,6 +29,7 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #include "analog/nld_twoterm.h"
 
 #include <cmath>
+
 #endif
 
 
@@ -111,8 +112,8 @@ public:
 #define CHIP(n, t) TTL_ ## t ## _DIP(n)
 
 #define OHM(x) x
-#define K_OHM(x) RES_K(X)
-#define M_OHM(x) RES_M(X)
+#define K_OHM(x) RES_K(x)
+#define M_OHM(x) RES_M(x)
 #define U_FARAD(x) CAP_U(x)
 #define N_FARAD(x) CAP_N(x)
 #define P_FARAD(x) CAP_P(x)
@@ -131,9 +132,9 @@ public:
 	NET_C(name.6, name ## _R.1) \
 	NET_C(name.6, name ## _C.1) \
 	NET_C(name ## _R.2, V5) \
-	NET_CSTR(# name "_C.2", "GND") \
+	NET_C(name ## _C.2, GND) \
 	NET_C(name.8, V5) \
-	NET_CSTR(# name ".1", "GND")
+	NET_C(name.1, GND)
 
 #define CHIP_555_Astable(name,  pdesc)   \
 	NE555_DIP(name) \
@@ -146,9 +147,9 @@ public:
 	NET_C(name.6, name ## _C.1) \
 	NET_C(name.2, name ## _C.1) \
 	NET_C(name ## _R1.2, V5) \
-	NET_CSTR(# name "_C.2", "GND") \
+	NET_C(name ## _C.2, GND) \
 	NET_C(name.8, V5) \
-	NET_CSTR(# name ".1", "GND")
+	NET_C(name.1, GND)
 
 #define CHIP_9602_Mono(name,  pdesc)   \
 	CHIP(# name, 9602) \
@@ -178,13 +179,13 @@ public:
 #define CHIP_INPUT_ACTIVE_LOW(name)   \
 	SWITCH2(name ## _SW) \
 	NET_C(name ## _SW.1, V5) \
-	NET_CSTR(# name "_SW.2", "GND") \
+	NET_C(name ## _SW.2, GND) \
 	ALIAS(name.1, name ## _SW.Q)
 
 #define CHIP_INPUT_ACTIVE_HIGH(name)   \
 	SWITCH2(name ## _SW) \
 	NET_C(name ## _SW.2, V5) \
-	NET_CSTR(# name "_SW.1", "GND") \
+	NET_C(name ## _SW.1, GND) \
 	ALIAS(name.1, name ## _SW.Q)
 
 #define CHIP_LATCH(name)   \

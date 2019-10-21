@@ -61,12 +61,14 @@ void c64_supercpu_device::c64_supercpu_map(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(c64_supercpu_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(G65816_TAG, G65816, 1000000)
-	MCFG_DEVICE_PROGRAM_MAP(c64_supercpu_map)
+void c64_supercpu_device::device_add_mconfig(machine_config &config)
+{
+	G65816(config, m_maincpu, 1000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &c64_supercpu_device::c64_supercpu_map);
 
-	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
-MACHINE_CONFIG_END
+	C64_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), c64_expansion_cards, nullptr);
+	m_exp->set_passthrough();
+}
 
 
 //-------------------------------------------------
@@ -113,7 +115,7 @@ c64_supercpu_device::c64_supercpu_device(const machine_config &mconfig, const ch
 	device_t(mconfig, C64_SUPERCPU, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, G65816_TAG),
-	m_exp(*this, C64_EXPANSION_SLOT_TAG),
+	m_exp(*this, "exp"),
 	m_sram(*this, "sram"),
 	m_dimm(*this, "dimm")
 {
@@ -142,9 +144,9 @@ void c64_supercpu_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t c64_supercpu_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_supercpu_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(offset, data, sphi2, ba, roml, romh, io1, io2);
 
 	switch (offset)
 	{
@@ -196,7 +198,7 @@ uint8_t c64_supercpu_device::c64_cd_r(address_space &space, offs_t offset, uint8
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_supercpu_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_supercpu_device::c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	switch (offset)
 	{
@@ -273,7 +275,7 @@ void c64_supercpu_device::c64_cd_w(address_space &space, offs_t offset, uint8_t 
 		break;
 	}
 
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(offset, data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -283,7 +285,7 @@ void c64_supercpu_device::c64_cd_w(address_space &space, offs_t offset, uint8_t 
 
 int c64_supercpu_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exp->game_r(offset, sphi2, ba, rw, m_slot->hiram());
+	return m_exp->game_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }
 
 
@@ -293,5 +295,5 @@ int c64_supercpu_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw)
 
 int c64_supercpu_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw)
 {
-	return m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->hiram());
+	return m_exp->exrom_r(offset, sphi2, ba, rw, m_slot->loram(), m_slot->hiram());
 }

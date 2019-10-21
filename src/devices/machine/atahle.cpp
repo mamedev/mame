@@ -588,7 +588,7 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 {
 	/* logit */
 //  if (offset != IDE_CS0_DATA_RW && offset != IDE_CS0_STATUS_R)
-		LOG(("%s:IDE cs0 read at %X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask));
+		LOG(("%s:IDE cs0 read at %X, mem_mask=%X\n", machine().describe_context(), offset, mem_mask));
 
 	uint16_t result = 0xffff;
 
@@ -692,7 +692,7 @@ uint16_t ata_hle_device::read_cs0(offs_t offset, uint16_t mem_mask)
 
 				/* log anything else */
 				default:
-					logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%d\n", machine().describe_context(), offset, mem_mask);
+					logerror("%s:unknown IDE cs0 read at %03X, mem_mask=%X\n", machine().describe_context(), offset, mem_mask);
 					break;
 			}
 		}

@@ -223,14 +223,14 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
 
 		if (m_HDCsel)
 		{
-			*value = m_hdc9234->read(space, (m_address>>2)&1, 0xff);
+			*value = m_hdc9234->read((m_address>>2)&1);
 			LOGMASKED(LOG_COMP, "%04x[HDC] -> %02x\n", m_address & 0xffff, *value);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
-			*value = m_clock->read(space, (m_address & 0x001e) >> 1);
+			*value = m_clock->read((m_address & 0x001e) >> 1);
 			LOGMASKED(LOG_COMP, "%04x[CLK] -> %02x\n", m_address & 0xffff, *value);
 			return;
 		}
@@ -278,7 +278,7 @@ READ8Z_MEMBER(myarc_hfdc_device::readz)
     0x5800 - 0x5bff static RAM page any of 32 pages
     0x5c00 - 0x5fff static RAM page any of 32 pages
 */
-WRITE8_MEMBER( myarc_hfdc_device::write )
+void myarc_hfdc_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled())
 	{
@@ -297,14 +297,14 @@ WRITE8_MEMBER( myarc_hfdc_device::write )
 		if (m_HDCsel)
 		{
 			LOGMASKED(LOG_COMP, "%04x[HDC] <- %02x\n", m_address & 0xffff, data);
-			m_hdc9234->write(space, (m_address>>2)&1, data, 0xff);
+			m_hdc9234->write((m_address>>2)&1, data);
 			return;
 		}
 
 		if (m_RTCsel)
 		{
 			LOGMASKED(LOG_COMP, "%04x[CLK] <- %02x\n", m_address & 0xffff, data);
-			m_clock->write(space, (m_address & 0x001e) >> 1, data);
+			m_clock->write((m_address & 0x001e) >> 1, data);
 			return;
 		}
 
@@ -376,7 +376,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 	uint8_t reply;
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		if ((offset & 0x00ff)==0)  // CRU bits 0-7
+		if ((offset & 0x00f0)==0)  // CRU bits 0-7
 		{
 			if (m_see_switches)
 			{
@@ -390,7 +390,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 				if (!m_motor_running) reply |= 0x04;
 				if (m_wait_for_hd1) reply |= 0x08;
 			}
-			*value = reply;
+			*value = BIT(reply, (offset >> 1) & 7);
 		}
 		else   // CRU bits 8+
 		{
@@ -425,7 +425,7 @@ READ8Z_MEMBER(myarc_hfdc_device::crureadz)
 
     HFDC manual p. 43
 */
-WRITE8_MEMBER(myarc_hfdc_device::cruwrite)
+void myarc_hfdc_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -627,7 +627,7 @@ void myarc_hfdc_device::signal_drive_status()
     (1,0) = OUTPUT1
     (1,1) = OUTPUT2
 */
-WRITE8_MEMBER( myarc_hfdc_device::auxbus_out )
+void myarc_hfdc_device::auxbus_out(offs_t offset, uint8_t data)
 {
 	int index;
 	switch (offset)
@@ -848,7 +848,7 @@ WRITE_LINE_MEMBER( myarc_hfdc_device::dip_w )
 /*
     Read a byte from the onboard SRAM. This is called from the HDC9234.
 */
-READ8_MEMBER( myarc_hfdc_device::read_buffer )
+uint8_t myarc_hfdc_device::read_buffer()
 {
 	LOGMASKED(LOG_DMA, "Read access to onboard SRAM at %04x\n", m_dma_address);
 	if (m_dma_address > 0x8000) LOGMASKED(LOG_WARN, "Read access beyond RAM size: %06x\n", m_dma_address);
@@ -860,7 +860,7 @@ READ8_MEMBER( myarc_hfdc_device::read_buffer )
 /*
     Write a byte to the onboard SRAM. This is called from the HDC9234.
 */
-WRITE8_MEMBER( myarc_hfdc_device::write_buffer )
+void myarc_hfdc_device::write_buffer(uint8_t data)
 {
 	LOGMASKED(LOG_DMA, "Write access to onboard SRAM at %04x: %02x\n", m_dma_address, data);
 	if (m_dma_address > 0x8000) LOGMASKED(LOG_WARN, "Write access beyond RAM size: %06x\n", m_dma_address);
@@ -1067,37 +1067,31 @@ ROM_START( ti99_hfdc )
 ROM_END
 
 
-MACHINE_CONFIG_START(myarc_hfdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(FDC_TAG, HDC9234, 0)
-	MCFG_HDC92X4_INTRQ_CALLBACK(WRITELINE(*this, myarc_hfdc_device, intrq_w))
-	MCFG_HDC92X4_DIP_CALLBACK(WRITELINE(*this, myarc_hfdc_device, dip_w))
-	MCFG_HDC92X4_AUXBUS_OUT_CALLBACK(WRITE8(*this, myarc_hfdc_device, auxbus_out))
-	MCFG_HDC92X4_DMARQ_CALLBACK(WRITELINE(*this, myarc_hfdc_device, dmarq_w))
-	MCFG_HDC92X4_DMA_IN_CALLBACK(READ8(*this, myarc_hfdc_device, read_buffer))
-	MCFG_HDC92X4_DMA_OUT_CALLBACK(WRITE8(*this, myarc_hfdc_device, write_buffer))
+void myarc_hfdc_device::device_add_mconfig(machine_config& config)
+{
+	HDC9234(config, m_hdc9234, 0);
+	m_hdc9234->intrq_cb().set(FUNC(myarc_hfdc_device::intrq_w));
+	m_hdc9234->dmarq_cb().set(FUNC(myarc_hfdc_device::dmarq_w));
+	m_hdc9234->dip_cb().set(FUNC(myarc_hfdc_device::dip_w));
+	m_hdc9234->auxbus_cb().set(FUNC(myarc_hfdc_device::auxbus_out));
+	m_hdc9234->dmain_cb().set(FUNC(myarc_hfdc_device::read_buffer));
+	m_hdc9234->dmaout_cb().set(FUNC(myarc_hfdc_device::write_buffer));
 
-	MCFG_FLOPPY_DRIVE_ADD("f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	// First two floppy drives shall be connected by default
+	FLOPPY_CONNECTOR(config, "f1", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f2", hfdc_floppies, "525dd", myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f3", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "f4", hfdc_floppies, nullptr, myarc_hfdc_device::floppy_formats).enable_sound(true);
 
-	// NB: Hard disks don't go without image (other than floppy drives)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h2", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
-	MCFG_MFM_HARDDISK_CONN_ADD("h3", hfdc_harddisks, nullptr, MFM_BYTE, 2000, 20, MFMHD_GEN_FORMAT)
+	// Hard disks don't go without image (other than floppy drives)
+	MFM_HD_CONNECTOR(config, "h1", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, "h2", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
+	MFM_HD_CONNECTOR(config, "h3", hfdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT);
 
-	MCFG_DEVICE_ADD(CLOCK_TAG, MM58274C, 0)
-	MCFG_MM58274C_MODE24(1) // 24 hour
-	MCFG_MM58274C_DAY1(0)   // sunday
+	MM58274C(config, CLOCK_TAG, 0).set_mode_and_day(1, 0); // 24h, sunday
 
-	MCFG_RAM_ADD(BUFFER)
-	MCFG_RAM_DEFAULT_SIZE("32K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	RAM(config, BUFFER).set_default_size("32K").set_default_value(0);
+}
 
 const tiny_rom_entry *myarc_hfdc_device::device_rom_region() const
 {

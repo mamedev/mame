@@ -10,9 +10,12 @@
 #ifndef MAME_INCLUDES_MADALIEN_H
 #define MAME_INCLUDES_MADALIEN_H
 
+#pragma once
+
 #include "machine/gen_latch.h"
 #include "sound/discrete.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 
 #define MADALIEN_MAIN_CLOCK     XTAL(10'595'000)
@@ -21,8 +24,8 @@
 class madalien_state : public driver_device
 {
 public:
-	madalien_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	madalien_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_charram(*this, "charram"),
 		m_video_control(*this, "video_control"),
@@ -39,12 +42,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2") { }
+		m_soundlatch2(*this, "soundlatch2")
+	{ }
 
 	void madalien(machine_config &config);
 	void madalien_video(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -76,8 +83,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_BG_2);
 	TILE_GET_INFO_MEMBER(get_tile_info_FG);
-	DECLARE_VIDEO_START(madalien);
-	DECLARE_PALETTE_INIT(madalien);
+	void madalien_palette(palette_device &palette) const;
 	uint32_t screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline int scan_helper(int col, int row, int section);
 	void draw_edges(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode);

@@ -14,7 +14,6 @@
 #pragma once
 
 
-#include "machine/apollo_dbg.h"
 #include "machine/apollo_kbd.h"
 
 #include "cpu/m68000/m68000.h"
@@ -31,10 +30,12 @@
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "bus/isa/3c505.h"
+#include "bus/isa/omti8621.h"
 
 #include "bus/rs232/rs232.h"
 
 #include "diserial.h"
+#include "screen.h"
 
 #ifndef VERBOSE
 #define VERBOSE 0
@@ -43,16 +44,16 @@
 #define LOG(x)  { logerror x; logerror ("\n"); apollo_check_log(); }
 #define LOG1(x) { if (VERBOSE > 0) LOG(x) }
 #define LOG2(x) { if (VERBOSE > 1) LOG(x) }
-#define CLOG(x) { machine().logerror ("%s - %s: ", apollo_cpu_context(machine().device(MAINCPU)), tag()); machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
+#define CLOG(x) { machine().logerror ("%s - %s: ", apollo_cpu_context(machine()), tag()); machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
 #define CLOG1(x) { if (VERBOSE > 0) CLOG(x) }
 #define CLOG2(x) { if (VERBOSE > 1) CLOG(x) }
-#define DLOG(x) { device->logerror ("%s - %s: ", apollo_cpu_context(device->machine().device(MAINCPU)), device->tag()); device->logerror x; device->logerror ("\n"); apollo_check_log(); }
+#define DLOG(x) { device->logerror ("%s - %s: ", apollo_cpu_context(device->machine()), device->tag()); device->logerror x; device->logerror ("\n"); apollo_check_log(); }
 #define DLOG1(x) { if (VERBOSE > 0) DLOG(x) }
 #define DLOG2(x) { if (VERBOSE > 1) DLOG(x) }
-#define MLOG(x)  { machine().logerror ("%s: ", apollo_cpu_context(machine().device(MAINCPU))); machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
+#define MLOG(x)  { machine().logerror ("%s: ", apollo_cpu_context(machine())); machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
 #define MLOG1(x) { if (VERBOSE > 0) MLOG(x) }
 #define MLOG2(x) { if (VERBOSE > 1) MLOG(x) }
-#define SLOG(x)  { machine().logerror ("%s: ", apollo_cpu_context(m_maincpu));machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
+#define SLOG(x)  { machine().logerror ("%s: ", apollo_cpu_context(machine()));machine().logerror x; machine().logerror ("\n"); apollo_check_log(); }
 #define SLOG1(x) { if (VERBOSE > 0) SLOG(x) }
 #define SLOG2(x) { if (VERBOSE > 1) SLOG(x) }
 
@@ -62,10 +63,10 @@
 // Do *not* report any issues on Mametesters if this is enabled!
 // #define APOLLO_XXL
 
-/*----------- drivers/apollo.c -----------*/
+/*----------- drivers/apollo.cpp -----------*/
 
 // return the current CPU context for log file entries
-const char *apollo_cpu_context(device_t *cpu);
+std::string apollo_cpu_context(running_machine &machine);
 
 // enable/disable the FPU
 void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff);
@@ -88,19 +89,13 @@ uint8_t apollo_get_ram_config_byte(void);
 //apollo_get_node_id - get the node id
 uint32_t apollo_get_node_id(void);
 
-#if 0
-	// should be called by the CPU core before executing each instruction
-int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
-#endif
-
 void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 
-/*----------- machine/apollo.c -----------*/
+/*----------- machine/apollo.cpp -----------*/
 
 #define APOLLO_CONF_TAG "conf"
 #define APOLLO_DMA1_TAG "dma8237_1"
 #define APOLLO_DMA2_TAG "dma8237_2"
-#define APOLLO_KBD_TAG  "kbd"
 #define APOLLO_STDIO_TAG "stdio"
 #define APOLLO_PIC1_TAG "pic8259_master"
 #define APOLLO_PIC2_TAG "pic8259_slave"
@@ -111,10 +106,15 @@ void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t dat
 #define APOLLO_ETH_TAG  "3c505"
 #define APOLLO_NI_TAG  "node_id"
 #define APOLLO_ISA_TAG "isabus"
+#define APOLLO_SCREEN_TAG "apollo_screen"
+#define APOLLO_KBD_TAG  "kbd"
+
 
 // forward declaration
 class apollo_sio;
 class apollo_ni;
+class apollo_graphics_15i;
+class apollo_kbd_device;
 
 class apollo_state : public driver_device
 {
@@ -122,7 +122,8 @@ public:
 	apollo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU),
-		m_messram_ptr(*this, "messram"),
+		m_ram(*this, RAM_TAG),
+		m_messram_ptr(*this, RAM_TAG),
 		m_dma8237_1(*this, APOLLO_DMA1_TAG),
 		m_dma8237_2(*this, APOLLO_DMA2_TAG),
 		m_pic8259_master(*this, APOLLO_PIC1_TAG),
@@ -132,10 +133,13 @@ public:
 		m_sio2(*this, APOLLO_SIO2_TAG),
 		m_rtc(*this, APOLLO_RTC_TAG),
 		m_node_id(*this, APOLLO_NI_TAG),
-		m_isa(*this, APOLLO_ISA_TAG)
+		m_isa(*this, APOLLO_ISA_TAG),
+		m_graphics(*this, APOLLO_SCREEN_TAG),
+		m_keyboard(*this, APOLLO_KBD_TAG)
 	{ }
 
 	required_device<m68000_base_device> m_maincpu;
+	required_device<ram_device> m_ram;
 	required_shared_ptr<uint32_t> m_messram_ptr;
 
 	required_device<am9517a_device> m_dma8237_1;
@@ -148,6 +152,8 @@ public:
 	required_device<mc146818_device> m_rtc;
 	required_device<apollo_ni> m_node_id;
 	required_device<isa16_device> m_isa;
+	optional_device<apollo_graphics_15i> m_graphics;
+	optional_device<apollo_kbd_device> m_keyboard;
 
 	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
 	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
@@ -209,8 +215,9 @@ public:
 	DECLARE_MACHINE_RESET(apollo);
 	DECLARE_MACHINE_START(apollo);
 
-	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
-	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
+	void cpu_space_map(address_map &map);
+	u16 apollo_irq_acknowledge(offs_t offset);
+	u16 apollo_pic_get_vector();
 	void apollo_bus_error();
 	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
 	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
@@ -253,13 +260,10 @@ public:
 	void select_dma_channel(int channel, bool state);
 
 	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
-	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
 	void common(machine_config &config);
 	void apollo(machine_config &config);
 	void apollo_terminal(machine_config &config);
-	void apollo_graphics(machine_config &config);
-	void apollo_mono19i(machine_config &config);
 	void dn3500(machine_config &config);
 	void dn5500_19i(machine_config &config);
 	void dn3000(machine_config &config);
@@ -285,7 +289,7 @@ private:
 	bool m_cur_eop;
 };
 
-/*----------- machine/apollo_config.c -----------*/
+/*----------- machine/apollo_config.cpp -----------*/
 
 // configuration bit definitions
 
@@ -310,7 +314,7 @@ int apollo_config(int mask);
 
 INPUT_PORTS_EXTERN(apollo_config);
 
-/*----------- machine/apollo_csr.c -----------*/
+/*----------- machine/apollo_csr.cpp -----------*/
 
 #define APOLLO_CSR_SR_SERVICE            0x0001
 #define APOLLO_CSR_SR_ATBUS_IO_TIMEOUT   0x0002
@@ -332,30 +336,15 @@ uint16_t apollo_csr_get_control_register(void);
 uint16_t apollo_csr_get_status_register(void);
 void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 
-/*----------- machine/apollo_sio.c -----------*/
-
-#define MCFG_APOLLO_SIO_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, APOLLO_SIO, _clock)
-
-#define MCFG_APOLLO_SIO_IRQ_CALLBACK(_cb) \
-	downcast<apollo_sio &>(*device).set_irq_cb(DEVCB_##_cb);
-
-#define MCFG_APOLLO_SIO_A_TX_CALLBACK(_cb) \
-	downcast<apollo_sio &>(*device).set_a_tx_cb(DEVCB_##_cb);
-
-#define MCFG_APOLLO_SIO_B_TX_CALLBACK(_cb) \
-	downcast<apollo_sio &>(*device).set_b_tx_cb(DEVCB_##_cb);
-
-#define MCFG_APOLLO_SIO_OUTPORT_CALLBACK(_cb) \
-	downcast<apollo_sio &>(*device).set_outport_cb(DEVCB_##_cb);
+/*----------- machine/apollo_sio.cpp -----------*/
 
 class apollo_sio: public duart_base_device
 {
 public:
 	apollo_sio(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read) override;
-	virtual DECLARE_WRITE8_MEMBER(write) override;
+	virtual uint8_t read(offs_t offset) override;
+	virtual void write(offs_t offset, uint8_t data) override;
 
 protected:
 	virtual void device_reset() override;
@@ -366,10 +355,8 @@ private:
 
 DECLARE_DEVICE_TYPE(APOLLO_SIO, apollo_sio)
 
-/*----------- machine/apollo_ni.c -----------*/
+/*----------- machine/apollo_ni.cpp -----------*/
 
-#define MCFG_APOLLO_NI_ADD(_tag, _xtal) \
-	MCFG_DEVICE_ADD(_tag, APOLLO_NI, _xtal)
 
 /*** Apollo Node ID device ***/
 
@@ -408,6 +395,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	optional_device<omti8621_apollo_device> m_wdc;
 	void set_node_id(uint32_t node_id);
 	uint32_t m_node_id;
 };
@@ -415,9 +403,7 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(APOLLO_NI, apollo_ni)
 
-/*----------- video/apollo.c -----------*/
-
-#define APOLLO_SCREEN_TAG "apollo_screen"
+/*----------- video/apollo.cpp -----------*/
 
 class apollo_graphics_15i : public device_t
 {
@@ -450,11 +436,14 @@ public:
 	int is_mono() { return m_n_planes == 1; }
 
 protected:
+	required_device<screen_device> m_screen;
+
 	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 protected:
 	class lut_fifo;
@@ -653,9 +642,6 @@ private:
 
 DECLARE_DEVICE_TYPE(APOLLO_GRAPHICS, apollo_graphics_15i)
 
-#define MCFG_APOLLO_GRAPHICS_ADD( _tag) \
-	apollo_graphics(config); \
-	MCFG_DEVICE_ADD(_tag, APOLLO_GRAPHICS, 0)
 
 class apollo_graphics_19i : public apollo_graphics_15i
 {
@@ -665,6 +651,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_add_mconfig(machine_config &config) override;
 
 private:
 	// internal state
@@ -672,20 +659,10 @@ private:
 
 DECLARE_DEVICE_TYPE(APOLLO_MONO19I, apollo_graphics_19i)
 
-#define MCFG_APOLLO_MONO19I_ADD(_tag) \
-	apollo_mono19i(config); \
-	MCFG_DEVICE_ADD(_tag, APOLLO_MONO19I, 0)
-
 #ifdef APOLLO_XXL
 
-/*----------- machine/apollo_stdio.c -----------*/
+/*----------- machine/apollo_stdio.cpp -----------*/
 
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_APOLLO_STDIO_TX_CALLBACK(_cb) \
-	downcast<apollo_stdio_device &>(*device).set_tx_cb(DEVCB_##_cb);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -700,23 +677,18 @@ public:
 	apollo_stdio_device(const machine_config &mconfig, const char *tag,
 			device_t *owner, uint32_t clock);
 
-	template<class Object> devcb_base &set_tx_cb(Object &&object)
-	{
-		return m_tx_w.set_callback(std::forward<Object>(object));
-	}
-
-	devcb_write_line m_tx_w;
+	auto tx_cb() { return m_tx_w.bind(); }
 
 private:
 	// device-level overrides
-	virtual void device_start();
-	virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
-	virtual void rcv_complete(); // Rx completed receiving byte
-	virtual void tra_complete(); // Tx completed sending byte
-	virtual void tra_callback(); // Tx send bit
+	virtual void rcv_complete() override; // Rx completed receiving byte
+	virtual void tra_complete() override; // Tx completed sending byte
+	virtual void tra_callback() override; // Tx send bit
 
 	TIMER_CALLBACK_MEMBER( poll_timer );
 	void xmit_char(uint8_t data);
@@ -728,6 +700,8 @@ private:
 	bool m_tx_busy;
 
 	emu_timer* m_poll_timer;
+
+	devcb_write_line m_tx_w;
 };
 
 // device type definition

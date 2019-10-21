@@ -31,7 +31,6 @@
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/ay8910.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -87,6 +86,7 @@ public:
 	TIMER_CALLBACK_MEMBER(update_tape);
 
 	virtual void machine_start() override;
+	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_oric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(vblank_w);
@@ -122,7 +122,7 @@ protected:
 	bool m_ext_irq;
 
 	virtual void update_irq();
-	void update_psg(address_space &space);
+	void update_psg();
 	void update_keyboard();
 	void machine_start_common();
 };
@@ -199,7 +199,7 @@ protected:
 void oric_state::oric_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).mirror(0xf0);
+	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map)).mirror(0xf0);
 	map(0xc000, 0xdfff).bankr("bank_c000_r").bankw("bank_c000_w");
 	map(0xe000, 0xf7ff).bankr("bank_e000_r").bankw("bank_e000_w");
 	map(0xf800, 0xffff).bankr("bank_f800_r").bankw("bank_f800_w");
@@ -211,12 +211,12 @@ Memory region &c000-&ffff can be ram or rom. */
 void telestrat_state::telestrat_mem(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("ram");
-	map(0x0300, 0x030f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0300, 0x030f).m(m_via, FUNC(via6522_device::map));
 	map(0x0310, 0x0313).rw(m_fdc, FUNC(fd1793_device::read), FUNC(fd1793_device::write));
 	map(0x0314, 0x0314).rw(FUNC(telestrat_state::port_314_r), FUNC(telestrat_state::port_314_w));
 	map(0x0318, 0x0318).r(FUNC(telestrat_state::port_318_r));
 	map(0x031c, 0x031f).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0x0320, 0x032f).rw(m_via2, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0320, 0x032f).m(m_via2, FUNC(via6522_device::map));
 	map(0xc000, 0xffff).bankr("bank_c000_r").bankw("bank_c000_w");
 }
 
@@ -302,15 +302,15 @@ void oric_state::update_keyboard()
 	m_via->write_pb3((m_kbd_row[m_via_b & 7]->read() | m_psg_a) != 0xff);
 }
 
-void oric_state::update_psg(address_space &space)
+void oric_state::update_psg()
 {
 	if(m_via_ca2)
 		if(m_via_cb2)
-			m_psg->address_w(space, 0, m_via_a);
+			m_psg->address_w(m_via_a);
 		else
-			m_via->write_pa(space, 0, m_psg->data_r(space, 0));
+			m_via->write_pa(m_psg->data_r());
 	else if(m_via_cb2)
-		m_psg->data_w(space, 0, m_via_a);
+		m_psg->data_w(m_via_a);
 }
 
 void oric_state::update_irq()
@@ -327,7 +327,7 @@ WRITE8_MEMBER(oric_state::via_a_w)
 {
 	m_via_a = data;
 	m_cent_data_out->write(m_via_a);
-	update_psg(space);
+	update_psg();
 }
 
 WRITE8_MEMBER(oric_state::via_b_w)
@@ -343,13 +343,13 @@ WRITE8_MEMBER(oric_state::via_b_w)
 WRITE_LINE_MEMBER(oric_state::via_ca2_w)
 {
 	m_via_ca2 = state;
-	update_psg(m_maincpu->space(AS_PROGRAM));
+	update_psg();
 }
 
 WRITE_LINE_MEMBER(oric_state::via_cb2_w)
 {
 	m_via_cb2 = state;
-	update_psg(m_maincpu->space(AS_PROGRAM));
+	update_psg();
 }
 
 WRITE_LINE_MEMBER(oric_state::via_irq_w)
@@ -411,6 +411,11 @@ void oric_state::machine_start()
 }
 
 
+void oric_state::machine_reset()
+{
+	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
+}
+
 void telestrat_state::machine_start()
 {
 	machine_start_common();
@@ -428,6 +433,7 @@ void telestrat_state::machine_start()
 
 void telestrat_state::machine_reset()
 {
+	m_tape_timer->adjust(attotime::from_hz(4800), 0, attotime::from_hz(4800));
 	m_port_314 = 0x00;
 	m_via2_a = 0xff;
 	remap();
@@ -458,7 +464,7 @@ WRITE8_MEMBER(telestrat_state::via2_b_w)
 	if(!(m_via2_b & 0x80))
 		port &= m_joy2->read();
 
-	m_via2->write_pb(space, 0, port);
+	m_via2->write_pb(port);
 }
 
 WRITE_LINE_MEMBER(telestrat_state::via2_ca2_w)
@@ -791,12 +797,10 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	screen.set_screen_update(FUNC(oric_state::screen_update_oric));
 	screen.screen_vblank().set(FUNC(oric_state::vblank_w));
 
-	PALETTE(config, m_palette, 8);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_3bit_rgb));
+	PALETTE(config, m_palette, palette_device::RGB_3BIT);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	AY8912(config, m_psg, 12_MHz_XTAL / 12);
 	m_psg->set_flags(AY8910_DISCRETE_OUTPUT);
@@ -814,7 +818,8 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	/* cassette */
 	CASSETTE(config, m_cassette, 0);
 	m_cassette->set_formats(oric_cassette_formats);
-	m_cassette->set_default_state((cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED));
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* via */
 	VIA6522(config, m_via, 12_MHz_XTAL / 12);

@@ -65,10 +65,11 @@ static INPUT_PORTS_START( mits680b )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(mits680b_state::mits680b)
+void mits680b_state::mits680b(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(1'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
+	M6800(config, m_maincpu, XTAL(1'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mits680b_state::mem_map);
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 153600));
 	uart_clock.signal_handler().set("acia", FUNC(acia6850_device::write_txc));
@@ -78,10 +79,10 @@ MACHINE_CONFIG_START(mits680b_state::mits680b)
 	acia.txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 	acia.rts_handler().set("rs232", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("acia", acia6850_device, write_rxd))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("acia", acia6850_device, write_cts))
-MACHINE_CONFIG_END
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set("acia", FUNC(acia6850_device::write_rxd));
+	rs232.cts_handler().set("acia", FUNC(acia6850_device::write_cts));
+}
 
 /* ROM definition */
 ROM_START( mits680b )

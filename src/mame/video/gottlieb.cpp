@@ -17,26 +17,25 @@
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
+void gottlieb_state::palette_w(offs_t offset, u8 data)
 {
-	int r, g, b, a, val;
+	int val;
 
-	m_generic_paletteram_8[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* blue & green are encoded in the even bytes */
-	val = m_generic_paletteram_8[offset & ~1];
-	g = combine_4_weights(m_weights, (val >> 4) & 1, (val >> 5) & 1, (val >> 6) & 1, (val >> 7) & 1);
-	b = combine_4_weights(m_weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
+	val = m_paletteram[offset & ~1];
+	int const g = combine_weights(m_weights, BIT(val, 4), BIT(val, 5), BIT(val, 6), BIT(val, 7));
+	int const b = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
 
 	/* red is encoded in the odd bytes */
-	val = m_generic_paletteram_8[offset | 1];
-	r = combine_4_weights(m_weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
+	val = m_paletteram[offset | 1];
+	int const r = combine_weights(m_weights, BIT(val, 0), BIT(val, 1), BIT(val, 2), BIT(val, 3));
 
 	/* alpha is set to 0 if laserdisc video is enabled */
-	a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
+	int const a = (m_transparent0 && offset / 2 == 0) ? 0 : 255;
 	m_palette->set_pen_color(offset / 2, rgb_t(a, r, g, b));
 }
-
 
 
 /*************************************
@@ -45,28 +44,28 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_paletteram_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_video_control_w)
+void gottlieb_state::video_control_w(u8 data)
 {
 	/* bit 0 controls foreground/background priority */
-	if (m_background_priority != (data & 0x01))
+	if (m_background_priority != (BIT(data, 0)))
 		m_screen->update_partial(m_screen->vpos());
-	m_background_priority = data & 0x01;
+	m_background_priority = BIT(data, 0);
 
 	/* bit 1 controls horizontal flip screen */
-	flip_screen_x_set(data & 0x02);
+	flip_screen_x_set(BIT(data, 1));
 
 	/* bit 2 controls vertical flip screen */
-	flip_screen_y_set(data & 0x04);
+	flip_screen_y_set(BIT(data, 2));
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
+void gottlieb_state::laserdisc_video_control_w(u8 data)
 {
 	/* bit 0 works like the other games */
-	gottlieb_video_control_w(space, offset, data & 0x01);
+	video_control_w(BIT(data, 0));
 
 	/* bit 1 controls the sprite bank. */
-	m_spritebank = (data & 0x02) >> 1;
+	m_spritebank = BIT(data, 1);
 
 	/* bit 2 video enable (0 = black screen) */
 	/* bit 3 genlock control (1 = show laserdisc image) */
@@ -74,10 +73,9 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
 	m_laserdisc->video_enable(((data & 0x0c) == 0x0c) ? true : false);
 
 	/* configure the palette if the laserdisc is enabled */
-	m_transparent0 = (data >> 3) & 1;
-	gottlieb_paletteram_w(space, 0, m_generic_paletteram_8[0]);
+	m_transparent0 = BIT(data, 3);
+	palette_w(0, m_paletteram[0]);
 }
-
 
 
 /*************************************
@@ -86,15 +84,14 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
  *
  *************************************/
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_videoram_w)
+WRITE8_MEMBER(gottlieb_state::videoram_w)
 {
-	uint8_t *videoram = m_videoram;
-	videoram[offset] = data;
+	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
+WRITE8_MEMBER(gottlieb_state::charram_w)
 {
 	if (m_charram[offset] != data)
 	{
@@ -102,7 +99,6 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
 		m_gfxdecode->gfx(0)->mark_dirty(offset / 32);
 	}
 }
-
 
 
 /*************************************
@@ -113,8 +109,7 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_charram_w)
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int code = videoram[tile_index];
+	int code = m_videoram[tile_index];
 	if ((code & 0x80) == 0)
 		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
 	else
@@ -123,8 +118,7 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
 {
-	uint8_t *videoram = m_videoram;
-	int code = videoram[tile_index];
+	int code = m_videoram[tile_index];
 	if ((code & 0xc0) == 0)
 		SET_TILE_INFO_MEMBER(m_gfxcharlo, code, 0, 0);
 	else
@@ -149,8 +143,6 @@ void gottlieb_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(0)->set_source(m_charram);
-
 	/* save some state */
 	save_item(NAME(m_background_priority));
 	save_item(NAME(m_spritebank));
@@ -174,8 +166,6 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
 
-	m_gfxdecode->gfx(0)->set_source(m_charram);
-
 	/* save some state */
 	save_item(NAME(m_background_priority));
 	save_item(NAME(m_spritebank));
@@ -192,7 +182,6 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 
 void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *spriteram = m_spriteram;
 	rectangle clip = cliprect;
 	int offs;
 
@@ -204,18 +193,17 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 	{
 		/* coordinates hand tuned to make the position correct in Q*Bert Qubes start */
 		/* of level animation. */
-		int sx = (spriteram[offs + 1]) - 4;
-		int sy = (spriteram[offs]) - 13;
-		int code = (255 ^ spriteram[offs + 2]) + 256 * m_spritebank;
+		int sx = (m_spriteram[offs + 1]) - 4;
+		int sy = (m_spriteram[offs]) - 13;
+		int code = (255 ^ m_spriteram[offs + 2]) + 256 * m_spritebank;
 
 		if (flip_screen_x()) sx = 233 - sx;
 		if (flip_screen_y()) sy = 228 - sy;
 
-
-			m_gfxdecode->gfx(2)->transpen(bitmap,clip,
-			code, 0,
-			flip_screen_x(), flip_screen_y(),
-			sx,sy, 0);
+		m_gfxdecode->gfx(2)->transpen(bitmap,clip,
+		code, 0,
+		flip_screen_x(), flip_screen_y(),
+		sx,sy, 0);
 	}
 }
 
@@ -227,7 +215,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-uint32_t gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gottlieb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* if the background has lower priority, render it first, else clear the screen */
 	if (!m_background_priority)

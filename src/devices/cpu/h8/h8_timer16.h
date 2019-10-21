@@ -17,25 +17,6 @@
 #include "h8.h"
 #include "h8_intc.h"
 
-#define MCFG_H8_TIMER16_ADD( _tag, _count, _tstr )  \
-	MCFG_DEVICE_ADD( _tag, H8_TIMER16, 0 )          \
-	downcast<h8_timer16_device *>(device)->set_info(_count, _tstr);
-
-#define MCFG_H8_TIMER16_CHANNEL_ADD( _tag, tgr_count, tbr_count, intc, irq_base ) \
-	MCFG_DEVICE_ADD( _tag, H8_TIMER16_CHANNEL, 0 )  \
-	downcast<h8_timer16_channel_device *>(device)->set_info(tgr_count, tbr_count, intc, irq_base);
-
-#define MCFG_H8H_TIMER16_CHANNEL_ADD( _tag, tgr_count, tbr_count, intc, irq_base ) \
-	MCFG_DEVICE_ADD( _tag, H8H_TIMER16_CHANNEL, 0 ) \
-	downcast<h8h_timer16_channel_device *>(device)->set_info(tgr_count, tbr_count, intc, irq_base);
-
-#define MCFG_H8S_TIMER16_CHANNEL_ADD( _tag, tgr_count, tier_mask, intc, irq_base, t0, t1, t2, t3, t4, t5, t6, t7 ) \
-	MCFG_DEVICE_ADD( _tag, H8S_TIMER16_CHANNEL, 0 ) \
-	downcast<h8s_timer16_channel_device *>(device)->set_info(tgr_count, tier_mask, intc, irq_base, t0, t1, t2, t3, t4, t5, t6, t7);
-
-#define MCFG_H8S_TIMER16_CHANNEL_SET_CHAIN( _tag )  \
-	downcast<h8s_timer16_channel_device *>(device)->set_chain(_tag);
-
 class h8_timer16_channel_device : public device_t {
 public:
 	enum {
@@ -76,6 +57,11 @@ public:
 
 
 	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, int tgr_count, int tbr_count, const char *intc, int irq_base)
+		: h8_timer16_channel_device(mconfig, tag, owner, 0)
+	{
+		set_info(tgr_count, tbr_count, intc, irq_base);
+	}
 
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
 
@@ -136,6 +122,11 @@ protected:
 class h8h_timer16_channel_device : public h8_timer16_channel_device {
 public:
 	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8h_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, int tgr_count, int tbr_count, const char *intc, int irq_base)
+		: h8h_timer16_channel_device(mconfig, tag, owner, 0)
+	{
+		set_info(tgr_count, tbr_count, intc, irq_base);
+	}
 	virtual ~h8h_timer16_channel_device();
 
 	void set_info(int tgr_count, int tbr_count, const char *intc, int irq_base);
@@ -150,6 +141,12 @@ protected:
 class h8s_timer16_channel_device : public h8_timer16_channel_device {
 public:
 	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	h8s_timer16_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, int tgr_count, int _tier_mask, const char *intc, int irq_base,
+					int t0, int t1, int t2, int t3, int t4, int t5, int t6, int t7)
+		: h8s_timer16_channel_device(mconfig, tag, owner, 0)
+	{
+		set_info(tgr_count, _tier_mask, intc, irq_base, t0, t1, t2, t3, t4, t5, t6, t7);
+	}
 	virtual ~h8s_timer16_channel_device();
 
 	void set_info(int tgr_count, uint8_t _tier_mask, const char *intc, int irq_base,
@@ -168,7 +165,11 @@ protected:
 class h8_timer16_device : public device_t {
 public:
 	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	h8_timer16_device(const machine_config &mconfig, const char *tag, device_t *owner, int timer_count, uint8_t default_tstr)
+		: h8_timer16_device(mconfig, tag, owner, 0)
+	{
+		set_info(timer_count, default_tstr);
+	}
 	void set_info(int timer_count, uint8_t default_tstr);
 
 	DECLARE_READ8_MEMBER(tstr_r);

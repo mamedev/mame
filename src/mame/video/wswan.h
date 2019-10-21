@@ -34,33 +34,23 @@ typedef device_delegate<void (int irq)> wswan_video_irq_cb_delegate;
 typedef device_delegate<void (void)> wswan_video_dmasnd_cb_delegate;
 #define WSWAN_VIDEO_DMASND_CB_MEMBER(_name)   void _name(void)
 
-#define MCFG_WSWAN_VIDEO_IRQ_CB(_class, _method) \
-	downcast<wswan_video_device &>(*device).set_irq_callback(wswan_video_irq_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_WSWAN_VIDEO_DMASND_CB(_class, _method) \
-	downcast<wswan_video_device &>(*device).set_dmasnd_callback(wswan_video_dmasnd_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_WSWAN_VIDEO_TYPE( _type) \
-	downcast<wswan_video_device &>(*device).set_vdp_type(_type);
-
-
-class wswan_video_device : public device_t
+class wswan_video_device : public device_t, public device_video_interface
 {
 public:
 	wswan_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~wswan_video_device() {}
 
 	// static configuration
-	void set_irq_callback(wswan_video_irq_cb_delegate callback) { m_set_irq_cb = callback; }
-	void set_dmasnd_callback(wswan_video_dmasnd_cb_delegate callback) { m_snd_dma_cb = callback; }
+	template <typename... T> void set_irq_callback(T &&... args) { m_set_irq_cb = wswan_video_irq_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_dmasnd_callback(T &&... args) { m_snd_dma_cb = wswan_video_dmasnd_cb_delegate(std::forward<T>(args)...); }
 	void set_vdp_type(int type) { m_vdp_type = type; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	virtual DECLARE_READ8_MEMBER(vram_r);
-	virtual DECLARE_WRITE8_MEMBER(vram_w);
-	virtual DECLARE_READ8_MEMBER(reg_r);
-	virtual DECLARE_WRITE8_MEMBER(reg_w);
+	uint8_t vram_r(offs_t offset);
+	void vram_w(offs_t offset, uint8_t data);
+	uint8_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint8_t data);
 
 protected:
 	// device-level overrides
@@ -77,8 +67,6 @@ protected:
 	void refresh_scanline();
 	void scanline_interrupt();
 	void common_save();
-
-	required_device<screen_device> m_screen;
 
 	bitmap_ind16 m_bitmap;
 	uint8_t m_layer_bg_enable;          /* Background layer on/off */

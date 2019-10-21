@@ -14,12 +14,6 @@
 
 #include "m6502.h"
 
-#define MCFG_M6510_PORT_CALLBACKS(_read, _write) \
-	downcast<m6510_device *>(device)->set_callbacks(DEVCB_##_read, DEVCB_##_write);
-
-#define MCFG_M6510_PORT_PULLS(_up, _down) \
-	downcast<m6510_device *>(device)->set_pulls(_up, _down);
-
 class m6510_device : public m6502_device {
 public:
 	m6510_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -27,10 +21,6 @@ public:
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
 
-	template <class Read, class Write> void set_callbacks(Read &&rd, Write &&wr) {
-		read_port.set_callback(std::forward<Read>(rd));
-		write_port.set_callback(std::forward<Write>(wr));
-	}
 	auto read_callback() { return read_port.bind(); }
 	auto write_callback() { return write_port.bind(); }
 
@@ -74,6 +64,7 @@ protected:
 	uint8_t port_r();
 	void port_w(uint8_t data);
 
+	void init_port();
 	void update_port();
 
 #define O(o) void o ## _full(); void o ## _partial()
@@ -90,11 +81,42 @@ protected:
 #undef O
 };
 
+class m6508_device : public m6510_device {
+public:
+	m6508_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+
+	class mi_6508_normal : public memory_interface {
+	public:
+		m6508_device *base;
+
+		mi_6508_normal(m6508_device *base);
+		virtual ~mi_6508_normal() {}
+		virtual uint8_t read(uint16_t adr) override;
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+		virtual void write(uint16_t adr, uint8_t val) override;
+	};
+
+	class mi_6508_nd : public mi_6508_normal {
+	public:
+		mi_6508_nd(m6508_device *base);
+		virtual ~mi_6508_nd() {}
+		virtual uint8_t read_sync(uint16_t adr) override;
+		virtual uint8_t read_arg(uint16_t adr) override;
+	};
+
+	std::unique_ptr<uint8_t[]> ram_page;
+};
+
 enum {
 	M6510_IRQ_LINE = m6502_device::IRQ_LINE,
 	M6510_NMI_LINE = m6502_device::NMI_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6510, m6510_device)
+DECLARE_DEVICE_TYPE(M6508, m6508_device)
 
 #endif // MAME_CPU_M6502_M6510_H

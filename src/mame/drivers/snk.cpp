@@ -327,11 +327,6 @@ enum
 
 /*********************************************************************/
 
-CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
-{
-	return m_soundlatch->pending_r() ? 1 : 0;
-}
-
 READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -363,14 +358,14 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 
 WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
 READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
-	return m_soundlatch->read(space,0);
+	return m_soundlatch->read();
 }
 
 READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
@@ -461,11 +456,11 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
+READ_LINE_MEMBER(snk_state::sound_busy_r)
 {
 	return (m_sound_status & 4) ? 1 : 0;
 }
@@ -507,7 +502,7 @@ READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
 READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
-	m_soundlatch->clear_w(space, 0, 0);
+	m_soundlatch->clear_w();
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
@@ -700,27 +695,28 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 *****************************************************************************/
 
+template <int Which>
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
-	int which = (int)(uintptr_t)param;
-	int value = m_rot_io[which]->read();
+	int value = m_rot_io[Which]->read();
 
-	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
+	if ((m_last_value[Which] == 0x5 && value == 0x6) || (m_last_value[Which] == 0x6 && value == 0x5))
 	{
-		if (!m_cp_count[which])
+		if (!m_cp_count[Which])
 			value = 0xf;
-		m_cp_count[which] = (m_cp_count[which] + 1) & 0x07;
+		m_cp_count[Which] = (m_cp_count[Which] + 1) & 0x07;
 	}
-	m_last_value[which] = value;
+	m_last_value[Which] = value;
 
 	return value;
 }
 
+template <int Which>
 CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
 {
 	if (m_joymode_io->read() == 1)
 	{
-		return gwar_rotary(field, param);
+		return gwar_rotary<Which>();
 	}
 	else
 	{
@@ -776,24 +772,23 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 /************************************************************************/
 
+template <int Mask>
 CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x01:  /* older games : "Occurrence" Dip Switch (DSW2:1) */
-			return ((m_bonus_io->read() & bit_mask) >> 0);
+			return ((m_bonus_io->read() & Mask) >> 0);
 		case 0xc0:  /* older games : "Bonus Life" Dip Switches (DSW1:7,8) */
-			return ((m_bonus_io->read() & bit_mask) >> 6);
+			return ((m_bonus_io->read() & Mask) >> 6);
 
 		case 0x04:  /* later games : "Occurrence" Dip Switch (DSW1:3) */
-			return ((m_bonus_io->read() & bit_mask) >> 2);
+			return ((m_bonus_io->read() & Mask) >> 2);
 		case 0x30:  /* later games : "Bonus Life" Dip Switches (DSW2:5,6) */
-			return ((m_bonus_io->read() & bit_mask) >> 4);
+			return ((m_bonus_io->read() & Mask) >> 4);
 
 		default:
-			logerror("snk_bonus_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("snk_bonus_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -1418,7 +1413,7 @@ void snk_state::hal21_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(snk_state::sgladiat_soundlatch_r));
 	map(0xc000, 0xc000).r(FUNC(snk_state::sgladiat_sound_nmi_ack_r));
 	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
-//  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
+//  map(0xe002, 0xe002).nopw();    // bitfielded(0-5) details unknown. Filter enable?
 	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
 }
 
@@ -1447,7 +1442,7 @@ void snk_state::aso_YM3526_sound_map(address_map &map)
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).r(FUNC(snk_state::tnk3_busy_clear_r));
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-//  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
+//  map(0xf002, 0xf002).nopr(); unknown
 	map(0xf004, 0xf004).r(FUNC(snk_state::tnk3_cmdirq_ack_r));
 	map(0xf006, 0xf006).r(FUNC(snk_state::tnk3_ymirq_ack_r));
 }
@@ -1518,7 +1513,7 @@ static INPUT_PORTS_START( marvins )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )   // service switch according to schematics, see code at 0x0453. Goes to garbage.
 
 	PORT_START("IN1")
@@ -1600,7 +1595,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1684,8 +1679,8 @@ static INPUT_PORTS_START( madcrash )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", generic_latch_8_device, pending_r) // sound CPU status
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
 	PORT_START("IN1")
@@ -1762,7 +1757,7 @@ static INPUT_PORTS_START( jcross )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1805,10 +1800,10 @@ static INPUT_PORTS_START( jcross )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 //  PORT_DIPSETTING(    0x10, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
 //  PORT_DIPSETTING(    0x08, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -1847,7 +1842,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )            /* code at 0x054e */
 
@@ -1888,10 +1883,10 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x02, 0x02, "Time" )                      PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, "More" )                      /* Hazard race 2:30 / Chariot race 3:30 */
 	PORT_DIPSETTING(    0x00, "Less" )                      /* Hazard race 2:00 / Chariot race 3:00 */
@@ -1931,7 +1926,7 @@ static INPUT_PORTS_START( hal21 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1972,10 +1967,10 @@ static INPUT_PORTS_START( hal21 )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2014,7 +2009,7 @@ static INPUT_PORTS_START( aso )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coinage" settings - code at 0x2e04 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2057,10 +2052,10 @@ static INPUT_PORTS_START( aso )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2100,7 +2095,7 @@ static INPUT_PORTS_START( alphamis )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coin A" settings - code at 0x2e17 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2147,7 +2142,7 @@ static INPUT_PORTS_START( alphamis )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW1:8" )
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2182,7 +2177,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2228,10 +2223,10 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0xc0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0xc0>)
 
 	PORT_START("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x01>)
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSW2:2,3")
 	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
@@ -2265,7 +2260,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( athena )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coin A" settings - code at 0x09d4 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2302,7 +2297,7 @@ static INPUT_PORTS_START( athena )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )          /* Single Controls */
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2329,7 +2324,7 @@ static INPUT_PORTS_START( athena )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                    PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
 	PORT_DIPNAME( 0x80, 0x80, "Energy" )                    PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, "12" )
@@ -2350,7 +2345,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fitegolf )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x045b */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
@@ -2446,7 +2441,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( countryc )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0450 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
@@ -2456,10 +2451,10 @@ static INPUT_PORTS_START( countryc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_x, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, countryc_trackball_x)
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_y, nullptr)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, countryc_trackball_y)
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2528,7 +2523,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ikari )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a15 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2568,7 +2563,7 @@ static INPUT_PORTS_START( ikari )
 	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "Separate" )
 	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2594,7 +2589,7 @@ static INPUT_PORTS_START( ikari )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x04, "Freeze" )
 	PORT_DIPSETTING(    0x00, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )           /* read at 0x07c4, but strange test at 0x07cc */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
@@ -2623,7 +2618,7 @@ static INPUT_PORTS_START( ikaria )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a00 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 INPUT_PORTS_END
@@ -2644,6 +2639,11 @@ static INPUT_PORTS_START( ikarijpb )
 	// this is accomplished by hooking the joystick input to the rotary input, plus
 	// of course the code is patched to handle that.
 
+	// According to a SNK 40th Anniversary Collection screenshot, this bootleg
+	// came from Korea:
+	// "The idea for Guevara's use of tanks with a human torso poking out of the top
+	// came from a poorly-programmed Korean bootleg of Ikari."
+
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x21, 0x01, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x42, 0x02, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
@@ -2660,7 +2660,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( victroad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a19 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2700,7 +2700,7 @@ static INPUT_PORTS_START( victroad )
 	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "Separate" )
 	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2726,7 +2726,7 @@ static INPUT_PORTS_START( victroad )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -2764,7 +2764,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bermudat )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0a0a */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2802,7 +2802,7 @@ static INPUT_PORTS_START( bermudat )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2828,7 +2828,7 @@ static INPUT_PORTS_START( bermudat )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state,snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0xc0, 0x80, "Game Style" )                PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(    0xc0, "Normal without continue" )
 	PORT_DIPSETTING(    0x80, "Normal with continue" )
@@ -2893,7 +2893,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2930,7 +2930,7 @@ static INPUT_PORTS_START( psychos )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -2957,7 +2957,7 @@ static INPUT_PORTS_START( psychos )
 	PORT_DIPNAME( 0x08, 0x08, "Freeze" )                    PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -2978,7 +2978,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x08c8 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )
@@ -2992,7 +2992,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwar_rotary, (void*)0)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwar_rotary<0>)
 
 	PORT_START("P1ROT")
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -3002,7 +3002,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwar_rotary, (void*)1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwar_rotary<1>)
 
 	PORT_START("P2ROT")
 	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
@@ -3024,7 +3024,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -3050,7 +3050,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8" )
 
@@ -3073,10 +3073,10 @@ static INPUT_PORTS_START( gwarb )
 	// connected. If rotary is not connected, player fires in the direction he's facing.
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwarb_rotary, (void*)0)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwarb_rotary<0>)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,gwarb_rotary, (void*)1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, gwarb_rotary<1>)
 
 	PORT_START("JOYSTICK_MODE")
 	PORT_CONFNAME( 0x01, 0x00, "Joystick mode" )
@@ -3087,7 +3087,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chopper )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0849 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )
@@ -3126,7 +3126,7 @@ static INPUT_PORTS_START( chopper )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )          /* Single Controls */
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x04)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x04>)
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -3152,7 +3152,7 @@ static INPUT_PORTS_START( chopper )
 	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_bonus_r, (void *)0x30)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(snk_state, snk_bonus_r<0x30>)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
@@ -3208,7 +3208,7 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* also reset - code at 0x074a */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x1065 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Start Game A")
@@ -3281,9 +3281,10 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	// TODO: tdfever2 has different dip switches (at least allow continue seems ignored)
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, "2 Player Upright" )
 	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
@@ -3349,7 +3350,7 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch / also reset - code at 0x00cc */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x677f */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(snk_state, sound_busy_r)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Start Game A")
@@ -3605,491 +3606,430 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-MACHINE_CONFIG_START(snk_state::marvins)
-
+void snk_state::marvins(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3360000)   /* 3.36 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(marvins_cpuA_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3360000);   /* 3.36 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 3360000)   /* 3.36 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(marvins_cpuB_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 3360000);    /* 3.36 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* verified on schematics */
-	MCFG_DEVICE_PROGRAM_MAP(marvins_sound_map)
-	MCFG_DEVICE_IO_MAP(marvins_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, nmi_line_assert,  244)  // schematics show a separate 244Hz timer
+	Z80(config, m_audiocpu, 4000000);  /* verified on schematics */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::marvins_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_marvins)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_marvins));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marvins)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marvins);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, FUNC(snk_state::tnk3_palette), 0x400);
+	m_palette->enable_shadows();
 
-	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,marvins)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(HOLDLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* verified on schematics */
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);/* verified on schematics */
+	SNKWAVE(config, "wave", 8000000).add_route(ALL_OUTPUTS, "mono", 0.30);   /* verified on schematics */
+}
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-
-	MCFG_DEVICE_ADD("wave", SNKWAVE, 8000000)   /* verified on schematics */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::vangrd2)
+void snk_state::vangrd2(machine_config &config)
+{
 	marvins(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(madcrash_cpuA_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::madcrash_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::madcrash_cpuB_map);
+}
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(madcrash_cpuB_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::madcrush)
+void snk_state::madcrush(machine_config &config)
+{
 	marvins(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(madcrush_cpuA_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::madcrush_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::madcrush_cpuB_map);
+}
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(madcrush_cpuB_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::jcross)
-
+void snk_state::jcross(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3350000) /* NOT verified */
-	MCFG_DEVICE_PROGRAM_MAP(jcross_cpuA_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, 3350000); /* NOT verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, 3350000) /* NOT verified */
-	MCFG_DEVICE_PROGRAM_MAP(jcross_cpuB_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, 3350000);  /* NOT verified */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) /* NOT verified */
-	MCFG_DEVICE_PROGRAM_MAP(jcross_sound_map)
-	MCFG_DEVICE_IO_MAP(jcross_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, irq0_line_assert,  244) // Marvin's frequency, sounds ok
+	Z80(config, m_audiocpu, 4000000); /* NOT verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::jcross_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &snk_state::jcross_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_assert), attotime::from_hz(244)); // Marvin's frequency, sounds ok
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_tnk3));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnk3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnk3);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, FUNC(snk_state::tnk3_palette), 0x400);
+	m_palette->enable_shadows();
 
-	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,jcross)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	AY8910(config, "ay1", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
+	AY8910(config, "ay2", 2000000).add_route(ALL_OUTPUTS, "mono", 0.35);  /* NOT verified */
+}
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 2000000)  /* NOT verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::sgladiat)
+void snk_state::sgladiat(machine_config &config)
+{
 	jcross(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sgladiat_cpuA_map)
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(sgladiat_cpuB_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::sgladiat_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::sgladiat_cpuB_map);
 
 	/* video hardware */
 	/* visible area is correct. Debug info is shown in the black bars at the sides
 	   of the screen when the Debug dip switch is on */
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,sgladiat)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::hal21)
+void snk_state::hal21(machine_config &config)
+{
 	jcross(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(hal21_cpuA_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::hal21_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::hal21_cpuB_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(hal21_cpuB_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(hal21_sound_map)
-	MCFG_DEVICE_IO_MAP(hal21_sound_portmap)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(snk_state, irq0_line_hold,  220) // music tempo, hand tuned
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::hal21_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &snk_state::hal21_sound_portmap);
+	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_hold), attotime::from_hz(220)); // music tempo, hand tuned
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,hal21)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::tnk3)
-
+void snk_state::tnk3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(tnk3_cpuA_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(tnk3_cpuB_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(tnk3_YM3526_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_YM3526_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tnk3)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_tnk3));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tnk3)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tnk3);
 
-	MCFG_PALETTE_ADD("palette", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	PALETTE(config, m_palette, FUNC(snk_state::tnk3_palette), 0x400);
+	m_palette->enable_shadows();
 
-	MCFG_PALETTE_INIT_OWNER(snk_state,tnk3)
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tnk3)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::aso)
+void snk_state::aso(machine_config &config)
+{
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(aso_cpuA_map)
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(aso_cpuB_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(aso_YM3526_sound_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::aso_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::aso_cpuB_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::aso_YM3526_sound_map);
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,aso)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::athena)
+void snk_state::athena(machine_config &config)
+{
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(YM3526_YM3526_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::fitegolf)
+void snk_state::fitegolf(machine_config &config)
+{
 	tnk3(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("audiocpu")
 	// xtal is 4MHz instead of 8MHz/2 but the end result is the same
-	MCFG_DEVICE_PROGRAM_MAP(YM3812_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_sound_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ym1", YM3812, XTAL(4'000'000)) /* verified on pcb */
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3812_device &ym1(YM3812(config.replace(), "ym1", XTAL(4'000'000))); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-MACHINE_CONFIG_START(snk_state::fitegolf2)
+void snk_state::fitegolf2(machine_config &config)
+{
 	fitegolf(config);
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_fitegolf2));
+}
 
-MACHINE_CONFIG_START(snk_state::countryc)
+void snk_state::countryc(machine_config &config)
+{
 	fitegolf(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::countryc_cpuA_map);
+}
+
+void snk_state::ikari(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(countryc_cpuA_map)
-MACHINE_CONFIG_END
+	Z80(config, m_maincpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::ikari_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
+	Z80(config, m_subcpu, XTAL(13'400'000)/4); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::ikari_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-MACHINE_CONFIG_START(snk_state::ikari)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(ikari_cpuA_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(13'400'000)/4) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(ikari_cpuB_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(YM3526_YM3526_sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(36*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_ikari)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_ikari));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ikari)
-
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ikari);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x400);
+	m_palette->enable_shadows();
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,ikari)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	MCFG_DEVICE_ADD("ym2", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	ym3526_device &ym2(YM3526(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq_handler().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::victroad)
+void snk_state::victroad(machine_config &config)
+{
 	ikari(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	y8950_device &ym2(Y8950(config.replace(), "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::bermudat)
-
+void snk_state::bermudat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(bermudat_cpuA_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_maincpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::bermudat_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("sub", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(bermudat_cpuB_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::bermudat_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(YM3526_Y8950_sound_map)
+	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(24000))
+	config.m_minimum_quantum = attotime::from_hz(24000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
 	// this visible area matches the psychos pcb
-	MCFG_SCREEN_SIZE(50*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_gwar)
-	MCFG_SCREEN_PALETTE("palette")
+	m_screen->set_size(50*8, 28*8);
+	m_screen->set_visarea(0*8, 50*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_gwar));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gwar)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gwar);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x400);
+
 	MCFG_VIDEO_START_OVERRIDE(snk_state,gwar)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM3526, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	ym3526_device &ym1(YM3526(config, "ym1", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 2.0);
 
-	MCFG_DEVICE_ADD("ym2", Y8950, XTAL(8'000'000)/2) /* verified on pcb */
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_CONFIG_END
+	y8950_device &ym2(Y8950(config, "ym2", XTAL(8'000'000)/2)); /* verified on pcb */
+	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 2.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::psychos)
+void snk_state::psychos(machine_config &config)
+{
 	bermudat(config);
-
-	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(snk_state,psychos)
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(snk_state::gwar)
+void snk_state::gwar(machine_config &config)
+{
 	bermudat(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuB_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuA_map)
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuB_map)
-
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::gwara)
+void snk_state::gwara(machine_config &config)
+{
 	bermudat(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::gwara_cpuA_map);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::gwara_cpuB_map);
+}
 
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gwara_cpuA_map)
-
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(gwara_cpuB_map)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(snk_state::chopper1)
+void snk_state::chopper1(machine_config &config)
+{
 	bermudat(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuB_map)
-
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(YM3812_Y8950_sound_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuB_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3812_Y8950_sound_map);
 
 	/* sound hardware */
-	MCFG_DEVICE_REPLACE("ym1", YM3812, 4000000)
-	MCFG_YM3812_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ym3812_device &ym1(YM3812(config.replace(), "ym1", 4000000));
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::choppera)
+void snk_state::choppera(machine_config &config)
+{
 	chopper1(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::gwar_cpuA_map);
+}
 
+
+void snk_state::tdfever(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gwar_cpuA_map)
-MACHINE_CONFIG_END
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &snk_state::tdfever_cpuA_map);
+	m_maincpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
+	Z80(config, m_subcpu, 4000000);
+	m_subcpu->set_addrmap(AS_PROGRAM, &snk_state::tdfever_cpuB_map);
+	m_subcpu->set_vblank_int("screen", FUNC(snk_state::irq0_line_hold));
 
-MACHINE_CONFIG_START(snk_state::tdfever)
+	Z80(config, m_audiocpu, 4000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(tdfever_cpuA_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("sub", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(tdfever_cpuB_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", snk_state,  irq0_line_hold)
-
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(YM3526_Y8950_sound_map)
-
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(50*8, 28*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_tdfever)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(50*8, 28*8);
+	m_screen->set_visarea(0*8, 50*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(snk_state::screen_update_tdfever));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_tdfever)
-
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 0x400)
-	MCFG_PALETTE_ENABLE_SHADOWS()
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_tdfever);
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 0x400).enable_shadows();
 
 	MCFG_VIDEO_START_OVERRIDE(snk_state,tdfever)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM3526, 4000000)
-	MCFG_YM3526_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_1))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ym3526_device &ym1(YM3526(config, "ym1", 4000000));
+	ym1.irq_handler().set(FUNC(snk_state::ymirq_callback_1));
+	ym1.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ym2", Y8950, 4000000)
-	MCFG_Y8950_IRQ_HANDLER(WRITELINE(*this, snk_state, ymirq_callback_2))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	y8950_device &ym2(Y8950(config, "ym2", 4000000));
+	ym2.irq().set(FUNC(snk_state::ymirq_callback_2));
+	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-
-MACHINE_CONFIG_START(snk_state::tdfever2)
+void snk_state::tdfever2(machine_config &config)
+{
 	tdfever(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("audiocpu")
-	MCFG_DEVICE_PROGRAM_MAP(Y8950_sound_map)
+	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::Y8950_sound_map);
 
 	/* sound hardware */
 
 	// apparently, no "ym1" in tdfever2
 	// (registers are written to but they cause sound not to work)
-	MCFG_DEVICE_REMOVE("ym1")
-MACHINE_CONFIG_END
+	config.device_remove("ym1");
+}
 
 
 /***********************************************************************/
@@ -5373,244 +5313,6 @@ ROM_END
 
 /***********************************************************************/
 
-/*
-pals
-----
-Fuse Plot - a6003-3
-?
-
-PAL16L8/A/A-2/A-4
-*
-DD PAL16L8/A/A-2/A-4*
-QP20*
-QF2048*
-G0*
-F0*
-L0     11111111111111111111111111111111*
-L32    11111110111111111111111111111111*
-L64    11111111111111101111111111111011*
-L96    11111111110111101111111111111111*
-L128   00000000000000000000000000000000*
-L160   00000000000000000000000000000000*
-L192   00000000000000000000000000000000*
-L224   00000000000000000000000000000000*
-L256   11111111111111111111111111111111*
-L288   11101111111111111111111111111111*
-L320   10111111111111111111111111111111*
-L352   11111011111111111111111111111111*
-L384   11111111101111111111111111111111*
-L416   00000000000000000000000000000000*
-L448   00000000000000000000000000000000*
-L480   00000000000000000000000000000000*
-L512   11111111111111111111111111111111*
-L544   11111111111111111111111111111110*
-L576   11111111111111111111111111101111*
-L608   11111111111111111111111011111111*
-L640   11111111111111111110111111111111*
-L672   00000000000000000000000000000000*
-L704   00000000000000000000000000000000*
-L736   00000000000000000000000000000000*
-L768   11111111111111111111111111111111*
-L800   11111111111110111111111111111111*
-L832   11111111111111111011111111111111*
-L864   11111111111111111111101111111111*
-L896   11111111111111111111111110111111*
-L928   00000000000000000000000000000000*
-L960   00000000000000000000000000000000*
-L992   00000000000000000000000000000000*
-L1024  00000000000000000000000000000000*
-L1056  00000000000000000000000000000000*
-L1088  00000000000000000000000000000000*
-L1120  00000000000000000000000000000000*
-L1152  00000000000000000000000000000000*
-L1184  00000000000000000000000000000000*
-L1216  00000000000000000000000000000000*
-L1248  00000000000000000000000000000000*
-L1280  00000000000000000000000000000000*
-L1312  00000000000000000000000000000000*
-L1344  00000000000000000000000000000000*
-L1376  00000000000000000000000000000000*
-L1408  00000000000000000000000000000000*
-L1440  00000000000000000000000000000000*
-L1472  00000000000000000000000000000000*
-L1504  00000000000000000000000000000000*
-L1536  00000000000000000000000000000000*
-L1568  00000000000000000000000000000000*
-L1600  00000000000000000000000000000000*
-L1632  00000000000000000000000000000000*
-L1664  00000000000000000000000000000000*
-L1696  00000000000000000000000000000000*
-L1728  00000000000000000000000000000000*
-L1760  00000000000000000000000000000000*
-L1792  11111111111111111111111111111111*
-L1824  11111110111111111111111111111111*
-L1856  11111111111011111111111111110111*
-L1888  11111111111001110111011101111111*
-L1920  00000000000000000000000000000000*
-L1952  00000000000000000000000000000000*
-L1984  00000000000000000000000000000000*
-L2016  00000000000000000000000000000000*
-C57BE*
-?
-
-
-Fuse Plot - a6004-1
-?
-
-PAL16R6B-2/B-4
-*
-DD PAL16R6B-2/B-4*
-QP20*
-QF2048*
-G0*
-F0*
-L0     11111111111111111111111111111111*
-L32    11111111111111111111011111111111*
-L64    11111110111111111111111111111111*
-L96    00000000000000000000000000000000*
-L128   00000000000000000000000000000000*
-L160   00000000000000000000000000000000*
-L192   00000000000000000000000000000000*
-L224   00000000000000000000000000000000*
-L256   01111111011111111111111111111111*
-L288   00000000000000000000000000000000*
-L320   00000000000000000000000000000000*
-L352   00000000000000000000000000000000*
-L384   00000000000000000000000000000000*
-L416   00000000000000000000000000000000*
-L448   00000000000000000000000000000000*
-L480   00000000000000000000000000000000*
-L512   11111111101111111111111111111111*
-L544   00000000000000000000000000000000*
-L576   00000000000000000000000000000000*
-L608   00000000000000000000000000000000*
-L640   00000000000000000000000000000000*
-L672   00000000000000000000000000000000*
-L704   00000000000000000000000000000000*
-L736   00000000000000000000000000000000*
-L768   11111110111101110111101111111111*
-L800   00000000000000000000000000000000*
-L832   00000000000000000000000000000000*
-L864   00000000000000000000000000000000*
-L896   00000000000000000000000000000000*
-L928   00000000000000000000000000000000*
-L960   00000000000000000000000000000000*
-L992   00000000000000000000000000000000*
-L1024  11111101111111110111101111111111*
-L1056  00000000000000000000000000000000*
-L1088  00000000000000000000000000000000*
-L1120  00000000000000000000000000000000*
-L1152  00000000000000000000000000000000*
-L1184  00000000000000000000000000000000*
-L1216  00000000000000000000000000000000*
-L1248  00000000000000000000000000000000*
-L1280  11111101111111111111101111111111*
-L1312  00000000000000000000000000000000*
-L1344  00000000000000000000000000000000*
-L1376  00000000000000000000000000000000*
-L1408  00000000000000000000000000000000*
-L1440  00000000000000000000000000000000*
-L1472  00000000000000000000000000000000*
-L1504  00000000000000000000000000000000*
-L1536  00000000000000000000000000000000*
-L1568  00000000000000000000000000000000*
-L1600  00000000000000000000000000000000*
-L1632  00000000000000000000000000000000*
-L1664  00000000000000000000000000000000*
-L1696  00000000000000000000000000000000*
-L1728  00000000000000000000000000000000*
-L1760  00000000000000000000000000000000*
-L1792  11111111111111111111111111111111*
-L1824  11111101111111111111111110111111*
-L1856  01110111011111111111111111111111*
-L1888  01111111011111111111111110111111*
-L1920  01110101011111111111111111111111*
-L1952  00000000000000000000000000000000*
-L1984  00000000000000000000000000000000*
-L2016  00000000000000000000000000000000*
-C311C*
-?
-
-
-Fuse Plot - a6004-2
-?
-
-PAL20L8A/A-2
-*
-DD PAL20L8A/A-2*
-QP24*
-QF2560*
-G0*
-F0*
-L0     0000000000000000000000000000000000000000*
-L40    0000000000000000000000000000000000000000*
-L80    0000000000000000000000000000000000000000*
-L120   0000000000000000000000000000000000000000*
-L160   0000000000000000000000000000000000000000*
-L200   0000000000000000000000000000000000000000*
-L240   0000000000000000000000000000000000000000*
-L280   0000000000000000000000000000000000000000*
-L320   1111111111111111111111111111111111111111*
-L360   1010011001111011111111111111111111111111*
-L400   1010011010110111111111111111111111111111*
-L440   1111110111111111101110110111011110111111*
-L480   1111110111111111101110110111101101111111*
-L520   0000000000000000000000000000000000000000*
-L560   0000000000000000000000000000000000000000*
-L600   0000000000000000000000000000000000000000*
-L640   1111111111111111111111111111111111111111*
-L680   1010011001110111111111111111111111111111*
-L720   1111110111111111101110110111011101111111*
-L760   0000000000000000000000000000000000000000*
-L800   0000000000000000000000000000000000000000*
-L840   0000000000000000000000000000000000000000*
-L880   0000000000000000000000000000000000000000*
-L920   0000000000000000000000000000000000000000*
-L960   1111111111111111111111111111111111111111*
-L1000  1010101010110111111111111111111111111111*
-L1040  1111110111111111101110111011101101111111*
-L1080  0000000000000000000000000000000000000000*
-L1120  0000000000000000000000000000000000000000*
-L1160  0000000000000000000000000000000000000000*
-L1200  0000000000000000000000000000000000000000*
-L1240  0000000000000000000000000000000000000000*
-L1280  1111111111111111111111111111111111111111*
-L1320  1111111011111111111111111111111111111011*
-L1360  1111110111111111111111111111111111111110*
-L1400  0000000000000000000000000000000000000000*
-L1440  0000000000000000000000000000000000000000*
-L1480  0000000000000000000000000000000000000000*
-L1520  0000000000000000000000000000000000000000*
-L1560  0000000000000000000000000000000000000000*
-L1600  1111111111111111111111111111111111111111*
-L1640  1010101001111011111111111111111111111111*
-L1680  1010101001110111111111111111111111111111*
-L1720  1111110111111111101110111011011110111111*
-L1760  1111110111111111101110111011011101111111*
-L1800  0000000000000000000000000000000000000000*
-L1840  0000000000000000000000000000000000000000*
-L1880  0000000000000000000000000000000000000000*
-L1920  1111111111111111111111111111111111111111*
-L1960  1010011010111011111111111111111111111111*
-L2000  1111110111111111101110110111101110111111*
-L2040  0000000000000000000000000000000000000000*
-L2080  0000000000000000000000000000000000000000*
-L2120  0000000000000000000000000000000000000000*
-L2160  0000000000000000000000000000000000000000*
-L2200  0000000000000000000000000000000000000000*
-L2240  0000000000000000000000000000000000000000*
-L2280  0000000000000000000000000000000000000000*
-L2320  0000000000000000000000000000000000000000*
-L2360  0000000000000000000000000000000000000000*
-L2400  0000000000000000000000000000000000000000*
-L2440  0000000000000000000000000000000000000000*
-L2480  0000000000000000000000000000000000000000*
-L2520  0000000000000000000000000000000000000000*
-C63C0*
-?
-*/
-/***********************************************************************/
-
 ROM_START( bermudat )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "bt_p1.rom",  0x0000, 0x10000,  CRC(43dec5e9) SHA1(2b29016d4af2a0a6be87f440f235a6a76f8a52a0) )
@@ -6137,46 +5839,46 @@ ROM_END
 
 ROM_START( chopper )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "kk_01.rom",  0x0000, 0x10000,  CRC(8fa2f839) SHA1(13cfdbeb433aa3e1dc7e7927c00690e02ed08274) )
+	ROM_LOAD( "kk_a_ver2_1.8g",  0x00000, 0x10000, CRC(dc325860) SHA1(89391897e6f31d9c1d3b7f27618f63fe8018d42a) ) /* Verified Ver2, Red "A" stamped on label */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "kk_04.rom",  0x00000, 0x10000, CRC(004f7d9a) SHA1(4d1c830f69dbf2f1523f9ad7da9b3275fd6b5dfb) )
+	ROM_LOAD( "kk_a_4.6g", 0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
-	ROM_LOAD( "up03_l1.rom",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* green */
-	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
+	ROM_LOAD( "k1.9w",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* BPROM MMI 63S441N - red */
+	ROM_LOAD( "k3.9u",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* BPROM MMI 63S441N - green */
+	ROM_LOAD( "k2.9v",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* BPROM MMI 63S441N - blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "kk_11.rom",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
-	ROM_LOAD( "kk_12.rom",  0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
-	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",    0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_a_11.8z",  0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_12.8ab", 0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_13.8ac",   0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "kk_09.rom",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
-	ROM_LOAD( "kk_08.rom",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
-	ROM_LOAD( "kk_07.rom",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
-	ROM_LOAD( "kk_06.rom",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
+	ROM_LOAD( "kk_a_9.3k",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_8.3l",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_7.3n",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_6.3p",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
@@ -6184,46 +5886,46 @@ ROM_END
 
 ROM_START( choppera )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1a.rom",  0x0000, 0x10000,  CRC(dc325860) SHA1(89391897e6f31d9c1d3b7f27618f63fe8018d42a) )
+	ROM_LOAD( "chpri-1.8g", 0x00000, 0x10000, CRC(a4e6e978) SHA1(dafc2a3da3725344023a09f5bdaedd0e8e1dbbe2) ) /* This set includes the revision "A" roms, so it's atleast Ver1 or later */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "4a.rom",  0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) )
+	ROM_LOAD( "kk_a_4.6g",  0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
-	ROM_LOAD( "up03_l1.rom",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* green */
-	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
+	ROM_LOAD( "k1.9w",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* BPROM MMI 63S441N - red */
+	ROM_LOAD( "k3.9u",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* BPROM MMI 63S441N - green */
+	ROM_LOAD( "k2.9v",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* BPROM MMI 63S441N - blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "11a.rom",    0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) )
-	ROM_LOAD( "12a.rom",    0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) )
-	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",    0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_a_11.8z",  0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_12.8ab", 0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_13.8ac",   0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "9a.rom",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) )
-	ROM_LOAD( "8a.rom",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) )
-	ROM_LOAD( "7a.rom",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) )
-	ROM_LOAD( "6a.rom",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) )
+	ROM_LOAD( "kk_a_9.3k",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_8.3l",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_7.3n",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) ) /* Red "A" stamped on label */
+	ROM_LOAD( "kk_a_6.3p",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) ) /* Red "A" stamped on label */
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
@@ -6231,46 +5933,46 @@ ROM_END
 
 ROM_START( chopperb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "chpri-1.bin",  0x0000, 0x10000,  CRC(a4e6e978) SHA1(dafc2a3da3725344023a09f5bdaedd0e8e1dbbe2) )
+	ROM_LOAD( "kk_01.8g",  0x00000, 0x10000, CRC(8fa2f839) SHA1(13cfdbeb433aa3e1dc7e7927c00690e02ed08274) ) /* First / original version without revised A roms */
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "chpri-4.bin",  0x00000, 0x10000, CRC(56d10ba3) SHA1(345a80239fd425c7fe1dfec9385c99a307511e00) )
+	ROM_LOAD( "kk_04.6g",  0x00000, 0x10000, CRC(004f7d9a) SHA1(4d1c830f69dbf2f1523f9ad7da9b3275fd6b5dfb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
-	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
-	ROM_LOAD( "up03_l1.rom",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* green */
-	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
+	ROM_LOAD( "k1.9w",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* BPROM MMI 63S441N - red */
+	ROM_LOAD( "k3.9u",  0x0400, 0x0400, CRC(15359fc3) SHA1(4ced674fb18b80ebe5fd6459e0fb9542461dbc74) ) /* BPROM MMI 63S441N - green */
+	ROM_LOAD( "k2.9v",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* BPROM MMI 63S441N - blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",    0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "chpri-11.bin", 0x10000, 0x10000, CRC(881ac259) SHA1(6cce41878c9d9712996d4987a9a578f1301b8feb) )
-	ROM_LOAD( "chpri-12.bin", 0x20000, 0x10000, CRC(de96b331) SHA1(725cfe739f7ed0f37eb620d9566bfda1369f4d50) )
-	ROM_LOAD( "kk_13.rom",    0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_11.8z",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
+	ROM_LOAD( "kk_12.8ab", 0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
+	ROM_LOAD( "kk_13.8ac", 0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "chpri-9.bin",  0x00000, 0x08000, CRC(106c2dcc) SHA1(919497757664c92e9955db50f5096ac81cec33c3) )
-	ROM_LOAD( "chpri-8.bin",  0x08000, 0x08000, CRC(d4f88f62) SHA1(ac89ffa83e0e207acce39711b93d94affc61c1cc) )
-	ROM_LOAD( "chpri-7.bin",  0x10000, 0x08000, CRC(28ae39f9) SHA1(7d51489b824b76710f6d4434a77f5f2833fcc532) )
-	ROM_LOAD( "chpri-6.bin",  0x18000, 0x08000, CRC(16774a36) SHA1(d1207513f790a30eef8802e63cfeeb10321d6ff7) )
+	ROM_LOAD( "kk_09.3k",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
+	ROM_LOAD( "kk_08.3l",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
+	ROM_LOAD( "kk_07.3n",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
+	ROM_LOAD( "kk_06.3p",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
@@ -6278,13 +5980,13 @@ ROM_END
 
 ROM_START( legofair )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "up03_m4.rom",  0x0000, 0x10000,  CRC(79a485c0) SHA1(bbf51e7321656b6a04223909d4958ceb4892193a) )
+	ROM_LOAD( "up03_m4.rom", 0x00000, 0x10000, CRC(79a485c0) SHA1(bbf51e7321656b6a04223909d4958ceb4892193a) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
-	ROM_LOAD( "up03_m8.rom",  0x00000, 0x10000, CRC(96d3a4d9) SHA1(e23a06e6117eca14b24de2d6fd48f5aa2a26d3bb) )
+	ROM_LOAD( "up03_m8.rom", 0x00000, 0x10000, CRC(96d3a4d9) SHA1(e23a06e6117eca14b24de2d6fd48f5aa2a26d3bb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kk_03.rom",  0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
+	ROM_LOAD( "kk_03.3d",   0x00000, 0x10000, CRC(dbaafb87) SHA1(e7d7f68250bda217230560481ba51da335fc05d7) )
 
 	ROM_REGION( 0x0c00, "proms", 0 )
 	ROM_LOAD( "up03_k1.rom",  0x0000, 0x0400, CRC(7f07a45c) SHA1(f751d01d9c25609195b19643395290dab8b8bc5c) ) /* red */
@@ -6292,32 +5994,35 @@ ROM_START( legofair )
 	ROM_LOAD( "up03_k2.rom",  0x0800, 0x0400, CRC(79b50f7d) SHA1(41579e498046570a6a74309310b5341fcde9c7de) ) /* blue */
 
 	ROM_REGION( 0x8000, "tx_tiles", 0 )
-	ROM_LOAD( "kk_05.rom",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
+	ROM_LOAD( "kk_05.8p",  0x0000, 0x8000, CRC(defc0987) SHA1(ea8eca852aadce90857eb8e65d78631409faac01) )
 
 	ROM_REGION( 0x40000, "bg_tiles", 0 )
-	ROM_LOAD( "kk_10.rom",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
-	ROM_LOAD( "kk_11.rom",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
-	ROM_LOAD( "kk_12.rom",  0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
-	ROM_LOAD( "kk_13.rom",  0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
+	ROM_LOAD( "kk_10.8y",  0x00000, 0x10000, CRC(5cf4d22b) SHA1(b66864740898478becb188d7dd34d61187926e4d) )
+	ROM_LOAD( "kk_11.8z",  0x10000, 0x10000, CRC(9af4cad0) SHA1(dd8c1a76e6a90661c5442c0a096cb9ffe496d12a) )
+	ROM_LOAD( "kk_12.8ab", 0x20000, 0x10000, CRC(02fec778) SHA1(477a3e22f913cc7783d6cbfce86f98fea9eaf3ec) )
+	ROM_LOAD( "kk_13.8ac", 0x30000, 0x10000, CRC(2756817d) SHA1(acde21454ddf843425deff3357c9e3a7e7a2baec) )
 
 	ROM_REGION( 0x20000, "sp16_tiles", 0 )
-	ROM_LOAD( "kk_09.rom",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
-	ROM_LOAD( "kk_08.rom",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
-	ROM_LOAD( "kk_07.rom",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
-	ROM_LOAD( "kk_06.rom",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
+	ROM_LOAD( "kk_09.3k",  0x00000, 0x08000, CRC(653c4342) SHA1(aacb3a7772dcea4c88f0010b3654f4159cfb6a8b) )
+	ROM_LOAD( "kk_08.3l",  0x08000, 0x08000, CRC(2da45894) SHA1(09f1ac544a119c9d3a9eeb0606f35585d35c2d1d) )
+	ROM_LOAD( "kk_07.3n",  0x10000, 0x08000, CRC(a0ebebdf) SHA1(83d8a9ba7b7ffd42e50afb017e4d0d40fe3e2739) )
+	ROM_LOAD( "kk_06.3p",  0x18000, 0x08000, CRC(284fad9e) SHA1(7bb572d7d5983a514e8381954ac89a720b86e9ba) )
 
 	ROM_REGION( 0x80000, "sp32_tiles", 0 )
-	ROM_LOAD( "kk_18.rom",  0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
-	ROM_LOAD( "kk_19.rom",  0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
-	ROM_LOAD( "kk_20.rom",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
-	ROM_LOAD( "kk_21.rom",  0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
-	ROM_LOAD( "kk_14.rom",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
-	ROM_LOAD( "kk_15.rom",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
-	ROM_LOAD( "kk_16.rom",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
-	ROM_LOAD( "kk_17.rom",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
+	ROM_LOAD( "kk_18.3ab", 0x00000, 0x10000, CRC(6abbff36) SHA1(8dde3163e454876a4b666b25c81c09b0740143b5) )
+	ROM_LOAD( "kk_19.2ad", 0x10000, 0x10000, CRC(5283b4d3) SHA1(980f74d3f468203cf9c1a5f3bc256139975035f3) )
+	ROM_LOAD( "kk_20.3y",  0x20000, 0x10000, CRC(6403ddf2) SHA1(54a044d9a1ba89fec3bea0e771f75fcc532e7aad) )
+	ROM_LOAD( "kk_21.3aa", 0x30000, 0x10000, CRC(9f411940) SHA1(73b0bd360a76ab183f8c7b41f78e930e49e2600c) )
+	ROM_LOAD( "kk_14.3v",  0x40000, 0x10000, CRC(9bad9e25) SHA1(0eb1e23dc7084172dd19927a1b084101d10b5137) )
+	ROM_LOAD( "kk_15.3x",  0x50000, 0x10000, CRC(89faf590) SHA1(876fc6dac48fef396670522470c41fc9d9b6a0b2) )
+	ROM_LOAD( "kk_16.3s",  0x60000, 0x10000, CRC(efb1fb6c) SHA1(12edd64e29472f3c6822f957b23547c64dab65d2) )
+	ROM_LOAD( "kk_17.3t",  0x70000, 0x10000, CRC(6b7fb0a5) SHA1(805ee6f439d9e921e1ece27438ba9c00b870e305) )
 
 	ROM_REGION( 0x10000, "ym2", 0 )
-	ROM_LOAD( "kk_02.rom",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+	ROM_LOAD( "kk_2.3j",  0x00000, 0x10000, CRC(06169ae0) SHA1(2690ce7cb28cf5c6d37886ce5fbe444067c08403) )
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pal16r6b.2c", 0x0000, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
 ROM_END
 
 /***********************************************************************/
@@ -6591,6 +6296,56 @@ ROM_START( tdfever2 )
 	ROM_LOAD( "td21.7k", 0x30000, 0x10000, CRC(f5a96d8e) SHA1(33bb2c41426449179fc27ee88b2c8db27b4ed1da) )
 ROM_END
 
+ROM_START( tdfever2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fa-3.h8", 0x0000,  0x10000, CRC(09647773) SHA1(ab0ef5c65a69ddc57ba0982d52f3fe9d018818f5) ) // on main PCB, 27512
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "fa-1.m3", 0x00000, 0x10000, CRC(6ecfe4f1) SHA1(99bad879b540427738f3585e95a7fa03e54c0436) ) // on main PCB, 27512
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fa-2.d3", 0x00000, 0x10000, CRC(d14eb61a) SHA1(01f2e8f0eabbeb7a44efc35fc18c0d210bccc146) ) // on main PCB, 27512
+
+	ROM_REGION( 0x0c00, "proms", 0 ) // on main PCB
+	ROM_LOAD( "82s137-1.8e", 0x000, 0x00400, CRC(1593c302) SHA1(46008b03c76547d57e3c8658f5f00321c2463cd5) ) /* red */
+	ROM_LOAD( "82s137-2.8d", 0x400, 0x00400, CRC(ac9df947) SHA1(214855e1015f7b519e336159c6ea62ab1f576353) ) /* green */
+	ROM_LOAD( "82s137-3.9e", 0x800, 0x00400, CRC(73cdf192) SHA1(63d1aa1b00035bbfe5bebd9bc9992a5d6f5abd10) ) /* blue */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "fa-14.f17", 0x0000,  0x8000,  CRC(d6521b0d) SHA1(79aba420b2f039d580892fa34de5d63be1a4f222) ) // on sub board, 27256
+
+	ROM_REGION( 0x60000, "bg_tiles", 0 ) // on sub board, all 27512, fa-19 and fa-20 are piggy-backed at b12
+	ROM_LOAD( "fa-15.b5",   0x00000, 0x10000, CRC(ad6e0927) SHA1(dd1c346fbf908af7b3e314f416937f48ade6af4c) )
+	ROM_LOAD( "fa-16.b7",   0x10000, 0x10000, CRC(181db036) SHA1(2c5ed172950fce1467517490a8ab3b7ac6594121) )
+	ROM_LOAD( "fa-17.b9",   0x20000, 0x10000, CRC(c5decca3) SHA1(12aff8adc0ad2bf903122ad065d182692d32fb7a) )
+	ROM_LOAD( "fa-18.b10", 0x30000, 0x10000, CRC(1f275a1c) SHA1(6d1a65d20d580ce093a1bf0c8c729a487239901b) )
+	ROM_LOAD( "fa-19.b12", 0x40000, 0x10000, CRC(f1081329) SHA1(efcc210d50923a8c9125227c741ba4b71cd9f688) )
+	ROM_LOAD( "fa-20.b12", 0x50000, 0x10000, CRC(cb152997) SHA1(776065ca3efcce17510a0ac08a49c4c1d0bad663) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 ) // on sub board, all 27512
+	ROM_LOAD( "fa-13.h23", 0x00000, 0x10000, CRC(88e2e819) SHA1(6d5529792dbd2ba63a1bc470e9d3ea63b876cfd8) )
+	ROM_LOAD( "fa-12.h21", 0x10000, 0x10000, CRC(047e618f) SHA1(1106d5b41082a0f245dd78ccaca1460f9599fe15) )
+	ROM_LOAD( "fa-11.h19", 0x20000, 0x10000, CRC(a0d53fbd) SHA1(a49f29b3f07ec833651aa0e37b0e87f3f72e0e3a) )
+	ROM_LOAD( "fa-10.h18", 0x30000, 0x10000, CRC(0efe5da6) SHA1(35715faac954eb0c9bc226da039f0705c41942c3) )
+	ROM_LOAD( "fa-9.h16",  0x40000, 0x10000, CRC(a8979657) SHA1(ec2f61a24b04437a9abd0a306923ae2aeee3eba9) )
+	ROM_LOAD( "fa-8.h15",  0x50000, 0x10000, CRC(1aa38303) SHA1(a1f511efc052ccf13e0271611f5ff6f2739ab861) )
+	ROM_LOAD( "fa-7.h14",  0x60000, 0x10000, CRC(72a5590d) SHA1(d8bd664702af9c66a2bda756d8417d1b69b0cab8) )
+	ROM_LOAD( "fa-6.h13",  0x70000, 0x10000, CRC(8cdc19cb) SHA1(5782cc0130bc379f76e2865055097bad71a998c6) )
+
+	ROM_REGION( 0x40000, "ym2", 0 ) // on main PCB, all 27512
+	ROM_LOAD( "fa-5.c13",  0x00000, 0x10000, CRC(e332e41f) SHA1(3fe41e35c5abbd8f8b9cff91bf85815275c62776) )
+	ROM_LOAD( "fa-4.c12",  0x10000, 0x10000, CRC(98af6d2d) SHA1(0f41f53d4143ec54b8e84cd480e3ab34c3e7ea20) )
+	ROM_LOAD( "fa-22.c11", 0x20000, 0x10000, CRC(34b4bce9) SHA1(bf9b000995dcbb27450c0ad1a8ef1bcc4feee080) )
+	ROM_LOAD( "fa-21.c10", 0x30000, 0x10000, CRC(1b52357b) SHA1(30ee641cad46cb86a36b1afa292da2dddc154f2f) )
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD( "pal16l8a.c1",  0x0000, 0x0104, CRC(9282d039) SHA1(7a85920fe2da8a19df6ca687704da08a0fa4b048) )
+	ROM_LOAD( "pal16l8a.h3",  0x0200, 0x0104, CRC(4ae59346) SHA1(f5c168f07d82a1c8956f3a7f690bb8a1dffb1bfb) )
+	ROM_LOAD( "pal16r8a.f2",  0x0400, 0x0104, CRC(311e5ae6) SHA1(8a3799e1611ac4086dda2755c5ad44c0dc16ff5b) )
+	ROM_LOAD( "pal16l8a.e7",  0x0600, 0x0104, CRC(4c2d02b3) SHA1(f97402225ce60b9d44c5d0cd0507e26a9f3509cb) )
+	ROM_LOAD( "pal16l8a.h11", 0x0800, 0x0104, CRC(e9a0efca) SHA1(a2439c07dc5f9fae2e8a6ea010b00c07e9a58012) )
+ROM_END
+
 /***********************************************************************/
 
 
@@ -6640,14 +6395,15 @@ GAME( 1987, gwarj,     gwar,     gwar,      gwar,      snk_state, empty_init, RO
 GAME( 1987, gwara,     gwar,     gwara,     gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (Version 1, set 1)", 0 )
 GAME( 1987, gwarab,    gwar,     gwara,     gwar,      snk_state, empty_init, ROT270, "SNK",     "Guerrilla War (Version 1, set 2)", 0 )
 GAME( 1987, gwarb,     gwar,     gwar,      gwarb,     snk_state, empty_init, ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
-GAME( 1988, chopper,   0,        chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US set 1)", 0 )
-GAME( 1988, choppera,  chopper,  choppera,  choppera,  snk_state, empty_init, ROT270, "SNK",     "Chopper I (US set 2)", 0 )
-GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US set 3)", 0 )
+GAME( 1988, chopper,   0,        choppera,  choppera,  snk_state, empty_init, ROT270, "SNK",     "Chopper I (US Ver 2)", 0 )
+GAME( 1988, choppera,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US Ver 1?)", 0 )
+GAME( 1988, chopperb,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Chopper I (US)", 0 ) /* First version, without the rev "A" roms */
 GAME( 1988, legofair,  chopper,  chopper1,  chopper,   snk_state, empty_init, ROT270, "SNK",     "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
 
 GAME( 1987, tdfever,   0,        tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (US)", 0 )
 GAME( 1987, tdfeverj,  tdfever,  tdfever,   tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever (Japan)", 0 )
 GAME( 1988, tdfever2,  tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "SNK",     "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, tdfever2b, tdfever,  tdfever2,  tdfever,   snk_state, empty_init, ROT90,  "bootleg", "TouchDown Fever 2 (bootleg)", 0 )
 GAME( 1988, fsoccer,   0,        tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (version 4)", 0 )
 GAME( 1988, fsoccerj,  fsoccer,  tdfever2,  fsoccer,   snk_state, empty_init, ROT0,   "SNK",     "Fighting Soccer (Japan)", 0 )
 GAME( 1988, fsoccerb,  fsoccer,  tdfever2,  fsoccerb,  snk_state, empty_init, ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )

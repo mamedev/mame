@@ -199,9 +199,10 @@
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(6'000'000)              /* confirmed */
-#define CPU_CLOCK      (MASTER_CLOCK / 2)      /* guess */
+#define CPU_CLOCK       MASTER_CLOCK           /* guess */
 #define CRTC_CLOCK     (MASTER_CLOCK / 8)      /* guess */
 
 
@@ -225,7 +226,7 @@ private:
 	DECLARE_WRITE8_MEMBER(unk_w);
 	DECLARE_READ8_MEMBER(mux_port_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	void jubileep_cru_map(address_map &map);
 	void jubileep_map(address_map &map);
@@ -284,7 +285,7 @@ void jubilee_state::video_start()
 	m_bg_tilemap->set_scrolldx(8, 0); /* guess */
 }
 
-uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -340,7 +341,7 @@ WRITE8_MEMBER(jubilee_state::unk_w)
     is set to one. Maybe this one clears the interrupt.
     TODO: Check the schematics.
 */
-	if (((offset<<1)==0x0ce2)&&(data==1))
+	if (((offset<<1)==0x0cf2)&&(data==1))
 	{
 		m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);
 	}
@@ -569,19 +570,19 @@ READ8_MEMBER(jubilee_state::mux_port_r)
 {
 	switch( mux_sel )
 	{
-		case 0x01: return ioport("IN0")->read();
-		case 0x02: return ioport("IN1")->read();    /* muxed credits input is here! */
-		case 0x03: return ioport("IN2")->read();
+		case 0x01: return BIT(ioport("IN0")->read(), offset);
+		case 0x02: return BIT(ioport("IN1")->read(), offset);    /* muxed credits input is here! */
+		case 0x03: return BIT(ioport("IN2")->read(), offset);
 	}
 
-	return 0xff;
+	return 1;
 }
 
 
 void jubilee_state::jubileep_cru_map(address_map &map)
 {
-	map(0x00c8, 0x00c8).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
-	map(0x0000, 0x07ff).w(FUNC(jubilee_state::unk_w));
+	map(0x0c80, 0x0c8f).r(FUNC(jubilee_state::mux_port_r));    /* multiplexed input port */
+	map(0x0000, 0x0fff).w(FUNC(jubilee_state::unk_w));
 }
 
 /* I/O byte R/W
@@ -670,30 +671,32 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(jubilee_state::jubileep)
-
+void jubilee_state::jubileep(machine_config &config)
+{
 	// Main CPU TMS9980A, no line connections.
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, CPU_CLOCK, jubileep_map, jubileep_cru_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", jubilee_state,  jubileep_interrupt)
+	TMS9980A(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jubilee_state::jubileep_map);
+	m_maincpu->set_addrmap(AS_IO, &jubilee_state::jubileep_cru_map);
+	m_maincpu->set_vblank_int("screen", FUNC(jubilee_state::jubileep_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("videoworkram")
+	NVRAM(config, "videoworkram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)                         /* (47+1*8, 38+1*8) from CRTC settings */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)   /* (32*8, 32*8) from CRTC settings */
-	MCFG_SCREEN_UPDATE_DRIVER(jubilee_state, screen_update_jubileep)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);                         /* (47+1*8, 38+1*8) from CRTC settings */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);   /* (32*8, 32*8) from CRTC settings */
+	screen.set_screen_update(FUNC(jubilee_state::screen_update_jubileep));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jubileep)
-	MCFG_PALETTE_ADD("palette",8)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jubileep);
+	PALETTE(config, "palette").set_entries(8);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+}
 
 
 /*************************

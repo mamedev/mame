@@ -8,6 +8,10 @@
  *  This work is based on the
  *  "NEC Electronics User's Manual, April 1987"
  *
+ *   NEC called this MCU family "μCOM-87" or "87AD" (7810 and up). It is
+ *   not to be confused with the later and incompatible 78K family, though
+ *   its architectural influence is acknowledged.
+ *
  * NS20030115:
  * - fixed INRW_wa()
  * - TODO: add 7807, differences are listed below.
@@ -1630,6 +1634,7 @@ void upd7810_device::base_device_start()
 	save_item(NAME(m_mc));
 	save_item(NAME(m_mm));
 	save_item(NAME(m_mf));
+	save_item(NAME(m_mt)); // TODO: uPD7807 only
 	save_item(NAME(m_tmm));
 	save_item(NAME(m_etmm));
 	save_item(NAME(m_eom));
@@ -1884,6 +1889,7 @@ void upd7801_device::device_reset()
 	upd7810_device::device_reset();
 	MA = 0;     /* Port A is output port on the uPD7801 */
 	m_ovc0 = 0;
+	m_int2 = 0;
 }
 
 void upd78c05_device::device_reset()
@@ -1902,9 +1908,9 @@ void upd7810_device::execute_run()
 	{
 		int cc;
 
+		PPC = PC;
 		debugger_instruction_hook(PC);
 
-		PPC = PC;
 		RDOP(OP);
 
 		/*

@@ -2523,9 +2523,14 @@ static void OPL3_save_state(OPL3 *chip, device_t *device) {
 	device->save_item(NAME(chip->OPL3_mode));
 	device->save_item(NAME(chip->rhythm));
 
+	device->save_item(NAME(chip->T));
+	device->save_item(NAME(chip->st));
+
 	device->save_item(NAME(chip->address));
 	device->save_item(NAME(chip->status));
 	device->save_item(NAME(chip->statusmask));
+
+	device->save_item(NAME(chip->nts));
 }
 
 void * ymf262_init(device_t *device, int clock, int rate)
@@ -2610,15 +2615,14 @@ void ymf262_update_one(void *_chip, OPL3SAMPLE **buffers, int length)
 	signed int *chanout = chip->chanout;
 	uint8_t       rhythm = chip->rhythm&0x20;
 
-	OPL3SAMPLE  *ch_a = buffers[0];
-	OPL3SAMPLE  *ch_b = buffers[1];
-	OPL3SAMPLE  *ch_c = buffers[2];
-	OPL3SAMPLE  *ch_d = buffers[3];
+	OPL3SAMPLE  *ch_a = buffers[0]; // DO2 (mixed) left output for OPL4
+	OPL3SAMPLE  *ch_b = buffers[1]; // DO2 (mixed) right output for OPL4
+	OPL3SAMPLE  *ch_c = buffers[2]; // DO0 (FM only) left output for OPL4
+	OPL3SAMPLE  *ch_d = buffers[3]; // DO0 (FM only) right output for OPL4
 
 	for( i=0; i < length ; i++ )
 	{
 		int a,b,c,d;
-
 
 		advance_lfo(chip);
 

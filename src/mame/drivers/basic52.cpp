@@ -12,7 +12,7 @@ BASIC-52 is an official Intel release.
 
 BASIC-31 (and variants) as found on the below url, are homebrews.
 
-http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
+https://web.archive.org/web/20110908004037/http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
 
 
 The driver is working, however there are issues with the cpu serial code.
@@ -67,9 +67,9 @@ void basic52_state::basic52_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x7fff).ram();
-	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	//AM_RANGE(0xc000, 0xdfff) // Expansion block
-	//AM_RANGE(0xe000, 0xffff) // Expansion block
+	//map(0x8000, 0x9fff).rom(); // EPROM
+	//map(0xc000, 0xdfff) // Expansion block
+	//map(0xe000, 0xffff) // Expansion block
 }
 
 void basic52_state::basic52_io(address_map &map)
@@ -78,8 +78,8 @@ void basic52_state::basic52_io(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0x9fff).rom(); // EPROM
 	map(0xa000, 0xa003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));  // PPI-8255
-	//AM_RANGE(0xc000, 0xdfff) // Expansion block
-	//AM_RANGE(0xe000, 0xffff) // Expansion block
+	//map(0xc000, 0xdfff) // Expansion block
+	//map(0xe000, 0xffff) // Expansion block
 }
 
 /* Input ports */
@@ -105,32 +105,34 @@ void basic52_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(basic52_state::basic31)
+void basic52_state::basic31(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8031, XTAL(11'059'200))
-	MCFG_DEVICE_PROGRAM_MAP(basic52_mem)
-	MCFG_DEVICE_IO_MAP(basic52_io)
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, basic52_state, unk_r))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(m_terminal, generic_terminal_device, write))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, basic52_state, from_term))
+	I8031(config, m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::basic52_mem);
+	m_maincpu->set_addrmap(AS_IO, &basic52_state::basic52_io);
+	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
+	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
+	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(basic52_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(basic52_state::kbd_put));
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-MACHINE_CONFIG_END
+	I8255(config, "ppi8255", 0);
+}
 
-MACHINE_CONFIG_START(basic52_state::basic52)
+void basic52_state::basic52(machine_config &config)
+{
 	basic31(config);
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", I8052, XTAL(11'059'200))
-	MCFG_DEVICE_PROGRAM_MAP(basic52_mem)
-	MCFG_DEVICE_IO_MAP(basic52_io)
-	MCFG_MCS51_PORT_P3_IN_CB(READ8(*this, basic52_state, unk_r))
-	MCFG_MCS51_SERIAL_TX_CB(WRITE8(m_terminal, generic_terminal_device, write))
-	MCFG_MCS51_SERIAL_RX_CB(READ8(*this, basic52_state, from_term))
-MACHINE_CONFIG_END
+	I8052(config.replace(), m_maincpu, XTAL(11'059'200));
+	m_maincpu->set_addrmap(AS_PROGRAM, &basic52_state::basic52_mem);
+	m_maincpu->set_addrmap(AS_IO, &basic52_state::basic52_io);
+	m_maincpu->port_in_cb<3>().set(FUNC(basic52_state::unk_r));
+	m_maincpu->serial_tx_cb().set(m_terminal, FUNC(generic_terminal_device::write));
+	m_maincpu->serial_rx_cb().set(FUNC(basic52_state::from_term));
+}
 
 /* ROM definition */
 ROM_START( basic52 )

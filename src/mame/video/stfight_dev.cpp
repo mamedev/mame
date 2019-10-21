@@ -109,18 +109,19 @@ static GFXDECODE_START( gfx_stfight )
 	GFXDECODE_ENTRY( "spr_gfx", 0x0000, spritelayout, 0, 32 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(stfight_video_device::device_add_mconfig)
+void stfight_video_device::device_add_mconfig(machine_config &config)
+{
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(stfight_video_device, screen_update_stfight)
-	MCFG_SCREEN_PALETTE("^palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(stfight_video_device::screen_update_stfight));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "^palette", gfx_stfight)
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stfight);
+}
 
 /*
         Graphics ROM Format

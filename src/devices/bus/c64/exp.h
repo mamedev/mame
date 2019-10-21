@@ -42,52 +42,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define C64_EXPANSION_SLOT_TAG      "exp"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C64_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot) \
-	MCFG_DEVICE_ADD(_tag, C64_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
-
-#define MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, nullptr) \
-	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, irq_w)) \
-	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, nmi_w)) \
-	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)) \
-	MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(READ8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_r)) \
-	MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(WRITE8(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_cd_w)) \
-	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(WRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, dma_w))
-
-
-#define MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_nmi_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_reset_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_CD_INPUT_CALLBACK(_read) \
-	downcast<c64_expansion_slot_device &>(*device).set_cd_rd_callback(DEVCB_##_read);
-
-#define MCFG_C64_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_cd_wr_callback(DEVCB_##_write);
-
-#define MCFG_C64_EXPANSION_SLOT_DMA_CALLBACK(_write) \
-	downcast<c64_expansion_slot_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -102,8 +56,8 @@ class c64_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
-		: c64_expansion_slot_device(mconfig, tag, owner, (uint32_t)0)
+	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&opts, const char *dflt)
+		: c64_expansion_slot_device(mconfig, tag, owner, clock)
 	{
 		option_reset();
 		opts(*this);
@@ -113,28 +67,22 @@ public:
 
 	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_nmi_wr_callback(Object &&cb) { return m_write_nmi.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_reset_wr_callback(Object &&cb) { return m_write_reset.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_rd_callback(Object &&cb) { return m_read_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cd_wr_callback(Object &&cb) { return m_write_dma_cd.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
-	auto irq_wr_callback() { return m_write_irq.bind(); }
-	auto nmi_wr_callback() { return m_write_nmi.bind(); }
-	auto reset_wr_callback() { return m_write_reset.bind(); }
-	auto cd_rd_callback() { return m_read_dma_cd.bind(); }
-	auto cd_wr_callback() { return m_write_dma_cd.bind(); }
-	auto dma_wr_callback() { return m_write_dma.bind(); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto nmi_callback() { return m_write_nmi.bind(); }
+	auto reset_callback() { return m_write_reset.bind(); }
+	auto cd_input_callback() { return m_read_dma_cd.bind(); }
+	auto cd_output_callback() { return m_write_dma_cd.bind(); }
+	auto dma_callback() { return m_write_dma.bind(); }
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	int game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
-	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
+	uint8_t cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	void cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	int game_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram);
+	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int loram, int hiram);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	uint8_t dma_cd_r(offs_t offset) { return m_read_dma_cd(offset); }
+	void dma_cd_w(offs_t offset, uint8_t data) { m_write_dma_cd(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
 	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
 	DECLARE_WRITE_LINE_MEMBER( dma_w ) { m_write_dma(state); }
@@ -142,6 +90,7 @@ public:
 	int phi2() { return clock(); }
 	int dotclock() { return phi2() * 8; }
 	int hiram() { return m_hiram; }
+	int loram() { return m_loram; }
 
 	void set_passthrough();
 
@@ -178,6 +127,7 @@ protected:
 	device_c64_expansion_card_interface *m_card;
 
 	int m_hiram;
+	int m_loram;
 };
 
 
@@ -191,8 +141,8 @@ public:
 	// construction/destruction
 	virtual ~device_c64_expansion_card_interface();
 
-	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
-	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
+	virtual uint8_t c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
+	virtual void c64_cd_w(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
 
@@ -201,6 +151,7 @@ protected:
 
 	optional_shared_ptr<uint8_t> m_roml;
 	optional_shared_ptr<uint8_t> m_romh;
+	optional_shared_ptr<uint8_t> m_romx;
 	optional_shared_ptr<uint8_t> m_nvram;
 
 	int m_game;

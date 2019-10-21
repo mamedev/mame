@@ -8,6 +8,130 @@
 
     This system is not emulated.
 
+ SCORPION 5 PCB
+ _________________________________________________________________________
+ | ______________________  _____________  _____________  _________    __  |
+ | |____PLUG_J_LAMPS_____| |___PLUG_K___| |___PLUG_L___| |_PLUG_M_|   |P| |
+ |                                                                    |L| |
+ | D20NF D20NF D20NF D20NF D20NF D20NF D20NF                          |N| |
+ | D20NF D20NF D20NF D20NF D20NF D20NF D20NF                          __  |
+ | __          D20NF  D20NF                    MM74HCT                |P| |
+ | |P|                                                                |L| |
+ | |L| ______  ______ ______  ______  ULN28030AG  CS4341AKSZ          |P| |
+ | |U| ULN28030AG x 2 UDN2982LWT x 2                                  __  |
+ | |G|               ____ ____ ____   ULN28030AG                      |P| |
+ | | |               HC14 HC14 HC14  _________  __________  ___       |L| |
+ | |F|               ______  ______  |AMI S   | |YAMAHA   | |P |      |Q| |
+ | |_|               UDN2982LWT x 2  |0728DC0 | |YMZ280B-F| |L |      __  |
+ | __   _____  _____                 |BFG206ML| |_________| |U | IC20 |P| |
+ | |P|  |    | |    |                 62215-001      XTL1   |G |      |L| |
+ | |L|  |DB9 | |DB9 |                                       |  | IC19 |R| |
+ | |E|  |MALE| |FEMALE                 ______   ___________ |Z |      |_| |
+ | |_|  |____| |____| 74HCT00          |NXP  |  |COLDFIRE  ||  |  __  __  |
+ | __            ___      XTL3  SCC68681C1A44|  |MCF5206EAB40  |  |P| |P| |
+ | |P|           |SW|  o <- LED        |_____|  |          ||  |  |L| |L| |
+ | |L|           | 4| __                        |          ||  |  |U| |U| |
+ | |U|           |__| |_| SW RESET              |__________||  |  |G| |G| |
+ | |G|           |SW| |_| SW TEST      ____  ______  ______ |  |  | | | | |
+ | | |           | 1|                  |GAL| IS62C256AL x 2 |__|  |U| |S| |
+ | |D|           |__|                  |___|                          __  |
+ | |_|                 o o o o o o o <- LEDS                     XTL2 |P| |
+ |  _______ _______ ____________________                   _______    |L| |
+ | |PLUG C||PLUG B| |______PLUG A_______|    BATTERY 3.6V  |PLUG V|   |T| |
+ |________________________________________________________________________|
+
+SW1 = 8 dipswitches
+SW4 = 8 dipswitches
+
+IC20 = MC1489DG
+IC19 = SN75188
+
+XTL1 = 16.9344 MHz
+XTL2 = 40.0000 MHz
+XTL3 = 3.6864 MHz
+
+PLUG A = POWER IN
+PLUG B = CAB SWITCHES
+PLUG C = REEL INPUTS
+PLUG D = REEL OUTPUTS
+PLE = PLUG E = GAME SWITCHES
+PLUG F = L.E.D.S
+PLUG J = LAMPS
+PLUG K = REEL LAMPS
+PLUG L = GENERAL I/O
+PLUG M = AUDIO OUTPUT
+PLN = PLUG N = ALPHA
+PLP = PLUG P = SEC METER
+PLQ = PLUG Q = CCTalk I/F
+PLR = PLUG R = RS232 PORT 2
+PLUG S = RS232 PORT 1 (DB25 female)
+PLT = PLUG T = I2C I/F
+PLUG U = BDM I/F
+PLUG V = I2C I/F
+PLUG Z = GAME CARD / VIDEO CARD
+
+
+ISS 3 ADDER 5 VIDEO CARD
+
+       COMPONENT SIDE                           SOLDER SIDE
+  ___________________________            ___________________________
+ | _______  _______ _______ |            |                          |
+ ||      | |__CN2_||__CN1_| |            |                          |
+ || IC3  |     MAX202 MAX202|            |                          |
+ ||______|  XTL3            |            |                          |
+ |  _________________       |___      ___|                          |
+ | |                | ___   |__|      |__|                          |
+ | | ROM 2 IC7      | |IC8  |__|      |__|                          |
+ | |________________|       |__| PLG1 |__|                          |
+ |  _________________       |__|      |__|                          |
+ | |                |       |__|      |__|                          |
+ | | ROM 1 IC6      | XTL2  |__|      |__|                          |
+ | |________________|       |__|      |__|                          |
+ | _______________________  |__|      |__|  ____                    |
+ ||_|_|_|_|__PLG3__|_|_|_|  |__|      |__|  |IC | ____________      |
+ |    ____                  |__|      |__|  |11 | |     ______|     |
+ |   |IC5|                  |__|      |__|  |___| |    |__          |
+ |   |___|              XTL1|__|      |__|  ____  |    |__          |
+ |  __________________      |__|      |__|  |IC | |    |__          |
+ |  |                 |     |__|      |__|  | 9 | |PL1 |__          |
+ |  | IC1             |     |__|      |__|  |___| |    |__          |
+ |  | YAMAHA          |     |__|      |__|  ____  |    |__          |
+ |  | YGV619-V        |     |__|      |__|  |IC | |    |__          |
+ |  |                 |     |__|      |__|  |10 | |    |__          |
+ |  |                 |     |            |  |___| |    |______      |
+ |  |_________________|     |            |        |___________|     |
+ | _____    _____       ____|            |____                      |
+ | |    |   |    |     |                      |                     |
+ | | IC2|   | IC4|     |                      |                     |
+ | |    |   |    |     |                      |                     |
+ | |____|   |____|     |                      |                     |
+ |             ______  |                      |  ______             |
+ |_____________|     |_|                      |_|     |_____________|
+              | PLG2  |                        |       |
+              |_______|                        |_______|
+
+XTL1 = 20.00 MHz
+XTL2 = 20.00 MHz
+XTL3 = 3.686 MHz
+
+IC2 = Samsung K4S641632H-UC75
+IC3 = Philips / NXP SCC6861C1A44
+IC4 = Samsung K4S641632H-UC75
+IC5 = GAL16V8D
+IC8 = PIC (for external Serial EEPROM)
+IC9 = LCX245
+IC10 = LCX245
+IC11 = 74HCT2730
+
+PLG1 = To mother board
+PLG2 = VGA OUT (HD15)
+PLG3 = Flash (for pluging flash ROMs)
+
+CN1 = RS232 Port 3
+CN2 = RS232 Port 4
+
+PL1 = Compact Flash Slot
+
 */
 
 
@@ -30,7 +154,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		m_duart->write(space,offset,(data>>8)&0x00ff);
+		m_duart->write(offset,(data>>8)&0x00ff);
 	}
 	else
 	{
@@ -210,27 +334,26 @@ WRITE8_MEMBER(bfm_sc5_state::bfm_sc5_duart_output_w)
 	logerror("bfm_sc5_duart_output_w\n");
 }
 
-MACHINE_CONFIG_START(bfm_sc5_state::bfm_sc5)
-	MCFG_DEVICE_ADD("maincpu", MCF5206E, 40000000) /* MCF5206eFT */
-	MCFG_DEVICE_PROGRAM_MAP(sc5_map)
-	MCFG_MCF5206E_PERIPHERAL_ADD("maincpu_onboard")
+void bfm_sc5_state::bfm_sc5(machine_config &config)
+{
+	MCF5206E(config, m_maincpu, 40000000); /* MCF5206eFT */
+	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc5_state::sc5_map);
+	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("duart68681", MC68681, 16000000/4) // ?? Mhz
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE(*this, bfm_sc5_state, bfm_sc5_duart_txa))
-	MCFG_MC68681_INPORT_CALLBACK(READ8(*this, bfm_sc5_state, bfm_sc5_duart_input_r))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, bfm_sc5_state, bfm_sc5_duart_output_w))
+	MC68681(config, m_duart, 16000000/4); // ?? Mhz
+	m_duart->set_clocks(16000000/2/8, 16000000/2/16, 16000000/2/16, 16000000/2/8);
+	m_duart->irq_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_irq_handler));
+	m_duart->a_tx_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_txa));
+	m_duart->inport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_input_r));;
+	m_duart->outport_cb().set(FUNC(bfm_sc5_state::bfm_sc5_duart_output_w));;
 
-	MCFG_BFMBDA_ADD("vfd0",0)
+	BFM_BDA(config, m_vfd0, 60, 0);
 
 	config.set_default_layout(layout_bfm_sc5);
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-#include "bfm_sc5sw.hxx"
+	YMZ280B(config, m_ymz, 16000000); // ?? Mhz
+	m_ymz->add_route(ALL_OUTPUTS, "mono", 1.0);
+}

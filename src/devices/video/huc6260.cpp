@@ -77,7 +77,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		{
 			g_profiler.start( PROFILER_VIDEO );
 			/* Get next pixel information */
-			m_pixel_data = m_next_pixel_data_cb( 0, 0xffff );
+			m_pixel_data = m_next_pixel_data_cb();
 			g_profiler.stop();
 		}
 
@@ -149,7 +149,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	/* Ask our slave device for time until next possible event */
 	{
-		uint16_t next_event_clocks = m_time_til_next_event_cb( 0, 0xffff );
+		uint16_t next_event_clocks = m_time_til_next_event_cb();
 		int event_hpos, event_vpos;
 
 		/* Adjust for pixel clocks per pixel */

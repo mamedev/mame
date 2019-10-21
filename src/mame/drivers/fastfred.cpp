@@ -14,7 +14,6 @@
 #include "includes/fastfred.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -200,7 +199,7 @@ void fastfred_state::fastfred_map(address_map &map)
 	map(0xd860, 0xdbff).ram(); // Unused, but initialized
 	map(0xe000, 0xe000).portr("BUTTONS").writeonly().share("bgcolor");
 	map(0xe800, 0xe800).portr("JOYS");
-	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf000, 0xf000).portr("DSW").nopw();
 	map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
@@ -219,8 +218,8 @@ void fastfred_state::jumpcoas_map(address_map &map)
 	map(0xe801, 0xe801).portr("DSW2");
 	map(0xe802, 0xe802).portr("BUTTONS");
 	map(0xe803, 0xe803).portr("JOYS");
-	map(0xf000, 0xf007).mirror(0x07f8).w("outlatch", FUNC(ls259_device::write_d0));
-	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
+	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
+	//map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));  // Why doesn't this work???
 	map(0xf800, 0xf801).nopr().w("ay8910.1", FUNC(ay8910_device::address_data_w));
 }
 
@@ -241,7 +240,7 @@ void fastfred_state::imago_map(address_map &map)
 	map(0xe000, 0xe000).portr("BUTTONS");
 	map(0xe800, 0xe800).portr("JOYS");
 	map(0xf000, 0xf000).portr("DSW");
-	map(0xf000, 0xf007).mirror(0x03f8).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xf000, 0xf007).mirror(0x03f8).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xf400, 0xf400).nopw(); // writes 0 or 2
 	map(0xf401, 0xf401).w(FUNC(fastfred_state::imago_sprites_bank_w));
 	map(0xf800, 0xf800).nopr().w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -633,96 +632,89 @@ INTERRUPT_GEN_MEMBER(fastfred_state::sound_timer_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(fastfred_state::fastfred)
-
+void fastfred_state::fastfred(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(12'432'000)/4)   /* 3.108 MHz; xtal from pcb pics, divider not verified */
-	MCFG_DEVICE_PROGRAM_MAP(fastfred_map)
+	Z80(config, m_maincpu, XTAL(12'432'000)/4);   /* 3.108 MHz; xtal from pcb pics, divider not verified */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::fastfred_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'432'000)/8)  /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
+	Z80(config, m_audiocpu, XTAL(12'432'000)/8);  /* 1.554 MHz; xtal from pcb pics, divider not verified */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fastfred_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(fastfred_state::sound_timer_irq), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0) // "Control Signal Latch" at D10
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, fastfred_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, fastfred_state, colorbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, fastfred_state, colorbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, charbank1_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, charbank2_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, fastfred_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, fastfred_state, flip_screen_y_w))
+	LS259(config, m_outlatch); // "Control Signal Latch" at D10
+	m_outlatch->q_out_cb<1>().set(FUNC(fastfred_state::nmi_mask_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(fastfred_state::colorbank1_w));
+	m_outlatch->q_out_cb<3>().set(FUNC(fastfred_state::colorbank2_w));
+	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::charbank1_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::charbank2_w));
+	m_outlatch->q_out_cb<6>().set(FUNC(fastfred_state::flip_screen_x_w));
+	m_outlatch->q_out_cb<7>().set(FUNC(fastfred_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) //CLOCK/16/60
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_fastfred)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, fastfred_state, vblank_irq))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); //CLOCK/16/60
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(fastfred_state::screen_update_fastfred));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(fastfred_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fastfred)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_fastfred);
 
-	MCFG_PALETTE_ADD("palette", 32*8)
-	MCFG_PALETTE_INDIRECT_ENTRIES(256)
-	MCFG_PALETTE_INIT_OWNER(fastfred_state,fastfred)
+	PALETTE(config, m_palette, FUNC(fastfred_state::fastfred_palette), 32 * 8, 256);
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,fastfred)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay8910.1", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8910(config, "ay8910.1", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
 
-	MCFG_DEVICE_ADD("ay8910.2", AY8910, XTAL(12'432'000)/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay8910.2", XTAL(12'432'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25); /* 1.554 MHz; xtal from pcb pics, divider not verified */
+}
 
-MACHINE_CONFIG_START(fastfred_state::jumpcoas)
+void fastfred_state::jumpcoas(machine_config &config)
+{
 	fastfred(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(jumpcoas_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::jumpcoas_map);
 
-	MCFG_DEVICE_REMOVE("audiocpu")
+	config.device_remove("audiocpu");
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_jumpcoas)
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_jumpcoas);
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("soundlatch")
-	MCFG_DEVICE_REMOVE("ay8910.2")
-MACHINE_CONFIG_END
+	config.device_remove("soundlatch");
+	config.device_remove("ay8910.2");
+}
 
-MACHINE_CONFIG_START(fastfred_state::imago)
+void fastfred_state::imago(machine_config &config)
+{
 	fastfred(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(imago_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &fastfred_state::imago_map);
 
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // writes 1 when level starts, 0 when game over
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, fastfred_state, imago_dma_irq_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, fastfred_state, imago_charbank_w))
+	m_outlatch->q_out_cb<0>().set_nop(); // writes 1 when level starts, 0 when game over
+	m_outlatch->q_out_cb<4>().set(FUNC(fastfred_state::imago_dma_irq_w));
+	m_outlatch->q_out_cb<5>().set(FUNC(fastfred_state::imago_charbank_w));
 
 	MCFG_MACHINE_START_OVERRIDE(fastfred_state,imago)
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_imago)
+	m_palette->set_entries(256+64+2); // 256 for characters, 64 for the stars and 2 for the web
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_imago);
 
 	MCFG_VIDEO_START_OVERRIDE(fastfred_state,imago)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(fastfred_state, screen_update_imago)
-MACHINE_CONFIG_END
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(fastfred_state::screen_update_imago));
+}
 
 #undef CLOCK
 
@@ -924,6 +916,29 @@ ROM_START( boggy84b )
 	ROM_LOAD( "b12e", 0x0200, 0x0100, CRC(52b7f445) SHA1(6395ac705a35e602a355cbf700025ff917e89b37) )
 ROM_END
 
+// main PCB is marked: "MC9003" and "MADE IN ITALY" on component side
+// main PCB is marked: "MADE IN ITALY" on solder side
+// ROMs PCB is marked: "MG25157" on component side
+ROM_START( boggy84b2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "boggy84-1.bin", 0x0000, 0x1000, CRC(97235e3a) SHA1(f493efd03331416a392cab7d73e39029d7e8098c) )
+	ROM_LOAD( "boggy84-2.bin", 0x1000, 0x1000, CRC(282f8830) SHA1(10c2c3d3b14fbe44ef4ad81607c61361fa2f25ae) )
+	ROM_LOAD( "boggy84-3.bin", 0x2000, 0x1000, CRC(b49c835a) SHA1(c6782643ff44e6cf972f0d2fc47ecc0a220c0e26) )
+	ROM_LOAD( "boggy84-4.bin", 0x3000, 0x1000, CRC(1f98ce07) SHA1(4145785ea55db3940ff4d3834ab736825e5c8712) )
+	ROM_LOAD( "boggy84-5.bin", 0x4000, 0x1000, CRC(7b3fd5fb) SHA1(630e7553fc76e59448cedca5dcb34dae3b08d9ba) )
+	ROM_LOAD( "boggy84-6.bin", 0x5000, 0x1000, CRC(a4083cc2) SHA1(a266ff0935288678d6e0286ac67ea17b9b42371a) )
+	ROM_LOAD( "boggy84-7.bin", 0x6000, 0x1000, CRC(9da29eb9) SHA1(d8802b9b67f9993aa26b8fe7941fc662a6719172) )
+	ROM_LOAD( "boggy84-8.bin", 0x7000, 0x1000, NO_DUMP ) // broken, unreadable
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_LOAD( "boggy84-11.7a", 0x0000, 0x1000, CRC(f4238c68) SHA1(a14cedb126e49e40bab6f46870af64c04ccb01f4) )
+	ROM_LOAD( "boggy84-10.9a", 0x1000, 0x1000, CRC(1979d9a6) SHA1(9da387179e6f09ba113219689d3aa039e87bd5e1) )
+	ROM_LOAD( "boggy84-9.bin", 0x2000, 0x0800, CRC(de3d8f06) SHA1(0ccc261fe15f63d5bd000b3a7008e294b78837a2) )
+
+	ROM_REGION( 0x20, "proms", 0 )
+	ROM_LOAD( "6331.10f", 0x00, 0x20, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+ROM_END
+
 ROM_START( redrobin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "redro01f.16d", 0x0000, 0x1000, CRC(0788ce10) SHA1(32084714fe005d0489ab1a7e6684a49bd103ce5e) )
@@ -1086,7 +1101,8 @@ GAME( 1983, jumpcoas,  0,        jumpcoas, jumpcoas, fastfred_state, init_jumpco
 GAME( 1983, jumpcoasa, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko", "Jump Coaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, jumpcoast, jumpcoas, jumpcoas, jumpcoas, fastfred_state, init_jumpcoas, ROT90, "Kaneko (Taito license)", "Jump Coaster (Taito)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, boggy84,   0,        jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "Kaneko", "Boggy '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b,  boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84b, ROT90, "bootleg (Eddie's Games)", "Boggy '84 (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, boggy84b2, boggy84,  jumpcoas, boggy84,  fastfred_state, init_boggy84,  ROT90, "bootleg", "Boggy '84 (bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // one program ROM isn't dumped
 GAME( 1986, redrobin,  0,        fastfred, redrobin, fastfred_state, init_flyboyb,  ROT90, "Elettronolo", "Red Robin", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, imago,     0,        imago,    imago,    fastfred_state, init_imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
 GAME( 1983, imagoa,    imago,    imago,    imagoa,   fastfred_state, init_imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )

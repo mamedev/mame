@@ -321,11 +321,11 @@ void coinmvga_state::coinmvga_map(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x080000, 0x0fffff).rom().region("maincpu", 0); //maybe not
 
-//  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
-//  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
+//  map(0x0a0000, 0x0fffff).ram();
+//  map(0x100000, 0x1fffff).ram(); //colorama
 	map(0x210000, 0x21ffff).ram().share("vram");
-//  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
-//  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
+//  map(0x40746e, 0x40746f).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, colorama
+//  map(0x403afa, 0x403afb).r(FUNC(coinmvga_state::test_r)).nopw(); //touch screen related, cmrltv75
 	map(0x400000, 0x40ffff).ram();
 
 	map(0x600000, 0x600000).w("ramdac", FUNC(ramdac_device::index_w));
@@ -347,20 +347,20 @@ void coinmvga_state::coinmvga_map(address_map &map)
 void coinmvga_state::coinmvga_io_map(address_map &map)
 {
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
-//  AM_RANGE(h8_device::PORT_4, h8_device::PORT_4)
-//  AM_RANGE(h8_device::PORT_5, h8_device::PORT_5)
-//  AM_RANGE(h8_device::PORT_6, h8_device::PORT_6)
-//  AM_RANGE(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
-//  AM_RANGE(h8_device::PORT_8, h8_device::PORT_8)
-//  AM_RANGE(h8_device::PORT_9, h8_device::PORT_9)
-//  AM_RANGE(h8_device::PORT_A, h8_device::PORT_A)
-//  AM_RANGE(h8_device::PORT_B, h8_device::PORT_B)
+//  map(h8_device::PORT_4, h8_device::PORT_4)
+//  map(h8_device::PORT_5, h8_device::PORT_5)
+//  map(h8_device::PORT_6, h8_device::PORT_6)
+//  map(h8_device::PORT_7, h8_device::PORT_7) <---- 0006 RW colorama
+//  map(h8_device::PORT_8, h8_device::PORT_8)
+//  map(h8_device::PORT_9, h8_device::PORT_9)
+//  map(h8_device::PORT_A, h8_device::PORT_A)
+//  map(h8_device::PORT_B, h8_device::PORT_B)
 
 /*  Analog Inputs */
-//  AM_RANGE(h8_device::ADC_0, h8_device::ADC_0)
-//  AM_RANGE(h8_device::ADC_1, h8_device::ADC_1)
-//  AM_RANGE(h8_device::ADC_2, h8_device::ADC_2)
-//  AM_RANGE(h8_device::ADC_3, h8_device::ADC_3)
+//  map(h8_device::ADC_0, h8_device::ADC_0)
+//  map(h8_device::ADC_1, h8_device::ADC_1)
+//  map(h8_device::ADC_2, h8_device::ADC_2)
+//  map(h8_device::ADC_3, h8_device::ADC_3)
 }
 
 /*  unknown writes (cmrltv75):
@@ -636,42 +636,44 @@ void coinmvga_state::ramdac2_map(address_map &map)
 }
 
 
-MACHINE_CONFIG_START(coinmvga_state::coinmvga)
-
+void coinmvga_state::coinmvga(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", H83007, CPU_CLOCK)  /* xtal */
-	MCFG_DEVICE_PROGRAM_MAP(coinmvga_map)
-	MCFG_DEVICE_IO_MAP(coinmvga_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", coinmvga_state,  vblank_irq)   /* wrong, fix me */
+	H83007(config, m_maincpu, CPU_CLOCK);  /* xtal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &coinmvga_state::coinmvga_map);
+	m_maincpu->set_addrmap(AS_IO, &coinmvga_state::coinmvga_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(coinmvga_state::vblank_irq));   /* wrong, fix me */
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640,480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(coinmvga_state, screen_update_coinmvga)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640,480);
+	screen.set_visarea_full();
+	screen.set_screen_update(FUNC(coinmvga_state::screen_update_coinmvga));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_coinmvga)
-	MCFG_DEVICE_ADD("gfxdecode2", GFXDECODE, "palette2", gfx_coinmvga2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmvga);
+	GFXDECODE(config, "gfxdecode2", m_palette2, gfx_coinmvga2);
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
+	PALETTE(config, m_palette).set_entries(256);
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &coinmvga_state::ramdac_map);
 
-	MCFG_PALETTE_ADD("palette2", 16)
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette2")
+	PALETTE(config, m_palette2).set_entries(16);
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette2));
+	ramdac2.set_addrmap(0, &coinmvga_state::ramdac2_map);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymz", YMZ280B, SND_CLOCK)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	ymz280b_device &ymz(YMZ280B(config, "ymz", SND_CLOCK));
+	ymz.add_route(0, "lspeaker", 1.0);
+	ymz.add_route(1, "rspeaker", 1.0);
+}
 
 
 /*************************

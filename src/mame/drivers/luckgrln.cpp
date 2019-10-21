@@ -76,12 +76,13 @@
 
 
 #include "emu.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "machine/msm6242.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "luckgrln.lh"
 #include "7smash.lh"
@@ -115,7 +116,7 @@ private:
 	required_shared_ptr_array<uint8_t, 4> m_reel_scroll;
 	required_shared_ptr_array<uint8_t, 3> m_luck_vram;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<hd647180x_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	output_finder<12> m_lamps;
@@ -136,7 +137,7 @@ private:
 	DECLARE_WRITE8_MEMBER(counters_w);
 	DECLARE_READ8_MEMBER(test_r);
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq);
 
 	void _7smash_io(address_map &map);
@@ -202,14 +203,14 @@ void luckgrln_state::video_start()
 	save_item(NAME(m_palette_ram));
 }
 
-uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	const rectangle &visarea = screen.visible_area();
 
 	rectangle clip = visarea;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for (int i = 0; i < 64; i++)
 	{
@@ -298,7 +299,6 @@ uint32_t luckgrln_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void luckgrln_state::mainmap(address_map &map)
 {
-	map(0x00000, 0x03fff).rom();
 	map(0x10000, 0x1ffff).rom().region("rom_data", 0x10000);
 	map(0x20000, 0x2ffff).rom().region("rom_data", 0x00000);
 
@@ -318,8 +318,7 @@ void luckgrln_state::mainmap(address_map &map)
 	map(0x0ce00, 0x0cfff).ram().w(FUNC(luckgrln_state::reel_attr_w<3>)).share("reel_attr.3");
 	map(0x0d600, 0x0d63f).ram().share("reel_scroll.3");
 
-//  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
-
+//  map(0x0d200, 0x0d2ff).ram();
 
 	map(0x0d800, 0x0dfff).ram(); // nvram
 
@@ -342,6 +341,8 @@ void luckgrln_state::_7smash_map(address_map &map)
 
 WRITE8_MEMBER(luckgrln_state::output_w)
 {
+	data &= 0xc7;
+
 	/* correct? */
 	if (data==0x84)
 		m_nmi_enable = 0;
@@ -445,8 +446,7 @@ WRITE8_MEMBER(luckgrln_state::counters_w)
 void luckgrln_state::common_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x0000, 0x003f).ram(); // Z180 internal regs
-	map(0x0060, 0x0060).w(FUNC(luckgrln_state::output_w));
+	map(0x0000, 0x007f).noprw(); // Z180 internal regs
 
 	map(0x00a0, 0x00a0).w(FUNC(luckgrln_state::palette_offset_low_w));
 	map(0x00a1, 0x00a1).w(FUNC(luckgrln_state::palette_offset_high_w));
@@ -479,7 +479,7 @@ void luckgrln_state::common_portmap(address_map &map)
 	map(0x00f8, 0x00f8).portr("DSW2");
 	map(0x00f9, 0x00f9).portr("DSW3");
 	map(0x00fa, 0x00fa).portr("DSW4");
-	map(0x00fb, 0x00fb).portr("DSW5"); //AM_WRITENOP
+	map(0x00fb, 0x00fb).portr("DSW5"); //.nopw();
 	map(0x00fc, 0x00fc).nopw();
 	map(0x00fd, 0x00fd).nopw();
 	map(0x00fe, 0x00fe).nopw();
@@ -510,7 +510,6 @@ READ8_MEMBER(luckgrln_state::test_r)
 void luckgrln_state::_7smash_io(address_map &map)
 {
 	common_portmap(map);
-	map(0x66, 0x66).r(FUNC(luckgrln_state::test_r));
 }
 
 static INPUT_PORTS_START( luckgrln )
@@ -861,41 +860,43 @@ INTERRUPT_GEN_MEMBER(luckgrln_state::irq)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(luckgrln_state::luckgrln)
-	MCFG_DEVICE_ADD(m_maincpu, Z180,8000000)
-	MCFG_DEVICE_PROGRAM_MAP(mainmap)
-	MCFG_DEVICE_IO_MAP(luckgrln_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", luckgrln_state, irq)
+void luckgrln_state::luckgrln(machine_config &config)
+{
+	HD647180X(config, m_maincpu, 16000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::mainmap);
+	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::luckgrln_io);
+	m_maincpu->set_vblank_int("screen", FUNC(luckgrln_state::irq));
+	m_maincpu->out_pa_callback().set(FUNC(luckgrln_state::output_w));
 
-	MCFG_MC6845_ADD("crtc", H46505, "screen", 6000000/4) /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	hd6845s_device &crtc(HD6845S(config, "crtc", 12_MHz_XTAL / 8)); /* HD6845SP; unknown clock, hand tuned to get ~60 fps */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, 0)
+	MSM6242(config, "rtc", 0);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(luckgrln_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(luckgrln_state::screen_update));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_luckgrln)
-	MCFG_PALETTE_ADD("palette", 0x8000)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_luckgrln);
+	PALETTE(config, m_palette).set_entries(0x8000);
 
 	SPEAKER(config, "mono").front_center();
+}
 
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(luckgrln_state::_7smash)
+void luckgrln_state::_7smash(machine_config &config)
+{
 	luckgrln(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(_7smash_map)
-	MCFG_DEVICE_IO_MAP(_7smash_io)
+	m_maincpu->set_addrmap(AS_PROGRAM, &luckgrln_state::_7smash_map);
+	m_maincpu->set_addrmap(AS_IO, &luckgrln_state::_7smash_io);
+	m_maincpu->in_pg_callback().set(FUNC(luckgrln_state::test_r));
 
-	MCFG_DEVICE_REMOVE("rtc")
-MACHINE_CONFIG_END
+	config.device_remove("rtc");
+}
 
 void luckgrln_state::init_luckgrln()
 {

@@ -16,11 +16,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/nscsi/hd.h"
 #include "cpu/i386/i386.h"
 #include "cpu/tms32031/tms32031.h"
 #include "machine/53c7xx.h"
 #include "machine/mc146818.h"
-#include "machine/nscsi_hd.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
@@ -62,7 +62,8 @@ public:
 		, m_nvram(*this, "nvram")
 		, m_tms_timer1(nullptr)
 		, m_tms_tx_timer(nullptr)
-	{}
+	{
+	}
 
 	void rastersp(machine_config &config);
 
@@ -904,11 +905,10 @@ void rastersp_state::rastersp(machine_config &config)
 	screen.set_screen_update(FUNC(rastersp_state::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_palette("palette");
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(rastersp_state::vblank_irq));
 
-	PALETTE(config, m_palette, 65536);
-	m_palette->set_init("palette", FUNC(palette_device::palette_init_RRRRRGGGGGGBBBBB));
+	PALETTE(config, m_palette, palette_device::RGB_565);
 
 	/* Sound */
 	SPEAKER(config, "lspeaker").front_left();
@@ -920,7 +920,6 @@ void rastersp_state::rastersp(machine_config &config)
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
 
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "ldac",  1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "rdac",  1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
@@ -953,6 +952,24 @@ ROM_START( rotr )
 	DISK_IMAGE( "rotr", 0, SHA1(d67d7feb52d8c7ba1d2a190a40d97e84871f2d80) )
 ROM_END
 
+
+ROM_START( rotra )
+	ROM_REGION(0x100000, "bios", 0)
+	ROM_LOAD( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
+
+	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_LOAD32_BYTE( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
+
+	ROM_REGION(0x8000, "proms", 0) /* Xilinx FPGA PROMs */
+	ROM_LOAD( "17128dpc.u72", 0x0000, 0x4000, CRC(5ddf6ee3) SHA1(f3d15b649b5641374a9e14877cea84ba9c57ef3c) )
+	ROM_LOAD( "17128dpc.u73", 0x2000, 0x4000, CRC(9e274cea) SHA1(e974cad4e4b965bf2c9df7d3d0b4eec64629eeb0) )
+
+	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
+	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
+
+	DISK_REGION( "scsibus:0:harddisk:image" )
+	DISK_IMAGE( "rotra", 0, SHA1(570d402e5e9bba123edf7dfa9db7a0e6bdb23823) )
+ROM_END
 
 /*
   Football Crazy runs on the (c)1997 "RASTERSPEED 2.1 31-599-001 ISS 4" PCB, which seems to be a more modern production version.
@@ -991,5 +1008,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, rotr,    0, rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)", 0 )
-GAME( 1997, fbcrazy, 0, rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM",        "Football Crazy (Video Quiz)",    MACHINE_NOT_WORKING )
+GAME( 1994, rotr,    0,    rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype)",        0 )
+GAME( 1994, rotra,   rotr, rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM/Mirage", "Rise of the Robots (prototype, older)", 0 )
+GAME( 1997, fbcrazy, 0,    rastersp, rotr, rastersp_state, empty_init, ROT0, "BFM",        "Football Crazy (Video Quiz)",           MACHINE_NOT_WORKING )

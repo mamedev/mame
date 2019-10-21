@@ -7,13 +7,15 @@
     Luxor ABC 830/832/834/838 disk image formats
 
 *********************************************************************/
+#ifndef MAME_FORMATS_ABC800_DSK_H
+#define MAME_FORMATS_ABC800_DSK_H
 
-#ifndef ABC800_DSK_H_
-#define ABC800_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class abc800_format : public wd177x_format {
+class abc800_format : public wd177x_format
+{
 public:
 	abc800_format();
 
@@ -30,4 +32,4 @@ private:
 
 extern const floppy_format_type FLOPPY_ABC800_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_ABC800_DSK_H

@@ -33,7 +33,6 @@ public:
 	virtual ~oricext_connector();
 
 	void set_cputag(const char *tag);
-	template <class Object> devcb_base &set_irq_handler(Object &&cb) { return irq_handler.set_callback(std::forward<Object>(cb)); }
 	auto irq_callback() { return irq_handler.bind(); }
 	void irq_w(int state);
 

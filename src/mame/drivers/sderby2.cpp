@@ -44,13 +44,14 @@
 class sderby2_state : public driver_device
 {
 public:
-	sderby2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sderby2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this, "subcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_proms(*this, "proms"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void sderby2(machine_config &config);
 
@@ -61,7 +62,7 @@ private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(sderby2);
+	void sderby2_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER(palette_w);
@@ -96,7 +97,7 @@ private:
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(sderby2_state,sderby2)
+void sderby2_state::sderby2_palette(palette_device &palette) const
 {
 
 }
@@ -297,33 +298,33 @@ void sderby2_state::machine_reset()
 
 }
 
-MACHINE_CONFIG_START(sderby2_state::sderby2)
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(main_program_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+void sderby2_state::sderby2(machine_config &config)
+{
+	Z80(config, m_maincpu, XTAL(3'579'545));
+	m_maincpu->set_addrmap(AS_PROGRAM, &sderby2_state::main_program_map);
+	m_maincpu->set_addrmap(AS_IO, &sderby2_state::main_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sderby2_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("subcpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(sub_program_map)
-	MCFG_DEVICE_IO_MAP(sub_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sderby2_state, irq0_line_hold)
+	Z80(config, m_subcpu, XTAL(3'579'545));
+	m_subcpu->set_addrmap(AS_PROGRAM, &sderby2_state::sub_program_map);
+	m_subcpu->set_addrmap(AS_IO, &sderby2_state::sub_io_map);
+	m_subcpu->set_vblank_int("screen", FUNC(sderby2_state::irq0_line_hold));
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256 - 1, 0, 256 - 1)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MCFG_SCREEN_UPDATE_DRIVER(sderby2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 256+256*3)
-	MCFG_PALETTE_INIT_OWNER(sderby2_state,sderby2)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256 - 1, 0, 256 - 1);
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
+	screen.set_screen_update(FUNC(sderby2_state::screen_update));
+	screen.set_palette(m_palette);
+	PALETTE(config, m_palette, FUNC(sderby2_state::sderby2_palette), 256+256*3);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sderby2)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sderby2);
 
 	// sound hardware
-MACHINE_CONFIG_END
+}
 
 /*************************************
  *

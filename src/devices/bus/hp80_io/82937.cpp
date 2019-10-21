@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER(hp82937_io_card_device::ieee488_ctrl_w)
 }
 
 static INPUT_PORTS_START(hp82937_port)
-	MCFG_HP80_IO_SC(7)
+	PORT_HP80_IO_SC(7)
 	PORT_START("sw1")
 	PORT_DIPNAME(0x1f , 0x15 , "HPIB address")
 	PORT_DIPLOCATION("S1:7,6,5,4,3")
@@ -253,7 +253,7 @@ void hp82937_io_card_device::device_reset()
 
 void hp82937_io_card_device::update_data_out()
 {
-	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r(machine().dummy_space() , 0) : 0xff);
+	m_ieee488->write_dio(m_dio_out ? m_cpu->p2_r() : 0xff);
 }
 
 void hp82937_io_card_device::update_signals()
@@ -264,7 +264,7 @@ void hp82937_io_card_device::update_signals()
 	}
 	m_updating = true;
 	bool ctrl_active = BIT(m_latch , LATCH_CA_BIT);
-	uint8_t p1 = m_cpu->p1_r(machine().dummy_space() , 0);
+	uint8_t p1 = m_cpu->p1_r();
 	m_iatn = BIT(p1 , P1_ATN_BIT);
 	if (ctrl_active) {
 		m_ieee488->host_atn_w(m_iatn);

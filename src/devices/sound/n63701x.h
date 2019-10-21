@@ -6,16 +6,6 @@
 #pragma once
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_NAMCO_63701X_ADD(_tag, _clock) \
-	MCFG_DEVICE_ADD(_tag, NAMCO_63701X, _clock)
-#define MCFG_NAMCO_63701X_REPLACE(_tag, _clock) \
-	MCFG_DEVICE_REPLACE(_tag, NAMCO_63701X, _clock)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

@@ -137,7 +137,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in pentagon_state::device_timer");
+		throw emu_fatalerror("Unknown id in pentagon_state::device_timer");
 	}
 }
 
@@ -164,23 +164,29 @@ READ8_MEMBER(pentagon_state::beta_neutral_r)
 
 READ8_MEMBER(pentagon_state::beta_enable_r)
 {
-	if(m_ROMSelection == 1) {
-		m_ROMSelection = 3;
-		if (m_beta->started()) {
-			m_beta->enable();
-			m_bank1->set_base(memregion("beta:beta")->base());
+	if (!(machine().side_effects_disabled())) {
+		if (m_ROMSelection == 1) {
+			m_ROMSelection = 3;
+			if (m_beta->started()) {
+				m_beta->enable();
+				m_bank1->set_base(memregion("beta:beta")->base());
+			}
 		}
 	}
+
 	return m_program->read_byte(offset + 0x3d00);
 }
 
 READ8_MEMBER(pentagon_state::beta_disable_r)
 {
-	if (m_beta->started() && m_beta->is_active()) {
-		m_ROMSelection = BIT(m_port_7ffd_data, 4);
-		m_beta->disable();
-		m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+	if (!(machine().side_effects_disabled())) {
+		if (m_beta->started() && m_beta->is_active()) {
+			m_ROMSelection = BIT(m_port_7ffd_data, 4);
+			m_beta->disable();
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection << 14)]);
+		}
 	}
+
 	return m_program->read_byte(offset + 0x4000);
 }
 
@@ -276,44 +282,44 @@ GFXDECODE_END
 
 
 
-MACHINE_CONFIG_START(pentagon_state::pentagon)
+void pentagon_state::pentagon(machine_config &config)
+{
 	spectrum_128(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_CLOCK(XTAL(14'000'000) / 4)
-	MCFG_DEVICE_PROGRAM_MAP(pentagon_mem)
-	MCFG_DEVICE_IO_MAP(pentagon_io)
-	MCFG_DEVICE_OPCODES_MAP(pentagon_switch)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pentagon_state,  pentagon_interrupt)
+	m_maincpu->set_clock(XTAL(14'000'000) / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pentagon_state::pentagon_mem);
+	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
+	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
+	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
 	MCFG_MACHINE_RESET_OVERRIDE(pentagon_state, pentagon )
 
-	MCFG_SCREEN_MODIFY("screen")
-	//MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287)
+	//m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 304);
+	m_screen->set_raw(XTAL(14'000'000) / 2, 448, 0, 352,  320, 0, 287);
 	MCFG_VIDEO_START_OVERRIDE(pentagon_state, pentagon )
 
-	MCFG_BETA_DISK_ADD(BETA_DISK_TAG)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_pentagon)
+	BETA_DISK(config, m_beta, 0);
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_REPLACE("ay8912", AY8912, XTAL(14'000'000) / 8)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 0.50)
+	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", XTAL(14'000'000)/8));
+	ay8912.add_route(0, "lspeaker", 0.50);
+	ay8912.add_route(1, "lspeaker", 0.25);
+	ay8912.add_route(1, "rspeaker", 0.25);
+	ay8912.add_route(2, "rspeaker", 0.50);
 
-	MCFG_DEVICE_REMOVE("exp")
+	config.device_remove("exp");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list_pen","pentagon_cass")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list_pen").set_original("pentagon_cass");
+	SOFTWARE_LIST(config, "betadisc_list").set_original("spectrum_betadisc_flop");
+}
 
-MACHINE_CONFIG_START(pentagon_state::pent1024)
+void pentagon_state::pent1024(machine_config &config)
+{
 	pentagon(config);
 	/* internal ram */
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1024K")
-MACHINE_CONFIG_END
+	m_ram->set_default_size("1024K");
+}
 
 /***************************************************************************
 

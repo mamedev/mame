@@ -30,8 +30,8 @@
     Game                           | ID        | CPU PCB      | CG Board(s)    | notes
     -----------------------------------------------------------------------------------------------
     GTI Club                       | GX688     | GN672(A)     | GN678(B)       |
-    Operation Thunder Hurricane    | GX792     | GN672(A)     | GN678(B)       | extra board for gun controls(?)
-    Solar Assault                  | GX680     | GN672(A)     | GN678(B)       |
+    Operation: Thunder Hurricane   | GX680     | GN672(A)     | GN678(B)       | GN680(E) I/O board
+    Solar Assault                  | GX792     | GN672(A)     | GN678(B)       |
 
     Hang Pilot                     | GN685     | GN672(A)     | 2x ??          | 3dfx-based CG boards
 
@@ -120,10 +120,11 @@ Solar Assault               792A07  792A12  792A11  792A10  792A09  792A06  792A
 Solar Assault : Revised     - N/A -
 
 Note : Jet Wave uses the lower board (GN678) from GTI Club, but it uses a different top board (ZR107 PWB(A)300769A)
-Check zr107.c for details on the top board.
+Check zr107.cpp for details on the top board.
 
-Operation Thunder Hurricane uses an additional top board for sound, network and analog
-control functions...
+Operation Thunder Hurricane uses an additional top board gun/analog controls. Analog inputs are controlled by two CCD
+cameras, one from each gun. This specific variation uses a K056230 for networking between the cpu board to receive
+the analog values that way. Teraburst uses a different variation of this I/O board replacing the K056230 with a K056800 (see hornet.cpp).
 
 GN680 PWB(E)403381B
 |------------------------------------------|
@@ -143,12 +144,15 @@ GN680 PWB(E)403381B
 |CN5                                       |
 |------------------------------------------|
 Notes:
-      68000 @ 16MHz (32/2)
+      68EC000 @ 16MHz (32/2)
       CN11/12 - Power connectors
-      CN8/9   - 6-pin analog control connectors
-      CN10    - 4-pin sound output connector
+      CN8/9   - 6-pin analog control connectors (to CCD cameras)
+      CN10    - 4-pin power connector for IR emitters
+      CN4/5   - Pin jack/network connectors (to cpu board)
       NRPS11  - Idec NRPS11 PC Board circuit protector
       LM1881  - Video sync separator (DIP8)
+      056230  - Konami Custom (QFP80)
+
 
 
 Bottom Board
@@ -255,6 +259,7 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_palette(*this, "palette"),
 		m_konppc(*this, "konppc"),
+		m_k056230(*this, "k056230"),
 		m_k001005(*this, "k001005"),
 		m_k001006_1(*this, "k001006_1"),
 		m_k001006_2(*this, "k001006_2"),
@@ -296,6 +301,7 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<palette_device> m_palette;
 	required_device<konppc_device> m_konppc;
+	required_device<k056230_device> m_k056230;
 	optional_device<k001005_device> m_k001005;
 	optional_device<k001006_device> m_k001006_1;
 	optional_device<k001006_device> m_k001006_2;
@@ -337,7 +343,7 @@ private:
 	INTERRUPT_GEN_MEMBER(gticlub_vblank);
 	TIMER_CALLBACK_MEMBER(sound_irq);
 
-	ADC1038_INPUT_CB(adc1038_input_callback);
+	int adc1038_input_callback(int input);
 
 	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lscreen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -533,8 +539,8 @@ void gticlub_state::gticlub_map(address_map &map)
 	map(0x78080000, 0x7808000f).rw(m_k001006_2, FUNC(k001006_device::read), FUNC(k001006_device::write));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));
-	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
 	map(0x7f800000, 0x7f9fffff).rom().share("share2");
@@ -551,8 +557,8 @@ void gticlub_state::hangplt_map(address_map &map)
 	map(0x78000000, 0x7800ffff).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_shared_r_ppc), FUNC(konppc_device::cgboard_dsp_shared_w_ppc));
 	map(0x780c0000, 0x780c0003).rw(m_konppc, FUNC(konppc_device::cgboard_dsp_comm_r_ppc), FUNC(konppc_device::cgboard_dsp_comm_w_ppc));
 	map(0x7e000000, 0x7e003fff).rw(FUNC(gticlub_state::sysreg_r), FUNC(gticlub_state::sysreg_w));
-	map(0x7e008000, 0x7e009fff).rw("k056230", FUNC(k056230_device::read), FUNC(k056230_device::write));
-	map(0x7e00a000, 0x7e00bfff).rw("k056230", FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
+	map(0x7e008000, 0x7e009fff).rw(m_k056230, FUNC(k056230_device::read), FUNC(k056230_device::write));
+	map(0x7e00a000, 0x7e00bfff).rw(m_k056230, FUNC(k056230_device::lanc_ram_r), FUNC(k056230_device::lanc_ram_w));
 	map(0x7e00c000, 0x7e00c00f).rw(m_k056800, FUNC(k056800_device::host_r), FUNC(k056800_device::host_w));
 	map(0x7f000000, 0x7f3fffff).rom().region("user2", 0);   /* Data ROM */
 	map(0x7f800000, 0x7f9fffff).rom().share("share2");
@@ -629,11 +635,11 @@ void gticlub_state::hangplt_sharc1_map(address_map &map)
 
 static INPUT_PORTS_START( gticlub )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View switch")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("AT/MT switch")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME("Start/View")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("AT/MT Switch") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -647,71 +653,67 @@ static INPUT_PORTS_START( gticlub )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x03, 0x03, "Network ID" )
+	PORT_DIPNAME( 0x03, 0x03, "Network ID" ) PORT_DIPLOCATION("SW:2,1")
 	PORT_DIPSETTING( 0x03, "1" )
 	PORT_DIPSETTING( 0x02, "2" )
 	PORT_DIPSETTING( 0x01, "3" )
 	PORT_DIPSETTING( 0x00, "4" )
-	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIP3" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("AN0")   /* mask default type             sens delta min max */
-	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x004,0x3fb) PORT_SENSITIVITY(50) PORT_KEYDELTA(25)
 
 	PORT_START("AN1")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL ) PORT_NAME("Gas Pedal") PORT_MINMAX(0x000,0x25f) PORT_SENSITIVITY(50) PORT_KEYDELTA(25)
 
 	PORT_START("AN2")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake Pedal") PORT_MINMAX(0x000,0x25f) PORT_SENSITIVITY(50) PORT_KEYDELTA(25)
 
 	PORT_START("AN3")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_NAME("Handbrake") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
-
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x000,0x25f) PORT_SENSITIVITY(50) PORT_KEYDELTA(25)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( slrasslt )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )                     // View Shift
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     // Trigger
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     // Missile
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)     // Power Up
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Power Up")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x01, 0x01, "DIP1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIP1" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIP2" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIP3" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("AN0")
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x008,0x3f7) PORT_SENSITIVITY(50) PORT_KEYDELTA(25)
 
 	PORT_START("AN1")
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x008,0x3f7) PORT_SENSITIVITY(50) PORT_KEYDELTA(25) PORT_REVERSE
 
 	PORT_START("AN2")
 	PORT_BIT( 0x3ff, 0x000, IPT_UNUSED )
@@ -723,22 +725,22 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( thunderh )
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1) PORT_NAME("P1 Trigger")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Bomb")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2) PORT_NAME("P2 Trigger")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Bomb")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_START("IN2")
@@ -746,70 +748,50 @@ static INPUT_PORTS_START( thunderh )
 
 	PORT_START("IN3")
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x01, 0x00, "DIP1" )
+	PORT_DIPNAME( 0x01, 0x00, "DIP1" ) PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIP2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIP2" ) PORT_DIPLOCATION("SW:2")
 	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIP3" ) PORT_DIPLOCATION("SW:3")
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIP4" ) PORT_DIPLOCATION("SW:4")
 	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hangplt )
-	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_INCLUDE( slrasslt )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start/View")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Select Left") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("Select Right") PORT_CODE(KEYCODE_D)
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)     // Push limit switch
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)     // Pull limit switch
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Push limit switch")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Pull limit switch")
 
-	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN3")
-	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x08, 0x08, "DIP4" )
-	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIP3" )
-	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Disable Test Mode" )
-	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x01, 0x01, "Disable Machine Init" )              // NOTE: Disabling Machine Init also disables analog controls
+	PORT_MODIFY("IN3") //Todo: The test mode for this game shows eight dip switches.
+	PORT_DIPNAME( 0x01, 0x01, "Disable Machine Init" ) PORT_DIPLOCATION("SW:1") // NOTE: Disabling Machine Init also disables analog controls
 	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Skip Post" ) PORT_DIPLOCATION("SW:2")
+	PORT_DIPSETTING( 0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
-	PORT_START("AN0")           // Rudder
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_X ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
+	PORT_MODIFY("AN0")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_NAME("Rudder") PORT_MINMAX(0x1c5,0x24a) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START("AN1")           // Control Bar
-	PORT_BIT( 0x3ff, 0x000, IPT_AD_STICK_Y ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5) PORT_REVERSE
-
-	PORT_START("AN2")
-	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
-
-	PORT_START("AN3")
-	PORT_BIT( 0x3ff, 0x000, IPT_UNKNOWN )
+	PORT_MODIFY("AN1")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_NAME("Control Bar") PORT_MINMAX(0x100,0x2ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(20) PORT_REVERSE
 INPUT_PORTS_END
 
 /* PowerPC interrupts
@@ -825,22 +807,16 @@ INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
 }
 
 
-ADC1038_INPUT_CB(gticlub_state::adc1038_input_callback)
+int gticlub_state::adc1038_input_callback(int input)
 {
-	int value = 0;
 	switch (input)
 	{
-	case 0: value = m_analog0->read(); break;
-	case 1: value = m_analog1->read(); break;
-	case 2: value = m_analog2->read(); break;
-	case 3: value = m_analog3->read(); break;
-	case 4: value = 0x000; break;
-	case 5: value = 0x000; break;
-	case 6: value = 0x000; break;
-	case 7: value = 0x000; break;
+	case 0:  return m_analog0->read();
+	case 1:  return m_analog1->read();
+	case 2:  return m_analog2->read();
+	case 3:  return m_analog3->read();
+	default: return 0;
 	}
-
-	return value;
 }
 
 MACHINE_RESET_MEMBER(gticlub_state,gticlub)
@@ -958,107 +934,97 @@ uint32_t gticlub_state::screen_update_rscreen(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-MACHINE_CONFIG_START(gticlub_state::gticlub)
-
+void gticlub_state::gticlub(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_DEVICE_PROGRAM_MAP(gticlub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gticlub_state,  gticlub_vblank)
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gticlub_state::gticlub_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gticlub_state::gticlub_vblank));
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gticlub_state::sound_memmap);
 
-	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(sharc_map)
+	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
-	MCFG_ADC1038_GTIHACK(1)
+	ADC1038(config, m_adc1038, 0);
+	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
+	m_adc1038->set_gti_club_hack(true);
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, m_k056230, "maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_gticlub)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(512, 384);
+	screen.set_visarea(0, 511, 0, 383);
+	screen.set_screen_update(FUNC(gticlub_state::screen_update_gticlub));
 
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette).set_entries(65536);
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(1)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)
-	MCFG_K001604_ROZ_OFFSET(0)
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604_1, 0);
+	m_k001604_1->set_layer_size(1);
+	m_k001604_1->set_roz_size(1);
+	m_k001604_1->set_txt_mem_offset(0);
+	m_k001604_1->set_roz_mem_offset(0);
+	m_k001604_1->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k001005", K001005, 0, "k001006_1")
+	K001005(config, m_k001005, 0, "k001006_1");
 
-	MCFG_DEVICE_ADD("k001006_1", K001006, 0)
-	MCFG_K001006_GFX_REGION("gfx1")
-	MCFG_K001006_TEX_LAYOUT(1)
+	K001006(config, m_k001006_1, 0);
+	m_k001006_1->set_gfx_region("gfx1");
+	m_k001006_1->set_tex_layout(1);
 
 	// The second K001006 chip connects to the second K001005 chip.
 	// Hook this up when the K001005 separation is understood (seems the load balancing is done on hardware).
-	MCFG_DEVICE_ADD("k001006_2", K001006, 0)
-	MCFG_K001006_GFX_REGION("gfx1")
-	MCFG_K001006_TEX_LAYOUT(1)
+	K001006(config, m_k001006_2, 0);
+	m_k001006_2->set_gfx_region("gfx1");
+	m_k001006_2->set_tex_layout(1);
 
-	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(33'868'800)/2);
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
+	rfsnd.add_route(0, "lspeaker", 1.0);
+	rfsnd.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
-	MCFG_KONPPC_CGBOARD_NUMBER(1)
-	MCFG_KONPPC_CGBOARD_TYPE(GTICLUB)
-MACHINE_CONFIG_END
+	KONPPC(config, m_konppc, 0);
+	m_konppc->set_num_boards(1);
+	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
+}
 
-MACHINE_CONFIG_START(gticlub_state::thunderh)
+void gticlub_state::thunderh(machine_config &config) //todo: add 68000 and K056230 from the I/O board
+{
 	gticlub(config);
 
-	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	m_adc1038->set_gti_club_hack(false);
 
-	MCFG_DEVICE_REMOVE("k056230")
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
-	MCFG_K056230_HACK(1)
-MACHINE_CONFIG_END
+	m_k056230->set_thunderh_hack(true);
+}
 
-MACHINE_CONFIG_START(gticlub_state::slrasslt)
+void gticlub_state::slrasslt(machine_config &config)
+{
 	gticlub(config);
 
-	MCFG_DEVICE_REMOVE("adc1038")
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	m_adc1038->set_gti_club_hack(false);
 
-	MCFG_DEVICE_REMOVE("k001604_1")
-	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(0)
-	MCFG_K001604_TXT_OFFSET(16384)
-	MCFG_K001604_ROZ_OFFSET(0)
-	MCFG_K001604_PALETTE("palette")
-MACHINE_CONFIG_END
+	m_k001604_1->set_layer_size(0);
+	m_k001604_1->set_roz_size(0);
+	m_k001604_1->set_txt_mem_offset(16384);
+}
 
 
 MACHINE_RESET_MEMBER(gticlub_state,hangplt)
@@ -1067,99 +1033,95 @@ MACHINE_RESET_MEMBER(gticlub_state,hangplt)
 	m_dsp2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(gticlub_state::hangplt)
-
+void gticlub_state::hangplt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC403GA, XTAL(64'000'000)/2)   /* PowerPC 403GA 32MHz */
-	MCFG_DEVICE_PROGRAM_MAP(hangplt_map)
+	PPC403GA(config, m_maincpu, XTAL(64'000'000)/2);   /* PowerPC 403GA 32MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gticlub_state::hangplt_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M68000, XTAL(64'000'000)/4)    /* 16MHz */
-	MCFG_DEVICE_PROGRAM_MAP(sound_memmap)
+	M68000(config, m_audiocpu, XTAL(64'000'000)/4);    /* 16MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &gticlub_state::sound_memmap);
 
-	MCFG_DEVICE_ADD("dsp", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(hangplt_sharc0_map)
+	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc0_map);
 
-	MCFG_DEVICE_ADD("dsp2", ADSP21062, XTAL(36'000'000))
-	MCFG_SHARC_BOOT_MODE(BOOT_MODE_EPROM)
-	MCFG_DEVICE_DATA_MAP(hangplt_sharc1_map)
+	ADSP21062(config, m_dsp2, XTAL(36'000'000));
+	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
+	m_dsp2->set_addrmap(AS_DATA, &gticlub_state::hangplt_sharc1_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C56_16BIT)
+	EEPROM_93C56_16BIT(config, "eeprom");
 
 	MCFG_MACHINE_START_OVERRIDE(gticlub_state,gticlub)
 	MCFG_MACHINE_RESET_OVERRIDE(gticlub_state,hangplt)
 
-	MCFG_DEVICE_ADD("adc1038", ADC1038, 0)
-	MCFG_ADC1038_INPUT_CB(gticlub_state, adc1038_input_callback)
+	ADC1038(config, m_adc1038, 0);
+	m_adc1038->set_input_callback(FUNC(gticlub_state::adc1038_input_callback));
 
-	MCFG_DEVICE_ADD("k056230", K056230, 0)
-	MCFG_K056230_CPU("maincpu")
+	K056230(config, m_k056230, "maincpu");
 
-	MCFG_DEVICE_ADD("voodoo0", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("lscreen")
-	MCFG_VOODOO_CPU_TAG("dsp")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_0))
+	VOODOO_1(config, m_voodoo[0], STD_VOODOO_1_CLOCK);
+	m_voodoo[0]->set_fbmem(2);
+	m_voodoo[0]->set_tmumem(2,2);
+	m_voodoo[0]->set_screen_tag("lscreen");
+	m_voodoo[0]->set_cpu_tag(m_dsp);
+	m_voodoo[0]->vblank_callback().set(FUNC(gticlub_state::voodoo_vblank_0));
 
-	MCFG_DEVICE_ADD("voodoo1", VOODOO_1, STD_VOODOO_1_CLOCK)
-	MCFG_VOODOO_FBMEM(2)
-	MCFG_VOODOO_TMUMEM(2,2)
-	MCFG_VOODOO_SCREEN_TAG("rscreen")
-	MCFG_VOODOO_CPU_TAG("dsp2")
-	MCFG_VOODOO_VBLANK_CB(WRITELINE(*this, gticlub_state,voodoo_vblank_1))
+	VOODOO_1(config, m_voodoo[1], STD_VOODOO_1_CLOCK);
+	m_voodoo[1]->set_fbmem(2);
+	m_voodoo[1]->set_tmumem(2,2);
+	m_voodoo[1]->set_screen_tag("rscreen");
+	m_voodoo[1]->set_cpu_tag(m_dsp2);
+	m_voodoo[1]->vblank_callback().set(FUNC(gticlub_state::voodoo_vblank_1));
 
-	MCFG_DEVICE_ADD("k033906_1", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo0")
-
-	MCFG_DEVICE_ADD("k033906_2", K033906, 0)
-	MCFG_K033906_VOODOO("voodoo1")
+	K033906(config, "k033906_1", 0, "voodoo0");
+	K033906(config, "k033906_2", 0, "voodoo1");
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 65536)
+	PALETTE(config, m_palette).set_entries(65536);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_lscreen)
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(60);
+	lscreen.set_size(512, 384);
+	lscreen.set_visarea(0, 511, 0, 383);
+	lscreen.set_screen_update(FUNC(gticlub_state::screen_update_lscreen));
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(512, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
-	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_rscreen)
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(60);
+	rscreen.set_size(512, 384);
+	rscreen.set_visarea(0, 511, 0, 383);
+	rscreen.set_screen_update(FUNC(gticlub_state::screen_update_rscreen));
 
-	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)
-	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604_1, 0);
+	m_k001604_1->set_layer_size(0);
+	m_k001604_1->set_roz_size(1);
+	m_k001604_1->set_txt_mem_offset(0);
+	m_k001604_1->set_roz_mem_offset(16384);
+	m_k001604_1->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k001604_2", K001604, 0)
-	MCFG_K001604_LAYER_SIZE(0)
-	MCFG_K001604_ROZ_SIZE(1)
-	MCFG_K001604_TXT_OFFSET(0)
-	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_PALETTE("palette")
+	K001604(config, m_k001604_2, 0);
+	m_k001604_2->set_layer_size(0);
+	m_k001604_2->set_roz_size(1);
+	m_k001604_2->set_txt_mem_offset(0);
+	m_k001604_2->set_roz_mem_offset(16384);
+	m_k001604_2->set_palette(m_palette);
 
-	MCFG_K056800_ADD("k056800", XTAL(33'868'800)/2)
-	MCFG_K056800_INT_HANDLER(INPUTLINE("audiocpu", M68K_IRQ_2))
+	K056800(config, m_k056800, XTAL(33'868'800)/2);
+	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("rfsnd", RF5C400, XTAL(33'868'800)/2)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
+	rfsnd.add_route(0, "lspeaker", 1.0);
+	rfsnd.add_route(1, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("konppc", KONPPC, 0)
-	MCFG_KONPPC_CGBOARD_NUMBER(2)
-	MCFG_KONPPC_CGBOARD_TYPE(HANGPLT)
-MACHINE_CONFIG_END
+	KONPPC(config, m_konppc, 0);
+	m_konppc->set_num_boards(2);
+	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
+}
 
 /*************************************************************************/
 
@@ -1297,7 +1259,7 @@ ROM_START( thunderh ) /* Euro version EAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
+	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1327,7 +1289,7 @@ ROM_START( thunderhu ) /* USA version UAA */
 	ROM_REGION(0x80000, "audiocpu", 0)      /* 68k program */
 	ROM_LOAD16_WORD_SWAP( "680a07.13k", 0x000000, 0x080000, CRC(12247a3e) SHA1(846cd9423efd3c9b17fce08393c6c83307d72f92) )
 
-	ROM_REGION(0x20000, "dsp", 0)       /* 68k program for outboard sound? network? board */
+	ROM_REGION(0x20000, "dsp", 0)       /* GN680 program */
 	ROM_LOAD16_WORD_SWAP( "680c22.20k", 0x000000, 0x020000, CRC(d93c0ee2) SHA1(4b58418cbb01b51e12d6e7c86b2c81cd35d86248) )
 
 	ROM_REGION16_LE(0x800000, "rfsnd", 0)    /* sound roms */
@@ -1501,11 +1463,10 @@ void gticlub_state::init_hangplt_common()
 	m_sharc_dataram_1 = std::make_unique<uint32_t[]>(0x100000/4);
 }
 
-void gticlub_state::init_hangplt()
+void gticlub_state::init_hangplt() //fixme: remove hacks and actually emulate the step lock. Possibly similar to Alpine Racer 1/2 and Alpine Surfer?
 {
 	init_hangplt_common();
 
-	// workaround for lock/unlock errors
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x153ac^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
@@ -1515,7 +1476,6 @@ void gticlub_state::init_hangpltu()
 {
 	init_hangplt_common();
 
-	// workaround for lock/unlock errors
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x153d0^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
@@ -1523,12 +1483,12 @@ void gticlub_state::init_hangpltu()
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state, init_gticlub,  ROT0, "Konami", "GTI Club (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, gticlub_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
 GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state, init_gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

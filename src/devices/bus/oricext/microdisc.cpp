@@ -68,18 +68,19 @@ const tiny_rom_entry *microdisc_device::device_rom_region() const
 	return ROM_NAME( microdisc );
 }
 
-MACHINE_CONFIG_START(microdisc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 8_MHz_XTAL / 8)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_irq_w))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, microdisc_device, fdc_drq_w))
-	MCFG_WD_FDC_HLD_CALLBACK(WRITELINE(*this, microdisc_device, fdc_hld_w))
-	MCFG_WD_FDC_FORCE_READY
+void microdisc_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, fdc, 8_MHz_XTAL / 8);
+	fdc->intrq_wr_callback().set(FUNC(microdisc_device::fdc_irq_w));
+	fdc->drq_wr_callback().set(FUNC(microdisc_device::fdc_drq_w));
+	fdc->hld_wr_callback().set(FUNC(microdisc_device::fdc_hld_w));
+	fdc->set_force_ready(true);
 
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", microdisc_floppies, nullptr,    microdisc_device::floppy_formats)
-MACHINE_CONFIG_END
+	FLOPPY_CONNECTOR(config, "fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
+}
 
 void microdisc_device::remap()
 {

@@ -12,6 +12,7 @@
 #pragma once
 
 #include "expansion.h"
+#include "imagedev/floppy.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "bus/generic/slot.h"
@@ -50,7 +51,7 @@ private:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<fd1793_device> m_fdc;
+	required_device<wd2793_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;

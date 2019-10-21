@@ -25,13 +25,14 @@
 class mjsister_state : public driver_device
 {
 public:
-	mjsister_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mjsister_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_mainlatch(*this, "mainlatch%u", 1),
 		m_palette(*this, "palette"),
 		m_dac(*this, "dac"),
-		m_rombank(*this, "bank1") { }
+		m_rombank(*this, "bank1")
+	{ }
 
 	void mjsister(machine_config &config);
 
@@ -211,7 +212,7 @@ void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		dac_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in mjsister_state::device_timer");
+		throw emu_fatalerror("Unknown id in mjsister_state::device_timer");
 	}
 }
 
@@ -492,53 +493,54 @@ INTERRUPT_GEN_MEMBER(mjsister_state::interrupt)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(mjsister_state::mjsister)
-
+void mjsister_state::mjsister(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mjsister_map)
-	MCFG_DEVICE_IO_MAP(mjsister_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mjsister_state, interrupt, 2*60)
+	Z80(config, m_maincpu, MCLK/2); /* 6.000 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mjsister_state::mjsister_map);
+	m_maincpu->set_addrmap(AS_IO, &mjsister_state::mjsister_io_map);
+	m_maincpu->set_periodic_int(FUNC(mjsister_state::interrupt), attotime::from_hz(2*60));
 
-	MCFG_DEVICE_ADD("mainlatch1", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mjsister_state, rombank_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mjsister_state, flip_screen_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, mjsister_state, colorbank_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mjsister_state, video_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mjsister_state, irq_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, mjsister_state, vrambank_w))
+	LS259(config, m_mainlatch[0]);
+	m_mainlatch[0]->q_out_cb<0>().set(FUNC(mjsister_state::rombank_w));
+	m_mainlatch[0]->q_out_cb<1>().set(FUNC(mjsister_state::flip_screen_w));
+	m_mainlatch[0]->q_out_cb<2>().set(FUNC(mjsister_state::colorbank_w));
+	m_mainlatch[0]->q_out_cb<3>().set(FUNC(mjsister_state::colorbank_w));
+	m_mainlatch[0]->q_out_cb<4>().set(FUNC(mjsister_state::colorbank_w));
+	m_mainlatch[0]->q_out_cb<5>().set(FUNC(mjsister_state::video_enable_w));
+	m_mainlatch[0]->q_out_cb<6>().set(FUNC(mjsister_state::irq_enable_w));
+	m_mainlatch[0]->q_out_cb<7>().set(FUNC(mjsister_state::vrambank_w));
 
-	MCFG_DEVICE_ADD("mainlatch2", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mjsister_state, coin_counter_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, mjsister_state, dac_bank_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, mjsister_state, rombank_w))
+	LS259(config, m_mainlatch[1]);
+	m_mainlatch[1]->q_out_cb<2>().set(FUNC(mjsister_state::coin_counter_w));
+	m_mainlatch[1]->q_out_cb<5>().set(FUNC(mjsister_state::dac_bank_w));
+	m_mainlatch[1]->q_out_cb<6>().set(FUNC(mjsister_state::rombank_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256+4, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255+4, 8, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(mjsister_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256+4, 256);
+	screen.set_visarea(0, 255+4, 8, 247);
+	screen.set_screen_update(FUNC(mjsister_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, MCLK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW2"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
+	ay8910_device &aysnd(AY8910(config, "aysnd", MCLK/8));
+	aysnd.port_a_read_callback().set_ioport("DSW1");
+	aysnd.port_b_read_callback().set_ioport("DSW2");
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.15);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 /*************************************
  *

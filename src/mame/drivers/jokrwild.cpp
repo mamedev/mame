@@ -78,6 +78,7 @@
 #include "machine/nvram.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK    XTAL(8'000'000)   /* guess */
 
@@ -85,32 +86,36 @@
 class jokrwild_state : public driver_device
 {
 public:
-	jokrwild_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	jokrwild_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void jokrwild(machine_config &config);
 
 	void init_jokrwild();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
 	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(testa_w);
 	DECLARE_WRITE8_MEMBER(testb_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jokrwild);
-	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	void jokrwild_palette(palette_device &palette) const;
+	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void jokrwild_map(address_map &map);
 };
 
@@ -150,13 +155,13 @@ void jokrwild_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jokrwild_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 24, 26);
 }
 
-uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(jokrwild_state, jokrwild)
+void jokrwild_state::jokrwild_palette(palette_device &palette) const
 {
 	//missing proms
 }
@@ -190,7 +195,7 @@ void jokrwild_state::jokrwild_map(address_map &map)
 	map(0x2400, 0x27ff).ram(); //stack RAM
 	map(0x4004, 0x4007).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); //optical sensor is here
-//  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
+//  map(0x4010, 0x4010).nopr(); /* R ???? */
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x6001, 0x6001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x6100, 0x6100).portr("SW1");
@@ -409,13 +414,13 @@ WRITE8_MEMBER(jokrwild_state::testb_w)
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(jokrwild_state::jokrwild)
-
+void jokrwild_state::jokrwild(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6809, MASTER_CLOCK/2)  /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(jokrwild_map)
+	M6809(config, m_maincpu, MASTER_CLOCK/2);  /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &jokrwild_state::jokrwild_map);
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	pia6821_device &pia0(PIA6821(config, "pia0", 0));
 	pia0.readpa_handler().set_ioport("IN0");
@@ -428,23 +433,22 @@ MACHINE_CONFIG_START(jokrwild_state::jokrwild)
 	pia1.readpb_handler().set_ioport("IN3");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  // From MC6845, registers 00 & 04. (value-1)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 26*8-1)    // From MC6845, registers 01 & 06.
-	MCFG_SCREEN_UPDATE_DRIVER(jokrwild_state, screen_update_jokrwild)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((32+1)*8, (32+1)*8);                  // From MC6845, registers 00 & 04. (value-1)
+	screen.set_visarea(0*8, 24*8-1, 0*8, 26*8-1);    // From MC6845, registers 01 & 06.
+	screen.set_screen_update(FUNC(jokrwild_state::screen_update_jokrwild));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_jokrwild)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(jokrwild_state, jokrwild)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_jokrwild);
+	PALETTE(config, "palette", FUNC(jokrwild_state::jokrwild_palette), 512);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
-MACHINE_CONFIG_END
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
 
 
 /*************************
@@ -482,22 +486,22 @@ ROM_END
 **************************/
 
 void jokrwild_state::init_jokrwild()
-/*****************************************************************************
-
-  Encryption was made by pages of 256 bytes.
-
-  For each page, the value is XORed with a fixed value (0xCC),
-  then XORed again with the offset of the original value inside its own page.
-
-  Example:
-
-  For encrypted value at offset 0x123A (0x89)...
-
-  0x89 XOR 0xCC XOR 0x3A = 0x7F
-
-*****************************************************************************/
 {
-	uint8_t *srcp = memregion( "maincpu" )->base();
+	/*****************************************************************************
+
+	  Encryption was made by pages of 256 bytes.
+
+	  For each page, the value is XORed with a fixed value (0xCC),
+	  then XORed again with the offset of the original value inside its own page.
+
+	  Example:
+
+	  For encrypted value at offset 0x123A (0x89)...
+
+	  0x89 XOR 0xCC XOR 0x3A = 0x7F
+
+	*****************************************************************************/
+	uint8_t *const srcp = memregion( "maincpu" )->base();
 	for (int i = 0x8000; i < 0x10000; i++)
 	{
 		int offs = i & 0xff;

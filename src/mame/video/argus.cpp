@@ -344,8 +344,7 @@ void argus_state::change_palette(int color, int lo_offs, int hi_offs)
 {
 	uint8_t lo = m_paletteram[lo_offs];
 	uint8_t hi = m_paletteram[hi_offs];
-	m_blend->set(color, hi & 0x0f);
-	m_palette->set_pen_color(color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
+	m_palette->set_pen_color(color, rgb_t(hi & 0x0f, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4)));
 }
 
 void argus_state::change_bg_palette(int color, int lo_offs, int hi_offs)

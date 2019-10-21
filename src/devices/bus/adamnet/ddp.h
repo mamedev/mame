@@ -43,7 +43,7 @@ protected:
 	virtual void adamnet_reset_w(int state) override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6801_cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_ddp0;
 	required_device<cassette_image_device> m_ddp1;
 
@@ -56,7 +56,6 @@ private:
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p4_r );
 
-	void adam_ddp_io(address_map &map);
 	void adam_ddp_mem(address_map &map);
 };
 

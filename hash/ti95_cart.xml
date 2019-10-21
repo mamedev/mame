@@ -22,7 +22,7 @@
 		<publisher>Texas Instruments</publisher>
 		<part name="cart" interface="ti95_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="mathematics.bin" size="0x8000" crc="f2221fd9" sha1="69eba2ecb85f9b2a6b556579e39c20246a50ef34" offset="0" />
+				<rom name="mathematics.bin" size="0x8000" crc="f2221fd9" sha1="69eba2ecb85f9b2a6b556579e39c20246a50ef34" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,7 +33,7 @@
 		<publisher>Texas Instruments</publisher>
 		<part name="cart" interface="ti95_cart">
 			<dataarea name="rom" size="0x8000">
-				<rom name="statistics.bin" size="0x8000" crc="a61753e8" sha1="8ed3048b909e3b05416c1c16b2437902e6ac16f8" offset="0" />
+				<rom name="statistics.bin" size="0x8000" crc="a61753e8" sha1="8ed3048b909e3b05416c1c16b2437902e6ac16f8" />
 			</dataarea>
 		</part>
 	</software>

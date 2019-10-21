@@ -78,6 +78,7 @@ static const help_item static_help_list[] =
 		"Type help <command> for further details on each command\n"
 		"\n"
 		"  help [<topic>] -- get help on a particular topic\n"
+		"  helpcustom -- get help on any custom commands registered by devices\n"
 		"  do <expression> -- evaluates the given expression\n"
 		"  symlist [<CPU>] -- lists registered symbols\n"
 		"  softreset -- executes a soft reset\n"

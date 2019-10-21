@@ -116,7 +116,7 @@ void sys2900_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(false, "Unknown id in sys2900_state::device_timer");
+		throw emu_fatalerror("Unknown id in sys2900_state::device_timer");
 	}
 }
 
@@ -141,28 +141,29 @@ uint32_t sys2900_state::screen_update_sys2900(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-MACHINE_CONFIG_START(sys2900_state::sys2900)
+void sys2900_state::sys2900(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sys2900_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &sys2900_state::io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sys2900_state, screen_update_sys2900)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 640-1, 0, 480-1);
+	screen.set_screen_update(FUNC(sys2900_state::screen_update_sys2900));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 0)
-	MCFG_DEVICE_ADD("pio", Z80PIO, 0)
-	MCFG_DEVICE_ADD("sio1", Z80SIO, 0)
-	MCFG_DEVICE_ADD("sio2", Z80SIO, 0)
-MACHINE_CONFIG_END
+	Z80CTC(config, "ctc", 0);
+	Z80PIO(config, "pio", 0);
+	Z80SIO(config, "sio1", 0);
+	Z80SIO(config, "sio2", 0);
+}
 
 /* ROM definition */
 ROM_START( sys2900 )

@@ -82,7 +82,7 @@ void comx_thm_device::device_reset()
 //  comx_mrd_r - memory read
 //-------------------------------------------------
 
-uint8_t comx_thm_device::comx_mrd_r(address_space &space, offs_t offset, int *extrom)
+uint8_t comx_thm_device::comx_mrd_r(offs_t offset, int *extrom)
 {
 	uint8_t data = 0;
 
@@ -99,7 +99,7 @@ uint8_t comx_thm_device::comx_mrd_r(address_space &space, offs_t offset, int *ex
 //  comx_io_r - I/O read
 //-------------------------------------------------
 
-uint8_t comx_thm_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_thm_device::comx_io_r(offs_t offset)
 {
 	/*
 	    INP 2 is used for the printer status, where:
@@ -116,7 +116,7 @@ uint8_t comx_thm_device::comx_io_r(address_space &space, offs_t offset)
 //  comx_io_w - I/O write
 //-------------------------------------------------
 
-void comx_thm_device::comx_io_w(address_space &space, offs_t offset, uint8_t data)
+void comx_thm_device::comx_io_w(offs_t offset, uint8_t data)
 {
 	/*
 	    OUT 2 is used to control the thermal printer where:

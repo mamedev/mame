@@ -15,7 +15,7 @@
 
 /*****************************************************************************/
 
-const char *const arc_disassembler::basic[0x20] =
+char const *const arc_disassembler::basic[0x20] =
 {
 	/* 00 */ "LD r+r",
 	/* 01 */ "LD r+o",
@@ -51,7 +51,7 @@ const char *const arc_disassembler::basic[0x20] =
 	/* 1f */ "MIN"
 };
 
-const char *arc_disassembler::conditions[0x20] =
+char const *const arc_disassembler::conditions[0x20] =
 {
 	/* 00 */ "AL", // (aka RA         - Always)
 	/* 01 */ "EQ", // (aka Z          - Zero
@@ -87,7 +87,7 @@ const char *arc_disassembler::conditions[0x20] =
 	/* 1f */ "0x1f Reserved"
 };
 
-const char *arc_disassembler::delaytype[0x4] =
+char const *const arc_disassembler::delaytype[0x4] =
 {
 	"ND", // NO DELAY - execute next instruction only when NOT jumping
 	"D",  // always execute next instruction
@@ -95,7 +95,7 @@ const char *arc_disassembler::delaytype[0x4] =
 	"Res!", // reserved / invalid
 };
 
-const char *arc_disassembler::regnames[0x40] =
+char const *const arc_disassembler::regnames[0x40] =
 {
 	/* 0x00 */ "r00",
 	/* 0x01 */ "r01",

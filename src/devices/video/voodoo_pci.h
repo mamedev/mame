@@ -10,12 +10,6 @@
 #include "machine/pci.h"
 #include "voodoo.h"
 
-#define MCFG_VOODOO_PCI_FBMEM(_value) \
-	downcast<voodoo_pci_device &>(*device).set_fbmem(_value);
-
-#define MCFG_VOODOO_PCI_TMUMEM(_value1, _value2) \
-	downcast<voodoo_pci_device &>(*device).set_tmumem(_value1, _value2);
-
 class voodoo_pci_device : public pci_device
 {
 public:

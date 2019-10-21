@@ -7,13 +7,15 @@
     Bonwell 12/14 format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_BW12_DSK_H
+#define MAME_FORMATS_BW12_DSK_H
 
-#ifndef BW12_DSK_H_
-#define BW12_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
-class bw12_format : public upd765_format {
+class bw12_format : public upd765_format
+{
 public:
 	bw12_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_BW12_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_BW12_DSK_H

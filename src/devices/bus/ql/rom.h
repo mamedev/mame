@@ -50,8 +50,8 @@ public:
 	virtual ~device_ql_rom_cartridge_card_interface();
 
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t read(offs_t offset, uint8_t data) { return data; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	device_ql_rom_cartridge_card_interface(const machine_config &mconfig, device_t &device);
@@ -86,8 +86,8 @@ public:
 	ql_rom_cartridge_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// computer interface
-	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
+	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 protected:

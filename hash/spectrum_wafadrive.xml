@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+    Wafadrive 'cartridges'
+    These are infinite tape loop based devices that act like discs
+-->
+<softwarelist name="spectrum_wafadrive" description="Sinclair ZX Wafadrive tapes/cartridges">
+
+	<software name="spctrlwr" supported="no">
+		<description>Spectral Writer</description>
+		<year>1984</year>
+		<publisher>Softek International Ltd</publisher>
+		<part name="cass" interface="wafadrive_cart">
+			<dataarea name="wafa" size="77450">
+				<rom name="spectral writer.wdr" size="77450" crc="3faa506e" sha1="4da9ecaa055ce307ad830cdff4b293d6dca9ecca"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

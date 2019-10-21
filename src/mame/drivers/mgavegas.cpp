@@ -292,7 +292,7 @@ uint8_t ret=0;
 	switch (offset&0x03)
 	{
 		case 1: //bdir=0    BC1=1
-				ret=m_ay->data_r(space,0);
+				ret=m_ay->data_r();
 				break;
 		default:
 				if (LOG_AY8910)
@@ -313,10 +313,10 @@ WRITE8_MEMBER(mgavegas_state::w_a0)
 	switch (offset&0x03)
 	{
 		case 0: //bdir=1    bc1=1
-				m_ay->address_w(space,0,data );
+				m_ay->address_w(data);
 				break;
 		case 2: //bdir=1    bc1=0
-				m_ay->data_w(space,0,data );
+				m_ay->data_w(data);
 				break;
 /*
         case 1: //bdir=0    bc1=1
@@ -426,8 +426,8 @@ void mgavegas_state::mgavegas_map(address_map &map)
 	map(0xc000, 0xc001).w(FUNC(mgavegas_state::cso1_w));                   // /CSout1
 	map(0xc400, 0xc401).w(FUNC(mgavegas_state::cso2_w));                   // /CSout2
 	map(0xc800, 0xc801).rw(FUNC(mgavegas_state::csoki_r), FUNC(mgavegas_state::csoki_w));      // /CSoki
-	//AM_RANGE(0xcc00, 0xcc01) AM_READWRITE(cso3_r,cso3_w)      // /CSout3 unused
-	//AM_RANGE(0xe000, 0xe003) AM_READWRITE(r_e0,w_e0)          // /CSaux unused
+	//map(0xcc00, 0xcc01).rw(FUNC(mgavegas_state::cso3_r), FUNC(mgavegas_state::cso3_w));      // /CSout3 unused
+	//map(0xe000, 0xe003).rw(FUNC(mgavegas_state::r_e0), FUNC(mgavegas_state::w_e0));          // /CSaux unused
 }
 
 
@@ -584,41 +584,35 @@ void mgavegas_state::init_mgavegas133()
 *    Machine Drivers     *
 *************************/
 
-
-MACHINE_CONFIG_START(mgavegas_state::mgavegas)
+void mgavegas_state::mgavegas(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLK)
-	MCFG_DEVICE_PROGRAM_MAP(mgavegas_map)
+	Z80(config, m_maincpu, CPU_CLK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mgavegas_state::mgavegas_map);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("int_0", mgavegas_state, int_0, attotime::from_hz(6000))  //6KHz from MSM5205 /VCK
+	TIMER(config, "int_0").configure_periodic(FUNC(mgavegas_state::int_0), attotime::from_hz(6000));    //6KHz from MSM5205 /VCK
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper",attotime::from_msec(200),TICKET_MOTOR_ACTIVE_HIGH,TICKET_STATUS_ACTIVE_LOW);
+	TICKET_DISPENSER(config, "hopper", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* sound hardware */
-
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, AY_CLK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.3)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, mgavegas_state, ay8910_a_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, mgavegas_state, ay8910_b_r))
+	AY8910(config, m_ay, AY_CLK);
+	m_ay->add_route(ALL_OUTPUTS, "mono", 0.3);
+	m_ay->port_a_read_callback().set(FUNC(mgavegas_state::ay8910_a_r));
+	m_ay->port_b_read_callback().set(FUNC(mgavegas_state::ay8910_b_r));
 
-	MCFG_DEVICE_ADD("5205", MSM5205, MSM_CLK)
-	MCFG_MSM5205_PRESCALER_SELECTOR(S64_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 2.0)
+	MSM5205(config, m_msm, MSM_CLK);
+	m_msm->set_prescaler_selector(msm5205_device::S64_4B);
+	m_msm->add_route(ALL_OUTPUTS, "filter1", 2.0);
 
-
-	MCFG_DEVICE_ADD("filter1", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2",2.0)
-	MCFG_DEVICE_ADD("filter2", FILTER_RC)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-
+	FILTER_RC(config, "filter1").add_route(ALL_OUTPUTS, "filter2", 2.0);
+	FILTER_RC(config, "filter2").add_route(ALL_OUTPUTS, "mono", 2.0);
 
 	/* Video */
 	config.set_default_layout(layout_mgavegas);
-
-MACHINE_CONFIG_END
+}
 
 
 /*************************

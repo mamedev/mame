@@ -31,6 +31,7 @@ Lot of infos available at: http://www.classiccmp.org/cini/ht68k.htm
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/mc68681.h"
 #include "machine/wd_fdc.h"
 #include "softlist.h"
@@ -76,8 +77,8 @@ void ht68k_state::ht68k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("p_ram"); // 512 KB RAM / ROM at boot
-	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
-	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
+	//map(0x00080000, 0x000fffff) // Expansion
+	//map(0x00d80000, 0x00d8ffff) // Printer
 	map(0x00e00000, 0x00e00007).mirror(0xfff8).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write)).umask16(0x00ff); // FDC WD1770
 	map(0x00e80000, 0x00e800ff).mirror(0xff00).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x00f00000, 0x00f07fff).rom().mirror(0xf8000).region("user1", 0);
@@ -93,15 +94,13 @@ void ht68k_state::machine_reset()
 
 	memcpy((uint8_t*)m_p_ram.target(),user1,0x8000);
 
-	m_maincpu->reset();
-
 	m_fdc->reset();
 	m_fdc->set_floppy(nullptr);
 }
 
 WRITE_LINE_MEMBER(ht68k_state::duart_irq_handler)
 {
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_3, state, M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }
 
 WRITE_LINE_MEMBER(ht68k_state::duart_txb)
@@ -129,31 +128,32 @@ static void ht68k_floppies(device_slot_interface &device)
 }
 
 
-MACHINE_CONFIG_START(ht68k_state::ht68k)
+void ht68k_state::ht68k(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 8_MHz_XTAL)
-	MCFG_DEVICE_PROGRAM_MAP(ht68k_mem)
+	M68000(config, m_maincpu, 8_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ht68k_state::ht68k_mem);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("duart68681", MC68681, 8_MHz_XTAL / 2)
-	MCFG_MC68681_SET_EXTERNAL_CLOCKS(500000, 500000, 1000000, 1000000)
-	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(*this, ht68k_state, duart_irq_handler))
-	MCFG_MC68681_A_TX_CALLBACK(WRITELINE("rs232", rs232_port_device, write_txd))
-	MCFG_MC68681_B_TX_CALLBACK(WRITELINE(*this, ht68k_state, duart_txb))
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, ht68k_state, duart_output))
+	MC68681(config, m_duart, 8_MHz_XTAL / 2);
+	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->irq_cb().set(FUNC(ht68k_state::duart_irq_handler));
+	m_duart->a_tx_cb().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_duart->b_tx_cb().set(FUNC(ht68k_state::duart_txb));
+	m_duart->outport_cb().set(FUNC(ht68k_state::duart_output));
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(WRITELINE("duart68681", mc68681_device, rx_a_w))
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
+	rs232.rxd_handler().set(m_duart, FUNC(mc68681_device::rx_a_w));
 
-	MCFG_DEVICE_ADD("wd1770", WD1770, 8_MHz_XTAL)
+	WD1770(config, m_fdc, 8_MHz_XTAL);
 
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:2", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("wd1770:3", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	FLOPPY_CONNECTOR(config, "wd1770:0", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:1", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:2", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, "wd1770:3", ht68k_floppies, "525dd", floppy_image_device::default_floppy_formats);
 
-	MCFG_SOFTWARE_LIST_ADD("flop525_list", "ht68k")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop525_list").set_original("ht68k");
+}
 
 /* ROM definition */
 ROM_START( ht68k )

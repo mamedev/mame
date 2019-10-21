@@ -62,13 +62,13 @@ class dblcrown_state : public driver_device
 {
 public:
 	dblcrown_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_watchdog(*this, "watchdog"),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_palette(*this, "palette"),
-			m_inputs(*this, "IN%u", 0U),
-			m_lamps(*this, "lamp%u", 0U)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_watchdog(*this, "watchdog")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_inputs(*this, "IN%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	void dblcrown(machine_config &config);
@@ -100,7 +100,7 @@ private:
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-	DECLARE_PALETTE_INIT(dblcrown);
+	void dblcrown_palette(palette_device &palette) const;
 
 	void dblcrown_io(address_map &map);
 	void dblcrown_map(address_map &map);
@@ -552,7 +552,7 @@ void dblcrown_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(dblcrown_state, dblcrown)
+void dblcrown_state::dblcrown_palette(palette_device &palette) const
 {
 }
 
@@ -599,43 +599,40 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 }
 
 
-MACHINE_CONFIG_START(dblcrown_state::dblcrown)
-
+void dblcrown_state::dblcrown(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(dblcrown_map)
-	MCFG_DEVICE_IO_MAP(dblcrown_io)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", dblcrown_state, dblcrown_irq_scanline, "screen", 0, 1)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::dblcrown_map);
+	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::dblcrown_io);
+	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::dblcrown_irq_scanline), "screen", 0, 1);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1000))   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
+	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1000));   /* 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator) */
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_UPDATE_DRIVER(dblcrown_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(FUNC(dblcrown_state::screen_update));
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dblcrown)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dblcrown);
 
-	MCFG_PALETTE_ADD("palette", 0x100)
-	MCFG_PALETTE_INIT_OWNER(dblcrown_state, dblcrown)
+	PALETTE(config, m_palette, FUNC(dblcrown_state::dblcrown_palette), 0x100);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, dblcrown_state, lamps_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, dblcrown_state, bank_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, dblcrown_state, mux_w))
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(dblcrown_state::lamps_w));
+	ppi.out_pb_callback().set(FUNC(dblcrown_state::bank_w));
+	ppi.out_pc_callback().set(FUNC(dblcrown_state::mux_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ymz", YMZ284, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	YMZ284(config, "ymz", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 
 /***************************************************************************

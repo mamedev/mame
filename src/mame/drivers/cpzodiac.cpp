@@ -6,12 +6,13 @@
 
 ****************************************************************************
 
-Hardware summary:
+Hardware summary (Japan ver.)
+
 Main PCB:
 - 2*Z80 TMPZ84C00AP-6, 12MHz XTAL
 - Z80 CTC TMPZ84C30AP-6
 - 27C512 EPROM, TMS27C010A EPROM, 2316000 Mask ROM
-- 3*5563-100 (8KB RAM?)
+- 3*5563-100 (8KB RAM)
 - YM2610B, 16MHz XTAL
 - TE7750, TC0140SYT
 - SED1351F LCD controller
@@ -51,7 +52,7 @@ public:
 private:
 	virtual void machine_start() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_memory_bank m_bank;
 
@@ -160,15 +161,15 @@ static const z80_daisy_config daisy_chain[] =
 	{ nullptr }
 };
 
-MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
-
+void cpzodiac_state::cpzodiac(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 12_MHz_XTAL/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_IO_MAP(main_io_map)
-	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cpzodiac_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &cpzodiac_state::main_io_map);
+	m_maincpu->set_daisy_config(daisy_chain);
 
-	te7750_device &io(TE7750(config, "io", 0));
+	te7750_device &io(TE7750(config, "io"));
 	io.ios_cb().set_constant(4);
 	io.in_port1_cb().set_ioport("IN1");
 	io.in_port2_cb().set_ioport("IN2");
@@ -190,17 +191,17 @@ MACHINE_CONFIG_START(cpzodiac_state::cpzodiac)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2610B, 16_MHz_XTAL/2)
-	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
+	ym2610_device &ymsnd(YM2610B(config, "ymsnd", 16_MHz_XTAL/2));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.add_route(0, "lspeaker", 0.25);
+	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(1, "lspeaker", 1.0);
+	ymsnd.add_route(2, "rspeaker", 1.0);
 
-	MCFG_DEVICE_ADD("syt", TC0140SYT, 0)
-	MCFG_TC0140SYT_MASTER_CPU("maincpu")
-	MCFG_TC0140SYT_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	tc0140syt_device &syt(TC0140SYT(config, "syt", 0));
+	syt.set_master_tag(m_maincpu);
+	syt.set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************
@@ -209,7 +210,24 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-ROM_START( cpzodiac )
+ROM_START( cpzodiac ) // this set looks like a conversion from JP version
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "16.ic16", 0x00000, 0x20000, CRC(d73c21ea) SHA1(2b60a1cf1a9834a88d0a2911b314939ca98b0893) ) // M27C1001
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "14.ic14", 0x00000, 0x10000, CRC(eb1a77bb) SHA1(7a9ed992144d4aade6fefbcb78b6737924fcca01) ) // M27C512
+
+	ROM_REGION( 0x200000, "ymsnd", 0 ) // daughterboard with 4*27C040 at ic32
+	ROM_LOAD( "17", 0x000000, 0x80000, CRC(0b457444) SHA1(022d9f030c9e9461a2ec954c9df00626e459d74a) )
+	ROM_LOAD( "18", 0x080000, 0x80000, CRC(4edf3a9b) SHA1(95021ca153f842958176c35430ed58fc897c6d2e) )
+	ROM_LOAD( "19", 0x100000, 0x80000, CRC(7c04ef12) SHA1(f5c5b2b1e28a65b0a33b332bcbf046aa462565c0) )
+	ROM_LOAD( "20", 0x180000, 0x80000, CRC(c91ee395) SHA1(940b87d55de2ff3ad55cae216ab8959ad4c9a7b9) )
+
+	ROM_REGION( 0x1000, "pals", 0 )
+	ROM_LOAD( "d52-02.ic38", 0x0000, 0x0aee, CRC(6be9b935) SHA1(d36af591b03873aee3098b7c74b53ac6370ca064) ) // PAL16L8BCN
+ROM_END
+
+ROM_START( cpzodiacj )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "d52_03-1.ic16", 0x00000, 0x20000, CRC(129b8f44) SHA1(2789cd6f1322176c1956668f024b8bc9d4b3a816) )
 
@@ -220,8 +238,10 @@ ROM_START( cpzodiac )
 	ROM_LOAD( "d52-01.ic32", 0x00000, 0x200000, CRC(3bde2b85) SHA1(4cf3cf88f7b227ac6d31ede7cdeffe6adcac5529) )
 
 	ROM_REGION( 0x1000, "pals", 0 )
-	ROM_LOAD( "16l8bcn.ic38", 0x0000, 0x0aee, CRC(6be9b935) SHA1(d36af591b03873aee3098b7c74b53ac6370ca064) )
+	ROM_LOAD( "d52-02.ic38", 0x0000, 0x0aee, CRC(6be9b935) SHA1(d36af591b03873aee3098b7c74b53ac6370ca064) ) // PAL16L8BCN
 ROM_END
 
 
-GAME( 1993, cpzodiac, 0, cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0, "Taito Corporation", "Captain Zodiac", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY              FULLNAME                  FLAGS
+GAME( 1993, cpzodiac,  0,        cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0,   "Taito Corporation", "Captain Zodiac (World)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1993, cpzodiacj, cpzodiac, cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0,   "Taito Corporation", "Captain Zodiac (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

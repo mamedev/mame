@@ -213,6 +213,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(8'000'000)
@@ -221,29 +222,33 @@
 class mpu12wbk_state : public driver_device
 {
 public:
-	mpu12wbk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mpu12wbk_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
-		m_gfxdecode(*this, "gfxdecode") { }
+		m_gfxdecode(*this, "gfxdecode")
+	{ }
 
 	void mpu12wbk(machine_config &config);
 
 	void init_mpu12wbk();
 
+protected:
+	virtual void video_start() override;
+
 private:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
+	required_device<cpu_device> m_maincpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+
 	DECLARE_WRITE8_MEMBER(mpu12wbk_videoram_w);
 	DECLARE_WRITE8_MEMBER(mpu12wbk_colorram_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mpu12wbk);
-	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
-	required_device<gfxdecode_device> m_gfxdecode;
+	void mpu12wbk_palette(palette_device &palette) const;
+	uint32_t screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mpu12wbk_map(address_map &map);
 };
 
@@ -289,14 +294,14 @@ void mpu12wbk_state::video_start()
 }
 
 
-uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mpu12wbk_state::screen_update_mpu12wbk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
 
-PALETTE_INIT_MEMBER(mpu12wbk_state, mpu12wbk)
+void mpu12wbk_state::mpu12wbk_palette(palette_device &palette) const
 {
 }
 
@@ -490,39 +495,36 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(mpu12wbk_state::mpu12wbk)
-
+void mpu12wbk_state::mpu12wbk(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC6809, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(mpu12wbk_map)
+	MC6809(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mpu12wbk_state::mpu12wbk_map);
 
-//  MCFG_NVRAM_ADD_0FILL("nvram")
+//  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((32+1)*8, (32+1)*8)                  /* From MC6845, registers 00 & 04. (value-1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)    /* Driven by MC6845, registers 01 & 06 */
-	MCFG_SCREEN_UPDATE_DRIVER(mpu12wbk_state, screen_update_mpu12wbk)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((32+1)*8, (32+1)*8);                  /* From MC6845, registers 00 & 04. (value-1) */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);    /* Driven by MC6845, registers 01 & 06 */
+	screen.set_screen_update(FUNC(mpu12wbk_state::screen_update_mpu12wbk));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mpu12wbk)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(mpu12wbk_state, mpu12wbk)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_mpu12wbk);
+	PALETTE(config, "palette", FUNC(mpu12wbk_state::mpu12wbk_palette), 512);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/4) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(4)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/4)); /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(4);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)        /* guess */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-MACHINE_CONFIG_END
+	AY8910(config, "ay8910", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.00);   /* clock guessed */
+}
 
 
 /*************************

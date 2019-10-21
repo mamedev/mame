@@ -1,9 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
+#ifndef MAME_INCLUDES_CALOMEGA_H
+#define MAME_INCLUDES_CALOMEGA_H
+
+#pragma once
+
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class calomega_state : public driver_device
 {
@@ -28,6 +34,21 @@ public:
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
+	void init_sys903();
+	void init_comg080();
+	void init_s903mod();
+	void init_sys905();
+
+	void sys905(machine_config &config);
+	void s903mod(machine_config &config);
+	void sys906(machine_config &config);
+	void sys903(machine_config &config);
+
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
+private:
 	DECLARE_WRITE8_MEMBER(calomega_videoram_w);
 	DECLARE_WRITE8_MEMBER(calomega_colorram_w);
 	DECLARE_READ8_MEMBER(s903_mux_port_r);
@@ -49,29 +70,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
-	void init_sys903();
-	void init_comg080();
-	void init_s903mod();
-	void init_sys905();
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(calomega);
+	uint32_t screen_update_calomega(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void calomega_palette(palette_device &palette) const;
 
-	void sys905(machine_config &config);
-	void s903mod(machine_config &config);
-	void sys906(machine_config &config);
-	void sys903(machine_config &config);
 	void s903mod_map(address_map &map);
 	void sys903_map(address_map &map);
 	void sys905_map(address_map &map);
 	void sys906_map(address_map &map);
-protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
 
 	optional_device_array<pia6821_device, 2> m_pia;
 
-private:
 	required_device<cpu_device> m_maincpu;
 	optional_device<acia6850_device> m_acia6850_0;
 	optional_device<clock_device> m_aciabaud;
@@ -95,3 +104,5 @@ private:
 	int m_s905_mux_data;
 	tilemap_t *m_bg_tilemap;
 };
+
+#endif // MAME_INCLUDES_CALOMEGA_H

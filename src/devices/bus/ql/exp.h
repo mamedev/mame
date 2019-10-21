@@ -49,24 +49,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_QL_EXPANSION_SLOT_IPL0L_CALLBACK(_write) \
-	downcast<ql_expansion_slot_device &>(*device).set_ipl0l_wr_callback(DEVCB_##_write);
-
-#define MCFG_QL_EXPANSION_SLOT_IPL1L_CALLBACK(_write) \
-	downcast<ql_expansion_slot_device &>(*device).set_ipl1l_wr_callback(DEVCB_##_write);
-
-#define MCFG_QL_EXPANSION_SLOT_BERRL_CALLBACK(_write) \
-	downcast<ql_expansion_slot_device &>(*device).set_berrl_wr_callback(DEVCB_##_write);
-
-#define MCFG_QL_EXPANSION_SLOT_EXTINTL_CALLBACK(_write) \
-	downcast<ql_expansion_slot_device &>(*device).set_extintl_wr_callback(DEVCB_##_write);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -80,8 +62,8 @@ class device_ql_expansion_card_interface : public device_slot_card_interface
 
 public:
 	virtual void romoeh_w(int state) { m_romoeh = state; }
-	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) { return data; }
-	virtual void write(address_space &space, offs_t offset, uint8_t data) { }
+	virtual uint8_t read(offs_t offset, uint8_t data) { return data; }
+	virtual void write(offs_t offset, uint8_t data) { }
 
 protected:
 	// construction/destruction
@@ -112,14 +94,14 @@ public:
 	}
 	ql_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_ipl0l_wr_callback(Object &&cb) { return m_write_ipl0l.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ipl1l_wr_callback(Object &&cb) { return m_write_ipl1l.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_berrl_wr_callback(Object &&cb) { return m_write_berrl.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_extintl_wr_callback(Object &&cb) { return m_write_extintl.set_callback(std::forward<Object>(cb)); }
+	auto ipl0l_wr_callback() { return m_write_ipl0l.bind(); }
+	auto ipl1l_wr_callback() { return m_write_ipl1l.bind(); }
+	auto berrl_wr_callback() { return m_write_berrl.bind(); }
+	auto extintl_wr_callback() { return m_write_extintl.bind(); }
 
 	// computer interface
-	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
-	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
+	uint8_t read(offs_t offset, uint8_t data) { if (m_card) data = m_card->read(offset, data); return data; }
+	void write(offs_t offset, uint8_t data) { if (m_card) m_card->write(offset, data); }
 	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
 
 	// card interface

@@ -42,11 +42,10 @@ protected:
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
 	virtual uint8_t read_cnxx(uint8_t offset) override;
 
-private:
 	required_device<diskii_fdc_device> m_wozfdc;
-	required_device<floppy_connector> floppy0;
-	required_device<floppy_connector> floppy1;
+	required_device_array<floppy_connector, 2> m_floppy;
 
+private:
 	const uint8_t *m_rom;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );

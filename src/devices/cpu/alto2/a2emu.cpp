@@ -489,8 +489,8 @@ void alto2_cpu_device::f2_early_acdest()
 #if ALTO2_DEBUG
 void alto2_cpu_device::bitblt_info()
 {
-	static const char *type_name[4] = {"bitmap","complement","and gray","gray"};
-	static const char *oper_name[4] = {"replace","paint","invert","erase"};
+	static char const *const type_name[4] = {"bitmap","complement","and gray","gray"};
+	static char const *const oper_name[4] = {"replace","paint","invert","erase"};
 	int bbt = m_r[rsel_ac2];
 	int val = debug_read_mem(bbt);
 

@@ -444,36 +444,37 @@ void gamecstl_state::machine_reset()
 	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 }
 
-MACHINE_CONFIG_START(gamecstl_state::gamecstl)
+void gamecstl_state::gamecstl(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PENTIUM3, 200000000)
-	MCFG_DEVICE_PROGRAM_MAP(gamecstl_map)
-	MCFG_DEVICE_IO_MAP(gamecstl_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+	PENTIUM3(config, m_maincpu, 200000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gamecstl_state::gamecstl_map);
+	m_maincpu->set_addrmap(AS_IO, &gamecstl_state::gamecstl_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	MCFG_PCI_BUS_LEGACY_ADD("pcibus", 0)
-	MCFG_PCI_BUS_LEGACY_DEVICE(0, DEVICE_SELF, gamecstl_state, intel82439tx_pci_r, intel82439tx_pci_w)
-	MCFG_PCI_BUS_LEGACY_DEVICE(7, DEVICE_SELF, gamecstl_state, intel82371ab_pci_r, intel82371ab_pci_w)
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device_read (0, FUNC(gamecstl_state::intel82439tx_pci_r), this);
+	pcibus.set_device_write(0, FUNC(gamecstl_state::intel82439tx_pci_w), this);
+	pcibus.set_device_read (7, FUNC(gamecstl_state::intel82371ab_pci_r), this);
+	pcibus.set_device_write(7, FUNC(gamecstl_state::intel82371ab_pci_w), this);
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 199)
-	MCFG_SCREEN_UPDATE_DRIVER(gamecstl_state, screen_update_gamecstl)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 199);
+	screen.set_screen_update(FUNC(gamecstl_state::screen_update_gamecstl));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cga)
-	MCFG_PALETTE_ADD("palette", 16)
-
-
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cga);
+	PALETTE(config, m_palette).set_entries(16);
+}
 
 void gamecstl_state::init_gamecstl()
 {

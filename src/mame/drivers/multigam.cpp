@@ -117,13 +117,14 @@ Eproms are 27512,27010,274001
 class multigam_state : public driver_device
 {
 public:
-	multigam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	multigam_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ppu(*this, "ppu"),
 		m_p1(*this, "P1"),
 		m_p2(*this, "P2"),
-		m_dsw(*this, "DSW") { }
+		m_dsw(*this, "DSW")
+	{ }
 
 	void multigam(machine_config &config);
 	void supergm3(machine_config &config);
@@ -134,10 +135,15 @@ public:
 	void init_multigam();
 	void init_multigm3();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+	DECLARE_READ_LINE_MEMBER(multigam_inputs_r);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<n2a03_device> m_maincpu;
 	required_device<ppu2c0x_device> m_ppu;
 	required_ioport m_p1;
 	required_ioport m_p2;
@@ -177,6 +183,7 @@ private:
 	int m_vrom4k;
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
+
 	DECLARE_WRITE8_MEMBER(multigam_nt_w);
 	DECLARE_READ8_MEMBER(multigam_nt_r);
 	DECLARE_WRITE8_MEMBER(sprite_dma_w);
@@ -195,10 +202,6 @@ private:
 	DECLARE_WRITE8_MEMBER(supergm3_prg_bank_w);
 	DECLARE_WRITE8_MEMBER(supergm3_chr_bank_w);
 	void set_mirroring(int mirroring);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(multigam);
 	DECLARE_MACHINE_START(multigm3);
 	DECLARE_MACHINE_RESET(multigm3);
 	DECLARE_MACHINE_START(supergm3);
@@ -343,7 +346,7 @@ READ8_MEMBER(multigam_state::multigam_IN1_r)
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-CUSTOM_INPUT_MEMBER(multigam_state::multigam_inputs_r)
+READ_LINE_MEMBER(multigam_state::multigam_inputs_r)
 {
 	/* bit 0: serial input (dsw)
 	   bit 1: coin */
@@ -1033,7 +1036,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, multigam_state,multigam_inputs_r, nullptr)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(multigam_state, multigam_inputs_r)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
@@ -1206,48 +1209,50 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);
 }
 
-MACHINE_CONFIG_START(multigam_state::multigam)
+void multigam_state::multigam(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", N2A03, NTSC_APU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(multigam_map)
+	N2A03(config, m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigam_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DEVICE("ppu", ppu2c0x_device, screen_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 262);
+	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	screen.set_screen_update("ppu", FUNC(ppu2c0x_device::screen_update));
 
-	MCFG_PPU2C02_ADD("ppu")
-	MCFG_PPU2C0X_CPU("maincpu")
-	MCFG_PPU2C0X_INT_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	PPU_2C02(config, m_ppu);
+	m_ppu->set_cpu_tag("maincpu");
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-MACHINE_CONFIG_END
+	m_maincpu->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
-MACHINE_CONFIG_START(multigam_state::multigm3)
+void multigam_state::multigm3(machine_config &config)
+{
 	multigam(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multigm3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigm3_map);
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state, multigm3 )
 	MCFG_MACHINE_RESET_OVERRIDE(multigam_state, multigm3 )
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(multigam_state::multigmt)
+void multigam_state::multigmt(machine_config &config)
+{
 	multigam(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(multigmt_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::multigmt_map);
+}
 
-MACHINE_CONFIG_START(multigam_state::supergm3)
+void multigam_state::supergm3(machine_config &config)
+{
 	multigam(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(supergm3_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &multigam_state::supergm3_map);
 
 	MCFG_MACHINE_START_OVERRIDE(multigam_state,supergm3)
-MACHINE_CONFIG_END
+}
 
 ROM_START( multigam )
 	ROM_REGION( 0x10000, "maincpu", 0 )

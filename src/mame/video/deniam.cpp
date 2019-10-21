@@ -60,8 +60,8 @@ TILEMAP_MAPPER_MEMBER(deniam_state::scan_pages)
 
 TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 {
-	int page = tile_index >> 11;
-	uint16_t attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
+	const int page = tile_index >> 11;
+	u16 attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
 	SET_TILE_INFO_MEMBER(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
@@ -70,8 +70,8 @@ TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 {
-	int page = tile_index >> 11;
-	uint16_t attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
+	const int page = tile_index >> 11;
+	u16 attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
 	SET_TILE_INFO_MEMBER(0,
 			attr,
 			(attr & 0x1fc0) >> 6,
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
 {
-	uint16_t attr = m_textram[tile_index];
+	u16 attr = m_textram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			attr & 0xf1ff,
 			(attr & 0x0e00) >> 9,
@@ -113,7 +113,7 @@ void deniam_state::video_start()
 
 ***************************************************************************/
 
-WRITE16_MEMBER(deniam_state::deniam_videoram_w)
+void deniam_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_videoram[offset]);
 
@@ -128,28 +128,19 @@ WRITE16_MEMBER(deniam_state::deniam_videoram_w)
 }
 
 
-WRITE16_MEMBER(deniam_state::deniam_textram_w)
+void deniam_state::textram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_textram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_MEMBER(deniam_state::deniam_palette_w)
-{
-	data = COMBINE_DATA(&m_paletteram[offset]);
-	int r = ((data << 1) & 0x1e) | ((data >> 12) & 0x01);
-	int g = ((data >> 3) & 0x1e) | ((data >> 13) & 0x01);
-	int b = ((data >> 7) & 0x1e) | ((data >> 14) & 0x01);
-	m_palette->set_pen_color(offset, pal5bit(r), pal5bit(g), pal5bit(b));
-}
-
-READ16_MEMBER(deniam_state::deniam_coinctrl_r)
+u16 deniam_state::coinctrl_r()
 {
 	return m_coinctrl;
 }
 
-WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
+void deniam_state::coinctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_coinctrl);
 
@@ -196,22 +187,20 @@ WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
  */
 void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	uint8_t *gfx = memregion("gfx2")->base();
-
 	for (int offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
-		uint8_t *rom = gfx;
+		u8 *rom = m_spritegfx->base();
 
 		int sx = (m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
 		if (sx >= 512) sx -= 512;
-		int starty = m_spriteram[offs + 0] & 0xff;
-		int endy = m_spriteram[offs + 0] >> 8;
+		const int starty = m_spriteram[offs + 0] & 0xff;
+		const int endy = m_spriteram[offs + 0] >> 8;
 
-		int width = m_spriteram[offs + 2] & 0x007f;
-		int flipx = m_spriteram[offs + 2] & 0x0100;
+		const int width = m_spriteram[offs + 2] & 0x007f;
+		bool flipx = m_spriteram[offs + 2] & 0x0100;
 		if (flipx) sx++;
 
-		int color = 0x40 + (m_spriteram[offs + 4] & 0x3f);
+		const u32 color = 0x40 + (m_spriteram[offs + 4] & 0x3f);
 
 		int primask = 8;
 		switch (m_spriteram[offs + 4] & 0xc0)
@@ -222,13 +211,12 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 			case 0xc0:                       break; /* above everything */
 		}
 
-
-		int start = m_spriteram[offs + 3] + ((m_spriteram[offs + 4] & 0x1f00) << 8);
+		const int start = m_spriteram[offs + 3] + ((m_spriteram[offs + 4] & 0x1f00) << 8);
 		rom += 2 * start;
 
 		for (int y = starty + 1; y <= endy; y++)
 		{
-			int drawing = 0;
+			bool drawing = false;
 			int i = 0;
 
 			rom += 2 * width;   /* note that the first line is skipped */
@@ -239,7 +227,7 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				{
 					if ((rom[i] & 0x0f) == 0x0f)
 					{
-						if (!drawing) drawing = 1;
+						if (!drawing) drawing = true;
 						else break;
 					}
 					else
@@ -258,7 +246,7 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 
 					if ((rom[i] & 0xf0) == 0xf0)
 					{
-						if (!drawing) drawing = 1;
+						if (!drawing) drawing = true;
 						else break;
 					}
 					else
@@ -281,7 +269,7 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 				{
 					if ((rom[i] & 0xf0) == 0xf0)
 					{
-						if (!drawing) drawing = 1;
+						if (!drawing) drawing = true;
 						else break;
 					}
 					else
@@ -300,7 +288,7 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 
 					if ((rom[i] & 0x0f) == 0x0f)
 					{
-						if (!drawing) drawing = 1;
+						if (!drawing) drawing = true;
 						else break;
 					}
 					else
@@ -326,46 +314,44 @@ void deniam_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 
 void deniam_state::set_bg_page( int page, int value )
 {
-	int tile_index;
-
 	if (m_bg_page[page] != value)
 	{
 		m_bg_page[page] = value;
-		for (tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
+		for (int tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
 			m_bg_tilemap->mark_tile_dirty(tile_index);
 	}
 }
 
 void deniam_state::set_fg_page( int page, int value )
 {
-	int tile_index;
-
 	if (m_fg_page[page] != value)
 	{
 		m_fg_page[page] = value;
-		for (tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
+		for (int tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
 			m_fg_tilemap->mark_tile_dirty(tile_index);
 	}
 }
 
-uint32_t deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 deniam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int bg_scrollx, bg_scrolly, fg_scrollx, fg_scrolly;
 	int page;
 
 	if (!m_display_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
 		return 0;   /* don't update (freeze display) */
+	}
 
-	bg_scrollx = m_textram[m_bg_scrollx_reg] - m_bg_scrollx_offs;
-	bg_scrolly = (m_textram[m_bg_scrolly_reg] & 0xff) - m_bg_scrolly_offs;
+	int bg_scrollx = m_textram[m_bg_scrollx_reg] - m_bg_scrollx_offs;
+	int bg_scrolly = (m_textram[m_bg_scrolly_reg] & 0xff) - m_bg_scrolly_offs;
 	page = m_textram[m_bg_page_reg];
 	set_bg_page(3, (page >>12) & 0x0f);
 	set_bg_page(2, (page >> 8) & 0x0f);
 	set_bg_page(1, (page >> 4) & 0x0f);
 	set_bg_page(0, (page >> 0) & 0x0f);
 
-	fg_scrollx = m_textram[m_fg_scrollx_reg] - m_fg_scrollx_offs;
-	fg_scrolly = (m_textram[m_fg_scrolly_reg] & 0xff) - m_fg_scrolly_offs;
+	int fg_scrollx = m_textram[m_fg_scrollx_reg] - m_fg_scrollx_offs;
+	int fg_scrolly = (m_textram[m_fg_scrolly_reg] & 0xff) - m_fg_scrolly_offs;
 	page = m_textram[m_fg_page_reg];
 	set_fg_page(3, (page >>12) & 0x0f);
 	set_fg_page(2, (page >> 8) & 0x0f);

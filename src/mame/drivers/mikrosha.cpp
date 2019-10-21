@@ -8,7 +8,6 @@
 
 ****************************************************************************/
 
-
 #include "emu.h"
 #include "includes/radio86.h"
 
@@ -16,7 +15,6 @@
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "sound/wave.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -46,7 +44,7 @@ private:
 void mikrosha_state::machine_reset()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 	radio86_state::machine_reset();
 }
 
@@ -169,9 +167,8 @@ WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
 
 I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 {
-	int i;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const uint8_t *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
+	uint8_t const *const charmap = &m_charmap[(m_mikrosha_font_page & 1) * 0x400];
 	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp) {
 		pixels = 0;
@@ -182,7 +179,7 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 	if (rvv) {
 		pixels ^= 0xff;
 	}
-	for(i=0;i<6;i++) {
+	for(int i=0;i<6;i++) {
 		bitmap.pix32(y, x + i) = palette[(pixels >> (5-i)) & 1 ? (hlgt ? 2 : 1) : 0];
 	}
 }
@@ -205,64 +202,63 @@ static GFXDECODE_START( gfx_mikrosha )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, mikrosha_charlayout, 0, 1 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(mikrosha_state::mikrosha)
+void mikrosha_state::mikrosha(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, XTAL(16'000'000) / 9)
-	MCFG_DEVICE_PROGRAM_MAP(mikrosha_mem)
-	MCFG_DEVICE_IO_MAP(mikrosha_io)
+	I8080(config, m_maincpu, XTAL(16'000'000) / 9);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mikrosha_state::mikrosha_mem);
+	m_maincpu->set_addrmap(AS_IO, &mikrosha_state::mikrosha_io);
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, radio86_state, radio86_8255_portb_r2))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, radio86_8255_porta_w2))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, radio86_state, radio86_8255_portc_r2))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, radio86_state, radio86_8255_portc_w2))
+	I8255(config, m_ppi8255_1);
+	m_ppi8255_1->in_pa_callback().set(FUNC(radio86_state::radio86_8255_portb_r2));
+	m_ppi8255_1->out_pb_callback().set(FUNC(radio86_state::radio86_8255_porta_w2));
+	m_ppi8255_1->in_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_r2));
+	m_ppi8255_1->out_pc_callback().set(FUNC(radio86_state::radio86_8255_portc_w2));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, radio86_state, mikrosha_8255_font_page_w))
+	I8255(config, m_ppi8255_2);
+	m_ppi8255_2->out_pb_callback().set(FUNC(radio86_state::mikrosha_8255_font_page_w));
 
-	MCFG_DEVICE_ADD("i8275", I8275, XTAL(16'000'000) / 12)
-	MCFG_I8275_CHARACTER_WIDTH(6)
-	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(mikrosha_state, display_pixels)
-	MCFG_I8275_DRQ_CALLBACK(WRITELINE("dma8257",i8257_device, dreq2_w))
+	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
+	i8275.set_character_width(6);
+	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels), this);
+	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
-	MCFG_DEVICE_ADD("pit8253", PIT8253, 0)
-	MCFG_PIT8253_CLK0(0)
-	MCFG_PIT8253_CLK1(0)
-	MCFG_PIT8253_CLK2(2000000)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(*this, mikrosha_state, mikrosha_pit_out2))
+	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));
+	pit8253.set_clk<0>(0);
+	pit8253.set_clk<1>(0);
+	pit8253.set_clk<2>(2000000);
+	pit8253.out_handler<2>().set(FUNC(mikrosha_state::mikrosha_pit_out2));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE("i8275", i8275_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_SIZE(78*6, 30*10)
-	MCFG_SCREEN_VISIBLE_AREA(0, 78*6-1, 0, 30*10-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(78*6, 30*10);
+	screen.set_visarea(0, 78*6-1, 0, 30*10-1);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mikrosha)
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(mikrosha_state,radio86)
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mikrosha);
+	PALETTE(config, m_palette, FUNC(mikrosha_state::radio86_palette), 3);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("dma8257", I8257, XTAL(16'000'000) / 9)
-	MCFG_I8257_OUT_HRQ_CB(WRITELINE(*this, radio86_state, hrq_w))
-	MCFG_I8257_IN_MEMR_CB(READ8(*this, radio86_state, memory_read_byte))
-	MCFG_I8257_OUT_MEMW_CB(WRITE8(*this, radio86_state, memory_write_byte))
-	MCFG_I8257_OUT_IOW_2_CB(WRITE8("i8275", i8275_device, dack_w))
-	MCFG_I8257_REVERSE_RW_MODE(1)
+	I8257(config, m_dma8257, XTAL(16'000'000) / 9);
+	m_dma8257->out_hrq_cb().set(FUNC(radio86_state::hrq_w));
+	m_dma8257->in_memr_cb().set(FUNC(radio86_state::memory_read_byte));
+	m_dma8257->out_memw_cb().set(FUNC(radio86_state::memory_write_byte));
+	m_dma8257->out_iow_cb<2>().set("i8275", FUNC(i8275_device::dack_w));
+	m_dma8257->set_reverse_rw_mode(1);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(rkm_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
-	MCFG_CASSETTE_INTERFACE("mikrosha_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(rkm_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mikrosha_cass");
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "mikrosha_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "mikrosha_cart", "bin,rom");
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "mikrosha_cass")
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "mikrosha_cart")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("mikrosha_cass");
+	SOFTWARE_LIST(config, "cart_list").set_original("mikrosha_cart");
+}
 
 
 /* ROM definition */

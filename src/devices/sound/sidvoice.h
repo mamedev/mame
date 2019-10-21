@@ -49,7 +49,7 @@ struct sidOperator
 
 	int32_t cycleLenCount;
 #if defined(DIRECT_FIXPOINT)
-	cpuLword cycleLen, cycleAddLen;
+	PAIR cycleLen, cycleAddLen;
 #else
 	uint32_t cycleAddLenPnt;
 	uint16_t cycleLen, cycleLenPnt;
@@ -59,7 +59,7 @@ struct sidOperator
 	void (*waveProc)(sidOperator *);
 
 #if defined(DIRECT_FIXPOINT)
-	cpuLword waveStep, waveStepAdd;
+	PAIR waveStep, waveStepAdd;
 #else
 	uint16_t waveStep, waveStepAdd;
 	uint32_t waveStepPnt, waveStepAddPnt;
@@ -67,10 +67,8 @@ struct sidOperator
 	uint16_t waveStepOld;
 	sw_storage wavePre[2];
 
-#if defined(DIRECT_FIXPOINT) && defined(LARGE_NOISE_TABLE)
-	cpuLword noiseReg;
-#elif defined(DIRECT_FIXPOINT)
-	cpuLBword noiseReg;
+#if defined(DIRECT_FIXPOINT)
+	PAIR noiseReg;
 #else
 	uint32_t noiseReg;
 #endif
@@ -86,7 +84,7 @@ struct sidOperator
 	float fenveStep, fenveStepAdd;
 	uint32_t enveStep;
 #elif defined(DIRECT_FIXPOINT)
-	cpuLword enveStep, enveStepAdd;
+	PAIR enveStep, enveStepAdd;
 #else
 	uint16_t enveStep, enveStepAdd;
 	uint32_t enveStepPnt, enveStepAddPnt;

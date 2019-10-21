@@ -32,14 +32,9 @@
 
 static osd_file::error common_process_file(emu_options &options, const char *location, const char *ext, const rom_entry *romp, emu_file &image_file)
 {
-	osd_file::error filerr;
-
-	if (location != nullptr && strcmp(location, "") != 0)
-		filerr = image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext);
-	else
-		filerr = image_file.open(ROM_GETNAME(romp), ext);
-
-	return filerr;
+	return (location && *location)
+			? image_file.open(location, PATH_SEPARATOR, ROM_GETNAME(romp), ext)
+			: image_file.open(ROM_GETNAME(romp), ext);
 }
 
 std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr)
@@ -475,7 +470,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if (m_errors != 0)
 	{
 		/* create the error message and exit fatally */
-		osd_printf_error("%s", m_errorstring.c_str());
+		osd_printf_error("%s", m_errorstring);
 		fatalerror_exitcode(machine(), EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
@@ -483,7 +478,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if ((m_warnings) || (m_knownbad))
 	{
 		m_errorstring.append("WARNING: the machine might not run correctly.");
-		osd_printf_warning("%s\n", m_errorstring.c_str());
+		osd_printf_warning("%s\n", m_errorstring);
 	}
 }
 
@@ -860,29 +855,29 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 	/* loop until we hit the end of this region */
 	while (!ROMENTRY_ISREGIONEND(romp))
 	{
-		/* if this is a continue entry, it's invalid */
 		if (ROMENTRY_ISCONTINUE(romp))
 			fatalerror("Error in RomModule definition: ROM_CONTINUE not preceded by ROM_LOAD\n");
 
-		/* if this is an ignore entry, it's invalid */
 		if (ROMENTRY_ISIGNORE(romp))
 			fatalerror("Error in RomModule definition: ROM_IGNORE not preceded by ROM_LOAD\n");
 
-		/* if this is a reload entry, it's invalid */
 		if (ROMENTRY_ISRELOAD(romp))
 			fatalerror("Error in RomModule definition: ROM_RELOAD not preceded by ROM_LOAD\n");
 
-		/* handle fills */
 		if (ROMENTRY_ISFILL(romp))
-			fill_rom_data(romp++);
+		{
+			if (!ROM_GETBIOSFLAGS(romp) || ROM_GETBIOSFLAGS(romp) == device->system_bios())
+				fill_rom_data(romp);
 
-		/* handle copies */
+			romp++;
+		}
 		else if (ROMENTRY_ISCOPY(romp))
+		{
 			copy_rom_data(romp++);
-
-		/* handle files */
+		}
 		else if (ROMENTRY_ISFILE(romp))
 		{
+			/* handle files */
 			int irrelevantbios = (ROM_GETBIOSFLAGS(romp) != 0 && ROM_GETBIOSFLAGS(romp) != device->system_bios());
 			const rom_entry *baserom = romp;
 			int explength = 0;
@@ -941,7 +936,7 @@ void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entr
 		}
 		else
 		{
-			romp++; /* something else; skip */
+			romp++; // something else - skip
 		}
 	}
 }
@@ -1257,13 +1252,13 @@ void rom_load_manager::normalize_flags_for_device(const char *rgntag, u8 &width,
 			int buswidth;
 
 			/* set the endianness */
-			if (spaceconfig->m_endianness == ENDIANNESS_LITTLE)
+			if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 				endian = ENDIANNESS_LITTLE;
 			else
 				endian = ENDIANNESS_BIG;
 
 			/* set the width */
-			buswidth = spaceconfig->m_data_width;
+			buswidth = spaceconfig->data_width();
 			if (buswidth <= 8)
 				width = 1;
 			else if (buswidth <= 16)

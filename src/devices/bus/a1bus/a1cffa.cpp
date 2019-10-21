@@ -33,9 +33,10 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(a1bus_cffa_device::device_add_mconfig)
-	MCFG_ATA_INTERFACE_ADD(CFFA_ATA_TAG, ata_devices, "hdd", nullptr, false)
-MACHINE_CONFIG_END
+void a1bus_cffa_device::device_add_mconfig(machine_config &config)
+{
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+}
 
 const tiny_rom_entry *a1bus_cffa_device::device_rom_region() const
 {

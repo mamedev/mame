@@ -46,11 +46,13 @@ enum iodevice_t
 	IO_QUICKLOAD,   /* 12 - Allow to load program/data into memory, without matching any actual device */
 	IO_MEMCARD,     /* 13 - Memory card */
 	IO_CDROM,       /* 14 - optical CD-ROM disc */
-	IO_MAGTAPE,     /* 15 - Magentic tape */
+	IO_MAGTAPE,     /* 15 - Magnetic tape */
 	IO_ROM,         /* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
 	IO_MIDIIN,      /* 17 - MIDI In port */
 	IO_MIDIOUT,     /* 18 - MIDI Out port */
-	IO_COUNT        /* 19 - Total Number of IO_devices for searching */
+	IO_PICTURE,     /* 19 - A single-frame image */
+	IO_VIDEO,       /* 20 - A video file */
+	IO_COUNT        /* 21 - Total Number of IO_devices for searching */
 };
 
 enum image_error_t
@@ -94,28 +96,15 @@ private:
 enum class image_init_result { PASS, FAIL };
 enum class image_verify_result { PASS, FAIL };
 
-// device image interface function types
-typedef delegate<image_init_result (device_image_interface &)> device_image_load_delegate;
-typedef delegate<void (device_image_interface &)> device_image_func_delegate;
-
 //**************************************************************************
 //  MACROS
 //**************************************************************************
 
-#define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
-#define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)        image_init_result DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_MEMBER(_class,_name)         image_init_result DEVICE_IMAGE_LOAD_NAME(_class,_name)(device_image_interface &image)
-#define DEVICE_IMAGE_LOAD_DELEGATE(_class,_name)       device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
+#define DEVICE_IMAGE_LOAD_MEMBER(_name)             image_init_result _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_LOAD_MEMBER(_name)     DEVICE_IMAGE_LOAD_MEMBER(_name)
 
-#define DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)          device_image_unload_##_name
-#define DEVICE_IMAGE_UNLOAD_NAME(_class,_name)          _class::DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)       void DEVICE_IMAGE_UNLOAD_MEMBER_NAME(_name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_MEMBER(_class,_name)        void DEVICE_IMAGE_UNLOAD_NAME(_class,_name)(device_image_interface &image)
-#define DEVICE_IMAGE_UNLOAD_DELEGATE(_class,_name)      device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
-
-#define MCFG_SET_IMAGE_LOADABLE(_usrload) \
-	dynamic_cast<device_image_interface &>(*device).set_user_loadable(_usrload);
+#define DEVICE_IMAGE_UNLOAD_MEMBER(_name)           void _name(device_image_interface &image)
+#define DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(_name)   DEVICE_IMAGE_UNLOAD_MEMBER(_name)
 
 
 // ======================> device_image_interface
@@ -124,6 +113,9 @@ typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 class device_image_interface : public device_interface
 {
 public:
+	typedef device_delegate<image_init_result (device_image_interface &)> load_delegate;
+	typedef device_delegate<void (device_image_interface &)> unload_delegate;
+
 	typedef std::vector<std::unique_ptr<image_device_format>> formatlist_type;
 
 	// construction/destruction
@@ -213,7 +205,7 @@ public:
 
 	const std::string &instance_name() const { return m_instance_name; }
 	const std::string &brief_instance_name() const { return m_brief_instance_name; }
-	const std::string &cannonical_instance_name() const { return m_canonical_instance_name; }
+	const std::string &canonical_instance_name() const { return m_canonical_instance_name; }
 	bool uses_file_extension(const char *file_extension) const;
 	const formatlist_type &formatlist() const { return m_formatlist; }
 
@@ -252,7 +244,7 @@ protected:
 
 	void clear_error();
 
-	void check_for_file() const { assert_always(m_file, "Illegal operation on unmounted image"); }
+	void check_for_file() const { if (!m_file) throw emu_fatalerror("%s(%s): Illegal operation on unmounted image", device().shortname(), device().tag()); }
 
 	void setup_working_directory();
 	bool try_change_working_directory(const std::string &subdir);

@@ -1135,148 +1135,138 @@ static GFXDECODE_START( gfx_srmp3 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(srmp2_state::srmp2)
-
+void srmp2_state::srmp2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(srmp2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
+	M68000(config, m_maincpu, 16000000/2);  /* 8.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::srmp2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq4_line_assert));
+	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60)); /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp2)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(464, 256-16)
-	MCFG_SCREEN_VISIBLE_AREA(16, 464-1, 8, 256-1-24)
-	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp2)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(464, 256-16);
+	screen.set_visarea(16, 464-1, 8, 256-1-24);
+	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp2));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp2)
-	MCFG_PALETTE_ADD("palette", 1024)   /* sprites only */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp2)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_srmp2);
+	PALETTE(config, "palette", FUNC(srmp2_state::srmp2_palette)).set_format(palette_device::xRGB_555, 1024); // sprites only
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 20000000/16)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 20000000/16));
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits  */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
-
-MACHINE_CONFIG_START(srmp2_state::srmp3)
-
+void srmp2_state::srmp3(machine_config &config)
+{
 	/* basic machine hardware */
-
-	MCFG_DEVICE_ADD("maincpu", Z80, 3500000)       /* 3.50 MHz ? */
-	//      4000000,                /* 4.00 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(srmp3_map)
-	MCFG_DEVICE_IO_MAP(srmp3_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state,  irq0_line_assert)
+	Z80(config, m_maincpu, 3500000);    /* 3.50 MHz? or 4.00 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::srmp3_map);
+	m_maincpu->set_addrmap(AS_IO, &srmp2_state::srmp3_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq0_line_assert));
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,srmp3)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
+	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(400, 256-16)
-	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 8, 256-1-24)
-	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_srmp3)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(400, 256-16);
+	screen.set_visarea(16, 400-1, 8, 256-1-24);
+	screen.set_screen_update(FUNC(srmp2_state::screen_update_srmp3));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
-	MCFG_PALETTE_ADD("palette", 512)    /* sprites only */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_PALETTE_INIT_OWNER(srmp2_state,srmp3)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_srmp3);
+	PALETTE(config, "palette", FUNC(srmp2_state::srmp3_palette)).set_format(palette_device::xRGB_555, 512); // sprites only
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 16000000/16));
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
-MACHINE_CONFIG_START(srmp2_state::rmgoldyh)
+void srmp2_state::rmgoldyh(machine_config &config)
+{
 	srmp3(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(rmgoldyh_map)
-	MCFG_DEVICE_IO_MAP(rmgoldyh_io_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::rmgoldyh_map);
+	m_maincpu->set_addrmap(AS_IO, &srmp2_state::rmgoldyh_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,rmgoldyh)
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(srmp2_state::mjyuugi)
-
+void srmp2_state::mjyuugi(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000,16000000/2)              /* 8.00 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mjyuugi_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", srmp2_state, irq4_line_assert)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(srmp2_state, irq2_line_assert, 15*60)      /* Interrupt times is not understood */
+	M68000(config, m_maincpu, 16000000/2);  /* 8.00 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &srmp2_state::mjyuugi_map);
+	m_maincpu->set_vblank_int("screen", FUNC(srmp2_state::irq4_line_assert));
+	m_maincpu->set_periodic_int(FUNC(srmp2_state::irq2_line_assert), attotime::from_hz(15*60)); /* Interrupt times is not understood */
 
 	MCFG_MACHINE_START_OVERRIDE(srmp2_state,mjyuugi)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
+	SETA001_SPRITE(config, m_seta001, 0);
+	m_seta001->set_gfxdecode_tag("gfxdecode");
+	m_seta001->set_gfxbank_callback(FUNC(srmp2_state::srmp3_gfxbank_callback), this);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(400, 256-16)
-	MCFG_SCREEN_VISIBLE_AREA(16, 400-1, 0, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(srmp2_state, screen_update_mjyuugi)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(400, 256-16);
+	screen.set_visarea(16, 400-1, 0, 256-1-16);
+	screen.set_screen_update(FUNC(srmp2_state::screen_update_mjyuugi));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_srmp3)
-	MCFG_PALETTE_ADD("palette", 512)            /* sprites only */
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_srmp3);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 512); // sprites only
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("aysnd", AY8910, 16000000/16)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW2"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	ay8910_device &aysnd(AY8910(config, "aysnd", 16000000/16));
+	aysnd.port_a_read_callback().set_ioport("DSW2");
+	aysnd.port_b_read_callback().set_ioport("DSW1");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	MCFG_DEVICE_ADD("msm", MSM5205, 384000)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, srmp2_state, adpcm_int))            /* IRQ handler */
-	MCFG_MSM5205_PRESCALER_SELECTOR(S48_4B)              /* 8 KHz, 4 Bits  */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm, 384000);
+	m_msm->vck_legacy_callback().set(FUNC(srmp2_state::adpcm_int)); /* IRQ handler */
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  /* 8 KHz, 4 Bits */
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.45);
+}
 
 
 

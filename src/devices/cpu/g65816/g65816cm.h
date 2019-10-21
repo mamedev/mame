@@ -117,16 +117,16 @@
 /* ======================================================================== */
 
 #define CLK_OP          1
-#define CLK_R8          m_rw8_cycles
-#define CLK_R16         m_rw16_cycles
-#define CLK_R24         m_rw24_cycles
-#define CLK_W8          m_rw8_cycles
-#define CLK_W16         m_rw16_cycles
-#define CLK_W24         m_rw24_cycles
-#define CLK_RMW8        m_rw8_cycles+m_rw8_cycles + 1
-#define CLK_RMW16       m_rw16_cycles+m_rw16_cycles + 1
+#define CLK_R8          1
+#define CLK_R16         2
+#define CLK_R24         3
+#define CLK_W8          1
+#define CLK_W16         2
+#define CLK_W24         3
+#define CLK_RMW8        3
+#define CLK_RMW16       5
 
-#define CLK_IMPLIED     1
+
 #define CLK_IMPLIED     1
 #define CLK_RELATIVE_8  1
 #define CLK_RELATIVE_16 2
@@ -169,7 +169,7 @@
 #define CLK_W_S         2
 #define CLK_W_SIY       5
 
-#define CLK(A)          CLOCKS -= A
+#define CLK(A)          CLOCKS -= ((A)*(m_divider))
 #define CLK_BUS(A)      CLOCKS -= A
 #define USE_ALL_CLKS()  CLOCKS = 0
 

@@ -68,7 +68,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
-	return (m_ym2151->status_r(space, 0) & ~0x30) | ioport("IN0")->read();
+	return (m_ym2151->status_r() & ~0x30) | ioport("IN0")->read();
 }
 
 void amspdwy_state::amspdwy_map(address_map &map)
@@ -78,7 +78,7 @@ void amspdwy_state::amspdwy_map(address_map &map)
 	map(0x9000, 0x93ff).mirror(0x0400).ram().w(FUNC(amspdwy_state::amspdwy_videoram_w)).share("videoram");
 	map(0x9800, 0x9bff).ram().w(FUNC(amspdwy_state::amspdwy_colorram_w)).share("colorram");
 	map(0x9c00, 0x9fff).ram(); // unused?
-//  AM_RANGE(0xa000, 0xa000) AM_WRITENOP // ?
+//  map(0xa000, 0xa000).nopw(); // ?
 	map(0xa000, 0xa000).portr("DSW1");
 	map(0xa400, 0xa400).portr("DSW2").w(FUNC(amspdwy_state::amspdwy_flipscreen_w));
 	map(0xa800, 0xa800).r(FUNC(amspdwy_state::amspdwy_wheel_0_r));
@@ -107,7 +107,7 @@ void amspdwy_state::amspdwy_portmap(address_map &map)
 void amspdwy_state::amspdwy_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-//  AM_RANGE(0x8000, 0x8000) AM_WRITENOP // ? writes 0 at start
+//  map(0x8000, 0x8000).nopw(); // ? writes 0 at start
 	map(0x9000, 0x9000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xa000, 0xa001).rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xc000, 0xdfff).ram();
@@ -247,44 +247,43 @@ void amspdwy_state::machine_reset()
 	m_wheel_return[1] = 0;
 }
 
-MACHINE_CONFIG_START(amspdwy_state::amspdwy)
-
+void amspdwy_state::amspdwy(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 3000000)
-	MCFG_DEVICE_PROGRAM_MAP(amspdwy_map)
-	MCFG_DEVICE_IO_MAP(amspdwy_portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", amspdwy_state, irq0_line_hold) /* IRQ: 60Hz, NMI: retn */
+	Z80(config, m_maincpu, 3000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &amspdwy_state::amspdwy_map);
+	m_maincpu->set_addrmap(AS_IO, &amspdwy_state::amspdwy_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(amspdwy_state::irq0_line_hold)); /* IRQ: 60Hz, NMI: retn */
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 3000000)
-	MCFG_DEVICE_PROGRAM_MAP(amspdwy_sound_map)
+	Z80(config, m_audiocpu, 3000000);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &amspdwy_state::amspdwy_sound_map);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(amspdwy_state, screen_update_amspdwy)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 0+16, 256-16-1);
+	m_screen->set_screen_update(FUNC(amspdwy_state::screen_update_amspdwy));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_amspdwy)
-	MCFG_PALETTE_ADD("palette", 32)
-	MCFG_PALETTE_FORMAT(BBGGGRRR_inverted)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_amspdwy);
+	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2151, 3000000)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	YM2151(config, m_ym2151, 3000000);
+	m_ym2151->irq_handler().set_inputline(m_audiocpu, 0);
+	m_ym2151->add_route(0, "lspeaker", 1.0);
+	m_ym2151->add_route(1, "rspeaker", 1.0);
+}
 
 
 

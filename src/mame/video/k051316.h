@@ -5,25 +5,11 @@
 
 #pragma once
 
+#include "tilemap.h"
+
 
 typedef device_delegate<void (int *code, int *color, int *flags)> k051316_cb_delegate;
 #define K051316_CB_MEMBER(_name)   void _name(int *code, int *color, int *flags)
-
-
-#define MCFG_K051316_CB(_class, _method) \
-	downcast<k051316_device &>(*device).set_k051316_callback(k051316_cb_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define MCFG_K051316_OFFSETS(_xoffs, _yoffs) \
-	downcast<k051316_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_K051316_BPP(_bpp) \
-	downcast<k051316_device &>(*device).set_bpp(_bpp);
-
-#define MCFG_K051316_LAYER_MASK(_mask) \
-	downcast<k051316_device &>(*device).set_layermask(_mask);
-
-#define MCFG_K051316_WRAP(_wrap) \
-	downcast<k051316_device &>(*device).set_wrap(_wrap);
 
 
 class k051316_device : public device_t, public device_gfx_interface
@@ -40,7 +26,7 @@ public:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo4_ram);
 
 	// configuration
-	void set_k051316_callback(k051316_cb_delegate callback) { m_k051316_cb = callback; }
+	template <typename... T> void set_zoom_callback(T &&... args) { m_k051316_cb = k051316_cb_delegate(std::forward<T>(args)...); }
 	void set_wrap(int wrap) { m_wrap = wrap; }
 	void set_bpp(int bpp);
 	void set_layermask(int mask) { m_layermask = mask; }
@@ -62,10 +48,10 @@ public:
 	  structure (e.g. TILE_FLIPX)
 	*/
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-	DECLARE_READ8_MEMBER( rom_r );
-	DECLARE_WRITE8_MEMBER( ctrl_w );
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+	u8 rom_r(offs_t offset);
+	void ctrl_w(offs_t offset, u8 data);
 	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint32_t priority);
 	void wraparound_enable(int status);
 

@@ -199,12 +199,12 @@ inline void mc6846_device::timer_launch()
 		m_cto = 0;
 		break;
 
-	case 0x20: /* single-shot */
-		m_cto = 0;
-		m_one_shot->reset(clocks_to_attotime(FACTOR));
+	case 0x20:  /* cascaded single-shot */
 		break;
 
-	case 0x30:  /* cascaded single-shot */
+	case 0x30: /* single-shot */
+		m_cto = 0;
+		m_one_shot->reset(clocks_to_attotime(FACTOR));
 		break;
 
 	default:
@@ -245,12 +245,12 @@ TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
 		m_cto = 1 ^ m_cto;
 		break;
 
-	case 0x20: /* single-shot */
-		m_cto = 0;
+	case 0x20:  /* cascaded single-shot */
+		m_cto = ( m_tcr & 0x80 ) ? 1 : 0;
 		break;
 
-	case 0x30:  /* cascaded single-shot */
-		m_cto = ( m_tcr & 0x80 ) ? 1 : 0;
+	case 0x30: /* single-shot */
+		m_cto = 0;
 		break;
 
 	default:
@@ -439,14 +439,14 @@ WRITE8_MEMBER(mc6846_device::write)
 	{
 		static const char *const mode[8] =
 			{
-				"continuous", "cascaded", "continuous", "one-shot",
-				"freq-cmp", "freq-cmp", "pulse-cmp", "pulse-cmp"
+				"continuous", "freq-cmp", "continuous", "pulse-cmp",
+				"cascaded", "freq-cmp", "one-shot", "pulse-cmp"
 			};
 		LOG( "%s %f: mc6846 TCR write $%02X reset=%i clock=%s scale=%i mode=%s out=%s\n",
 				machine().describe_context(), machine().time().as_double(), data,
-				(data >> 7) & 1, (data & 0x40) ? "extern" : "sys",
-				(data & 0x40) ? 1 : 8, mode[ (data >> 1) & 7 ],
-				(data & 1) ? "enabled" : "0" );
+				data & 1, (data & 2) ? "sys" : "extern",
+				(data & 4) ? 8 : 1, mode[ (data >> 3) & 7 ],
+				(data & 0x80) ? "enabled" : "0" );
 
 		m_tcr = data;
 		if ( m_tcr & 1 )
@@ -454,7 +454,7 @@ WRITE8_MEMBER(mc6846_device::write)
 			/* timer preset = initialization without launch */
 			m_preset = m_latch;
 			m_csr &= ~1;
-			if ( MODE != 0x30 )
+			if ( MODE != 0x20 )
 				m_cto = 0;
 			update_cto();
 			m_interval->reset();

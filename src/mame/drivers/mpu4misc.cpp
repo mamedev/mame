@@ -144,7 +144,6 @@ ROM_END
 
 #define M4DCRLS_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "dcr_sounds.bin", 0x0000, 0x09664e, CRC(431cecbc) SHA1(b564ae8d083fef84328526192626a220e979d5ad) ) /* intelhex */ \
 	ROM_LOAD( "71000110.bin", 0x0000, 0x080000, CRC(0373a197) SHA1(b32bf521e36b5a53170d3a6ec545ce8db3a5094d) )
 
 #undef GAME_CUSTOM
@@ -180,8 +179,6 @@ GAME_CUSTOM( 199?, m4dcrls__r,      m4dcrls,    "dcr_data_340.bin",             
 
 #define M4JUNGJK_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "71000080.lo.hex", 0x0000, 0x134084, CRC(f3866082) SHA1(f33f6d7e078d7072cc7c67672b3afa3e90e1f805) ) \
-	ROM_LOAD( "71000080.hi.hex", 0x0000, 0x12680f, CRC(2a9db1df) SHA1(73823c3db5c68068dadf6d9b4c93b47c0cf13bd3) ) \
 	ROM_LOAD( "71000080.p1", 0x000000, 0x080000, CRC(b39d5e03) SHA1(94c9208601ea230463b460f5b6ea668363d239f4) ) \
 	ROM_LOAD( "71000080.p2", 0x080000, 0x080000, CRC(ad6da9af) SHA1(9ec8c8fd7b9bcd1d4c6ed93726fafe9a50a15894) )
 
@@ -207,8 +204,7 @@ GAME_CUSTOM( 199?, m4jungjk__e,    m4jungjk,   "jungle.p1",                    0
 
 #define M4RHNOTE_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "71000120.hex", 0x0000, 0x112961, CRC(5eb5245e) SHA1(449b02baf56e5798f656d9aee497b88d34f562cc) ) \
-	ROM_LOAD( "rhnsnd.bin", 0x0000, 0x080000, CRC(e03eaa43) SHA1(69117021adc1a8968d50703336147a7344c62100) )
+	ROM_LOAD( "rhnsnd.bin", 0x0000, 0x080000, CRC(e03eaa43) SHA1(69117021adc1a8968d50703336147a7344c62100) ) // = 70000120.hex
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -246,9 +242,9 @@ GAME_CUSTOM( 199?, m4rhnote__x,    m4rhnote,   "rhn_std_110.bin",              0
 GAME_CUSTOM( 199?, m4rhnote__y,    m4rhnote,   "rhn_std_110_lv.bin",           0x0000, 0x040000, CRC(922b8196) SHA1(6fdbf301aaadacaeabf29ad11c67b22122954051), "Qps","Red Hot Notes (Qps) (MPU4) (set 26)" )
 
 #define M4RHROCK_EXTRA_ROMS \
-	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) /* intelhex, needs converting */ \
-	ROM_LOAD( "71000200.hi.hex", 0x0000, 0x0ff0f8, CRC(998e28ea) SHA1(f54a69af16e05119df2697bc01e548ac51ed3e11) ) \
-	ROM_LOAD( "71000200.lo.hex", 0x0000, 0x134084, CRC(ccd0b35f) SHA1(6d3ef65577a46c68f8628675d146f829c9a99659) )
+	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) /* 71000200.hi padded with 0xff as original IntelHex was undersize */ \
+	ROM_LOAD( "71000200.hi", 0x0000, 0x80000, CRC(3054ff83) SHA1(241ab9b634c83d5b388eff2d598e7897aa7dd703) ) \
+	ROM_LOAD( "71000200.lo", 0x0000, 0x80000, CRC(b426e83f) SHA1(c30b3868f2c6a4f84a678e2c5151861619b27905) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
@@ -264,13 +260,12 @@ GAME_CUSTOM( 199?, m4rhrock,       0,          "rhr_v200_1625_da8c_nlv.bin", 0x0
 GAME_CUSTOM( 199?, m4rhrock__a,    m4rhrock,   "rhr_v300_1216_ce52_nlv.bin", 0x0000, 0x040000, CRC(86b0d683) SHA1(c6553bf65c055c4f911c215ba112eaa672357290), "Qps","Red Hot Rocks (Qps) (MPU4) (set 2)" )
 
 
-
+// 71000180.lo.hex and  71000180.hi.hex converted
 #define M4RHWHL_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "71000180.hi.hex", 0x0000, 0x04da98, CRC(0ffa11a5) SHA1(a3f8eb00b6771cb49965a717e27d0b544c6b2f4f) ) \
-	ROM_LOAD( "71000180.lo.hex", 0x0000, 0x134084, CRC(6dfc7474) SHA1(806b4b8ca5fa868581b4bf33080b9c486ce71bb6) ) \
 	ROM_LOAD( "redhotwheelssnd.p1", 0x0000, 0x080000, CRC(7b274a71) SHA1(38ba69084819133253b41f2eb1d784104e5f10f7) ) \
 	ROM_LOAD( "redhotwheelssnd.p2", 0x0000, 0x080000, CRC(e36e19e2) SHA1(204554622c9020479b095acd4fbab1f21f829137) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -315,6 +310,7 @@ GAME_CUSTOM( 199?, m4rdeal__i,  m4rdeal,    "70001745.bin", 0x0000, 0x080000, CR
 	ROM_LOAD( "snrsnd.p1", 0x000000, 0x080000, CRC(985c7c8c) SHA1(d2740ff6192c21af3a8a8a9a92b6fd604b40e9d1) ) \
 	ROM_LOAD( "snrsnd.p2", 0x080000, 0x080000, CRC(6a3a57ce) SHA1(3aaa0a761e17a2a14196cb023b10a49b44ba1046) ) \
 	ROM_LOAD( "shock.s2", 0x080000, 0x080000, CRC(10e9912f) SHA1(833d2b125bf30bdb8de71f6c9d8a9fe92701f741) ) /* alt snd2 */
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -329,12 +325,12 @@ GAME_CUSTOM( 199?, m4shoknr__a,    m4shoknr,   "snr_v300_1221_c8ff_nlv.bin",   0
 GAME_CUSTOM( 199?, m4shoknr__b,    m4shoknr,   "snr_v200_1145_047f_lv.bin",    0x0000, 0x040000, CRC(73ef1e1a) SHA1(6ccaf64daa5acacfba4df576281bb5478f2fbd29), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 3)" )
 GAME_CUSTOM( 199?, m4shoknr__c,    m4shoknr,   "snr_v200_1655_5a69_nlv.bin",   0x0000, 0x040000, CRC(50ba0c6b) SHA1(767fd59858fc55ae95f096f00c54bd619369a56c), "Qps","Shock 'n' Roll (Qps) (MPU4) (set 4)" )
 
+// 71000300.lo.hex and 71000300.hi.hex converted
 #define M4TORNAD_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "71000300.hi.hex", 0x0000, 0x0be342, CRC(f9021a32) SHA1(4bd7d7306385ef37dd9cbb5085dbc104657abc0e) ) \
-	ROM_LOAD( "71000300.lo.hex", 0x0000, 0x134084, CRC(af34658d) SHA1(63a6db1f5ed00fa6208c63e0a2211ba2afe0e9a1) ) \
-	ROM_LOAD( "tornadosnd.p1", 0x0000, 0x080000, CRC(cac88f25) SHA1(6ccbf372d983a47a49caedb8a526fc7703b31ed4) ) \
+	ROM_LOAD( "tornadosnd.p1", 0x000000, 0x080000, CRC(cac88f25) SHA1(6ccbf372d983a47a49caedb8a526fc7703b31ed4) ) \
 	ROM_LOAD( "tornadosnd.p2", 0x080000, 0x080000, CRC(ef4f563d) SHA1(1268061edd93474296e3454e0a2e706b90c0621c) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -353,13 +349,12 @@ GAME_CUSTOM( 199?, m4tornad__e,    m4tornad,   "torn_v200_1617_ece9_lv.bin",    
 GAME_CUSTOM( 199?, m4tornad__f,    m4tornad,   "tornsp_v200_1623_eee3_nlv.bin",    0x0000, 0x040000, CRC(6b4f8baf) SHA1(fea21f43b3bbc1c969a7426ca956898e3680823f), "Qps","Tornado (Qps) (MPU4) (set 7)" )
 GAME_CUSTOM( 199?, m4tornad__g,    m4tornad,   "tornsp_v200_1626_ec93_lv.bin",     0x0000, 0x040000, CRC(9e18327f) SHA1(7682cd172903cd5c26873306e70394c154e66c30), "Qps","Tornado (Qps) (MPU4) (set 8)" )
 
-
+//=71000250.lo.hex and hi.hex converted
 #define M4SHKWAV_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "71000250.hi.hex", 0x0000, 0x0c852b, CRC(e3a857c7) SHA1(66619b7926ae7df970045fffd7e20763abfe14a4) ) \
-	ROM_LOAD( "71000250.lo.hex", 0x0000, 0x134084, CRC(46758bc5) SHA1(18d02960580646b276e7a6aabdeb4ca449ec5ea0) ) \
 	ROM_LOAD( "shocksnd.p1", 0x000000, 0x080000, CRC(54bf0ddb) SHA1(693b855367972b5a45e9d2d6152849ab2cde38a7) ) \
 	ROM_LOAD( "shocksnd.p2", 0x080000, 0x080000, CRC(facebc55) SHA1(75367473646cfc735f4d1267e13a9c92ea19c4e3) )
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \
@@ -386,10 +381,9 @@ GAME_CUSTOM( 199?, m4shkwav__g,    m4shkwav,   "swsp_v300_1606_ded8_lv.bin",    
 
 #define M4CLAB_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "msm6376", ROMREGION_ERASE00 ) \
-	ROM_LOAD( "71000010.lo", 0x0000, 0x134084, CRC(c39bbae4) SHA1(eee333376612a96a4c344729a96cc60c217bfde3) ) \
-	ROM_LOAD( "71000010.hi", 0x0000, 0x091c0b, CRC(d0d3cb4f) SHA1(eaacf9ed3a6b6dcda8e1a3edbc3a9a2a51ffcbd8) ) \
-	ROM_LOAD( "clab_snd1_c8a6.bin", 0x0000, 0x080000, CRC(cf9de981) SHA1(e5c73e9b9db9ac512602c2dd586ca5cf65f98bc1) ) \
-	ROM_LOAD( "clab_snd2_517a.bin", 0x080000, 0x080000, CRC(d4eb949e) SHA1(0ebbd1b5e3c86da94f35c69d9d60e36844cc4d7e) )
+	ROM_LOAD( "clab_snd1_c8a6.bin", 0x000000, 0x080000, CRC(cf9de981) SHA1(e5c73e9b9db9ac512602c2dd586ca5cf65f98bc1) ) \
+	ROM_LOAD( "clab_snd2_517a.bin", 0x080000, 0x080000, CRC(d4eb949e) SHA1(0ebbd1b5e3c86da94f35c69d9d60e36844cc4d7e) ) //71000010
+
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \
 	ROM_START( setname ) \

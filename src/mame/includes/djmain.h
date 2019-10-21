@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
+#ifndef MAME_INCLUDES_DJMAIN_H
+#define MAME_INCLUDES_DJMAIN_H
+
+#pragma once
+
 #include "machine/ataintf.h"
 #include "video/konami_helper.h"
 #include "video/k054156_k054157_k056832.h"
@@ -18,7 +23,7 @@ public:
 		, m_ata(*this, "ata")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
-		, m_turntable(*this, {"TT1", "TT2"})
+		, m_turntable(*this, "TT%u", 1U)
 		, m_sndram(*this, "sndram")
 		, m_leds(*this, "led%u", 0U)
 	{
@@ -96,3 +101,5 @@ private:
 	const uint8_t *m_ata_user_password;
 	const uint8_t *m_ata_master_password;
 };
+
+#endif // MAME_INCLUDES_DJMAIN_H

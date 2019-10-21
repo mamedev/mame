@@ -101,7 +101,7 @@ const g65816_disassembler::opcode_struct g65816_disassembler::s_opcodes[256] =
 	{op::BIT, M, DX  }, {op::AND, M, DX  }, {op::ROL, M, DX  }, {op::AND, M, DLIY},
 	{op::SEC, I, IMP }, {op::AND, M, AY  }, {op::DEA, I, IMP }, {op::TSC, I, IMP },
 	{op::BIT, M, AX  }, {op::AND, M, AX  }, {op::ROL, M, AX  }, {op::AND, M, ALX },
-	{op::RTI, I, IMP }, {op::EOR, M, DXI }, {op::WDM, I, IMP }, {op::EOR, M, S   },
+	{op::RTI, I, IMP }, {op::EOR, M, DXI }, {op::WDM, I, SIG }, {op::EOR, M, S   },
 	{op::MVP, I, MVP }, {op::EOR, M, D   }, {op::LSR, M, D   }, {op::EOR, M, DLI },
 	{op::PHA, I, IMP }, {op::EOR, M, IMM }, {op::LSR, M, ACC }, {op::PHK, I, IMP },
 	{op::JMP, I, A   }, {op::EOR, M, A   }, {op::LSR, M, A   }, {op::EOR, M, AL  },

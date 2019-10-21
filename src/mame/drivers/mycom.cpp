@@ -37,8 +37,6 @@
       toggles between English and Kana.
 
     TODO/info:
-    - Sound not working. The info makes its way to the audio chip but for
-      some unknown reason, nothing is heard.
     - FDC, little info, guessing (143kb, single sided, 525sd)
     - Cassette doesn't load
     - Printer
@@ -46,17 +44,30 @@
     - Keyboard autorepeat
     - Need software
 
+    Basic:
+    - To enter Basic, type BASIC. To quit, type EXIT.
+
+    Cassette:
+    - Bios 0: you can SAVE and LOAD from the monitor, but not from Basic. (see ToDo)
+    - Bios 1: Doesn't seem to be supported.
+
+    Sound:
+    - Bios 0: Sound is initialised with the volume turned off. In Basic, you
+              can POKE 4382,144 to enable sound.
+    - Bios 1: Doesn't appear to support sound. The included Basic has a SOUND
+              command (e.g SOUND 127,80), but no sound is heard.
+
 *******************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
 #include "sound/sn76496.h"
-#include "sound/wave.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -410,7 +421,7 @@ WRITE8_MEMBER( mycom_state::mycom_0a_w )
 		m_cass->output( BIT(data, 2) ? -1.0 : +1.0);
 
 	if ( (BIT(data, 7)) != (BIT(m_0a, 7)) )
-		m_crtc->set_clock(BIT(data, 7) ? 1008000 : 2016000);
+		m_crtc->set_unscaled_clock(BIT(data, 7) ? 1008000 : 2016000);
 
 	m_0a = data;
 
@@ -507,64 +518,61 @@ void mycom_state::init_mycom()
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
-MACHINE_CONFIG_START(mycom_state::mycom)
+void mycom_state::mycom(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, 10_MHz_XTAL / 4)
-	MCFG_DEVICE_PROGRAM_MAP(mycom_map)
-	MCFG_DEVICE_IO_MAP(mycom_io)
+	Z80(config, m_maincpu, 10_MHz_XTAL / 4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mycom_state::mycom_map);
+	m_maincpu->set_addrmap(AS_IO, &mycom_state::mycom_io);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, mycom_state, mycom_04_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(*this, mycom_state, mycom_05_r))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, mycom_state, mycom_06_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_06_w))
+	I8255(config, m_ppi0);
+	m_ppi0->out_pa_callback().set(FUNC(mycom_state::mycom_04_w));
+	m_ppi0->in_pb_callback().set(FUNC(mycom_state::mycom_05_r));
+	m_ppi0->in_pc_callback().set(FUNC(mycom_state::mycom_06_r));
+	m_ppi0->out_pc_callback().set(FUNC(mycom_state::mycom_06_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, mycom_state, mycom_08_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_0a_w))
+	I8255(config, m_ppi1);
+	m_ppi1->in_pa_callback().set(FUNC(mycom_state::mycom_08_r));
+	m_ppi1->out_pc_callback().set(FUNC(mycom_state::mycom_0a_w));
 
-	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTB_CB(READ8("rtc", msm5832_device, data_r))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8("rtc", msm5832_device, data_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, mycom_state, mycom_rtc_w))
+	I8255(config, m_ppi2);
+	m_ppi2->in_pb_callback().set(m_rtc, FUNC(msm5832_device::data_r));
+	m_ppi2->out_pb_callback().set(m_rtc, FUNC(msm5832_device::data_w));
+	m_ppi2->out_pc_callback().set(FUNC(mycom_state::mycom_rtc_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 192-1)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mycom)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 320-1, 0, 192-1);
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_mycom);
 
 	/* Manual states clock is 1.008mhz for 40 cols, and 2.016 mhz for 80 cols.
-	The CRTC is a HD46505S - same as a 6845. The start registers need to be readable. */
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1008000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(mycom_state, crtc_update_row)
+	The manual states the CRTC is a HD46505S (apparently same as HD6845S). The start registers need to be readable. */
+	HD6845S(config, m_crtc, 1008000);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(mycom_state::crtc_update_row), this);
 
 	SPEAKER(config, "mono").front_center();
-
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-
-	MCFG_DEVICE_ADD("sn1", SN76489, 10_MHz_XTAL / 4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
+	SN76489(config, m_audio, 10_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.50);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("rtc", MSM5832, 32.768_kHz_XTAL)
+	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
-	MCFG_CASSETTE_ADD("cassette")
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	MCFG_DEVICE_ADD("fdc", FD1771, 16_MHz_XTAL / 16)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_SOUND(true)
+	FD1771(config, m_fdc, 16_MHz_XTAL / 16);
+	FLOPPY_CONNECTOR(config, "fdc:0", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mycom_floppies, "525sd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard_timer", mycom_state, mycom_kbd, attotime::from_hz(20))
-MACHINE_CONFIG_END
+	TIMER(config, "keyboard_timer").configure_periodic(FUNC(mycom_state::mycom_kbd), attotime::from_hz(20));
+}
 
 /* ROM definition */
 ROM_START( mycom )
@@ -589,4 +597,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                      FULLNAME      FLAGS
-COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1981, mycom, 0,      0,      mycom,   mycom, mycom_state, init_mycom, "Japan Electronics College", "MYCOMZ-80A", MACHINE_NOT_WORKING )

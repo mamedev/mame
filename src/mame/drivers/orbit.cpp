@@ -265,16 +265,16 @@ void orbit_state::machine_reset()
  *
  *************************************/
 
-MACHINE_CONFIG_START(orbit_state::orbit)
-
+void orbit_state::orbit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, M6800, MASTER_CLOCK / 16)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", orbit_state, interrupt)
+	M6800(config, m_maincpu, MASTER_CLOCK / 16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &orbit_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(orbit_state::interrupt));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
+	TIMER(config, "32v").configure_scanline(FUNC(orbit_state::nmi_32v), "screen", 0, 32);
 
-	MCFG_DEVICE_ADD(m_latch, F9334, 0) // M6
+	F9334(config, m_latch); // M6
 	/* BIT0 => UNUSED       */
 	/* BIT1 => LOCKOUT      */
 	/* BIT2 => NMI ENABLE   */
@@ -283,31 +283,31 @@ MACHINE_CONFIG_START(orbit_state::orbit)
 	/* BIT5 => PANEL STROBE */
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, orbit_state, coin_lockout_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(OUTPUT("led0"))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(OUTPUT("led1"))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(m_discrete, discrete_device, write_line<ORBIT_WARNING_EN>))
+	m_latch->q_out_cb<1>().set(FUNC(orbit_state::coin_lockout_w));
+	m_latch->q_out_cb<3>().set_output("led0");
+	m_latch->q_out_cb<6>().set_output("led1");
+	m_latch->q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<ORBIT_WARNING_EN>));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD(m_screen, RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2)
-	MCFG_SCREEN_UPDATE_DRIVER(orbit_state, screen_update)
-	MCFG_SCREEN_PALETTE(m_palette)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_CLOCK*2, 384*2, 0, 256*2, 261*2, 0, 240*2);
+	m_screen->set_screen_update(FUNC(orbit_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_orbit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_orbit);
 
-	MCFG_PALETTE_ADD_MONOCHROME(m_palette)
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD(m_discrete, DISCRETE, orbit_discrete)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, orbit_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
+}
 
 
 

@@ -18,31 +18,31 @@
 		<part name="cass1" interface="sc499_cass">
 			<feature name="part_id" value="Tape 1 (CRTG_STD_SFW_BOOT_1)"/>
 			<dataarea name="ctape" size="53678592">
-				<rom name="019593-001.crtg_std_sfw_boot_1.ct" size="53678592" crc="cf1b4813" sha1="4b7e64153b3046da25cef0e2115553611d57929e" offset="0" />
+				<rom name="019593-001.crtg_std_sfw_boot_1.ct" size="53678592" crc="cf1b4813" sha1="4b7e64153b3046da25cef0e2115553611d57929e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sc499_cass">
 			<feature name="part_id" value="Tape 2 (CRTG_STD_SFW_1)"/>
 			<dataarea name="ctape" size="58403328">
-				<rom name="019594-001.crtg_std_sfw_1.ct" size="58403328" crc="3335f0c9" sha1="94ce5ea3f9d075df7952793254ef067b92df79a6" offset="0" />
+				<rom name="019594-001.crtg_std_sfw_1.ct" size="58403328" crc="3335f0c9" sha1="94ce5ea3f9d075df7952793254ef067b92df79a6"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sc499_cass">
 			<feature name="part_id" value="Tape 3 (CRTG_STD_SFW_2)"/>
 			<dataarea name="ctape" size="61564928">
-				<rom name="019594-002.crtg_std_sfw_2.ct" size="61564928" crc="39d0647a" sha1="6cde13fae598574b4f5ad0fc4dbb33ea1902ff6e" offset="0" />
+				<rom name="019594-002.crtg_std_sfw_2.ct" size="61564928" crc="39d0647a" sha1="6cde13fae598574b4f5ad0fc4dbb33ea1902ff6e"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sc499_cass">
 			<feature name="part_id" value="Tape 4 (CRTG_STD_SFW_3)"/>
 			<dataarea name="ctape" size="56568320">
-				<rom name="019594-003.crtg_std_sfw_3.ct" size="56568320" crc="e9e76b3f" sha1="24fe96a22c975e9c7fcbbf0daad89277a467fae3" offset="0" />
+				<rom name="019594-003.crtg_std_sfw_3.ct" size="56568320" crc="e9e76b3f" sha1="24fe96a22c975e9c7fcbbf0daad89277a467fae3"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sc499_cass">
 			<feature name="part_id" value="Tape 5 (CRTG_STD_SFW_4)"/>
 			<dataarea name="ctape" size="57844224">
-				<rom name="019594-004.crtg_std_sfw_4.ct" size="57844224" crc="88d4a0eb" sha1="a3b4eb922182302e350f475b8e5c39a79503c4e3" offset="0" />
+				<rom name="019594-004.crtg_std_sfw_4.ct" size="57844224" crc="88d4a0eb" sha1="a3b4eb922182302e350f475b8e5c39a79503c4e3"/>
 			</dataarea>
 		</part>
 	</software>

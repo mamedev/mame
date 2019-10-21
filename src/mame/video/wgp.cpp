@@ -5,40 +5,27 @@
 #include "screen.h"
 
 
+// reference : https://www.youtube.com/watch?v=Sb3I3eQQvcU
 /*******************************************************************/
 
-inline void wgp_state::common_get_piv_tile_info(tile_data &tileinfo, int tile_index, int num)
+template<unsigned Offset>
+TILE_GET_INFO_MEMBER(wgp_state::get_piv_tile_info)
 {
-	uint16_t tilenum = m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
-	uint16_t attr = m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
+	const u16 tilenum = m_pivram[tile_index + Offset];    /* 3 blocks of $2000 */
+	const u16 attr = m_pivram[tile_index + Offset + 0x8000];  /* 3 blocks of $2000 */
 
-	SET_TILE_INFO_MEMBER(2,
+	SET_TILE_INFO_MEMBER(1,
 			tilenum & 0x3fff,
 			(attr & 0x3f),  /* attr & 0x1 ?? */
-			TILE_FLIPYX( (attr & 0xc0) >> 6));
-}
-
-TILE_GET_INFO_MEMBER(wgp_state::get_piv0_tile_info)
-{
-	common_get_piv_tile_info(tileinfo, tile_index, 0);
-}
-
-TILE_GET_INFO_MEMBER(wgp_state::get_piv1_tile_info)
-{
-	common_get_piv_tile_info(tileinfo, tile_index, 1);
-}
-
-TILE_GET_INFO_MEMBER(wgp_state::get_piv2_tile_info)
-{
-	common_get_piv_tile_info(tileinfo, tile_index, 2);
+			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
 
 void wgp_state::core_vh_start(int piv_xoffs, int piv_yoffs)
 {
-	m_piv_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_piv_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_piv_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv_tile_info<0x0000>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv_tile_info<0x1000>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wgp_state::get_piv_tile_info<0x2000>),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_piv_xoffs = piv_xoffs;
 	m_piv_yoffs = piv_yoffs;
@@ -120,7 +107,7 @@ custom chip capable of four rather than three tilemaps.)
 
 *******************************************************************/
 
-WRITE16_MEMBER(wgp_state::pivram_word_w)
+void wgp_state::pivram_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_pivram[offset]);
 
@@ -138,9 +125,9 @@ WRITE16_MEMBER(wgp_state::pivram_word_w)
 	}
 }
 
-WRITE16_MEMBER(wgp_state::piv_ctrl_word_w)
+void wgp_state::piv_ctrl_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t a, b;
+	u16 a, b;
 
 	COMBINE_DATA(&m_piv_ctrlram[offset]);
 	data = m_piv_ctrlram[offset];
@@ -317,13 +304,13 @@ Memory Map
    structure for each big sprite: the hardware is probably
    constructing each 4x4 sprite from 4 2x2 sprites... */
 
-static const uint8_t xlookup[16] =
+static const u8 xlookup[16] =
 	{ 0, 1, 0, 1,
 		2, 3, 2, 3,
 		0, 1, 0, 1,
 		2, 3, 2, 3 };
 
-static const uint8_t ylookup[16] =
+static const u8 ylookup[16] =
 	{ 0, 0, 1, 1,
 		0, 0, 1, 1,
 		2, 2, 3, 3,
@@ -331,44 +318,39 @@ static const uint8_t ylookup[16] =
 
 void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint16_t *spriteram = m_spriteram;
-	int offs, i, j, k;
-	int x, y, curx, cury;
-	int zx, zy, zoomx, zoomy, priority = 0;
-	uint8_t small_sprite, col, flipx, flipy;
-	uint16_t code, bigsprite, map_index;
-//  uint16_t rotate = 0;
-	uint16_t tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
-	static const int primasks[2] = {0x0, 0xfffc};   /* fff0 => under rhs of road only */
+	int i, j, k;
+//  u16 rotate = 0;
+	const u32 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
+	static const u32 primasks[2] = {0x0, 0xfffc};   /* fff0 => under rhs of road only */
 
-	for (offs = 0x1ff; offs >= 0; offs--)
+	for (int offs = 0x1ff; offs >= 0; offs--)
 	{
-		code = (spriteram[0xe00 + offs]);
+		const int code = (m_spriteram[0xe00 + offs]);
 
 		if (code)   /* do we have an active sprite ? */
 		{
 			i = (code << 3) & 0xfff;    /* yes, so we look up its sprite entry */
 
-			x = spriteram[i];
-			y = spriteram[i + 1];
-			bigsprite = spriteram[i + 2] & 0x3fff;
+			int x = m_spriteram[i];
+			int y = m_spriteram[i + 1];
+			const int bigsprite = m_spriteram[i + 2] & 0x3fff;
 
 			/* The last five words [i + 3 through 7] must be zoom/rotation
 			   control: for time being we kludge zoom using 1 word.
 			   Timing problems are causing many glitches. */
 
-			if ((spriteram[i + 4] == 0xfff6) && (spriteram[i + 5] == 0))
+			if ((m_spriteram[i + 4] == 0xfff6) && (m_spriteram[i + 5] == 0))
 				continue;
 
-//          if (((spriteram[i + 4] != 0xf800) && (spriteram[i + 4] != 0xfff6))
-//              || ((spriteram[i + 5] != 0xf800) && (spriteram[i + 5] != 0))
-//              || spriteram[i + 7] != 0)
+//          if (((m_spriteram[i + 4] != 0xf800) && (m_spriteram[i + 4] != 0xfff6))
+//              || ((m_spriteram[i + 5] != 0xf800) && (m_spriteram[i + 5] != 0))
+//              || m_spriteram[i + 7] != 0)
 //              rotate = i << 1;
 
 			/***** Begin zoom kludge ******/
 
-			zoomx = (spriteram[i + 3] & 0x1ff) + 1;
-			zoomy = (spriteram[i + 3] & 0x1ff) + 1;
+			const int zoomx = (m_spriteram[i + 3] & 0x1ff) + 1;
+			const int zoomy = (m_spriteram[i + 3] & 0x1ff) + 1;
 
 			y -= 4;
 			// distant sprites were some 16 pixels too far down //
@@ -380,38 +362,38 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
-			map_index = bigsprite << 1; /* now we access sprite tilemap */
+			const int map_index = bigsprite << 1; /* now we access sprite tilemap */
 
 			/* don't know what selects 2x2 sprites: we use a nasty kludge which seems to work */
 
 			i = m_spritemap[map_index + 0xa];
 			j = m_spritemap[map_index + 0xc];
-			small_sprite = ((i > 0) & (i <= 8) & (j > 0) & (j <= 8));
+			const bool small_sprite = ((i > 0) & (i <= 8) & (j > 0) & (j <= 8));
 
 			if (small_sprite)
 			{
 				for (i = 0; i < 4; i++)
 				{
-					code = m_spritemap[(map_index + (i << 1))] & tile_mask;
-					col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
+					const u32 tile = m_spritemap[(map_index + (i << 1))] & tile_mask;
+					const u32 col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
 
 					/* not known what controls priority */
-					priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
+					const int priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
 
-					flipx = 0;  // no flip xy?
-					flipy = 0;
+					int flipx = 0;  // no flip xy?
+					int flipy = 0;
 
 					k = xlookup[i]; // assumes no xflip
 					j = ylookup[i]; // assumes no yflip
 
-					curx = x + ((k * zoomx) / 2);
-					cury = y + ((j * zoomy) / 2);
+					const int curx = x + ((k * zoomx) / 2);
+					const int cury = y + ((j * zoomy) / 2);
 
-					zx = x + (((k + 1) * zoomx) / 2) - curx;
-					zy = y + (((j + 1) * zoomy) / 2) - cury;
+					const int zx = x + (((k + 1) * zoomx) / 2) - curx;
+					const int zy = y + (((j + 1) * zoomy) / 2) - cury;
 
 					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
-							code,
+							tile,
 							col,
 							flipx, flipy,
 							curx,cury,
@@ -423,26 +405,26 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 			{
 				for (i = 0; i < 16; i++)
 				{
-					code = m_spritemap[(map_index + (i << 1))] & tile_mask;
-					col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
+					const u32 tile = m_spritemap[(map_index + (i << 1))] & tile_mask;
+					const u32 col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
 
 					/* not known what controls priority */
-					priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
+					const int priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
 
-					flipx = 0;  // no flip xy?
-					flipy = 0;
+					int flipx = 0;  // no flip xy?
+					int flipy = 0;
 
 					k = xlookup[i]; // assumes no xflip
 					j = ylookup[i]; // assumes no yflip
 
-					curx = x + ((k * zoomx) / 4);
-					cury = y + ((j * zoomy) / 4);
+					const int curx = x + ((k * zoomx) / 4);
+					const int cury = y + ((j * zoomy) / 4);
 
-					zx = x + (((k + 1) * zoomx) / 4) - curx;
-					zy = y + (((j + 1) * zoomy) / 4) - cury;
+					const int zx = x + (((k + 1) * zoomx) / 4) - curx;
+					const int zy = y + (((j + 1) * zoomy) / 4) - cury;
 
 					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
-							code,
+							tile,
 							col,
 							flipx, flipy,
 							curx,cury,
@@ -469,20 +451,20 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
 *********************************************************/
 
 static inline void bryan2_drawscanline(bitmap_ind16 &bitmap, int x, int y, int length,
-		const uint16_t *src, int transparent, uint32_t orient, bitmap_ind8 &priority, int pri)
+		const u16 *src, bool transparent, u32 orient, bitmap_ind8 &priority, u8 pri, u8 primask = 0xff)
 {
-	uint16_t *dsti = &bitmap.pix16(y, x);
-	uint8_t *dstp = &priority.pix8(y, x);
+	u16 *dsti = &bitmap.pix16(y, x);
+	u8 *dstp = &priority.pix8(y, x);
 
 	if (transparent)
 	{
 		while (length--)
 		{
-			uint32_t spixel = *src++;
+			const u32 spixel = *src++;
 			if (spixel < 0x7fff)
 			{
 				*dsti = spixel;
-				*dstp = pri;
+				*dstp = (*dstp & primask) | pri;
 			}
 			dsti++;
 			dstp++;
@@ -493,38 +475,35 @@ static inline void bryan2_drawscanline(bitmap_ind16 &bitmap, int x, int y, int l
 		while (length--)
 		{
 			*dsti++ = *src++;
-			*dstp++ = pri;
+			*dstp = (*dstp & primask) | pri;
+			dstp++;
 		}
 	}
 }
 
 
 
-void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority)
+void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority)
 {
 	bitmap_ind16 &srcbitmap = m_piv_tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_piv_tilemap[layer]->flagsmap();
 
-	uint16_t *dst16,*src16;
-	uint8_t *tsrc;
-	int y_index, src_y_index, row_index, row_zoom;
+	int y_index;
 
-	/* I have a fairly strong feeling these should be uint32_t's, x_index is
+	/* I have a fairly strong feeling these should be u32's, x_index is
 	   falling through from max +ve to max -ve quite a lot in this routine */
-	int sx, x_index, x_step;
+	int sx;
 
-	uint32_t zoomx, zoomy;
-	uint16_t scanline[512];
-	uint16_t row_colbank, row_scroll;
+	u16 scanline[512];
 	int flipscreen = 0; /* n/a */
 
-	uint16_t screen_width = cliprect.width();
-	uint16_t min_y = cliprect.min_y;
-	uint16_t max_y = cliprect.max_y;
+	const int screen_width = cliprect.width();
+	const int min_y = cliprect.min_y;
+	const int max_y = cliprect.max_y;
 
-	int width_mask = 0x3ff;
+	const int width_mask = 0x3ff;
 
-	zoomx = 0x10000;    /* No overall X zoom, unlike TC0480SCP */
+	const u32 zoomx = 0x10000;    /* No overall X zoom, unlike TC0480SCP */
 
 	/* Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max ???
 	   In WGP see:  stage 4 (big spectator stand)
@@ -534,7 +513,7 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 	   In WGP2 see: road at big hill (default course) */
 
 	/* This calculation may be wrong, the y_index one too */
-	zoomy = 0x10000 - (((m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);
+	const u32 zoomy = 0x10000 - (((m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);
 
 	if (!flipscreen)
 	{
@@ -554,22 +533,22 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 	{
 		int a;
 
-		src_y_index = (y_index >> 16) & 0x3ff;
-		row_index = src_y_index;
+		const int src_y_index = (y_index >> 16) & 0x3ff;
+		const int row_index = src_y_index;
 
-		row_zoom = m_pivram[row_index + layer * 0x400 + 0x3400] & 0xff;
+		const int row_zoom = m_pivram[row_index + layer * 0x400 + 0x3400] & 0xff;
 
-		row_colbank = m_pivram[row_index + layer * 0x400 + 0x3400] >> 8;
+		u16 row_colbank = m_pivram[row_index + layer * 0x400 + 0x3400] >> 8;
 		a = (row_colbank & 0xe0);   /* kill bit 4 */
 		row_colbank = (((row_colbank & 0xf) << 1) | a) << 4;
 
-		row_scroll = m_pivram[row_index + layer * 0x1000 + 0x4000];
+		u16 row_scroll = m_pivram[row_index + layer * 0x1000 + 0x4000];
 		a = (row_scroll & 0xffe0) >> 1; /* kill bit 4 */
 		row_scroll = ((row_scroll & 0xf) | a) & width_mask;
 
-		x_index = sx - (row_scroll << 16);
+		int x_index = sx - (row_scroll << 16);
 
-		x_step = zoomx;
+		int x_step = zoomx;
 		if (row_zoom > 0x7f)    /* zoom in: reduce x_step */
 		{
 			x_step -= (((row_zoom - 0x7f) << 8) & 0xffff);
@@ -579,9 +558,9 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 			x_step += (((0x7f - row_zoom) << 8) & 0xffff);
 		}
 
-		src16 = &srcbitmap.pix16(src_y_index);
-		tsrc  = &flagsbitmap.pix8(src_y_index);
-		dst16 = scanline;
+		u16 *src16 = &srcbitmap.pix16(src_y_index);
+		u8 *tsrc   = &flagsbitmap.pix8(src_y_index);
+		u16 *dst16 = scanline;
 
 		if (flags & TILEMAP_DRAW_OPAQUE)
 		{
@@ -603,7 +582,7 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 			}
 		}
 
-		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, screen.priority(), priority);
+		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? false : true, ROT0, screen.priority(), priority);
 
 		y_index += zoomy;
 	}
@@ -615,10 +594,9 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
                         SCREEN REFRESH
 **************************************************************/
 
-uint32_t wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int i;
-	uint8_t layer[3];
+	u8 layer[3];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_V))
@@ -646,7 +624,7 @@ uint32_t wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 #endif
 
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < 3; i++)
 	{
 		m_piv_tilemap[i]->set_scrollx(0, m_piv_scrollx[i]);
 		m_piv_tilemap[i]->set_scrolly(0, m_piv_scrolly[i]);
@@ -654,6 +632,7 @@ uint32_t wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	m_tc0100scn->tilemap_update();
 
+	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
 	layer[0] = 0;
@@ -713,7 +692,7 @@ uint32_t wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		char buf[80];
 		int i;
 
-		for (i = 0; i < 8; i += 1)
+		for (int i = 0; i < 8; i += 1)
 		{
 			sprintf (buf, "%02x: %04x", i, rotate_ctrl[i]);
 			ui_draw_text (buf, 0, i*8);

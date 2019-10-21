@@ -24,22 +24,24 @@
 #ifndef NLD_82S126_H_
 #define NLD_82S126_H_
 
-#include "../nl_setup.h"
+#include "netlist/nl_setup.h"
 
 #define PROM_82S126(name, cCE1Q, cCE2Q, cA0, cA1, cA2, cA3, cA4, cA5, cA6, cA7) \
-		NET_REGISTER_DEV(PROM_82S126, name) \
-		NET_CONNECT(name, CE1Q, cCE1Q)  \
-		NET_CONNECT(name, CE2Q, cCE2Q)  \
-		NET_CONNECT(name, A0,   cA0)    \
-		NET_CONNECT(name, A1,   cA1)    \
-		NET_CONNECT(name, A2,   cA2)    \
-		NET_CONNECT(name, A3,   cA3)    \
-		NET_CONNECT(name, A4,   cA4)    \
-		NET_CONNECT(name, A5,   cA5)    \
-		NET_CONNECT(name, A6,   cA6)    \
+		NET_REGISTER_DEV(PROM_82S126, name)                                    \
+		NET_CONNECT(name, GND, GND)                                            \
+		NET_CONNECT(name, VCC, VCC)                                            \
+		NET_CONNECT(name, CE1Q, cCE1Q)                                         \
+		NET_CONNECT(name, CE2Q, cCE2Q)                                         \
+		NET_CONNECT(name, A0,   cA0)                                           \
+		NET_CONNECT(name, A1,   cA1)                                           \
+		NET_CONNECT(name, A2,   cA2)                                           \
+		NET_CONNECT(name, A3,   cA3)                                           \
+		NET_CONNECT(name, A4,   cA4)                                           \
+		NET_CONNECT(name, A5,   cA5)                                           \
+		NET_CONNECT(name, A6,   cA6)                                           \
 		NET_CONNECT(name, A7,   cA7)
 
-#define PROM_82S126_DIP(name)                                 \
+#define PROM_82S126_DIP(name)                                                  \
 		NET_REGISTER_DEV(PROM_82S126_DIP, name)
 
 #endif /* NLD_82S126_H_ */

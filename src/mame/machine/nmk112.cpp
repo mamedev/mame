@@ -90,7 +90,7 @@ void nmk112_device::do_bankswitch( int offset, int data )
     DEVICE HANDLERS
 *****************************************************************************/
 
-WRITE8_MEMBER( nmk112_device::okibank_w )
+void nmk112_device::okibank_w(offs_t offset, u8 data)
 {
 	if (m_current_bank[offset] != data)
 		do_bankswitch(offset, data);

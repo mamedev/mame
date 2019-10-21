@@ -113,7 +113,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Data Abort
 	if (m_pendingAbtD)
 	{
-		if (MODE26) fatalerror( "pendingAbtD (todo)\n");
+		if (MODE26) fatalerror( "ARM7: pendingAbtD (todo)\n");
 		SwitchMode(eARM7_MODE_ABT);             /* Set ABT mode so PC is saved to correct R14 bank */
 		SetRegister(14, pc - 8 + 8);                   /* save PC to R14 */
 		SetRegister(SPSR, cpsr);               /* Save current CPSR */
@@ -184,7 +184,7 @@ void arm7_cpu_device::arm7_check_irq_state()
 	// Undefined instruction
 	if (m_pendingUnd)
 	{
-		if (MODE26) fatalerror( "pendingUnd (todo)\n");
+		if (MODE26) printf( "ARM7: pendingUnd (todo)\n");
 		SwitchMode(eARM7_MODE_UND);             /* Set UND mode so PC is saved to correct R14 bank */
 		// compensate for prefetch (should this also be done for normal IRQ?)
 		if (T_IS_SET(GET_CPSR))

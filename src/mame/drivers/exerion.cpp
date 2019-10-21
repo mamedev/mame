@@ -237,7 +237,7 @@ void exerion_state::sub_map(address_map &map)
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state, exerion_controls_r, nullptr)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(exerion_state, exerion_controls_r)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -372,44 +372,42 @@ void exerion_state::machine_reset()
 		m_background_latches[i] = 0;
 }
 
-MACHINE_CONFIG_START(exerion_state::exerion)
+void exerion_state::exerion(machine_config &config)
+{
+	Z80(config, m_maincpu, EXERION_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &exerion_state::main_map);
 
-	MCFG_DEVICE_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-
-	MCFG_DEVICE_ADD("sub", Z80, EXERION_CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(sub_map)
+	z80_device &sub(Z80(config, "sub", EXERION_CPU_CLOCK));
+	sub.set_addrmap(AS_PROGRAM, &exerion_state::sub_map);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(exerion_state, screen_update_exerion)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(EXERION_PIXEL_CLOCK, EXERION_HTOTAL, EXERION_HBEND, EXERION_HBSTART, EXERION_VTOTAL, EXERION_VBEND, EXERION_VBSTART);
+	m_screen->set_screen_update(FUNC(exerion_state::screen_update_exerion));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_exerion)
-	MCFG_PALETTE_ADD("palette", 256*3)
-	MCFG_PALETTE_INDIRECT_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(exerion_state, exerion)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exerion);
+	PALETTE(config, m_palette, FUNC(exerion_state::exerion_palette), 256*3, 32);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	AY8910(config, "ay1", EXERION_AY8910_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, exerion_state, exerion_porta_r))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, exerion_state, exerion_portb_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config, "ay2", EXERION_AY8910_CLOCK));
+	ay2.port_a_read_callback().set(FUNC(exerion_state::exerion_porta_r));
+	ay2.port_b_write_callback().set(FUNC(exerion_state::exerion_portb_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
-MACHINE_CONFIG_START(exerion_state::irion)
+void exerion_state::irion(machine_config &config)
+{
 	exerion(config);
-	MCFG_DEVICE_REMOVE("sub")
-MACHINE_CONFIG_END
+	config.device_remove("sub");
+}
 
 
 

@@ -1,13 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
-#include "machine/74157.h"
+#ifndef MAME_INCLUDES_DEC0_H
+#define MAME_INCLUDES_DEC0_H
+
+#pragma once
+
 #include "cpu/h6280/h6280.h"
+#include "cpu/mcs51/mcs51.h"
+#include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
+#include "sound/msm5205.h"
+#include "video/bufsprite.h"
 #include "video/decbac06.h"
 #include "video/decmxc06.h"
-#include "sound/msm5205.h"
 #include "emupal.h"
+#include "screen.h"
 
 class dec0_state : public driver_device
 {
@@ -17,8 +25,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundlatch(*this, "soundlatch"),
+		m_screen(*this, "screen"),
+		m_gfxdecode(*this, "gfxdecode"),
 		m_tilegen(*this, "tilegen%u", 1U),
 		m_spritegen(*this, "spritegen"),
+		m_spriteram(*this, "spriteram"),
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "palette"),
 		m_subcpu(*this, "sub"),
@@ -26,7 +37,6 @@ public:
 		m_pfprotect(*this, "pfprotect"),
 		m_sndprotect(*this, "sndprotect"),
 		m_ram(*this, "ram"),
-		m_spriteram(*this, "spriteram"),
 		m_robocop_shared_ram(*this, "robocop_shared"),
 		m_hippodrm_shared_ram(*this, "hippodrm_shared")
 	{ }
@@ -40,6 +50,7 @@ public:
 	void midresbj(machine_config &config);
 	void slyspy(machine_config &config);
 	void hbarrel(machine_config &config);
+	void bandit(machine_config &config);
 	void midresb(machine_config &config);
 	void ffantasybl(machine_config &config);
 	void drgninjab(machine_config &config);
@@ -50,7 +61,6 @@ public:
 	void init_hippodrm();
 	void init_hbarrel();
 	void init_slyspy();
-	void init_birdtry();
 	void init_drgninja();
 	void init_midresb();
 	void init_ffantasybl();
@@ -61,8 +71,11 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device_array<deco_bac06_device, 3> m_tilegen;
 	optional_device<deco_mxc06_device> m_spritegen;
+	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_paletteram;
 
@@ -71,13 +84,16 @@ protected:
 
 	DECLARE_READ16_MEMBER(dec0_controls_r);
 	DECLARE_READ16_MEMBER(slyspy_controls_r);
-	DECLARE_WRITE16_MEMBER(dec0_priority_w);
+	DECLARE_WRITE16_MEMBER(priority_w);
+
+	void robocop_colpri_cb(u32 &colour, u32 &pri_mask);
+
+	void set_screen_raw_params_data_east(machine_config &config);
 
 private:
 	enum class mcu_type {
 		EMULATED,
-		BADDUDES_SIM,
-		BIRDTRY_SIM
+		BADDUDES_SIM
 	};
 
 	optional_device<h6280_device> m_subcpu;
@@ -85,7 +101,6 @@ private:
 	optional_device<address_map_bank_device> m_pfprotect;
 	optional_device<address_map_bank_device> m_sndprotect;
 	required_shared_ptr<uint16_t> m_ram;
-	required_shared_ptr<uint16_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_robocop_shared_ram;
 	optional_shared_ptr<uint8_t> m_hippodrm_shared_ram;
 
@@ -116,7 +131,6 @@ private:
 	DECLARE_WRITE16_MEMBER(sprite_mirror_w);
 	DECLARE_READ16_MEMBER(robocop_68000_share_r);
 	DECLARE_WRITE16_MEMBER(robocop_68000_share_w);
-	DECLARE_WRITE16_MEMBER(dec0_update_sprites_w);
 	DECLARE_READ16_MEMBER(ffantasybl_242024_r);
 
 	DECLARE_READ8_MEMBER(slyspy_sound_state_r);
@@ -127,6 +141,7 @@ private:
 	DECLARE_VIDEO_START(dec0);
 
 	uint32_t screen_update_hbarrel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bandit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_baddudes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_birdtry(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_robocop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -134,12 +149,16 @@ private:
 	uint32_t screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void hbarrel_colpri_cb(u32 &colour, u32 &pri_mask);
+	void bandit_colpri_cb(u32 &colour, u32 &pri_mask);
+	void midres_colpri_cb(u32 &colour, u32 &pri_mask);
+
 	void baddudes_i8751_write(int data);
-	void birdtry_i8751_write(int data);
 	void dec0_i8751_write(int data);
 	void dec0_i8751_reset();
 	void h6280_decrypt(const char *cputag);
 	void dec0_map(address_map &map);
+	void dec0_tb_map(address_map &map);
 	void dec0_s_map(address_map &map);
 	void hippodrm_map(address_map &map);
 	void hippodrm_sub_map(address_map &map);
@@ -197,3 +216,5 @@ private:
 	void secretab_map(address_map &map);
 	void secretab_s_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_DEC0_H

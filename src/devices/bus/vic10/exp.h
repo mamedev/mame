@@ -49,31 +49,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACK(_write) \
-	downcast<vic10_expansion_slot_device &>(*device).set_irq_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIC10_EXPANSION_SLOT_RES_CALLBACK(_write) \
-	downcast<vic10_expansion_slot_device &>(*device).set_res_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIC10_EXPANSION_SLOT_CNT_CALLBACK(_write) \
-	downcast<vic10_expansion_slot_device &>(*device).set_cnt_wr_callback(DEVCB_##_write);
-
-#define MCFG_VIC10_EXPANSION_SLOT_SP_CALLBACK(_write) \
-	downcast<vic10_expansion_slot_device &>(*device).set_sp_wr_callback(DEVCB_##_write);
-
-
-#define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACKS(_irq, _res) \
-	downcast<vic10_expansion_slot_device *>(device)->set_irq_callbacks(DEVCB_##_irq, DEVCB_##_res);
-
-#define MCFG_VIC10_EXPANSION_SLOT_SERIAL_CALLBACKS(_cnt, _sp) \
-	downcast<vic10_expansion_slot_device *>(device)->set_serial_callbacks(DEVCB_##_cnt, DEVCB_##_sp);
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -98,14 +73,14 @@ public:
 	}
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_irq_wr_callback(Object &&cb) { return m_write_irq.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_res_wr_callback(Object &&cb) { return m_write_res.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_cnt_wr_callback(Object &&cb) { return m_write_cnt.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sp_wr_callback(Object &&cb) { return m_write_sp.set_callback(std::forward<Object>(cb)); }
+	auto irq_callback() { return m_write_irq.bind(); }
+	auto res_callback() { return m_write_res.bind(); }
+	auto cnt_callback() { return m_write_cnt.bind(); }
+	auto sp_callback() { return m_write_sp.bind(); }
 
 	// computer interface
-	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram);
-	void cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram);
+	uint8_t cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
+	void cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram);
 	DECLARE_READ_LINE_MEMBER( p0_r );
 	DECLARE_WRITE_LINE_MEMBER( p0_w );
 
@@ -158,8 +133,8 @@ public:
 	// construction/destruction
 	virtual ~device_vic10_expansion_card_interface();
 
-	virtual uint8_t vic10_cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; }
-	virtual void vic10_cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram) { }
+	virtual uint8_t vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram) { return data; }
+	virtual void vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram) { }
 	virtual int vic10_p0_r() { return 0; }
 	virtual void vic10_p0_w(int state) { }
 	virtual void vic10_sp_w(int state) { }

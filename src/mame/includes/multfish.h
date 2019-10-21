@@ -10,6 +10,7 @@
 #include "machine/ticket.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
 #define igrosoft_gamble_VIDRAM_SIZE (0x2000*0x04)
@@ -53,6 +54,10 @@ public:
 	void init_crzmon2();
 	void init_crzmon2lot();
 	void init_crzmon2ent();
+	void init_islandent();
+	void init_pirateent();
+	void init_sweetlent();
+	void init_rollfruit();
 
 private:
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);

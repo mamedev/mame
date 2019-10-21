@@ -7,6 +7,7 @@
 
 #include "oricext.h"
 #include "imagedev/floppy.h"
+#include "machine/74259.h"
 #include "machine/wd_fdc.h"
 
 DECLARE_DEVICE_TYPE(JASMIN, jasmin_device)
@@ -21,7 +22,6 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -29,21 +29,20 @@ protected:
 private:
 	void remap();
 
-	DECLARE_WRITE8_MEMBER(side_sel_w);
-	DECLARE_WRITE8_MEMBER(fdc_reset_w);
-	DECLARE_WRITE8_MEMBER(ram_access_w);
-	DECLARE_WRITE8_MEMBER(rom_access_w);
-	DECLARE_WRITE8_MEMBER(select_w);
+	DECLARE_WRITE_LINE_MEMBER(side_sel_w);
+	DECLARE_WRITE_LINE_MEMBER(ram_access_w);
+	DECLARE_WRITE_LINE_MEMBER(rom_access_w);
+	DECLARE_WRITE_LINE_MEMBER(select_w);
 
 	void map(address_map &map);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	required_device<wd1770_device> fdc;
-
-	bool side_sel, fdc_reset, ram_access, rom_access, select[4];
-	uint8_t *jasmin_rom;
-	floppy_image_device *cur_floppy, *floppies[4];
+	required_device<wd1770_device> m_fdc;
+	required_device<ls259_device> m_fdlatch;
+	required_device_array<floppy_connector, 4> m_floppies;
+	required_region_ptr<uint8_t> m_jasmin_rom;
+	floppy_image_device *m_cur_floppy;
 };
 
 #endif // MAME_BUS_ORICEXT_JASMIN_H

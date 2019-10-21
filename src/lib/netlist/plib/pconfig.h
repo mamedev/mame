@@ -13,7 +13,7 @@
  * RDTSCP.
  */
 #ifndef PHAS_RDTSCP
-#define PHAS_RDTSCP (1)
+#define PHAS_RDTSCP (0)
 #endif
 
 /*
@@ -21,16 +21,53 @@
  * if PHAS_RDTSCP == 1
  */
 #ifndef PUSE_ACCURATE_STATS
-#define PUSE_ACCURATE_STATS (1)
+#define PUSE_ACCURATE_STATS (0)
 #endif
 
 /*
  * Set this to one if you want to use 128 bit int for ptime.
- * This is for tests only.
+ * This is about 5% slower on a kaby lake processor.
  */
 
 #ifndef PHAS_INT128
 #define PHAS_INT128 (0)
+#endif
+
+/*
+ * OpenMP adds about 10% to 20% performance for analog
+ * netlists like kidniki.
+ */
+
+#ifndef PUSE_OPENMP
+#define PUSE_OPENMP              (0)
+#endif
+
+/*
+ * Set this to one if you want to use aligned storage optimizations.
+ */
+
+#ifndef PUSE_ALIGNED_OPTIMIZATIONS
+#define PUSE_ALIGNED_OPTIMIZATIONS (0)
+#endif
+
+#define PUSE_ALIGNED_ALLOCATION (PUSE_ALIGNED_OPTIMIZATIONS)
+#define PUSE_ALIGNED_HINTS      (PUSE_ALIGNED_OPTIMIZATIONS)
+/*
+ * Standard alignment macros
+ */
+
+#define PALIGN_CACHELINE        (64)
+#define PALIGN_VECTOROPT        (64)
+
+#define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
+#define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)
+
+/* Breaks mame build on windows due to -Wattribute
+ * FIXME: no error on cross-compile - need further checks */
+#if defined(_WIN32) && defined(__GNUC__)
+#define PALIGNAS(x)
+#else
+#define PALIGNAS(x) alignas(x)
 #endif
 
 /*============================================================
@@ -47,6 +84,13 @@
  *
  *============================================================*/
 
+#ifndef NVCCBUILD
+#define NVCCBUILD (0)
+#endif
+
+#if NVCCBUILD
+#define C14CONSTEXPR
+#else
 #if __cplusplus == 201103L
 #define C14CONSTEXPR
 #elif __cplusplus == 201402L
@@ -58,9 +102,6 @@
 #else
 #error "C++ version not supported"
 #endif
-
-#ifndef PHAS_INT128
-#define PHAS_INT128 (0)
 #endif
 
 #if (PHAS_INT128)
@@ -68,67 +109,36 @@ typedef __uint128_t UINT128;
 typedef __int128_t INT128;
 #endif
 
-#if defined(__GNUC__)
-#ifdef RESTRICT
-#undef RESTRICT
-#endif
-#define RESTRICT                __restrict__
-#define ATTR_UNUSED             __attribute__((__unused__))
+//============================================================
+// Check for OpenMP
+//============================================================
+
+#if defined(OPENMP)
+#if ( OPENMP >= 200805 )
+#define PHAS_OPENMP (1)
 #else
-#define RESTRICT
-#define ATTR_UNUSED
+#define PHAS_OPENMP (0)
 #endif
-
-//============================================================
-//  Standard defines
-//============================================================
-
-//============================================================
-//  Pointer to Member Function
-//============================================================
-
-// This will be autodetected
-//#define PPMF_TYPE 0
-
-#define PPMF_TYPE_PMF             0
-#define PPMF_TYPE_GNUC_PMF_CONV   1
-#define PPMF_TYPE_INTERNAL        2
-
-#if defined(__GNUC__)
-	/* does not work in versions over 4.7.x of 32bit MINGW  */
-	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
-		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
-		#define PHAS_PMF_INTERNAL 1
-		#define MEMBER_ABI _thiscall
-	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
-		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(EMSCRIPTEN)
-		#define PHAS_PMF_INTERNAL 2
-	#else
-		#define PHAS_PMF_INTERNAL 1
-	#endif
-#elif defined(_MSC_VER) && defined (_M_X64)
-	#define PHAS_PMF_INTERNAL 3
+#elif defined(_OPENMP)
+#if ( _OPENMP >= 200805 )
+#define PHAS_OPENMP (1)
 #else
-	#define PHAS_PMF_INTERNAL 0
+#define PHAS_OPENMP (0)
 #endif
-
-#ifndef MEMBER_ABI
-	#define MEMBER_ABI
-#endif
-
-#ifndef PPMF_TYPE
-	#if (PHAS_PMF_INTERNAL > 0)
-		#define PPMF_TYPE PPMF_TYPE_INTERNAL
-	#else
-		#define PPMF_TYPE PPMF_TYPE_PMF
-	#endif
 #else
-	#undef PHAS_PMF_INTERNAL
-	#define PHAS_PMF_INTERNAL 0
-	#undef MEMBER_ABI
-	#define MEMBER_ABI
+#define PHAS_OPENMP (0)
 #endif
+
+
+//============================================================
+//  WARNINGS
+//============================================================
+
+#if (PUSE_OPENMP)
+#if (!(PHAS_OPENMP))
+#error To use openmp compile and link with "-fopenmp"
+#endif
+#endif
+
 
 #endif /* PCONFIG_H_ */

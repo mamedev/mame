@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia
+#ifndef MAME_INCLUDES_GALPANI2_H
+#define MAME_INCLUDES_GALPANI2_H
+
+#pragma once
+
 #include "video/kaneko_spr.h"
 #include "sound/okim6295.h"
 #include "machine/eepromser.h"
@@ -9,8 +14,8 @@
 class galpani2_state : public driver_device
 {
 public:
-	galpani2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	galpani2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub"),
 		m_kaneko_spr(*this, "kan_spr"),
@@ -65,8 +70,6 @@ private:
 	DECLARE_WRITE16_MEMBER(subdatabank_select_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(galpani2);
 	uint32_t screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 	void copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -78,3 +81,5 @@ private:
 	void galpani2_mem1(address_map &map);
 	void galpani2_mem2(address_map &map);
 };
+
+#endif // MAME_INCLUDES_GALPANI2_H

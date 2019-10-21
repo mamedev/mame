@@ -236,10 +236,11 @@ void deco_zoomspr_device::dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rec
 	        0x8000: Y flip
 	        0x03ff: Y size of block in pixels (for scaling)
 	    Word 6 :
-	        0x1f - colour.
-	        0x20 - ?  Used for background at 'frog' boss and title screen dragon.
-	        0x40 - ?  priority?
-	        0x80 - Alpha blending enable
+	        0x0000001f - colour.
+	        0x00000020 - ?  Used for background at 'frog' boss and title screen dragon.
+	        0x00000040 - ?  priority?
+	        0x00000080 - Alpha blending enable
+	        0x40000000 - Additive/Subtractable blend? (dragngun)
 	    Word 7 :
 
 

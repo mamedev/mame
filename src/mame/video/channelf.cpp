@@ -3,16 +3,16 @@
 #include "emu.h"
 #include "includes/channelf.h"
 
-static const rgb_t channelf_palette[] =
+static constexpr rgb_t channelf_pens[] =
 {
-	rgb_t(0x10, 0x10, 0x10), /* black */
-	rgb_t(0xfd, 0xfd, 0xfd), /* white */
-	rgb_t(0xff, 0x31, 0x53), /* red   */
-	rgb_t(0x02, 0xcc, 0x5d), /* green */
-	rgb_t(0x4b, 0x3f, 0xf3), /* blue  */
-	rgb_t(0xe0, 0xe0, 0xe0), /* ltgray  */
-	rgb_t(0x91, 0xff, 0xa6), /* ltgreen */
-	rgb_t(0xce, 0xd0, 0xff)  /* ltblue  */
+	{ 0x10, 0x10, 0x10 }, // black
+	{ 0xfd, 0xfd, 0xfd }, // white
+	{ 0xff, 0x31, 0x53 }, // red
+	{ 0x02, 0xcc, 0x5d }, // green
+	{ 0x4b, 0x3f, 0xf3 }, // blue
+	{ 0xe0, 0xe0, 0xe0 }, // ltgray
+	{ 0x91, 0xff, 0xa6 }, // ltgreen
+	{ 0xce, 0xd0, 0xff }  // ltblue
 };
 
 #define BLACK   0
@@ -32,9 +32,9 @@ static const uint16_t colormap[] = {
 };
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(channelf_state, channelf)
+void channelf_state::channelf_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, channelf_palette, ARRAY_LENGTH(channelf_palette));
+	palette.set_pen_colors(0, channelf_pens);
 }
 
 void channelf_state::video_start()

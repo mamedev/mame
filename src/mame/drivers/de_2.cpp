@@ -528,82 +528,87 @@ WRITE8_MEMBER(de_2_state::lamps_w)
 }
 
 
-MACHINE_CONFIG_START(de_2_state::de_bg_audio)
+void de_2_state::de_bg_audio(machine_config &config)
+{
 	/* sound CPU */
-	MCFG_DEVICE_ADD("audiocpu", MC6809E, XTAL(8'000'000) / 4) // MC68B09E
-	MCFG_DEVICE_PROGRAM_MAP(de_2_audio_map)
+	MC6809E(config, m_audiocpu, XTAL(8'000'000) / 4); // MC68B09E
+	m_audiocpu->set_addrmap(AS_PROGRAM, &de_2_state::de_2_audio_map);
 
 	SPEAKER(config, "bg").front_center();
 
-	MCFG_DEVICE_ADD("ym2151", YM2151, XTAL(3'579'545))
-	MCFG_YM2151_IRQ_HANDLER(WRITELINE(*this, de_2_state, ym2151_irq_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
+	YM2151(config, m_ym2151, XTAL(3'579'545));
+	m_ym2151->irq_handler().set(FUNC(de_2_state::ym2151_irq_w));
+	m_ym2151->add_route(ALL_OUTPUTS, "bg", 0.50);
 
-	MCFG_DEVICE_ADD("msm5205", MSM5205, XTAL(384'000))
-	MCFG_MSM5205_VCLK_CB(WRITELINE(*this, de_2_state, msm5205_irq_w))
-	MCFG_MSM5205_PRESCALER_SELECTOR(S96_4B)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "bg", 0.50)
-MACHINE_CONFIG_END
+	MSM5205(config, m_msm5205, XTAL(384'000));
+	m_msm5205->vck_legacy_callback().set(FUNC(de_2_state::msm5205_irq_w));
+	m_msm5205->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm5205->add_route(ALL_OUTPUTS, "bg", 0.50);
+}
 
-MACHINE_CONFIG_START(de_2_state::de_type1)
+void de_2_state::de_type1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE1_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
+	decocpu_type1_device &decocpu(DECOCPU1(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_2_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_2_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
 	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(de_2_state::de_type2)
+void de_2_state::de_type2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
+	decocpu_type2_device &decocpu(DECOCPU2(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_2_state::display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_2_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
 	config.set_default_layout(layout_de2);
 
 	genpin_audio(config);
 	de_bg_audio(config);
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(de_2_state::de_type2_alpha3)
+void de_2_state::de_type2_alpha3(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE2_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,type2alpha3_display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
+	de_type2(config);
+	subdevice<decocpu_type2_device>("decocpu")->display_write_callback().set(FUNC(de_2_state::type2alpha3_display_w));
+
+	/* Video */
+	config.set_default_layout(layout_de2a3);
+}
+
+void de_2_state::de_type3(machine_config &config)
+{
+	/* basic machine hardware */
+	decocpu_type3_device &decocpu(DECOCPU3(config, "decocpu", XTAL(8'000'000) / 2, "maincpu"));
+	decocpu.display_read_callback().set(FUNC(de_2_state::display_r));
+	decocpu.display_write_callback().set(FUNC(de_2_state::type3_display_w));
+	decocpu.soundlatch_write_callback().set(FUNC(de_2_state::sound_w));
+	decocpu.switch_read_callback().set(FUNC(de_2_state::switch_r));
+	decocpu.switch_write_callback().set(FUNC(de_2_state::switch_w));
+	decocpu.lamp_write_callback().set(FUNC(de_2_state::lamps_w));
 
 	/* Video */
 	config.set_default_layout(layout_de2a3);
 
 	genpin_audio(config);
 	de_bg_audio(config);
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(de_2_state::de_type3)
-	/* basic machine hardware */
-	MCFG_DECOCPU_TYPE3_ADD("decocpu", XTAL(8'000'000) / 2, ":maincpu")
-	MCFG_DECOCPU_DISPLAY(READ8(*this, de_2_state,display_r),WRITE8(*this, de_2_state,type3_display_w))
-	MCFG_DECOCPU_SOUNDLATCH(WRITE8(*this, de_2_state,sound_w))
-	MCFG_DECOCPU_SWITCH(READ8(*this, de_2_state,switch_r),WRITE8(*this, de_2_state,switch_w))
-	MCFG_DECOCPU_LAMP(WRITE8(*this, de_2_state,lamps_w))
-
-	/* Video */
-	config.set_default_layout(layout_de2a3);
-
-	genpin_audio(config);
-	de_bg_audio(config);
-MACHINE_CONFIG_END
+}
 
 
 /*--------------------------------------------------------------------------------
@@ -752,6 +757,17 @@ ROM_START(poto_a32)
 	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
 ROM_END
 
+ROM_START(poto_a31)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("potob5.3-1", 0x4000, 0x4000, CRC(b7be6fa8) SHA1(3ef77daafaf31e2388ac207275aa060f854bd4b9))
+	ROM_LOAD("potoc5.3-1", 0x8000, 0x8000, CRC(4ce1d254) SHA1(4d24a230ae3a37674cc25ab5ae40c57acbdf5f04))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("potof7.rom", 0x8000, 0x8000, CRC(2e60b2e3) SHA1(0be89fc9b2c6548392febb35c1ace0eb912fc73f))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("potof6.rom", 0x00000, 0x10000, CRC(62b8f74b) SHA1(f82c706b88f49341bab9014bd83371259eb53b47))
+	ROM_LOAD("potof5.rom", 0x10000, 0x10000, CRC(5a0537a8) SHA1(26724441d7e2edd7725337b262d95448499151ad))
+ROM_END
+
 ROM_START(poto_a29)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("potob5.2-9", 0x4000, 0x4000, CRC(f01b5510) SHA1(90c632ee74a2dbf877cfe013a69067b1771f1d67))
@@ -795,6 +811,17 @@ ROM_START(robo_a30)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("b5.256", 0x0000, 0x8000, CRC(6870f3ae) SHA1(f02cace5f1d1922aed52c84efe60a46e5297865c))
 	ROM_LOAD("c5.256", 0x8000, 0x8000, CRC(f2de58cf) SHA1(0b5dd14761b4c64c1b01faad923ab671573499c5))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("robof7.rom", 0x8000, 0x8000, CRC(fa0891bd) SHA1(332d03c7802989abf717564230993b54819ebc0d))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("robof6.rom", 0x00000, 0x10000, CRC(9246e107) SHA1(e8e72c0d099b17ea9e59ea7794011bad4c072c5e))
+	ROM_LOAD("robof4.rom", 0x10000, 0x10000, CRC(27d31df3) SHA1(1611a508ce74eb62a07296d69782ea4fa14503fc))
+ROM_END
+
+ROM_START(robo_a29)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("robob5.a29", 0x0000, 0x8000, CRC(72497d0b) SHA1(8a970c879cd0aaef5970a77778f71c0f3d6da049))
+	ROM_LOAD("roboc5.a29", 0x8000, 0x8000, CRC(b251b0b6) SHA1(3d340070494b102703e282ae3a7970f6f8aaede9))
 	ROM_REGION(0x10000, "audiocpu", 0)
 	ROM_LOAD("robof7.rom", 0x8000, 0x8000, CRC(fa0891bd) SHA1(332d03c7802989abf717564230993b54819ebc0d))
 	ROM_REGION(0x40000, "sound1", 0)
@@ -937,10 +964,12 @@ GAME( 1987, lwar_e90, lwar_a83, de_type1,        de_2, de_2_state, empty_init, R
 GAME( 1989, mnfb_c29, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.9, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, mnfb_c27, mnfb_c29, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "Monday Night Football (2.7, 50cts)",   MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1990, poto_a32, 0,        de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.2)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1990, poto_a31, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (3.1)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1990, poto_a29, poto_a32, de_type2_alpha3, de_2, de_2_state, empty_init, ROT0, "Data East", "The Phantom of the Opera (2.9)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, play_a24, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Playboy 35th Anniversary (2.4)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, robo_a34, 0,        de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.4)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1989, robo_a30, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (3.0)",                        MACHINE_IS_SKELETON_MECHANICAL)
+GAME( 1989, robo_a29, robo_a34, de_type3,        de_2, de_2_state, empty_init, ROT0, "Data East", "Robocop (2.9)",                        MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, ssvc_a26, 0,        de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6)",                 MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, ssvc_b26, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (2.6 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME( 1988, ssvc_a42, ssvc_a26, de_type2,        de_2, de_2_state, empty_init, ROT0, "Data East", "Secret Service (4.2 alternate sound)", MACHINE_IS_SKELETON_MECHANICAL)

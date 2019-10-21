@@ -135,6 +135,8 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_dma8237_out_eop )
 
 void ibm5160_mb_device::pc_select_dma_channel(int channel, bool state)
 {
+	m_isabus->dack_line_w(channel, state);
+
 	if(!state) {
 		m_dma_channel = channel;
 		if(m_cur_eop)
@@ -194,6 +196,11 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::pc_pit8253_out2_changed )
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
+WRITE_LINE_MEMBER( ibm5150_mb_device::pc_pit8253_out2_changed )
+{
+	ibm5160_mb_device::pc_pit8253_out2_changed(state);
+	m_cassette->output(m_pit_out2 ? 1.0 : -1.0);
+}
 
 /**********************************************************
  *
@@ -388,8 +395,16 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 WRITE8_MEMBER( ibm5160_mb_device::nmi_enable_w )
 {
 	m_nmi_enabled = BIT(data,7);
-	m_isabus->set_nmi_state(m_nmi_enabled);
+	if (!m_nmi_enabled)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
+
+WRITE_LINE_MEMBER( ibm5160_mb_device::iochck_w )
+{
+	if (m_nmi_enabled && !state)
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -405,8 +420,9 @@ DEFINE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device, "ibm5160_mb", "IBM 51
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
-	PIT8253(config, m_pit8253, 0);
+void ibm5160_mb_device::device_add_mconfig(machine_config &config)
+{
+	PIT8253(config, m_pit8253);
 	m_pit8253->set_clk<0>(XTAL(14'318'181)/12.0); // heartbeat IRQ
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
 	m_pit8253->set_clk<1>(XTAL(14'318'181)/12.0); // DRAM refresh
@@ -431,7 +447,7 @@ MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
 	m_dma8237->out_dack_callback<2>().set(FUNC(ibm5160_mb_device::pc_dack2_w));
 	m_dma8237->out_dack_callback<3>().set(FUNC(ibm5160_mb_device::pc_dack3_w));
 
-	PIC8259(config, m_pic8259, 0);
+	PIC8259(config, m_pic8259);
 	m_pic8259->out_int_callback().set(FUNC(ibm5160_mb_device::pic_int_w));
 
 	I8255A(config, m_ppi8255, 0);
@@ -439,26 +455,28 @@ MACHINE_CONFIG_START(ibm5160_mb_device::device_add_mconfig)
 	m_ppi8255->out_pb_callback().set(FUNC(ibm5160_mb_device::pc_ppi_portb_w));
 	m_ppi8255->in_pc_callback().set(FUNC(ibm5160_mb_device::pc_ppi_portc_r));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU(":maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237", am9517a_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_memspace(":maincpu", AS_PROGRAM);
+	m_isabus->set_iospace(":maincpu", AS_IO);
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set(m_pic8259, FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set(m_pic8259, FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set(m_dma8237, FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_dma8237, FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_dma8237, FUNC(am9517a_device::dreq3_w));
+	m_isabus->iochck_callback().set(FUNC(ibm5160_mb_device::iochck_w));
 
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ibm5160_mb_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE(*this, ibm5160_mb_device, keyboard_data_w))
+	PC_KBDC(config, m_pc_kbdc, 0);
+	m_pc_kbdc->out_clock_cb().set(FUNC(ibm5160_mb_device::keyboard_clock_w));
+	m_pc_kbdc->out_data_cb().set(FUNC(ibm5160_mb_device::keyboard_data_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
-MACHINE_CONFIG_END
+}
 
 
 static INPUT_PORTS_START( ibm5160_mb )
@@ -590,19 +608,18 @@ DEFINE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device, "ibm5150_mb", "IBM 51
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ibm5150_mb_device::device_add_mconfig)
+void ibm5150_mb_device::device_add_mconfig(machine_config &config)
+{
 	ibm5160_mb_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("pc_kbdc")
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ibm5150_mb_device, keyboard_clock_w))
+	subdevice<pc_kbdc_device>("pc_kbdc")->out_clock_cb().set(FUNC(ibm5150_mb_device::keyboard_clock_w));
 
-	MCFG_DEVICE_MODIFY("ppi8255")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ibm5150_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ibm5150_mb_device, pc_ppi_portc_r))
+	m_ppi8255->out_pb_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(ibm5150_mb_device::pc_ppi_portc_r));
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
+}
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -761,23 +778,133 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1840 motherboard")
+DEFINE_DEVICE_TYPE(EC1840_MOTHERBOARD, ec1840_mb_device, "ec1840_mb", "EC-1840 motherboard")
 
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(ec1841_mb_device::device_add_mconfig)
+void ec1840_mb_device::device_add_mconfig(machine_config &config)
+{
+	ec1841_mb_device::device_add_mconfig(config);
+
+	m_ppi8255->in_pc_callback().set(FUNC(ec1840_mb_device::pc_ppi_portc_r));
+}
+
+// via http://oldpc.su/pc/ec1840/ec1840rep.html
+static INPUT_PORTS_START( ec1840_mb )
+	PORT_START("DSW0") /* SA1 */
+	PORT_DIPNAME( 0xc0, 0x40, "Number of floppy drives")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPSETTING(    0x80, "3" )
+	PORT_DIPSETTING(    0xc0, "4" )
+	PORT_DIPNAME( 0x30, 0x30, "Graphics adapter")
+	PORT_DIPSETTING(    0x00, "Reserved" )
+	PORT_DIPSETTING(    0x10, "Color 40x25" )
+	PORT_DIPSETTING(    0x20, "Color 80x25" )
+	PORT_DIPSETTING(    0x30, "Monochrome" )
+	PORT_BIT(     0x0c, 0x0c, IPT_UNUSED )
+	PORT_DIPNAME( 0x02, 0x02, "DMAC installed")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x02, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x01, 0x01, "Boot from floppy")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
+
+	PORT_START("SA2")
+	PORT_BIT(     0xcf, 0x00, IPT_UNUSED )
+	PORT_DIPNAME( 0x20, 0x20, "SA2.5")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Yes) )
+	PORT_DIPNAME( 0x10, 0x10, "SA2.4")
+	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+	PORT_DIPSETTING(    0x10, DEF_STR(Yes) )
+INPUT_PORTS_END
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor ec1840_mb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( ec1840_mb );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ec1840_mb_device - constructor
+//-------------------------------------------------
+
+ec1840_mb_device::ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ec1841_mb_device(mconfig, EC1840_MOTHERBOARD, tag, owner, clock)
+{
+}
+
+void ec1840_mb_device::device_start()
+{
+}
+
+READ8_MEMBER( ec1840_mb_device::pc_ppi_portc_r )
+{
+	int data = 0xff;
+
+	data &= ~0x80; // no parity error
+	data &= ~0x40; // no error on expansion board
+
+	if (m_ppi_portc_switch_high)
+	{
+		/* read hi nibble of SW2 */
+		data = data & 0xf0;
+
+		switch (m_ram->size())
+		{
+		case 128 * 1024:    data |= 0x00; break;
+		case 256 * 1024:    data |= 0x01; break;
+		case 384 * 1024:    data |= 0x02; break;
+		case 512 * 1024:    data |= 0x03; break;
+		case 640 * 1024:    data |= 0x04; break;
+		}
+
+		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
+	}
+	else
+	{
+		/* read lo nibble of S2 */
+		data = (data & 0xf0) | (ioport("DSW0")->read() >> 4);
+		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
+	}
+
+	data = ( data & ~0x20 ) | ( m_pit_out2 ? 0x20 : 0x00 );
+
+	return data;
+}
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device, "ec1841_mb", "EC-1841 motherboard")
+
+
+//-------------------------------------------------
+//  device_add_mconfig - add device configuration
+//-------------------------------------------------
+
+void ec1841_mb_device::device_add_mconfig(machine_config &config)
+{
 	ibm5160_mb_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_MODIFY("ppi8255")
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, ec1841_mb_device, pc_ppi_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, ec1841_mb_device, pc_ppi_portc_r))
+	m_ppi8255->out_pb_callback().set(FUNC(ec1841_mb_device::pc_ppi_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(ec1841_mb_device::pc_ppi_portc_r));
 
-	MCFG_DEVICE_MODIFY("pc_kbdc")
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE(*this, ec1841_mb_device, keyboard_clock_w))
-MACHINE_CONFIG_END
+	subdevice<pc_kbdc_device>("pc_kbdc")->out_clock_cb().set(FUNC(ec1841_mb_device::keyboard_clock_w));
+}
 
 static INPUT_PORTS_START( ec1841_mb )
 	PORT_START("DSW0") /* SA1 */
@@ -804,6 +931,7 @@ static INPUT_PORTS_START( ec1841_mb )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
 
 	PORT_START("SA2")
+	PORT_BIT(     0xcb, 0x00, IPT_UNUSED )
 	PORT_DIPNAME( 0x04, 0x04, "Speech synthesizer")
 	PORT_DIPSETTING(    0x00, "Installed" )
 	PORT_DIPSETTING(    0x04, "Not installed" )
@@ -828,6 +956,11 @@ ioport_constructor ec1841_mb_device::device_input_ports() const
 
 ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ibm5160_mb_device(mconfig, EC1841_MOTHERBOARD, tag, owner, clock)
+{
+}
+
+ec1841_mb_device::ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ibm5160_mb_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -859,7 +992,7 @@ WRITE8_MEMBER( ec1841_mb_device::pc_ppi_portb_w )
 	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 }
 
-READ8_MEMBER ( ec1841_mb_device::pc_ppi_portc_r )
+READ8_MEMBER( ec1841_mb_device::pc_ppi_portc_r )
 {
 	int data=0xff;
 
@@ -895,12 +1028,13 @@ pc_noppi_mb_device::pc_noppi_mb_device(const machine_config &mconfig, device_typ
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(pc_noppi_mb_device::device_add_mconfig)
+void pc_noppi_mb_device::device_add_mconfig(machine_config &config)
+{
 	ibm5160_mb_device::device_add_mconfig(config);
 
-	MCFG_DEVICE_REMOVE("pc_kbdc")
-	MCFG_DEVICE_REMOVE("ppi8255")
-MACHINE_CONFIG_END
+	config.device_remove("pc_kbdc");
+	config.device_remove("ppi8255");
+}
 
 static INPUT_PORTS_START( pc_noppi_mb )
 INPUT_PORTS_END

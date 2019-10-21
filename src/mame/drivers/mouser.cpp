@@ -190,49 +190,44 @@ void mouser_state::machine_reset()
 {
 }
 
-MACHINE_CONFIG_START(mouser_state::mouser)
-
+void mouser_state::mouser(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 4000000)   /* 4 MHz ? */
-	MCFG_DEVICE_PROGRAM_MAP(mouser_map)
-	MCFG_DEVICE_OPCODES_MAP(decrypted_opcodes_map)
+	Z80(config, m_maincpu, 4000000);   /* 4 MHz ? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mouser_state::mouser_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &mouser_state::decrypted_opcodes_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000)  /* ??? */
-	MCFG_DEVICE_PROGRAM_MAP(mouser_sound_map)
-	MCFG_DEVICE_IO_MAP(mouser_sound_io_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(mouser_state, mouser_sound_nmi_assert,  4*60) /* ??? This controls the sound tempo */
+	Z80(config, m_audiocpu, 4000000);  /* ??? */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &mouser_state::mouser_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &mouser_state::mouser_sound_io_map);
+	m_audiocpu->set_periodic_int(FUNC(mouser_state::mouser_sound_nmi_assert), attotime::from_hz(4*60)); /* ??? This controls the sound tempo */
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // type unconfirmed
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, mouser_state, nmi_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, mouser_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, mouser_state, flip_screen_y_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // type unconfirmed
+	mainlatch.q_out_cb<0>().set(FUNC(mouser_state::nmi_enable_w));
+	mainlatch.q_out_cb<1>().set(FUNC(mouser_state::flip_screen_x_w));
+	mainlatch.q_out_cb<2>().set(FUNC(mouser_state::flip_screen_y_w));
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mouser_state, screen_update_mouser)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mouser_state, mouser_nmi_interrupt))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(mouser_state::screen_update_mouser));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(mouser_state::mouser_nmi_interrupt));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mouser)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(mouser_state, mouser)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mouser);
+	PALETTE(config, m_palette, FUNC(mouser_state::mouser_palette), 64);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 4000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DEVICE_ADD("ay2", AY8910, 4000000/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "ay1", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+	AY8910(config, "ay2", 4000000/2).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
 ROM_START( mouser )

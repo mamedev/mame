@@ -5,6 +5,10 @@
     Run and Gun / Slam Dunk
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_RUNGUN_H
+#define MAME_INCLUDES_RUNGUN_H
+
+#pragma once
 
 #include "sound/k054539.h"
 #include "machine/k053252.h"
@@ -14,12 +18,13 @@
 #include "video/konami_helper.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class rungun_state : public driver_device
 {
 public:
-	rungun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	rungun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_k054539_1(*this, "k054539_1"),
@@ -33,7 +38,7 @@ public:
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
 		m_sysreg(*this, "sysreg")
-		{ }
+	{ }
 
 	void rng(machine_config &config);
 	void rng_dual(machine_config &config);
@@ -116,7 +121,8 @@ private:
 
 	INTERRUPT_GEN_MEMBER(rng_interrupt);
 
-	void k054539_map(address_map &map);
 	void rungun_map(address_map &map);
 	void rungun_sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_RUNGUN_H

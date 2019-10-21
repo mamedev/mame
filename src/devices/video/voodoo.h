@@ -1429,32 +1429,6 @@ enum
 #define STD_VOODOO_3_CLOCK          132000000
 
 
-
-/***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_VOODOO_FBMEM(_value) \
-	downcast<voodoo_device &>(*device).set_fbmem(_value);
-
-#define MCFG_VOODOO_TMUMEM(_value1, _value2) \
-	downcast<voodoo_device &>(*device).set_tmumem(_value1, _value2);
-
-#define MCFG_VOODOO_SCREEN_TAG(_tag) \
-	downcast<voodoo_device &>(*device).set_screen_tag(_tag);
-
-#define MCFG_VOODOO_CPU_TAG(_tag) \
-	downcast<voodoo_device &>(*device).set_cpu_tag(_tag);
-
-#define MCFG_VOODOO_VBLANK_CB(_devcb) \
-	downcast<voodoo_device &>(*device).set_vblank_callback(DEVCB_##_devcb);
-
-#define MCFG_VOODOO_STALL_CB(_devcb) \
-	downcast<voodoo_device &>(*device).set_stall_callback(DEVCB_##_devcb);
-
-#define MCFG_VOODOO_PCIINT_CB(_devcb) \
-	downcast<voodoo_device &>(*device).set_pciint_callback(DEVCB_##_devcb);
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -1470,15 +1444,15 @@ public:
 	void set_tmumem(int value1, int value2) { m_tmumem0 = value1; m_tmumem1 = value2; }
 	template <typename T> void set_screen_tag(T &&tag) { m_screen_finder.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu_finder.set_tag(std::forward<T>(tag)); }
-	template <class Object> devcb_base &set_vblank_callback(Object &&cb) { return m_vblank.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_stall_callback(Object &&cb)  { return m_stall.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_pciint_callback(Object &&cb) { return m_pciint.set_callback(std::forward<Object>(cb)); }
+	auto vblank_callback() { return m_vblank.bind(); }
+	auto stall_callback() { return m_stall.bind(); }
+	auto pciint_callback() { return m_pciint.bind(); }
 
 	void set_screen(screen_device &screen) { assert(!m_screen); m_screen = &screen; }
 	void set_cpu(cpu_device &cpu) { assert(!m_cpu); m_cpu = &cpu; }
 
-	DECLARE_READ32_MEMBER( voodoo_r );
-	DECLARE_WRITE32_MEMBER( voodoo_w );
+	u32 voodoo_r(offs_t offset);
+	void voodoo_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	uint8_t             m_fbmem;
 	uint8_t             m_tmumem0;
@@ -1863,7 +1837,7 @@ protected:
 	static void raster_##name(void *destbase, int32_t y, const poly_extent *extent, const void *extradata, int threadid);
 #define RASTERIZER_ENTRY(fbzcp, alpha, fog, fbz, tex0, tex1) \
 	RASTERIZER_HEADER(fbzcp##_##alpha##_##fog##_##fbz##_##tex0##_##tex1)
-#include "voodoo_rast.hxx"
+#include "voodoo_rast.ipp"
 
 #undef RASTERIZER_ENTRY
 
@@ -1937,22 +1911,22 @@ class voodoo_banshee_device : public voodoo_device
 public:
 	voodoo_banshee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_READ32_MEMBER( banshee_r );
-	DECLARE_WRITE32_MEMBER( banshee_w );
-	DECLARE_READ32_MEMBER( banshee_fb_r );
-	DECLARE_WRITE32_MEMBER( banshee_fb_w );
-	DECLARE_READ32_MEMBER( banshee_io_r );
-	DECLARE_WRITE32_MEMBER( banshee_io_w );
-	DECLARE_READ32_MEMBER( banshee_rom_r );
-	DECLARE_READ8_MEMBER(banshee_vga_r);
-	DECLARE_WRITE8_MEMBER(banshee_vga_w);
+	u32 banshee_r(offs_t offset, u32 mem_mask = ~0);
+	void banshee_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 banshee_fb_r(offs_t offset);
+	void banshee_fb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 banshee_io_r(offs_t offset, u32 mem_mask = ~0);
+	void banshee_io_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 banshee_rom_r(offs_t offset);
+	u8 banshee_vga_r(offs_t offset);
+	void banshee_vga_w(offs_t offset, u8 data);
 
 protected:
 	voodoo_banshee_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t vdt);
 
 	// device-level overrides
-	DECLARE_READ32_MEMBER( banshee_agp_r );
-	DECLARE_WRITE32_MEMBER( banshee_agp_w );
+	u32 banshee_agp_r(offs_t offset);
+	void banshee_agp_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
 
 

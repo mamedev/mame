@@ -76,9 +76,9 @@ Notes:
 READ8_MEMBER( ob68k1a_state::pia_r )
 {
 	if (offset) {
-		return m_pia1->read(space,0);
+		return m_pia1->read(0);
 	} else {
-		return m_pia0->read(space,0);
+		return m_pia0->read(0);
 	}
 }
 
@@ -90,9 +90,9 @@ READ8_MEMBER( ob68k1a_state::pia_r )
 WRITE8_MEMBER( ob68k1a_state::pia_w )
 {
 	if (offset) {
-		m_pia1->write(space,0,data);
+		m_pia1->write(0,data);
 	} else {
-		m_pia0->write(space,0,data);
+		m_pia0->write(0,data);
 	}
 }
 
@@ -114,8 +114,8 @@ void ob68k1a_state::ob68k1a_mem(address_map &map)
 	map(0xffff00, 0xffff03).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
 	map(0xffff10, 0xffff10).w(COM8116_TAG, FUNC(com8116_device::str_stt_w));
 	map(0xffff20, 0xffff23).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_0_TAG, pia6821_device, read, write, 0x00ff)
-//  AM_RANGE(0xffff40, 0xffff47) AM_DEVREADWRITE8(MC6821_1_TAG, pia6821_device, read, write, 0xff00)
+//  map(0xffff40, 0xffff47).rw(MC6821_0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0x00ff);
+//  map(0xffff40, 0xffff47).rw(MC6821_1_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write)).umask16(0xff00);
 	map(0xffff40, 0xffff47).rw(FUNC(ob68k1a_state::pia_r), FUNC(ob68k1a_state::pia_w));
 	map(0xffff60, 0xffff6f).rw(MC6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write)).umask16(0x00ff);
 }
@@ -160,16 +160,14 @@ void ob68k1a_state::machine_start()
 void ob68k1a_state::machine_reset()
 {
 	// initialize COM8116
-	m_dbrg->write_stt(0x0e);
-	m_dbrg->write_str(0x0e);
+	m_dbrg->stt_w(0x0e);
+	m_dbrg->str_w(0x0e);
 
 	// set reset vector
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
 	uint8_t *rom = memregion(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
-
-	m_maincpu->reset();
 }
 
 
@@ -179,7 +177,7 @@ void ob68k1a_state::machine_reset()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( ob68k1a )
+//  machine_config( ob68k1a )
 //-------------------------------------------------
 
 void ob68k1a_state::ob68k1a(machine_config &config)
@@ -256,4 +254,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY     FULLNAME   FLAGS
-COMP( 1982, ob68k1a, 0,      0,      ob68k1a, ob68k1a, ob68k1a_state, empty_init, "Omnibyte", "OB68K1A", MACHINE_NO_SOUND_HW )
+COMP( 1982, ob68k1a, 0,      0,      ob68k1a, ob68k1a, ob68k1a_state, empty_init, "Omnibyte", "OB68K1A Single Board Computer", MACHINE_NO_SOUND_HW )

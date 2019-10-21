@@ -10,7 +10,7 @@ Typical Taito mid-80s hardware but with dual video output.
 
 Sound board:    Z80, 2 x YM2149, OKI M5232
 CPU board:      Z80, ROM and RAM, 68705P5 MCU (protected)
-OBJ board:      ROMs and RAM
+OBJ board:      48MHz OSC, ROMs and RAM
 Video board:    ROMs and RAM, 4 x Fujitsu MB112S146 (also used on arkanoid, lkage)
 
 The rest is just common logic, there are no custom chips.
@@ -34,6 +34,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
@@ -42,6 +43,7 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class wyvernf0_state : public driver_device
@@ -55,13 +57,18 @@ public:
 		m_spriteram(*this,"spriteram"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	void wyvernf0(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
 
 private:
 	// memory pointers
@@ -79,7 +86,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	DECLARE_WRITE8_MEMBER(bgram_w);
 	DECLARE_WRITE8_MEMBER(fgram_w);
-	DECLARE_VIDEO_START(wyvernf0);
 	uint32_t screen_update_wyvernf0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bool is_foreground );
 
@@ -94,21 +100,14 @@ private:
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(nmi_disable_w);
 	DECLARE_WRITE8_MEMBER(nmi_enable_w);
-	DECLARE_MACHINE_START(wyvernf0);
-	DECLARE_MACHINE_RESET(wyvernf0);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 
-	// MCU
-	uint8_t       m_mcu_val, m_mcu_ready;
-
-	DECLARE_READ8_MEMBER(fake_mcu_r);
-	DECLARE_WRITE8_MEMBER(fake_mcu_w);
-	DECLARE_READ8_MEMBER(fake_status_r);
+	DECLARE_READ8_MEMBER(mcu_status_r);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	required_device<taito68705_mcu_device> m_bmcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -162,7 +161,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
 
-VIDEO_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wyvernf0_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -300,26 +299,13 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 ***************************************************************************/
 
-READ8_MEMBER(wyvernf0_state::fake_mcu_r)
+READ8_MEMBER(wyvernf0_state::mcu_status_r)
 {
-	int result = 0;
-
-	if ((m_mcu_val & 0x73) == 0x73)
-		result = 0x42;  // at boot
-
-	return result;
-}
-
-WRITE8_MEMBER(wyvernf0_state::fake_mcu_w)
-{
-	m_mcu_val = data;
-}
-
-READ8_MEMBER(wyvernf0_state::fake_status_r)
-{
-	// bit 0 = ok to write
-	// bit 1 = ok to read
-	return 0x03;
+	// bit 0 = when 1, MCU is ready to receive data from main CPU
+	// bit 1 = when 1, MCU has sent data to the main CPU
+	return
+		((CLEAR_LINE == m_bmcu->host_semaphore_r()) ? 0x01 : 0x00) |
+		((CLEAR_LINE != m_bmcu->mcu_semaphore_r()) ? 0x02 : 0x00);
 }
 
 
@@ -371,7 +357,7 @@ TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
 
 WRITE8_MEMBER(wyvernf0_state::sound_command_w)
 {
-	m_soundlatch->write(space, 0, data);
+	m_soundlatch->write(data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(wyvernf0_state::nmi_callback),this), data);
 }
 
@@ -408,8 +394,8 @@ void wyvernf0_state::wyvernf0_map(address_map &map)
 
 	map(0xd300, 0xd303).ram().share("scrollram");
 
-	map(0xd400, 0xd400).rw(FUNC(wyvernf0_state::fake_mcu_r), FUNC(wyvernf0_state::fake_mcu_w));
-	map(0xd401, 0xd401).r(FUNC(wyvernf0_state::fake_status_r));
+	map(0xd400, 0xd400).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
+	map(0xd401, 0xd401).r(FUNC(wyvernf0_state::mcu_status_r));
 
 	map(0xd500, 0xd5ff).ram().share("spriteram");
 
@@ -618,7 +604,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_start()
 {
 	uint8_t *ROM = memregion("rombank")->base();
 	membank("rombank")->configure_entries(0, 8, ROM, 0x2000);
@@ -632,86 +618,77 @@ MACHINE_START_MEMBER(wyvernf0_state,wyvernf0)
 	save_item(NAME(m_pending_nmi));
 	save_item(NAME(m_rombank));
 	save_item(NAME(m_rambank));
-	save_item(NAME(m_mcu_val));
-	save_item(NAME(m_mcu_ready));
 }
 
-MACHINE_RESET_MEMBER(wyvernf0_state,wyvernf0)
+void wyvernf0_state::machine_reset()
 {
 	m_sound_nmi_enable = 0;
 	m_pending_nmi = 0;
 	m_rombank = 0;
 	m_rambank = 0;
-	m_mcu_val = 0;
-	m_mcu_ready = 0;
 }
 
-MACHINE_CONFIG_START(wyvernf0_state::wyvernf0)
-
+void wyvernf0_state::wyvernf0(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 6000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(wyvernf0_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", wyvernf0_state, irq0_line_hold)
+	Z80(config, m_maincpu, 48_MHz_XTAL/8); // 6MHz D780C-2 - Clock verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &wyvernf0_state::wyvernf0_map);
+	m_maincpu->set_vblank_int("screen", FUNC(wyvernf0_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, 4000000) // ?
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(wyvernf0_state, irq0_line_hold, 60*2)  // IRQ generated by ??? (drives music tempo), NMI by main cpu
+	// OSC on sound board is a custom/strange 6-pin part that outputs 8MHz, 4MHz, 2MHz (no external divider)
+	Z80(config, m_audiocpu, 4_MHz_XTAL); // 4MHz - Clock verified
+	m_audiocpu->set_addrmap(AS_PROGRAM, &wyvernf0_state::sound_map);
+	m_audiocpu->set_periodic_int(FUNC(wyvernf0_state::irq0_line_hold), attotime::from_hz(60*2)); // IRQ generated by ??? (drives music tempo), NMI by main cpu
 
-//  MCFG_DEVICE_ADD("mcu", M68705P5, 4000000) // ?
+	TAITO68705_MCU(config, m_bmcu, 48_MHz_XTAL/16); // 3MHz - Clock verified
 
-//  MCFG_QUANTUM_TIME(attotime::from_hz(6000)) // 100 CPU slices per second to synchronize between the MCU and the main CPU
-
-	MCFG_MACHINE_START_OVERRIDE(wyvernf0_state,wyvernf0)
-	MCFG_MACHINE_RESET_OVERRIDE(wyvernf0_state,wyvernf0)
+	/* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 	// video hardware
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(wyvernf0_state, screen_update_wyvernf0)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wyvernf0_state::screen_update_wyvernf0));
+	screen.set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_wyvernf0)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xxxxRRRRGGGGBBBB)
-	MCFG_PALETTE_ENDIANNESS(ENDIANNESS_BIG)
-
-	MCFG_VIDEO_START_OVERRIDE(wyvernf0_state,wyvernf0)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wyvernf0);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 512);
+	m_palette->set_endianness(ENDIANNESS_BIG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
 	// coin, fire, lift-off
-	MCFG_DEVICE_ADD("ay1", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2149(config, "ay1", 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // YM2149 2MHz clock verified, pin 26 ??
 
 	// lift-off, explosion (saucers), boss alarm
-	MCFG_DEVICE_ADD("ay2", YM2149, 3000000) // YM2149 clock ??, pin 26 ??
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	YM2149(config, "ay2", 2_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // YM2149 2MHz clock verified, pin 26 ??
 
 	// music
-	MCFG_DEVICE_ADD("msm", MSM5232, 2000000) // ?
-	MCFG_MSM5232_SET_CAPACITORS(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6) /* default 0.39 uF capacitors (not verified) */
-	MCFG_SOUND_ROUTE(0, "mono", 0.5)    // pin 28  2'-1
-	MCFG_SOUND_ROUTE(1, "mono", 0.5)    // pin 29  4'-1
-	MCFG_SOUND_ROUTE(2, "mono", 0.5)    // pin 30  8'-1
-	MCFG_SOUND_ROUTE(3, "mono", 0.5)    // pin 31 16'-1
-	MCFG_SOUND_ROUTE(4, "mono", 0.5)    // pin 36  2'-2
-	MCFG_SOUND_ROUTE(5, "mono", 0.5)    // pin 35  4'-2
-	MCFG_SOUND_ROUTE(6, "mono", 0.5)    // pin 34  8'-2
-	MCFG_SOUND_ROUTE(7, "mono", 0.5)    // pin 33 16'-2
+	msm5232_device &msm(MSM5232(config, "msm", 2_MHz_XTAL)); // 2MHz - Clock verified
+	msm.set_capacitors(0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6, 0.39e-6); /* default 0.39 uF capacitors (not verified) */
+	msm.add_route(0, "mono", 0.5);   // pin 28  2'-1
+	msm.add_route(1, "mono", 0.5);   // pin 29  4'-1
+	msm.add_route(2, "mono", 0.5);   // pin 30  8'-1
+	msm.add_route(3, "mono", 0.5);   // pin 31 16'-1
+	msm.add_route(4, "mono", 0.5);   // pin 36  2'-2
+	msm.add_route(5, "mono", 0.5);   // pin 35  4'-2
+	msm.add_route(6, "mono", 0.5);   // pin 34  8'-2
+	msm.add_route(7, "mono", 0.5);   // pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "mono", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 /***************************************************************************
 
@@ -734,8 +711,8 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_16.ic26", 0x0000, 0x4000, CRC(5a681fb4) SHA1(e31e751a54fa9853acb462ce22dd2ff5286808f0) )
 	ROM_FILL(                0xe000, 0x2000, 0xff ) // diagnostics ROM
 
-	ROM_REGION( 0x0800, "mcu", 0 )  // protected 68705P5 MCU
-	ROM_LOAD( "a39_mcu.icxx", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // 68705P5 MCU
+	ROM_LOAD( "a39_mc68705p5s.ic23", 0x0000, 0x0800, CRC(14bff574) SHA1(c91446540e7628b3e62135e2f560a118f7e0dad4) ) /* from other set, appears to be correct */
 
 	ROM_REGION( 0x10000, "sprites", 0 ) // sprites
 	ROM_LOAD( "a39_11.ic99", 0x0000, 0x4000, CRC(af70e1dc) SHA1(98dba673750cdfdf25c119c24da10428eff6591b) )
@@ -744,10 +721,42 @@ ROM_START( wyvernf0 )
 	ROM_LOAD( "a39_08.ic75", 0xc000, 0x4000, CRC(0ad69501) SHA1(29037c60bed9435568e997689d193f161f6a4f5b) )
 
 	ROM_REGION( 0x8000, "tiles", 0 ) // tilemaps
-	ROM_LOAD( "a39_14.ic99",  0x0000, 0x2000, CRC(90a66147) SHA1(8515c43980b7fa55933ca74fb23172e8c832a830) ) // wrong name?
+	ROM_LOAD( "a39_15.ic99",  0x0000, 0x2000, CRC(90a66147) SHA1(8515c43980b7fa55933ca74fb23172e8c832a830) ) // was listed as a39_14,ic99 but changed to a39_15.ic99
 	ROM_LOAD( "a39_14.ic73",  0x2000, 0x2000, CRC(a31f3507) SHA1(f72e089dbd700639d64e418812d4b6f4dc1dff75) )
 	ROM_LOAD( "a39_13.ic100", 0x4000, 0x2000, CRC(be708238) SHA1(f12d433af7bf6010dea9454a1b3bb2990a42a372) )
 	ROM_LOAD( "a39_12.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) )
 ROM_END
 
-GAME( 1985, wyvernf0, 0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito", "Wyvern F-0", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+ROM_START( wyvernf0a ) /* Possibly the first version or even an earlier development version as A39 06 above isn't labeled as A39 06-1 */
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "soft1_c2a0.ic37", 0x0000, 0x4000, CRC(15f0beb8) SHA1(4105f7064bf94460a020aecca8795553870e3fdc) ) /* Hand written label SOFT1 C2A0 */
+	ROM_LOAD( "soft2_7b60.ic36", 0x4000, 0x4000, CRC(569a40c4) SHA1(5391b6cdc854277e63e4658f79889da4a941ee42) ) /* Hand written label SOFT2 7B60 */
+
+	ROM_REGION( 0x10000, "rombank", 0 ) /* Only EXT 4 label was hand written, the others were printed */
+	ROM_LOAD( "ext1.ic35",      0x0000, 0x4000, CRC(50314281) SHA1(0f4805f06b92c170469b7bc2c0342db919107a91) ) /* == a39_03.ic35 */
+	ROM_LOAD( "ext2.ic34",      0x4000, 0x4000, CRC(7a225bf9) SHA1(4f0c287051e27f5bc936736225003a685cdf8ad3) ) /* == a39_04.ic34 */
+	ROM_LOAD( "ext3.ic33",      0x8000, 0x4000, CRC(41f21a67) SHA1(bee4a692259c727baf5fc4f47e09efb953b1c94e) ) /* == a39_05.ic33 */
+	ROM_LOAD( "ext4_8ca8.ic32", 0xc000, 0x4000, CRC(793e36de) SHA1(2a316d832ce524250c36602ca910bb4c8befa15d) ) /* Hand written label EXT 4 8CA8 */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // ROM had hand written label
+	ROM_LOAD( "sound_4182.ic26", 0x0000, 0x4000, CRC(5a681fb4) SHA1(e31e751a54fa9853acb462ce22dd2ff5286808f0) ) /* == a39_16.ic26 */
+	ROM_FILL(                    0xe000, 0x2000, 0xff ) // diagnostics ROM
+
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  // 68705P5 MCU
+	ROM_LOAD( "a39_mc68705p5s.ic23", 0x0000, 0x0800, CRC(14bff574) SHA1(c91446540e7628b3e62135e2f560a118f7e0dad4) ) /* hand written label P5 5/1 - part was unprotected */
+
+	ROM_REGION( 0x10000, "sprites", 0 ) // sprites - These 4 ROMs had hand written labels
+	ROM_LOAD( "obj4_d779.ic99", 0x0000, 0x4000, CRC(af70e1dc) SHA1(98dba673750cdfdf25c119c24da10428eff6591b) ) /* == a39_11.ic99 */
+	ROM_LOAD( "obj3_5852.ic78", 0x4000, 0x4000, CRC(a84380fb) SHA1(ed77892c1a789040fdfecd5903a23b8cbc1df1da) ) /* == a39_10.ic78 */
+	ROM_LOAD( "obj2_50fd.ic96", 0x8000, 0x4000, CRC(c0cee243) SHA1(97f66dde552c7a011ecc7ca8da0e62bc83ef8102) ) /* == a39_09.ic96 */
+	ROM_LOAD( "obj1_bd50.ic75", 0xc000, 0x4000, CRC(0ad69501) SHA1(29037c60bed9435568e997689d193f161f6a4f5b) ) /* == a39_08.ic75 */
+
+	ROM_REGION( 0x8000, "tiles", 0 ) // tilemaps
+	ROM_LOAD( "sch_4.ic99",  0x0000, 0x2000, CRC(90a66147) SHA1(8515c43980b7fa55933ca74fb23172e8c832a830) ) /* == a39_15.ic99  */
+	ROM_LOAD( "sch_3.ic73",  0x2000, 0x2000, CRC(a31f3507) SHA1(f72e089dbd700639d64e418812d4b6f4dc1dff75) ) /* == a39_14.ic73  */
+	ROM_LOAD( "sch_2.ic100", 0x4000, 0x2000, CRC(be708238) SHA1(f12d433af7bf6010dea9454a1b3bb2990a42a372) ) /* == a39_13.ic100 */
+	ROM_LOAD( "sch_1.ic74",  0x6000, 0x2000, CRC(1cc389de) SHA1(4213484d3a82688f312811e7a5c4d128e40584c3) ) /* == a39_12.ic74  */
+ROM_END
+
+GAME( 1985, wyvernf0,  0,        wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0 (Rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND)
+GAME( 1985, wyvernf0a, wyvernf0, wyvernf0, wyvernf0, wyvernf0_state, empty_init, ROT270, "Taito Corporation", "Wyvern F-0",         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND) // First version or earlier dev version?

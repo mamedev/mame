@@ -44,6 +44,7 @@ device_cpc_expansion_card_interface::~device_cpc_expansion_card_interface()
 cpc_expansion_slot_device::cpc_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CPC_EXPANSION_SLOT, tag, owner, clock)
 	, device_slot_interface(mconfig, *this)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_out_irq_cb(*this)
 	, m_out_nmi_cb(*this)
 	, m_out_reset_cb(*this)
@@ -73,6 +74,22 @@ void cpc_expansion_slot_device::device_start()
 	m_out_rom_select.resolve_safe();
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cpc_expansion_slot_device::device_config_complete()
+{
+	// for passthrough connectors, use the parent slot's CPU tag
+	if ((m_cpu.finder_tag() == finder_base::DUMMY_TAG) && (dynamic_cast<device_cpc_expansion_card_interface *>(owner()) != nullptr))
+	{
+		auto parent = dynamic_cast<cpc_expansion_slot_device *>(owner()->owner());
+		if (parent != nullptr)
+			m_cpu.set_tag(parent->m_cpu);
+	}
+}
 
 //-------------------------------------------------
 //  device_reset - device-specific reset

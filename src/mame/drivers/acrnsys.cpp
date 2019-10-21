@@ -123,7 +123,7 @@ void acrnsys_state::a6502_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x03ff).ram();
-	map(0x0e00, 0x0e7f).mirror(0x100).rw(m_ins8154, FUNC(ins8154_device::ins8154_r), FUNC(ins8154_device::ins8154_w));
+	map(0x0e00, 0x0e7f).mirror(0x100).rw(m_ins8154, FUNC(ins8154_device::read_io), FUNC(ins8154_device::write_io));
 	map(0xf000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -131,7 +131,7 @@ void acrnsys_state::a6809_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-	map(0x0900, 0x090f).mirror(0xf0).rw(m_via6522, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0900, 0x090f).mirror(0xf0).m(m_via6522, FUNC(via6522_device::map));
 	map(0xf800, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -139,7 +139,7 @@ void acrnsys_state::a6502a_mem(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x0000, 0x07ff).ram();
-	map(0x0e00, 0x0e0f).mirror(0x1f0).rw(m_via6522, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x0e00, 0x0e0f).mirror(0x1f0).m(m_via6522, FUNC(via6522_device::map));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -360,27 +360,29 @@ void acrnsys_state::kbd_put_pb(uint8_t data)
     6502 CPU Board - Part No. 200,000
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys_state::a6502)
+void acrnsys_state::a6502(machine_config &config)
+{
 	M6502(config, m_maincpu, 24_MHz_XTAL / 12); /* 1MHz 6502 CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys_state::a6502_mem);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
-	MCFG_DEVICE_ADD(m_ins8154, INS8154, 0)
-	//MCFG_INS8154_IN_A_CB(READ8(*this, acrnsys_state, ins8154_pa_r))
-	//MCFG_INS8154_OUT_A_CB(WRITE8(*this, acrnsys_state, ins8154_pa_w))
-	MCFG_INS8154_IN_B_CB(READ8(*this, acrnsys_state, kbd_r))
+	INS8154(config, m_ins8154);
+	//m_ins8154->in_a().set(FUNC(acrnsys_state::ins8154_pa_r));
+	//m_ins8154->out_a().set(FUNC(acrnsys_state::ins8154_pa_w));
+	m_ins8154->in_b().set(FUNC(acrnsys_state::kbd_r));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put));
+}
 
 
 /***************************************************************************
     6502A CPU Board - Part No. 200,005
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys_state::a6502a)
+void acrnsys_state::a6502a(machine_config &config)
+{
 	M6502(config, m_maincpu, 24_MHz_XTAL / 12); /* 2MHz 6502A CPU */
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys_state::a6502a_mem);
 
@@ -391,16 +393,17 @@ MACHINE_CONFIG_START(acrnsys_state::a6502a)
 	//m_via6522->cb2_handler().set(FUNC(acrnsys_state::cass_w));
 	m_via6522->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put));
+}
 
 
 /***************************************************************************
     6809 CPU Board - Part No. 200,012
 ***************************************************************************/
 
-MACHINE_CONFIG_START(acrnsys_state::a6809)
+void acrnsys_state::a6809(machine_config &config)
+{
 	MC6809(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &acrnsys_state::a6809_mem);
 
@@ -415,11 +418,12 @@ MACHINE_CONFIG_START(acrnsys_state::a6809)
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_via6522, FUNC(via6522_device::write_ca1));
 	m_centronics->busy_handler().set(m_via6522, FUNC(via6522_device::write_pa7));
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+	output_latch_device &latch(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(latch);
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(acrnsys_state, kbd_put_pb))
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(acrnsys_state::kbd_put_pb));
+}
 
 
 /***************************************************************************
@@ -433,7 +437,7 @@ void acrnsys_state::acrnsys2(machine_config &config)
 
 	/* Acorn Bus - 8 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
@@ -457,7 +461,7 @@ void acrnsys_state::acrnsys3(machine_config &config)
 
 	/* Acorn Bus - 8 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
@@ -481,7 +485,7 @@ void acrnsys_state::acrnsys3_6809(machine_config &config)
 
 	/* Acorn Bus - 8 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x0000-0x1fff
@@ -504,7 +508,7 @@ void acrnsys_state::acrnsys4(machine_config &config)
 
 	/* Acorn Bus - 14 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "8k"); // 0x2000-0x3fff
@@ -534,7 +538,7 @@ void acrnsys_state::acrnsys5(machine_config &config)
 
 	/* Acorn Bus - 7 Slot Backplane */
 	ACORN_BUS(config, m_bus, 0);
-	m_bus->set_cputag(m_maincpu);
+	m_bus->set_space(m_maincpu, AS_PROGRAM);
 	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 	m_bus->out_nmi_callback().set(FUNC(acrnsys_state::bus_nmi_w));
 	ACORN_BUS_SLOT(config, "bus1", m_bus, acorn_bus_devices, "32k"); // 32K

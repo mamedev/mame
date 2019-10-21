@@ -29,25 +29,20 @@ public:
 	void stellafr(machine_config &config);
 
 private:
-	IRQ_CALLBACK_MEMBER(irq_ack);
 	DECLARE_WRITE8_MEMBER(write_8000c1);
 	DECLARE_READ8_MEMBER(read_800101);
 	DECLARE_WRITE8_MEMBER(write_800101);
 	DECLARE_WRITE8_MEMBER(duart_output_w);
 	DECLARE_WRITE8_MEMBER(ay8910_portb_w);
 
-	void stellafr_map(address_map &map);
+	void mem_map(address_map &map);
+	void fc7_map(address_map &map);
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 };
 
-
-IRQ_CALLBACK_MEMBER(stellafr_state::irq_ack)
-{
-	return m_duart->get_irq_vector();
-}
 
 WRITE8_MEMBER(stellafr_state::write_8000c1)
 {
@@ -72,7 +67,7 @@ WRITE8_MEMBER(stellafr_state::ay8910_portb_w)
 
 
 
-void stellafr_state::stellafr_map(address_map &map)
+void stellafr_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
 	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::write_8000c1));
@@ -83,6 +78,11 @@ void stellafr_state::stellafr_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();
 }
 
+void stellafr_state::fc7_map(address_map &map)
+{
+	map(0xfffff5, 0xfffff5).r(m_duart, FUNC(mc68681_device::get_irq_vector));
+}
+
 
 static INPUT_PORTS_START( stellafr )
 	PORT_START("INPUTS")
@@ -90,21 +90,22 @@ static INPUT_PORTS_START( stellafr )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(stellafr_state::stellafr)
-	MCFG_DEVICE_ADD("maincpu", M68000, 10000000 ) //?
-	MCFG_DEVICE_PROGRAM_MAP(stellafr_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(stellafr_state, irq_ack)
+void stellafr_state::stellafr(machine_config &config)
+{
+	M68000(config, m_maincpu, 10000000 ); //?
+	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map);
+	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
-	MCFG_DEVICE_ADD("duart", MC68681, 3686400)
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", M68K_IRQ_2)) // ?
-	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(*this, stellafr_state, duart_output_w))
+	MC68681(config, m_duart, 3686400);
+	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_2); // ?
+	m_duart->outport_cb().set(FUNC(stellafr_state::duart_output_w));
 
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("INPUTS"))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, stellafr_state, ay8910_portb_w))
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	aysnd.port_a_read_callback().set_ioport("INPUTS");
+	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
+}
 
 
 

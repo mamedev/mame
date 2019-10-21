@@ -39,15 +39,16 @@ DEFINE_DEVICE_TYPE(NUBUS_824GC, nubus_824gc_device, "nb_824gc", "Apple 8*24 vide
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(jmfb_device::device_add_mconfig)
-	MCFG_SCREEN_ADD(GC48_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, jmfb_device, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(25175000, 800, 0, 640, 525, 0, 480)
-//  MCFG_SCREEN_SIZE(1152, 870)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 1152-1, 0, 870-1)
-//  MCFG_SCREEN_REFRESH_RATE(75)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1260))
-MACHINE_CONFIG_END
+void jmfb_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, GC48_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(jmfb_device::screen_update));
+	screen.set_raw(25175000, 800, 0, 640, 525, 0, 480);
+//  screen.set_size(1152, 870);
+//  screen.set_visarea(0, 1152-1, 0, 870-1);
+//  screen.set_refresh_hz(75);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(1260));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

@@ -2,7 +2,7 @@
 // copyright-holders:R. Belmont, Acho A. Tang, Phil Stroffolino, Olivier Galibert
 /**************************************************************************
  *
- * machine/konamigx.c - contains various System GX hardware abstractions
+ * machine/konamigx.cpp - contains various System GX hardware abstractions
  *
  */
 

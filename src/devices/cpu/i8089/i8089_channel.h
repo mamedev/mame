@@ -15,17 +15,6 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_I8089_CHANNEL_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, I8089_CHANNEL, 0)
-
-#define MCFG_I8089_CHANNEL_SINTR(_sintr) \
-	downcast<i8089_channel_device *>(device)->set_sintr_callback(DEVCB_##_sintr);
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -38,7 +27,7 @@ public:
 	// construction/destruction
 	i8089_channel_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> void set_sintr_callback(Object &&sintr) { m_write_sintr.set_callback(std::forward<Object>(sintr)); }
+	auto sintr() { return m_write_sintr.bind(); }
 
 	// set register
 	void set_reg(int reg, uint32_t value, int tag = -1);
@@ -157,7 +146,7 @@ private:
 	void ori_ri(int r, int16_t i);
 	void ori_mi(int m, int16_t i, int o);
 	void setb(int m, int b, int o);
-	void sintr();
+	void do_sintr();
 	void tsl(int m, int8_t i, int8_t d, int o);
 	void wid(int s, int d);
 	void xfer();

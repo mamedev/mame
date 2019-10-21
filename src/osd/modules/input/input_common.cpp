@@ -34,14 +34,16 @@
 #elif defined(OSD_SDL)
 // SDL include
 #include <SDL2/SDL.h>
-#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char *) UI }
-#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char*) #mame }
+#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, ascii, "ITEM_ID_"#mame, (char *) UI }
+#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #elif defined(OSD_UWP)
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #else
 // osd mini
 #endif
+
+// FIXME: sdl_key can be removed from the table below. It is no longer used.
 
 #if defined(OSD_WINDOWS) || defined(OSD_SDL) || defined(OSD_UWP)
 key_trans_entry keyboard_trans_table::s_default_table[] =

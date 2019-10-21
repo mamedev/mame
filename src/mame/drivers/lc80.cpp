@@ -330,92 +330,89 @@ void lc80_state::machine_start()
 
 /* Machine Driver */
 
-MACHINE_CONFIG_START(lc80_state::lc80)
+void lc80_state::lc80(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 900000) /* UD880D */
-	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
-	MCFG_DEVICE_IO_MAP(lc80_io)
+	Z80(config, m_maincpu, 900000); /* UD880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, lc80_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio2_pb_r))
+	Z80PIO(config, m_pio2, 900000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("1K")
-	MCFG_RAM_EXTRA_OPTIONS("2K,3K,4K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("1K").set_extra_options("2K,3K,4K");
+}
 
-MACHINE_CONFIG_START(lc80_state::lc80_2)
+void lc80_state::lc80_2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 1800000) /* UD880D */
-	MCFG_DEVICE_PROGRAM_MAP(lc80_mem)
-	MCFG_DEVICE_IO_MAP(lc80_io)
+	Z80(config, m_maincpu, 1800000); /* UD880D */
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::lc80_mem);
+	m_maincpu->set_addrmap(AS_IO, &lc80_state::lc80_io);
 
 	/* video hardware */
 	config.set_default_layout(layout_lc80);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	/* devices */
-	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 900000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80CTC_ZC0_CB(WRITELINE(*this, lc80_state, ctc_z0_w))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE(*this, lc80_state, ctc_z1_w))
-	MCFG_Z80CTC_ZC2_CB(WRITELINE(*this, lc80_state, ctc_z2_w))
+	z80ctc_device& ctc(Z80CTC(config, Z80CTC_TAG, 900000));
+	ctc.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	ctc.zc_callback<0>().set(FUNC(lc80_state::ctc_z0_w));
+	ctc.zc_callback<1>().set(FUNC(lc80_state::ctc_z1_w));
+	ctc.zc_callback<2>().set(FUNC(lc80_state::ctc_z2_w));
 
-	MCFG_DEVICE_ADD(Z80PIO1_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_OUT_PA_CB(WRITE8(*this, lc80_state, pio1_pa_w))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio1_pb_r))
-	MCFG_Z80PIO_OUT_PB_CB(WRITE8(*this, lc80_state, pio1_pb_w))
+	z80pio_device& pio1(Z80PIO(config, Z80PIO1_TAG, 900000));
+	pio1.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	pio1.out_pa_callback().set(FUNC(lc80_state::pio1_pa_w));
+	pio1.in_pb_callback().set(FUNC(lc80_state::pio1_pb_r));
+	pio1.out_pb_callback().set(FUNC(lc80_state::pio1_pb_w));
 
-	MCFG_DEVICE_ADD(Z80PIO2_TAG, Z80PIO, 900000)
-	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
-	MCFG_Z80PIO_IN_PB_CB(READ8(*this, lc80_state, pio2_pb_r))
+	Z80PIO(config, m_pio2, 900000);
+	m_pio2->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio2->in_pb_callback().set(FUNC(lc80_state::pio2_pb_r));
 
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("4K")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("4K");
+}
 
 #if 0
-static MACHINE_CONFIG_START( sc80 )
+void lc80_state::sc80(machine_config &config)
+{
 	lc80_2(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY(Z80_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(sc80_mem)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &lc80_state::sc80_mem);
+}
 #endif
 
 /* ROMs */

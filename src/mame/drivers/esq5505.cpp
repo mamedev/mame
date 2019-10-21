@@ -132,6 +132,7 @@
 #include "cpu/es5510/es5510.h"
 #include "cpu/m68000/m68000.h"
 #include "formats/esq16_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/esqlcd.h"
 #include "machine/esqpanel.h"
 #include "machine/esqvfd.h"
@@ -193,7 +194,7 @@ public:
 	void init_sq1();
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+
 	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
 
 private:
@@ -221,13 +222,13 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
 	DECLARE_WRITE8_MEMBER(duart_output);
 
+	void es5505_clock_changed(u32 data);
+
 	int m_system_type;
 	uint8_t m_duart_io;
 	uint8_t otis_irq_state;
 	uint8_t dmac_irq_state;
-	int dmac_irq_vector;
 	uint8_t duart_irq_state;
-	int duart_irq_vector;
 
 	void update_irq_to_maincpu();
 
@@ -238,39 +239,35 @@ private:
 	void vfx_map(address_map &map);
 	void vfxsd_map(address_map &map);
 
+	void cpu_space_map(address_map &map);
+	void eps_cpu_space_map(address_map &map);
+
 	uint16_t  *m_rom, *m_ram;
 	uint16_t m_analog_values[8];
 
 	//dmac
-	DECLARE_WRITE8_MEMBER(dma_end);
-	DECLARE_WRITE8_MEMBER(dma_error);
+	DECLARE_WRITE_LINE_MEMBER(dma_irq);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
 	FLOPPY_ESQIMG_FORMAT
 FLOPPY_FORMATS_END
 
-IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
+void esq5505_state::cpu_space_map(address_map &map)
 {
-	switch(irqline)
-	{
-	case 1:
-		return M68K_INT_ACK_AUTOVECTOR;
-	case 2:
-		return dmac_irq_vector;
-	case 3:
-		return duart_irq_vector;
-	default:
-		logerror("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
-		return 0;
-	}
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff7, 0xfffff7).r(m_duart, FUNC(mc68681_device::get_irq_vector));
+}
+
+void esq5505_state::eps_cpu_space_map(address_map &map)
+{
+	cpu_space_map(map);
+	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
 }
 
 void esq5505_state::machine_start()
 {
 	driver_device::machine_start();
-	// tell the pump about the ESP chips
-	m_pump->set_esp(m_esp);
 
 	m_rom = (uint16_t *)(void *)memregion("osrom")->base();
 	m_ram = (uint16_t *)(void *)memshare("osram")->ptr();
@@ -319,13 +316,13 @@ void esq5505_state::update_irq_to_maincpu()
 	{
 		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 	}
 	else if (dmac_irq_state)
 	{
 		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	}
 	else if (otis_irq_state)
 	{
@@ -434,6 +431,11 @@ WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
 	update_irq_to_maincpu();
 }
 
+void esq5505_state::es5505_clock_changed(u32 data)
+{
+	m_pump->set_unscaled_clock(data);
+}
+
 WRITE16_MEMBER(esq5505_state::analog_w)
 {
 	offset &= 0x7;
@@ -450,12 +452,11 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
 	if (state == ASSERT_LINE)
 	{
-		duart_irq_vector = m_duart->get_irq_vector();
 		duart_irq_state = 1;
 	}
 	else
 	{
-				duart_irq_state = 0;
+		duart_irq_state = 0;
 	}
 	update_irq_to_maincpu();
 }
@@ -526,30 +527,12 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 	m_panel->rx_w(state);
 }
 
-WRITE8_MEMBER(esq5505_state::dma_end)
+WRITE_LINE_MEMBER(esq5505_state::dma_irq)
 {
-	if (data != 0)
+	if (state != CLEAR_LINE)
 	{
-		//printf("DMAC IRQ, vector = %x\n", m_dmac->get_vector(offset));
+		logerror("DMAC error, vector = %x\n", m_dmac->iack());
 		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
-	}
-	else
-	{
-		dmac_irq_state = 0;
-	}
-
-	// printf("IRQ update from DMAC: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-	update_irq_to_maincpu();
-}
-
-WRITE8_MEMBER(esq5505_state::dma_error)
-{
-	if(data != 0)
-	{
-		logerror("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
-		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
@@ -562,7 +545,7 @@ WRITE8_MEMBER(esq5505_state::dma_error)
 #if KEYBOARD_HACK
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
-	int val = (uint8_t)(uintptr_t)param;
+	int val = (uint8_t)param;
 	int cmp = 0x60;
 
 	if (m_system_type == SQ1)
@@ -605,7 +588,7 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		}
 		else if (oldval == 1 && newval == 0)
 		{
-	//        printf("key off %x\n", (uint8_t)(uintptr_t)param);
+	//        printf("key off %x\n", (uint8_t)param);
 			m_panel->xmit_char(val&0x7f);
 			m_panel->xmit_char(0x00);
 		}
@@ -617,7 +600,7 @@ void esq5505_state::vfx(machine_config &config)
 {
 	M68000(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfx_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(esq5505_state::maincpu_irq_acknowledge_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
@@ -643,10 +626,12 @@ void esq5505_state::vfx(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ESQ_5505_5510_PUMP(config, m_pump, 10_MHz_XTAL / (16 * 21));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
 	auto &es5505(ES5505(config, "otis", 10_MHz_XTAL));
+	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */
@@ -666,6 +651,7 @@ void esq5505_state::eps(machine_config &config)
 {
 	vfx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
@@ -681,10 +667,9 @@ void esq5505_state::eps(machine_config &config)
 
 	HD63450(config, m_dmac, 10_MHz_XTAL);   // MC68450 compatible
 	m_dmac->set_cpu_tag(m_maincpu);
-	m_dmac->set_our_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
+	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
-	m_dmac->dma_end().set(FUNC(esq5505_state::dma_end));
-	m_dmac->dma_error().set(FUNC(esq5505_state::dma_error));
+	m_dmac->irq_callback().set(FUNC(esq5505_state::dma_irq));
 	m_dmac->dma_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
 	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
@@ -704,9 +689,9 @@ void esq5505_state::vfxsd(machine_config &config)
 // 32-voice machines with the VFX-SD type config
 void esq5505_state::vfx32(machine_config &config)
 {
-	M68000(config, m_maincpu, 30.4761_MHz_XTAL / 2);
+	M68000(config, m_maincpu, 30.47618_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(esq5505_state::maincpu_irq_acknowledge_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::cpu_space_map);
 
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
@@ -731,11 +716,13 @@ void esq5505_state::vfx32(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ESQ_5505_5510_PUMP(config, m_pump, 30.4761_MHz_XTAL / (2 * 16 * 32));
+	ESQ_5505_5510_PUMP(config, m_pump, 30.47618_MHz_XTAL / (2 * 16 * 32));
+	m_pump->set_esp(m_esp);
 	m_pump->add_route(0, "lspeaker", 1.0);
 	m_pump->add_route(1, "rspeaker", 1.0);
 
-	auto &es5505(ES5505(config, "otis", 30.4761_MHz_XTAL / 2));
+	auto &es5505(ES5505(config, "otis", 30.47618_MHz_XTAL / 2));
+	es5505.sample_rate_changed().set(FUNC(esq5505_state::es5505_clock_changed));
 	es5505.set_region0("waverom");  /* Bank 0 */
 	es5505.set_region1("waverom2"); /* Bank 1 */
 	es5505.set_channels(4);          /* channels */

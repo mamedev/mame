@@ -48,10 +48,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 
 	// device_newbrain_expansion_slot_interface overrides
-	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
-	virtual void mreq_w(address_space &space, offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
-	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t data, bool &prtov) override;
-	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, bool &prtov) override;
+	virtual uint8_t mreq_r(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
+	virtual void mreq_w(offs_t offset, uint8_t data, bool &romov, int &exrm, bool &raminh) override;
+	virtual uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov) override;
+	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );

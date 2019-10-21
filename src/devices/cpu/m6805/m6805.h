@@ -12,7 +12,6 @@
 //**************************************************************************
 
 // device type definition
-DECLARE_DEVICE_TYPE(M6805,     m6805_device)
 DECLARE_DEVICE_TYPE(M68HC05EG, m68hc05eg_device)
 DECLARE_DEVICE_TYPE(HD63705,   hd63705_device)
 
@@ -65,6 +64,25 @@ protected:
 			, m_addr_width(addr_width)
 			, m_sp_mask(sp_mask)
 			, m_sp_floor(sp_floor)
+			, m_vector_mask((1U << addr_width) - 1)
+			, m_swi_vector(swi_vector)
+		{
+		}
+
+		configuration_params(
+				op_handler_table &ops,
+				cycle_count_table &cycles,
+				u32 addr_width,
+				u32 sp_mask,
+				u32 sp_floor,
+				u16 vector_mask,
+				u16 swi_vector)
+			: m_ops(ops)
+			, m_cycles(cycles)
+			, m_addr_width(addr_width)
+			, m_sp_mask(sp_mask)
+			, m_sp_floor(sp_floor)
+			, m_vector_mask(vector_mask)
 			, m_swi_vector(swi_vector)
 		{
 		}
@@ -74,6 +92,7 @@ protected:
 		u32 m_addr_width;
 		u32 m_sp_mask;
 		u32 m_sp_floor;
+		u16 m_vector_mask;
 		u16 m_swi_vector;
 	};
 
@@ -279,16 +298,6 @@ protected:
 	// address spaces
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-};
-
-
-// ======================> m6805_device
-
-class m6805_device : public m6805_base_device
-{
-public:
-	// construction/destruction
-	m6805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

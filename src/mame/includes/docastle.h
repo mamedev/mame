@@ -14,6 +14,7 @@
 #include "video/mc6845.h"
 #include "sound/msm5205.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 class docastle_state : public driver_device
 {
@@ -37,12 +38,17 @@ public:
 	void idsoccer(machine_config &config);
 	void docastle(machine_config &config);
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+	virtual void video_start() override;
+
 private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_cpu3;
-	required_device<h46505_device> m_crtc;
+	required_device<hd6845s_device> m_crtc;
 	optional_device<msm5205_device> m_msm;
 	required_device_array<tms1025_device, 2> m_inp;
 
@@ -78,17 +84,12 @@ private:
 	DECLARE_READ8_MEMBER(idsoccer_adpcm_status_r);
 	DECLARE_WRITE8_MEMBER(idsoccer_adpcm_w);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(docastle);
+	void docastle_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(dorunrun);
-	uint32_t screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_docastle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void video_start_common( uint32_t tile_transmask );
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(docastle_tint);
-	DECLARE_WRITE_LINE_MEMBER(stx_on_w);
-	DECLARE_WRITE_LINE_MEMBER(stx_off_w);
 	DECLARE_WRITE_LINE_MEMBER(idsoccer_adpcm_int);
 	void docastle_io_map(address_map &map);
 	void docastle_map(address_map &map);

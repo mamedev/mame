@@ -25,7 +25,7 @@ class wswan_sound_device : public device_t,
 public:
 	wswan_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER( port_w );
+	void port_w(offs_t offset, uint8_t data);
 
 protected:
 	struct CHAN
@@ -42,7 +42,7 @@ protected:
 
 		uint16_t  freq;           /* frequency */
 		uint16_t  period;         /* period */
-		int32_t   pos;            /* position */
+		uint32_t  pos;            /* position */
 		uint8_t   vol_left;       /* volume left */
 		uint8_t   vol_right;      /* volume right */
 		uint8_t   on;         /* on/off */
@@ -71,7 +71,7 @@ private:
 	CHAN m_audio4;     /* Audio channel 4 */
 	int8_t    m_sweep_step;     /* Sweep step */
 	uint32_t  m_sweep_time;     /* Sweep time */
-	int32_t   m_sweep_count;        /* Sweep counter */
+	uint32_t  m_sweep_count;        /* Sweep counter */
 	uint8_t   m_noise_type;     /* Noise generator type */
 	uint8_t   m_noise_reset;        /* Noise reset */
 	uint8_t   m_noise_enable;       /* Noise enable */

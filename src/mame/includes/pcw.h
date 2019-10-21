@@ -5,10 +5,13 @@
  * includes/pcw.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_PCW_H
 #define MAME_INCLUDES_PCW_H
 
+#pragma once
+
+#include "cpu/mcs48/mcs48.h"
+#include "imagedev/floppy.h"
 #include "machine/upd765.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
@@ -32,14 +35,20 @@ class pcw_state : public driver_device
 {
 public:
 	pcw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_fdc(*this, "upd765"),
-			m_floppy(*this, "upd765:%u", 0U),
-			m_ram(*this, RAM_TAG),
-			m_beeper(*this, "beeper"),
-			m_screen(*this, "screen"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_printer_mcu(*this, "printer_mcu")
+		, m_keyboard_mcu(*this, "keyboard_mcu")
+		, m_fdc(*this, "upd765")
+		, m_floppy(*this, "upd765:%u", 0U)
+		, m_ram(*this, RAM_TAG)
+		, m_beeper(*this, "beeper")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_ppalette(*this, "ppalette")
+		, m_rdbanks(*this, "bank%u", 1U)
+		, m_wrbanks(*this, "bank%u", 5U)
+		, m_iptlines(*this, "LINE%u", 0U)
 	{ }
 
 	int m_boot;
@@ -111,7 +120,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pcw);
+	void set_8xxx_palette(palette_device &palette) const;
+	void set_9xxx_palette(palette_device &palette) const;
+	void set_printer_palette(palette_device &palette) const;
 	uint32_t screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pcw_timer_pulse);
@@ -124,12 +135,17 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( pcw_fdc_interrupt );
 	required_device<cpu_device> m_maincpu;
+	required_device<upi41_cpu_device> m_printer_mcu;
+	required_device<i8048_device> m_keyboard_mcu;
 	required_device<upd765a_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<ram_device> m_ram;
 	required_device<beep_device> m_beeper;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<palette_device> m_ppalette;
+	required_memory_bank_array<4> m_rdbanks, m_wrbanks;
+	required_ioport_array<16> m_iptlines;
 
 	inline void pcw_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void pcw_update_interrupt_counter();
@@ -143,6 +159,9 @@ public:
 	void pcw8256(machine_config &config);
 	void pcw8512(machine_config &config);
 	void pcw9512(machine_config &config);
+	void pcw9256(machine_config &config);
+	void pcw9512p(machine_config &config);
+	void pcw10(machine_config &config);
 	void pcw9512_io(address_map &map);
 	void pcw_io(address_map &map);
 	void pcw_map(address_map &map);

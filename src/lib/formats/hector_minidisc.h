@@ -7,11 +7,10 @@
     Disk image format
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_HECTOR_MINIDISC_H
+#define MAME_FORMATS_HECTOR_MINIDISC_H
 
 #pragma once
-
-#ifndef __HMD_DSK_H__
-#define __HMD_DSK_H__
 
 #include "upd765_dsk.h"
 
@@ -30,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_HMD_FORMAT;
 
-#endif // __HMD_DSK_H__
+#endif // MAME_FORMATS_HECTOR_MINIDISC_H

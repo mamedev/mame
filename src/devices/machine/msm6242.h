@@ -40,10 +40,6 @@
 #include "dirtc.h"
 
 
-#define MCFG_MSM6242_OUT_INT_HANDLER(_devcb) \
-	downcast<msm6242_device &>(*device).set_out_int_handler(DEVCB_##_devcb);
-
-
 // ======================> msm6242_device
 
 class msm6242_device : public device_t, public device_rtc_interface
@@ -52,7 +48,6 @@ public:
 	// construction/destruction
 	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_out_int_handler(Object &&cb) { return m_out_int_handler.set_callback(std::forward<Object>(cb)); }
 	auto out_int_handler() { return m_out_int_handler.bind(); }
 
 	// I/O operations

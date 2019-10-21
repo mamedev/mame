@@ -171,14 +171,14 @@ static NETLIST_START(nl_mario_dac)
 	RES(R35, RES_M(1))
 	RES(R36, RES_M(1.8))
 	LM3900(3M_1)
-	NET_C(3M_1.VM, GND)
-	NET_C(3M_1.VP, V5)
+	NET_C(3M_1.GND, GND)
+	NET_C(3M_1.VCC, V5)
 
 	NET_C(DAC.VOUT, R34.1)
 	NET_C(3M_1.MINUS, R34.2, R35.2)
 	NET_C(3M_1.OUT, R35.1)
 	NET_C(3M_1.PLUS, R36.1)
-	NET_C(R36.2, GND)
+	NET_C(R36.2, V5)
 
 	RES(R21, RES_M(1.8))
 	RES(R23, RES_K(10))
@@ -193,8 +193,8 @@ static NETLIST_START(nl_mario_dac)
 	CAP(C30, CAP_P(100))
 
 	LM3900(3M_2)
-	NET_C(3M_2.VM, GND)
-	NET_C(3M_2.VP, V5)
+	NET_C(3M_2.GND, GND)
+	NET_C(3M_2.VCC, V5)
 
 	NET_C(R35.1, C20.1)
 	NET_C(C20.2, R37.1)
@@ -218,13 +218,15 @@ NETLIST_START(mario)
 	LOCAL_SOURCE(nl_mario_dac)
 
 	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-6)
+	PARAM(Solver.ACCURACY, 1e-7)
 	PARAM(Solver.SOR_FACTOR, 1.0)
 	PARAM(Solver.GS_LOOPS, 1)
 	/* Dynamic timestepping avoids excessive newton loops on startup */
 	PARAM(Solver.DYNAMIC_LTE, 5e-2)
-	PARAM(Solver.DYNAMIC_TS,  1)
+	PARAM(Solver.DYNAMIC_TS,  0)
+
 	ANALOG_INPUT(V5, 5)
+	ALIAS(VCC, V5) // no-ttl-dip devices need VCC!
 
 	TTL_INPUT(SOUND0, 1)
 	INCLUDE(nl_mario_snd0)

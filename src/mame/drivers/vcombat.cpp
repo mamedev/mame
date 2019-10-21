@@ -94,6 +94,9 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 
 class vcombat_state : public driver_device
 {
@@ -104,8 +107,7 @@ public:
 		m_framebuffer_ctrl(*this, "fb_control"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
-		m_vid_0(*this, "vid_0"),
-		m_vid_1(*this, "vid_1"),
+		m_vid(*this, "vid_%u", 0U),
 		m_dac(*this, "dac"),
 		m_crtc(*this, "crtc") { }
 
@@ -115,13 +117,15 @@ public:
 	void shadfgtr(machine_config &config);
 	void vcombat(machine_config &config);
 
+protected:
+	virtual void machine_reset() override;
+
 private:
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<uint16_t> m_framebuffer_ctrl;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<i860_cpu_device> m_vid_0;
-	optional_device<i860_cpu_device> m_vid_1;
+	optional_device_array<i860_cpu_device, 2> m_vid;
 	required_device<dac_word_interface> m_dac;
 	optional_device<mc6845_device> m_crtc;
 
@@ -133,6 +137,7 @@ private:
 	DECLARE_READ16_MEMBER(control_1_r);
 	DECLARE_READ16_MEMBER(control_2_r);
 	DECLARE_READ16_MEMBER(control_3_r);
+	void wiggle_i860_common(int which, uint16_t data);
 	DECLARE_WRITE16_MEMBER(wiggle_i860p0_pins_w);
 	DECLARE_WRITE16_MEMBER(wiggle_i860p1_pins_w);
 	DECLARE_READ16_MEMBER(main_irqiack_r);
@@ -143,8 +148,6 @@ private:
 	DECLARE_WRITE16_MEMBER(vcombat_dac_w);
 	DECLARE_WRITE_LINE_MEMBER(sound_update);
 
-	DECLARE_MACHINE_RESET(vcombat);
-	DECLARE_MACHINE_RESET(shadfgtr);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -246,46 +249,47 @@ READ16_MEMBER(vcombat_state::control_3_r)
 	return (ioport("IN2")->read() << 8);
 }
 
-static void wiggle_i860_common(i860_cpu_device *device, uint16_t data)
+void vcombat_state::wiggle_i860_common(int which, uint16_t data)
 {
 	int bus_hold = (data & 0x03) == 0x03;
 	int reset = data & 0x10;
-	if (!device)
+	if (!m_vid[which].found())
 		return;
 
+	i860_cpu_device &device = *m_vid[which];
 	if (bus_hold)
 	{
-		fprintf(stderr, "M0 asserting bus HOLD to i860 %s\n", device->tag());
-		device->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
+		LOG("M0 asserting bus HOLD to i860 #%d\n", which);
+		device.i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 	}
 	else
 	{
-		fprintf(stderr, "M0 clearing bus HOLD to i860 %s\n", device->tag());
-		device->i860_set_pin(DEC_PIN_BUS_HOLD, 0);
+		LOG("M0 clearing bus HOLD to i860 #%d\n", which);
+		device.i860_set_pin(DEC_PIN_BUS_HOLD, 0);
 	}
 
 	if (reset)
 	{
-		fprintf(stderr, "M0 asserting RESET to i860 %s\n", device->tag());
-		device->i860_set_pin(DEC_PIN_RESET, 1);
+		LOG("M0 asserting RESET to i860 #%d\n", which);
+		device.i860_set_pin(DEC_PIN_RESET, 1);
 	}
 	else
-		device->i860_set_pin(DEC_PIN_RESET, 0);
+		device.i860_set_pin(DEC_PIN_RESET, 0);
 }
 
 WRITE16_MEMBER(vcombat_state::wiggle_i860p0_pins_w)
 {
-	wiggle_i860_common(m_vid_0, data);
+	wiggle_i860_common(0, data);
 }
 
 WRITE16_MEMBER(vcombat_state::wiggle_i860p1_pins_w)
 {
-	wiggle_i860_common(m_vid_1, data);
+	wiggle_i860_common(1, data);
 }
 
 READ16_MEMBER(vcombat_state::main_irqiack_r)
 {
-	//fprintf(stderr, "M0: irq iack\n");
+	//LOG("M0: irq iack\n");
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	return 0;
@@ -293,7 +297,7 @@ READ16_MEMBER(vcombat_state::main_irqiack_r)
 
 READ16_MEMBER(vcombat_state::sound_resetmain_r)
 {
-	//fprintf(stderr, "M1: reset line to M0\n");
+	//LOG("M1: reset line to M0\n");
 	//m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	return 0;
 }
@@ -348,9 +352,9 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 		return;
 
 	if (m_crtc_select == 0)
-		m_crtc->address_w(space, 0, data >> 8);
+		m_crtc->address_w(data >> 8);
 	else
-		m_crtc->register_w(space, 0, data >> 8);
+		m_crtc->register_w(data >> 8);
 
 	m_crtc_select ^= 1;
 }
@@ -359,7 +363,7 @@ WRITE16_MEMBER(vcombat_state::vcombat_dac_w)
 {
 	m_dac->write(data >> 5);
 	if (data & 0x801f)
-		fprintf(stderr, "dac overflow %04x\n", data & 0x801f);
+		LOG("dac overflow %04x\n", data & 0x801f);
 }
 
 void vcombat_state::main_map(address_map &map)
@@ -390,8 +394,8 @@ void vcombat_state::main_map(address_map &map)
 	map(0x702000, 0x702001).r(FUNC(vcombat_state::control_3_r));
 	map(0x705000, 0x705001).ram().share("share4");      /* M1->M0 */
 
-	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
-	//AM_RANGE(0x704000, 0x704001)      /* Headset rotation axis? */
+	//map(0x703000, 0x703001)      /* Headset rotation axis? */
+	//map(0x704000, 0x704001)      /* Headset rotation axis? */
 
 	map(0x706000, 0x70601f).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
 }
@@ -434,17 +438,11 @@ void vcombat_state::sound_map(address_map &map)
 }
 
 
-MACHINE_RESET_MEMBER(vcombat_state,vcombat)
+void vcombat_state::machine_reset()
 {
-	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
-	m_vid_1->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
-
-	m_crtc_select = 0;
-}
-
-MACHINE_RESET_MEMBER(vcombat_state,shadfgtr)
-{
-	m_vid_0->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
+	for (auto &i860 : m_vid)
+		if (i860.found())
+			i860->i860_set_pin(DEC_PIN_BUS_HOLD, 1);
 
 	m_crtc_select = 0;
 }
@@ -560,86 +558,90 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(vcombat_state::vcombat)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
+void vcombat_state::vcombat(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
-	MCFG_DEVICE_ADD("vid_0", I860, XTAL(20'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(vid_0_map)
+	I860(config, m_vid[0], XTAL(20'000'000));
+	m_vid[0]->set_addrmap(AS_PROGRAM, &vcombat_state::vid_0_map);
 
 	/* The top board i860 */
-	MCFG_DEVICE_ADD("vid_1", I860, XTAL(20'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(vid_1_map)
+	I860(config, m_vid[1], XTAL(20'000'000));
+	m_vid[1]->set_addrmap(AS_PROGRAM, &vcombat_state::vid_1_map);
 
 	/* Sound CPU */
-	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(vcombat_state, irq1_line_hold,  15000) /* Remove this if MC6845 is enabled */
+	M68000(config, m_soundcpu, XTAL(12'000'000));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &vcombat_state::sound_map);
+	m_soundcpu->set_periodic_int(FUNC(vcombat_state::irq1_line_hold), attotime::from_hz(15000)); /* Remove this if MC6845 is enabled */
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,vcombat)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//MCFG_QUANTUM_TIME(attotime::from_hz(1200))
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	//config.m_minimum_quantum = attotime::from_hz(1200);
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
 	/* Disabled for now as it can't handle multiple screens */
-//  MCFG_MC6845_ADD("crtc", MC6845, "screen", 6000000 / 16)
+//  MC6845(config, m_crtc, 6000000 / 16);
+//  m_crtc->set_screen("screen");
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
-	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
+	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 
-	MCFG_SCREEN_ADD("aux", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208)
-	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_aux)
+	screen_device &aux(SCREEN(config, "aux", SCREEN_TYPE_RASTER));
+	aux.set_raw(XTAL(12'000'000) / 2, 400, 0, 256, 291, 0, 208);
+	aux.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_aux));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_10BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
-MACHINE_CONFIG_START(vcombat_state::shadfgtr)
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", vcombat_state,  irq1_line_assert)
+void vcombat_state::shadfgtr(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(12'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &vcombat_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(vcombat_state::irq1_line_assert));
 
 	/* The middle board i860 */
-	MCFG_DEVICE_ADD("vid_0", I860, XTAL(20'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(vid_0_map)
+	I860(config, m_vid[0], XTAL(20'000'000));
+	m_vid[0]->set_addrmap(AS_PROGRAM, &vcombat_state::vid_0_map);
 
 	/* Sound CPU */
-	MCFG_DEVICE_ADD("soundcpu", M68000, XTAL(12'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(sound_map)
+	M68000(config, m_soundcpu, XTAL(12'000'000));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &vcombat_state::sound_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_MACHINE_RESET_OVERRIDE(vcombat_state,shadfgtr)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL(20'000'000) / 4 / 16)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(16)
-	MCFG_MC6845_OUT_HSYNC_CB(WRITELINE(*this, vcombat_state, sound_update))
+	MC6845(config, m_crtc, XTAL(20'000'000) / 4 / 16);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(16);
+	m_crtc->out_hsync_callback().set(FUNC(vcombat_state::sound_update));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(vcombat_state, screen_update_vcombat_main)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(20'000'000) / 4, 320, 0, 256, 277, 0, 224);
+	screen.set_screen_update(FUNC(vcombat_state::screen_update_vcombat_main));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_10BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_10BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
 
 ROM_START( vcombat )

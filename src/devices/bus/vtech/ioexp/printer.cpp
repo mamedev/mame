@@ -23,11 +23,14 @@ DEFINE_DEVICE_TYPE(VTECH_PRINTER_INTERFACE, vtech_printer_interface_device, "vte
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(vtech_printer_interface_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(m_centronics, CENTRONICS, centronics_devices, "printer")
-	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(*this, vtech_printer_interface_device, busy_w))
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("latch", "centronics")
-MACHINE_CONFIG_END
+void vtech_printer_interface_device::device_add_mconfig(machine_config &config)
+{
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(vtech_printer_interface_device::busy_w));
+
+	OUTPUT_LATCH(config, m_latch);
+	m_centronics->set_output_latch(*m_latch);
+}
 
 
 //**************************************************************************

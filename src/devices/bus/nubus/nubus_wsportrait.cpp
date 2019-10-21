@@ -39,13 +39,14 @@ DEFINE_DEVICE_TYPE(NUBUS_WSPORTRAIT, nubus_wsportrait_device, "nb_wspt", "Macint
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_wsportrait_device::device_add_mconfig)
-	MCFG_SCREEN_ADD( WSPORTRAIT_SCREEN_NAME, RASTER)
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, nubus_wsportrait_device, screen_update)
-	MCFG_SCREEN_SIZE(1024,960)
-	MCFG_SCREEN_REFRESH_RATE(75.0)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 870-1)
-MACHINE_CONFIG_END
+void nubus_wsportrait_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, WSPORTRAIT_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(nubus_wsportrait_device::screen_update));
+	screen.set_size(1024, 960);
+	screen.set_refresh_hz(75.0);
+	screen.set_visarea(0, 640-1, 0, 870-1);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

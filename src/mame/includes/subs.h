@@ -8,6 +8,8 @@
 #ifndef MAME_INCLUDES_SUBS_H
 #define MAME_INCLUDES_SUBS_H
 
+#pragma once
+
 #include "sound/discrete.h"
 #include "emupal.h"
 
@@ -62,7 +64,7 @@ private:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(subs);
+	void subs_palette(palette_device &palette) const;
 
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -71,7 +71,7 @@ address lines), and then reading it from the 051962.
 052109 memory layout:
 0000-07ff: layer FIX tilemap (attributes)
 0800-0fff: layer A tilemap (attributes)
-1000-1fff: layer B tilemap (attributes)
+1000-17ff: layer B tilemap (attributes)
 180c-1833: A y scroll
 1a00-1bff: A x scroll
 1c00     : ?
@@ -123,6 +123,8 @@ to through the chip.
 #include "emu.h"
 #include "k052109.h"
 
+#include "screen.h"
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -163,6 +165,7 @@ GFXDECODE_END
 k052109_device::k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K052109, tag, owner, clock),
 	device_gfx_interface(mconfig, *this, gfxinfo),
+	device_video_interface(mconfig, *this, false),
 	m_ram(nullptr),
 	m_videoram_F(nullptr),
 	m_videoram_A(nullptr),
@@ -180,7 +183,6 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_romsubbank(0),
 	m_scrollctrl(0),
 	m_char_rom(*this, DEVICE_SELF),
-	m_screen(*this, finder_base::DUMMY_TAG),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
 	m_nmi_handler(*this)
@@ -188,7 +190,7 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-void k052109_device::set_ram(bool ram)
+void k052109_device::set_char_ram(bool ram)
 {
 	if (ram)
 		set_info(gfxinfo_ram);
@@ -203,14 +205,14 @@ void k052109_device::set_ram(bool ram)
 
 void k052109_device::device_start()
 {
-	if (m_screen.found())
+	if (has_screen())
 	{
 		// make sure our screen is started
-		if (!m_screen->started())
+		if (!screen().started())
 			throw device_missing_dependencies();
 
 		// and register a callback for vblank state
-		m_screen->register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
+		screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 	}
 
 	decode_gfx();
@@ -252,7 +254,6 @@ void k052109_device::device_start()
 	save_item(NAME(m_charrombank));
 	save_item(NAME(m_charrombank_2));
 	save_item(NAME(m_has_extra_video_ram));
-	machine().save().register_postload(save_prepost_delegate(FUNC(k052109_device::tileflip_reset), this));
 }
 
 //-------------------------------------------------
@@ -275,17 +276,26 @@ void k052109_device::device_reset()
 	}
 }
 
+//-------------------------------------------------
+//  device_post_load - device-specific postload
+//-------------------------------------------------
+
+void k052109_device::device_post_load()
+{
+	tileflip_reset();
+}
+
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
 void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
-	if (state)
+	if (state && m_irq_enabled)
 		m_irq_handler(ASSERT_LINE);
 }
 
-READ8_MEMBER( k052109_device::read )
+u8 k052109_device::read(offs_t offset)
 {
 	if (m_rmrd_line == CLEAR_LINE)
 	{
@@ -334,7 +344,7 @@ READ8_MEMBER( k052109_device::read )
 	}
 }
 
-WRITE8_MEMBER( k052109_device::write )
+void k052109_device::write(offs_t offset, u8 data)
 {
 	if ((offset & 0x1fff) < 0x1800) /* tilemap RAM */
 	{
@@ -367,7 +377,7 @@ WRITE8_MEMBER( k052109_device::write )
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			m_irq_enabled = data & 0x04;
-			if (m_irq_enabled)
+			if (!m_irq_enabled)
 				m_irq_handler(CLEAR_LINE);
 		}
 		else if (offset == 0x1d80)
@@ -462,28 +472,17 @@ WRITE8_MEMBER( k052109_device::write )
 	}
 }
 
-READ16_MEMBER( k052109_device::word_r )
+u16 k052109_device::word_r(offs_t offset)
 {
-	return read(space, offset + 0x2000) | (read(space, offset) << 8);
+	return read(offset + 0x2000) | (read(offset) << 8);
 }
 
-WRITE16_MEMBER( k052109_device::word_w )
+void k052109_device::word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
-		write(space, offset, (data >> 8) & 0xff);
+		write(offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		write(space, offset + 0x2000, data & 0xff);
-}
-
-READ16_MEMBER( k052109_device::lsb_r )
-{
-	return read(space, offset);
-}
-
-WRITE16_MEMBER( k052109_device::lsb_w )
-{
-	if(ACCESSING_BITS_0_7)
-		write(space, offset, data & 0xff);
+		write(offset + 0x2000, data & 0xff);
 }
 
 void k052109_device::set_rmrd_line( int state )
@@ -658,11 +657,6 @@ if (machine().input().code_pressed(KEYCODE_F))
 void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority )
 {
 	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority);
-}
-
-int k052109_device::is_irq_enabled( )
-{
-	return m_irq_enabled;
 }
 
 

@@ -66,7 +66,7 @@ TODO: This table is nowhere near as accurate. If you bother, here's how colors s
 -after the first stage, houses have red/white colors.
 */
 
-static const uint8_t fakecols[4*4][8][3]=
+static constexpr rgb_t fakecols[4 * 4][8] =
 {
 {{0x00,0x00,0x00},
 	{42,87,140},
@@ -264,12 +264,11 @@ void ssrj_state::draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-PALETTE_INIT_MEMBER(ssrj_state, ssrj)
+void ssrj_state::ssrj_palette(palette_device &palette) const
 {
-	int i, j;
-	for(i=0; i<4*4; i++)
-		for(j=0; j<8; j++)
-			palette.set_pen_color(i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
+	for (int i = 0; i < 4*4; i++)
+		for (int j = 0; j < 8; j++)
+			palette.set_pen_color(i*8 + j, fakecols[i][j]);
 }
 
 uint32_t ssrj_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -7,290 +7,23 @@
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
-#include "pconfig.h"
-#include "pstring.h"
-#include "pfmtlog.h"
-#include "pexception.h"
 
+#include "palloc.h"
+#include "pconfig.h"
+#include "pexception.h"
+#include "pfmtlog.h"
+#include "pstring.h"
+#include "pstrutil.h"
+
+#include <array>
+#include <fstream>
+#include <ios>
+#include <iostream>
+#include <sstream>
+#include <type_traits>
 #include <vector>
 
 namespace plib {
-// -----------------------------------------------------------------------------
-// pstream: things common to all streams
-// -----------------------------------------------------------------------------
-
-class pstream : nocopyassignmove
-{
-public:
-
-	using pos_type = std::size_t;
-
-	static constexpr pos_type SEEK_EOF = static_cast<pos_type>(-1);
-
-	bool seekable() const { return ((m_flags & FLAG_SEEKABLE) != 0); }
-
-	void seek(const pos_type n)
-	{
-		return vseek(n);
-	}
-
-	pos_type tell()
-	{
-		return vtell();
-	}
-
-protected:
-	explicit pstream(const unsigned flags) : m_flags(flags)
-	{
-	}
-	~pstream();
-
-	virtual void vseek(const pos_type n) = 0;
-	virtual pos_type vtell() = 0;
-
-	static constexpr unsigned FLAG_EOF = 0x01;
-	static constexpr unsigned FLAG_SEEKABLE = 0x04;
-
-	void set_flag(const unsigned flag)
-	{
-		m_flags |= flag;
-	}
-	void clear_flag(const unsigned flag)
-	{
-		m_flags &= ~flag;
-	}
-	unsigned flags() const { return m_flags; }
-private:
-
-	unsigned m_flags;
-};
-
-// -----------------------------------------------------------------------------
-// pistream: input stream
-// -----------------------------------------------------------------------------
-
-class pistream : public pstream
-{
-public:
-
-	virtual ~pistream();
-
-	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
-
-	pos_type read(void *buf, const pos_type n)
-	{
-		return vread(buf, n);
-	}
-
-protected:
-	explicit pistream(const unsigned flags) : pstream(flags) {}
-	/* read up to n bytes from stream */
-	virtual pos_type vread(void *buf, const pos_type n) = 0;
-
-};
-
-// -----------------------------------------------------------------------------
-// postream: output stream
-// -----------------------------------------------------------------------------
-
-class postream : public pstream
-{
-public:
-
-	virtual ~postream();
-
-	void write(const void *buf, const pos_type n)
-	{
-		vwrite(buf, n);
-	}
-
-	void write(pistream &strm);
-
-protected:
-	explicit postream(unsigned flags) : pstream(flags) {}
-	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const pos_type n) = 0;
-
-private:
-};
-
-// -----------------------------------------------------------------------------
-// pomemstream: output string stream
-// -----------------------------------------------------------------------------
-
-class pomemstream : public postream
-{
-public:
-
-	pomemstream();
-	virtual ~pomemstream() override;
-
-	char *memory() const { return m_mem; }
-	pos_type size() const { return m_size; }
-
-protected:
-	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const pos_type) override;
-	virtual void vseek(const pos_type n) override;
-	virtual pos_type vtell() override;
-
-private:
-	pos_type m_pos;
-	pos_type m_capacity;
-	pos_type m_size;
-	char *m_mem;
-};
-
-class postringstream : public postream
-{
-public:
-
-	postringstream() : postream(0) { }
-	virtual ~postringstream() override;
-
-	const pstring &str() { return m_buf; }
-
-protected:
-	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const pos_type n) override
-	{
-		m_buf += pstring(static_cast<const pstring::mem_t *>(buf), n, pstring::UTF8);
-	}
-	virtual void vseek(const pos_type n) override { }
-	virtual pos_type vtell() override { return m_buf.mem_t_size(); }
-
-private:
-	pstring m_buf;
-};
-
-// -----------------------------------------------------------------------------
-// pofilestream: file output stream
-// -----------------------------------------------------------------------------
-
-class pofilestream : public postream
-{
-public:
-
-	explicit pofilestream(const pstring &fname);
-	virtual ~pofilestream() override;
-
-protected:
-	pofilestream(void *file, const pstring &name, const bool do_close);
-	/* write n bytes to stream */
-	virtual void vwrite(const void *buf, const pos_type n) override;
-	virtual void vseek(const pos_type n) override;
-	virtual pos_type vtell() override;
-
-private:
-	void *m_file;
-	pos_type m_pos;
-	bool m_actually_close;
-	pstring m_filename;
-
-	void init();
-};
-
-// -----------------------------------------------------------------------------
-// pstderr: write to stderr
-// -----------------------------------------------------------------------------
-
-class pstderr : public pofilestream
-{
-public:
-	pstderr();
-	virtual ~pstderr();
-};
-
-// -----------------------------------------------------------------------------
-// pstdout: write to stdout
-// -----------------------------------------------------------------------------
-
-class pstdout : public pofilestream
-{
-public:
-	pstdout();
-	virtual ~pstdout();
-};
-
-// -----------------------------------------------------------------------------
-// pifilestream: file input stream
-// -----------------------------------------------------------------------------
-
-class pifilestream : public pistream
-{
-public:
-
-	explicit pifilestream(const pstring &fname);
-	virtual ~pifilestream() override;
-
-protected:
-	pifilestream(void *file, const pstring &name, const bool do_close);
-
-	/* read up to n bytes from stream */
-	virtual pos_type vread(void *buf, const pos_type n) override;
-	virtual void vseek(const pos_type n) override;
-	virtual pos_type vtell() override;
-
-private:
-	void *m_file;
-	pos_type m_pos;
-	bool m_actually_close;
-	pstring m_filename;
-
-	void init();
-};
-
-// -----------------------------------------------------------------------------
-// pstdin: reads from stdin
-// -----------------------------------------------------------------------------
-
-class pstdin : public pifilestream
-{
-public:
-
-	pstdin();
-	virtual ~pstdin() override;
-};
-
-// -----------------------------------------------------------------------------
-// pimemstream: input memory stream
-// -----------------------------------------------------------------------------
-
-class pimemstream : public pistream
-{
-public:
-
-	pimemstream(const void *mem, const pos_type len);
-	explicit pimemstream(const pomemstream &ostrm);
-	virtual ~pimemstream() override;
-
-	pos_type size() const { return m_len; }
-protected:
-	/* read up to n bytes from stream */
-	virtual pos_type vread(void *buf, const pos_type n) override;
-	virtual void vseek(const pos_type n) override;
-	virtual pos_type vtell() override;
-
-private:
-	pos_type m_pos;
-	pos_type m_len;
-	const char *m_mem;
-};
-
-// -----------------------------------------------------------------------------
-// pistringstream: input string stream
-// -----------------------------------------------------------------------------
-
-class pistringstream : public pimemstream
-{
-public:
-	explicit pistringstream(const pstring &str) : pimemstream(str.c_str(), str.mem_t_size()), m_str(str) { }
-	virtual ~pistringstream() override;
-
-private:
-	/* only needed for a reference till destruction */
-	pstring m_str;
-};
 
 // -----------------------------------------------------------------------------
 // putf8reader_t: reader on top of istream
@@ -298,47 +31,113 @@ private:
 
 /* this digests linux & dos/windows text files */
 
-class putf8_reader : plib::nocopyassignmove
+
+template <typename T>
+struct constructor_helper
+{
+	plib::unique_ptr<std::istream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
+};
+
+// NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
+class putf8_reader
 {
 public:
-	explicit putf8_reader(pistream &strm) : m_strm(strm) {}
-	virtual ~putf8_reader() {}
 
-	bool eof() const { return m_strm.eof(); }
-	bool readline(pstring &line);
+	COPYASSIGN(putf8_reader, delete)
+	putf8_reader &operator=(putf8_reader &&src) = delete;
+	virtual ~putf8_reader() = default;
 
-	bool readbyte1(char &b)
+	template <typename T>
+	friend struct constructor_helper;
+
+	template <typename T>
+	putf8_reader(T &&strm) // NOLINT(cppcoreguidelines-special-member-functions, misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+	: m_strm(std::move(constructor_helper<T>()(std::move(strm)))) // NOLINT(bugprone-move-forwarding-reference)
+	{}
+
+	bool eof() const { return m_strm->eof(); }
+
+	bool readline(pstring &line)
 	{
-		return (m_strm.read(&b, 1) == 1);
-	}
-
-	bool readcode(pstring::code_t &c)
-	{
-		char b[4];
-		if (m_strm.read(&b[0], 1) != 1)
+		putf8string::code_t c = 0;
+		m_linebuf = putf8string("");
+		if (!this->readcode(c))
+		{
+			line = "";
 			return false;
-		const std::size_t l = pstring::traits_type::codelen(b);
-		for (std::size_t i = 1; i < l; i++)
-			if (m_strm.read(&b[i], 1) != 1)
-				return false;
-		c = pstring::traits_type::code(b);
+		}
+		while (true)
+		{
+			if (c == 10)
+				break;
+			else if (c != 13) /* ignore CR */
+				m_linebuf += putf8string(1, c);
+			if (!this->readcode(c))
+				break;
+		}
+		line = m_linebuf;
 		return true;
 	}
 
+	bool readbyte(std::istream::char_type &b)
+	{
+		if (m_strm->eof())
+			return false;
+		m_strm->read(&b, 1);
+		return true;
+	}
+
+	bool readcode(putf8string::traits_type::code_t &c)
+	{
+		std::array<std::istream::char_type, 4> b{0};
+		if (m_strm->eof())
+			return false;
+		m_strm->read(&b[0], 1);
+		const std::size_t l = putf8string::traits_type::codelen(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
+		for (std::size_t i = 1; i < l; i++)
+		{
+			if (m_strm->eof())
+				return false;
+			m_strm->read(&b[i], 1);
+		}
+		c = putf8string::traits_type::code(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
+		return true;
+	}
+
+	std::istream &stream() { return *m_strm; }
 private:
-	pistream &m_strm;
-	pstring m_linebuf;
+	plib::unique_ptr<std::istream> m_strm;
+	putf8string m_linebuf;
 };
+
+template <>
+struct constructor_helper<putf8_reader>
+{
+	plib::unique_ptr<std::istream> operator()(putf8_reader &&s) { return std::move(s.m_strm); }
+};
+
+template <>
+struct constructor_helper<plib::unique_ptr<std::istream>>
+{
+	plib::unique_ptr<std::istream> operator()(plib::unique_ptr<std::istream> &&s) { return std::move(s); }
+};
+
 
 // -----------------------------------------------------------------------------
 // putf8writer_t: writer on top of ostream
 // -----------------------------------------------------------------------------
 
-class putf8_writer : plib::nocopyassignmove
+class putf8_writer
 {
 public:
-	explicit putf8_writer(postream &strm) : m_strm(strm) {}
-	virtual ~putf8_writer() {}
+	explicit putf8_writer(std::ostream *strm) : m_strm(strm) {}
+
+	putf8_writer(putf8_writer &&src) noexcept : m_strm(src.m_strm) {}
+
+	COPYASSIGN(putf8_writer, delete)
+	putf8_writer &operator=(putf8_writer &&src) = delete;
+
+	virtual ~putf8_writer() = default;
 
 	void writeline(const pstring &line) const
 	{
@@ -348,27 +147,41 @@ public:
 
 	void write(const pstring &text) const
 	{
-		m_strm.write(text.c_str(), text.mem_t_size());
+		// NOLINTNEXTLINE(performance-unnecessary-copy-initialization)
+		const putf8string conv_utf8(text);
+		m_strm->write(conv_utf8.c_str(), static_cast<std::streamsize>(plib::strlen(conv_utf8.c_str())));
 	}
 
-	void write(const pstring::code_t c) const
+	void write(const pstring::value_type c) const
 	{
-		write(pstring(c));
+		pstring t(1,c);
+		write(t);
 	}
 
 private:
-	postream &m_strm;
+	std::ostream *m_strm;
 };
 
 class putf8_fmt_writer : public pfmt_writer_t<putf8_fmt_writer>, public putf8_writer
 {
 public:
 
-	explicit putf8_fmt_writer(postream &strm);
-	virtual ~putf8_fmt_writer() override;
+	explicit putf8_fmt_writer(std::ostream *strm)
+	: pfmt_writer_t()
+	, putf8_writer(strm)
+	{
+	}
+
+	COPYASSIGNMOVE(putf8_fmt_writer, delete)
+
+	~putf8_fmt_writer() override = default;
 
 //protected:
-	void vdowrite(const pstring &ls) const;
+	void vdowrite(const pstring &s) const
+	{
+		write(s);
+	}
+
 
 private:
 };
@@ -377,57 +190,68 @@ private:
 // pbinary_writer_t: writer on top of ostream
 // -----------------------------------------------------------------------------
 
-class pbinary_writer : plib::nocopyassignmove
+class pbinary_writer
 {
 public:
-	explicit pbinary_writer(postream &strm) : m_strm(strm) {}
-	virtual ~pbinary_writer() {}
+	explicit pbinary_writer(std::ostream &strm) : m_strm(strm) {}
+	pbinary_writer(pbinary_writer &&src) noexcept : m_strm(src.m_strm) {}
+
+	COPYASSIGN(pbinary_writer, delete)
+	pbinary_writer &operator=(pbinary_writer &&src) = delete;
+
+	virtual ~pbinary_writer() = default;
 
 	template <typename T>
-	void write(const T val)
+	void write(const T &val)
 	{
-		m_strm.write(&val, sizeof(T));
+		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(&val), sizeof(T));
 	}
 
 	void write(const pstring &s)
 	{
-		write(s.mem_t_size());
-		m_strm.write(s.c_str(), s.mem_t_size());
+		const auto sm = reinterpret_cast<const std::ostream::char_type *>(s.c_str());
+		const auto sl(static_cast<std::streamsize>(pstring_mem_t_size(s)));
+		write(sl);
+		m_strm.write(sm, sl);
 	}
 
 	template <typename T>
 	void write(const std::vector<T> &val)
 	{
-		std::size_t sz = val.size();
+		const auto sz(static_cast<std::streamsize>(val.size()));
 		write(sz);
-		m_strm.write(val.data(), sizeof(T) * sz);
+		m_strm.write(reinterpret_cast<const std::ostream::char_type *>(val.data()), sz * static_cast<std::streamsize>(sizeof(T)));
 	}
 
 private:
-	postream &m_strm;
+	std::ostream &m_strm;
 };
 
-class pbinary_reader : plib::nocopyassignmove
+class pbinary_reader
 {
 public:
-	explicit pbinary_reader(pistream &strm) : m_strm(strm) {}
-	virtual ~pbinary_reader() {}
+	explicit pbinary_reader(std::istream &strm) : m_strm(strm) {}
+	pbinary_reader(pbinary_reader &&src) noexcept : m_strm(src.m_strm) { }
+
+	COPYASSIGN(pbinary_reader, delete)
+	pbinary_reader &operator=(pbinary_reader &&src) = delete;
+
+	virtual ~pbinary_reader() = default;
 
 	template <typename T>
 	void read(T &val)
 	{
-		m_strm.read(&val, sizeof(T));
+		m_strm.read(reinterpret_cast<std::istream::char_type *>(&val), sizeof(T));
 	}
 
 	void read( pstring &s)
 	{
 		std::size_t sz = 0;
 		read(sz);
-		pstring::mem_t *buf = new pstring::mem_t[sz+1];
-		m_strm.read(buf, sz);
+		std::vector<plib::string_info<pstring>::mem_t> buf(sz+1);
+		m_strm.read(buf.data(), static_cast<std::streamsize>(sz));
 		buf[sz] = 0;
-		s = pstring(buf, pstring::UTF8);
-		delete [] buf;
+		s = pstring(buf.data());
 	}
 
 	template <typename T>
@@ -436,13 +260,53 @@ public:
 		std::size_t sz = 0;
 		read(sz);
 		val.resize(sz);
-		m_strm.read(val.data(), sizeof(T) * sz);
+		m_strm.read(reinterpret_cast<std::istream::char_type *>(val.data()), static_cast<std::streamsize>(sizeof(T) * sz));
 	}
 
 private:
-	pistream &m_strm;
+	std::istream &m_strm;
 };
 
+inline void copystream(std::ostream &dest, std::istream &src)
+{
+	// FIXME: optimize
+	std::array<std::ostream::char_type, 1024> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
+	while (!src.eof())
+	{
+		src.read(buf.data(), 1);
+		dest.write(buf.data(), 1);
+	}
 }
+
+struct perrlogger
+{
+	template <typename ... Args>
+	explicit perrlogger(Args&& ... args)
+	{
+		h()(std::forward<Args>(args)...); // NOLINT(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
+	}
+private:
+	static putf8_fmt_writer &h()
+	{
+		static plib::putf8_fmt_writer perr(&std::cerr);
+		return perr;
+	}
+};
+
+// -----------------------------------------------------------------------------
+// c++17 preparation
+// -----------------------------------------------------------------------------
+
+namespace filesystem
+{
+	template< class Source >
+	pstring /*path */ u8path( const Source& source )
+	{
+		return source;
+	}
+
+} // namespace filesystem
+
+} // namespace plib
 
 #endif /* PSTREAM_H_ */

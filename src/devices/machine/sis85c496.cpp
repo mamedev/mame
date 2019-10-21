@@ -45,7 +45,8 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	map(0x00e0, 0x00ef).noprw();
 }
 
-MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
+void sis85c496_host_device::device_add_mconfig(machine_config &config)
+{
 	PIT8254(config, m_pit8254, 0);
 	m_pit8254->set_clk<0>(4772720/4); // heartbeat IRQ
 	m_pit8254->out_handler<0>().set(FUNC(sis85c496_host_device::at_pit8254_out0_changed));
@@ -96,25 +97,26 @@ MACHINE_CONFIG_START(sis85c496_host_device::device_add_mconfig)
 	m_pic8259_slave->out_int_callback().set(m_pic8259_master, FUNC(pic8259_device::ir2_w));
 	m_pic8259_slave->in_sp_callback().set_constant(0);
 
-	MCFG_DEVICE_ADD("keybc", AT_KEYBOARD_CONTROLLER, XTAL(12'000'000))
-	MCFG_AT_KEYBOARD_CONTROLLER_SYSTEM_RESET_CB(WRITELINE(*this, sis85c496_host_device, cpu_reset_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_GATE_A20_CB(WRITELINE(*this, sis85c496_host_device, cpu_a20_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_INPUT_BUFFER_FULL_CB(WRITELINE("pic8259_master", pic8259_device, ir1_w))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_CLOCK_CB(WRITELINE("pc_kbdc", pc_kbdc_device, clock_write_from_mb))
-	MCFG_AT_KEYBOARD_CONTROLLER_KEYBOARD_DATA_CB(WRITELINE("pc_kbdc", pc_kbdc_device, data_write_from_mb))
-	MCFG_DEVICE_ADD("pc_kbdc", PC_KBDC, 0)
-	MCFG_PC_KBDC_OUT_CLOCK_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_clock_w))
-	MCFG_PC_KBDC_OUT_DATA_CB(WRITELINE("keybc", at_keyboard_controller_device, keyboard_data_w))
-	MCFG_PC_KBDC_SLOT_ADD("pc_kbdc", "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL)
+	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
+	m_keybc->hot_res().set(FUNC(sis85c496_host_device::cpu_reset_w));
+	m_keybc->gate_a20().set(FUNC(sis85c496_host_device::cpu_a20_w));
+	m_keybc->kbd_irq().set("pic8259_master", FUNC(pic8259_device::ir1_w));
+	m_keybc->kbd_clk().set("pc_kbdc", FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set("pc_kbdc", FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_pc_kbdc, 0);
+	m_pc_kbdc->out_clock_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_clk_w));
+	m_pc_kbdc->out_data_cb().set("keybc", FUNC(at_keyboard_controller_device::kbd_data_w));
+	PC_KBDC_SLOT(config, "kbd", pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL).set_pc_kbdc_slot(subdevice("pc_kbdc"));
 
 	DS12885(config, m_ds12885);
-	m_ds12885->irq_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
+	m_ds12885->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_ds12885->set_century_index(0x32);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-MACHINE_CONFIG_END
+}
 
 
 sis85c496_host_device::sis85c496_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -491,6 +493,8 @@ WRITE_LINE_MEMBER( sis85c496_host_device::at_dma8237_out_eop )
 
 void sis85c496_host_device::pc_select_dma_channel(int channel, bool state)
 {
+	//m_isabus->dack_line_w(channel, state);
+
 	if(!state) {
 		m_dma_channel = channel;
 		//if(m_cur_eop)
@@ -540,19 +544,19 @@ WRITE8_MEMBER( sis85c496_host_device::at_portb_w )
 
 READ8_MEMBER( sis85c496_host_device::at_dma8237_2_r )
 {
-	return m_dma8237_2->read( space, offset / 2);
+	return m_dma8237_2->read( offset / 2);
 }
 
 WRITE8_MEMBER( sis85c496_host_device::at_dma8237_2_w )
 {
-	m_dma8237_2->write( space, offset / 2, data);
+	m_dma8237_2->write( offset / 2, data);
 }
 
 READ8_MEMBER( sis85c496_host_device::at_keybc_r )
 {
 	switch (offset)
 	{
-	case 0: return m_keybc->data_r(space, 0);
+	case 0: return m_keybc->data_r();
 	case 1: return at_portb_r(space, 0);
 	}
 
@@ -563,7 +567,7 @@ WRITE8_MEMBER( sis85c496_host_device::at_keybc_w )
 {
 	switch (offset)
 	{
-	case 0: m_keybc->data_w(space, 0, data); break;
+	case 0: m_keybc->data_w(data); break;
 	case 1: at_portb_w(space, 0, data); break;
 	}
 }
@@ -574,10 +578,10 @@ WRITE8_MEMBER( sis85c496_host_device::write_rtc )
 	if (offset==0) {
 		m_nmi_enabled = BIT(data,7);
 		//m_isabus->set_nmi_state((m_nmi_enabled==0) && (m_channel_check==0));
-		m_ds12885->write(space,0,data);
+		m_ds12885->write(0,data);
 	}
 	else {
-		m_ds12885->write(space,offset,data);
+		m_ds12885->write(offset,data);
 	}
 }
 

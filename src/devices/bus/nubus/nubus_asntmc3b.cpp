@@ -41,12 +41,13 @@ DEFINE_DEVICE_TYPE(NUBUS_APPLEENET, nubus_appleenet_device, "nb_aenet", "Apple N
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nubus_mac8390_device::device_add_mconfig)
-	MCFG_DEVICE_ADD(MAC8390_839X, DP8390D, 0)
-	MCFG_DP8390D_IRQ_CB(WRITELINE(*this, nubus_mac8390_device, dp_irq_w))
-	MCFG_DP8390D_MEM_READ_CB(READ8(*this, nubus_mac8390_device, dp_mem_read))
-	MCFG_DP8390D_MEM_WRITE_CB(WRITE8(*this, nubus_mac8390_device, dp_mem_write))
-MACHINE_CONFIG_END
+void nubus_mac8390_device::device_add_mconfig(machine_config &config)
+{
+	DP8390D(config, m_dp83902, 0);
+	m_dp83902->irq_callback().set(FUNC(nubus_mac8390_device::dp_irq_w));
+	m_dp83902->mem_read_callback().set(FUNC(nubus_mac8390_device::dp_mem_read));
+	m_dp83902->mem_write_callback().set(FUNC(nubus_mac8390_device::dp_mem_write));
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region

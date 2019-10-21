@@ -224,40 +224,19 @@ TODO :
 #include "includes/witch.h"
 
 
-TILE_GET_INFO_MEMBER(witch_state::get_gfx0b_tile_info)
+TILE_GET_INFO_MEMBER(witch_state::get_gfx0_tile_info)
 {
 	int code  = m_gfx0_vram[tile_index];
 	int color = m_gfx0_cram[tile_index];
 
 	code=code | ((color & 0xe0) << 3);
-
-	if(color&0x10)
-	{
-		code=0;
-	}
 
 	SET_TILE_INFO_MEMBER(1,
 			code,   //tiles beyond 0x7ff only for sprites?
 			color & 0x0f,
 			0);
-}
 
-TILE_GET_INFO_MEMBER(witch_state::get_gfx0a_tile_info)
-{
-	int code  = m_gfx0_vram[tile_index];
-	int color = m_gfx0_cram[tile_index];
-
-	code=code | ((color & 0xe0) << 3);
-
-	if((color&0x10)==0)
-	{
-		code=0;
-	}
-
-	SET_TILE_INFO_MEMBER(1,
-			code,//tiles beyond 0x7ff only for sprites?
-			color & 0x0f,
-			0);
+	tileinfo.category = (color & 0x10) >> 4;
 }
 
 TILE_GET_INFO_MEMBER(witch_state::get_gfx1_tile_info)
@@ -284,11 +263,9 @@ TILE_GET_INFO_MEMBER(keirinou_state::get_keirinou_gfx1_tile_info)
 
 void witch_state::video_common_init()
 {
-	m_gfx0a_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0a_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
-	m_gfx0b_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0b_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_gfx0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_gfx0a_tilemap->set_transparent_pen(0);
-	m_gfx0b_tilemap->set_transparent_pen(0);
+	m_gfx0_tilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -301,8 +278,7 @@ void witch_state::video_start()
 	video_common_init();
 	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(witch_state::get_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_gfx0a_tilemap->set_palette_offset(0x100);
-	m_gfx0b_tilemap->set_palette_offset(0x100);
+	m_gfx0_tilemap->set_palette_offset(0x100);
 	m_gfx1_tilemap->set_palette_offset(0x200);
 
 	has_spr_rom_bank = false;
@@ -314,8 +290,7 @@ void keirinou_state::video_start()
 	video_common_init();
 	m_gfx1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(keirinou_state::get_keirinou_gfx1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
-	m_gfx0a_tilemap->set_palette_offset(0x000);
-	m_gfx0b_tilemap->set_palette_offset(0x000);
+	m_gfx0_tilemap->set_palette_offset(0x000);
 	m_gfx1_tilemap->set_palette_offset(0x100);
 
 	save_item(NAME(m_spr_bank));
@@ -370,30 +345,28 @@ void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-uint32_t witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t witch_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gfx1_tilemap->set_scrollx(0, m_scrollx-7 ); //offset to have it aligned with the sprites
 	m_gfx1_tilemap->set_scrolly(0, m_scrolly+8 );
 
 	m_gfx1_tilemap->draw(screen, bitmap, cliprect, 0,0);
-	m_gfx0a_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_gfx0_tilemap->draw(screen, bitmap, cliprect, 1,0);
 	draw_sprites(bitmap, cliprect);
-	m_gfx0b_tilemap->draw(screen, bitmap, cliprect, 0,0);
+	m_gfx0_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
 
 WRITE8_MEMBER(witch_state::gfx0_vram_w)
 {
 	m_gfx0_vram[offset] = data;
-	m_gfx0a_tilemap->mark_tile_dirty(offset);
-	m_gfx0b_tilemap->mark_tile_dirty(offset);
+	m_gfx0_tilemap->mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(witch_state::gfx0_cram_w)
 {
 	m_gfx0_cram[offset] = data;
-	m_gfx0a_tilemap->mark_tile_dirty(offset);
-	m_gfx0b_tilemap->mark_tile_dirty(offset);
+	m_gfx0_tilemap->mark_tile_dirty(offset);
 }
 
 #define FIX_OFFSET() do { \
@@ -570,8 +543,8 @@ WRITE8_MEMBER(keirinou_state::palette_w)
 
 void witch_state::common_map(address_map &map)
 {
-	map(0xa000, 0xa003).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xa004, 0xa007).rw("ppi2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa000, 0xa003).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xa004, 0xa007).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa00c, 0xa00c).portr("SERVICE");    // stats / reset
 	map(0xa00e, 0xa00e).portr("COINS");      // coins/attendant keys
 	map(0xc000, 0xc3ff).ram().w(FUNC(witch_state::gfx0_vram_w)).share("gfx0_vram");
@@ -954,108 +927,105 @@ void witch_state::machine_reset()
 	m_motor_active = (ioport("YM_PortB")->read() & 0x08) ? 0 : 1;
 }
 
-MACHINE_CONFIG_START(witch_state::witch)
+void witch_state::witch(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(witch_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	Z80(config, m_maincpu, CPU_CLOCK);    /* 3 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &witch_state::witch_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
 	/* 2nd z80 */
-	MCFG_DEVICE_ADD("sub", Z80, CPU_CLOCK)    /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(witch_sub_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", witch_state,  irq0_line_assert)
+	Z80(config, m_subcpu, CPU_CLOCK);    /* 3 MHz */
+	m_subcpu->set_addrmap(AS_PROGRAM, &witch_state::witch_sub_map);
+	m_subcpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	// 82C255 (actual chip on PCB) is equivalent to two 8255s
-	MCFG_DEVICE_ADD("ppi1", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(*this, witch_state, read_a000))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("UNK"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, witch_state, write_a002))
+	I8255(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set(FUNC(witch_state::read_a000));
+	m_ppi[0]->in_pb_callback().set_ioport("UNK");
+	m_ppi[0]->out_pc_callback().set(FUNC(witch_state::write_a002));
 
-	MCFG_DEVICE_ADD("ppi2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("A004"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("A005"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, witch_state, write_a006))
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("A004");
+	m_ppi[1]->in_pb_callback().set_ioport("A005");
+	m_ppi[1]->out_pc_callback().set(FUNC(witch_state::write_a006));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(8, 256-1-8, 8*4, 256-8*4-1)
-	MCFG_SCREEN_UPDATE_DRIVER(witch_state, screen_update_witch)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256, 256);
+	screen.set_visarea(8, 256-1-8, 8*4, 256-8*4-1);
+	screen.set_screen_update(FUNC(witch_state::screen_update));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_witch)
-	MCFG_PALETTE_ADD("palette", 0x800)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_witch);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_ES8712_ADD("essnd", 0)
-	MCFG_ES8712_MSM_WRITE_CALLBACK(WRITE8("msm", msm5205_device, data_w))
-	MCFG_ES8712_MSM_TAG("msm")
+	es8712_device &essnd(ES8712(config, "essnd", 0));
+	essnd.msm_write_handler().set("msm", FUNC(msm5205_device::data_w));
+	essnd.set_msm_tag("msm");
 
-	MCFG_DEVICE_ADD("msm", MSM5205, MSM5202_CLOCK)   /* actually MSM5202 */
-	MCFG_MSM6585_VCK_CALLBACK(WRITELINE("essnd", es8712_device, msm_int))
-	MCFG_MSM6585_PRESCALER_SELECTOR(S48_4B)         /* 8 kHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	msm5205_device &msm(MSM5205(config, "msm", MSM5202_CLOCK));   /* actually MSM5202 */
+	msm.vck_legacy_callback().set("essnd", FUNC(es8712_device::msm_int));
+	msm.set_prescaler_selector(msm5205_device::S48_4B); /* 8 kHz */
+	msm.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ym2203_device &ym1(YM2203(config, "ym1", YM2203_CLOCK));     /* 3 MHz */
+	ym1.port_a_read_callback().set_ioport("YM_PortA");
+	ym1.port_b_read_callback().set_ioport("YM_PortB");
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("ym2", YM2203, YM2203_CLOCK)     /* 3 MHz */
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_CONFIG_END
+	ym2203_device &ym2(YM2203(config, "ym2", YM2203_CLOCK));     /* 3 MHz */
+	ym2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
+	ym2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.5);
+}
 
-MACHINE_CONFIG_START(keirinou_state::keirinou)
+void keirinou_state::keirinou(machine_config &config)
+{
 	witch(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(keirinou_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &keirinou_state::keirinou_main_map);
 
-	MCFG_DEVICE_MODIFY("sub")
-	MCFG_DEVICE_PROGRAM_MAP(keirinou_sub_map)
+	m_subcpu->set_addrmap(AS_PROGRAM, &keirinou_state::keirinou_sub_map);
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD("palette", 0x200+0x80)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_keirinou)
+	PALETTE(config.replace(), m_palette).set_entries(0x200+0x80);
+	m_gfxdecode->set_info(gfx_keirinou);
 
-//  MCFG_PALETTE_FORMAT(IIBBGGRR)
+//  m_palette->set_format(palette_device::IIBBGGRR, 0x200+0x80);
 
-	MCFG_DEVICE_MODIFY("ppi1") // Keirin Ou does have two individual PPIs (NEC D8255AC-2)
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, keirinou_state, write_keirinou_a002))
+	// Keirin Ou does have two individual PPIs (NEC D8255AC-2)
+	m_ppi[0]->out_pc_callback().set(FUNC(keirinou_state::write_keirinou_a002));
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("YM_PortA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("YM_PortB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &ay1(AY8910(config, "ay1", AY8910_CLOCK));
+	ay1.port_a_read_callback().set_ioport("YM_PortA");
+	ay1.port_b_read_callback().set_ioport("YM_PortB");
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, witch_state, xscroll_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, witch_state, yscroll_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	ay8910_device &ay2(AY8910(config, "ay2", AY8910_CLOCK));
+	ay2.port_a_write_callback().set(FUNC(witch_state::xscroll_w));
+	ay2.port_b_write_callback().set(FUNC(witch_state::yscroll_w));
+	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	MCFG_DEVICE_REMOVE("essnd")
-	MCFG_DEVICE_REMOVE("msm")
-	MCFG_DEVICE_REMOVE("ym1")
-	MCFG_DEVICE_REMOVE("ym2")
-MACHINE_CONFIG_END
+	config.device_remove("essnd");
+	config.device_remove("msm");
+	config.device_remove("ym1");
+	config.device_remove("ym2");
+}
 
 ROM_START( witch )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "u_5b.u5", 0x10000, 0x20000, CRC(5c9f685a) SHA1(b75950048009ffb8c3b356592b1c69f905a1a2bd) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u_5b.u5", 0x00000, 0x20000, CRC(5c9f685a) SHA1(b75950048009ffb8c3b356592b1c69f905a1a2bd) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) )
@@ -1076,9 +1046,8 @@ ROM_END
 
 /* Witch (With ranking) */
 ROM_START( witchb )
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "x.u5", 0x10000, 0x20000, CRC(d0818777) SHA1(a6232fef84bec3cfb4a6122a48e96e7b7950e013) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "x.u5", 0x00000, 0x20000, CRC(d0818777) SHA1(a6232fef84bec3cfb4a6122a48e96e7b7950e013) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) )
@@ -1098,9 +1067,8 @@ ROM_END
 
 
 ROM_START( witchs ) /* this set has (c)1992 Sega / Vic Tokai in the roms */
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "rom.u5", 0x10000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "rom.u5", 0x00000, 0x20000, CRC(348fccb8) SHA1(947defd86c4a597fbfb9327eec4903aa779b3788) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "6.s6", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
@@ -1120,9 +1088,8 @@ ROM_END
 
 
 ROM_START( pbchmp95 ) /* Licensed for Germany? */
-	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "3.bin", 0x10000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
-	ROM_COPY( "maincpu" , 0x10000, 0x0000, 0x8000 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.bin", 0x00000, 0x20000, CRC(e881aa05) SHA1(10d259396cac4b9a1b72c262c11ffa5efbdac433) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "4.bin", 0x00000, 0x08000, CRC(82460b82) SHA1(d85a9d77edaa67dfab8ff6ac4cb6273f0904b3c0) ) /* Same data as the Witch set */
@@ -1166,14 +1133,14 @@ ROM_END
 
 void witch_state::init_witch()
 {
-	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000 + UNBANKED_SIZE, 0x8000);
+	m_mainbank->configure_entries(0, 4, memregion("maincpu")->base() + UNBANKED_SIZE, 0x8000);
 	m_mainbank->set_entry(0);
 
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), this));
 }
 
-GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System",     "Keirin Ou", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Excellent System",     "Witch (With ranking)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Sega / Vic Tokai",     "Witch (Sega License)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, keirinou, 0,     keirinou, keirinou, keirinou_state, empty_init, ROT0, "Excellent System", "Keirin Ou", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witch,    0,     witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchb,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Excellent System license)", "Witch (with ranking)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, witchs,   witch, witch,    witch,    witch_state,    init_witch, ROT0, "Vic Tokai (Sega license)", "Witch (Sega license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pbchmp95, witch, witch,    witch,    witch_state,    init_witch, ROT0, "Veltmeijer Automaten", "Pinball Champ '95", MACHINE_SUPPORTS_SAVE )

@@ -17,6 +17,7 @@
 #include "sound/sn76496.h"
 #include "video/k051316.h"
 #include "emupal.h"
+#include "tilemap.h"
 
 #define XTAL1 XTAL(24'000'000)
 
@@ -64,10 +65,10 @@ private:
 	DECLARE_MACHINE_RESET(divebomb);
 	DECLARE_MACHINE_START(divebomb);
 	DECLARE_VIDEO_START(divebomb);
-	DECLARE_PALETTE_INIT(divebomb);
+	void divebomb_palette(palette_device &palette) const;
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void decode_proms(const uint8_t* rgn, int size, int index, bool inv);
+	static void decode_proms(palette_device &palette, const uint8_t* rgn, int size, int index, bool inv);
 	uint32_t screen_update_divebomb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	K051316_CB_MEMBER(zoom_callback_1);

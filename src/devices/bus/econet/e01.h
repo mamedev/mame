@@ -15,6 +15,7 @@
 #include "bus/centronics/ctronics.h"
 #include "bus/scsi/scsi.h"
 #include "cpu/m6502/m65c02.h"
+#include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/buffer.h"
 #include "machine/output_latch.h"

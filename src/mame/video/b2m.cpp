@@ -47,14 +47,14 @@ uint32_t b2m_state::screen_update_b2m(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-static const rgb_t b2m_palette[4] = {
-	rgb_t(0x00, 0x00, 0x00), // 0
-	rgb_t(0x00, 0x00, 0x00), // 1
-	rgb_t(0x00, 0x00, 0x00), // 2
-	rgb_t(0x00, 0x00, 0x00), // 3
-};
-
-PALETTE_INIT_MEMBER(b2m_state, b2m)
+void b2m_state::b2m_palette(palette_device &palette) const
 {
-	palette.set_pen_colors(0, b2m_palette, ARRAY_LENGTH(b2m_palette));
+	static constexpr rgb_t b2m_pens[4] = {
+		{ 0x00, 0x00, 0x00 }, // 0
+		{ 0x00, 0x00, 0x00 }, // 1
+		{ 0x00, 0x00, 0x00 }, // 2
+		{ 0x00, 0x00, 0x00 }, // 3
+	};
+
+	palette.set_pen_colors(0, b2m_pens);
 }

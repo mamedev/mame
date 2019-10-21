@@ -25,7 +25,7 @@ public:
 	virtual ~datach_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read);
+	virtual uint8_t read(offs_t offset);
 
 	uint8_t *get_cart_base() { return m_rom; }
 	void write_prg_bank(uint8_t bank) { m_bank = bank; }
@@ -52,6 +52,15 @@ class nes_datach_slot_device : public device_t,
 	friend class nes_datach_device;
 public:
 	// construction/destruction
+	template <typename T>
+	nes_datach_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock, T &&opts)
+		: nes_datach_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(nullptr);
+		set_fixed(false);
+	}
 	nes_datach_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_datach_slot_device();
 
@@ -74,7 +83,7 @@ public:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	virtual DECLARE_READ8_MEMBER(read);
+	uint8_t read(offs_t offset);
 	void write_prg_bank(uint8_t bank) { if (m_cart) m_cart->write_prg_bank(bank); }
 
 protected:
@@ -83,11 +92,6 @@ protected:
 
 // device type definition
 DECLARE_DEVICE_TYPE(NES_DATACH_SLOT, nes_datach_slot_device)
-
-
-#define MCFG_DATACH_MINICART_ADD(_tag, _slot_intf) \
-		MCFG_DEVICE_ADD(_tag, NES_DATACH_SLOT, 0) \
-		MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, nullptr, false)
 
 
 //--------------------------------
@@ -148,9 +152,9 @@ public:
 	// construction/destruction
 	nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

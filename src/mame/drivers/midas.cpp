@@ -55,6 +55,8 @@
 #include "includes/neogeo.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/mcs51/mcs51.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/ymz280b.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
@@ -65,8 +67,8 @@
 class midas_state : public driver_device
 {
 public:
-	midas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	midas_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -75,7 +77,8 @@ public:
 		m_screen(*this, "screen"),
 		m_prize(*this, "prize%u", 1),
 		m_ticket(*this, "ticket"),
-		m_zoomram(*this, "zoomtable")
+		m_zoomram(*this, "zoomtable"),
+		m_zoomtable(*this, "spritegen:zoomy")
 	{ }
 
 	void hammer(machine_config &config);
@@ -83,21 +86,22 @@ public:
 
 	void init_livequiz();
 
-private:
-	DECLARE_READ16_MEMBER(ret_ffff);
-	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
-	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
-	DECLARE_READ16_MEMBER(hammer_sensor_r);
-	DECLARE_WRITE16_MEMBER(hammer_coin_w);
-	DECLARE_WRITE16_MEMBER(hammer_motor_w);
-	DECLARE_WRITE16_MEMBER(midas_eeprom_w);
-	DECLARE_WRITE16_MEMBER(midas_zoomtable_w);
+protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
+private:
+	DECLARE_READ16_MEMBER(ret_ffff);
+	DECLARE_WRITE16_MEMBER(gfxregs_w);
+	DECLARE_WRITE8_MEMBER(livequiz_coin_w);
+	DECLARE_READ16_MEMBER(hammer_sensor_r);
+	DECLARE_WRITE8_MEMBER(hammer_coin_w);
+	DECLARE_WRITE8_MEMBER(hammer_motor_w);
+	DECLARE_WRITE8_MEMBER(eeprom_w);
+	DECLARE_WRITE16_MEMBER(zoomtable_w);
 
-	uint32_t screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -107,8 +111,9 @@ private:
 	optional_device_array<ticket_dispenser_device, 2> m_prize;
 	optional_device<ticket_dispenser_device> m_ticket;
 	required_shared_ptr<uint16_t> m_zoomram;
+	required_region_ptr<uint8_t> m_zoomtable;
 
-	DECLARE_WRITE_LINE_MEMBER(screen_vblank_midas);
+	DECLARE_WRITE_LINE_MEMBER(screen_vblank);
 
 	void hammer_map(address_map &map);
 	void livequiz_map(address_map &map);
@@ -117,13 +122,11 @@ private:
 
 
 
-
-
 void midas_state::video_start()
 {
 }
 
-uint32_t midas_state::screen_update_midas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t midas_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// fill with background color first
 	bitmap.fill(0x0, cliprect);
@@ -135,19 +138,16 @@ uint32_t midas_state::screen_update_midas(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-WRITE16_MEMBER(midas_state::midas_eeprom_w)
+WRITE8_MEMBER(midas_state::eeprom_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		// latch the bit
-		m_eeprom->di_write((data & 0x04) >> 2);
+	// latch the bit
+	m_eeprom->di_write((data & 0x04) >> 2);
 
-		// reset line asserted: reset.
-		m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
+	// reset line asserted: reset.
+	m_eeprom->cs_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE );
 
-		// clock line asserted: write latch or select next bit to read
-		m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
-	}
+	// clock line asserted: write latch or select next bit to read
+	m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 READ16_MEMBER(midas_state::ret_ffff)
@@ -155,7 +155,7 @@ READ16_MEMBER(midas_state::ret_ffff)
 	return 0xffff;
 }
 
-WRITE16_MEMBER(midas_state::midas_gfxregs_w)
+WRITE16_MEMBER(midas_state::gfxregs_w)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
@@ -173,15 +173,14 @@ WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 	}
 }
 
-WRITE16_MEMBER(midas_state::midas_zoomtable_w)
+WRITE16_MEMBER(midas_state::zoomtable_w)
 {
 	COMBINE_DATA(&m_zoomram[offset]);
-	uint8_t *rgn          =   memregion("zoomy")->base();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		rgn[offset+0x00000] = data & 0xff;
-		rgn[offset+0x10000] = data & 0xff;
+		m_zoomtable[offset+0x00000] = data & 0xff;
+		m_zoomtable[offset+0x10000] = data & 0xff;
 	}
 
 }
@@ -189,12 +188,9 @@ WRITE16_MEMBER(midas_state::midas_zoomtable_w)
                                        Live Quiz Show
 ***************************************************************************************/
 
-WRITE16_MEMBER(midas_state::livequiz_coin_w)
+WRITE8_MEMBER(midas_state::livequiz_coin_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x0001);
-	}
+	machine().bookkeeping().coin_counter_w(0, data & 0x0001);
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
 #endif
@@ -209,11 +205,11 @@ void midas_state::livequiz_map(address_map &map)
 	map(0x940000, 0x940001).portr("PLAYER2");
 	map(0x980000, 0x980001).portr("START");
 
-	map(0x980000, 0x980001).w(FUNC(midas_state::livequiz_coin_w));
+	map(0x980001, 0x980001).w(FUNC(midas_state::livequiz_coin_w));
 
-	map(0x9a0000, 0x9a0001).w(FUNC(midas_state::midas_eeprom_w));
+	map(0x9a0001, 0x9a0001).w(FUNC(midas_state::eeprom_w));
 
-	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::gfxregs_w));
 	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
 	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -229,7 +225,7 @@ void midas_state::livequiz_map(address_map &map)
 	map(0xba0000, 0xba0001).portr("START3");
 	map(0xbc0000, 0xbc0001).portr("PLAYER3");
 
-	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::zoomtable_w)).share("zoomtable"); // zoom table?
 
 	map(0xe00000, 0xe3ffff).ram();
 }
@@ -246,27 +242,21 @@ READ16_MEMBER(midas_state::hammer_sensor_r)
 	return (ioport("SENSORY")->read() << 8) | ioport("SENSORX")->read();
 }
 
-WRITE16_MEMBER(midas_state::hammer_coin_w)
+WRITE8_MEMBER(midas_state::hammer_coin_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-		machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
-	}
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
 #endif
 }
 
-WRITE16_MEMBER(midas_state::hammer_motor_w)
+WRITE8_MEMBER(midas_state::hammer_motor_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_prize[0]->motor_w(BIT(data, 0));
-		m_prize[1]->motor_w(BIT(data, 1));
-		m_ticket->motor_w(BIT(data, 4));
-		// data & 0x0080 ?
-	}
+	m_prize[0]->motor_w(BIT(data, 0));
+	m_prize[1]->motor_w(BIT(data, 1));
+	m_ticket->motor_w(BIT(data, 4));
+	// data & 0x0080 ?
 #ifdef MAME_DEBUG
 //  popmessage("motor %04X", data);
 #endif
@@ -281,11 +271,11 @@ void midas_state::hammer_map(address_map &map)
 	map(0x940000, 0x940001).portr("IN0");
 	map(0x980000, 0x980001).portr("TILT");
 
-	map(0x980000, 0x980001).w(FUNC(midas_state::hammer_coin_w));
+	map(0x980001, 0x980001).w(FUNC(midas_state::hammer_coin_w));
 
-	map(0x9a0000, 0x9a0001).w(FUNC(midas_state::midas_eeprom_w));
+	map(0x9a0001, 0x9a0001).w(FUNC(midas_state::eeprom_w));
 
-	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::midas_gfxregs_w));
+	map(0x9c0000, 0x9c0005).w(FUNC(midas_state::gfxregs_w));
 	map(0x9c000c, 0x9c000d).nopw();    // IRQ Ack, temporary
 
 	map(0xa00000, 0xa3ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -301,11 +291,11 @@ void midas_state::hammer_map(address_map &map)
 	map(0xba0000, 0xba0001).portr("IN1");
 	map(0xbc0000, 0xbc0001).portr("HAMMER");
 
-	map(0xbc0002, 0xbc0003).w(FUNC(midas_state::hammer_motor_w));
+	map(0xbc0003, 0xbc0003).w(FUNC(midas_state::hammer_motor_w));
 
 	map(0xbc0004, 0xbc0005).r(FUNC(midas_state::hammer_sensor_r));
 
-	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::midas_zoomtable_w)).share("zoomtable"); // zoom table?
+	map(0xd00000, 0xd1ffff).ram().w(FUNC(midas_state::zoomtable_w)).share("zoomtable"); // zoom table?
 
 	map(0xe00000, 0xe3ffff).ram();
 }
@@ -615,7 +605,6 @@ INPUT_PORTS_END
 void midas_state::machine_start()
 {
 	m_sprgen->set_pens(m_palette->pens());
-	m_sprgen->set_screen(m_screen);
 	m_sprgen->set_sprite_region(memregion("sprites")->base(), memregion("sprites")->bytes());
 	m_sprgen->set_fixed_regions(memregion("tiles")->base(), memregion("tiles")->bytes(), memregion("tiles"));
 	m_sprgen->neogeo_set_fixed_layer_source(0); // temporary: ensure banking is disabled
@@ -625,75 +614,89 @@ void midas_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER(midas_state::screen_vblank_midas)
+WRITE_LINE_MEMBER(midas_state::screen_vblank)
 {
 	if (state) m_sprgen->buffer_vram();
 }
 
 
 
-MACHINE_CONFIG_START(midas_state::livequiz)
-
+void midas_state::livequiz(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(24'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(livequiz_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(24'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midas_state::livequiz_map);
+	m_maincpu->set_vblank_int("screen", FUNC(midas_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	pic16c56_device &pic1(PIC16C56(config, "pic1", XTAL(24'000'000) / 6));  // !! PIC12C508 !! unknown MHz
+	pic1.set_disable(); // Currently not hooked up
+
+	pic16c56_device &pic2(PIC16C56(config, "pic2", XTAL(24'000'000) / 6));  // !! PIC12C508 !! unknown MHz
+	pic2.set_disable(); // Currently not hooked up
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, midas_state, screen_vblank_midas))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
+	m_screen->set_screen_update(FUNC(midas_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
-	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
+	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(XRGB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(midas_state::hammer)
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(0, "lspeaker", 0.80);
+	ymz.add_route(1, "rspeaker", 0.80);
+}
 
+void midas_state::hammer(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(28'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(hammer_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", midas_state,  irq1_line_hold)
+	M68000(config, m_maincpu, XTAL(28'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midas_state::hammer_map);
+	m_maincpu->set_vblank_int("screen", FUNC(midas_state::irq1_line_hold));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	at89c52_device &mcu(AT89C52(config, "mcu", XTAL(24'000'000) / 2)); // on top board, unknown MHz
+	mcu.set_disable(); // Currently not hooked up
 
-	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("ticket",    attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	TICKET_DISPENSER(config, m_prize[0], 0);
+	m_prize[0]->set_period(attotime::from_msec(1000*5));
+	m_prize[0]->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
+
+	TICKET_DISPENSER(config, m_prize[1], 0);
+	m_prize[1]->set_period(attotime::from_msec(1000*5));
+	m_prize[1]->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
+
+	TICKET_DISPENSER(config, m_ticket, 0);
+	m_ticket->set_period(attotime::from_msec(200));
+	m_ticket->set_senses(TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW, false);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(midas_state, screen_update_midas)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, midas_state, screen_vblank_midas))
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(NEOGEO_PIXEL_CLOCK, NEOGEO_HTOTAL, NEOGEO_HBEND, NEOGEO_HBSTART, NEOGEO_VTOTAL, NEOGEO_VBEND, NEOGEO_VBSTART);
+	m_screen->set_screen_update(FUNC(midas_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(midas_state::screen_vblank));
 
-	MCFG_DEVICE_ADD("spritegen", NEOGEO_SPRITE_MIDAS, 0)
+	NEOGEO_SPRITE_MIDAS(config, m_sprgen, 0).set_screen(m_screen);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_midas)
-	MCFG_PALETTE_ADD("palette", 0x10000)
-	MCFG_PALETTE_FORMAT(XRGB)
-
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_midas);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 0x10000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ymz", YMZ280B, XTAL(16'934'400))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_CONFIG_END
+	SPEAKER(config, "mono").front_center(); // stereo outputs aren't exists?
+
+	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
+	ymz.add_route(ALL_OUTPUTS, "mono", 0.80);
+}
 
 
 /***************************************************************************************
@@ -788,8 +791,10 @@ ROM_START( livequiz )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "flash.u1", 0x000000, 0x200000, CRC(8ec44493) SHA1(a987886cb87ac0a744f01f2e4a7cc6d12efeaa04) )
 
-	ROM_REGION( 0x200000, "pic", 0 )
+	ROM_REGION( 0x000800, "pic1", 0 )
 	ROM_LOAD( "main_pic12c508a.u27", 0x000000, 0x000400, CRC(a84f0a7e) SHA1(fb27c05fb27b98ca603697e1be214dc6c8d5f884) )
+
+	ROM_REGION( 0x000800, "pic2", 0 )
 	ROM_LOAD( "sub_pic12c508a.u4",   0x000000, 0x000400, CRC(e52ebdc4) SHA1(0f3af66b5ea184e49188e74a873699324a3930f1) )
 
 	ROM_REGION( 0x800000, "sprites", 0 )
@@ -804,7 +809,7 @@ ROM_START( livequiz )
 	ROM_REGION( 0x200000, "ymz", 0 )
 	ROM_LOAD( "flash.u5", 0x000000, 0x200000, CRC(dc062792) SHA1(ec415c918c47ce9d181f014cde317af5717600e4) )
 
-	ROM_REGION( 0x20000, "zoomy", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
 
@@ -878,6 +883,9 @@ ROM_START( hammer )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p.u22", 0x000000, 0x200000, CRC(687f1596) SHA1(3dc5fb0af1e8c4f3a42ce4aad39635b1111831d8) )
 
+	ROM_REGION( 0x002000, "mcu", 0 )
+	ROM_LOAD( "hammer_at89c52", 0x000000, 0x002000, NO_DUMP )
+
 	ROM_REGION( 0x1000000, "sprites", 0 )
 	ROM_LOAD64_WORD( "a0l.u44", 0x000000, 0x200000, CRC(b9cafd81) SHA1(24698970d1aea0907e2963c872ce61077f44c3af) )
 	ROM_LOAD64_WORD( "a0h.u46", 0x800000, 0x200000, CRC(f60f188b) SHA1(486f26c473b46efb402662b2f374e361cd7b4284) )
@@ -899,7 +907,7 @@ ROM_START( hammer )
 	ROM_LOAD( "s0.u25", 0x000000, 0x200000, CRC(c049a3e0) SHA1(0c7016c3128c170a84ad3f92fad1165775210e3d) )
 	ROM_LOAD( "s1.u26", 0x200000, 0x200000, CRC(9cc4b3ec) SHA1(b91a8747074a1032eb7f70a015d394fe8e896d7e) )
 
-	ROM_REGION( 0x20000, "zoomy", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "spritegen:zoomy", ROMREGION_ERASE00 )
 	/* uploaded */
 ROM_END
 

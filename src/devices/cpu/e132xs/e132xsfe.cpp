@@ -28,22 +28,6 @@ e132xs_frontend::e132xs_frontend(hyperstone_device *e132xs, uint32_t window_star
 {
 }
 
-inline uint32_t e132xs_frontend::imm_length(opcode_desc &desc, uint16_t op)
-{
-	uint8_t nybble = op & 0x0f;
-	switch (nybble)
-	{
-		case 0:
-		default:
-			return 2;
-		case 1:
-			return 6;
-		case 2:
-		case 3:
-			return 4;
-	}
-}
-
 inline uint16_t e132xs_frontend::read_word(opcode_desc &desc)
 {
 	return m_cpu->m_pr16(desc.physpc);
@@ -686,7 +670,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		case 0x71: // cmpbi global,limm
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			break;
 		case 0x62: // cmpi local,simm
 		case 0x72: // cmpbi local,simm
@@ -699,7 +683,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			break;
 		case 0x64: // movi global,simm
 			desc.regin[0] |= SR_CODE;
@@ -722,7 +706,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << (gdst_code + 16);
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
 			if (gdst_code == PC_REGISTER)
 			{
@@ -743,7 +727,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			break;
 		case 0x68: // addi global,simm
 		case 0x6c: // addsi global,simm
@@ -764,7 +748,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
 			if (gdst_code == PC_REGISTER)
 			{
@@ -786,7 +770,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
 			break;
 		case 0x74: // andni global,simm
@@ -809,7 +793,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= 1 << gdst_code;
 			desc.regout[0] |= 1 << gdst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			if (gdst_code == PC_REGISTER)
 			{
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
@@ -831,7 +815,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[ldst_group] |= 1 << ldst_code;
 			desc.regout[ldst_group] |= 1 << ldst_code;
 			desc.regout[0] |= SR_CODE;
-			desc.length = imm_length(desc, op);
+			desc.length = hyperstone_device::imm_length(op) << 1;
 			break;
 		case 0x80: case 0x81: // shrdi
 		case 0x84: case 0x85: // sardi
@@ -1310,12 +1294,14 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
+			desc.length = (op & 0x80) ? 4 : 2;
 			break;
-		case 0xec: // dbr - could be 4 bytes (pcrel)
+		case 0xec: // dbr
 			decode_pcrel(desc, op);
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
 			desc.delayslots = 1;
+			desc.length = (op & 0x80) ? 4 : 2;
 			break;
 		case 0xed: // frame
 			desc.regin[0] |= SR_CODE;
@@ -1331,6 +1317,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
 			break;
 		case 0xef: // call local
 			desc.regin[0] |= SR_CODE;
@@ -1339,6 +1326,7 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regout[ldstf_group] |= 1 << ldstf_code;
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
 			break;
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3: // bv, bnv, be, bne
 		case 0xf4: case 0xf5: case 0xf6: case 0xf7: // bc, bnc, bse, bht
@@ -1347,12 +1335,14 @@ bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			desc.regin[0] |= SR_CODE;
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
+			desc.length = (op & 0x80) ? 4 : 2;
 			break;
 		case 0xfc: // br
 		{
 			int32_t offset = decode_pcrel(desc, op);
 			desc.targetpc = (desc.pc + desc.length) + offset;
 			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
+			desc.length = (op & 0x80) ? 4 : 2;
 			break;
 		}
 		case 0xfd: case 0xfe: case 0xff: // trap

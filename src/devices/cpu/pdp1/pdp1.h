@@ -198,9 +198,4 @@ private:
 
 DECLARE_DEVICE_TYPE(PDP1, pdp1_device)
 
-
-#define MCFG_PDP1_RESET_PARAM(_param) \
-	downcast<pdp1_device &>(*device).set_reset_param(&(_param));
-
-
 #endif // MAME_CPU_PDP1_PDP1_H

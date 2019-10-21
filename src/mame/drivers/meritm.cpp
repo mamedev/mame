@@ -197,6 +197,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_z80pio(*this, "z80pio%u", 0U),
 			m_ds1204(*this, "ds1204"),
+			m_ppi(*this, "ppi8255"),
 			m_v9938(*this, "v9938_%u", 0U),
 			m_microtouch(*this, "microtouch") ,
 			m_uart(*this, "ns16550"),
@@ -220,10 +221,11 @@ protected:
 private:
 	required_device_array<z80pio_device, 2> m_z80pio;
 	required_device<ds1204_device> m_ds1204;
+	required_device<i8255_device> m_ppi;
 	required_device_array<v9938_device, 2> m_v9938;
 	optional_device<microtouch_device> m_microtouch;
 	optional_device<ns16550_device> m_uart;
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	optional_memory_bank_array<3> m_banks;
 	required_memory_region m_region_maincpu;
 	optional_memory_region m_region_extra;
@@ -1100,15 +1102,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
 	m_z80pio[0]->port_a_write(m_vint);
 }
 
-MACHINE_CONFIG_START(meritm_state::crt250)
-	MCFG_DEVICE_ADD(m_maincpu, Z80, SYSTEM_CLK/6)
-	MCFG_DEVICE_PROGRAM_MAP(crt250_map)
-	MCFG_DEVICE_IO_MAP(crt250_io_map)
-	MCFG_Z80_DAISY_CHAIN(meritm_daisy_chain)
+void meritm_state::crt250(machine_config &config)
+{
+	Z80(config, m_maincpu, SYSTEM_CLK/6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_map);
+	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_io_map);
+	m_maincpu->set_daisy_config(meritm_daisy_chain);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, meritm_state, crt250_port_b_w))   // used LMP x DRIVE
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
+	I8255(config, m_ppi);
+	m_ppi->out_pb_callback().set(FUNC(meritm_state::crt250_port_b_w));   // used LMP x DRIVE
+	m_ppi->in_pc_callback().set(FUNC(meritm_state::_8255_port_c_r));
 
 	Z80PIO(config, m_z80pio[0], SYSTEM_CLK/6);
 	m_z80pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1124,68 +1127,75 @@ MACHINE_CONFIG_START(meritm_state::crt250)
 	m_z80pio[1]->in_pb_callback().set_ioport("PIO1_PORTB");
 	m_z80pio[1]->out_pb_callback().set(FUNC(meritm_state::io_pio_port_b_w));
 
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_start", meritm_state, vblank_start_tick, "screen", 259, 262)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("vblank_end", meritm_state, vblank_end_tick, "screen", 262, 262)
+	TIMER(config, "vblank_start", 0).configure_scanline(FUNC(meritm_state::vblank_start_tick), "screen", 259, 262);
+	TIMER(config, "vblank_end", 0).configure_scanline(FUNC(meritm_state::vblank_end_tick), "screen", 262, 262);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DS1204_ADD(m_ds1204)
+	DS1204(config, m_ds1204);
 
-	MCFG_V9938_ADD(m_v9938[0], "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state, vdp0_interrupt))
+	V9938(config, m_v9938[0], SYSTEM_CLK);
+	m_v9938[0]->set_screen_ntsc("screen");
+	m_v9938[0]->set_vram_size(0x20000);
+	m_v9938[0]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
-	MCFG_V9938_ADD(m_v9938[1], "screen", 0x20000, SYSTEM_CLK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(*this, meritm_state, vdp1_interrupt))
+	V9938(config, m_v9938[1], SYSTEM_CLK);
+	m_v9938[1]->set_screen_ntsc("screen");
+	m_v9938[1]->set_vram_size(0x20000);
+	m_v9938[1]->int_cb().set(FUNC(meritm_state::vdp0_interrupt));
 
-	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938_0", SYSTEM_CLK)
-	MCFG_SCREEN_UPDATE_DRIVER(meritm_state, screen_update)
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER).set_screen_update(FUNC(meritm_state::screen_update));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8930, SYSTEM_CLK/12)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW")) /* Port A read */
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, meritm_state, ay8930_port_b_w))  /* Port B write */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8930_device &aysnd(AY8930(config, "aysnd", SYSTEM_CLK/12));
+	aysnd.port_a_read_callback().set_ioport("DSW");
+	aysnd.port_b_write_callback().set(FUNC(meritm_state::ay8930_port_b_w));
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
-MACHINE_CONFIG_START(meritm_state::crt250_questions)
+void meritm_state::crt250_questions(machine_config &config)
+{
 	crt250(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(crt250_questions_map)
-	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_questions)
-MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START(meritm_state::crt250_crt252_crt258)
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::crt250_questions_map);
+
+	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_questions)
+}
+
+void meritm_state::crt250_crt252_crt258(machine_config &config)
+{
 	crt250_questions(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(crt250_crt258_io_map)
+
+	m_maincpu->set_addrmap(AS_IO, &meritm_state::crt250_crt258_io_map);
+
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt250_crt252_crt258)
 
-	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(m_microtouch, microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
-MACHINE_CONFIG_END
+	NS16550(config, m_uart, UART_CLK);
+	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
-MACHINE_CONFIG_START(meritm_state::crt260)
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+}
+
+void meritm_state::crt260(machine_config &config)
+{
 	crt250(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(map)
-	MCFG_DEVICE_IO_MAP(io_map)
 
-	MCFG_DEVICE_REMOVE("ppi8255")
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, meritm_state, _8255_port_c_r))
+	m_maincpu->set_addrmap(AS_PROGRAM, &meritm_state::map);
+	m_maincpu->set_addrmap(AS_IO, &meritm_state::io_map);
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_msec(1200))  // DS1232, TD connected to VCC
+	m_ppi->out_pb_callback().set_nop();
+
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1200));  // DS1232, TD connected to VCC
 	MCFG_MACHINE_START_OVERRIDE(meritm_state, crt260)
 
-	MCFG_DEVICE_ADD(m_uart, NS16550, UART_CLK)
-	MCFG_INS8250_OUT_TX_CB(WRITELINE(m_microtouch, microtouch_device, rx))
-	MCFG_MICROTOUCH_ADD(m_microtouch, 9600, WRITELINE(m_uart, ins8250_uart_device, rx_w))
-	MCFG_MICROTOUCH_TOUCH_CB(meritm_state, touch_coord_transform)
-MACHINE_CONFIG_END
+	NS16550(config, m_uart, UART_CLK);
+	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
+
+	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+}
 
 
 /*
@@ -1914,6 +1924,25 @@ ROM_START( megat3te ) /* Dallas DS1204V security key at U5 labeled 9255-30-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
+ROM_START( megat3tg ) /* Dallas DS1204V security key at U5 labeled 9255-30-50 U5-RO1 C1995 MII */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "9255-30-01_u32-r0",  0x000000, 0x100000, CRC(31ac0004) SHA1(4bec97a852a7dadb0ab4f193bc376ed149102082) ) /* Location U32 */
+	ROM_LOAD( "qs9255-01_u36-r0",   0x100000, 0x080000, CRC(96bb501e) SHA1(f48ef238e8543676c42e3b85464a25ac179dcdd1) ) /* Location U36 */
+	ROM_RELOAD(                     0x180000, 0x080000)
+	ROM_LOAD( "qs9255-01_u37-r0",   0x200000, 0x100000, CRC(273560bd) SHA1(5de8b9f5a7c4b676f131dd7d47ec71d35fa1755c) ) /* Location U37 */
+	ROM_LOAD( "9255-30-50_u38-r0f", 0x300000, 0x080000, CRC(dbab32d9) SHA1(c05f31c4aad0ba9ff74aa68e80e0376b014d52a1) ) /* Location U38, 03/13/1996 11:34:57 - Bi-Lingual GER/ENG Version */
+	ROM_RELOAD(                     0x380000, 0x080000)
+
+	ROM_REGION( 0x000022, "ds1204", 0 )
+	ROM_LOAD( "9255-30-50_u5-r01_c1995_mii", 0x000000, 0x000022, BAD_DUMP CRC(6b5d2ac2) SHA1(463ab84972a065598e35e3d31176770afdebfbeb) )
+
+	ROM_REGION( 0x1000, "user2", 0 ) // PALs
+	ROM_LOAD( "sc3943.u20",     0x000, 0x117, CRC(5a72fe78) SHA1(4b1a36904eb7048518507fe14bdade5c2589dbd7) )
+	ROM_LOAD( "sc3944-0a.u19",  0x000, 0x2dd, CRC(4cc46c5e) SHA1(0bab970df1539ce905f43603ad13171b05449a01) )
+	ROM_LOAD( "sc3980.u40",     0x000, 0x117, CRC(ee0cdab5) SHA1(216fef50a8a0f6a33b704d3501a4c5c3cbac2bad) )
+	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
+ROM_END
+
 ROM_START( megat4 ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD( "9255-40-01_u32-r0",  0x000000, 0x100000, CRC(08b1b8fe) SHA1(c562f2e065d6d7f753f6fd1d0b8355b01cb089ec) ) /* Location U32 */
@@ -2403,6 +2432,7 @@ GAME( 1996, megat3ca,  megat3, crt260, meritm_crt260, meritm_state, empty_init, 
 GAME( 1995, megat3caa, megat3, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-06 R0D, California version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, megat3nj,  megat3, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch III (9255-20-07 R0G, New Jersey version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3te,  megat3, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch III Tournament Edition (9255-30-01 R0E, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, megat3tg,  megat3, crt260, meritm_crt260, meritm_state, init_megat3te, ROT0, "Merit", "Megatouch III Turnier Edition (9255-30-50 R0F, Bi-Lingual GER/ENG version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4,    0,      crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 R0E, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4a,   megat4, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 R0D, Standard version)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, megat4b,   megat4, crt260, meritm_crt260, meritm_state, empty_init,    ROT0, "Merit", "Megatouch IV (9255-40-01 R0B, Standard version)", MACHINE_IMPERFECT_GRAPHICS )

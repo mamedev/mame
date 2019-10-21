@@ -300,7 +300,7 @@ public:
 		int keynum;
 
 		// allocate and link in a new device
-		devinfo = m_dinput_helper->create_device<dinput_keyboard_device>(machine, *this, instance, &c_dfDIKeyboard, nullptr, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		devinfo = m_dinput_helper->create_device<dinput_keyboard_device>(machine, *this, instance, &c_dfDIKeyboard, nullptr, dinput_cooperative_level::FOREGROUND);
 		if (devinfo == nullptr)
 			goto exit;
 
@@ -372,7 +372,7 @@ public:
 		HRESULT result;
 
 		// allocate and link in a new device
-		devinfo = m_dinput_helper->create_device<dinput_mouse_device>(machine, *this, instance, &c_dfDIMouse2, &c_dfDIMouse, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		devinfo = m_dinput_helper->create_device<dinput_mouse_device>(machine, *this, instance, &c_dfDIMouse2, &c_dfDIMouse, dinput_cooperative_level::FOREGROUND);
 		if (devinfo == nullptr)
 			goto exit;
 
@@ -572,13 +572,13 @@ public:
 
 	BOOL device_enum_callback(LPCDIDEVICEINSTANCE instance, LPVOID ref) override
 	{
-		DWORD cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
+		dinput_cooperative_level cooperative_level = dinput_cooperative_level::FOREGROUND;
 		running_machine &machine = *static_cast<running_machine *>(ref);
 		dinput_joystick_device *devinfo;
 		int result = 0;
 
 		if (!osd_common_t::s_window_list.empty() && osd_common_t::s_window_list.front()->win_has_menu())
-			cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
+			cooperative_level = dinput_cooperative_level::BACKGROUND;
 
 		// allocate and link in a new device
 		devinfo = m_dinput_helper->create_device<dinput_joystick_device>(machine, *this, instance, &c_dfDIJoystick, nullptr, cooperative_level);

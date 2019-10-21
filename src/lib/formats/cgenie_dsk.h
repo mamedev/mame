@@ -7,11 +7,10 @@
     Disk image format
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_CGENIE_DSK_H
+#define MAME_FORMATS_CGENIE_DSK_H
 
 #pragma once
-
-#ifndef __CGENIE_DSK_H__
-#define __CGENIE_DSK_H__
 
 #include "wd177x_dsk.h"
 
@@ -34,4 +33,4 @@ private:
 
 extern const floppy_format_type FLOPPY_CGENIE_FORMAT;
 
-#endif // __CGENIE_DSK_H__
+#endif // MAME_FORMATS_CGENIE_DSK_H

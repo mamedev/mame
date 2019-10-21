@@ -42,30 +42,6 @@ constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MAS
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
-	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor(&std::remove_pointer_t<decltype(this)>::_map, tag(), this));
-
-#define MCFG_DEVICE_REMOVE_ADDRESS_MAP(_space) \
-	dynamic_cast<device_memory_interface *>(device)->set_addrmap(_space, address_map_constructor());
-
-#define MCFG_DEVICE_PROGRAM_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
-
-#define MCFG_DEVICE_DATA_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_DATA, _map)
-
-#define MCFG_DEVICE_IO_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
-
-#define MCFG_DEVICE_OPCODES_MAP(_map) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_OPCODES, _map)
-
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 

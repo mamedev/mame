@@ -122,9 +122,7 @@ WRITE16_MEMBER(m107_state::control_w)
 
 void m107_state::video_start()
 {
-	int laynum;
-
-	for (laynum = 0; laynum < 4; laynum++)
+	for (int laynum = 0; laynum < 4; laynum++)
 	{
 		pf_layer_info *layer = &m_pf_layer[laynum];
 

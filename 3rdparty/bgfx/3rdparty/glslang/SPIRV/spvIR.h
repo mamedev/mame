@@ -1,5 +1,6 @@
 //
 // Copyright (C) 2014 LunarG, Inc.
+// Copyright (C) 2015-2018 Google, Inc.
 //
 // All rights reserved.
 //
@@ -74,13 +75,16 @@ const Decoration NoPrecision = DecorationMax;
 
 POTENTIALLY_UNUSED
 const MemorySemanticsMask MemorySemanticsAllMemory =
-                (MemorySemanticsMask)(MemorySemanticsSequentiallyConsistentMask |
-                                      MemorySemanticsUniformMemoryMask |
-                                      MemorySemanticsSubgroupMemoryMask |
+                (MemorySemanticsMask)(MemorySemanticsUniformMemoryMask |
                                       MemorySemanticsWorkgroupMemoryMask |
-                                      MemorySemanticsCrossWorkgroupMemoryMask |
                                       MemorySemanticsAtomicCounterMemoryMask |
                                       MemorySemanticsImageMemoryMask);
+
+struct IdImmediate {
+    bool isId;      // true if word is an Id, false if word is an immediate
+    unsigned word;
+    IdImmediate(bool i, unsigned w) : isId(i), word(w) {}
+};
 
 //
 // SPIR-V IR instruction.
@@ -91,8 +95,19 @@ public:
     Instruction(Id resultId, Id typeId, Op opCode) : resultId(resultId), typeId(typeId), opCode(opCode), block(nullptr) { }
     explicit Instruction(Op opCode) : resultId(NoResult), typeId(NoType), opCode(opCode), block(nullptr) { }
     virtual ~Instruction() {}
-    void addIdOperand(Id id) { operands.push_back(id); }
-    void addImmediateOperand(unsigned int immediate) { operands.push_back(immediate); }
+    void addIdOperand(Id id) {
+        operands.push_back(id);
+        idOperand.push_back(true);
+    }
+    void addImmediateOperand(unsigned int immediate) {
+        operands.push_back(immediate);
+        idOperand.push_back(false);
+    }
+    void setImmediateOperand(unsigned idx, unsigned int immediate) {
+        assert(!idOperand[idx]);
+        operands[idx] = immediate;
+    }
+
     void addStringOperand(const char* str)
     {
         unsigned int word;
@@ -119,14 +134,25 @@ public:
             addImmediateOperand(word);
         }
     }
+    bool isIdOperand(int op) const { return idOperand[op]; }
     void setBlock(Block* b) { block = b; }
     Block* getBlock() const { return block; }
     Op getOpCode() const { return opCode; }
-    int getNumOperands() const { return (int)operands.size(); }
+    int getNumOperands() const
+    {
+        assert(operands.size() == idOperand.size());
+        return (int)operands.size();
+    }
     Id getResultId() const { return resultId; }
     Id getTypeId() const { return typeId; }
-    Id getIdOperand(int op) const { return operands[op]; }
-    unsigned int getImmediateOperand(int op) const { return operands[op]; }
+    Id getIdOperand(int op) const {
+        assert(idOperand[op]);
+        return operands[op];
+    }
+    unsigned int getImmediateOperand(int op) const {
+        assert(!idOperand[op]);
+        return operands[op];
+    }
 
     // Write out the binary form.
     void dump(std::vector<unsigned int>& out) const
@@ -156,7 +182,8 @@ protected:
     Id resultId;
     Id typeId;
     Op opCode;
-    std::vector<Id> operands;
+    std::vector<Id> operands;     // operands, both <id> and immediates (both are unsigned int)
+    std::vector<bool> idOperand;  // true for operands that are <id>, false for immediates
     Block* block;
 };
 
@@ -182,6 +209,7 @@ public:
     const std::vector<std::unique_ptr<Instruction> >& getInstructions() const {
         return instructions;
     }
+    const std::vector<std::unique_ptr<Instruction> >& getLocalVariables() const { return localVariables; }
     void setUnreachable() { unreachable = true; }
     bool isUnreachable() const { return unreachable; }
     // Returns the block's merge instruction, if one exists (otherwise null).
@@ -261,7 +289,8 @@ public:
             delete blocks[i];
     }
     Id getId() const { return functionInstruction.getResultId(); }
-    Id getParamId(int p) { return parameterInstructions[p]->getResultId(); }
+    Id getParamId(int p) const { return parameterInstructions[p]->getResultId(); }
+    Id getParamType(int p) const { return parameterInstructions[p]->getTypeId(); }
 
     void addBlock(Block* block) { blocks.push_back(block); }
     void removeBlock(Block* block)
@@ -333,7 +362,9 @@ public:
 
     Instruction* getInstruction(Id id) const { return idToInstruction[id]; }
     const std::vector<Function*>& getFunctions() const { return functions; }
-    spv::Id getTypeId(Id resultId) const { return idToInstruction[resultId]->getTypeId(); }
+    spv::Id getTypeId(Id resultId) const {
+        return idToInstruction[resultId] == nullptr ? NoType : idToInstruction[resultId]->getTypeId();
+    }
     StorageClass getStorageClass(Id typeId) const
     {
         assert(idToInstruction[typeId]->getOpCode() == spv::OpTypePointer);
@@ -405,6 +436,6 @@ __inline void Block::addInstruction(std::unique_ptr<Instruction> inst)
         parent.getParent().mapInstruction(raw_instruction);
 }
 
-};  // end spv namespace
+}  // end spv namespace
 
 #endif // spvIR_H

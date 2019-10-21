@@ -182,8 +182,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen[0]->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen[0]->pf_control_r(0);
 	uint16_t priority = m_priority;
 
 	// sprites are flipped relative to tilemaps

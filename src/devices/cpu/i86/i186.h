@@ -16,18 +16,14 @@ public:
 	// construction/destruction
 	i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_read_slave_ack_callback(Object &&cb) { return m_read_slave_ack_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_chip_select_callback(Object &&cb) { return m_out_chip_select_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tmrout0_handler(Object &&cb) { return m_out_tmrout0_func.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_tmrout1_handler(Object &&cb) { return m_out_tmrout1_func.set_callback(std::forward<Object>(cb)); }
 	auto read_slave_ack_callback() { return m_read_slave_ack_func.bind(); }
 	auto chip_select_callback() { return m_out_chip_select_func.bind(); }
 	auto tmrout0_handler() { return m_out_tmrout0_func.bind(); }
 	auto tmrout1_handler() { return m_out_tmrout1_func.bind(); }
 
 	IRQ_CALLBACK_MEMBER(int_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(drq1_w) { if(state) drq_callback(1); m_dma[1].drq_state = state; }
+	DECLARE_WRITE_LINE_MEMBER(drq0_w) { m_dma[0].drq_state = state; }
+	DECLARE_WRITE_LINE_MEMBER(drq1_w) { m_dma[1].drq_state = state; }
 	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
 	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
 	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
@@ -41,16 +37,21 @@ public:
 protected:
 	enum
 	{
-		I80186_RELOC = I8086_HALT + 1,
+		I80186_RELREG = I8086_HALT + 1,
 		I80186_UMCS, I80186_LMCS, I80186_PACS, I80186_MMCS, I80186_MPCS,
-		I80186_DMA_SP,
-		I80186_DMA_DP = I80186_DMA_SP + 2,
-		I80186_DMA_TC = I80186_DMA_DP + 2,
-		I80186_DMA_CR = I80186_DMA_TC + 2,
-		I80186_T_COUNT = I80186_DMA_CR + 2,
-		I80186_T_MAX_A = I80186_T_COUNT + 3,
-		I80186_T_MAX_B = I80186_T_MAX_A + 3,
-		I80186_T_CONTROL = I80186_T_MAX_B + 2
+		I80186_DxSRC,
+		I80186_DxDST = I80186_DxSRC + 2,
+		I80186_DxTC = I80186_DxDST + 2,
+		I80186_DxCON = I80186_DxTC + 2,
+		I80186_TxCNT = I80186_DxCON + 2,
+		I80186_TxCMPA = I80186_TxCNT + 3,
+		I80186_TxCMPB = I80186_TxCMPA + 3,
+		I80186_TxCON = I80186_TxCMPB + 2,
+		I80186_INSERV = I80186_TxCON + 3,
+		I80186_REQST, I80186_PRIMSK, I80186_INTSTS,
+		I80186_TCUCON, I80186_DMA0CON, I80186_DMA1CON,
+		I80186_I0CON, I80186_I1CON, I80186_I2CON, I80186_I3CON,
+		I80186_POLLSTS
 	};
 
 	i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size);
@@ -69,6 +70,7 @@ protected:
 	virtual uint8_t read_port_byte(uint16_t port) override;
 	virtual uint16_t read_port_word(uint16_t port) override;
 	virtual void write_port_byte(uint16_t port, uint8_t data) override;
+	void write_port_byte_al(uint16_t port);
 	virtual void write_port_word(uint16_t port, uint16_t data) override;
 	virtual uint8_t read_byte(uint32_t addr) override;
 	virtual uint16_t read_word(uint32_t addr) override;
@@ -136,6 +138,7 @@ private:
 	dma_state       m_dma[2];
 	intr_state      m_intr;
 	mem_state       m_mem;
+	bool            m_last_dma;
 
 	static const device_timer_id TIMER_INT0 = 0;
 	static const device_timer_id TIMER_INT1 = 1;
@@ -159,17 +162,5 @@ public:
 	// construction/destruction
 	i80188_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
-
-#define MCFG_80186_IRQ_SLAVE_ACK(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_read_slave_ack_callback(DEVCB_##_devcb);
-
-#define MCFG_80186_CHIP_SELECT_CB(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_chip_select_callback(DEVCB_##_devcb);
-
-#define MCFG_80186_TMROUT0_HANDLER(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_tmrout0_handler(DEVCB_##_devcb);
-
-#define MCFG_80186_TMROUT1_HANDLER(_devcb) \
-	downcast<i80186_cpu_device &>(*device).set_tmrout1_handler(DEVCB_##_devcb);
 
 #endif // MAME_CPU_I86_I186_H

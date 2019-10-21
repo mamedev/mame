@@ -198,11 +198,11 @@ std::string vic10_expansion_slot_device::get_default_card_software(get_default_c
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-uint8_t vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+uint8_t vic10_expansion_slot_device::cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
 	if (m_card != nullptr)
 	{
-		data = m_card->vic10_cd_r(space, offset, data, lorom, uprom, exram);
+		data = m_card->vic10_cd_r(offset, data, lorom, uprom, exram);
 	}
 
 	return data;
@@ -213,11 +213,11 @@ uint8_t vic10_expansion_slot_device::cd_r(address_space &space, offs_t offset, u
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void vic10_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+void vic10_expansion_slot_device::cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
 {
 	if (m_card != nullptr)
 	{
-		m_card->vic10_cd_w(space, offset, data, lorom, uprom, exram);
+		m_card->vic10_cd_w(offset, data, lorom, uprom, exram);
 	}
 }
 

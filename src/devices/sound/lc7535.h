@@ -28,21 +28,10 @@
 
 
 //**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_LC7535_SELECT_CB(_read) \
-	downcast<lc7535_device &>(*device).set_select_callback(DEVCB_##_read);
-
-#define MCFG_LC7535_VOLUME_CB(_class, _method) \
-	downcast<lc7535_device &>(*device).set_volume_callback(lc7535_device::volume_delegate(&_class::_method, #_class "::" #_method, this));
-
-#define LC7535_VOLUME_CHANGED(name) void name(int attenuation_right, int attenuation_left, bool loudness)
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+#define LC7535_VOLUME_CHANGED(name) void name(int attenuation_right, int attenuation_left, bool loudness)
 
 class lc7535_device : public device_t
 {
@@ -52,9 +41,16 @@ public:
 
 	typedef device_delegate<void (int attenuation_right, int attenuation_left, bool loudness)> volume_delegate;
 
-	template <typename Object> void set_volume_callback(Object &&cb) { m_volume_cb = std::forward<Object>(cb); }
-
-	template <class Object> devcb_base &set_select_callback(Object &&cb) { return m_select_cb.set_callback(std::forward<Object>(cb)); }
+	auto select() { return m_select_cb.bind(); }
+	void set_volume_callback(volume_delegate callback) { m_volume_cb = callback; }
+	template <class FunctionClass> void set_volume_callback(const char *devname, void (FunctionClass::*callback)(int, int, bool), const char *name)
+	{
+		set_volume_callback(volume_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
+	}
+	template <class FunctionClass> void set_volume_callback(void (FunctionClass::*callback)(int, int, bool), const char *name)
+	{
+		set_volume_callback(volume_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
+	}
 
 	// serial interface
 	DECLARE_WRITE_LINE_MEMBER( ce_w );

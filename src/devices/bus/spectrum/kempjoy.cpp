@@ -62,19 +62,6 @@ spectrum_kempjoy_device::spectrum_kempjoy_device(const machine_config &mconfig, 
 
 void spectrum_kempjoy_device::device_start()
 {
-	address_space& spaceio = machine().device("maincpu")->memory().space(AS_IO);
-	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(owner());
-
-	spaceio.install_read_handler(0x1f, 0x1f, 0, 0xff00, 0, read8_delegate(FUNC(spectrum_kempjoy_device::joystick_r), this));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_kempjoy_device::device_reset()
-{
 }
 
 
@@ -82,7 +69,13 @@ void spectrum_kempjoy_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ8_MEMBER(spectrum_kempjoy_device::joystick_r)
+uint8_t spectrum_kempjoy_device::iorq_r(offs_t offset)
 {
-	return m_joy->read() & 0x1f;
+	uint8_t data = 0xff;
+
+	if (offset == 0x1f)
+	{
+		data = m_joy->read() & 0x1f;
+	}
+	return data;
 }

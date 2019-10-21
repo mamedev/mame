@@ -13,12 +13,7 @@ DEFINE_DEVICE_TYPE(TTL7404, ttl7404_device, "7404", "5/7404 Hex Inverters")
 
 ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL7404, tag, owner, clock)
-	, m_y1_func(*this)
-	, m_y2_func(*this)
-	, m_y3_func(*this)
-	, m_y4_func(*this)
-	, m_y5_func(*this)
-	, m_y6_func(*this)
+	, m_y_func{{*this}, {*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_a(0)
 	, m_y(0x3f)
 {
@@ -26,25 +21,14 @@ ttl7404_device::ttl7404_device(const machine_config &mconfig, const char *tag, d
 
 void ttl7404_device::device_start()
 {
-	init();
-
 	save_item(NAME(m_a));
 	save_item(NAME(m_y));
 
-	m_y1_func.resolve_safe();
-	m_y2_func.resolve_safe();
-	m_y3_func.resolve_safe();
-	m_y4_func.resolve_safe();
-	m_y5_func.resolve_safe();
-	m_y6_func.resolve_safe();
+	for (std::size_t bit = 0; bit < 6; bit++)
+		m_y_func[bit].resolve_safe();
 }
 
 void ttl7404_device::device_reset()
-{
-	init();
-}
-
-void ttl7404_device::init()
 {
 	m_a = 0;
 	m_y = 0x3f;
@@ -63,15 +47,7 @@ void ttl7404_device::update()
 			if (BIT(m_y, bit) == BIT(last_y, bit))
 				continue;
 
-			switch(bit)
-			{
-				case 0: m_y1_func(BIT(m_y, bit)); break;
-				case 1: m_y2_func(BIT(m_y, bit)); break;
-				case 2: m_y3_func(BIT(m_y, bit)); break;
-				case 3: m_y4_func(BIT(m_y, bit)); break;
-				case 4: m_y5_func(BIT(m_y, bit)); break;
-				case 5: m_y6_func(BIT(m_y, bit)); break;
-			}
+			m_y_func[bit](BIT(m_y, bit));
 		}
 	}
 }

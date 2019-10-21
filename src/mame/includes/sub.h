@@ -5,9 +5,10 @@
 Submarine (c) 1985 Sigma
 
 *************************************************************************************/
-
 #ifndef MAME_INCLUDES_SUB_H
 #define MAME_INCLUDES_SUB_H
+
+#pragma once
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
@@ -17,14 +18,15 @@ Submarine (c) 1985 Sigma
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #define MASTER_CLOCK            XTAL(18'432'000)
 
 class sub_state : public driver_device
 {
 public:
-	sub_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	sub_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -34,7 +36,8 @@ public:
 		m_attr(*this, "attr"),
 		m_spriteram(*this, "spriteram"),
 		m_spriteram2(*this, "spriteram2"),
-		m_scrolly(*this, "scrolly") { }
+		m_scrolly(*this, "scrolly")
+	{ }
 
 	void sub(machine_config &config);
 
@@ -46,7 +49,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 
-	DECLARE_PALETTE_INIT(sub);
+	void sub_palette(palette_device &palette) const;
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	DECLARE_WRITE8_MEMBER(attr_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
@@ -80,4 +83,4 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#endif
+#endif // MAME_INCLUDES_SUB_H

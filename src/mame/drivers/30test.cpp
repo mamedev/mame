@@ -69,7 +69,7 @@ protected:
 	virtual void machine_start() override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<mc68hc11_cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	output_finder<72> m_digits;
 	output_finder<8> m_lamps;
@@ -86,7 +86,6 @@ private:
 	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
 
-	void namco_30test_io(address_map &map);
 	void namco_30test_map(address_map &map);
 };
 
@@ -174,13 +173,6 @@ void namco_30test_state::namco_30test_map(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void namco_30test_state::namco_30test_io(address_map &map)
-{
-	map(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA).r(FUNC(namco_30test_state::namco_30test_mux_r));
-//  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
-	map(MC68HC11_IO_PORTE, MC68HC11_IO_PORTE).portr("SYSTEM");
-}
-
 
 static INPUT_PORTS_START( 30test )
 	PORT_START("IN0")
@@ -253,23 +245,23 @@ void namco_30test_state::machine_start()
 	save_item(NAME(m_oki_bank));
 }
 
-MACHINE_CONFIG_START(namco_30test_state::_30test)
-
+void namco_30test_state::_30test(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", MC68HC11,MAIN_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(namco_30test_map)
-	MCFG_DEVICE_IO_MAP(namco_30test_io)
-	MCFG_MC68HC11_CONFIG( 0, 768, 0x00 )
+	MC68HC11K1(config, m_maincpu, MAIN_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &namco_30test_state::namco_30test_map);
+	m_maincpu->in_pa_callback().set(FUNC(namco_30test_state::namco_30test_mux_r));
+	//m_maincpu->in_pd_callback().set_ram();
+	m_maincpu->in_pe_callback().set_ioport("SYSTEM");
 
-
-	/* no video! */
+	/* no video hardware */
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, 1056000, okim6295_device::PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 1056000, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

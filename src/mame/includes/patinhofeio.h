@@ -26,7 +26,7 @@ public:
 	void teletype_kbd_input(u8 data);
 	TIMER_CALLBACK_MEMBER(teletype_callback);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( tape_load );
 
 	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);
 

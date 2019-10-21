@@ -35,12 +35,12 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(subs_state, subs)
+void subs_state::subs_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette.set_pen_color(1,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert */
-	palette.set_pen_color(2,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
-	palette.set_pen_color(3,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert*/
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // BLACK - modified on video invert
+	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
+	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00)); // BLACK - modified on video invert
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff)); // WHITE - modified on video invert
 }
 
 
@@ -54,15 +54,16 @@ PALETTE_INIT_MEMBER(subs_state, subs)
 void subs_state::main_map(address_map &map)
 {
 	map.global_mask(0x3fff);
-	map(0x0000, 0x01ff).ram();
+	map(0x0000, 0x008f).ram();
 	map(0x0000, 0x0000).w(FUNC(subs_state::noise_reset_w));
 	map(0x0000, 0x0007).r(FUNC(subs_state::control_r));
 	map(0x0020, 0x0020).w(FUNC(subs_state::steer_reset_w));
 	map(0x0020, 0x0027).r(FUNC(subs_state::coin_r));
-//  AM_RANGE(0x0040, 0x0040) AM_WRITE(timer_reset_w)
+//  map(0x0040, 0x0040).w(FUNC(subs_state::timer_reset_w));
 	map(0x0060, 0x0063).r(FUNC(subs_state::options_r));
 	map(0x0060, 0x006f).w("latch", FUNC(ls259_device::write_a0));
-	map(0x0090, 0x009f).share("spriteram");
+	map(0x0090, 0x009f).ram().share("spriteram");
+	map(0x00a0, 0x01ff).ram();
 	map(0x0800, 0x0bff).ram().share("videoram");
 	map(0x2000, 0x3fff).rom();
 }
@@ -173,37 +174,36 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(subs_state::subs)
-
+void subs_state::subs(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502,12096000/16)      /* clock input is the "4H" signal */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(subs_state, interrupt, 4*57)
+	M6502(config, m_maincpu, 12096000/16);      /* clock input is the "4H" signal */
+	m_maincpu->set_addrmap(AS_PROGRAM, &subs_state::main_map);
+	m_maincpu->set_periodic_int(FUNC(subs_state::interrupt), attotime::from_hz(4*57));
 
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_subs)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_subs);
 
-	MCFG_PALETTE_ADD("palette", 4)
-	MCFG_PALETTE_INIT_OWNER(subs_state, subs)
+	PALETTE(config, m_palette, FUNC(subs_state::subs_palette), 4);
 
 	config.set_default_layout(layout_dualhsxs);
 
-	MCFG_SCREEN_ADD("lscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subs_state, screen_update_left)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	lscreen.set_refresh_hz(57);
+	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	lscreen.set_size(32*8, 32*8);
+	lscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	lscreen.set_screen_update(FUNC(subs_state::screen_update_left));
+	lscreen.set_palette(m_palette);
 
-	MCFG_SCREEN_ADD("rscreen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(subs_state, screen_update_right)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	rscreen.set_refresh_hz(57);
+	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	rscreen.set_size(32*8, 32*8);
+	rscreen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	rscreen.set_screen_update(FUNC(subs_state::screen_update_right));
+	rscreen.set_palette(m_palette);
 
 
 	/* sound hardware */
@@ -222,7 +222,7 @@ MACHINE_CONFIG_START(subs_state::subs)
 	latch.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<SUBS_CRASH_EN>));
 	latch.q_out_cb<6>().set(FUNC(subs_state::invert1_w));
 	latch.q_out_cb<7>().set(FUNC(subs_state::invert2_w));
-MACHINE_CONFIG_END
+}
 
 
 

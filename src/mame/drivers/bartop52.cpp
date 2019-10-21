@@ -118,7 +118,7 @@ void bartop52_state::machine_reset()
 {
 	atari_common_state::machine_reset();
 
-	subdevice<pokey_device>("pokey")->write(machine().dummy_space(), 15, 0);
+	m_pokey->write(15, 0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
@@ -126,44 +126,42 @@ TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
 	m_antic->generic_interrupt(4);
 }
 
-MACHINE_CONFIG_START(bartop52_state::a5200)
+void bartop52_state::a5200(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, pokey_device::FREQ_17_EXACT)
-	MCFG_DEVICE_PROGRAM_MAP(a5200_mem)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bartop52_state, bartop_interrupt, "screen", 0, 1)
+	M6502(config, m_maincpu, pokey_device::FREQ_17_EXACT);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bartop52_state::a5200_mem);
+	TIMER(config, "scantimer").configure_scanline(FUNC(bartop52_state::bartop_interrupt), "screen", 0, 1);
 
-	MCFG_DEVICE_ADD("gtia", ATARI_GTIA, 0)
-	MCFG_GTIA_REGION(GTIA_NTSC)
+	ATARI_GTIA(config, m_gtia, 0);
+	m_gtia->set_region(GTIA_NTSC);
 
-	MCFG_DEVICE_ADD("antic", ATARI_ANTIC, 0)
-	MCFG_ANTIC_GTIA("gtia")
+	ATARI_ANTIC(config, m_antic, 0);
+	m_antic->set_gtia_tag(m_gtia);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1))
-	MCFG_SCREEN_VISIBLE_AREA_ANTIC()
-	MCFG_SCREEN_REFRESH_RATE_ANTIC_60HZ()
-	MCFG_SCREEN_SIZE_ANTIC_60HZ()
-	MCFG_SCREEN_UPDATE_DEVICE("antic", antic_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1));
+	m_screen->set_visarea(antic_device::MIN_X, antic_device::MAX_X, antic_device::MIN_Y, antic_device::MAX_Y);
+	m_screen->set_refresh_hz(antic_device::FRAME_RATE_60HZ);
+	m_screen->set_size(antic_device::HWIDTH * 8, antic_device::TOTAL_LINES_60HZ);
+	m_screen->set_screen_update("antic", FUNC(antic_device::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(bartop52_state, atari)
+	PALETTE(config, "palette", FUNC(bartop52_state::atari_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("pokey", POKEY, pokey_device::FREQ_17_EXACT)
-	MCFG_POKEY_POT0_R_CB(IOPORT("analog_0"))
-	MCFG_POKEY_POT1_R_CB(IOPORT("analog_1"))
-	MCFG_POKEY_POT2_R_CB(IOPORT("analog_2"))
-	MCFG_POKEY_POT3_R_CB(IOPORT("analog_3"))
-	MCFG_POKEY_KEYBOARD_CB(bartop52_state, a5200_keypads)
-	MCFG_POKEY_INTERRUPT_CB(bartop52_state, interrupt_cb)
-
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-
-MACHINE_CONFIG_END
+	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
+	m_pokey->pot_r<0>().set_ioport("analog_0");
+	m_pokey->pot_r<1>().set_ioport("analog_1");
+	m_pokey->pot_r<2>().set_ioport("analog_2");
+	m_pokey->pot_r<3>().set_ioport("analog_3");
+	m_pokey->set_keyboard_callback(FUNC(bartop52_state::a5200_keypads));
+	m_pokey->set_interrupt_callback(FUNC(bartop52_state::interrupt_cb));
+	m_pokey->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
 
 ROM_START(barbball)
 	ROM_REGION(0x10000, "maincpu", 0)

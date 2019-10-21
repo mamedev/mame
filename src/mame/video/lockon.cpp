@@ -67,7 +67,7 @@ WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
 {
 	if (m_main_inten)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // V30
 
 	m_cursor_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
 }
@@ -98,16 +98,15 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(lockon_state, lockon)
+void lockon_state::lockon_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < 1024; ++i)
+	for (int i = 0; i < 1024; ++i)
 	{
 		uint8_t r, g, b;
-		uint8_t p1 = color_prom[i];
-		uint8_t p2 = color_prom[i + 0x400];
+		uint8_t const p1 = color_prom[i];
+		uint8_t const p2 = color_prom[i + 0x400];
 
 		if (p2 & 0x80)
 		{
@@ -282,7 +281,7 @@ WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 
 TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
 {
-	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff); // V30
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 

@@ -115,9 +115,9 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 	case phase::CONSENT:
 		draw_text_box(
 				std::begin(m_prompt), std::end(m_prompt),
-				x, x2, y - top, y - UI_BOX_TB_BORDER,
+				x, x2, y - top, y - ui().box_tb_border(),
 				ui::text_layout::CENTER, ui::text_layout::NEVER, false,
-				UI_TEXT_COLOR, UI_GREEN_COLOR, 1.0f);
+				ui().colors().text_color(), UI_GREEN_COLOR, 1.0f);
 		break;
 
 	case phase::AUDIT:
@@ -140,7 +140,7 @@ void menu_audit::custom_render(void *selectedref, float top, float bottom, float
 void menu_audit::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Start Audit"), "", 0, ITEMREF_START);
-	customtop = (ui().get_line_height() * 2.0f) + (UI_BOX_TB_BORDER * 3.0f);
+	customtop = (ui().get_line_height() * 2.0f) + (ui().box_tb_border() * 3.0f);
 }
 
 void menu_audit::handle()
@@ -207,24 +207,21 @@ void menu_audit::audit_fast()
 
 void menu_audit::audit_all()
 {
-	m_availablesorted.clear();
 	driver_enumerator enumerator(machine().options());
 	media_auditor auditor(enumerator);
+	std::vector<bool> available(driver_list::total(), false);
 	while (enumerator.next())
 	{
 		m_current.store(&enumerator.driver());
 		media_auditor::summary const summary(auditor.audit_media(AUDIT_VALIDATE_FAST));
 
 		// if everything looks good, include the driver
-		m_availablesorted.emplace_back(enumerator.driver(), (summary == media_auditor::CORRECT) || (summary == media_auditor::BEST_AVAILABLE) || (summary == media_auditor::NONE_NEEDED));
+		available[enumerator.current()] = (summary == media_auditor::CORRECT) || (summary == media_auditor::BEST_AVAILABLE) || (summary == media_auditor::NONE_NEEDED);
 		++m_audited;
 	}
 
-	// sort
-	std::stable_sort(
-			m_availablesorted.begin(),
-			m_availablesorted.end(),
-			[] (ui_system_info const &a, ui_system_info const &b) { return sorted_game_list(a.driver, b.driver); });
+	for (ui_system_info &info : m_availablesorted)
+		info.available = available[info.index];
 }
 
 void menu_audit::save_available_machines()

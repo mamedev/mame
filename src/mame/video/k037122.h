@@ -4,6 +4,8 @@
 #define MAME_VIDEO_K037122_H
 #pragma once
 
+#include "tilemap.h"
+
 class k037122_device : public device_t,
 						public device_video_interface,
 						public device_gfx_interface
@@ -43,12 +45,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(K037122, k037122_device)
-
-#define MCFG_K037122_ADD(_tag, _screen) \
-	MCFG_DEVICE_ADD(_tag, K037122, 0) \
-	MCFG_VIDEO_SET_SCREEN(_screen)
-
-#define MCFG_K037122_PALETTE(_palette_tag) \
-	MCFG_GFX_PALETTE(_palette_tag)
 
 #endif // MAME_VIDEO_K037122_H

@@ -12,13 +12,13 @@ void galpanic_state::video_start()
 	save_item(NAME(m_bitmap));
 }
 
-PALETTE_INIT_MEMBER(galpanic_state,galpanic)
+void galpanic_state::galpanic_palette(palette_device &palette) const
 {
-	/* first 1024 colors are dynamic */
+	// first 1024 colors are dynamic
 
-	/* initialize 555 RGB lookup */
-	for (int i = 0;i < 32768;i++)
-		palette.set_pen_color(i+1024,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));
+	// initialize 555 GRB lookup
+	for (int i = 0; i < 32768; i++)
+		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
 WRITE16_MEMBER(galpanic_state::bgvideoram_w)

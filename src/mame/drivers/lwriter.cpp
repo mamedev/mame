@@ -209,7 +209,7 @@ void lwriter_state::maincpu_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x1fffff).rw(FUNC(lwriter_state::bankedarea_r), FUNC(lwriter_state::bankedarea_w));
 	map(0x200000, 0x2fffff).rom().region("rom", 0); // 1MB ROM
-	//AM_RANGE(0x300000, 0x3fffff) // open bus?
+	//map(0x300000, 0x3fffff) // open bus?
 	map(0x400000, 0x5fffff).ram().region("dram", 0).mirror(0x200000); // 2MB DRAM
 	map(0x800000, 0x800000).w(FUNC(lwriter_state::led_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
 	map(0x800001, 0x800001).w(FUNC(lwriter_state::fifo_out_w)).mirror(0x1ffffe); // mirror is a guess given that the pals can only decode A18-A23
@@ -226,7 +226,7 @@ void lwriter_state::maincpu_map(address_map &map)
 #if TPI
 	map(0xe00010, 0xe0001f).rw("tpi", FUNC(tpi6523_device::read), FUNC(tpi6523_device::write)).umask16(0x00ff).mirror(0x17ffe0); // Used on older boards, needs proper mapping
 #else
-	map(0xe00000, 0xe0001f).rw(m_via, FUNC(via6522_device::read), FUNC(via6522_device::write)).umask16(0x00ff).mirror(0x17ffe0);
+	map(0xe00000, 0xe0001f).m(m_via, FUNC(via6522_device::map)).umask16(0x00ff).mirror(0x17ffe0);
 #endif
 }
 
@@ -340,7 +340,7 @@ WRITE_LINE_MEMBER(lwriter_state::via_int_w)
 {
 	logerror(" VIA: INT output set to %d!\n", state);
 	//TODO: this is likely wrong, the VPA pin which controls whether autovector is enabled or not is controlled by PAL U8D, which is not dumped.
-	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, (state ? ASSERT_LINE : CLEAR_LINE), M68K_INT_ACK_AUTOVECTOR);
+	m_maincpu->set_input_line(M68K_IRQ_1, (state ? ASSERT_LINE : CLEAR_LINE));
 }
 
 /* scc stuff */

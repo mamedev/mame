@@ -224,7 +224,7 @@ READ16_MEMBER(cischeat_state::cischeat_ip_select_r)
 WRITE16_MEMBER(cischeat_state::cischeat_soundlatch_w)
 {
 	/* Sound CPU: reads latch during int 4, and stores command */
-	m_soundlatch->write(space, 0, data, mem_mask);
+	m_soundlatch->write(data);
 	m_soundcpu->set_input_line(4, HOLD_LINE);
 }
 
@@ -1009,11 +1009,11 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
-		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
+		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%02X",
 							m_scudhamm_motor_command,
 							scudhamm_motor_pos_r(space,0,0xffff),
 							scudhamm_motor_status_r(space,0,0xffff),
-							scudhamm_analog_r(space,0,0xffff) );
+							scudhamm_analog_r() );
 
 #if 0
 	// captflag

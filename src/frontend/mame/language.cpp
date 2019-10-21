@@ -72,7 +72,7 @@ void load_translation(emu_options &m_options)
 		{
 			std::string original = (const char *)data + buffer[original_table_offset + 2 * i + 1];
 			std::string translation = (const char *)data + buffer[translation_table_offset + 2 * i + 1];
-			g_translation.insert(std::pair<std::string, std::string>(original, translation));
+			g_translation.emplace(std::move(original), std::move(translation));
 		}
 		global_free_array(buffer);
 	}

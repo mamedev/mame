@@ -22,18 +22,50 @@
 
 
 /*
-  Following data contain real command reply obfuscated, it is extracted by such code:
+ Officially not documented security-related packet commands:
 
-   for (uint32_t i = 0, offset = 0; i < length; i++)
+ SYS_CHK_SECU (70h) Media security check
+    Parameters: 1byte - R0011111, R - "recheck" (it seems actual security check performed automatically at drive power on or when disc was inserted, so normally this and next command returns result of already performed check.
+                                      however, when MSB R bit is 1 will be forced media security recheck)
+    Result: none
+ SYS_REQ_SECU (71h) Request security data
+    Parameters: 1byte - always 0x1f
+    Result: a bit less than 1Kbyte chunk of data (length vary each time), contains real command reply obfuscated, which is extracted by such code:
+
+   u8 reply[], real_reply[];
+   for (u32 i = 0, offset = 0; i < length; i++)
    {
      offset++;
-     offset += GDROM_Cmd71_Reply[offset] - 2;
-     result[i] = GDROM_Cmd71_Reply[offset++];
+     u32 skip = reply[offset] - 2; // normally skip value is < 0x10, might be used to identify real reply length
+     offset += skip;
+     real_reply[i] = reply[offset++];
    }
 
- in the case of cmd 0x71 only 1 byte extracted, and later verified for &0x10.
+   Real reply is 43 byte:
+    struct sec_reply {
+        u8 check_result;       // 0x1f - valid GD-ROM, 0x10 - valid Mil-CD (in this case following char[] fields is empty, 0x00-filled)
+        char key_id[10];       // presumable Disc ID (T-xxxxxx or HDR-xxxxx etc)
+        char key_maker_id[16]; // presumable "SEGA ENTERPRISES"
+        char hard_id[16];      // presumable "SEGA SEGAKATANA "
+    };
 
- SysCalls/BIOS uses same extract routine for command 0x72 (14 bytes), but it seems not used on practice
+    *_id fields names came from Dev.box "Checker BIOS" disassembly, contents meaning is guesswork because all the reply dumps we have now was dumped with Mil-CD disc inserted but not GD-ROM.
+    Presumable these data somehow encoded in GD-ROM disc HD area Lead-in (or Security Ring area ?), and compared with data in LD area IP.BIN by GD-drive firmware,
+    as described in Sega patent EP0935242A1 https://patents.google.com/patent/EP0935242A1
+
+    Dreamcast BIOS code verify only 1st result byte, if it's 5th bit (0x10) == 1.
+    Naomi DIMM firmware verify if result byte equal to 0x1f.
+
+ SYS_CHG_COMD (72h) ??? Authentication for next command ?
+    Parameters: 1byte, probably key/password, in retail Dreamcast - 5th byte of unit SN# (located in flash ROM at 1A05Ah), 0 in Dev.box checker BIOS.
+    Result: none
+
+ SYS_REQ_COMD (73h) Request command list
+    Parameters: none
+    Result: chunk of data where obfuscated real reply, see command 71.
+            real result: 14 bytes - codes of all regular (not security) packet commands supported by drive (00 10 11 12 13 14 15 16 20 21 22 30 31 40).
+
+  Dreamcast BIOS SysCalls contain commands 0x72/73 routine, but it seems not used at practice.
 */
 
 static const uint8_t GDROM_Cmd71_Reply[] =
@@ -233,7 +265,7 @@ void gdrom_device::ExecCommand()
 			break;
 		}
 
-		case 0x70:  // unknown, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
+		case 0x70:  // security check, return no data, always followed by cmd 0x71, command[1] parameter can be 0x1f or 0x9f
 			m_phase = SCSI_PHASE_STATUS;
 			m_status_code = SCSI_STATUS_CODE_GOOD;
 			m_transfer_length = 0;

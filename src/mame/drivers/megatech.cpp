@@ -4,7 +4,7 @@
 
 About MegaTech:
 
-Megatech games are identical to their Genesis/SMS equivlents, however the Megatech cartridges contain
+Megatech games are identical to their Genesis/SMS equivalents, however the Megatech cartridges contain
 a BIOS rom with the game instructions.  The last part number of the bios ROM is the cart/game ID code.
 
 The instruction rom appears to map at 0x300000 in the cart space.
@@ -17,8 +17,8 @@ with their Playchoice 10 system.
 The BIOS screen is based around SMS hardware, with an additional Z80 and SMS VDP chip not present on
 a standard Genesis.
 
-SMS games run on Megatech in the Genesis's SMS compatability mode, where the Genesis Z80 becomes the
-main CPU and the Genesis VDP acts in a mode mimicing the behavior of the SMS VDP. A pin on the carts
+SMS games run on Megatech in the Genesis's SMS compatibility mode, where the Genesis Z80 becomes the
+main CPU and the Genesis VDP acts in a mode mimicking the behavior of the SMS VDP. A pin on the carts
 determines which mode the game runs in.
 
 Additions will only be made to this driver if proof that the dumped set are original roms with original
@@ -43,8 +43,13 @@ Game                       PCB #       Sticker on PCB    Sticker on cart     IC1
 -------------------------------------------------------------------------------------------------------------------------------------------------
 Altered Beast              171-5782    837-6963-01       610-0239-01         MPR-12538F     (834200A)     EPR-12368-01   (27C256)  n/a
 Space Harrier II           171-5782    837-6963-02       610-0239-02         MPR-11934      (834200)      EPR-12368-02   (27256)   n/a
+Super Thunder Blade                                      610-0239-03
+Great Golf                                               610-0239-04
+Afterburner                                              610-0239-05
 Out Run                    171-5783    837-6963-06       610-0239-06         MPR-11078      (Mask)        EPR-12368-06   (27256)   n/a
 Alien Syndrome             171-5783    837-6963-07       610-0239-07         MPR-11194      (232011)      EPR-12368-07   (27256)   n/a
+Shinobi                                                  610-0239-08
+Fantasy Zone                                             610-0239-09
 Afterburner                171-5784    837-6963-10       610-0239-10         315-5235       (custom)      MPR-11271-T    (834000)  EPR-12368-10 (27256)
 Great Football             171-5783    837-6963-19       610-0239-19         MPR-10576F     (831000)      EPR-12368-19   (27256)   n/a
 World Championship Soccer  171-5782    837-6963-21       610-0239-21         MPR-12607B     (uPD23C4000)  EPR-12368-21   (27256)   n/a
@@ -53,14 +58,14 @@ Ghouls & Ghosts            171-5869A   -                 610-0239-23         MPR
 Super Hang On              171-5782    837-6963-24       610-0239-24         MPR-12640      (234000)      EPR-12368-24   (27256)   n/a
 Forgotten Worlds           171-5782    837-6963-26       610-0239-26         MPR-12672-H    (Mask)        EPR-12368-26   (27256)   n/a
 The Revenge Of Shinobi     171-5782    837-6963-28       610-0239-28         MPR-12675 S44  (uPD23C4000)  EPR-12368-28   (27C256)  n/a
-Arnold Palmer Tour Golf    171-5782    837-6963-31       610-0239-31         MPR-12645F     (23C4000)     EPR-12368-31   (27256)   n/a
+Arnold Palmer Tour Golf    171-5782    837-6963-31       610-0239-31         MPR-12645F     (834200A)     EPR-12368-31   (27256)   n/a
 Super Real Basket Ball     171-5782    837-6963-32       610-0239-32         MPR-12904F     (838200A)     EPR-12368-32   (27256)   n/a
 Tommy Lasorda Baseball     171-5782    837-6963-35       610-0239-35         MPR-12706F     (834200A)     EPR-12368-35   (27256)   n/a
 ESWAT                      171-5782    837-6963-38       610-0239-38         MPR-13192-H    (uPD23C4000)  EPR-12368-38   (27256)   n/a
 Moonwalker                 171-5782    837-6963-40       610-0239-40         MPR-13285A S61 (uPD23C4000)  EPR-12368-40   (27256)   n/a
 Shadow Dancer              171-5782    837-6963-43       610-0239-43         MPR-13571-S    (uPD23C4000)  EPR-12368-43   (27256)   n/a
-Wrestle War                171-5782    837-6963-48       610-0239-48         MPR-14025-F    (23C4000)     EPR-12368-48   (27256)   n/a
-Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR-13905A-F   (23C4000)     EPR-12368-49   (27256)   n/a
+Wrestle War                171-5782    837-6963-48       610-0239-48         MPR-14025-F    (834200A)     EPR-12368-48   (27256)   n/a
+Bonanza Bros.              171-5782    837-6963-49       610-0239-49         MPR-13905A-F   (834200A)     EPR-12368-49   (27256)   n/a
 Streets of Rage            171-5782    837-6963-51       610-0239-51         MPR-14125-SM   (uPD23C4000)  EPR-12368-51   (27C256)  n/a
 Sonic The Hedgehog         171-5782    837-6963-52       610-0239-52         MPR-13913-F    (834200A)     EPR-12368-52   (27C256)  n/a
 Spider-Man                 171-5782    837-6963-54       610-0239-54         MPR-14027-SM   (uPD23C4000)  EPR-12368-54   (27C256)  n/a
@@ -73,7 +78,6 @@ Sonic Hedgehog 2           171-6215A   837-6963-62       610-0239-62         MPR
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
-#include "sound/sn76496.h"
 #include "rendlay.h"
 
 #include "includes/megadriv.h"
@@ -129,8 +133,7 @@ private:
 	DECLARE_READ8_MEMBER(bios_joypad_r);
 	DECLARE_WRITE8_MEMBER(bios_port_7f_w);
 	DECLARE_READ8_MEMBER(vdp1_count_r);
-	DECLARE_READ8_MEMBER(sms_count_r);
-	DECLARE_WRITE8_MEMBER(sms_sn_w);
+	u8 sms_count_r(offs_t offset);
 	DECLARE_READ8_MEMBER(sms_ioport_dc_r);
 	DECLARE_READ8_MEMBER(sms_ioport_dd_r);
 	DECLARE_WRITE8_MEMBER(mt_sms_standard_rom_bank_w);
@@ -156,7 +159,7 @@ private:
 
 	uint8_t m_mt_cart_select_reg;
 	uint32_t m_bios_port_ctrl;
-	int m_current_MACHINE_IS_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
+	int m_current_machine_is_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
 	uint32_t m_bios_ctrl_inputs;
 	uint8_t m_bios_ctrl[6];
 	int m_mt_bank_addr;
@@ -317,19 +320,12 @@ INPUT_PORTS_END
 
 /* MEGATECH specific */
 
-READ8_MEMBER(mtech_state::sms_count_r)
+u8 mtech_state::sms_count_r(offs_t offset)
 {
-	address_space &prg = m_z80snd->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp->hcount_read(prg, offset);
+		return m_vdp->hcount_read();
 	else
-		return m_vdp->vcount_read(prg, offset);
-}
-
-WRITE8_MEMBER(mtech_state::sms_sn_w)
-{
-	address_space &prg = m_z80snd->space(AS_PROGRAM);
-	m_vdp->vdp_w(prg, 0x10 >> 1, data, 0x00ff);
+		return m_vdp->vcount_read();
 }
 
 READ8_MEMBER (mtech_state::sms_ioport_dc_r)
@@ -393,10 +389,10 @@ void mtech_state::set_genz80_as_sms()
 	prg.install_write_handler(0xfffc, 0xffff, write8_delegate(FUNC(mtech_state::mt_sms_standard_rom_bank_w),this));
 
 	// ports
-	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8_delegate(FUNC(mtech_state::sms_count_r),this));
-	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8_delegate(FUNC(mtech_state::sms_sn_w),this));
-	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
-	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
+	io.install_read_handler      (0x40, 0x41, 0, 0x3e, 0, read8sm_delegate(FUNC(mtech_state::sms_count_r),this));
+	io.install_write_handler     (0x40, 0x41, 0, 0x3e, 0, write8smo_delegate(FUNC(sega315_5124_device::psg_w),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x80, 0x80, 0, 0x3e, 0, read8smo_delegate(FUNC(sega315_5124_device::data_read),(sega315_5124_device *)m_vdp), write8smo_delegate(FUNC(sega315_5124_device::data_write),(sega315_5124_device *)m_vdp));
+	io.install_readwrite_handler (0x81, 0x81, 0, 0x3e, 0, read8smo_delegate(FUNC(sega315_5124_device::control_read),(sega315_5124_device *)m_vdp), write8smo_delegate(FUNC(sega315_5124_device::control_write),(sega315_5124_device *)m_vdp));
 
 	io.install_read_handler      (0x10, 0x10, read8_delegate(FUNC(mtech_state::sms_ioport_dd_r),this)); // super tetris
 
@@ -417,7 +413,7 @@ void mtech_state::set_genz80_as_md()
 
 	prg.install_ram(0x0000, 0x1fff, m_genz80.z80_prgram.get());
 
-	prg.install_readwrite_handler(0x4000, 0x4003, read8_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
+	prg.install_readwrite_handler(0x4000, 0x4003, read8sm_delegate(FUNC(ym2612_device::read), (ym2612_device *)m_ymsnd), write8sm_delegate(FUNC(ym2612_device::write), (ym2612_device *)m_ymsnd));
 	prg.install_write_handler    (0x6000, 0x6000, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	prg.install_write_handler    (0x6001, 0x6001, write8_delegate(FUNC(mtech_state::megadriv_z80_z80_bank_w),this));
 	prg.install_read_handler     (0x6100, 0x7eff, read8_delegate(FUNC(mtech_state::megadriv_z80_unmapped_read),this));
@@ -447,7 +443,7 @@ void mtech_state::switch_cart(int gameno)
 		if (!m_cart_is_genesis[gameno])
 		{
 			logerror("enabling SMS Z80\n");
-			m_current_MACHINE_IS_sms = 1;
+			m_current_machine_is_sms = 1;
 			set_genz80_as_sms();
 			//m_z80snd->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
@@ -455,7 +451,7 @@ void mtech_state::switch_cart(int gameno)
 		else
 		{
 			logerror("disabling SMS Z80\n");
-			m_current_MACHINE_IS_sms = 0;
+			m_current_machine_is_sms = 0;
 			set_genz80_as_md();
 			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 			//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -542,7 +538,7 @@ void mtech_state::megatech_bios_map(address_map &map)
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
-	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
+	//map(0x7800, 0x7fff).ram(); // ?
 	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 
@@ -581,18 +577,17 @@ WRITE8_MEMBER(mtech_state::bios_port_7f_w)
 
 READ8_MEMBER(mtech_state::vdp1_count_r)
 {
-	address_space &prg = m_bioscpu->space(AS_PROGRAM);
 	if (offset & 0x01)
-		return m_vdp1->hcount_read(prg, offset);
+		return m_vdp1->hcount_read();
 	else
-		return m_vdp1->vcount_read(prg, offset);
+		return m_vdp1->vcount_read();
 }
 
 void mtech_state::megatech_bios_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x3f, 0x3f).w(FUNC(mtech_state::bios_port_ctrl_w));
-	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w));
+	map(0x7f, 0x7f).w(FUNC(mtech_state::bios_port_7f_w)); // PSG?
 
 	map(0x40, 0x41).mirror(0x3e).r(FUNC(mtech_state::vdp1_count_r));
 	map(0x80, 0x80).mirror(0x3e).rw(m_vdp1, FUNC(sega315_5124_device::data_read), FUNC(sega315_5124_device::data_write));
@@ -625,7 +620,7 @@ void mtech_state::init_mt_crt()
 uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip
-	if (!m_current_MACHINE_IS_sms)
+	if (!m_current_machine_is_sms)
 		screen_update_megadriv(screen, bitmap, cliprect);
 	else
 	{
@@ -647,7 +642,7 @@ uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bi
 
 WRITE_LINE_MEMBER(mtech_state::screen_vblank_main)
 {
-	if (!m_current_MACHINE_IS_sms)
+	if (!m_current_machine_is_sms)
 		screen_vblank_megadriv(state);
 }
 
@@ -686,59 +681,56 @@ uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bi
 }
 
 
-MACHINE_CONFIG_START(mtech_state::megatech)
+void mtech_state::megatech(machine_config &config)
+{
 	/* basic machine hardware */
 	md_ntsc(config);
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MCFG_DEVICE_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MCFG_DEVICE_PROGRAM_MAP(megatech_bios_map)
-	MCFG_DEVICE_IO_MAP(megatech_bios_portmap)
+	Z80(config, m_bioscpu, MASTER_CLOCK / 15); /* ?? */
+	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
+	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
 
-	MCFG_DEVICE_ADD("io1", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_DSW0"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_DSW1"))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, cart_select_w))
+	cxd1095_device &io1(CXD1095(config, "io1"));
+	io1.in_porta_cb().set_ioport("BIOS_DSW0");
+	io1.in_portb_cb().set_ioport("BIOS_DSW1");
+	io1.out_porte_cb().set(FUNC(mtech_state::cart_select_w));
 
-	MCFG_DEVICE_ADD("io2", CXD1095, 0)
-	MCFG_CXD1095_IN_PORTA_CB(IOPORT("BIOS_IN0"))
-	MCFG_CXD1095_IN_PORTB_CB(IOPORT("BIOS_IN1"))
-	MCFG_CXD1095_IN_PORTC_CB(READ8(*this, mtech_state, bios_portc_r))
-	MCFG_CXD1095_OUT_PORTD_CB(WRITE8(*this, mtech_state, bios_portd_w))
-	MCFG_CXD1095_IN_PORTE_CB(READ8(*this, mtech_state, bios_porte_r))
-	MCFG_CXD1095_OUT_PORTE_CB(WRITE8(*this, mtech_state, bios_porte_w))
+	cxd1095_device &io2(CXD1095(config, "io2"));
+	io2.in_porta_cb().set_ioport("BIOS_IN0");
+	io2.in_portb_cb().set_ioport("BIOS_IN1");
+	io2.in_portc_cb().set(FUNC(mtech_state::bios_portc_r));
+	io2.out_portd_cb().set(FUNC(mtech_state::bios_portd_w));
+	io2.in_porte_cb().set(FUNC(mtech_state::bios_porte_r));
+	io2.out_porte_cb().set(FUNC(mtech_state::bios_porte_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(mtech_state, megatech)
 
 	config.set_default_layout(layout_dualhovu);
 
-	MCFG_SCREEN_MODIFY("megadriv")
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	screen_device &screen(*subdevice<screen_device>("megadriv"));
+	screen.set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_main)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, mtech_state, screen_vblank_main))
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	screen.set_screen_update(FUNC(mtech_state::screen_update_main));
+	screen.screen_vblank().set(FUNC(mtech_state::screen_vblank_main));
 
-	MCFG_DEVICE_MODIFY("gen_vdp")
-	MCFG_SEGA315_5313_INT_CB(INPUTLINE("genesis_snd_z80", 0))
+	m_vdp->n_int().set_inputline(m_z80snd, 0);
 
-	MCFG_SCREEN_ADD("menu", RASTER)
+	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
 	// check frq
-	MCFG_SCREEN_RAW_PARAMS(XTAL(10'738'635)/2, \
+	menu.set_raw(XTAL(10'738'635)/2, \
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
-			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224)
-	MCFG_SCREEN_UPDATE_DRIVER(mtech_state, screen_update_menu)
+			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
+	menu.set_screen_update(FUNC(mtech_state::screen_update_menu));
 
-	MCFG_DEVICE_ADD("vdp1", SEGA315_5246, 0)
-	MCFG_SEGA315_5246_SET_SCREEN("menu")
-	MCFG_SEGA315_5246_IS_PAL(false)
-	MCFG_SEGA315_5246_INT_CB(INPUTLINE("mtbios", 0))
-
-	/* sound hardware */
-	MCFG_DEVICE_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
+	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
+	m_vdp1->set_screen("menu");
+	m_vdp1->set_is_pal(false);
+	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
+	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+}
 
 
 image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
@@ -775,34 +767,36 @@ image_init_result mtech_state::load_cart(device_image_interface &image, generic_
 	return image_init_result::PASS;
 }
 
-#define MCFG_MEGATECH_CARTSLOT_ADD(_tag, _load) \
-	MCFG_GENERIC_CARTSLOT_ADD(_tag, generic_plain_slot, "megatech_cart") \
-	MCFG_GENERIC_LOAD(mtech_state, _load)
+#define MEGATECH_CARTSLOT(_tag, _load) \
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "megatech_cart").set_device_load(FUNC(mtech_state::_load), this)
 
-MACHINE_CONFIG_START(mtech_state::megatech_multislot)
+void mtech_state::megatech_multislot(machine_config &config)
+{
 	megatech(config);
 
 	// add cart slots
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot2", mt_cart2)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot3", mt_cart3)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot4", mt_cart4)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot5", mt_cart5)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot6", mt_cart6)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot7", mt_cart7)
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot8", mt_cart8)
+	MEGATECH_CARTSLOT("mt_slot1", mt_cart1);
+	MEGATECH_CARTSLOT("mt_slot2", mt_cart2);
+	MEGATECH_CARTSLOT("mt_slot3", mt_cart3);
+	MEGATECH_CARTSLOT("mt_slot4", mt_cart4);
+	MEGATECH_CARTSLOT("mt_slot5", mt_cart5);
+	MEGATECH_CARTSLOT("mt_slot6", mt_cart6);
+	MEGATECH_CARTSLOT("mt_slot7", mt_cart7);
+	MEGATECH_CARTSLOT("mt_slot8", mt_cart8);
 
-	MCFG_SOFTWARE_LIST_ADD("cart_list","megatech")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("megatech");
+}
 
 
-MACHINE_CONFIG_START(mtech_state::megatech_fixedslot)
+void mtech_state::megatech_fixedslot(machine_config &config)
+{
 	megatech(config);
 
 	// add cart slots
-	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_SET_IMAGE_LOADABLE(false)
-MACHINE_CONFIG_END
+	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "mt_slot1", generic_plain_slot, "megatech_cart"));
+	cartslot.set_device_load(FUNC(mtech_state::mt_cart1), this);
+	cartslot.set_user_loadable(false);
+}
 
 
 /* MegaTech Games - Genesis & sms! Games with a timer */
@@ -1110,12 +1104,12 @@ ROM_START( mt_parlg ) /* Parlour Games */
 ROM_END
 
 
-/* Game 31 - Arnold Palmer Tournament Gold */
+/* Game 31 - Arnold Palmer Tournament Golf */
 ROM_START( mt_tgolf ) /* Arnold Palmer Tournament Golf */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "mp12645f.ic1", 0x000000, 0x080000, CRC(c07ef8d2) SHA1(9d111fdc7bb92d52bfa048cd134aa488b4f475ef) )
+	ROM_LOAD16_WORD_SWAP( "mpr-12645f.ic1", 0x000000, 0x080000, CRC(c07ef8d2) SHA1(9d111fdc7bb92d52bfa048cd134aa488b4f475ef) )
 	ROM_LOAD16_BYTE( "epr-12368-31.ic2", 0x300001, 0x08000, CRC(30af7e4a) SHA1(baf91d527393dc90aba9371abcb1e690bcc83c7e) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
@@ -1256,11 +1250,13 @@ ROM_END
 
 
 /* Game 49 - Bonanza Bros. */
+// original dump of mpr-13905a.ic1 had a size of 0x100000, which is a double dump of the correct size 0x080000
+// the IC is a Fujitsu MB834200A MaskROM by 4Mb (512KB) in a DIP40-600mil package
 ROM_START( mt_bbros ) /* Bonanza Bros. */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "mp13905a.ic1", 0x000000, 0x100000, CRC(68a88d60) SHA1(2f56e8a2b0999de4fa0d14a1527f4e1df0f9c7a2) )
+	ROM_LOAD16_WORD_SWAP( "mpr-13905a.ic1", 0x000000, 0x080000, CRC(6d617940) SHA1(11d5ff1c2db79632f6dea2edf97f56af2149cea4) )
 	ROM_LOAD16_BYTE( "epr-12368-49.ic2", 0x300001, 0x08000, CRC(c5101da2) SHA1(636f30043e2e9291e193ef9a2ead2e97a0bf7380) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
@@ -1392,14 +1388,14 @@ ROM_END
 
 
 /* Game 61 - Turbo Outrun */
-// original dump of epr-14674.ic1 had CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2)
+// original dump of mpr-14674.ic1 had CRC(c2b9a802) SHA1(108cc844c944125f9d271a2f2db094301294e8c2)
 // with the byte at offset 3 being F6 instead of Fe, this seems like a bad dump when compared to the Genesis rom which
 // has been verified on multiple carts, chances are the ROM had developed a fault.
 ROM_START( mt_tout ) /* Turbo Outrun */
 	MEGATECH_BIOS
 
 	ROM_REGION16_BE( 0x400000, "mt_slot1:cart", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "epr-14674.ic1", 0x000000, 0x080000, CRC(453712a2) SHA1(5d2c8430a9a14aac7f19c22617539b0503ab92cd) )
+	ROM_LOAD16_WORD_SWAP( "mpr-14674.ic1", 0x000000, 0x080000, CRC(453712a2) SHA1(5d2c8430a9a14aac7f19c22617539b0503ab92cd) )
 	ROM_LOAD16_BYTE( "epr-12368-61.ic2", 0x300001, 0x08000, CRC(4aa0b2a2) SHA1(bce03f88d6cfd02683d51c28058f6229fda13b49) )
 
 	ROM_REGION( 0x01, "sms_pin", ROMREGION_ERASE00 )
@@ -1490,7 +1486,7 @@ ROM_END
 - Enduro Racer
 
 Games seen in auction (#122011114579) known not to be original but manufactured/bootlegged on actual megatech carts.
-The labels are noticably different than expected.  Be careful if thinking of obtaining!
+The labels are noticeably different than expected.  Be careful if thinking of obtaining!
 - After Burner II (GEN)
 - Castle of Illusion Starring Mickey Mouse (GEN)
 - Double Dragon (SMS)

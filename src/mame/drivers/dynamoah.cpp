@@ -87,7 +87,7 @@ void dynamoah_state::dynamoah(machine_config &config)
 	maincpu.port_out_cb<1>().append(FUNC(dynamoah_state::p1_w)).mask(0x1f);
 	maincpu.port_out_cb<3>().set(FUNC(dynamoah_state::p3_w));
 
-	EEPROM_SERIAL_93C46_16BIT(config, "eeprom");
+	EEPROM_93C46_16BIT(config, "eeprom");
 }
 
 static INPUT_PORTS_START(dynamoah)

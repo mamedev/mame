@@ -142,13 +142,13 @@ READ16_MEMBER( b16_state::vblank_r )
 WRITE8_MEMBER( b16_state::b16_6845_address_w )
 {
 	m_crtc_index = data;
-	m_mc6845->address_w(space,offset, data);
+	m_mc6845->address_w(data);
 }
 
 WRITE8_MEMBER( b16_state::b16_6845_data_w )
 {
 	m_crtc_vreg[m_crtc_index] = data;
-	m_mc6845->register_w(space, offset, data);
+	m_mc6845->register_w(data);
 }
 
 /*
@@ -266,34 +266,35 @@ WRITE8_MEMBER(b16_state::memory_write_byte)
 }
 
 
-MACHINE_CONFIG_START(b16_state::b16)
+void b16_state::b16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(m_maincpu, I8086, XTAL(14'318'181)/2) //unknown xtal
-	MCFG_DEVICE_PROGRAM_MAP(b16_map)
-	MCFG_DEVICE_IO_MAP(b16_io)
+	I8086(config, m_maincpu, XTAL(14'318'181)/2); //unknown xtal
+	m_maincpu->set_addrmap(AS_PROGRAM, &b16_state::b16_map);
+	m_maincpu->set_addrmap(AS_IO, &b16_state::b16_io);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(b16_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update(FUNC(b16_state::screen_update));
+	screen.set_size(640, 400);
+	screen.set_visarea_full();
+	screen.set_palette(m_palette);
 
-	MCFG_MC6845_ADD(m_mc6845, H46505, "screen", XTAL(14'318'181)/5)    /* unknown clock, hand tuned to get ~60 fps */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MC6845(config, m_mc6845, XTAL(14'318'181)/5);    /* unknown variant, unknown clock, hand tuned to get ~60 fps */
+	m_mc6845->set_screen("screen");
+	m_mc6845->set_show_border_area(false);
+	m_mc6845->set_char_width(8);
 
 	AM9517A(config, m_dma8237, XTAL(14'318'181)/2);
 	m_dma8237->in_memr_callback().set(FUNC(b16_state::memory_read_byte));
 	m_dma8237->out_memw_callback().set(FUNC(b16_state::memory_write_byte));
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, m_palette, gfx_b16)
-	MCFG_PALETTE_ADD(m_palette, 8)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_b16);
+	PALETTE(config, m_palette).set_entries(8);
 //  MCFG_PALETTE_INIT_STANDARD(black_and_white) // TODO
-
-MACHINE_CONFIG_END
+}
 
 /* ROM definition */
 ROM_START( b16 )

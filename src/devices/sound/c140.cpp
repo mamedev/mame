@@ -10,12 +10,7 @@ This chip controls 24 channels (C140) or 16 (219) of PCM.
 16 bytes are associated with each channel.
 Channels can be 8 bit signed PCM, or 12 bit signed PCM.
 
-Timer behavior is not yet handled.
-
-Unmapped registers:
-    0x1f8:timer interval?   (Nx0.1 ms)
-    0x1fa:irq ack? timer restart?
-    0x1fe:timer switch?(0:off 1:on)
+TODO: What does the INT0 pin do? Normally Namco tied it to VOL0 (with VOL1 = VCC).
 
 --------------
 
@@ -90,6 +85,7 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 	: device_t(mconfig, C140, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this, 21)
+	, m_int1_callback(*this)
 	, m_sample_rate(0)
 	, m_stream(nullptr)
 	, m_banking_type(C140_TYPE::SYSTEM2)
@@ -109,6 +105,9 @@ c140_device::c140_device(const machine_config &mconfig, const char *tag, device_
 void c140_device::device_start()
 {
 	m_sample_rate = m_baserate = clock();
+
+	m_int1_callback.resolve_safe();
+	m_int1_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(c140_device::int1_on), this));
 
 	m_stream = stream_alloc(0, 2, m_sample_rate);
 
@@ -374,21 +373,21 @@ void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 }
 
 
-READ8_MEMBER( c140_device::c140_r )
+u8 c140_device::c140_r(offs_t offset)
 {
 	offset&=0x1ff;
 	return m_REG[offset];
 }
 
 
-WRITE8_MEMBER( c140_device::c140_w )
+void c140_device::c140_w(offs_t offset, u8 data)
 {
 	m_stream->update();
 
 	offset&=0x1ff;
 
 	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE::ASIC219))
+	if ((offset >= 0x1f8) && BIT(offset, 0) && (m_banking_type == C140_TYPE::ASIC219))
 	{
 		offset -= 8;
 	}
@@ -440,6 +439,36 @@ WRITE8_MEMBER( c140_device::c140_w )
 			}
 		}
 	}
+	else if (offset == 0x1fa)
+	{
+		m_int1_callback(CLEAR_LINE);
+
+		// timing not verified
+		unsigned div = m_REG[0x1f8] != 0 ? m_REG[0x1f8] : 256;
+		attotime interval = attotime::from_ticks(div * 2, m_baserate);
+		if (BIT(m_REG[0x1fe], 0))
+			m_int1_timer->adjust(interval);
+	}
+	else if (offset == 0x1fe)
+	{
+		if (BIT(data, 0))
+		{
+			// kyukaidk and marvlandj want the first interrupt to happen immediately
+			if (!m_int1_timer->enabled())
+				m_int1_callback(ASSERT_LINE);
+		}
+		else
+		{
+			m_int1_callback(CLEAR_LINE);
+			m_int1_timer->enable(false);
+		}
+	}
+}
+
+
+TIMER_CALLBACK_MEMBER(c140_device::int1_on)
+{
+	m_int1_callback(ASSERT_LINE);
 }
 
 

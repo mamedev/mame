@@ -44,9 +44,10 @@ static INPUT_PORTS_START( sawatte )
 INPUT_PORTS_END
 
 
-MACHINE_CONFIG_START(sawatte_state::sawatte)
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "sawatte")
-MACHINE_CONFIG_END
+void sawatte_state::sawatte(machine_config &config)
+{
+	SOFTWARE_LIST(config, "cart_list").set_original("sawatte");
+}
 
 ROM_START( sawatte )
 ROM_END

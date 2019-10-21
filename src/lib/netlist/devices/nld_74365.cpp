@@ -6,12 +6,21 @@
  */
 
 #include "nld_74365.h"
-#include "../nl_base.h"
+#include "netlist/nl_base.h"
+#include "nlid_system.h"
 
 namespace netlist
 {
 	namespace devices
 	{
+
+	/* FIXME: This should be a single device, i.e. one tristate buffer only.
+	 *
+	 * FIXME: Implement tristate output.
+	 *
+	 */
+
+
 	NETLIB_OBJECT(74365)
 	{
 		NETLIB_CONSTRUCTOR(74365)
@@ -19,6 +28,7 @@ namespace netlist
 		, m_G2Q(*this, "G2Q")
 		, m_A(*this, {{ "A1", "A2", "A3", "A4", "A5", "A6" }})
 		, m_Y(*this, {{ "Y1", "Y2", "Y3", "Y4", "Y5", "Y6" }})
+		, m_power_pins(*this)
 		{
 		}
 
@@ -29,6 +39,7 @@ namespace netlist
 		logic_input_t m_G2Q;
 		object_array_t<logic_input_t, 6> m_A;
 		object_array_t<logic_output_t, 6> m_Y;
+		nld_power_pins m_power_pins;
 	};
 
 	NETLIB_OBJECT_DERIVED(74365_dip, 74365)
@@ -42,6 +53,7 @@ namespace netlist
 			register_subalias("5", m_Y[1]);
 			register_subalias("6", m_A[2]);
 			register_subalias("7", m_Y[2]);
+			register_subalias("8", "GND");
 
 			register_subalias("9",  m_A[3]);
 			register_subalias("10", m_Y[3]);
@@ -50,6 +62,7 @@ namespace netlist
 			register_subalias("13", m_A[5]);
 			register_subalias("14", m_Y[5]);
 			register_subalias("15", m_G2Q);
+			register_subalias("16", "VCC");
 
 		}
 	};
@@ -68,8 +81,8 @@ namespace netlist
 		}
 	}
 
-	NETLIB_DEVICE_IMPL(74365)
-	NETLIB_DEVICE_IMPL(74365_dip)
+	NETLIB_DEVICE_IMPL(74365, "TTL_74365", "+G1Q,+G2Q,+A1,+A2,+A3,+A4,+A5,+A6,@VCC,@GND")
+	NETLIB_DEVICE_IMPL(74365_dip, "TTL_74365_DIP", "")
 
 	} //namespace devices
 } // namespace netlist

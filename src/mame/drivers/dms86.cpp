@@ -111,12 +111,15 @@ void dms86_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x80, 0x87).rw("sio1", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x88, 0x8f).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
-	map(0x90, 0x97).rw("sio2", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
-	map(0x9A, 0x9B).r(FUNC(dms86_state::port9a_r)); // parallel SASI port
+	map(0x80, 0x87).rw(m_sio[0], FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
+	map(0x88, 0x8f).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write)).umask16(0x00ff);
+	map(0x90, 0x97).rw(m_sio[1], FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
+	//map(0x98, 0x99)  // r SASI data read ; w SASI SEL probe
+	map(0x9A, 0x9B).r(FUNC(dms86_state::port9a_r)); // r parallel ports, status byte ; w SASI ACK strobe, SASI data write
+	// 9C,9D - no setup bytes; meant for printer // r Port P data read ; Port P data write
 	map(0x9c, 0x9d).r(FUNC(dms86_state::port9c_r));
 	map(0x9c, 0x9c).w(m_terminal, FUNC(generic_terminal_device::write));
+	//map(0x9e, 0x9f)  // r SASI software reset ; w Port P AUX strobe
 }
 
 /* Input ports */
@@ -135,7 +138,8 @@ void dms86_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-MACHINE_CONFIG_START(dms86_state::dms86)
+void dms86_state::dms86(machine_config &config)
+{
 	/* basic machine hardware */
 	I8086(config, m_maincpu, XTAL(14'745'600) / 3); // according to the manual... hmm
 	m_maincpu->set_addrmap(AS_PROGRAM, &dms86_state::mem_map);
@@ -170,9 +174,9 @@ MACHINE_CONFIG_START(dms86_state::dms86)
 	rs232.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcdb_w)); // HiNet / Monitor switch
 	rs232.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsb_w)).invert();
 
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(dms86_state, kbd_put))
-MACHINE_CONFIG_END
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(dms86_state::kbd_put));
+}
 
 /* ROM definition */
 ROM_START( dms86 )

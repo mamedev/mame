@@ -5,9 +5,10 @@
     Poly Disk image formats
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_POLY_DSK_H
+#define MAME_FORMATS_POLY_DSK_H
 
-#ifndef POLY_DSK_H_
-#define POLY_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -26,4 +27,4 @@ public:
 
 extern const floppy_format_type FLOPPY_POLY_CPM_FORMAT;
 
-#endif /* POLY_DSK_H_ */
+#endif // MAME_FORMATS_POLY_DSK_H

@@ -4,10 +4,10 @@
 #include "includes/rollrace.h"
 
 
-
 #define RA_FGCHAR_BASE  0
 #define RA_BGCHAR_BASE  4
 #define RA_SP_BASE  5
+
 
 TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
 {
@@ -61,32 +61,33 @@ WRITE8_MEMBER(rollrace_state::cram_w)
   bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(rollrace_state, rollrace)
+void rollrace_state::rollrace_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,bit3,r,g,b;
+		int bit0, bit1, bit2, bit3;
 
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[palette.entries()] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
-		bit0 = (color_prom[2*palette.entries()] >> 0) & 0x01;
-		bit1 = (color_prom[2*palette.entries()] >> 1) & 0x01;
-		bit2 = (color_prom[2*palette.entries()] >> 2) & 0x01;
-		bit3 = (color_prom[2*palette.entries()] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+		bit0 = BIT(color_prom[0], 0);
+		bit1 = BIT(color_prom[0], 1);
+		bit2 = BIT(color_prom[0], 2);
+		bit3 = BIT(color_prom[0], 3);
+		int const r = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		bit0 = BIT(color_prom[palette.entries()], 0);
+		bit1 = BIT(color_prom[palette.entries()], 1);
+		bit2 = BIT(color_prom[palette.entries()], 2);
+		bit3 = BIT(color_prom[palette.entries()], 3);
+		int const g = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+
+		bit0 = BIT(color_prom[2 * palette.entries()], 0);
+		bit1 = BIT(color_prom[2 * palette.entries()], 1);
+		bit2 = BIT(color_prom[2 * palette.entries()], 2);
+		bit3 = BIT(color_prom[2 * palette.entries()], 3);
+		int const b = 0x0e * bit0 + 0x1f * bit1 + 0x42 * bit2 + 0x90 * bit3;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
 
 		color_prom++;
 	}

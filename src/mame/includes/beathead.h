@@ -10,16 +10,20 @@
 
 #pragma once
 
-#include "machine/atarigen.h"
 #include "machine/timer.h"
 #include "cpu/asap/asap.h"
 #include "audio/atarijsa.h"
+#include "emupal.h"
+#include "screen.h"
 
-class beathead_state : public atarigen_state
+class beathead_state : public driver_device
 {
 public:
 	beathead_state(const machine_config &mconfig, device_type type, const char *tag) :
-		atarigen_state(mconfig, type, tag),
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_jsa(*this, "jsa"),
 		m_scan_timer(*this, "scan_timer"),
 		m_videoram(*this, "videoram"),
@@ -33,7 +37,7 @@ public:
 
 protected:
 	// in drivers/beathead.c
-	virtual void update_interrupts() override;
+	void update_interrupts();
 	DECLARE_WRITE32_MEMBER( interrupt_control_w );
 	DECLARE_READ32_MEMBER( interrupt_control_r );
 	DECLARE_WRITE32_MEMBER( sound_reset_w );
@@ -58,6 +62,10 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
+	required_device<cpu_device> m_maincpu;
+	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+
 	required_device<atari_jsa_iii_device> m_jsa;
 	required_device<timer_device> m_scan_timer;
 
@@ -81,8 +89,6 @@ private:
 	uint8_t           m_irq_line_state;
 	uint8_t           m_irq_enable[3];
 	uint8_t           m_irq_state[3];
-
-	uint8_t           m_eeprom_enabled;
 };
 
 #endif // MAME_INCLUDES_BEATHEAD_H

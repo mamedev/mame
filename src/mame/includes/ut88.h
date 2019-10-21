@@ -5,13 +5,13 @@
  * includes/ut88.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_UT88_H
 #define MAME_INCLUDES_UT88_H
 
+#pragma once
+
 #include "cpu/i8085/i8085.h"
 #include "sound/dac.h"
-#include "sound/wave.h"
 #include "machine/i8255.h"
 #include "imagedev/cassette.h"
 #include "emupal.h"
@@ -42,7 +42,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_digits(*this, "digit%u", 0U)
-		{ }
+	{ }
 
 	void ut88(machine_config &config);
 	void ut88mini(machine_config &config);

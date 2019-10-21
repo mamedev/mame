@@ -31,27 +31,34 @@ void nes_state::video_start()
 uint32_t nes_state::screen_update_nes(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// render the ppu
-	m_ppu->render(bitmap, 0, 0, 0, 0);
+	m_ppu->render(bitmap, 0, 0, 0, 0, cliprect);
+	return 0;
+}
 
-	// if this is a disk system game, check for the flip-disk key
-	if ((m_cartslot && m_cartslot->exists() && (m_cartslot->get_pcb_id() == STD_DISKSYS))   // first scenario = disksys in m_cartslot (= famicom)
-			|| m_disk)  // second scenario = disk via fixed internal disk option (fds & famitwin)
+void nes_state::screen_vblank_nes(int state)
+{
+	// on rising edge
+	if (!state)
 	{
-		if (m_io_disksel)
+		// if this is a disk system game, check for the flip-disk key
+		if ((m_cartslot && m_cartslot->exists() && (m_cartslot->get_pcb_id() == STD_DISKSYS))   // first scenario = disksys in m_cartslot (= famicom)
+				|| m_disk)  // second scenario = disk via fixed internal disk option (fds & famitwin)
 		{
-			// latch this input so it doesn't go at warp speed
-			if ((m_io_disksel->read() & 0x01) && (!m_last_frame_flip))
+			if (m_io_disksel)
 			{
-				if (m_disk)
-					m_disk->disk_flip_side();
-				else
-					m_cartslot->disk_flip_side();
-				m_last_frame_flip = 1;
-			}
+				// latch this input so it doesn't go at warp speed
+				if ((m_io_disksel->read() & 0x01) && (!m_last_frame_flip))
+				{
+					if (m_disk)
+						m_disk->disk_flip_side();
+					else
+						m_cartslot->disk_flip_side();
+					m_last_frame_flip = 1;
+				}
 
-			if (!(m_io_disksel->read() & 0x01))
-				m_last_frame_flip = 0;
+				if (!(m_io_disksel->read() & 0x01))
+					m_last_frame_flip = 0;
+			}
 		}
 	}
-	return 0;
 }

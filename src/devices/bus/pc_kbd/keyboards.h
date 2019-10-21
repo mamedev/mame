@@ -27,7 +27,13 @@ void pc_xt_keyboards(device_slot_interface &device);
 #define STR_KBD_MICROSOFT_NATURAL   "ms_naturl"
 #define STR_KBD_IBM_PC_AT_84        "pcat"
 #define STR_KBD_IBM_3270PC_122      "3270pc"
+#define STR_KBD_IBM_PC_AT_101       "pcat101"
 
 void pc_at_keyboards(device_slot_interface &device);
+
+// PS/2 protocol mice
+#define STR_HLE_PS2_MOUSE           "hle_ps2_mouse"
+
+void ps2_mice(device_slot_interface &device);
 
 #endif // MAME_BUS_PC_KBD_KEYBOARDS_H

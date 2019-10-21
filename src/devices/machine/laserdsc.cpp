@@ -92,8 +92,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 		m_videopalette(nullptr),
 		m_overenable(false),
 		m_overindex(0),
-		m_overtex(nullptr),
-		m_overlay_palette(*this, finder_base::DUMMY_TAG)
+		m_overtex(nullptr)
 {
 	// initialize overlay_config
 	m_orig_config.m_overposx = m_orig_config.m_overposy = 0.0f;
@@ -157,7 +156,7 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 {
 	// handle the overlay if present
 	screen_bitmap &overbitmap = m_overbitmap[m_overindex];
-	if (overbitmap.valid() && (!m_overupdate_ind16.isnull() || !m_overupdate_rgb32.isnull()))
+	if (overbitmap.valid() && !m_overupdate_rgb32.isnull())
 	{
 		// scale the cliprect to the overlay size
 		rectangle clip(m_overclip);
@@ -167,10 +166,7 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		clip.max_y = (cliprect.max_y + 1) * overbitmap.height() / bitmap.height() - 1;
 
 		// call the update callback
-		if (!m_overupdate_ind16.isnull())
-			m_overupdate_ind16(screen, overbitmap.as_ind16(), clip);
-		else
-			m_overupdate_rgb32(screen, overbitmap.as_rgb32(), clip);
+		m_overupdate_rgb32(screen, overbitmap.as_rgb32(), clip);
 	}
 
 	// if this is the last update, do the rendering
@@ -218,10 +214,6 @@ uint32_t laserdisc_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 
 void laserdisc_device::device_start()
 {
-	// if we have a palette and it's not started, wait for it
-	if (m_overlay_palette != nullptr && !m_overlay_palette->started())
-		throw device_missing_dependencies();
-
 	// initialize the various pieces
 	init_disc();
 	init_video();
@@ -278,9 +270,6 @@ void laserdisc_device::device_reset()
 
 void laserdisc_device::device_validity_check(validity_checker &valid) const
 {
-	texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTE16 : TEXFORMAT_RGB32;
-	if (m_overlay_palette == nullptr && texformat == TEXFORMAT_PALETTE16)
-		osd_printf_error("Overlay screen does not have palette defined\n");
 }
 
 //-------------------------------------------------
@@ -642,7 +631,7 @@ void laserdisc_device::init_disc()
 {
 	// get a handle to the disc to play
 	if (!m_getdisc_callback.isnull())
-		m_disc = m_getdisc_callback(*this);
+		m_disc = m_getdisc_callback();
 	else
 		m_disc = machine().rom_load().get_disk_handle(tag());
 
@@ -741,19 +730,12 @@ void laserdisc_device::init_video()
 	if (m_overenable)
 	{
 		// bind our handlers
-		m_overupdate_ind16.bind_relative_to(*owner());
 		m_overupdate_rgb32.bind_relative_to(*owner());
-
-		// configure bitmap formats
-		bitmap_format format = !m_overupdate_ind16.isnull() ? BITMAP_FORMAT_IND16 : BITMAP_FORMAT_RGB32;
-		texture_format texformat = !m_overupdate_ind16.isnull() ? TEXFORMAT_PALETTEA16 : TEXFORMAT_ARGB32;
 
 		// allocate overlay bitmaps
 		for (auto & elem : m_overbitmap)
 		{
-			elem.set_format(format, texformat);
-			if (format==BITMAP_FORMAT_IND16)
-				elem.set_palette(m_overlay_palette->palette());
+			elem.set_format(BITMAP_FORMAT_RGB32, TEXFORMAT_ARGB32);
 			elem.resize(m_overwidth, m_overheight);
 		}
 
@@ -1017,7 +999,7 @@ void laserdisc_device::process_track_data()
 
 	// pass the audio to the callback
 	if (!m_audio_callback.isnull())
-		m_audio_callback(*this, m_samplerate, m_audiocursamples, m_avhuff_config.audio[0], m_avhuff_config.audio[1]);
+		m_audio_callback(m_samplerate, m_audiocursamples, m_avhuff_config.audio[0], m_avhuff_config.audio[1]);
 
 	// shift audio data if we read it into the beginning of the buffer
 	if (m_audiocursamples != 0 && m_audiobufin != 0)
@@ -1133,4 +1115,22 @@ void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *p
 		if (!changed)
 			ldnode->delete_node();
 	}
+}
+
+void laserdisc_device::add_ntsc_screen(machine_config &config, const char *_tag)
+{
+	set_screen(_tag);
+	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
+	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));
+}
+
+void laserdisc_device::add_pal_screen(machine_config &config, const char *_tag)
+{
+	set_screen(_tag);
+	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_SELF_RENDER);
+	screen.set_raw(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624);
+	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));
 }

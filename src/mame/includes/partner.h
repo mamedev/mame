@@ -13,6 +13,7 @@
 
 #include "includes/radio86.h"
 
+#include "imagedev/floppy.h"
 #include "machine/i8255.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"

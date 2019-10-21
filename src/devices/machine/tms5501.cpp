@@ -263,6 +263,9 @@ READ8_MEMBER( tms5501_device::rst_r )
 
 READ8_MEMBER( tms5501_device::sta_r )
 {
+	if(is_transmit_register_empty())
+		m_sta |= STA_XBE;
+
 	uint8_t data = m_sta;
 
 	m_sta &= ~STA_OE;

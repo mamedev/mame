@@ -47,7 +47,6 @@ void menu_control_floppy_image::do_load_create()
 			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
-		fd->setup_write(output_format);
 	} else {
 		image_init_result err = fd->load(input_filename);
 		if ((err == image_init_result::PASS) && (output_filename.compare("") != 0))
@@ -56,9 +55,9 @@ void menu_control_floppy_image::do_load_create()
 			machine().popmessage("Error: %s", fd->error());
 			return;
 		}
-		if(output_format)
-			fd->setup_write(output_format);
 	}
+	if(output_format)
+		fd->setup_write(output_format);
 }
 
 void menu_control_floppy_image::hook_load(const std::string &filename)
@@ -134,6 +133,7 @@ void menu_control_floppy_image::handle()
 		switch(m_submenu_result.rw) {
 		case menu_select_rw::result::READONLY:
 			do_load_create();
+			fd->setup_write(nullptr);
 			stack_pop();
 			break;
 

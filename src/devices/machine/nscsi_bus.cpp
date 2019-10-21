@@ -3,12 +3,15 @@
 #include "emu.h"
 #include "nscsi_bus.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_STATE   (1U << 1)
-#define LOG_CONTROL (1U << 2)
+#define LOG_GENERAL     (1U << 0)
+#define LOG_UNSUPPORTED (1U << 1)
+#define LOG_STATE       (1U << 2)
+#define LOG_CONTROL     (1U << 3)
+#define LOG_DATA        (1U << 4)
+#define LOG_DATA_SENT   (1U << 5)
 
-//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL)
-#define VERBOSE (LOG_GENERAL)
+//#define VERBOSE (LOG_GENERAL | LOG_STATE | LOG_CONTROL | LOG_DATA)
+#define VERBOSE (LOG_UNSUPPORTED)
 
 #include "logmacro.h"
 
@@ -49,7 +52,7 @@ void nscsi_bus_device::regen_data()
 
 void nscsi_bus_device::regen_ctrl(int refid)
 {
-	static const char *phase[8] = {
+	static char const *const phase[8] = {
 		"dout", "din ", "cmd ", "stat", "4   ", "5   ", "mout", "min "
 	};
 
@@ -122,19 +125,15 @@ void nscsi_bus_device::ctrl_wait(int refid, uint32_t lines, uint32_t mask)
 	dev[refid].wait_ctrl = (w & ~mask) | (lines & mask);
 }
 
-void nscsi_bus_device::device_config_complete()
+void nscsi_bus_device::device_resolve_objects()
 {
-	char id[3];
 	for(int i=0; i<16; i++) {
-		sprintf(id, "%d", i);
-		nscsi_connector *conn = downcast<nscsi_connector *>(subdevice(id));
-		if(conn) {
-			nscsi_device *sdev = conn->get_device();
-			if(sdev) {
-				int rid = devcnt++;
-				dev[rid].dev = sdev;
-				sdev->connect_to_bus(this, rid, i);
-			}
+		device_t *subdev = subdevice(string_format("%d", i).c_str());
+		nscsi_device *sdev = subdev ? downcast<nscsi_connector &>(*subdev).get_device() : nullptr;
+		if(sdev) {
+			int rid = devcnt++;
+			dev[rid].dev = sdev;
+			sdev->connect_to_bus(this, rid, i);
 		}
 	}
 }
@@ -150,18 +149,34 @@ nscsi_connector::~nscsi_connector()
 {
 }
 
+void nscsi_connector::device_validity_check(validity_checker &valid) const
+{
+	device_t *const carddev = get_card_device();
+	if (carddev && !dynamic_cast<nscsi_slot_card_interface *>(carddev))
+		osd_printf_error("Card device %s (%s) does not implement nscsi_slot_card_interface\n", carddev->tag(), carddev->name());
+}
+
 void nscsi_connector::device_start()
 {
 }
 
 nscsi_device *nscsi_connector::get_device()
 {
-	return dynamic_cast<nscsi_device *>(get_card_device());
+	nscsi_slot_card_interface *connected = dynamic_cast<nscsi_slot_card_interface *>(get_card_device());
+	if (connected)
+		return connected->device().subdevice<nscsi_device>(connected->m_nscsi.finder_tag());
+	else
+		return nullptr;
+}
+
+nscsi_slot_card_interface::nscsi_slot_card_interface(const machine_config &mconfig, device_t &device, const char *nscsi_tag) :
+	device_slot_card_interface(mconfig, device),
+	m_nscsi(device, nscsi_tag)
+{
 }
 
 nscsi_device::nscsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_slot_card_interface(mconfig, *this)
+	device_t(mconfig, type, tag, owner, clock)
 {
 	scsi_id = scsi_refid = -1;
 	scsi_bus = nullptr;
@@ -183,6 +198,12 @@ void nscsi_device::device_start()
 	save_item(NAME(scsi_id));
 }
 
+
+nscsi_full_device::nscsi_full_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_device(mconfig, type, tag, owner, clock),
+	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF)
+{
+}
 
 const char *const nscsi_full_device::command_names[256] = {
 	/* 00 */ "TEST_UNIT_READY", "REZERO", "?", "REQUEST_SENSE", "FORMAT_UNIT", "?", "?", "REASSIGN_BLOCKS",
@@ -244,6 +265,8 @@ void nscsi_full_device::device_reset()
 	scsi_state = scsi_substate = IDLE;
 	buf_control_rpos = buf_control_wpos = 0;
 	scsi_identify = 0;
+	data_buffer_size = 0;
+	data_buffer_pos = 0;
 	scsi_bus->data_w(scsi_refid, 0);
 	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
@@ -364,8 +387,13 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_id = ctl->param1;
 			data_buffer_size = ctl->param2;
 			data_buffer_pos = 0;
-			scsi_state = TARGET_WAIT_DATA_IN_BYTE;
-			target_send_buffer_byte();
+			if (data_buffer_size > 0) {
+				scsi_state = TARGET_WAIT_DATA_IN_BYTE;
+			}
+			else {
+				scsi_state = TARGET_NEXT_CONTROL;
+			}
+			step(false);
 			break;
 
 		case BC_DATA_OUT:
@@ -373,8 +401,13 @@ void nscsi_full_device::step(bool timeout)
 			data_buffer_id = ctl->param1;
 			data_buffer_size = ctl->param2;
 			data_buffer_pos = 0;
-			scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
-			target_recv_byte();
+			if (data_buffer_size > 0) {
+				scsi_state = TARGET_WAIT_DATA_OUT_BYTE;
+			}
+			else {
+				scsi_state = TARGET_NEXT_CONTROL;
+			}
+			step(false);
 			break;
 
 		case BC_MESSAGE_1:
@@ -427,7 +460,7 @@ void nscsi_full_device::step(bool timeout)
 			break;
 		}
 
-		if(command_done()) {
+		if(scsi_command_done(scsi_cmdbuf[0], data_buffer_pos)) {
 			scsi_cmdsize = data_buffer_pos;
 			scsi_bus->ctrl_wait(scsi_refid, 0, S_ACK);
 			scsi_command();
@@ -465,6 +498,7 @@ uint8_t nscsi_full_device::scsi_get_data(int id, int pos)
 {
 	switch(id) {
 	case SBUF_MAIN:
+		LOGMASKED(LOG_DATA, "scsi_get_data MAIN, id:%d pos:%d data:%02x %c\n", id, pos, scsi_cmdbuf[pos], scsi_cmdbuf[pos] >= 0x20 && scsi_cmdbuf[pos] < 0x7f ? (char)scsi_cmdbuf[pos] : ' ');
 		return scsi_cmdbuf[pos];
 	case SBUF_SENSE:
 		return scsi_sense_buffer[pos];
@@ -477,6 +511,7 @@ void nscsi_full_device::scsi_put_data(int id, int pos, uint8_t data)
 {
 	switch(id) {
 	case SBUF_MAIN:
+		LOGMASKED(LOG_DATA, "nscsi_bus: scsi_put_data MAIN, id:%d pos:%d data:%02x %c\n", id, pos, data, data >= 0x20 && data < 0x7f ? (char)data : ' ');
 		scsi_cmdbuf[pos] = data;
 		break;
 	case SBUF_SENSE:
@@ -492,18 +527,17 @@ void nscsi_full_device::target_send_buffer_byte()
 	target_send_byte(scsi_get_data(data_buffer_id, data_buffer_pos++));
 }
 
-bool nscsi_full_device::command_done()
+bool nscsi_full_device::scsi_command_done(uint8_t command, uint8_t length)
 {
-	if(!data_buffer_pos)
+	if(!length)
 		return false;
-	uint8_t h = scsi_cmdbuf[0];
-	switch(h >> 5) {
-	case 0: return data_buffer_pos == 6;
-	case 1: return data_buffer_pos == 10;
-	case 2: return data_buffer_pos == 10;
+	switch(command >> 5) {
+	case 0: return length == 6;
+	case 1: return length == 10;
+	case 2: return length == 10;
 	case 3: return true;
 	case 4: return true;
-	case 5: return data_buffer_pos == 12;
+	case 5: return length == 12;
 	case 6: return true;
 	case 7: return true;
 	}
@@ -547,6 +581,17 @@ void nscsi_full_device::scsi_status_complete(uint8_t st)
 
 void nscsi_full_device::scsi_data_in(int buf, int size)
 {
+	if((VERBOSE & LOG_DATA_SENT) && buf == 0) {
+		std::string dt = "";
+		int sz = size;
+		if(sz > 50)
+			sz = 50;
+		for(int i=0; i<sz; i++)
+			dt += util::string_format(" %02x", scsi_cmdbuf[i]);
+		if(size > sz)
+			dt += " ...";
+		LOGMASKED(LOG_DATA_SENT, "Sending data (%d)%s\n", size, dt);
+	}
 	control *c;
 	c = buf_control_push();
 	c->action = BC_DATA_IN;
@@ -563,30 +608,33 @@ void nscsi_full_device::scsi_data_out(int buf, int size)
 	c->param2 = size;
 }
 
-void nscsi_full_device::sense(bool deferred, uint8_t key)
+void nscsi_full_device::sense(bool deferred, uint8_t key, uint8_t asc, uint8_t ascq)
 {
 	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
 	scsi_sense_buffer[0] = deferred ? 0x71 : 0x70;
 	scsi_sense_buffer[2] = key;
+	scsi_sense_buffer[7] = sizeof(scsi_sense_buffer) - 8;
+	scsi_sense_buffer[12] = asc;
+	scsi_sense_buffer[13] = ascq;
 }
 
 void nscsi_full_device::scsi_unknown_command()
 {
-	LOG("Unhandled command %s", command_names[scsi_cmdbuf[0]]);
+	std::string txt = util::string_format("Unhandled command %s (%d):", command_names[scsi_cmdbuf[0]], scsi_cmdsize);
 	for(int i=0; i != scsi_cmdsize; i++)
-		logerror(" %02x", scsi_cmdbuf[i]);
-	logerror("\n");
+		txt += util::string_format(" %02x", scsi_cmdbuf[i]);
+	LOGMASKED(LOG_UNSUPPORTED, "%s\n", txt);
 
 	scsi_status_complete(SS_CHECK_CONDITION);
-	sense(false, 5);
+	sense(false, SK_ILLEGAL_REQUEST);
 }
 
 void nscsi_full_device::scsi_command()
 {
 	switch(scsi_cmdbuf[0]) {
 	case SC_REQUEST_SENSE:
-		LOG("command REQUEST SENSE\n");
-		scsi_data_in(SBUF_SENSE, 8);
+		LOG("command REQUEST SENSE alloc=%d\n", scsi_cmdbuf[4]);
+		scsi_data_in(SBUF_SENSE, scsi_cmdbuf[4] ? std::min(scsi_cmdbuf[4], u8(sizeof(scsi_sense_buffer))) : 4);
 		scsi_status_complete(SS_GOOD);
 		break;
 	default:
@@ -602,10 +650,10 @@ void nscsi_full_device::scsi_message()
 		return;
 	}
 
-	LOG("Unknown message");
+	std::string txt = "Unknown message";
 	for(int i=0; i != scsi_cmdsize; i++)
-		logerror(" %02x", scsi_cmdbuf[i]);
-	logerror("\n");
+		txt += util::string_format(" %02x", scsi_cmdbuf[i]);
+	LOGMASKED(LOG_UNSUPPORTED, "%s\n", txt);
 }
 
 int nscsi_full_device::get_lun(int def)
@@ -619,7 +667,7 @@ int nscsi_full_device::get_lun(int def)
 void nscsi_full_device::bad_lun()
 {
 	scsi_status_complete(SS_CHECK_CONDITION);
-	sense(false, 2);
+	sense(false, SK_ILLEGAL_REQUEST, SK_ASC_LOGICAL_UNIT_NOT_SUPPORTED);
 }
 
 // Arbitration delay (2.4us)

@@ -22,26 +22,22 @@
  * (*) Fatal Fury WA standard elements are 0x1000-0x1000, all the other games sets 0x100-0x100, related to the bit 27 of sprite regs 0?
  * (**) setted by black squares in ranking screen in Samurai Shodown 64 1, sprite disable?
  * (***) bit 22 is setted on some Fatal Fury WA snow (not all of them), bit 21 is setted on Xrally how to play elements in attract mode
- *
- * Sprite Global Registers
+ ** Sprite Global Registers
  * -----------------------
  *
  * uint32_t | Bits                                    | Use
  *        | 3322 2222 2222 1111 1111 11             |
  * -------+-1098-7654-3210-9876-5432-1098-7654-3210-+----------------
- *   0    | ---- z--- b--- ---- ---- ---- ---- ---- | zooming mode, bpp select
- *   1    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | global sprite offset (ss64 rankings in attract)
- *   2    | ---- ---- ---- ---- ---- ---- ---- ---- |
+ *   0    | ssss z--f b--- -aap ---- ---- ---- ---- | s = unknown, samsho  z = zooming mode, f = depthfilter mode (unset set in roadedge ingame) b = bpp select a = always, p = post, disable?
+ *   1    | yyyy yyyy yyyy yyyy xxxx xxxx xxxx xxxx | global sprite offset (ss64 rankings in attract, roadedge HUD scroll when starting game)
+ *   2    | ---- ---- ---- uuuu uuuu uuuu uuuu uuuu | u = unknown, set to 0x000fffff in roadedge ingame, bbust2, samsho - also possible depthfilter related
  *   3    | ---- ---- ---- ---- ---- ---- ---- ---- |
  *   4    | ---- ---- ---- ---- ---- ---- ---- ---- |
  * (anything else is unknown at the current time)
  * Notes:
- * [0]
- * 0xf0000000 setted in both Samurai Shodown
- * 0x00060000 always setted in all the games
- * 0x00010000 setted in POST, sprite disable?
  * [4]
  * 0x0e0 in Samurai Shodown/Xrally games, 0x1c0 in all the others, zooming factor?
+
  */
 
 void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -74,7 +70,6 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		int disable;
 
 
-
 		ypos = (source[0]&0xffff0000)>>16;
 		xpos = (source[0]&0x0000ffff)>>0;
 		xpos += (spriteoffsx);
@@ -96,13 +91,21 @@ void hng64_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, cons
 		zoomy = (source[1]&0xffff0000)>>16;
 		zoomx = (source[1]&0x0000ffff)>>0;
 
-		#if 1
-		if(zbuf == 0x7ff) //temp kludge to avoid garbage on screen
+		int filtervalue = 0x000;
+
+		// This flips between ingame and other screens for roadedge, where the sprites which are filtered definitely needs to change and the game explicitly swaps the values in the sprite list at the same time.
+		// m_spriteregs[2] could also play a part as it also flips between 0x00000000 and 0x000fffff at the same time
+		// Samsho games also set the upper 3 bits which could be related, samsho games still have some unwanted sprites (but also use the other 'sprite clear' mechanism)
+		// Could also be draw order related, check if it inverts the z value?
+		if (m_spriteregs[0] & 0x01000000)
+			filtervalue = 0x7ff;
+
+		if(zbuf == filtervalue)
 		{
 			source+=8;
 			continue;
 		}
-		#endif
+
 		if(disable)
 		{
 			source+=8;

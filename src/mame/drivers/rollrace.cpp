@@ -249,63 +249,59 @@ INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-MACHINE_CONFIG_START(rollrace_state::rollrace)
-
+void rollrace_state::rollrace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,XTAL(24'000'000)/8) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rollrace_map)
+	Z80(config, m_maincpu, XTAL(24'000'000)/8); /* verified on pcb */
+	m_maincpu->set_addrmap(AS_PROGRAM, &rollrace_state::rollrace_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_DEVICE_PROGRAM_MAP(rollrace_sound_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(rollrace_state, sound_timer_irq, 4*60)
+	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(24'000'000)/16)); /* verified on pcb */
+	audiocpu.set_addrmap(AS_PROGRAM, &rollrace_state::rollrace_sound_map);
+	audiocpu.set_periodic_int(FUNC(rollrace_state::sound_timer_irq), attotime::from_hz(4*60));
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, rollrace_state, flipx_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, rollrace_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, rollrace_state, coin_counter_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, rollrace_state, coin_counter_2_w))
-	MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(WRITELINE(*this, rollrace_state, charbank_0_w))
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, rollrace_state, charbank_1_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, rollrace_state, spritebank_w))
+	ls259_device &mainlatch(LS259(config, "mainlatch"));
+	mainlatch.q_out_cb<0>().set(FUNC(rollrace_state::flipx_w));
+	mainlatch.q_out_cb<1>().set(FUNC(rollrace_state::nmi_mask_w));
+	mainlatch.q_out_cb<2>().set(FUNC(rollrace_state::coin_counter_1_w));
+	mainlatch.q_out_cb<3>().set(FUNC(rollrace_state::coin_counter_2_w));
+	mainlatch.q_out_cb<4>().set(FUNC(rollrace_state::charbank_0_w));
+	mainlatch.q_out_cb<5>().set(FUNC(rollrace_state::charbank_1_w));
+	mainlatch.q_out_cb<6>().set(FUNC(rollrace_state::spritebank_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
-	MCFG_SCREEN_UPDATE_DRIVER(rollrace_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, rollrace_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 255-16);
+	screen.set_screen_update(FUNC(rollrace_state::screen_update));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(rollrace_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rollrace)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(rollrace_state, rollrace)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_rollrace);
+	PALETTE(config, m_palette, FUNC(rollrace_state::rollrace_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	AY8910(config, "ay1", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay2", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	AY8910(config, "ay2", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); /* verified on pcb */
 
-	MCFG_DEVICE_ADD("ay3", AY8910,XTAL(24'000'000)/16) /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-MACHINE_CONFIG_END
+	AY8910(config, "ay3", XTAL(24'000'000)/16).add_route(ALL_OUTPUTS, "lspeaker", 0.10); /* verified on pcb */
+}
 
-MACHINE_CONFIG_START(rollrace_state::rollace2)
+void rollrace_state::rollace2(machine_config &config)
+{
 	rollrace(config);
 
 	/* basic machine hardware */
 
-//  MCFG_SCREEN_MODIFY("screen")
-//  MCFG_SCREEN_VISIBLE_AREA(0,256-1,16, 255-16)
-MACHINE_CONFIG_END
+//  subdevice<screen_device>("screen")->set_visarea(0, 256-1, 16, 255-16);
+}
 
 
 /***************************************************************************

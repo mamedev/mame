@@ -165,6 +165,8 @@ elif outfmt == 'plist':
     fp.write('\t<string>%s</string>\n' % product_name)
     fp.write('\t<key>CFBundleShortVersionString</key>\n')
     fp.write('\t<string>%s.%s.%s</string>\n' % (version_major, version_minor, version_build))
+    fp.write('\t<key>NSPrincipalClass</key>\n')
+    fp.write('\t<string>NSApplication</string>\n')
     fp.write('</dict>\n')
     fp.write('</plist>\n')
 fp.flush()

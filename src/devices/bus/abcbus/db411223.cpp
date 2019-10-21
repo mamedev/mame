@@ -68,11 +68,12 @@ void databoard_4112_23_t::databoard_4112_23_io(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(databoard_4112_23_t::device_add_mconfig)
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, 4000000)
-	MCFG_DEVICE_PROGRAM_MAP(databoard_4112_23_mem)
-	MCFG_DEVICE_IO_MAP(databoard_4112_23_io)
-MACHINE_CONFIG_END
+void databoard_4112_23_t::device_add_mconfig(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &databoard_4112_23_t::databoard_4112_23_mem);
+	m_maincpu->set_addrmap(AS_IO, &databoard_4112_23_t::databoard_4112_23_io);
+}
 
 
 //-------------------------------------------------

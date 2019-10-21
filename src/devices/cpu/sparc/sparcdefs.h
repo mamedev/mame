@@ -29,9 +29,13 @@
 #define PSR_RES_MASK        0x000fc000
 #define PSR_ICC_MASK        0x00f00000
 #define PSR_N_MASK          0x00800000
+#define PSR_N_SHIFT         23
 #define PSR_Z_MASK          0x00400000
+#define PSR_Z_SHIFT         22
 #define PSR_V_MASK          0x00200000
+#define PSR_V_SHIFT         21
 #define PSR_C_MASK          0x00100000
+#define PSR_C_SHIFT         20
 #define PSR_VER_SHIFT       24
 #define PSR_VER_MASK        0x0f000000
 #define PSR_VER             0
@@ -41,25 +45,25 @@
 #define PSR_ZERO_MASK       (PSR_IMPL_MASK | PSR_VER_MASK | PSR_RES_MASK)
 
 #define ICC_N_SET           (m_psr & PSR_N_MASK)
-#define ICC_N               (ICC_N_SET ? 1 : 0)
+#define ICC_N               (ICC_N_SET >> PSR_N_SHIFT)
 #define ICC_N_CLEAR         (!ICC_N_SET)
 #define SET_ICC_N_FLAG      do { m_psr |= PSR_N_MASK; } while(0)
 #define CLEAR_ICC_N_FLAG    do { m_psr &= ~PSR_N_MASK; } while(0)
 
 #define ICC_Z_SET           (m_psr & PSR_Z_MASK)
-#define ICC_Z               (ICC_Z_SET ? 1 : 0)
+#define ICC_Z               (ICC_Z_SET >> PSR_Z_SHIFT)
 #define ICC_Z_CLEAR         (!ICC_Z_SET)
 #define SET_ICC_Z_FLAG      do { m_psr |= PSR_Z_MASK; } while(0)
 #define CLEAR_ICC_Z_FLAG    do { m_psr &= ~PSR_Z_MASK; } while(0)
 
 #define ICC_V_SET           (m_psr & PSR_V_MASK)
-#define ICC_V               (ICC_V_SET ? 1 : 0)
+#define ICC_V               (ICC_V_SET >> PSR_V_SHIFT)
 #define ICC_V_CLEAR         (!ICC_V_SET)
 #define SET_ICC_V_FLAG      do { m_psr |= PSR_V_MASK; } while(0)
 #define CLEAR_ICC_V_FLAG    do { m_psr &= ~PSR_V_MASK; } while(0)
 
 #define ICC_C_SET           (m_psr & PSR_C_MASK)
-#define ICC_C               (ICC_C_SET ? 1 : 0)
+#define ICC_C               (ICC_C_SET >> PSR_C_SHIFT)
 #define ICC_C_CLEAR         (!ICC_C_SET)
 #define SET_ICC_C_FLAG      do { m_psr |= PSR_C_MASK; } while(0)
 #define CLEAR_ICC_C_FLAG    do { m_psr &= ~PSR_C_MASK; } while(0)
@@ -81,7 +85,9 @@
 #define WIM                 m_wim
 #define TBR                 m_tbr
 
-#define OP      (op >> 30) // gangnam style
+#define OP_NS   (op & 0xc0000000)
+
+#define OP      (op >> 30)
 #define OP2     ((op >> 22) & 7)
 #define OP3     ((op >> 19) & 63)
 #define OPF     ((op >> 5) & 0x1ff)
@@ -103,24 +109,25 @@
 #define SHCNT32 (op & 31)
 #define SHCNT64 (op & 63)
 #define IAMODE  (op & 0x7)
-#define USEIMM  ((op >> 13) & 1)
-#define USEEXT  ((op >> 12) & 1)
+#define USEIMM  (op & (1 << 13))
+#define USEEXT  (op & (1 << 12))
 
 
 #define COND    ((op >> 25) & 15)
 #define RCOND   ((op >> 10) & 7)
 #define MOVCOND ((op >> 14) & 15)
-#define PRED    ((op >> 19) & 1)
-#define ANNUL   ((op >> 29) & 1)
+#define PRED    (op & (1 << 19))
+#define ANNUL   (op & (1 << 29))
 #define BRCC    ((op >> 20) & 3)
 #define MOVCC   (((op >> 11) & 3) | ((op >> 16) & 4))
 #define OPFCC   ((op >> 11) & 7)
 #define TCCCC   ((op >> 11) & 3)
-#define ASI     ((op >> 5) & 255)
+#define ASI     (uint8_t)(op >> 5)
 #define MMASK   (op & 15)
 #define CMASK   ((op >> 4) & 7)
 
 #define RD      ((op >> 25) & 31)
+#define RDBITS  (op & 0x3e000000)
 #define RS1     ((op >> 14) & 31)
 #define RS2     (op & 31)
 
@@ -148,10 +155,15 @@
 #define UPDATE_PC   true
 #define PC_UPDATED  false
 
-#define OP_TYPE0    0
-#define OP_CALL     1
-#define OP_ALU      2
-#define OP_LDST     3
+#define OP_TYPE0    u32(0)
+#define OP_CALL     u32(1)
+#define OP_ALU      u32(2)
+#define OP_LDST     u32(3)
+
+#define OP_TYPE0_NS (OP_TYPE0 << 30)
+#define OP_CALL_NS  (OP_CALL << 30)
+#define OP_ALU_NS   (OP_ALU << 30)
+#define OP_LDST_NS  (OP_LDST << 30)
 
 #define OP2_UNIMP   0
 #define OP2_BICC    2
@@ -208,6 +220,7 @@
 #define OP3_JMPL    56
 #define OP3_RETT    57
 #define OP3_TICC    58
+#define OP3_IFLUSH  59
 #define OP3_SAVE    60
 #define OP3_RESTORE 61
 

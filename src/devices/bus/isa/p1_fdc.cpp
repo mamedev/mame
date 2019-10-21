@@ -12,18 +12,6 @@
 #include "cpu/i86/i86.h"
 #include "formats/pc_dsk.h"
 
-#define VERBOSE_DBG 0
-
-#define DBG_LOG(N,M,A) \
-	do { \
-		if(VERBOSE_DBG>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",machine().time().as_double(),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -62,13 +50,14 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(p1_fdc_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("fdc", FD1793, 16_MHz_XTAL / 16)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(*this, p1_fdc_device, p1_fdc_irq_drq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(*this, p1_fdc_device, p1_fdc_irq_drq))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats)
-MACHINE_CONFIG_END
+void p1_fdc_device::device_add_mconfig(machine_config &config)
+{
+	FD1793(config, m_fdc, 16_MHz_XTAL / 16);
+	m_fdc->intrq_wr_callback().set(FUNC(p1_fdc_device::p1_fdc_irq_drq));
+	m_fdc->drq_wr_callback().set(FUNC(p1_fdc_device::p1_fdc_irq_drq));
+	FLOPPY_CONNECTOR(config, "fdc:0", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", poisk1_floppies, "525qd", p1_fdc_device::floppy_formats);
+}
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -86,7 +75,6 @@ const tiny_rom_entry *p1_fdc_device::device_rom_region() const
 
 uint8_t p1_fdc_device::p1_wd17xx_motor_r()
 {
-	DBG_LOG(1, "p1_fdc_motor_r", ("R = $%02x\n", 0));
 	// XXX always on for now
 	return 0;
 }
@@ -117,8 +105,6 @@ uint8_t p1_fdc_device::p1_wd17xx_aux_r()
 */
 void p1_fdc_device::p1_wd17xx_aux_w(int data)
 {
-	DBG_LOG(1, "p1_fdc_aux_w", ("W $%02x\n", data));
-
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
 	floppy_image_device *floppy = ((data & 2) ? floppy1 : floppy0);

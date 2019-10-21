@@ -7,11 +7,10 @@
     Disk image formats
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_FSD_DSK_H
+#define MAME_FORMATS_FSD_DSK_H
 
 #pragma once
-
-#ifndef __FSD_DSK_H__
-#define __FSD_DSK_H__
 
 #include "flopimg.h"
 #include "wd177x_dsk.h"
@@ -40,4 +39,4 @@ public:
 
 extern const floppy_format_type FLOPPY_FSD_FORMAT;
 
-#endif // __FSD_DSK_H__
+#endif // MAME_FORMATS_FSD_DSK_H

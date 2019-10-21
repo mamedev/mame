@@ -5,30 +5,28 @@
 
 #pragma once
 
-#include "emupal.h"
+typedef device_delegate<void (u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)> pc090oj_colpri_cb_delegate;
 
-class pc090oj_device : public device_t
+class pc090oj_device : public device_t, public device_gfx_interface
 {
 public:
-	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc090oj_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
-	void set_gfxdecode_tag(const char *tag) { m_gfxdecode.set_tag(tag); }
-	void set_palette_tag(const char *tag) { m_palette.set_tag(tag); }
-	void set_gfx_region(int gfxregion) { m_gfxnum = gfxregion; }
-	void set_usebuffer(int use_buf) { m_use_buffer = use_buf; }
+	void set_usebuffer(bool use_buf) { m_use_buffer = use_buf; }
 	void set_offsets(int x_offset, int y_offset)
 	{
 		m_x_offset = x_offset;
 		m_y_offset = y_offset;
 	}
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = pc090oj_colpri_cb_delegate(std::forward<T>(args)...); }
 
-	DECLARE_READ16_MEMBER( word_r );
-	DECLARE_WRITE16_MEMBER( word_w );
+	u16 word_r(offs_t offset);
+	void word_w(offs_t offset, u16 data, u16 mem_mask = 0);
+	void sprite_ctrl_w(u16 data);
 
-	void set_sprite_ctrl(uint16_t sprctrl);
 	void eof_callback();
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int pri_type);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -45,37 +43,21 @@ private:
 	routines here modular.
 
 */
+	pc090oj_colpri_cb_delegate m_colpri_cb;
 
-	uint16_t     m_ctrl;
-	uint16_t     m_sprite_ctrl;
+	// decoding info
+	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
-	std::unique_ptr<uint16_t[]>  m_ram;
-	std::unique_ptr<uint16_t[]>  m_ram_buffered;
+	u16     m_ctrl;
+	u16     m_sprite_ctrl;
 
-	int        m_gfxnum;
+	std::unique_ptr<u16[]>  m_ram;
+	std::unique_ptr<u16[]>  m_ram_buffered;
+
 	int        m_x_offset, m_y_offset;
-	int        m_use_buffer;
-
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	bool       m_use_buffer;
 };
 
 DECLARE_DEVICE_TYPE(PC090OJ, pc090oj_device)
-
-
-#define MCFG_PC090OJ_GFX_REGION(_region) \
-	downcast<pc090oj_device &>(*device).set_gfx_region(_region);
-
-#define MCFG_PC090OJ_OFFSETS(_xoffs, _yoffs) \
-	downcast<pc090oj_device &>(*device).set_offsets(_xoffs, _yoffs);
-
-#define MCFG_PC090OJ_USEBUFFER(_use_buf) \
-	downcast<pc090oj_device &>(*device).set_usebuffer(_use_buf);
-
-#define MCFG_PC090OJ_GFXDECODE(_gfxtag) \
-	downcast<pc090oj_device &>(*device).set_gfxdecode_tag(_gfxtag);
-
-#define MCFG_PC090OJ_PALETTE(_palette_tag) \
-	downcast<pc090oj_device &>(*device).set_palette_tag(_palette_tag);
 
 #endif // MAME_VIDEO_PC090)J_H

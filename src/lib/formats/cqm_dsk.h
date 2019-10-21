@@ -7,9 +7,10 @@
     CopyQM disk images
 
 *********************************************************************/
+#ifndef MAME_FORMATS_CQM_DSK_H
+#define MAME_FORMATS_CQM_DSK_H
 
-#ifndef CQM_DSK_H_
-#define CQM_DSK_H_
+#pragma once
 
 #include "flopimg.h"
 
@@ -30,4 +31,4 @@ public:
 
 extern const floppy_format_type FLOPPY_CQM_FORMAT;
 
-#endif /* CQM_DSK_H_ */
+#endif // MAME_FORMATS_CQM_DSK_H

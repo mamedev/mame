@@ -72,7 +72,7 @@ WRITE8_MEMBER( alesis_state::p3_w )
 
 WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 {
-	m_lcdc->write(space, BIT(m_kb_matrix,7), data);
+	m_lcdc->write(BIT(m_kb_matrix,7), data);
 }
 
 WRITE8_MEMBER( alesis_state::mmt8_led_w )
@@ -143,7 +143,7 @@ void alesis_state::sr16_mem(address_map &map)
 
 void alesis_state::sr16_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map(0x0000, 0x0000).mirror(0xff).w("dm3ag", FUNC(alesis_dm3ag_device::write));
 	map(0x0200, 0x0200).mirror(0xff).w(FUNC(alesis_state::sr16_lcd_w));
 	map(0x0300, 0x0300).mirror(0xff).w(FUNC(alesis_state::kb_matrix_w));
@@ -329,7 +329,7 @@ static INPUT_PORTS_START( sr16 )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(alesis_state, alesis)
+void alesis_state::alesis_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -414,7 +414,8 @@ HD44780_PIXEL_UPDATE(alesis_state::sr16_pixel_update)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
 
-MACHINE_CONFIG_START(alesis_state::hr16)
+void alesis_state::hr16(machine_config &config)
+{
 	/* basic machine hardware */
 	I8031(config, m_maincpu, 12_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &alesis_state::hr16_mem);
@@ -424,31 +425,31 @@ MACHINE_CONFIG_START(alesis_state::hr16)
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea_full();
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
-	MCFG_PALETTE_INIT_OWNER(alesis_state, alesis)
+	PALETTE(config, "palette", FUNC(alesis_state::alesis_palette), 2);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE("hr16_cass")
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_interface("hr16_cass");
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
 
 	/* sound hardware */
-	MCFG_ALESIS_DM3AG_ADD("dm3ag", 12_MHz_XTAL/2)
+	ALESIS_DM3AG(config, "dm3ag", 12_MHz_XTAL/2);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-MACHINE_CONFIG_END
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
 
-MACHINE_CONFIG_START(alesis_state::sr16)
+void alesis_state::sr16(machine_config &config)
+{
 	hr16(config);
 
 	/* basic machine hardware */
@@ -457,17 +458,18 @@ MACHINE_CONFIG_START(alesis_state::sr16)
 	m_maincpu->port_in_cb<1>().set_constant(0);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(6*8, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*8-1, 0, 9*2-1)
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(6*8, 9*2);
+	screen.set_visarea_full();
+
 	config.set_default_layout(layout_sr16);
 
-	MCFG_DEVICE_MODIFY("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 8)
-	MCFG_HD44780_PIXEL_UPDATE_CB(alesis_state, sr16_pixel_update)
-MACHINE_CONFIG_END
+	m_lcdc->set_lcd_size(2, 8);
+	m_lcdc->set_pixel_update_cb(FUNC(alesis_state::sr16_pixel_update), this);
+}
 
-MACHINE_CONFIG_START(alesis_state::mmt8)
+void alesis_state::mmt8(machine_config &config)
+{
 	hr16(config);
 
 	/* basic machine hardware */
@@ -476,8 +478,8 @@ MACHINE_CONFIG_START(alesis_state::mmt8)
 	m_maincpu->port_in_cb<3>().set(FUNC(alesis_state::mmt8_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(alesis_state::mmt8_p3_w));
 
-	MCFG_DEVICE_REMOVE("dm3ag")
-MACHINE_CONFIG_END
+	config.device_remove("dm3ag");
+}
 
 /* ROM definition */
 ROM_START( hr16 )

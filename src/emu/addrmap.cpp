@@ -686,7 +686,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 	// if map is narrower than 64 bits, check the mask width as well
 	if (m_map.m_databits < 64 && (unitmask >> m_map.m_databits) != 0)
 	{
-		osd_printf_error("Handler %s specified a mask of %08X%08X, too wide to be used in a %d-bit address map\n", string, (u32)(unitmask >> 32), (u32)unitmask, m_map.m_databits);
+		osd_printf_error("Handler %s specified a mask of %016X, too wide to be used in a %d-bit address map\n", string, unitmask, m_map.m_databits);
 		return false;
 	}
 
@@ -700,7 +700,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 			count++;
 		else if ((unitmask & singlemask) != 0)
 		{
-			osd_printf_error("Handler %s specified a mask of %08X%08X; needs to be in even chunks of %X\n", string, (u32)(unitmask >> 32), (u32)unitmask, basemask);
+			osd_printf_error("Handler %s specified a mask of %016X; needs to be in even chunks of %X\n", string, unitmask, basemask);
 			return false;
 		}
 		singlemask <<= width;
@@ -718,7 +718,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 		|| (unitmask_wh != 0 && unitmask_wl != 0 && unitmask_wh != unitmask_wl)
 		|| (unitmask_dh != 0 && unitmask_dl != 0 && unitmask_dh != unitmask_dl))
 	{
-		osd_printf_error("Handler %s specified an asymmetrical mask of %08X%08X\n", string, (u32)(unitmask >> 32), (u32)unitmask);
+		osd_printf_error("Handler %s specified an asymmetrical mask of %016X\n", string, unitmask);
 		return false;
 	}
 #endif
@@ -758,12 +758,6 @@ address_map::address_map(device_t &device, int spacenum)
 		m_device = device.owner();
 		memintf->get_addrmap(spacenum)(*this);
 		m_device = &device;
-	}
-	else
-	{
-		// if the owner didn't provide a map, use the default device map
-		if (!spaceconfig->m_default_map.isnull())
-			spaceconfig->m_default_map(*this);
 	}
 
 	// construct the internal device map (last so it takes priority)
@@ -841,7 +835,7 @@ address_map_entry &address_map::operator()(offs_t start, offs_t end)
 //  import_submaps - propagate in the device submaps
 //-------------------------------------------------
 
-void address_map::import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian)
+void address_map::import_submaps(running_machine &machine, device_t &owner, int data_width, endianness_t endian, int addr_shift)
 {
 	address_map_entry *prev = nullptr;
 	address_map_entry *entry = m_entrylist.first();
@@ -863,7 +857,7 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 			address_map submap(*mapdevice, entry);
 
 			// Recursively import if needed
-			submap.import_submaps(machine, *mapdevice, data_width, endian);
+			submap.import_submaps(machine, *mapdevice, data_width, endian, addr_shift);
 
 			offs_t max_end = entry->m_addrend - entry->m_addrstart;
 
@@ -873,6 +867,24 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 				while (submap.m_entrylist.count())
 				{
 					address_map_entry *subentry = submap.m_entrylist.detach_head();
+
+					if (addr_shift > 0)
+					{
+						subentry->m_addrstart <<= addr_shift;
+						subentry->m_addrend = ((subentry->m_addrend + 1) << addr_shift) - 1;
+						subentry->m_addrmirror <<= addr_shift;
+						subentry->m_addrmask <<= addr_shift;
+						subentry->m_addrselect <<= addr_shift;
+					}
+					else if (addr_shift < 0)
+					{
+						subentry->m_addrstart >>= -addr_shift;
+						subentry->m_addrend >>= -addr_shift;
+						subentry->m_addrmirror >>= -addr_shift;
+						subentry->m_addrmask >>= -addr_shift;
+						subentry->m_addrselect >>= -addr_shift;
+					}
+
 					if (subentry->m_addrend > max_end)
 						subentry->m_addrend = max_end;
 
@@ -901,6 +913,10 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					if ((entry->m_mask >> i) & 1)
 						ratio ++;
 				ratio = data_width / ratio;
+				if (addr_shift > 0)
+					ratio <<= addr_shift;
+				else if (addr_shift < 0)
+					max_end = ((max_end + 1) << -addr_shift) - 1;
 				max_end = (max_end + 1) / ratio - 1;
 
 				// Then merge the contents taking the ratio into account
@@ -939,11 +955,22 @@ void address_map::import_submaps(running_machine &machine, device_t &owner, int 
 					if (subentry->m_addrend > max_end)
 						subentry->m_addrend = max_end;
 
-					subentry->m_addrstart = subentry->m_addrstart * ratio + entry->m_addrstart;
-					subentry->m_addrend = (subentry->m_addrend + 1) * ratio - 1 + entry->m_addrstart;
-					subentry->m_addrmirror = (subentry->m_addrmirror / ratio) | entry->m_addrmirror;
-					subentry->m_addrmask = (subentry->m_addrmask / ratio) | entry->m_addrmask;
-					subentry->m_addrselect = (subentry->m_addrselect / ratio) | entry->m_addrselect;
+					if (addr_shift < 0)
+					{
+						subentry->m_addrstart = ((subentry->m_addrstart * ratio) >> -addr_shift) + entry->m_addrstart;
+						subentry->m_addrend = (((subentry->m_addrend + 1) * ratio - 1) >> -addr_shift) + entry->m_addrstart;
+						subentry->m_addrmirror = ((subentry->m_addrmirror / ratio) << -addr_shift) | entry->m_addrmirror;
+						subentry->m_addrmask = ((subentry->m_addrmask / ratio) << -addr_shift) | entry->m_addrmask;
+						subentry->m_addrselect = ((subentry->m_addrselect / ratio) << -addr_shift) | entry->m_addrselect;
+					}
+					else
+					{
+						subentry->m_addrstart = subentry->m_addrstart * ratio + entry->m_addrstart;
+						subentry->m_addrend = (subentry->m_addrend + 1) * ratio - 1 + entry->m_addrstart;
+						subentry->m_addrmirror = (subentry->m_addrmirror / ratio) | entry->m_addrmirror;
+						subentry->m_addrmask = (subentry->m_addrmask / ratio) | entry->m_addrmask;
+						subentry->m_addrselect = (subentry->m_addrselect / ratio) | entry->m_addrselect;
+					}
 
 					if (subentry->m_addrstart > entry->m_addrend)
 					{
@@ -1084,7 +1111,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 		{
 			// address map entries that reference regions but are NOPs are pointless
 			if (entry.m_read.m_type == AMH_NONE && entry.m_write.m_type == AMH_NONE)
-				osd_printf_error("%s space references memory region %s, but is AM_NOP\n", spaceconfig.m_name, entry.m_region);
+				osd_printf_error("%s space references memory region %s, but is noprw()\n", spaceconfig.m_name, entry.m_region);
 
 			// make sure we can resolve the full path to the region
 			bool found = false;
@@ -1108,7 +1135,7 @@ void address_map::map_validity_check(validity_checker &valid, int spacenum) cons
 
 			// error if not found
 			if (!found)
-				osd_printf_error("%s space memory map entry %X-%X references non-existant region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				osd_printf_error("%s space memory map entry %X-%X references nonexistent region '%s'\n", spaceconfig.m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 		}
 
 		// make sure all devices exist

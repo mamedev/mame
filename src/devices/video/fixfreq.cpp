@@ -19,33 +19,148 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-
 /***************************************************************************
 
     Fixed frequency monitor
 
 ***************************************************************************/
+
+
+
 // device type definition
 DEFINE_DEVICE_TYPE(FIXFREQ, fixedfreq_device, "fixfreq", "Fixed-Frequency Monochrome Monitor")
+
+void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const double newval)
+{
+	const time_type delta_time = time - m_last_sync_time;
+
+	const int last_vsync = m_sig_vsync;
+	const int last_comp = m_sig_composite;
+
+	m_vsync_filter += ((double) last_comp - m_vsync_filter) * (1.0 - exp(-delta_time * m_vsync_filter_timeconst));
+	m_sig_composite = (newval < m_desc.m_sync_threshold) ? 1 : 0 ;
+
+	m_sig_vsync = (m_vsync_filter > m_vsync_threshold) ? 1 : 0;
+
+	if (!last_vsync && m_sig_vsync)
+	{
+		//LOG("VSYNC %d %d\n", m_last_x, m_last_y + m_sig_field);
+		m_last_y = m_desc.m_vbackporch - m_desc.m_vsync;
+		m_intf.vsync_start_cb(time - m_last_vsync_time);
+		m_last_vsync_time = time;
+	}
+	else if (last_vsync && !m_sig_vsync)
+	{
+		m_sig_field = last_comp;   /* force false-progressive */
+		m_sig_field = (m_sig_field ^ 1) ^ last_comp;   /* if there is no field switch, auto switch */
+		//LOG("Field: %d\n", m_sig_field);
+	}
+
+	if (!last_comp && m_sig_composite)
+	{
+		/* TODO - time since last hsync and field detection */
+		//LOG("HSYNC up %d\n", m_last_x);
+		// FIXME: pixels > 50 filters some spurious hysnc on line 27 in breakout
+		if (!m_sig_vsync && (m_last_x > m_desc.m_hscale * 100))
+		{
+			m_last_y += m_desc.m_fieldcount;
+			m_last_x = 0;
+			m_line_time = time;
+		}
+		//if (m_last_y == 27) printf("HSYNC up %d %d\n", m_last_y, pixels);
+	}
+	else if (last_comp && !m_sig_composite)
+	{
+		/* falling composite */
+		//LOG("HSYNC down %f %d %f\n", time * 1e6, m_last_x, m_sync_signal);
+	}
+
+	m_sync_signal = newval;
+	m_last_sync_time = time;
+}
+
+void fixedfreq_monitor_state::update_bm(const time_type &time)
+{
+	const int pixels = round((time - m_line_time) * m_desc.m_hscale / m_clock_period);
+	const int has_fields = (m_desc.m_fieldcount > 1) ? 1: 0;
+
+	uint32_t col(0xffff0000); // Mark sync areas
+
+	if (m_sync_signal >= m_desc.m_sync_threshold)
+		col = m_col;
+
+	m_intf.plot_hline(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, col);
+	m_last_x = pixels;
+}
+
+void fixedfreq_monitor_state::update_composite_monochrome(const time_type &time, const double data)
+{
+	update_bm(time);
+	update_sync_channel(time, data);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		m_col = 0xffff0000;
+	else
+		m_col = 0xff000000 | (colv<<16) | (colv<<8) | colv;
+}
+
+void fixedfreq_monitor_state::update_red(const time_type &time, const double data)
+{
+	update_bm(time);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		colv = 0;
+	m_col = (m_col & 0xff00ffff) | (colv<<16);
+}
+
+void fixedfreq_monitor_state::update_green(const time_type &time, const double data)
+{
+	update_bm(time);
+	//update_sync_channel(ctime, data);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		colv = 0;
+	m_col = (m_col & 0xffff00ff) | (colv<<8);
+}
+
+void fixedfreq_monitor_state::update_blue(const time_type &time, const double data)
+{
+	update_bm(time);
+	//update_sync_channel(ctime, data);
+
+	int colv = (int) ((data - m_desc.m_sync_threshold) * m_desc.m_gain * 255.0);
+	if (colv > 255)
+		colv = 255;
+	if (colv < 0)
+		colv = 0;
+	m_col = (m_col & 0xffffff00) | colv;
+
+}
+
+void fixedfreq_monitor_state::update_sync(const time_type &time, const double data)
+{
+	update_bm(time);
+	update_sync_channel(time, data);
+}
 
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this, false),
-		m_htotal(0), m_vtotal(0), m_vid(0), m_last_x(0), m_last_y(0), m_cur_bm(0),
-		// default to NTSC "704x480@30i"
-		m_monitor_clock(13500000),
-		m_hvisible(704),
-		m_hfrontporch(728),
-		m_hsync(791),
-		m_hbackporch(858),
-		m_vvisible(480),
-		m_vfrontporch(486),
-		m_vsync(492),
-		m_vbackporch(525),
-		m_fieldcount(2),
-		m_sync_threshold(0.3),
-		m_gain(1.0 / 3.7),
-		m_vint(0), m_int_trig(0), m_mult(0), m_sig_vsync(0), m_sig_composite(0), m_sig_field(0)
+		m_cur_bm(0),
+		m_htotal(0),
+		m_vtotal(0),
+		m_refresh_period(time_type(0)),
+		m_monitor(),
+		m_state(m_monitor, *this)
 {
 }
 
@@ -54,159 +169,66 @@ fixedfreq_device::fixedfreq_device(const machine_config &mconfig, const char *ta
 {
 }
 
+void fixedfreq_device::device_config_complete()
+{
+	if (!has_screen())
+		return;
+
+	if (!screen().refresh_attoseconds())
+		screen().set_raw(m_monitor.m_monitor_clock, m_monitor.m_hbackporch, 0,
+			m_monitor.m_hbackporch, m_monitor.m_vbackporch, 0,
+			m_monitor.m_vbackporch);
+
+	if (!screen().has_screen_update())
+		screen().set_screen_update(screen_update_rgb32_delegate(FUNC(fixedfreq_device::screen_update), this));
+}
+
 void fixedfreq_device::device_start()
 {
-	m_htotal = 0;
-	m_vtotal = 0;
 
-	m_vid = 0.0;
-	m_last_x = 0;
-	m_last_y = 0;
-	m_last_time = attotime::zero;
-	m_line_time = attotime::zero;
-	m_last_hsync_time = attotime::zero;
-	m_last_vsync_time = attotime::zero;
-	m_refresh = attotime::zero;
-	m_clock_period = attotime::zero;
-	//bitmap_rgb32 *m_bitmap[2];
+	m_refresh_period = time_type(0);
+
 	m_cur_bm = 0;
 
-	/* sync separator */
-	m_vint = 0.0;
-	m_int_trig = 0.0;
-	m_mult = 0.0;
+	m_htotal = m_monitor.m_hbackporch;
+	m_vtotal = m_monitor.m_vbackporch;
+	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
+	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
 
-	m_sig_vsync = 0;
-	m_sig_composite = 0;
-	m_sig_field = 0;
+	m_state.start();
 
-	m_bitmap[0] = nullptr;
-	m_bitmap[1] = nullptr;
-	//m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
-	recompute_parameters(false);
-
-	save_item(NAME(m_vid));
-	save_item(NAME(m_last_x));
-	save_item(NAME(m_last_y));
-	save_item(NAME(m_last_time));
-	save_item(NAME(m_line_time));
-	save_item(NAME(m_last_hsync_time));
-	save_item(NAME(m_last_vsync_time));
-	save_item(NAME(m_refresh));
-	save_item(NAME(m_clock_period));
+	// FIXME: will be done by netlist going forward
+	save_item(NAME(m_state.m_sync_signal));
+	save_item(NAME(m_state.m_last_x));
+	save_item(NAME(m_state.m_last_y));
+	save_item(NAME(m_state.m_last_sync_time));
+	save_item(NAME(m_state.m_line_time));
+	save_item(NAME(m_state.m_last_hsync_time));
+	save_item(NAME(m_state.m_last_vsync_time));
+	save_item(NAME(m_refresh_period));
+	save_item(NAME(m_state.m_clock_period));
 	//save_item(NAME(m_bitmap[0]));
 	//save_item(NAME(m_bitmap[1]));
 	save_item(NAME(m_cur_bm));
 
 	/* sync separator */
-	save_item(NAME(m_vint));
-	save_item(NAME(m_int_trig));
-	save_item(NAME(m_mult));
+	save_item(NAME(m_state.m_vsync_filter));
+	save_item(NAME(m_state.m_vsync_threshold));
+	save_item(NAME(m_state.m_vsync_filter_timeconst));
 
-	save_item(NAME(m_sig_vsync));
-	save_item(NAME(m_sig_composite));
-	save_item(NAME(m_sig_field));
-
-
-
+	save_item(NAME(m_state.m_sig_vsync));
+	save_item(NAME(m_state.m_sig_composite));
+	save_item(NAME(m_state.m_sig_field));
 }
 
 void fixedfreq_device::device_reset()
 {
-	m_last_time = attotime::zero;
-	m_line_time = attotime::zero;
-	m_last_hsync_time = attotime::zero;
-	m_last_vsync_time = attotime::zero;
-	m_vint = 0;
-
+	m_state.reset();
 }
-
 
 void fixedfreq_device::device_post_load()
 {
-	//recompute_parameters(true);
-}
-
-void fixedfreq_device::recompute_parameters(bool postload)
-{
-	bool needs_realloc = (m_htotal != m_hbackporch) && (m_vtotal != m_vbackporch);
-
-	if (m_bitmap[0] != nullptr || needs_realloc)
-		m_bitmap[0] = nullptr;
-	if (m_bitmap[1] != nullptr || needs_realloc)
-		m_bitmap[1] = nullptr;
-
-	m_htotal = m_hbackporch;
-	m_vtotal = m_vbackporch;
-
-	/* sync separator */
-
-	m_int_trig = (exp(- 3.0/(3.0+3.0))) - exp(-1.0);
-	m_mult = (double) (m_monitor_clock) / (double) m_htotal * 1.0; // / (3.0 + 3.0);
-	LOG("trigger %f with len %f\n", m_int_trig, 1e6 / m_mult);
-
-	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
-	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal, m_vtotal);
-
-	rectangle visarea(
-			m_hbackporch - m_hfrontporch,
-			m_hbackporch - m_hfrontporch + m_hvisible - 1,
-			m_vbackporch - m_vfrontporch,
-			m_vbackporch - m_vfrontporch + m_vvisible - 1);
-
-	m_clock_period = attotime::from_hz(m_monitor_clock);
-
-	m_refresh = attotime::from_hz(m_monitor_clock) * m_vtotal * m_htotal;
-	screen().configure(m_htotal, m_vtotal, visarea, m_refresh.as_attoseconds());
-}
-
-void fixedfreq_device::update_screen_parameters(const attotime &refresh)
-{
-	rectangle visarea(
-//          m_hsync - m_hvisible,
-//          m_hsync - 1 ,
-			m_hbackporch - m_hfrontporch,
-			m_hbackporch - m_hfrontporch + m_hvisible - 1,
-			m_vbackporch - m_vfrontporch,
-			m_vbackporch - m_vfrontporch + m_vvisible - 1);
-
-	m_refresh = refresh;
-	screen().configure(m_htotal, m_vtotal, visarea, m_refresh.as_attoseconds());
-}
-
-int fixedfreq_device::sync_separator(const attotime &time, double newval)
-{
-	int last_vsync = m_sig_vsync;
-	int last_comp = m_sig_composite;
-	int ret = 0;
-
-	m_vint += ((double) last_comp - m_vint) * (1.0 - exp(-time.as_double() * m_mult));
-	m_sig_composite = (newval < m_sync_threshold) ? 1 : 0 ;
-
-	m_sig_vsync = (m_vint > m_int_trig) ? 1 : 0;
-
-	if (!last_vsync && m_sig_vsync)
-	{
-		/* TODO - time since last hsync and field detection */
-		ret |= 1;
-	}
-	if (last_vsync && !m_sig_vsync)
-	{
-		m_sig_field = last_comp;   /* force false-progressive */
-		m_sig_field = (m_sig_field ^ 1) ^ last_comp;   /* if there is no field switch, auto switch */
-		LOG("Field: %d\n", m_sig_field);
-	}
-	if (!last_comp && m_sig_composite)
-	{
-		/* TODO - time since last hsync and field detection */
-		ret |= 2;
-	}
-	if (last_comp && !m_sig_composite)
-	{
-		/* falling composite */
-		ret |= 4;
-	}
-	return ret;
+	//recompute_parameters();
 }
 
 uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -216,72 +238,62 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	return 0;
 }
 
-NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_vid)
+void fixedfreq_device::vsync_start_cb(double refresh_time)
 {
-	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();
-	const int has_fields = (m_fieldcount > 1) ? 1: 0;
+	// toggle bitmap
+	m_cur_bm ^= 1;
 
-	int pixels = round((time - m_line_time).as_double() / m_clock_period.as_double());
-	attotime delta_time = (time - m_last_time);
+	rectangle visarea(m_monitor.minh(), m_monitor.maxh(), m_monitor.minv(), m_monitor.maxv());
 
-	if (data == m_vid)
-		return;
-
-	ATTR_UNUSED int sync = sync_separator(delta_time, data);
-
-	if (m_last_y < bm->height())
-	{
-		rgb_t col;
-
-		if (m_vid < m_sync_threshold)
-			// Mark sync areas
-			col = rgb_t(255, 0, 0);
-		else
-		{
-			int colv = (int) ((m_vid - m_sync_threshold) * m_gain * 255.0);
-			if (colv > 255)
-				colv = 255;
-			col = rgb_t(colv, colv, colv);
-		}
-
-		bm->plot_box(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, 1, col);
-		m_last_x = pixels;
-	}
-	if (sync & 1)
-	{
-		LOG("VSYNC %d %d\n", pixels, m_last_y + m_sig_field);
-	}
-	if (sync & 2)
-	{
-		LOG("HSYNC up %d\n", pixels);
-		//if (m_last_y == 27) printf("HSYNC up %d %d\n", m_last_y, pixels);
-	}
-	if (sync & 4)
-	{
-		LOG("HSYNC down %f %d %f\n", time.as_double()* 1e6, pixels, m_vid);
-	}
-
-	if (sync & 1)
-	{
-		m_last_y = m_vbackporch - m_vsync;
-		// toggle bitmap
-		m_cur_bm ^= 1;
-		update_screen_parameters(time - m_last_vsync_time);
-		m_last_vsync_time = time;
-	}
-
-	// FIXME: pixels > 50 filters some spurious hysnc on line 27 in breakout
-	if ((sync & 2) && !m_sig_vsync && (pixels > 100))
-	{
-		m_last_y += m_fieldcount;
-		m_last_x = 0;
-		m_line_time = time;
-	}
-
-	m_last_time = time;
-	m_vid = data;
-
+	m_refresh_period = refresh_time;
+	screen().configure(m_htotal * m_monitor.m_hscale, m_vtotal, visarea, DOUBLE_TO_ATTOSECONDS(m_refresh_period));
 }
 
+void fixedfreq_device::plot_hline(int x, int y, int w, uint32_t col)
+{
+	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();
+	if (y < bm->height())
+		bm->plot_box(x, y, w, 1, col);
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)
+{
+	// double is good enough for this exercise;
+
+	const time_type ctime = time.as_double();
+	m_state.update_composite_monochrome(ctime, data);
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_red)
+{
+	// double is good enough for this exercise;
+
+	const time_type ctime = time.as_double();
+	m_state.update_red(ctime, data);
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_green)
+{
+	// double is good enough for this exercise;
+
+	const time_type ctime = time.as_double();
+	m_state.update_green(ctime, data);
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_blue)
+{
+	// double is good enough for this exercise;
+
+	const time_type ctime = time.as_double();
+	m_state.update_blue(ctime, data);
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_sync)
+{
+	// double is good enough for this exercise;
+
+	const time_type ctime = time.as_double();
+	m_state.update_sync(ctime, data);
+}
 
 /***************************************************************************/

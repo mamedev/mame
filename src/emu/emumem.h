@@ -164,8 +164,6 @@ template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
 template <typename D, typename T, typename Ret, typename... Params>
 struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
-template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (*)(T *, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T *, Params...), const char *, const char *, T *>::value> > { using type = T; };
 
 template <typename D, typename T> using rw_device_class_t  = typename rw_device_class <D, T>::type;
 
@@ -1134,11 +1132,13 @@ private:
 // describes an address space and provides basic functions to map addresses to bytes
 class address_space_config
 {
+	friend class address_map;
+
 public:
 	// construction/destruction
 	address_space_config();
-	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift = 0, address_map_constructor internal = address_map_constructor(), address_map_constructor defmap = address_map_constructor());
-	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal = address_map_constructor(), address_map_constructor defmap = address_map_constructor());
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift = 0, address_map_constructor internal = address_map_constructor());
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal = address_map_constructor());
 
 	// getters
 	const char *name() const { return m_name; }
@@ -1146,6 +1146,9 @@ public:
 	int data_width() const { return m_data_width; }
 	int addr_width() const { return m_addr_width; }
 	int addr_shift() const { return m_addr_shift; }
+	int logaddr_width() const { return m_logaddr_width; }
+	int page_shift() const { return m_page_shift; }
+	bool is_octal() const { return m_is_octal; }
 
 	// Actual alignment of the bus addresses
 	int alignment() const { int bytes = m_data_width / 8; return m_addr_shift < 0 ? bytes >> -m_addr_shift : bytes << m_addr_shift; }
@@ -1158,7 +1161,7 @@ public:
 	inline offs_t addr2byte_end(offs_t address) const { return (m_addr_shift < 0) ? ((address << -m_addr_shift) | ((1 << -m_addr_shift) - 1)) : (address >> m_addr_shift); }
 	inline offs_t byte2addr_end(offs_t address) const { return (m_addr_shift > 0) ? ((address << m_addr_shift) | ((1 << m_addr_shift) - 1)) : (address >> -m_addr_shift); }
 
-	// state
+	// state (TODO: privatize)
 	const char *        m_name;
 	endianness_t        m_endianness;
 	u8                  m_data_width;
@@ -1169,7 +1172,6 @@ public:
 	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
 
 	address_map_constructor m_internal_map;
-	address_map_constructor m_default_map;
 };
 
 
@@ -1233,11 +1235,12 @@ public:
 
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
+	int logaddr_width() const { return m_config.logaddr_width(); }
 	int alignment() const { return m_config.alignment(); }
 	endianness_t endianness() const { return m_config.endianness(); }
 	int addr_shift() const { return m_config.addr_shift(); }
 	u64 unmap() const { return m_unmap; }
-	bool is_octal() const { return m_config.m_is_octal; }
+	bool is_octal() const { return m_config.is_octal(); }
 
 	offs_t addrmask() const { return m_addrmask; }
 	u8 addrchars() const { return m_addrchars; }
@@ -1314,11 +1317,11 @@ public:
 	void install_ram(offs_t addrstart, offs_t addrend, void *baseptr = nullptr) { install_ram(addrstart, addrend, 0, baseptr); }
 
 	// install ports, banks, RAM (with mirror/mask)
-	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmirror, rtag, nullptr); }
-	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmirror, nullptr, wtag); }
-	virtual void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) = 0;
-	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, tag, nullptr); }
-	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, nullptr, tag); }
+	void install_read_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag) { install_readwrite_port(addrstart, addrend, addrmirror, rtag, ""); }
+	void install_write_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *wtag) { install_readwrite_port(addrstart, addrend, addrmirror, "", wtag); }
+	virtual void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) = 0;
+	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, tag, ""); }
+	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag) { install_bank_generic(addrstart, addrend, addrmirror, "", tag); }
 	void install_readwrite_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *tag)  { install_bank_generic(addrstart, addrend, addrmirror, tag, tag); }
 	void install_read_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmirror, bank, nullptr); }
 	void install_write_bank(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *bank) { install_bank_generic(addrstart, addrend, addrmirror, nullptr, bank); }
@@ -1538,7 +1541,7 @@ protected:
 	void populate_map_entry(const address_map_entry &entry, read_or_write readorwrite);
 	virtual void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) = 0;
 	virtual void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) = 0;
-	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) = 0;
+	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) = 0;
 	virtual void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) = 0;
 	void adjust_addresses(offs_t &start, offs_t &end, offs_t &mask, offs_t &mirror);
 	void *find_backing_memory(offs_t addrstart, offs_t addrend);
@@ -1651,7 +1654,7 @@ public:
 	int entry() const { return m_curentry; }
 	bool anonymous() const { return m_anonymous; }
 	offs_t addrstart() const { return m_addrstart; }
-	void *base() const { return m_baseptr; }
+	void *base() const { return m_entries.empty() ? nullptr : m_entries[m_curentry]; }
 	const char *tag() const { return m_tag.c_str(); }
 	const char *name() const { return m_name.c_str(); }
 
@@ -1677,7 +1680,6 @@ public:
 private:
 	// internal state
 	running_machine &       m_machine;              // need the machine to free our memory
-	u8 *                    m_baseptr;              // pointer to our current base pointer
 	std::vector<u8 *>       m_entries;              // the entries
 	bool                    m_anonymous;            // are we anonymous or explicit?
 	offs_t                  m_addrstart;            // start offset

@@ -1193,20 +1193,22 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	m_buf_params(dynamic_cast<device_disasm_interface &>(device).get_disassembler()),
 	m_flags(m_dintf.interface_flags())
 {
+	address_space &pspace = m_mintf->space(AS_PROGRAM);
+
 	if(m_flags & util::disasm_interface::INTERNAL_DECRYPTION) {
-		m_buf_raw.set_source(m_mintf->space(AS_PROGRAM));
+		m_buf_raw.set_source(pspace);
 		m_buf_opcodes.set_source(m_buf_raw, true);
 		if((m_flags & util::disasm_interface::SPLIT_DECRYPTION) == util::disasm_interface::SPLIT_DECRYPTION)
 			m_buf_params.set_source(m_buf_raw, false);
 	} else {
 		if(m_mintf->has_space(AS_OPCODES)) {
 			m_buf_opcodes.set_source(m_mintf->space(AS_OPCODES));
-			m_buf_params.set_source(m_mintf->space(AS_PROGRAM));
+			m_buf_params.set_source(pspace);
 		} else
-			m_buf_opcodes.set_source(m_mintf->space(AS_PROGRAM));
+			m_buf_opcodes.set_source(pspace);
 	}
 
-	m_pc_mask = m_mintf->space(AS_PROGRAM).logaddrmask();
+	m_pc_mask = pspace.logaddrmask();
 
 	if(m_flags & util::disasm_interface::PAGED)
 		m_page_mask = (1 << m_dintf.page_address_bits()) - 1;
@@ -1253,8 +1255,8 @@ debug_disasm_buffer::debug_disasm_buffer(device_t &device) :
 	}
 
 	// pc to string conversion
-	int aw = m_mintf->space(AS_PROGRAM).addr_width();
-	bool is_octal = m_mintf->space(AS_PROGRAM).is_octal();
+	int aw = pspace.logaddr_width();
+	bool is_octal = pspace.is_octal();
 	if((m_flags & util::disasm_interface::PAGED2LEVEL) == util::disasm_interface::PAGED2LEVEL) {
 		int bits1 = m_dintf.page_address_bits();
 		int bits2 = m_dintf.page2_address_bits();

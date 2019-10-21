@@ -32,28 +32,28 @@ class ti_rs232_pio_device : public device_t, public device_ti99_peribox_card_int
 public:
 	ti_rs232_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_stop() override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual ioport_constructor device_input_ports() const override;
+	void device_start() override;
+	void device_reset() override;
+	void device_stop() override;
+	const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override;
+	ioport_constructor device_input_ports() const override;
 
 private:
 	DECLARE_WRITE_LINE_MEMBER(int0_callback);
 	DECLARE_WRITE_LINE_MEMBER(int1_callback);
 	DECLARE_WRITE_LINE_MEMBER(rcv0_callback);
 	DECLARE_WRITE_LINE_MEMBER(rcv1_callback);
-	DECLARE_WRITE8_MEMBER(xmit0_callback);
-	DECLARE_WRITE8_MEMBER(xmit1_callback);
-	DECLARE_WRITE8_MEMBER(ctrl0_callback);
-	DECLARE_WRITE8_MEMBER(ctrl1_callback);
+	void xmit0_callback(uint8_t data);
+	void xmit1_callback(uint8_t data);
+	void ctrl0_callback(offs_t offset, uint8_t data);
+	void ctrl1_callback(offs_t offset, uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER(selected_w);
 	DECLARE_WRITE_LINE_MEMBER(pio_direction_in_w);
@@ -77,15 +77,18 @@ private:
 	void        ctrl_callback(int uartind, int type, uint8_t data);
 
 	required_device<ls259_device> m_crulatch;
+	// Asynchronous receivers/transmitters
+	required_device<tms9902_device> m_uart0;
+	required_device<tms9902_device> m_uart1;
 
-	// UART chips
-	tms9902_device*             m_uart[2];
 	// Connected images (file or socket connection) that represent the
 	// devices that are connected to the serial adapters
-	ti_rs232_attached_device*   m_serdev[2];
+	required_device<ti_rs232_attached_device> m_serdev0;
+	required_device<ti_rs232_attached_device> m_serdev1;
+
 	// Connected image (file) that represents the device connected to the
 	// parallel interface
-	ti_pio_attached_device*     m_piodev;
+	required_device<ti_pio_attached_device> m_piodev;
 	uint8_t*                      m_dsrrom;
 
 	// Input buffer for each UART. We have to copy the contents of sdlsocket here
@@ -138,14 +141,16 @@ public:
 	bool is_reset_on_load() const override       { return false; }
 	const char *image_interface() const override { return ""; }
 	const char *file_extensions() const override { return ""; }
+	void connect(tms9902_device *dev) { m_uart = dev; }
 
 protected:
-	virtual void    device_start() override;
+	void device_start() override { };
 	image_init_result    call_load() override;
 	void    call_unload() override;
 
 private:
 	int get_index_from_tagname();
+	tms9902_device* m_uart;
 };
 
 /*
@@ -166,7 +171,7 @@ public:
 	const char *file_extensions() const override { return ""; }
 
 protected:
-	virtual void    device_start() override;
+	void    device_start() override { };
 	image_init_result    call_load() override;
 	void    call_unload() override;
 };

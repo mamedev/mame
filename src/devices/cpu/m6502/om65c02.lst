@@ -119,36 +119,59 @@ and_zpi
 	set_nz(A);
 	prefetch();
 
+asl_c_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_asl(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
 asl_c_abx
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
-	}
+	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_asl(TMP2);
 	write(TMP, TMP2);
+	prefetch();
+
+asl_c_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_asl(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+asl_c_zpx
+	TMP = read_pc();
+	read(TMP);
+	TMP = uint8_t(TMP+X);
+	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 = do_asl(TMP2);
 	write(TMP, TMP2);
 	prefetch();
 
 bbr_zpb
-	// Access pattern uncertain
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
 	TMP = read_pc();
-	read_pc_noinc();
 	if(!(TMP2 & (1 << ((inst_state >> 4) & 7)))) {
 		PC += int8_t(TMP);
 	}
 	prefetch();
 
 bbs_zpb
-	// Access pattern uncertain
 	TMP = read_pc();
 	TMP2 = read(TMP);
+	read(TMP);
 	TMP = read_pc();
-	read_pc_noinc();
 	if(TMP2 & (1 << ((inst_state >> 4) & 7))) {
 		PC += int8_t(TMP);
 	}
@@ -229,6 +252,48 @@ dec_acc
 	set_nz(A);
 	prefetch();
 
+dec_c_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2--;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+dec_c_abx
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	read(set_l(TMP, TMP+X));
+	TMP += X;
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2--;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+dec_c_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2--;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+dec_c_zpx
+	TMP = read_pc();
+	read(TMP);
+	TMP = uint8_t(TMP+X);
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2--;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
 eor_zpi
 	TMP2 = read_pc();
 	TMP = read(TMP2 & 0xff);
@@ -241,6 +306,48 @@ inc_acc
 	read_pc_noinc();
 	A++;
 	set_nz(A);
+	prefetch();
+
+inc_c_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2++;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+inc_c_abx
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	read(set_l(TMP, TMP+X));
+	TMP += X;
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2++;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+inc_c_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2++;
+	set_nz(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+inc_c_zpx
+	TMP = read_pc();
+	read(TMP);
+	TMP = uint8_t(TMP+X);
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2++;
+	set_nz(TMP2);
+	write(TMP, TMP2);
 	prefetch();
 
 jmp_iax
@@ -268,16 +375,40 @@ lda_zpi
 	set_nz(A);
 	prefetch();
 
+lsr_c_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_lsr(TMP2);
+	write(TMP, TMP2);
+	prefetch();
 
 lsr_c_abx
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
-	}
+	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_lsr(TMP2);
 	write(TMP, TMP2);
+	prefetch();
+
+lsr_c_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_lsr(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+lsr_c_zpx
+	TMP = read_pc();
+	read(TMP);
+	TMP = uint8_t(TMP+X);
+	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 = do_lsr(TMP2);
 	write(TMP, TMP2);
 	prefetch();
@@ -338,37 +469,85 @@ ply_imp
 	prefetch();
 
 rmb_bzp
-	// Access pattern unknown but probable (built upon inc_zpg)
 	TMP = read_pc();
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	TMP2 &= ~(1 << ((inst_state >> 4) & 7));
+	write(TMP, TMP2);
+	prefetch();
+
+rol_c_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_rol(TMP2);
 	write(TMP, TMP2);
 	prefetch();
 
 rol_c_abx
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
-	}
+	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	TMP2 = do_rol(TMP2);
 	write(TMP, TMP2);
 	prefetch();
 
+rol_c_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_rol(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+rol_c_zpx
+	TMP = read_pc();
+	read(TMP);
+	TMP = uint8_t(TMP+X);
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_rol(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+ror_c_aba
+	TMP = read_pc();
+	TMP = set_h(TMP, read_pc());
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_ror(TMP2);
+	write(TMP, TMP2);
+	prefetch();
 
 ror_c_abx
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
-	}
+	read(set_l(TMP, TMP+X));
 	TMP += X;
 	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_ror(TMP2);
 	write(TMP, TMP2);
+	prefetch();
+
+ror_c_zpg
+	TMP = read_pc();
+	TMP2 = read(TMP);
+	read(TMP);
+	TMP2 = do_ror(TMP2);
+	write(TMP, TMP2);
+	prefetch();
+
+ror_c_zpx
+	TMP = read_pc();
+	read(TMP);
+	TMP = uint8_t(TMP+X);
+	TMP2 = read(TMP);
+	read(TMP);
 	TMP2 = do_ror(TMP2);
 	write(TMP, TMP2);
 	prefetch();
@@ -483,10 +662,9 @@ sbc_c_zpx
 	prefetch();
 
 smb_bzp
-	// Access pattern unknown but probable (built upon inc_zpg)
 	TMP = read_pc();
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	TMP2 |= 1 << ((inst_state >> 4) & 7);
 	write(TMP, TMP2);
 	prefetch();
@@ -584,3 +762,16 @@ wai_imp
 		eat-all-cycles;
 	}
 	prefetch();
+
+#   exceptions
+reset_c
+	read_arg(0xffff);
+	read_pc_noinc();
+	read(SP); dec_SP();
+	read(SP); dec_SP();
+	read(SP); dec_SP();
+	P = (P | F_I) & ~F_D;
+	PC = read_arg(0xfffc);
+	PC = set_h(PC, read_arg(0xfffd));
+	prefetch();
+	inst_state = -1;

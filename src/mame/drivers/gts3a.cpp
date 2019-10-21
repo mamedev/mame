@@ -83,8 +83,8 @@ private:
 void gts3a_state::gts3a_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram().share("nvram");
-	map(0x2000, 0x200f).rw(m_u4, FUNC(via6522_device::read), FUNC(via6522_device::write));
-	map(0x2010, 0x201f).rw(m_u5, FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x2000, 0x200f).m(m_u4, FUNC(via6522_device::map));
+	map(0x2010, 0x201f).m(m_u5, FUNC(via6522_device::map));
 	map(0x2020, 0x2023).mirror(0x0c).w(FUNC(gts3a_state::segbank_w));
 	map(0x4000, 0xffff).rom();
 }
@@ -361,8 +361,7 @@ void gts3a_state::gts3a(machine_config &config)
 	screen.set_size(128, 32);
 	screen.set_visarea(0, 127, 0, 31);
 
-	PALETTE(config, m_palette, 2);
-	m_palette->set_init(DEVICE_SELF_OWNER, FUNC(gts3a_state::palette_init));
+	PALETTE(config, m_palette, FUNC(gts3a_state::palette_init), 2);
 
 	mc6845_device &crtc(MC6845(config, "crtc", XTAL(3'579'545) / 2));
 	crtc.set_screen("screen");

@@ -25,14 +25,30 @@ protected:
 	void program_2k(address_map &map);
 	void data_64_24x4(address_map &map);
 
+	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const override { return (clocks + 3 - 1) / 3; } // 3 cycles per machine cycle
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const override { return (cycles * 3); } // "
 	virtual void execute_one() override;
 	virtual void get_opcode_param() override;
 
-	virtual u8 ram_r() override;
-	virtual void ram_w(u8 data) override;
+	using sm510_base_device::do_branch;
+	virtual void do_branch(u8 pu, u8 pl); // does not have Pm
+	virtual void reset_vector() override { do_branch(0xf, 0); }
+	virtual void wakeup_vector() override { do_branch(0, 0); }
+
+	// opcode handlers
+	virtual void op_lb() override;
+	virtual void op_incb() override;
+
+	virtual void op_tl() override;
+	virtual void op_trs();
+
+	virtual void op_adx() override;
+
+	virtual void op_atbp() override;
 };
 
 class sm531_device : public sm530_device

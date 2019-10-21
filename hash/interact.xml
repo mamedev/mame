@@ -85,7 +85,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQS-101"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="blackjack (19xx)(interact electronics inc.).cin" size="7664" crc="a4c182a4" sha1="96691a7278794125e475d311cbc862cc8eb09937" offset="0" />
+				<rom name="blackjack (19xx)(interact electronics inc.).cin" size="7664" crc="a4c182a4" sha1="96691a7278794125e475d311cbc862cc8eb09937"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@ Alignment Tape (Micro Video)
 		<publisher>Interact Electronics</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="star track (19xx)(interact electronics inc.).cin" size="8178" crc="339244be" sha1="8726957a975ce6ee8ce5ba7ade77f6a4fa971682" offset="0" />
+				<rom name="star track (19xx)(interact electronics inc.).cin" size="8178" crc="339244be" sha1="8726957a975ce6ee8ce5ba7ade77f6a4fa971682"/>
 			</dataarea>
 		</part>
 	</software>
@@ -110,7 +110,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQS-103"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="concentration (19xx)(interact electronics inc.).cin" size="7664" crc="fcf13c4c" sha1="434ebfc8e02b965b755e51529b68f18fae88b061" offset="0" />
+				<rom name="concentration (19xx)(interact electronics inc.).cin" size="7664" crc="fcf13c4c" sha1="434ebfc8e02b965b755e51529b68f18fae88b061"/>
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQS-105"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="video chess (19xx)(interact electronics inc.).cin" size="8178" crc="6e8dc7da" sha1="50b51815f24b9ef373e577801d069e31ac880235" offset="0" />
+				<rom name="video chess (19xx)(interact electronics inc.).cin" size="8178" crc="6e8dc7da" sha1="50b51815f24b9ef373e577801d069e31ac880235"/>
 			</dataarea>
 		</part>
 	</software>
@@ -135,7 +135,7 @@ Alignment Tape (Micro Video)
 		<publisher>Interact Electronics</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="16356">
-				<rom name="interact microchess (19xx)(interact electronics inc.).cin" size="16356" crc="e0e70a16" sha1="e95855334248f353c5302108eb4a87e4cb76c068" offset="0" />
+				<rom name="interact microchess (19xx)(interact electronics inc.).cin" size="16356" crc="e0e70a16" sha1="e95855334248f353c5302108eb4a87e4cb76c068"/>
 			</dataarea>
 		</part>
 	</software>
@@ -148,7 +148,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQS-107"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="backgammon (19xx)(interact electronics inc.).cin" size="8178" crc="20034353" sha1="52fa72d43bcbcadaaae9139ee799374d37f1a3fc" offset="0" />
+				<rom name="backgammon (19xx)(interact electronics inc.).cin" size="8178" crc="20034353" sha1="52fa72d43bcbcadaaae9139ee799374d37f1a3fc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@ Alignment Tape (Micro Video)
 		<publisher>Interact Electronics</publisher><!-- re-released by Micro Video -->
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="reversi (19xx)(interact electronics inc.).cin" size="8178" crc="ccc4f285" sha1="064d325515a637e81631d8fb1fd3a963521991bf" offset="0" />
+				<rom name="reversi (19xx)(interact electronics inc.).cin" size="8178" crc="ccc4f285" sha1="064d325515a637e81631d8fb1fd3a963521991bf"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQE-201"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="add em up (19xx)(interact electronics inc.).cin" size="7664" crc="86182e2c" sha1="b494a1e6693123d265a4b7ae4e4e3c6ec396508d" offset="0" />
+				<rom name="add em up (19xx)(interact electronics inc.).cin" size="7664" crc="86182e2c" sha1="b494a1e6693123d265a4b7ae4e4e3c6ec396508d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@ Alignment Tape (Micro Video)
 		<publisher>Interact Electronics</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="computer-a-color (19xx)(interact electronics inc.).cin" size="7664" crc="3ffed189" sha1="b96af5b18692d9992bac4e11699e37c8ffa1454d" offset="0" />
+				<rom name="computer-a-color (19xx)(interact electronics inc.).cin" size="7664" crc="3ffed189" sha1="b96af5b18692d9992bac4e11699e37c8ffa1454d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -198,7 +198,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQE-203"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="hang-man (19xx)(interact electronics inc.).cin" size="7664" crc="088856de" sha1="1aca3300746f867a4fabbda26c73c0228e7ca0c4" offset="0" />
+				<rom name="hang-man (19xx)(interact electronics inc.).cin" size="7664" crc="088856de" sha1="1aca3300746f867a4fabbda26c73c0228e7ca0c4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -211,7 +211,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQE-206"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="knockdown (19xx)(interact electronics inc.).cin" size="7664" crc="ef2c1e5e" sha1="1cf602ba1a12572b1b6582409ae454f20d48da0e" offset="0" />
+				<rom name="knockdown (19xx)(interact electronics inc.).cin" size="7664" crc="ef2c1e5e" sha1="1cf602ba1a12572b1b6582409ae454f20d48da0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -223,7 +223,7 @@ Alignment Tape (Micro Video)
 		<publisher>Interact Electronics</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="edu-basic (19xx)(interact electronics inc.).cin" size="7664" crc="19647c46" sha1="5d89279c3f3c5dd21d2e7d307ad4bea361370272" offset="0" />
+				<rom name="edu-basic (19xx)(interact electronics inc.).cin" size="7664" crc="19647c46" sha1="5d89279c3f3c5dd21d2e7d307ad4bea361370272"/>
 			</dataarea>
 		</part>
 	</software>
@@ -236,7 +236,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQE-208"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="music maestro (19xx)(interact electronics inc.).cin" size="8178" crc="f0ae4f00" sha1="e6d10c52ece74f263e824d98f7182d539f757951" offset="0" />
+				<rom name="music maestro (19xx)(interact electronics inc.).cin" size="8178" crc="f0ae4f00" sha1="e6d10c52ece74f263e824d98f7182d539f757951"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQA-301"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="regatta (19xx)(interact electronics inc.).cin" size="7664" crc="6e10b63d" sha1="ab4feef12835a6889119e13a7e0f9a5a3340e8b4" offset="0" />
+				<rom name="regatta (19xx)(interact electronics inc.).cin" size="7664" crc="6e10b63d" sha1="ab4feef12835a6889119e13a7e0f9a5a3340e8b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -262,7 +262,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQA-302"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="trail blazers (19xx)(-).cin" size="7664" crc="fd073328" sha1="2d40770c8bb8bd9b49708f77d6a36100fb3496b2" offset="0" />
+				<rom name="trail blazers (19xx)(-).cin" size="7664" crc="fd073328" sha1="2d40770c8bb8bd9b49708f77d6a36100fb3496b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -275,7 +275,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQA-303"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="dogfight (19xx)(interact electronics inc.).cin" size="8178" crc="d1c1f73f" sha1="e973dabd289a03a8d04d8a93f27b0d263360ff1c" offset="0" />
+				<rom name="dogfight (19xx)(interact electronics inc.).cin" size="8178" crc="d1c1f73f" sha1="e973dabd289a03a8d04d8a93f27b0d263360ff1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -288,7 +288,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQA-304"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="showdown (19xx)(interact electronics inc.).cin" size="8178" crc="5a3986df" sha1="2094f7cec4da5a2bdeae4920b47213bf0168c9f7" offset="0" />
+				<rom name="showdown (19xx)(interact electronics inc.).cin" size="8178" crc="5a3986df" sha1="2094f7cec4da5a2bdeae4920b47213bf0168c9f7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -300,7 +300,7 @@ Alignment Tape (Micro Video)
 		<publisher>Interact Electronics</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="computer maze (19xx)(interact electronics inc.).cin" size="7664" crc="b96e1f71" sha1="900e45e86b2ec79cf2363ab5e5b3a8a4b8c75a8b" offset="0" />
+				<rom name="computer maze (19xx)(interact electronics inc.).cin" size="7664" crc="b96e1f71" sha1="900e45e86b2ec79cf2363ab5e5b3a8a4b8c75a8b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -313,7 +313,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQA-306"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="breakthrough (19xx)(interact electronics inc.).cin" size="7664" crc="4cf838dc" sha1="e83102ccac40e5e797670510aa3c05f89b9b1a3d" offset="0" />
+				<rom name="breakthrough (19xx)(interact electronics inc.).cin" size="7664" crc="4cf838dc" sha1="e83102ccac40e5e797670510aa3c05f89b9b1a3d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -326,7 +326,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQA-307"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="volleyball (19xx)(-).cin" size="8178" crc="24c0e861" sha1="b81b3b210ff6e5117ffc6ac7b64da2bfa4b41ee5" offset="0" />
+				<rom name="volleyball (19xx)(-).cin" size="8178" crc="24c0e861" sha1="b81b3b210ff6e5117ffc6ac7b64da2bfa4b41ee5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -339,7 +339,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQK-401"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="biorhythm (19xx)(interact electronics inc.).cin" size="7664" crc="3cce40b1" sha1="16a5e156bb5a1ccbe2df54c073c4e7c8dee4793a" offset="0" />
+				<rom name="biorhythm (19xx)(interact electronics inc.).cin" size="7664" crc="3cce40b1" sha1="16a5e156bb5a1ccbe2df54c073c4e7c8dee4793a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@ Alignment Tape (Micro Video)
 		<info name="serial" value="QQM-505"/>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="calculator (19xx)(-).cin" size="8178" crc="2e7fe018" sha1="07a95803e37f30c85753db38f0c8df493d20ac4d" offset="0" />
+				<rom name="calculator (19xx)(-).cin" size="8178" crc="2e7fe018" sha1="07a95803e37f30c85753db38f0c8df493d20ac4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -365,7 +365,7 @@ Alignment Tape (Micro Video)
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="11011">
-				<rom name="checkbook balancer (19xx)(-).cin" size="11011" crc="f07effc7" sha1="74116d39b67d296f4b0344037f38846ebee39541" offset="0" />
+				<rom name="checkbook balancer (19xx)(-).cin" size="11011" crc="f07effc7" sha1="74116d39b67d296f4b0344037f38846ebee39541"/>
 			</dataarea>
 		</part>
 	</software>
@@ -376,7 +376,7 @@ Alignment Tape (Micro Video)
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="diagnostic tape (19xx)(-).cin" size="7664" crc="e1200d18" sha1="fc5266c183856f65f2bc676fb6d009e4f4ac9d28" offset="0" />
+				<rom name="diagnostic tape (19xx)(-).cin" size="7664" crc="e1200d18" sha1="fc5266c183856f65f2bc676fb6d009e4f4ac9d28"/>
 			</dataarea>
 		</part>
 	</software>
@@ -387,7 +387,7 @@ Alignment Tape (Micro Video)
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="12905">
-				<rom name="eart outpost i (1980)(micro video corp).cin" size="12905" crc="b4b22fbd" sha1="c8220d61b43f63a22833fa1dd9cf4e2c3aa9e12f" offset="0" />
+				<rom name="eart outpost i (1980)(micro video corp).cin" size="12905" crc="b4b22fbd" sha1="c8220d61b43f63a22833fa1dd9cf4e2c3aa9e12f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -398,7 +398,7 @@ Alignment Tape (Micro Video)
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="7664">
-				<rom name="message center (19xx)(-).cin" size="7664" crc="b1b012fc" sha1="84cb3b3056a6cc3cae8706742eb6840e45dbe314" offset="0" />
+				<rom name="message center (19xx)(-).cin" size="7664" crc="b1b012fc" sha1="84cb3b3056a6cc3cae8706742eb6840e45dbe314"/>
 			</dataarea>
 		</part>
 	</software>
@@ -409,7 +409,7 @@ Alignment Tape (Micro Video)
 		<publisher>Microsoft</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="10857">
-				<rom name="microsoft basic v4.7 (1978)(microsoft).cin" size="10857" crc="c166c8e8" sha1="cd16c96d84bbb3a067458fcb8f72c779b9dec808" offset="0" />
+				<rom name="microsoft basic v4.7 (1978)(microsoft).cin" size="10857" crc="c166c8e8" sha1="cd16c96d84bbb3a067458fcb8f72c779b9dec808"/>
 			</dataarea>
 		</part>
 	</software>
@@ -419,7 +419,7 @@ Alignment Tape (Micro Video)
 		<publisher>Micro Video</publisher>
 		<part name="cass" interface="interact_cass">
 			<dataarea name="cass" size="8178">
-				<rom name="touch down!! (19xx)(-).cin" size="8178" crc="e047d0fa" sha1="2b86fbebcd01af754b8c9cf08b20e1a8a6b513d7" offset="0" />
+				<rom name="touch down!! (19xx)(-).cin" size="8178" crc="e047d0fa" sha1="2b86fbebcd01af754b8c9cf08b20e1a8a6b513d7"/>
 			</dataarea>
 		</part>
 	</software>

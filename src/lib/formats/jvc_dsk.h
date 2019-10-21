@@ -9,11 +9,10 @@
     Named after its creator, Jeff Vavasour
 
 ***************************************************************************/
+#ifndef MAME_FORMATS_JVC_DSK_H
+#define MAME_FORMATS_JVC_DSK_H
 
 #pragma once
-
-#ifndef __JVC_DSK_H__
-#define __JVC_DSK_H__
 
 #include "flopimg.h"
 
@@ -47,4 +46,4 @@ private:
 
 extern const floppy_format_type FLOPPY_JVC_FORMAT;
 
-#endif // __JVC_DSK_H__
+#endif // MAME_FORMATS_JVC_DSK_H

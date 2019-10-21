@@ -123,11 +123,12 @@ ioport_constructor nes_fckeybrd_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(nes_fckeybrd_device::device_add_mconfig)
-	MCFG_CASSETTE_ADD("tape")
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("fc_cass")
-MACHINE_CONFIG_END
+void nes_fckeybrd_device::device_add_mconfig(machine_config &config)
+{
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->set_interface("fc_cass");
+}
 
 
 //**************************************************************************

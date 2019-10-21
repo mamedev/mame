@@ -25,35 +25,29 @@
 #include "speaker.h"
 
 
-WRITE_LINE_MEMBER(bottom9_state::vblank_irq)
-{
-	if (state && m_k052109->is_irq_enabled())
-		m_maincpu->set_input_line(0, HOLD_LINE);
-}
-
 READ8_MEMBER(bottom9_state::k052109_051960_r)
 {
 	if (m_k052109->get_rmrd_line() == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return m_k051960->k051937_r(space, offset - 0x3800);
+			return m_k051960->k051937_r(offset - 0x3800);
 		else if (offset < 0x3c00)
-			return m_k052109->read(space, offset);
+			return m_k052109->read(offset);
 		else
-			return m_k051960->k051960_r(space, offset - 0x3c00);
+			return m_k051960->k051960_r(offset - 0x3c00);
 	}
 	else
-		return m_k052109->read(space, offset);
+		return m_k052109->read(offset);
 }
 
 WRITE8_MEMBER(bottom9_state::k052109_051960_w)
 {
 	if (offset >= 0x3800 && offset < 0x3808)
-		m_k051960->k051937_w(space, offset - 0x3800, data);
+		m_k051960->k051937_w(offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		m_k052109->write(space, offset, data);
+		m_k052109->write(offset, data);
 	else
-		m_k051960->k051960_w(space, offset - 0x3c00, data);
+		m_k051960->k051960_w(offset - 0x3c00, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
@@ -63,9 +57,9 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram1_r)
 	else
 	{
 		if (m_zoomreadroms)
-			return m_k051316->rom_r(space, offset);
+			return m_k051316->rom_r(offset);
 		else
-			return m_k051316->read(space, offset);
+			return m_k051316->read(offset);
 	}
 }
 
@@ -74,7 +68,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram1_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset, data);
 	else
-		m_k051316->write(space, offset, data);
+		m_k051316->write(offset, data);
 }
 
 READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
@@ -90,7 +84,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
 	if (m_k052109_selected)
 		k052109_051960_w(space, offset + 0x2000, data);
 	else
-		m_palette->write8(space, offset, data);
+		m_palette->write8(offset, data);
 }
 
 WRITE8_MEMBER(bottom9_state::bankswitch_w)
@@ -131,7 +125,7 @@ WRITE8_MEMBER(bottom9_state::bottom9_1f90_w)
 
 WRITE8_MEMBER(bottom9_state::bottom9_sh_irqtrigger_w)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
+	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
 INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
@@ -300,60 +294,60 @@ void bottom9_state::machine_reset()
 	m_nmienable = 0;
 }
 
-MACHINE_CONFIG_START(bottom9_state::bottom9)
-
+void bottom9_state::bottom9(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", HD6309E, XTAL(24'000'000) / 8) // 63C09E
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // 63C09E
+	m_maincpu->set_addrmap(AS_PROGRAM, &bottom9_state::main_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(3'579'545))
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bottom9_state, bottom9_sound_interrupt, 8*60)  /* irq is triggered by the main CPU */
+	Z80(config, m_audiocpu, XTAL(3'579'545));
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bottom9_state::audio_map);
+	m_audiocpu->set_periodic_int(FUNC(bottom9_state::bottom9_sound_interrupt), attotime::from_hz(8*60));  /* irq is triggered by the main CPU */
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
-	MCFG_SCREEN_UPDATE_DRIVER(bottom9_state, screen_update_bottom9)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bottom9_state, vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(bottom9_state::screen_update_bottom9));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_ENABLE_SHADOWS()
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
+	m_palette->enable_shadows();
 
-	MCFG_DEVICE_ADD("k052109", K052109, 0) // 051961 on schematics
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K052109_CB(bottom9_state, tile_callback)
+	K052109(config, m_k052109, 0); // 051961 on schematics
+	m_k052109->set_palette(m_palette);
+	m_k052109->set_screen("screen");
+	m_k052109->set_tile_callback(FUNC(bottom9_state::tile_callback), this);
+	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
-	MCFG_DEVICE_ADD("k051960", K051960, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051960_SCREEN_TAG("screen")
-	MCFG_K051960_CB(bottom9_state, sprite_callback)
+	K051960(config, m_k051960, 0);
+	m_k051960->set_palette(m_palette);
+	m_k051960->set_screen("screen");
+	m_k051960->set_sprite_callback(FUNC(bottom9_state::sprite_callback), this);
 
-	MCFG_DEVICE_ADD("k051316", K051316, 0)
-	MCFG_GFX_PALETTE("palette")
-	MCFG_K051316_CB(bottom9_state, zoom_callback)
+	K051316(config, m_k051316, 0);
+	m_k051316->set_palette(m_palette);
+	m_k051316->set_zoom_callback(FUNC(bottom9_state::zoom_callback), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("k007232_1", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback0))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
+	K007232(config, m_k007232_1, XTAL(3'579'545));
+	m_k007232_1->port_write().set(FUNC(bottom9_state::volume_callback0));
+	m_k007232_1->add_route(0, "mono", 0.40);
+	m_k007232_1->add_route(1, "mono", 0.40);
 
-	MCFG_DEVICE_ADD("k007232_2", K007232, XTAL(3'579'545))
-	MCFG_K007232_PORT_WRITE_HANDLER(WRITE8(*this, bottom9_state, volume_callback1))
-	MCFG_SOUND_ROUTE(0, "mono", 0.40)
-	MCFG_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_CONFIG_END
+	K007232(config, m_k007232_2, XTAL(3'579'545));
+	m_k007232_2->port_write().set(FUNC(bottom9_state::volume_callback1));
+	m_k007232_2->add_route(0, "mono", 0.40);
+	m_k007232_2->add_route(1, "mono", 0.40);
+}
 
 
 /***************************************************************************

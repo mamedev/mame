@@ -195,24 +195,24 @@ void decodmd_type1_device::decodmd1_io_map(address_map &map)
 	map(0x00, 0xff).rw(FUNC(decodmd_type1_device::dmd_port_r), FUNC(decodmd_type1_device::dmd_port_w));
 }
 
-MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
+void decodmd_type1_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("dmdcpu", Z80, XTAL(8'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(decodmd1_map)
-	MCFG_DEVICE_IO_MAP(decodmd1_io_map)
+	Z80(config, m_cpu, XTAL(8'000'000) / 2);
+	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type1_device::decodmd1_map);
+	m_cpu->set_addrmap(AS_IO, &decodmd_type1_device::decodmd1_io_map);
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(50))
+	config.m_minimum_quantum = attotime::from_hz(50);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("nmi_timer", decodmd_type1_device, dmd_nmi, attotime::from_hz(2000))  // seems a lot
+	TIMER(config, "nmi_timer").configure_periodic(FUNC(decodmd_type1_device::dmd_nmi), attotime::from_hz(2000));  // seems a lot
 
-	MCFG_SCREEN_ADD("dmd", LCD)
-	MCFG_SCREEN_SIZE(128, 16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 128-1, 0, 16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(decodmd_type1_device, screen_update)
-	MCFG_SCREEN_REFRESH_RATE(50)
+	screen_device &dmd(SCREEN(config, "dmd", SCREEN_TYPE_LCD));
+	dmd.set_size(128, 16);
+	dmd.set_visarea(0, 128-1, 0, 16-1);
+	dmd.set_screen_update(FUNC(decodmd_type1_device::screen_update));
+	dmd.set_refresh_hz(50);
 
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
+	RAM(config, RAM_TAG).set_default_size("8K");
 
 	HC259(config, m_bitlatch); // U4
 	m_bitlatch->parallel_out_cb().set_membank(m_rombank1).mask(0x07).invert();
@@ -221,7 +221,7 @@ MACHINE_CONFIG_START(decodmd_type1_device::device_add_mconfig)
 	m_bitlatch->q_out_cb<5>().set(FUNC(decodmd_type1_device::rowdata_w));
 	m_bitlatch->q_out_cb<6>().set(FUNC(decodmd_type1_device::rowclock_w));
 	m_bitlatch->q_out_cb<7>().set(FUNC(decodmd_type1_device::test_w));
-MACHINE_CONFIG_END
+}
 
 
 decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -231,6 +231,7 @@ decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const 
 	, m_rombank2(*this, "dmdbank2")
 	, m_ram(*this, RAM_TAG)
 	, m_bitlatch(*this, "bitlatch")
+	, m_rom(*this, finder_base::DUMMY_TAG)
 {}
 
 void decodmd_type1_device::device_start()
@@ -240,16 +241,13 @@ void decodmd_type1_device::device_start()
 
 void decodmd_type1_device::device_reset()
 {
-	uint8_t* ROM;
 	uint8_t* RAM = m_ram->pointer();
-	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x2000);
 	memset(m_pixels,0,0x200*sizeof(uint32_t));
 
-	ROM = m_rom->base();
-	m_rombank1->configure_entries(0, 8, &ROM[0x0000], 0x4000);
-	m_rombank2->configure_entry(0, &ROM[0x1c000]);
+	m_rombank1->configure_entries(0, 8, &m_rom[0x0000], 0x4000);
+	m_rombank2->configure_entry(0, &m_rom[0x1c000]);
 	m_rombank1->set_entry(0);
 	m_rombank2->set_entry(0);
 	m_status = 0;

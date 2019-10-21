@@ -195,15 +195,15 @@ WRITE8_MEMBER(hitme_state::output_port_0_w)
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	m_timeout_time = machine().time() + duration;
 
-	m_discrete->write(space, HITME_DOWNCOUNT_VAL, data);
-	m_discrete->write(space, HITME_OUT0, 1);
+	m_discrete->write(HITME_DOWNCOUNT_VAL, data);
+	m_discrete->write(HITME_OUT0, 1);
 }
 
 
 WRITE8_MEMBER(hitme_state::output_port_1_w)
 {
-	m_discrete->write(space, HITME_ENABLE_VAL, data);
-	m_discrete->write(space, HITME_OUT1, 1);
+	m_discrete->write(HITME_ENABLE_VAL, data);
+	m_discrete->write(HITME_OUT1, 1);
 }
 
 
@@ -314,32 +314,30 @@ void hitme_state::machine_reset()
 	m_timeout_time = attotime::zero;
 }
 
-MACHINE_CONFIG_START(hitme_state::hitme)
-
+void hitme_state::hitme(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I8080, MASTER_CLOCK/16)
-	MCFG_DEVICE_PROGRAM_MAP(hitme_map)
-	MCFG_DEVICE_IO_MAP(hitme_portmap)
+	I8080(config, m_maincpu, MASTER_CLOCK/16);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hitme_state::hitme_map);
+	m_maincpu->set_addrmap(AS_IO, &hitme_state::hitme_portmap);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(40*8, 19*10)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 19*10-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_hitme)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(40*8, 19*10);
+	m_screen->set_visarea(0*8, 40*8-1, 0*8, 19*10-1);
+	m_screen->set_screen_update(FUNC(hitme_state::screen_update_hitme));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hitme)
-
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_hitme);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("discrete", DISCRETE, hitme_discrete)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	DISCRETE(config, m_discrete, hitme_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 
@@ -350,19 +348,19 @@ MACHINE_CONFIG_END
     Barricade or is the resolution set by a dip switch?
 */
 
-MACHINE_CONFIG_START(hitme_state::barricad)
+void hitme_state::barricad(machine_config &config)
+{
 	hitme(config);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_SIZE(32*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hitme_state, screen_update_barricad)
+	m_screen->set_size(32*8, 24*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 24*8-1);
+	m_screen->set_screen_update(FUNC(hitme_state::screen_update_barricad));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_barricad)
+	m_gfxdecode->set_info(gfx_barricad);
 
 	MCFG_VIDEO_START_OVERRIDE(hitme_state,barricad)
-MACHINE_CONFIG_END
+}
 
 
 
@@ -640,7 +638,7 @@ ROM_START( hitme1 )
 	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
 ROM_END
 
-ROM_START( m21 )
+ROM_START( mirco21 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "mirco1.bin", 0x0000, 0x0200, CRC(aa796ad7) SHA1(2908bdb4ab17a2f5bc4da2f957906bf2b57afa50) )
 	ROM_LOAD( "hm2.c7", 0x0200, 0x0200, CRC(25d47ba4) SHA1(6f3bb4ca6918dc07f37d0c0c7fe5ec53aa7171a5) )
@@ -695,7 +693,7 @@ ROM_END
 
 GAME( 1976, hitme,    0,        hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 1)",   MACHINE_SUPPORTS_SAVE )   // 05/1976
 GAME( 1976, hitme1,   hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Ramtek",      "Hit Me (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1976, m21,      hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
+GAME( 1976, mirco21,  hitme,    hitme,    hitme,    hitme_state, empty_init, ROT0, "Mirco Games", "21 (Mirco)",       MACHINE_SUPPORTS_SAVE )   // 08/1976, licensed?
 GAME( 1978, super21,  0,        hitme,    super21,  hitme_state, empty_init, ROT0, "Mirco Games", "Super Twenty One", MACHINE_SUPPORTS_SAVE )
 GAMEL(1976, barricad, 0,        barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Barricade",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )
 GAMEL(1976, brickyrd, barricad, barricad, barricad, hitme_state, empty_init, ROT0, "Ramtek",      "Brickyard",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_barricad )

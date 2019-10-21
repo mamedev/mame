@@ -54,7 +54,7 @@ void dmv_k233_device::device_reset()
 	m_enabled = false;
 }
 
-void dmv_k233_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
+void dmv_k233_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	if (ifsel == 1)
 		m_enabled = !m_enabled;

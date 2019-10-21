@@ -5,20 +5,10 @@
 
 #pragma once
 
-#include "imagedev/floppy.h"
 #include "fdc_pll.h"
 
-#define MCFG_I8271_IRQ_CALLBACK(_write) \
-	downcast<i8271_device &>(*device).set_intrq_wr_callback(DEVCB_##_write);
+class floppy_image_device;
 
-#define MCFG_I8271_DRQ_CALLBACK(_write) \
-	downcast<i8271_device &>(*device).set_drq_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8271_HDL_CALLBACK(_write) \
-	downcast<i8271_device &>(*device).set_hdl_wr_callback(DEVCB_##_write);
-
-#define MCFG_I8271_OPT_CALLBACK(_write) \
-	downcast<i8271_device &>(*device).set_opt_wr_callback(DEVCB_##_write);
 
 /***************************************************************************
     MACROS
@@ -29,17 +19,15 @@ class i8271_device : public device_t
 public:
 	i8271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <class Object> devcb_base &set_intrq_wr_callback(Object &&cb) { return intrq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_wr_callback(Object &&cb) { return drq_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_hdl_wr_callback(Object &&cb) { return hdl_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_opt_wr_callback(Object &&cb) { return opt_cb.set_callback(std::forward<Object>(cb)); }
 	auto intrq_wr_callback() { return intrq_cb.bind(); }
 	auto drq_wr_callback() { return drq_cb.bind(); }
 	auto hdl_wr_callback() { return hdl_cb.bind(); }
 	auto opt_wr_callback() { return opt_cb.bind(); }
 
-	DECLARE_READ8_MEMBER (data_r);
-	DECLARE_WRITE8_MEMBER(data_w);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 	void ready_w(bool val);
 
@@ -240,11 +228,11 @@ private:
 		C_INCOMPLETE
 	};
 
-	DECLARE_READ8_MEMBER (sr_r);
-	DECLARE_READ8_MEMBER (rr_r);
-	DECLARE_WRITE8_MEMBER(reset_w) { if(data == 1) soft_reset(); }
-	DECLARE_WRITE8_MEMBER(cmd_w);
-	DECLARE_WRITE8_MEMBER(param_w);
+	uint8_t sr_r();
+	uint8_t rr_r();
+	void reset_w(uint8_t data) { if(data == 1) soft_reset(); }
+	void cmd_w(uint8_t data);
+	void param_w(uint8_t data);
 
 	void delay_cycles(emu_timer *tm, int cycles);
 	void set_drq(bool state);

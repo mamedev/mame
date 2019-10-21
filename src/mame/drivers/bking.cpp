@@ -42,7 +42,7 @@ WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
 
 WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 {
-	m_soundlatch->write(space, offset, bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
+	m_soundlatch->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7));
 }
 
 WRITE8_MEMBER(bking_state::bking3_addr_l_w)
@@ -103,7 +103,7 @@ void bking_state::bking_io_map(address_map &map)
 	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
 	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
 	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
+//  map(0x0c, 0x0c).w(FUNC(bking_state::bking_eport2_w));   this is not shown to be connected anywhere
 	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
 	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
 }
@@ -123,7 +123,7 @@ void bking_state::bking3_io_map(address_map &map)
 	map(0x09, 0x09).w(FUNC(bking_state::bking_cont2_w));
 	map(0x0a, 0x0a).w(FUNC(bking_state::bking_cont3_w));
 	map(0x0b, 0x0b).w(FUNC(bking_state::bking_soundlatch_w));
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(bking_eport2_w)   this is not shown to be connected anywhere
+//  map(0x0c, 0x0c).w(FUNC(bking_state::bking_eport2_w));   this is not shown to be connected anywhere
 	map(0x0d, 0x0d).w(FUNC(bking_state::bking_hitclr_w));
 	map(0x07, 0x1f).r(FUNC(bking_state::bking_pos_r));
 	map(0x2f, 0x2f).rw(m_bmcu, FUNC(taito68705_mcu_device::data_r), FUNC(taito68705_mcu_device::data_w));
@@ -389,74 +389,71 @@ MACHINE_RESET_MEMBER(bking_state,bking3)
 	m_addr_l = 0;
 }
 
-MACHINE_CONFIG_START(bking_state::bking)
-
+void bking_state::bking(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("main_cpu", Z80, XTAL(12'000'000)/4) /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bking_map)
-	MCFG_DEVICE_IO_MAP(bking_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", bking_state,  irq0_line_hold)
+	z80_device &maincpu(Z80(config, "main_cpu", XTAL(12'000'000)/4)); /* 3 MHz */
+	maincpu.set_addrmap(AS_PROGRAM, &bking_state::bking_map);
+	maincpu.set_addrmap(AS_IO, &bking_state::bking_io_map);
+	maincpu.set_vblank_int("screen", FUNC(bking_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(6'000'000)/2)  /* 3 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(bking_audio_map)
+	Z80(config, m_audiocpu, XTAL(6'000'000)/2);  /* 3 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bking_state::bking_audio_map);
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
 	/* - NMI triggered by the main CPU */
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(bking_state, irq0_line_hold,  (double)6000000/(4*16*16*10*16))
+	m_audiocpu->set_periodic_int(FUNC(bking_state::irq0_line_hold), attotime::from_hz((double)6000000/(4*16*16*10*16)));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(bking_state, screen_update_bking)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bking_state, screen_vblank_bking))
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(bking_state::screen_update_bking));
+	m_screen->screen_vblank().set(FUNC(bking_state::screen_vblank_bking));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_bking)
-	MCFG_PALETTE_ADD("palette", 4*8+4*4+4*2+4*2)
-	MCFG_PALETTE_INIT_OWNER(bking_state, bking)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bking);
+	PALETTE(config, m_palette, FUNC(bking_state::bking_palette), 4*8 + 4*4 + 4*2 + 4*2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
-	MCFG_GENERIC_LATCH_DATA_PENDING_CB(WRITELINE("soundnmi", input_merger_device, in_w<0>))
+	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set(m_soundnmi, FUNC(input_merger_device::in_w<0>));
 
-	MCFG_INPUT_MERGER_ALL_HIGH("soundnmi")
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
+	INPUT_MERGER_ALL_HIGH(config, m_soundnmi).output_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("ay1", AY8910, XTAL(6'000'000)/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	AY8910(config, "ay1", XTAL(6'000'000)/4).add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, XTAL(6'000'000)/4)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8("dac", dac_byte_interface, data_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, bking_state, port_b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(6'000'000)/4));
+	ay2.port_a_write_callback().set("dac", FUNC(dac_byte_interface::data_w));
+	ay2.port_b_write_callback().set(FUNC(bking_state::port_b_w));
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
+}
 
-MACHINE_CONFIG_START(bking_state::bking3)
+void bking_state::bking3(machine_config &config)
+{
 	bking(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("main_cpu")
-	MCFG_DEVICE_IO_MAP(bking3_io_map)
+	subdevice<z80_device>("main_cpu")->set_addrmap(AS_IO, &bking_state::bking3_io_map);
 
-	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, XTAL(3'000'000))      /* xtal is 3MHz, divided by 4 internally */
+	TAITO68705_MCU(config, m_bmcu, XTAL(3'000'000));      /* xtal is 3MHz, divided by 4 internally */
 
 	MCFG_MACHINE_START_OVERRIDE(bking_state,bking3)
 	MCFG_MACHINE_RESET_OVERRIDE(bking_state,bking3)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
-MACHINE_CONFIG_END
+	config.m_minimum_quantum = attotime::from_hz(6000);
+}
 
 
 /***************************************************************************

@@ -25,7 +25,6 @@
 #include "spchsyn.h"
 
 #include "machine/spchrom.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #define LOG_WARN        (1U<<1)    // Warnings
@@ -46,7 +45,9 @@ namespace bus { namespace ti99 { namespace peb {
 ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_SPEECH, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_vsp(nullptr), m_reading(false), m_sbe(false)
+	m_vsp(*this, "vsp"),
+	m_reading(false),
+	m_sbe(false)
 {
 }
 
@@ -60,27 +61,27 @@ READ8Z_MEMBER( ti_speech_synthesizer_device::readz )
 
 	if (m_sbe)
 	{
-		*value = m_vsp->status_r(space, 0, 0xff) & 0xff;
+		*value = m_vsp->status_r() & 0xff;
 		LOGMASKED(LOG_MEM, "read value = %02x\n", *value);
 		// We should clear the lines at this point. The TI-99/4A clears the
 		// lines by setting the address bus to a different value, but the
 		// Geneve may behave differently. This may not 100% reflect the real
 		// situation, but it ensures a safe processing.
-		m_vsp->combined_rsq_wsq_w(space, 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 	}
 }
 
 /*
     Memory write
 */
-WRITE8_MEMBER( ti_speech_synthesizer_device::write )
+void ti_speech_synthesizer_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
 	if (m_sbe)
 	{
 		LOGMASKED(LOG_MEM, "write value = %02x\n", data);
-		m_vsp->data_w(space, 0, data);
+		m_vsp->data_w(data);
 		// Note that we must NOT clear the lines here. Find the lines in the
 		// READY callback below.
 	}
@@ -91,7 +92,6 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 	// 1001 00xx xxxx xxx0   DBIN=1
 	// 1001 01xx xxxx xxx0   DBIN=0
 	// 1111 1000 0000 0001    mask
-	m_space = &space;
 	m_reading = (state==ASSERT_LINE);
 
 	bool valid = (((offset & 0x0400)==0) == m_reading);
@@ -106,11 +106,11 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 		// both RS* and WS* are active, which is illegal.
 		// Alternatively, we'll use the combined settings method
 
-		m_vsp->combined_rsq_wsq_w(space, 0, m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
+		m_vsp->combined_rsq_wsq_w(m_reading ? ~tms5220_device::RS : ~tms5220_device::WS);
 	}
 	else
 		// If other address, turn off RS* and WS* (negative logic!)
-		m_vsp->combined_rsq_wsq_w(space, 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 }
 
 /****************************************************************************/
@@ -125,18 +125,11 @@ WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 
 	if ((state==0) && !m_reading)
 		// Clear the lines only when we are done with writing.
-		m_vsp->combined_rsq_wsq_w(*m_space, 0, ~0);
+		m_vsp->combined_rsq_wsq_w(~0);
 }
 
 void ti_speech_synthesizer_device::device_start()
 {
-	m_vsp = subdevice<cd2501e_device>("speechsyn");
-	// Need to configure the speech ROM for inverse bit order
-	speechrom_device* mem = subdevice<speechrom_device>("vsm");
-	mem->set_reverse_bit_order(true);
-
-	// We don't need to save m_space because the calling method
-	// combined_rsq_wsq_w only needs the address space formally.
 	save_item(NAME(m_reading));
 	save_item(NAME(m_sbe));
 }
@@ -164,15 +157,25 @@ ROM_START( ti99_speech )
 	ROM_LOAD("cd2326a.u2b", 0x4000, 0x4000, CRC(65d00401) SHA1(a367242c2c96cebf0e2bf21862f3f6734b2b3020)) // at location u2, top of stack
 ROM_END
 
-MACHINE_CONFIG_START(ti_speech_synthesizer_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("vsm", SPEECHROM, 0)
+void ti_speech_synthesizer_device::device_add_mconfig(machine_config& config)
+{
+	SPEECHROM(config, "vsm", 0).set_reverse_bit_order(true);
+	SPEAKER(config, "speech_out").front_center();
+	CD2501E(config, m_vsp, 640000L);
+	m_vsp->set_speechrom_tag("vsm");
+	m_vsp->ready_cb().set(FUNC(ti_speech_synthesizer_device::speech_ready));
+	m_vsp->add_route(ALL_OUTPUTS, "speech_out", 0.50);
 
-	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speechsyn", CD2501E, 640000L)
-	MCFG_TMS52XX_READYQ_HANDLER(WRITELINE(*this, ti_speech_synthesizer_device, speech_ready))
-	MCFG_TMS52XX_SPEECHROM("vsm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+/*
+    // FIXME: Make it work. Guess we need two VSM circuits @16K.
+    TMS6100(config, "vsm", 640_kHz_XTAL/4);
+    m_vsp->m0_cb().set("vsm", FUNC(tms6100_device::m0_w));
+    m_vsp->m1_cb().set("vsm", FUNC(tms6100_device::m1_w));
+    m_vsp->addr_cb().set("vsm", FUNC(tms6100_device::add_w));
+    m_vsp->data_cb().set("vsm", FUNC(tms6100_device::data_line_r));
+    m_vsp->romclk_cb().set("vsm", FUNC(tms6100_device::clk_w));
+*/
+}
 
 const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {

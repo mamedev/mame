@@ -43,9 +43,10 @@ const tiny_rom_entry *sega_837_13551_device::device_rom_region() const
 	return ROM_NAME(jvs13551);
 }
 
-MACHINE_CONFIG_START(sega_837_13551_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("iomcu", TMP90PH44, 10000000) // unknown clock
-MACHINE_CONFIG_END
+void sega_837_13551_device::device_add_mconfig(machine_config &config)
+{
+	TMP90PH44(config, "iomcu", 10000000); // unknown clock
+}
 
 ioport_constructor sega_837_13551_device::device_input_ports() const
 {
@@ -53,8 +54,8 @@ ioport_constructor sega_837_13551_device::device_input_ports() const
 }
 
 sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, SEGA_837_13551, tag, owner, clock)
+, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
-	memset(port_tag, 0, sizeof(port_tag));
 }
 
 const char *sega_837_13551_device::device_id()
@@ -80,10 +81,6 @@ uint8_t sega_837_13551_device::comm_method_version()
 void sega_837_13551_device::device_start()
 {
 	jvs_device::device_start();
-	for (int i = 0; i < ARRAY_LENGTH(port_tag); i++)
-	{
-		port[i] = ioport(port_tag[i]);
-	}
 	save_item(NAME(coin_counter));
 }
 

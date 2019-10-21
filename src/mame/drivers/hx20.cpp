@@ -6,12 +6,17 @@
 
     http://fjkraan.home.xs4all.nl/comp/hx20/
 
-    Epson CM6000
+    Epson CM6000 Series
 
-    This is a re-badged HX-20 with revision H motherboard and keyboard overlay.
-    It takes 3x16K ROMs instead of the usual 4x8K + 8K optional. Appears to
+    These are re-badged HX-20 with revision H motherboard and keyboard overlay.
+
+    CM6032: Takes 3x16K ROMs instead of the usual 4x8K + 8K optional. Appears to
     be from a BT phone exchange.
     Label on base states CM6000 Series, CM6032 System, MOH 89/1.
+
+    CM6127: Takes 2x16K ROMs and 32K CMOS RAM. Also has an expansion unit
+    containing 2x16K ROMs and 32K CMOS RAM.
+    Label on base states CM6000 Series, CM6127H System.
 
 ****************************************************************************/
 
@@ -19,7 +24,7 @@
 
     TODO:
 
-    - m6800.c rewrite
+    - m6800.cpp rewrite
     - keyboard interrupt
     - LCD controller
     - serial
@@ -75,15 +80,9 @@ WRITE8_MEMBER( hx20_state::ksc_w )
 READ8_MEMBER( hx20_state::krtn07_r )
 {
 	uint8_t data = 0xff;
-
-	if (!BIT(m_ksc, 0)) data &= m_ksc0->read();
-	if (!BIT(m_ksc, 1)) data &= m_ksc1->read();
-	if (!BIT(m_ksc, 2)) data &= m_ksc2->read();
-	if (!BIT(m_ksc, 3)) data &= m_ksc3->read();
-	if (!BIT(m_ksc, 4)) data &= m_ksc4->read();
-	if (!BIT(m_ksc, 5)) data &= m_ksc5->read();
-	if (!BIT(m_ksc, 6)) data &= m_ksc6->read();
-	if (!BIT(m_ksc, 7)) data &= m_ksc7->read();
+	for (int b = 0; 8 > b; ++b)
+		if (!BIT(m_ksc, b))
+			data &= m_ksc_io[b]->read();
 
 	return data;
 }
@@ -111,15 +110,9 @@ READ8_MEMBER( hx20_state::krtn89_r )
 	*/
 
 	uint8_t data = 0xff;
-
-	if (!BIT(m_ksc, 0)) data &= m_ksc0->read() >> 8;
-	if (!BIT(m_ksc, 1)) data &= m_ksc1->read() >> 8;
-	if (!BIT(m_ksc, 2)) data &= m_ksc2->read() >> 8;
-	if (!BIT(m_ksc, 3)) data &= m_ksc3->read() >> 8;
-	if (!BIT(m_ksc, 4)) data &= m_ksc4->read() >> 8;
-	if (!BIT(m_ksc, 5)) data &= m_ksc5->read() >> 8;
-	if (!BIT(m_ksc, 6)) data &= m_ksc6->read() >> 8;
-	if (!BIT(m_ksc, 7)) data &= m_ksc7->read() >> 8;
+	for (int b = 0; 8 > b; ++b)
+		if (!BIT(m_ksc, b))
+			data &= m_ksc_io[b]->read() >> 8;
 
 	return data;
 }
@@ -149,31 +142,15 @@ WRITE8_MEMBER( hx20_state::lcd_cs_w )
 	logerror("LCD CS %02x\n", data);
 
 	// LCD
-	m_lcdc0->cs_w(1);
-	m_lcdc1->cs_w(1);
-	m_lcdc2->cs_w(1);
-	m_lcdc3->cs_w(1);
-	m_lcdc4->cs_w(1);
-	m_lcdc5->cs_w(1);
+	for (auto &lcdc : m_lcdc)
+		lcdc->cs_w(1);
 
-	switch (data & 0x07)
-	{
-	case 1: m_lcdc0->cs_w(0); break;
-	case 2: m_lcdc1->cs_w(0); break;
-	case 3: m_lcdc2->cs_w(0); break;
-	case 4: m_lcdc3->cs_w(0); break;
-	case 5: m_lcdc4->cs_w(0); break;
-	case 6: m_lcdc5->cs_w(0); break;
-	}
+	if (data & 0x07)
+		m_lcdc[(data & 0x07) - 1]->cs_w(0);
 
-	int cd = BIT(data, 3);
-
-	m_lcdc0->cd_w(cd);
-	m_lcdc1->cd_w(cd);
-	m_lcdc2->cd_w(cd);
-	m_lcdc3->cd_w(cd);
-	m_lcdc4->cd_w(cd);
-	m_lcdc5->cd_w(cd);
+	int const cd = BIT(data, 3);
+	for (auto &lcdc : m_lcdc)
+		lcdc->cd_w(cd);
 
 	// serial
 	m_sio->pout_w(BIT(data, 5));
@@ -557,24 +534,12 @@ void hx20_state::hx20_mem(address_map &map)
 	map(0x0028, 0x0028).r(FUNC(hx20_state::krtn89_r));
 	map(0x002a, 0x002a).w(FUNC(hx20_state::lcd_data_w));
 	map(0x002c, 0x002c); // mask interruption by using IC 8E in sleep mode
+	map(0x0030, 0x0033); // switch memory banks (expansion unit)
 	map(0x0040, 0x007f).rw(m_rtc, FUNC(mc146818_device::read), FUNC(mc146818_device::write));
 	map(0x0080, 0x00ff).ram();
 	map(0x0100, 0x3fff).ram();
 	map(0x6000, 0x7fff).rom().r(FUNC(hx20_state::optrom_r));
 	map(0x8000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( hx20_io )
-//-------------------------------------------------
-
-void hx20_state::hx20_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::main_p1_r), FUNC(hx20_state::main_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::main_p2_r), FUNC(hx20_state::main_p2_w));
-	map(M6801_PORT3, M6801_PORT3).noprw(); // A0-A7, D0-D7
-	map(M6801_PORT4, M6801_PORT4).noprw(); // A8-A15
 }
 
 
@@ -591,26 +556,25 @@ void hx20_state::hx20_sub_mem(address_map &map)
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( hx20_sub_io )
+//  ADDRESS_MAP( cm6032_mem )
 //-------------------------------------------------
 
-void hx20_state::hx20_sub_io(address_map &map)
+void hx20_state::cm6032_mem(address_map &map)
 {
-	map(M6801_PORT1, M6801_PORT1).rw(FUNC(hx20_state::slave_p1_r), FUNC(hx20_state::slave_p1_w));
-	map(M6801_PORT2, M6801_PORT2).rw(FUNC(hx20_state::slave_p2_r), FUNC(hx20_state::slave_p2_w));
-	map(M6801_PORT3, M6801_PORT3).rw(FUNC(hx20_state::slave_p3_r), FUNC(hx20_state::slave_p3_w));
-	map(M6801_PORT4, M6801_PORT4).rw(FUNC(hx20_state::slave_p4_r), FUNC(hx20_state::slave_p4_w));
+	hx20_mem(map);
+	map(0x4000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
 }
 
 
 //-------------------------------------------------
-//  ADDRESS_MAP( cm6000_mem )
+//  ADDRESS_MAP( cm6127_mem )
 //-------------------------------------------------
 
-void hx20_state::cm6000_mem(address_map &map)
+void hx20_state::cm6127_mem(address_map &map)
 {
 	hx20_mem(map);
-	map(0x4000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
+	map(0x4000, 0x7fff).ram();
+	map(0x8000, 0xffff).rom().region(HD6301V1_MAIN_TAG, 0);
 }
 
 
@@ -736,7 +700,7 @@ static INPUT_PORTS_START( hx20 )
 	PORT_DIPSETTING(    0x04, "England" )
 	PORT_DIPSETTING(    0x05, "Germany" )
 	PORT_DIPSETTING(    0x06, "France" )
-	PORT_DIPSETTING(    0x07, "America" )
+	PORT_DIPSETTING(    0x07, "U.S.A." )
 	PORT_DIPNAME( 0x08, 0x00, "Floppy Drive TF-20" ) PORT_DIPLOCATION("SW6:4")
 	PORT_DIPSETTING(    0x00, "Installed" )
 	PORT_DIPSETTING(    0x08, "Not Installed" )
@@ -764,10 +728,10 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( cm6000 )
+//  INPUT_PORTS( cm6032 )
 //-------------------------------------------------
 
-static INPUT_PORTS_START( cm6000 )
+static INPUT_PORTS_START( cm6032 )
 	PORT_INCLUDE(hx20)
 
 	PORT_MODIFY("KSC0")
@@ -788,6 +752,35 @@ static INPUT_PORTS_START( cm6000 )
 	PORT_MODIFY("KSC7")
 	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ABORT")
 	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT FF")
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( cm6127 )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( cm6127 )
+	PORT_INCLUDE(hx20)
+
+	PORT_MODIFY("KSC0")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F1 Checkout") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+
+	PORT_MODIFY("KSC1")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F2 Enquiry") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+
+	PORT_MODIFY("KSC2")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3 Checkin") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+
+	PORT_MODIFY("KSC3")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F4 Audit") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+
+	PORT_MODIFY("KSC4")
+	PORT_BIT(0x0100, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F5 T/Date") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5))
+
+	PORT_MODIFY("KSC7")
+	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Abort")
+	PORT_BIT(0x0008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Pause")
+	PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Ext FF")
 INPUT_PORTS_END
 
 
@@ -812,7 +805,7 @@ WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
 //  VIDEO
 //**************************************************************************
 
-PALETTE_INIT_MEMBER(hx20_state, hx20)
+void hx20_state::hx20_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);
@@ -825,12 +818,8 @@ PALETTE_INIT_MEMBER(hx20_state, hx20)
 
 uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_lcdc0->screen_update(screen, bitmap, cliprect);
-	m_lcdc1->screen_update(screen, bitmap, cliprect);
-	m_lcdc2->screen_update(screen, bitmap, cliprect);
-	m_lcdc3->screen_update(screen, bitmap, cliprect);
-	m_lcdc4->screen_update(screen, bitmap, cliprect);
-	m_lcdc5->screen_update(screen, bitmap, cliprect);
+	for (auto &lcdc : m_lcdc)
+		lcdc->screen_update(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -840,13 +829,13 @@ uint32_t hx20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 //  OPTIONAL ROMS
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
+DEVICE_IMAGE_LOAD_MEMBER(hx20_state::optrom_load)
 {
 	uint32_t size = m_optrom->common_get_size("rom");
 
 	if (size != 0x2000)
 	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported rom size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported ROM size");
 		return image_init_result::FAIL;
 	}
 
@@ -859,7 +848,7 @@ DEVICE_IMAGE_LOAD_MEMBER(hx20_state, optrom_load)
 READ8_MEMBER(hx20_state::optrom_r)
 {
 	if (m_optrom->exists())
-		return m_optrom->read_rom(space, offset);
+		return m_optrom->read_rom(offset);
 	else
 		return 0;
 }
@@ -891,91 +880,105 @@ void hx20_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( hx20 )
+//  machine_config( hx20 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hx20_state::hx20)
+void hx20_state::hx20(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(HD6301V1_MAIN_TAG, HD63701, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(hx20_mem)
-	MCFG_DEVICE_IO_MAP(hx20_io)
+	HD63701(config, m_maincpu, 2.4576_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_mem);
+	m_maincpu->in_p1_cb().set(FUNC(hx20_state::main_p1_r));
+	m_maincpu->out_p1_cb().set(FUNC(hx20_state::main_p1_w));
+	m_maincpu->in_p2_cb().set(FUNC(hx20_state::main_p2_r));
+	m_maincpu->out_p2_cb().set(FUNC(hx20_state::main_p2_w));
+	// Port 3 = A0-A7, D0-D7
+	// Port 4 = A8-A15
 
-	MCFG_DEVICE_ADD(HD6301V1_SLAVE_TAG, HD63701, XTAL(2'457'600))
-	MCFG_DEVICE_PROGRAM_MAP(hx20_sub_mem)
-	MCFG_DEVICE_IO_MAP(hx20_sub_io)
+	HD63701(config, m_subcpu, 2.4576_MHz_XTAL);
+	m_subcpu->set_addrmap(AS_PROGRAM, &hx20_state::hx20_sub_mem);
+	m_subcpu->in_p1_cb().set(FUNC(hx20_state::slave_p1_r));
+	m_subcpu->out_p1_cb().set(FUNC(hx20_state::slave_p1_w));
+	m_subcpu->in_p2_cb().set(FUNC(hx20_state::slave_p2_r));
+	m_subcpu->out_p2_cb().set(FUNC(hx20_state::slave_p2_w));
+	m_subcpu->in_p3_cb().set(FUNC(hx20_state::slave_p3_r));
+	m_subcpu->out_p3_cb().set(FUNC(hx20_state::slave_p3_w));
+	m_subcpu->in_p4_cb().set(FUNC(hx20_state::slave_p4_r));
+	m_subcpu->out_p4_cb().set(FUNC(hx20_state::slave_p4_w));
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(120, 32)
-	MCFG_SCREEN_VISIBLE_AREA(0, 120-1, 0, 32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hx20_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_size(120, 32);
+	screen.set_visarea(0, 120-1, 0, 32-1);
+	screen.set_screen_update(FUNC(hx20_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hx20_state, hx20)
+	PALETTE(config, "palette", FUNC(hx20_state::hx20_palette), 2);
 
-	MCFG_UPD7227_ADD(UPD7227_0_TAG, 0, 0)
-	MCFG_UPD7227_ADD(UPD7227_1_TAG, 40, 0)
-	MCFG_UPD7227_ADD(UPD7227_2_TAG, 80, 0)
-	MCFG_UPD7227_ADD(UPD7227_3_TAG, 0, 16)
-	MCFG_UPD7227_ADD(UPD7227_4_TAG, 40, 16)
-	MCFG_UPD7227_ADD(UPD7227_5_TAG, 80, 16)
+	for (int y = 0, i = 0; 2 > y; ++y)
+		for (int x = 0; 3 > x; ++x)
+			UPD7227(config, m_lcdc[i++], x * 40, y * 16);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SPEAKER_TAG, SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
-	MCFG_DEVICE_ADD(MC146818_TAG, MC146818, 4.194304_MHz_XTAL)
-	MCFG_MC146818_IRQ_HANDLER(WRITELINE(*this, hx20_state, rtc_irq_w))
-	MCFG_DEVICE_ADD(RS232_TAG, RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG)
-	MCFG_EPSON_SIO_ADD("sio", "tf20")
-	MCFG_EPSON_SIO_RX(WRITELINE(*this, hx20_state, sio_rx_w))
-	MCFG_EPSON_SIO_PIN(WRITELINE(*this, hx20_state, sio_pin_w))
+	MC146818(config, m_rtc, 4.194304_MHz_XTAL);
+	m_rtc->irq().set(FUNC(hx20_state::rtc_irq_w));
+
+	RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr);
+	CASSETTE(config, m_cassette);
+
+	EPSON_SIO(config, m_sio, "tf20");
+	m_sio->rx_callback().set(FUNC(hx20_state::sio_rx_w));
+	m_sio->pin_callback().set(FUNC(hx20_state::sio_pin_w));
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("16K")
-	MCFG_RAM_EXTRA_OPTIONS("32K")
+	RAM(config, RAM_TAG).set_default_size("16K").set_extra_options("32K");
 
 	// optional rom
-	MCFG_GENERIC_SOCKET_ADD("optrom", generic_plain_slot, "opt_rom")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(hx20_state, optrom_load)
+	GENERIC_SOCKET(config, m_optrom, generic_plain_slot, "opt_rom", "bin,rom");
+	m_optrom->set_device_load(FUNC(hx20_state::optrom_load), this);
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("hx20_opt_list", "hx20_rom")
-	MCFG_SOFTWARE_LIST_ADD("epson_cpm_list", "epson_cpm")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "hx20_opt_list").set_original("hx20_rom");
+	SOFTWARE_LIST(config, "epson_cpm_list").set_original("epson_cpm");
+}
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( hx20 )
+//  machine_config( cm6032 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(hx20_state::cm6000)
+void hx20_state::cm6032(machine_config &config)
+{
 	hx20(config);
-	// basic machine hardware
-	MCFG_DEVICE_MODIFY(HD6301V1_MAIN_TAG)
-	MCFG_DEVICE_PROGRAM_MAP(cm6000_mem)
-	MCFG_DEVICE_IO_MAP(hx20_io)
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6032_mem);
 
 	// optional rom
-	MCFG_DEVICE_REMOVE("optrom")
+	config.device_remove("optrom");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_REMOVE("epson_cpm_list")
-	MCFG_SOFTWARE_LIST_REMOVE("hx20_opt_list")
-MACHINE_CONFIG_END
+	config.device_remove("epson_cpm_list");
+	config.device_remove("hx20_opt_list");
+}
 
 
-//**************************************************************************
-//  ROMS
-//**************************************************************************
+//-------------------------------------------------
+//  machine_config( cm6127 )
+//-------------------------------------------------
+
+void hx20_state::cm6127(machine_config &config)
+{
+	cm6032(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &hx20_state::cm6127_mem);
+}
+
 
 //-------------------------------------------------
 //  ROM( ehx20 )
@@ -985,10 +988,10 @@ ROM_START( ehx20 )
 	ROM_REGION( 0x8000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS( "v11" )
 	ROM_SYSTEM_BIOS( 0, "v10", "version 1.0" )
-	ROMX_LOAD( "hx20_v10.12e", 0x0000, 0x2000, CRC(ed7482c6) SHA1(8fba63037f2418aee9e933a353b052a5ed816ead), ROM_BIOS(0) )
-	ROMX_LOAD( "hx20_v10.13e", 0x2000, 0x2000, CRC(f5cc8868) SHA1(3248a1ddf0d8df7e9f2fe96955385218d760c4ad), ROM_BIOS(0) )
-	ROMX_LOAD( "hx20_v10.14e", 0x4000, 0x2000, CRC(27d743ed) SHA1(ebae367b0fa5f42ac78424df2534312296fd6fdc), ROM_BIOS(0) )
-	ROMX_LOAD( "hx20_v10.15e", 0x6000, 0x2000, CRC(33fbb1ab) SHA1(292ace94b4dad267aa7786dc64e68ac6f3c98aa7), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.12e", 0x6000, 0x2000, CRC(ed7482c6) SHA1(8fba63037f2418aee9e933a353b052a5ed816ead), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.13e", 0x4000, 0x2000, CRC(f5cc8868) SHA1(3248a1ddf0d8df7e9f2fe96955385218d760c4ad), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.14e", 0x2000, 0x2000, CRC(27d743ed) SHA1(ebae367b0fa5f42ac78424df2534312296fd6fdc), ROM_BIOS(0) )
+	ROMX_LOAD( "hx20_v10.15e", 0x0000, 0x2000, CRC(33fbb1ab) SHA1(292ace94b4dad267aa7786dc64e68ac6f3c98aa7), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "v11", "version 1.1" )
 	ROMX_LOAD( "hx20_v11.12e", 0x0000, 0x2000, CRC(4de0b4b6) SHA1(f15c537824b7effde9d9b9a21e92a081fb089371), ROM_BIOS(1) )
 	ROMX_LOAD( "hx20_v11.13e", 0x2000, 0x2000, CRC(10d6ae76) SHA1(3163954ed9981f70f590ee98bcc8e19e4be6527a), ROM_BIOS(1) )
@@ -1017,10 +1020,10 @@ ROM_END
 
 
 //-------------------------------------------------
-//  ROM( ecm6000 )
+//  ROM( ecm6032 )
 //-------------------------------------------------
 
-ROM_START( ecm6000 )
+ROM_START( ecm6032 )
 	// 1988 MOSU 20120200004 H:::
 	ROM_REGION( 0xc000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "cm6032a-1_v43.11e", 0x0000, 0x4000, CRC(124797c2) SHA1(33d3418c99eb2d557151996bc09debf4ca089298) )
@@ -1028,7 +1031,24 @@ ROM_START( ecm6000 )
 	ROM_LOAD( "cm6032a-3_v43.15e", 0x8000, 0x4000, CRC(95c34bdc) SHA1(c7022145f37e9fd2f339f8e7ad3adce76a67ca0b) )
 
 	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
-	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a)) // not verified
+	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( ecm6127 )
+//-------------------------------------------------
+
+ROM_START( ecm6127 )
+	ROM_REGION( 0x8000, HD6301V1_MAIN_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "cm6127h-1_v16.13e", 0x0000, 0x4000, CRC(80f08fb8) SHA1(f1a1b38ce0aff25e6915fb7092d9158f13fd4108) )
+	ROM_LOAD( "cm6127h-2_v16.15e", 0x4000, 0x4000, CRC(2c59851e) SHA1(2b031e958497b87601bbdda15f5e974cfd931ed9) )
+	ROM_REGION( 0x8000, "ext", ROMREGION_ERASEFF )
+	ROM_LOAD( "cm6127h-3_v16.13b", 0x0000, 0x4000, CRC(0dbb1f51) SHA1(80aa442a42f04f661de01b8b64a6dde72751c851) ) // Expansion Unit
+	ROM_LOAD( "cm6127h-4_v16.14b", 0x4000, 0x4000, CRC(348cdd4b) SHA1(88c88b40d83e3a7cc93d2db684bc70cf78aaa180) ) // Expansion Unit
+
+	ROM_REGION( 0x1000, HD6301V1_SLAVE_TAG, 0 )
+	ROM_LOAD( "hd6301v1.6d", 0x0000, 0x1000, CRC(b36f5b99) SHA1(c6b54163bb268e4f4f5c79aa2e83ec51f775b16a) )
 ROM_END
 
 
@@ -1039,4 +1059,5 @@ ROM_END
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS       INIT        COMPANY  FULLNAME                FLAGS
 COMP( 1983, ehx20,   0,      0,      hx20,    hx20,   hx20_state, empty_init, "Epson", "Epson HX-20",          MACHINE_NOT_WORKING )
 COMP( 1983, ehx20e,  ehx20,  0,      hx20,    hx20e,  hx20_state, empty_init, "Epson", "Epson HX-20 (Europe)", MACHINE_NOT_WORKING )
-COMP( 1989, ecm6000, ehx20,  0,      cm6000,  cm6000, hx20_state, empty_init, "Epson", "Epson CM6000",         MACHINE_NOT_WORKING )
+COMP( 1989, ecm6032, ehx20,  0,      cm6032,  cm6032, hx20_state, empty_init, "Epson", "Epson CM6032",         MACHINE_NOT_WORKING )
+COMP( 1993, ecm6127, ehx20,  0,      cm6127,  cm6127, hx20_state, empty_init, "Epson", "Epson CM6127",         MACHINE_NOT_WORKING )

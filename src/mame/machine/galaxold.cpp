@@ -66,8 +66,7 @@ void galaxold_state::machine_reset_common(int line)
 	m_7474_9m_1->preset_w(0);
 
 	/* start a timer to generate interrupts */
-	timer_device *int_timer = machine().device<timer_device>("int_timer");
-	int_timer->adjust(m_screen->time_until_pos(0));
+	subdevice<timer_device>("int_timer")->adjust(m_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,galaxold)
@@ -141,14 +140,6 @@ WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 	m__4in1_bank = data & 0x03;
 	galaxold_gfxbank_w(space, 0, m__4in1_bank);
 	membank("bank1")->set_entry(m__4in1_bank);
-}
-
-CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
-{
-	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-	int bit_mask = (uintptr_t)param;
-
-	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
 
 void galaxold_state::init_4in1()

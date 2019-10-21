@@ -50,40 +50,38 @@
 #include "includes/funworld.h"
 
 
-PALETTE_INIT_MEMBER(funworld_state,funworld)
+void funworld_state::funworld_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
-	static const int resistances_rb[3] = { 1000, 470, 220 };
-	static const int resistances_g [2] = { 470, 220 };
-	double weights_r[3], weights_b[3], weights_g[2];
+	uint8_t const *const color_prom = memregion("proms")->base();
+	static constexpr int resistances_rb[3] = { 1000, 470, 220 };
+	static constexpr int resistances_g [2] = { 470, 220 };
 
+	double weights_r[3], weights_b[3], weights_g[2];
 	compute_resistor_weights(0, 255,    -1.0,
 			3,  resistances_rb, weights_r,  100,    0,
 			3,  resistances_rb, weights_b,  100,    0,
 			2,  resistances_g,  weights_g,  100,    0);
 
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0, bit1, bit2, r, g, b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (color_prom[i] >> 0) & 0x01;
-		bit1 = (color_prom[i] >> 1) & 0x01;
-		bit2 = (color_prom[i] >> 2) & 0x01;
-		r = combine_3_weights(weights_r, bit0, bit1, bit2);
-		/* blue component */
-		bit0 = (color_prom[i] >> 3) & 0x01;
-		bit1 = (color_prom[i] >> 4) & 0x01;
-		bit2 = (color_prom[i] >> 5) & 0x01;
-		b = combine_3_weights(weights_b, bit0, bit1, bit2);
-		/* green component */
-		bit0 = (color_prom[i] >> 6) & 0x01;
-		bit1 = (color_prom[i] >> 7) & 0x01;
-		g = combine_2_weights(weights_g, bit0, bit1);
+		// red component
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 1);
+		bit2 = BIT(color_prom[i], 2);
+		int const r = combine_weights(weights_r, bit0, bit1, bit2);
+		// blue component
+		bit0 = BIT(color_prom[i], 3);
+		bit1 = BIT(color_prom[i], 4);
+		bit2 = BIT(color_prom[i], 5);
+		int const b = combine_weights(weights_b, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(color_prom[i], 6);
+		bit1 = BIT(color_prom[i], 7);
+		int const g = combine_weights(weights_g, bit0, bit1);
 
-		palette.set_pen_color(i,rgb_t(r,g,b));
+		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
 }
 
@@ -111,11 +109,11 @@ WRITE8_MEMBER(funworld_state::funworld_colorram_w)
 
 TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 {
-/*  - bits -
-    7654 3210
-    xxxx ----   tiles color.
-    ---- xxxx   unused.
-*/
+	/*  - bits -
+	    7654 3210
+	    xxxx ----   tiles color.
+	    ---- xxxx   unused.
+	*/
 	int offs = tile_index;
 	int attr = m_videoram[offs] + (m_colorram[offs] << 8);
 	int code = attr & 0xfff;
@@ -125,23 +123,28 @@ TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
 }
 
 
-VIDEO_START_MEMBER(funworld_state, funworld)
+void funworld_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 29);
 }
 
-VIDEO_START_MEMBER(funworld_state, magicrd2)
+void magicrd2_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicrd2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 112, 34);
 }
 
-VIDEO_START_MEMBER(funworld_state, chinatow)
+void chinatow_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(funworld_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinatow_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
+}
+
+void multiwin_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(multiwin_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 4, 8, 96, 31);
 }
 
 
-uint32_t funworld_state::screen_update_funworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t funworld_state::screen_update_funworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

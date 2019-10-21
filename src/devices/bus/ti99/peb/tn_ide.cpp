@@ -54,8 +54,10 @@ enum
 nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TI99_IDE, tag, owner, clock),
 	device_ti99_peribox_card_interface(mconfig, *this),
-	m_cru_register(0), m_rtc(nullptr),
-	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false),
+	m_cru_register(0),
+	m_rtc(*this, "ide_rtc"),
+	m_ata(*this, "ata"),
+	m_clk_irq(false), m_sram_enable(false),
 	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
 	m_input_latch(0), m_output_latch(0), m_ram(*this, RAMREGION)
 {
@@ -69,9 +71,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 	uint8_t reply = 0;
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		int bit = (offset >> 4) & 7;
-
-		if (bit==0)
+		if ((offset & 0x0070) == 0)
 		{
 			reply = m_cru_register & 0x30;
 			reply |= 8; /* IDE bus IORDY always set */
@@ -82,14 +82,14 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 			if (!m_ata_irq)
 				reply |= 1;
 		}
-		*value = reply;
+		*value = BIT(reply, (offset >> 1) & 7);
 	}
 }
 
 /*
     CRU write
 */
-WRITE8_MEMBER(nouspikel_ide_interface_device::cruwrite)
+void nouspikel_ide_interface_device::cruwrite(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -144,18 +144,18 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 0:     /* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					reply = m_rtc->xram_r(machine().dummy_space(), (addr & 0x1f) | 0x20);
+					reply = m_rtc->xram_r((addr & 0x1f) | 0x20);
 				else
 					/* RTC RAM read */
-					reply = m_rtc->xram_r(machine().dummy_space(), addr);
+					reply = m_rtc->xram_r(addr);
 				break;
 			case 1:     /* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					reply = m_rtc->rtc_r(machine().dummy_space(), 1);
+					reply = m_rtc->rtc_r(1);
 				else
 					/* register select */
-					reply = m_rtc->rtc_r(machine().dummy_space(), 0);
+					reply = m_rtc->rtc_r(0);
 				break;
 			case 2:     /* IDE registers set 1 (CS1Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
@@ -195,7 +195,7 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 /*
     Memory write. The controller is 16 bit, so we need to demultiplex again.
 */
-WRITE8_MEMBER(nouspikel_ide_interface_device::write)
+void nouspikel_ide_interface_device::write(offs_t offset, uint8_t data)
 {
 	if (machine().side_effects_disabled()) return;
 
@@ -215,18 +215,18 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 			case 0:     /* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					m_rtc->xram_w(machine().dummy_space(), (addr & 0x1f) | 0x20, data);
+					m_rtc->xram_w((addr & 0x1f) | 0x20, data);
 				else
 					/* RTC RAM write */
-					m_rtc->xram_w(machine().dummy_space(), addr, data);
+					m_rtc->xram_w(addr, data);
 				break;
 			case 1:     /* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					m_rtc->rtc_w(machine().dummy_space(), 1, data);
+					m_rtc->rtc_w(1, data);
 				else
 					/* register select */
-					m_rtc->rtc_w(machine().dummy_space(), 0, data);
+					m_rtc->rtc_w(0, data);
 				break;
 			case 2:     /* IDE registers set 1 (CS1Fx) */
 /*
@@ -307,7 +307,6 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
 
 void nouspikel_ide_interface_device::device_start()
 {
-	m_rtc = subdevice<rtc65271_device>("ide_rtc");
 	m_sram_enable_dip = false; // TODO: what is this?
 
 	save_item(NAME(m_ata_irq));
@@ -366,16 +365,18 @@ INPUT_PORTS_START( tn_ide )
 		PORT_DIPSETTING( 0x1f00, "1F00" )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(nouspikel_ide_interface_device::device_add_mconfig)
-	MCFG_DEVICE_ADD( "ide_rtc", RTC65271, 0 )
-	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(*this, nouspikel_ide_interface_device, clock_interrupt_callback))
-	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, nouspikel_ide_interface_device, ide_interrupt_callback))
+void nouspikel_ide_interface_device::device_add_mconfig(machine_config &config)
+{
+	RTC65271(config, m_rtc, 0);
+	m_rtc->interrupt_cb().set(FUNC(nouspikel_ide_interface_device::clock_interrupt_callback));
 
-	MCFG_RAM_ADD(RAMREGION)
-	MCFG_RAM_DEFAULT_SIZE("512K")
-	MCFG_RAM_DEFAULT_VALUE(0)
-MACHINE_CONFIG_END
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	m_ata->irq_handler().set(FUNC(nouspikel_ide_interface_device::ide_interrupt_callback));
+
+	RAM(config, m_ram);
+	m_ram->set_default_size("512K");
+	m_ram->set_default_value(0);
+}
 
 ioport_constructor nouspikel_ide_interface_device::device_input_ports() const
 {

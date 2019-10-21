@@ -27,6 +27,7 @@
     company in 1981 and changed its name to IGT.
 
 ***********************************************************************************/
+
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/nvram.h"
@@ -34,17 +35,19 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class drw80pkr_state : public driver_device
 {
 public:
-	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	drw80pkr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_aysnd(*this, "aysnd"),
-		m_mainbank(*this, "mainbank") { }
+		m_mainbank(*this, "mainbank")
+	{ }
 
 	void init_drw80pkr();
 	void drw80pkr(machine_config &config);
@@ -67,7 +70,7 @@ private:
 	uint16_t m_video_ram[0x0400];
 	uint8_t m_color_ram[0x0400];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<i8039_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<ay8912_device> m_aysnd;
 	required_memory_bank m_mainbank;
@@ -85,7 +88,7 @@ private:
 	DECLARE_READ8_MEMBER(io_r);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(drw80pkr);
+	void drw80pkr_palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map);
@@ -200,11 +203,11 @@ WRITE8_MEMBER(drw80pkr_state::io_w)
 
 		// ay8910 control port
 		if (m_p1 == 0xfc)
-			m_aysnd->address_w(space, 0, data);
+			m_aysnd->address_w(data);
 
 		// ay8910_write_port_0_w
 		if (m_p1 == 0xfe)
-			m_aysnd->data_w(space, 0, data);
+			m_aysnd->data_w(data);
 	}
 }
 
@@ -345,29 +348,24 @@ uint32_t drw80pkr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
+void drw80pkr_state::drw80pkr_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int j;
-
-	for (j = 0; j < palette.entries(); j++)
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int j = 0; j < palette.entries(); j++)
 	{
-		int r, g, b, tr, tg, tb, i;
+		int const i = BIT(color_prom[j], 3);
 
-		i = (color_prom[j] >> 3) & 0x01;
-		//i = color_prom[j];
+		// red component
+		int const tr = 0xf0 - (0xf0 * BIT(color_prom[j], 0));
+		int const r = tr - (i * (tr / 5));
 
-		/* red component */
-		tr = 0xf0 - (0xf0 * ((color_prom[j] >> 0) & 0x01));
-		r = tr - (i * (tr / 5));
+		// green component
+		int const tg = 0xf0 - (0xf0 * BIT(color_prom[j], 1));
+		int const g = tg - (i * (tg / 5));
 
-		/* green component */
-		tg = 0xf0 - (0xf0 * ((color_prom[j] >> 1) & 0x01));
-		g = tg - (i * (tg / 5));
-
-		/* blue component */
-		tb = 0xf0 - (0xf0 * ((color_prom[j] >> 2) & 0x01));
-		b = tb - (i * (tb / 5));
+		// blue component
+		int const tb = 0xf0 - (0xf0 * BIT(color_prom[j], 2));
+		int const b = tb - (i * (tb / 5));
 
 		palette.set_pen_color(j, rgb_t(r, g, b));
 	}
@@ -455,45 +453,42 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-MACHINE_CONFIG_START(drw80pkr_state::drw80pkr)
+void drw80pkr_state::drw80pkr(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(m_maincpu, I8039, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_MCS48_PORT_T0_IN_CB(READLINE(*this, drw80pkr_state, t0_r))
-	MCFG_MCS48_PORT_T1_IN_CB(READLINE(*this, drw80pkr_state, t1_r))
-	MCFG_MCS48_PORT_P1_IN_CB(READ8(*this, drw80pkr_state, p1_r))
-	MCFG_MCS48_PORT_P1_OUT_CB(WRITE8(*this, drw80pkr_state, p1_w))
-	MCFG_MCS48_PORT_P2_IN_CB(READ8(*this, drw80pkr_state, p2_r))
-	MCFG_MCS48_PORT_P2_OUT_CB(WRITE8(*this, drw80pkr_state, p2_w))
-	MCFG_MCS48_PORT_PROG_OUT_CB(WRITELINE(*this, drw80pkr_state, prog_w))
-	MCFG_MCS48_PORT_BUS_IN_CB(READ8(*this, drw80pkr_state, bus_r))
-	MCFG_MCS48_PORT_BUS_OUT_CB(WRITE8(*this, drw80pkr_state, bus_w))
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", drw80pkr_state, irq0_line_hold)
-
+	I8039(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &drw80pkr_state::map);
+	m_maincpu->set_addrmap(AS_IO, &drw80pkr_state::io_map);
+	m_maincpu->t0_in_cb().set(FUNC(drw80pkr_state::t0_r));
+	m_maincpu->t1_in_cb().set(FUNC(drw80pkr_state::t1_r));
+	m_maincpu->p1_in_cb().set(FUNC(drw80pkr_state::p1_r));
+	m_maincpu->p1_out_cb().set(FUNC(drw80pkr_state::p1_w));
+	m_maincpu->p2_in_cb().set(FUNC(drw80pkr_state::p2_r));
+	m_maincpu->p2_out_cb().set(FUNC(drw80pkr_state::p2_w));
+	m_maincpu->prog_out_cb().set(FUNC(drw80pkr_state::prog_w));
+	m_maincpu->bus_in_cb().set(FUNC(drw80pkr_state::bus_r));
+	m_maincpu->bus_out_cb().set(FUNC(drw80pkr_state::bus_w));
+	m_maincpu->set_vblank_int("screen", FUNC(drw80pkr_state::irq0_line_hold));
 
 	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size((31+1)*8, (31+1)*8);
+	screen.set_visarea(0*8, 24*8-1, 0*8, 27*8-1);
+	screen.set_screen_update(FUNC(drw80pkr_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE((31+1)*8, (31+1)*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*8-1, 0*8, 27*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(drw80pkr_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_drw80pkr);
+	PALETTE(config, "palette", FUNC(drw80pkr_state::drw80pkr_palette), 16 * 16);
 
-	MCFG_DEVICE_ADD(m_gfxdecode, GFXDECODE, "palette", gfx_drw80pkr)
-	MCFG_PALETTE_ADD("palette", 16*16)
-	MCFG_PALETTE_INIT_OWNER(drw80pkr_state, drw80pkr)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD(m_aysnd, AY8912, 20000000/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_CONFIG_END
+	AY8912(config, m_aysnd, 20000000/12).add_route(ALL_OUTPUTS, "mono", 0.75);
+}
 
 /*************************
 *        Rom Load        *

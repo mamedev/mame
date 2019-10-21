@@ -5,6 +5,11 @@
     Wild West C.O.W.boys of Moo Mesa / Bucky O'Hare
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_MOO_H
+#define MAME_INCLUDES_MOO_H
+
+#pragma once
+
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"
@@ -21,8 +26,8 @@
 class moo_state : public driver_device
 {
 public:
-	moo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	moo_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_workram(*this, "workram"),
 		m_spriteram(*this, "spriteram"),
 		m_maincpu(*this, "maincpu"),
@@ -36,7 +41,8 @@ public:
 		m_k054338(*this, "k054338"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
-		m_k054321(*this, "k054321") { }
+		m_k054321(*this, "k054321")
+	{ }
 
 	void bucky(machine_config &config);
 	void moo(machine_config &config);
@@ -95,3 +101,5 @@ private:
 	void moobl_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_MOO_H

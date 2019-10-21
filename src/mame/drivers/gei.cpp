@@ -89,6 +89,7 @@ public:
 	gei_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi8255_%u", 0U)
 		, m_dac(*this, "dac")
 		, m_ticket(*this, "ticket")
 		, m_screen(*this, "screen")
@@ -157,6 +158,7 @@ private:
 	uint8_t m_nmi_mask;
 
 	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 2> m_ppi;
 	required_device<dac_bit_interface> m_dac;
 	optional_device<ticket_dispenser_device> m_ticket;
 	required_device<screen_device> m_screen;
@@ -355,8 +357,8 @@ void gei_state::getrivia_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).bankr("rombank");
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x600f, 0x600f).w(FUNC(gei_state::banksel_w<8>));
 	map(0x6017, 0x6017).w(FUNC(gei_state::banksel_w<6>));
 	map(0x601b, 0x601b).w(FUNC(gei_state::banksel_w<4>));
@@ -382,8 +384,8 @@ void gei_state::gselect_map(address_map &map)
 	map(0x4401, 0x4401).w(FUNC(gei_state::banksel_w<1>));
 	map(0x4402, 0x4402).w(FUNC(gei_state::banksel_w<2>));
 	map(0x4403, 0x4403).w(FUNC(gei_state::banksel_w<3>));
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
 	map(0xc000, 0xffff).ram().w(FUNC(gei_state::gei_bitmap_w));
 }
@@ -394,8 +396,8 @@ void gei_state::amuse_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).bankr("rombank");
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x606f, 0x606f).w(FUNC(gei_state::banksel_w<8>));
 	map(0x6077, 0x6077).w(FUNC(gei_state::banksel_w<6>));
 	map(0x607b, 0x607b).w(FUNC(gei_state::banksel_w<4>));
@@ -411,8 +413,8 @@ void gei_state::gepoker_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x3fff).bankr("rombank");
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x60ef, 0x60ef).w(FUNC(gei_state::banksel_w<4>));
 	map(0x60f7, 0x60f7).w(FUNC(gei_state::banksel_w<3>));
 	map(0x60fb, 0x60fb).w(FUNC(gei_state::banksel_w<2>));
@@ -433,8 +435,8 @@ void gei_state::amuse1_map(address_map &map)
 	map(0x4401, 0x4401).w(FUNC(gei_state::banksel_w<2>));
 	map(0x4402, 0x4402).w(FUNC(gei_state::banksel_w<4>));
 	map(0x4403, 0x4403).w(FUNC(gei_state::banksel_w<6>));
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5800, 0x5fff).rom();
 	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
 	map(0x8000, 0xbfff).rom(); /* space for diagnostic ROM? */
@@ -447,8 +449,8 @@ void gei_state::findout_map(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(gei_state::catchall));
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	/* banked ROMs are enabled by low 6 bits of the address */
 	map(0x601f, 0x601f).w(FUNC(gei_state::banksel_w<0>));
 	map(0x602f, 0x602f).w(FUNC(gei_state::banksel_w<5>));
@@ -469,8 +471,8 @@ void gei_state::quizvid_map(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(gei_state::catchall));
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	/* banked ROMs are enabled by low 6 bits of the address */
 	map(0x602f, 0x602f).r(FUNC(gei_state::banksel_r<5>));
 	map(0x6037, 0x6037).r(FUNC(gei_state::banksel_r<4>));
@@ -487,8 +489,8 @@ void gei_state::suprpokr_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x6200, 0x6200).w(FUNC(gei_state::signature_w));
 	map(0x6400, 0x6400).r(FUNC(gei_state::signature_r));
 	map(0x8000, 0x8002).w(FUNC(gei_state::gei_drawctrl_w));
@@ -500,8 +502,8 @@ void gei_state::sprtauth_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram().share("nvram");
-	map(0x4800, 0x4803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5000, 0x5003).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x4800, 0x4803).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x5000, 0x5003).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x5600, 0x5600).r(FUNC(gei_state::signature_r));
 	map(0x5800, 0x5800).w(FUNC(gei_state::signature_w));
 	map(0x5a00, 0x5cff).w(FUNC(gei_state::geimulti_bank_w));
@@ -976,140 +978,128 @@ INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(gei_state::getrivia)
-	MCFG_DEVICE_ADD("maincpu",Z80,4000000) /* 4 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(getrivia_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", gei_state, vblank_irq)
+void gei_state::getrivia(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000); /* 4 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::getrivia_map);
+	m_maincpu->set_vblank_int("screen", FUNC(gei_state::vblank_irq));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_UPDATE_DRIVER(gei_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(48, 511-48, 16, 255-16)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_screen_update(FUNC(gei_state::screen_update));
+	m_screen->set_size(512, 256);
+	m_screen->set_visarea(48, 511-48, 16, 255-16);
+	m_screen->set_palette("palette");
 
-	MCFG_PALETTE_ADD_3BIT_GBR("palette")
+	PALETTE(config, "palette", palette_device::GBR_3BIT);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, sound_w))
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("DSWA");
+	m_ppi[0]->in_pb_callback().set_ioport("IN0");
+	m_ppi[0]->out_pc_callback().set(FUNC(gei_state::sound_w));
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, lamps2_w))
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN1");
+	m_ppi[1]->out_pb_callback().set(FUNC(gei_state::lamps_w));
+	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::lamps2_w));
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_ticket, attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.99);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-MACHINE_CONFIG_START(gei_state::findout)
+void gei_state::findout(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(findout_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::findout_map);
 
-	MCFG_DEVICE_REMOVE("ppi8255_1")
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, gei_state, portC_r))
-MACHINE_CONFIG_END
+	m_ppi[1]->in_pc_callback().set(FUNC(gei_state::portC_r));
+	m_ppi[1]->out_pc_callback().set_nop();
+}
 
-MACHINE_CONFIG_START(gei_state::quizvid)
+void gei_state::quizvid(machine_config &config)
+{
 	findout(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(quizvid_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::quizvid_map);
 
-	MCFG_DEVICE_REMOVE("palette")
-	MCFG_PALETTE_ADD_3BIT_GRB("palette")
-MACHINE_CONFIG_END
+	PALETTE(config.replace(), "palette", palette_device::GRB_3BIT);
+}
 
-MACHINE_CONFIG_START(gei_state::gselect)
+void gei_state::gselect(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ticket")
+	config.device_remove("ticket");
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gselect_map);
 
-	MCFG_DEVICE_REMOVE("ppi8255_0")
-	MCFG_DEVICE_REMOVE("ppi8255_1")
+	m_ppi[0]->out_pc_callback().set(FUNC(gei_state::sound2_w));
 
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSWA"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN0"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, sound2_w))
+	m_ppi[1]->in_pc_callback().set_ioport("IN2");
+	m_ppi[1]->out_pc_callback().set(FUNC(gei_state::nmi_w));
+}
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, gei_state, lamps_w))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gei_state, nmi_w))
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START(gei_state::jokpokera)
+void gei_state::jokpokera(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_REMOVE("ticket")
+	config.device_remove("ticket");
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gselect_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gselect_map);
+}
 
-MACHINE_CONFIG_START(gei_state::amuse)
+void gei_state::amuse(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amuse_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::amuse_map);
+}
 
-MACHINE_CONFIG_START(gei_state::gepoker)
+void gei_state::gepoker(machine_config &config)
+{
 	getrivia(config);
 
 	/* basic machine hardware */
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(gepoker_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::gepoker_map);
+}
 
-MACHINE_CONFIG_START(gei_state::amuse1)
+void gei_state::amuse1(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(amuse1_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::amuse1_map);
+}
 
-MACHINE_CONFIG_START(gei_state::suprpokr)
+void gei_state::suprpokr(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(suprpokr_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::suprpokr_map);
+}
 
-MACHINE_CONFIG_START(gei_state::sprtauth)
+void gei_state::sprtauth(machine_config &config)
+{
 	getrivia(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(sprtauth_map)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_PROGRAM, &gei_state::sprtauth_map);
+}
 
 
 /***************************************************
@@ -1754,11 +1744,11 @@ ROM_START( quizvid )
 	ROM_LOAD( "quiz.reva.attuale.5", 0x30000, 0x8000, CRC(a3642478) SHA1(57851aabc6d2f5acff426c09574559e141da5d13) )
 
 	ROM_REGION( 0x0104, "plds", 0 )
-	ROM_LOAD( "pal10l8cn.pal1",            0x0000, 0x002c, CRC(7f4499de) SHA1(74838150d0b71171f00f65e03748b262c2bb6e4c) )
-	ROM_LOAD( "pal10l8cn.pal4",            0x0000, 0x002c, CRC(f14a34ab) SHA1(78af7f5eafbf2d52ee7b01b497ad59448c986693) )
-	ROM_LOAD( "pal16l8a-2.bad.dump",       0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "pal16l8cn.pal3.bad.dump",   0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
-	ROM_LOAD( "pal16l8cn.pal5.bad.dump",   0x0000, 0x0104, BAD_DUMP CRC(e9cd78fb) SHA1(557d3e7ef3b25c1338b24722cac91bca788c02b8) )
+	ROM_LOAD( "pal10l8cn.pal1", 0x0000, 0x002c, CRC(7f4499de) SHA1(74838150d0b71171f00f65e03748b262c2bb6e4c) )
+	ROM_LOAD( "pal10l8cn.pal4", 0x0000, 0x002c, CRC(f14a34ab) SHA1(78af7f5eafbf2d52ee7b01b497ad59448c986693) )
+	ROM_LOAD( "pal16l8a-2.bin", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8cn.pal3", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "pal16l8cn.pal5", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
 ROM_START( quiz211 )

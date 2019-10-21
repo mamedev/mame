@@ -41,7 +41,6 @@ write
 #include "includes/marineb.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "sound/ay8910.h"
 #include "screen.h"
 #include "speaker.h"
@@ -85,7 +84,7 @@ void marineb_state::marineb_map(address_map &map)
 	map(0x9800, 0x9800).w(FUNC(marineb_state::marineb_column_scroll_w));
 	map(0x9a00, 0x9a00).w(FUNC(marineb_state::marineb_palette_bank_0_w));
 	map(0x9c00, 0x9c00).w(FUNC(marineb_state::marineb_palette_bank_1_w));
-	map(0xa000, 0xa007).w("outlatch", FUNC(ls259_device::write_d0));
+	map(0xa000, 0xa007).w(m_outlatch, FUNC(ls259_device::write_d0));
 	map(0xa000, 0xa000).portr("P2");
 	map(0xa800, 0xa800).portr("P1");
 	map(0xb000, 0xb000).portr("DSW");
@@ -123,27 +122,27 @@ static INPUT_PORTS_START( marineb )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x1c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4,5") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x04, "???" )
-//  PORT_DIPSETTING(    0x08, "???" )
-//  PORT_DIPSETTING(    0x0c, "???" )
-//  PORT_DIPSETTING(    0x10, "???" )
-//  PORT_DIPSETTING(    0x14, "???" )
-//  PORT_DIPSETTING(    0x18, "???" )
+//  PORT_DIPSETTING(    0x14, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
+//  PORT_DIPSETTING(    0x18, DEF_STR( 3C_2C ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x1c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "20000 50000" )
 	PORT_DIPSETTING(    0x20, "40000 70000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -173,26 +172,26 @@ static INPUT_PORTS_START( changes )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,4") /* coinage doesn't work?? - always 1C / 1C or Free Play?? */
+//  PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) /* This is the correct Coinage according to manual */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x04, "???" )
-//  PORT_DIPSETTING(    0x08, "???" )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x00, "1st Bonus Life" )
+	PORT_DIPNAME( 0x10, 0x00, "1st Bonus Life" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, "20000" )
 	PORT_DIPSETTING(    0x10, "40000" )
-	PORT_DIPNAME( 0x20, 0x00, "2nd Bonus Life" )
+	PORT_DIPNAME( 0x20, 0x00, "2nd Bonus Life" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, "50000" )
 	PORT_DIPSETTING(    0x20, "100000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -220,23 +219,23 @@ static INPUT_PORTS_START( hoccer )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Unknown ) )  /* difficulty maybe? */
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
@@ -352,39 +351,36 @@ static INPUT_PORTS_START( bcruzm12 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
 	PORT_START("SYSTEM")    /* we use same tags as above, to simplify reads */
-	PORT_DIPNAME( 0x03, 0x01, "2nd Bonus Life" )
+	PORT_DIPNAME( 0x03, 0x01, "2nd Bonus Life" ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x01, "60000" )
 	PORT_DIPSETTING(    0x02, "80000" )
 	PORT_DIPSETTING(    0x03, "100000" )
-	PORT_DIPNAME( 0x0c, 0x04, "1st Bonus Life" )
+	PORT_DIPNAME( 0x0c, 0x04, "1st Bonus Life" ) PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x04, "30000" )
 	PORT_DIPSETTING(    0x08, "40000" )
 	PORT_DIPSETTING(    0x0c, "50000" )
-	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0x40, " A 3C/1C  B 3C/1C" )
 	PORT_DIPSETTING(    0xe0, " A 3C/1C  B 1C/2C" )
 	PORT_DIPSETTING(    0xf0, " A 3C/1C  B 1C/4C" )
@@ -539,122 +535,105 @@ WRITE_LINE_MEMBER(marineb_state::wanted_vblank_irq)
 }
 
 
-MACHINE_CONFIG_START(marineb_state::marineb)
-
+void marineb_state::marineb(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)   /* 3 MHz? */
-	MCFG_DEVICE_PROGRAM_MAP(marineb_map)
-	MCFG_DEVICE_IO_MAP(marineb_io_map)
+	Z80(config, m_maincpu, CPU_CLOCK);   /* 3 MHz? */
+	m_maincpu->set_addrmap(AS_PROGRAM, &marineb_state::marineb_map);
+	m_maincpu->set_addrmap(AS_IO, &marineb_state::marineb_io_map);
 
-	MCFG_DEVICE_ADD("outlatch", LS259, 0)
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_y_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, marineb_state, flipscreen_x_w))
+	LS259(config, m_outlatch);
+	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::nmi_mask_w));
+	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w));
+	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000)   /* frames per second, vblank duration */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_marineb)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, marineb_vblank_irq))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000)   /* frames per second, vblank duration */);
+	screen.set_size(32*8, 32*8);
+	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(marineb_state::screen_update_marineb));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(marineb_state::marineb_vblank_irq));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_marineb)
-	MCFG_PALETTE_ADD("palette", 256)
-	MCFG_PALETTE_INIT_OWNER(marineb_state, marineb)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_marineb);
+	PALETTE(config, m_palette, FUNC(marineb_state::marineb_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_CONFIG_END
+	AY8910(config, "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.50);
+}
 
 
-MACHINE_CONFIG_START(marineb_state::changes)
+void marineb_state::changes(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_changes)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_changes)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_changes);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_changes));
+}
 
 
 void marineb_state::springer(machine_config &config)
 {
 	marineb(config);
 
-	/* basic machine hardware */
-	ls259_device &outlatch(*subdevice<ls259_device>("outlatch"));
-	outlatch.q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
-	outlatch.q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
+	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
 
-	/* video hardware */
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_springer));
 }
 
 
-MACHINE_CONFIG_START(marineb_state::hoccer)
+void marineb_state::hoccer(machine_config &config)
+{
+	marineb(config);
+
+	/* video hardware */
+	m_gfxdecode->set_info(gfx_hoccer);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hoccer));
+}
+
+
+void marineb_state::wanted(machine_config &config)
+{
 	marineb(config);
 
 	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_IO, &marineb_state::wanted_io_map);
+
+	m_outlatch->q_out_cb<0>().set(FUNC(marineb_state::irq_mask_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hoccer)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hoccer)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(marineb_state::wanted)
-	marineb(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(wanted_io_map)
-
-	MCFG_DEVICE_MODIFY("outlatch")
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, marineb_state, irq_mask_w))
-
-	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_wanted)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_springer)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, marineb_state, wanted_vblank_irq))
+	m_gfxdecode->set_info(gfx_wanted);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_springer));
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(marineb_state::wanted_vblank_irq));
 
 	// sound hardware (PSG type verified only for bcruzm12)
-	MCFG_DEVICE_REPLACE("ay1", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	AY8912(config.replace(), "ay1", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8912, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8912(config, "ay2", SOUND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
 
-MACHINE_CONFIG_START(marineb_state::hopprobo)
+void marineb_state::hopprobo(machine_config &config)
+{
 	marineb(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_hopprobo)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(marineb_state, screen_update_hopprobo)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_hopprobo);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(marineb_state::screen_update_hopprobo));
+}
 
 
 void marineb_state::bcruzm12(machine_config &config)
 {
 	wanted(config);
 
-	/* basic machine hardware */
-	ls259_device &outlatch(*subdevice<ls259_device>("outlatch"));
-	outlatch.q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
-	outlatch.q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
+	m_outlatch->q_out_cb<1>().set(FUNC(marineb_state::flipscreen_y_w)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(marineb_state::flipscreen_x_w)).invert();
 }
 
 /***************************************************************************

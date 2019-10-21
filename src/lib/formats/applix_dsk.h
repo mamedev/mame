@@ -7,13 +7,15 @@
     Applix disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_APPLIX_DSK_H
+#define MAME_FORMATS_APPLIX_DSK_H
 
-#ifndef APPLIX_DSK_H_
-#define APPLIX_DSK_H_
+#pragma once
 
 #include "wd177x_dsk.h"
 
-class applix_format : public wd177x_format {
+class applix_format : public wd177x_format
+{
 public:
 	applix_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_APPLIX_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_APPLIX_DSK_H

@@ -1244,7 +1244,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 
 	<software name="pinball">
 		<description>Pinball! (USA, Prototype)</description>
-		<year>1979</year><!-- re-released at Classic Games Expo (2004 in Philidelphia) with Ralph Baer's autograph (as he was designer)  -->
+		<year>1979</year><!-- re-released at Classic Games Expo (2004 in Philadelphia) with Ralph Baer's autograph (as he was the designer)  -->
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Don McGuiness"/>
 		<part name="cart" interface="odyssey_cart">
@@ -1767,6 +1767,33 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
+
+	<software name="amok">
+		<description>AMOK!</description>
+		<year>1998</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="John Dondzila" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size = "4096">
+				<rom name="amokpd.bin" size="4096" crc="2247405e" sha1="31c1b0e10d9f56a6d885e6db5a55aa35c407b740" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calc">
+		<description>Calculator!</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="René van den Enden" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size = "4096">
+				<rom name="new_calculator.bin" size="4096" crc="eccd03be" sha1="b1327cdc079edfaef5eea4314912072801e77d6b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ktaa">
 		<description>Kill the Attacking Aliens</description>
 		<year>2003</year>
@@ -1776,6 +1803,19 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			<feature name="slot" value="o2_rom12" />
 			<dataarea name="rom" size="12288">
 				<rom name="ktaa.bin" size="12288" crc="4e2cc6d3" sha1="42ad0c57bd16b7f24c242f60b5c0e9988d8dfba8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mrroboto">
+		<description>Mr. Roboto!</description>
+		<year>2006</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="programmer" value="Ted Szczypiorski" />
+		<part name="cart" interface="odyssey_cart">
+			<feature name="slot" value="o2_rom" />
+			<dataarea name="rom" size="8192">
+				<rom name="mrroboto.bin" size="8192" crc="a030b990" sha1="bcd2deeeed9283ff585d644993494961f0acc46d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1793,15 +1833,15 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		</part>
 	</software>
 
-	<software name="mrroboto">
-		<description>Mr. Roboto!</description>
-		<year>2006</year>
+	<software name="pong">
+		<description>Pong for Videopac and Odyssey²!</description>
+		<year>2004</year>
 		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="programmer" value="Ted Szczypiorski" />
+		<info name="programmer" value="René van den Enden" />
 		<part name="cart" interface="odyssey_cart">
 			<feature name="slot" value="o2_rom" />
-			<dataarea name="rom" size="8192">
-				<rom name="mrroboto.bin" size="8192" crc="a030b990" sha1="bcd2deeeed9283ff585d644993494961f0acc46d" offset="0" />
+			<dataarea name="rom" size = "4096">
+				<rom name="new_pong_all.bin" size="4096" crc="c06a3880" sha1="c559c05de321f794e4b63c625f6023fdbde3a3aa" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

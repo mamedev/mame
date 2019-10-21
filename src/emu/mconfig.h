@@ -1,13 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Aaron Giles
 /***************************************************************************/
-/**
-  * @file mconfig.h
-  * @defgroup MACHINE_CONFIG Machine configuration macros and functions
-  * @{
-  */
-/***************************************************************************/
-
 
 #pragma once
 
@@ -190,76 +183,4 @@ private:
 	device_t *                  m_current_device;
 };
 
-
-namespace emu { namespace detail {
-
-template <typename Tag, typename Creator, typename... Params>
-inline std::enable_if_t<emu::detail::is_device_implementation<typename std::remove_reference_t<Creator>::exposed_type>::value, typename std::remove_reference_t<Creator>::exposed_type *> device_add_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
-{
-	return &type(mconfig, std::forward<Tag>(tag), std::forward<Params>(args)...);
-}
-template <typename Tag, typename Creator, typename... Params>
-inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_reference_t<Creator>::exposed_type>::value, device_t *> device_add_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
-{
-	return &type(mconfig, std::forward<Tag>(tag), std::forward<Params>(args)...).device();
-}
-template <typename Tag, typename Creator, typename... Params>
-inline std::enable_if_t<emu::detail::is_device_implementation<typename std::remove_reference_t<Creator>::exposed_type>::value, typename std::remove_reference_t<Creator>::exposed_type *> device_replace_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
-{
-	return &type(mconfig.replace(), std::forward<Tag>(tag), std::forward<Params>(args)...);
-}
-template <typename Tag, typename Creator, typename... Params>
-inline std::enable_if_t<emu::detail::is_device_interface<typename std::remove_reference_t<Creator>::exposed_type>::value, device_t *> device_replace_impl(machine_config &mconfig, Tag &&tag, Creator &&type, Params &&... args)
-{
-	return &type(mconfig.replace(), std::forward<Tag>(tag), std::forward<Params>(args)...).device();
-}
-
-} } // namespace emu::detail
-
-
-//*************************************************************************/
-/** @name Machine config start/end macros */
-//*************************************************************************/
-
-/**
- @def MACHINE_CONFIG_START(_name)
- Begins a device machine configuration member
- @param _name name of this config
- @hideinitializer
-*/
-#define MACHINE_CONFIG_START(_name) \
-ATTR_COLD void _name(machine_config &config) \
-{ \
-	device_t *device = nullptr; \
-	(void)device; \
-
-/**
-@def MACHINE_CONFIG_END
-Ends a machine_config.
-@hideinitializer
-*/
-#define MACHINE_CONFIG_END \
-}
-
-//*************************************************************************/
-/** @name Core machine config options */
-//*************************************************************************/
-
-// scheduling parameters
-#define MCFG_QUANTUM_TIME(_time) \
-	config.m_minimum_quantum = _time;
-#define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
-	config.m_perfect_cpu_quantum = subtag(_cputag);
-
-// add/remove devices
-#define MCFG_DEVICE_ADD(_tag, ...) \
-	device = emu::detail::device_add_impl(config, _tag, __VA_ARGS__);
-#define MCFG_DEVICE_REPLACE(_tag, ...) \
-	device = emu::detail::device_replace_impl(config, _tag, __VA_ARGS__);
-#define MCFG_DEVICE_REMOVE(_tag) \
-	device = config.device_remove(_tag);
-#define MCFG_DEVICE_MODIFY(_tag)    \
-	device = config.device_find(this, _tag);
-
-#endif  /* MAME_EMU_MCONFIG_H */
-/** @} */
+#endif // MAME_EMU_MCONFIG_H

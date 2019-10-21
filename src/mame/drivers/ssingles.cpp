@@ -161,8 +161,9 @@ class ssingles_state : public driver_device
 {
 public:
 	ssingles_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	void ssingles(machine_config &config);
 	void atamanot(machine_config &config);
@@ -171,6 +172,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 
+protected:
+	virtual void video_start() override;
+
 private:
 	uint8_t m_videoram[VMEM_SIZE];
 	uint8_t m_colorram[VMEM_SIZE];
@@ -178,6 +182,9 @@ private:
 	pen_t m_pens[NUM_PENS];
 
 	uint8_t m_atamanot_prot_state;
+
+	required_device<cpu_device> m_maincpu;
+
 	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
 	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
 	DECLARE_READ8_MEMBER(c000_r);
@@ -186,11 +193,10 @@ private:
 	DECLARE_READ8_MEMBER(atamanot_prot_r);
 	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 
-	virtual void video_start() override;
 	DECLARE_WRITE_LINE_MEMBER(atamanot_irq);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
-	required_device<cpu_device> m_maincpu;
+
 	void atamanot_io_map(address_map &map);
 	void atamanot_map(address_map &map);
 	void ssingles_io_map(address_map &map);
@@ -198,16 +204,16 @@ private:
 };
 
 //fake palette
-static const uint8_t ssingles_colors[NUM_PENS*3]=
+static constexpr rgb_t ssingles_colors[NUM_PENS] =
 {
-	0x00,0x00,0x00, 0xff,0xff,0xff, 0xff,0x00,0x00, 0x80,0x00,0x00,
-	0x00,0x00,0x00, 0xf0,0xf0,0xf0, 0xff,0xff,0x00, 0x40,0x40,0x40,
-	0x00,0x00,0x00, 0xff,0xff,0xff, 0xff,0x00,0x00, 0xff,0xff,0x00,
-	0x00,0x00,0x00, 0xff,0xff,0x00, 0xd0,0x00,0x00, 0x80,0x00,0x00,
-	0x00,0x00,0x00, 0xff,0x00,0x00, 0xff,0xff,0x00, 0x80,0x80,0x00,
-	0x00,0x00,0x00, 0xff,0x00,0x00, 0x40,0x40,0x40, 0xd0,0xd0,0xd0,
-	0x00,0x00,0x00, 0x00,0x00,0xff, 0x60,0x40,0x30, 0xff,0xff,0x00,
-	0x00,0x00,0x00, 0xff,0x00,0xff, 0x80,0x00,0x80, 0x40,0x00,0x40
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0x00,0x00 }, { 0x80,0x00,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xf0,0xf0,0xf0 }, { 0xff,0xff,0x00 }, { 0x40,0x40,0x40 },
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0xff }, { 0xff,0x00,0x00 }, { 0xff,0xff,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0xff,0x00 }, { 0xd0,0x00,0x00 }, { 0x80,0x00,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0x00,0x00 }, { 0xff,0xff,0x00 }, { 0x80,0x80,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0x00,0x00 }, { 0x40,0x40,0x40 }, { 0xd0,0xd0,0xd0 },
+	{ 0x00,0x00,0x00 }, { 0x00,0x00,0xff }, { 0x60,0x40,0x30 }, { 0xff,0xff,0x00 },
+	{ 0x00,0x00,0x00 }, { 0xff,0x00,0xff }, { 0x80,0x00,0x80 }, { 0x40,0x00,0x40 }
 };
 
 MC6845_UPDATE_ROW( ssingles_state::ssingles_update_row )
@@ -300,13 +306,8 @@ WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 
 void ssingles_state::video_start()
 {
-	{
-		int i;
-		for(i=0;i<NUM_PENS;++i)
-		{
-			m_pens[i]=rgb_t(ssingles_colors[3*i], ssingles_colors[3*i+1], ssingles_colors[3*i+2]);
-		}
-	}
+	for (int i=0; i<NUM_PENS; ++i)
+		m_pens[i] = ssingles_colors[i];
 }
 
 
@@ -389,11 +390,11 @@ void ssingles_state::atamanot_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x47ff).ram();
 	map(0x6000, 0x60ff).ram(); //kanji tilemap?
-//  AM_RANGE(0x6000, 0x7fff) AM_ROM
+//  map(0x6000, 0x7fff).rom();
 	map(0x8000, 0x83ff).r(FUNC(ssingles_state::atamanot_prot_r));
-//  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
-//  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
+//  map(0x8000, 0x9fff).rom().region("question", 0x10000);
+//  map(0xc000, 0xc000).r(FUNC(ssingles_state::c000_r));
+//  map(0xc001, 0xc001).rw(FUNC(ssingles_state::c001_r), FUNC(ssingles_state::c001_w));
 }
 
 void ssingles_state::ssingles_io_map(address_map &map)
@@ -407,7 +408,7 @@ void ssingles_state::ssingles_io_map(address_map &map)
 	map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).portr("DSW1");
 	map(0x1c, 0x1c).portr("INPUTS");
-//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  map(0x1a, 0x1a).nopw(); //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
 }
@@ -423,7 +424,7 @@ void ssingles_state::atamanot_io_map(address_map &map)
 	map(0x16, 0x16).portr("DSW0");
 	map(0x18, 0x18).portr("DSW1").w(FUNC(ssingles_state::atamanot_prot_w));
 	map(0x1c, 0x1c).portr("INPUTS");
-//  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
+//  map(0x1a, 0x1a).nopw(); //video/crt related
 	map(0xfe, 0xfe).w("crtc", FUNC(mc6845_device::address_w));
 	map(0xff, 0xff).w("crtc", FUNC(mc6845_device::register_w));
 }
@@ -432,7 +433,7 @@ static INPUT_PORTS_START( ssingles )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, nullptr)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(ssingles_state, controls_r)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -552,58 +553,53 @@ static GFXDECODE_START( gfx_atamanot )
 	GFXDECODE_ENTRY( "kanji_lc", 0, layout_8x16,     0, 8 )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(ssingles_state::ssingles)
+void ssingles_state::ssingles(machine_config &config)
+{
+	Z80(config, m_maincpu, 4000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssingles_state::ssingles_map);
+	m_maincpu->set_addrmap(AS_IO, &ssingles_state::ssingles_io_map);
 
-	MCFG_DEVICE_ADD("maincpu", Z80,4000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(ssingles_map)
-	MCFG_DEVICE_IO_MAP(ssingles_io_map)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(4000000, 256, 0, 256, 256, 0, 256);   /* temporary, CRTC will configure screen */
+	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)   /* temporary, CRTC will configure screen */
-	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
+	PALETTE(config, "palette").set_entries(4); //guess
 
-	MCFG_PALETTE_ADD("palette", 4) //guess
+	GFXDECODE(config, "gfxdecode", "palette", gfx_ssingles);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_ssingles)
-
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, ssingles_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", 1000000 /* ? MHz */));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.set_update_row_callback(FUNC(ssingles_state::ssingles_update_row), this);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, 1500000) /* ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "mono", 0.5); /* ? MHz */
 
-	MCFG_DEVICE_ADD("ay2", AY8910, 1500000) /* ? MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "mono", 0.5); /* ? MHz */
+}
 
 WRITE_LINE_MEMBER(ssingles_state::atamanot_irq)
 {
 	// ...
 }
 
-MACHINE_CONFIG_START(ssingles_state::atamanot)
+void ssingles_state::atamanot(machine_config &config)
+{
 	ssingles(config);
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(atamanot_map)
-	MCFG_DEVICE_IO_MAP(atamanot_io_map)
 
-	MCFG_DEVICE_REMOVE("crtc")
+	m_maincpu->set_addrmap(AS_PROGRAM, &ssingles_state::atamanot_map);
+	m_maincpu->set_addrmap(AS_IO, &ssingles_state::atamanot_io_map);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", 1000000 /* ? MHz */)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(ssingles_state, atamanot_update_row)
-	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(*this, ssingles_state, atamanot_irq))
+	mc6845_device &crtc(*subdevice<mc6845_device>("crtc"));
+	crtc.set_update_row_callback(FUNC(ssingles_state::atamanot_update_row), this);
+	crtc.out_vsync_callback().set(FUNC(ssingles_state::atamanot_irq));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_atamanot)
-MACHINE_CONFIG_END
+	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atamanot);
+}
 
 ROM_START( ssingles )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 main CPU  */

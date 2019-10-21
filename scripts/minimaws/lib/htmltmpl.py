@@ -163,3 +163,32 @@ SOURCEFILE_LIST_ROW = string.Template(
         '            <td>${sourcefile}</td>\n' \
         '            <td style="text-align: right">${machines}</td>\n' \
         '        </tr>\n')
+
+ROMIDENT_PAGE = string.Template(
+        '<!DOCTYPE html>\n' \
+        '<html>\n' \
+        '<head>\n' \
+        '    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">\n' \
+        '    <meta http-equiv="Content-Style-Type" content="text/css">\n' \
+        '    <meta http-equiv="Content-Script-Type" content="text/javascript">\n' \
+        '    <link rel="stylesheet" type="text/css" href="${assets}/style.css">\n' \
+        '    <script type="text/javascript">\n' \
+        '        var appurl="${app}"\n' \
+        '        var assetsurl="${assets}"\n' \
+        '    </script>\n' \
+        '    <script type="text/javascript" src="${assets}/common.js"></script>\n' \
+        '    <script type="text/javascript" src="${assets}/romident.js"></script>\n' \
+        '    <title>Identify ROM/Disk Dumps</title>\n' \
+        '</head>\n' \
+        '<body>\n' \
+        '<h1>Identify ROM/Disk Dumps</h1>\n' \
+        '<p>No files are uploaded.  Files are examined locally and checksums/digests are sent to the server.  File checksums and digests may be logged on the server.</p>\n' \
+        '<div id="div-dropzone" class="dropzone" ondragover="div_dropzone_dragover(event)" ondrop="div_dropzone_drop(event)">\n' \
+        '<p><button type="button" onclick="document.getElementById(&quot;input-dumps&quot;).click()">Select ROM/disk dumps</button></p>\n' \
+        '<p>Drag and drop ROM/disk dump files here to identify them.</p>\n' \
+        '</div>\n' \
+        '<input id="input-dumps" type="file" multiple onchange="add_dump_files(this.files)" style="display: none">\n' \
+        '<div id="div-progress"></div>\n' \
+        '<div id="div-machines"></div>\n' \
+        '</body>\n' \
+        '</html>\n')

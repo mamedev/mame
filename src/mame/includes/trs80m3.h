@@ -12,7 +12,7 @@
 #include "machine/ram.h"
 #include "machine/bankdev.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
 #include "machine/com8116.h"
@@ -20,7 +20,6 @@
 #include "machine/buffer.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #include "formats/trs_cas.h"
@@ -54,7 +53,7 @@ public:
 		, m_32kbanks(*this, "bank%u", 0U)
 		, m_16kbank(*this, "16kbank")
 		, m_vidbank(*this, "vidbank")
-		{ }
+	{ }
 
 	void model4p(machine_config &config);
 	void model3(machine_config &config);
@@ -64,6 +63,10 @@ public:
 	void init_trs80m3();
 	void init_trs80m4();
 	void init_trs80m4p();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -95,7 +98,7 @@ private:
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(drq_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER(trs80_cmd);
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	uint32_t screen_update_trs80m3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cp500_io(address_map &map);
@@ -128,8 +131,6 @@ private:
 	bool m_drq_off;
 	bool m_intrq_off;
 	floppy_image_device *m_floppy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;

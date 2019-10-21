@@ -5,9 +5,15 @@
     Ojanko High School & other Video System mahjong series
 
 *************************************************************************/
+#ifndef MAME_INCLUDES_OJANKOHS_H
+#define MAME_INCLUDES_OJANKOHS_H
+
+#pragma once
+
 #include "sound/msm5205.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 class ojankohs_state : public driver_device
 {
@@ -35,6 +41,9 @@ public:
 	void ccasino(machine_config &config);
 	void ojankoc(machine_config &config);
 	void ojankoy(machine_config &config);
+
+protected:
+	virtual void machine_reset() override;
 
 private:
 	/* memory pointers */
@@ -100,12 +109,11 @@ private:
 	DECLARE_READ8_MEMBER(ojankohs_dipsw2_r);
 	TILE_GET_INFO_MEMBER(ojankohs_get_tile_info);
 	TILE_GET_INFO_MEMBER(ojankoy_get_tile_info);
-	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(ojankohs);
 	DECLARE_VIDEO_START(ojankohs);
 	DECLARE_MACHINE_START(ojankoy);
 	DECLARE_VIDEO_START(ojankoy);
-	DECLARE_PALETTE_INIT(ojankoy);
+	void ojankoy_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(ccasino);
 	DECLARE_MACHINE_START(ojankoc);
 	DECLARE_VIDEO_START(ojankoc);
@@ -123,3 +131,5 @@ private:
 	void ojankoy_io_map(address_map &map);
 	void ojankoy_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_OJANKOHS_H

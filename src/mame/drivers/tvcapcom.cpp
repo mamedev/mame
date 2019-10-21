@@ -55,26 +55,25 @@ uint32_t tvcapcom_state::screen_update_tvcapcom(screen_device &screen, bitmap_rg
 static INPUT_PORTS_START( tvcapcom )
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(tvcapcom_state::tvcapcom)
-
+void tvcapcom_state::tvcapcom(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", PPC603, 72900000) // IBM PowerPC Broadway CPU @ 729 MHz  ?
-	MCFG_DEVICE_PROGRAM_MAP(gc_map)
-	MCFG_DEVICE_DISABLE()
+	PPC603(config, m_maincpu, 72900000); // IBM PowerPC Broadway CPU @ 729 MHz  ?
+	m_maincpu->set_addrmap(AS_PROGRAM, &tvcapcom_state::gc_map);
+	m_maincpu->set_disable();
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
+	config.m_minimum_quantum = attotime::from_hz(6000);
 
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_UPDATE_DRIVER(tvcapcom_state, screen_update_tvcapcom)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(640, 480);
+	screen.set_visarea(0, 639, 0, 479);
+	screen.set_screen_update(FUNC(tvcapcom_state::screen_update_tvcapcom));
 
-	MCFG_PALETTE_ADD("palette", 65536)
-
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(65536);
+}
 
 ROM_START( tvcapcom )
 	// Bios??

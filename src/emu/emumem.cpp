@@ -240,9 +240,9 @@ public:
 
 	void unmap_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, bool quiet) override;
 	void install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite, void *baseptr) override;
-	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, memory_bank *rbank, memory_bank *wbank) override;
-	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag) override;
+	void install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag) override;
 	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_constructor &map, u64 unitmask = 0, int cswidth = 0) override;
 
 	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0, int cswidth = 0) override;
@@ -408,6 +408,7 @@ public:
 	}
 
 	virtual void remove_passthrough(std::unordered_set<handler_entry *> &handlers) override {
+		invalidate_caches(read_or_write::READWRITE);
 		m_root_read->detach(handlers);
 		m_root_write->detach(handlers);
 	}
@@ -741,6 +742,13 @@ void memory_manager::allocate(device_memory_interface &memory)
 			// allocate one of the appropriate type
 			switch (spaceconfig->data_width() | (spaceconfig->addr_shift() + 4))
 			{
+				case  8|(4+1):
+					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_LITTLE>>(*this, spacenum);
+					else
+						memory.allocate<address_space_specific<0,  1, ENDIANNESS_BIG   >>(*this, spacenum);
+					break;
+
 				case  8|(4-0):
 					if (spaceconfig->endianness() == ENDIANNESS_LITTLE)
 						memory.allocate<address_space_specific<0,  0, ENDIANNESS_LITTLE>>(*this, spacenum);
@@ -945,6 +953,62 @@ memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, of
 }
 
 //**************************************************************************
+//  ADDRESS SPACE CONFIG
+//**************************************************************************
+
+//-------------------------------------------------
+//  address_space_config - constructors
+//-------------------------------------------------
+
+address_space_config::address_space_config()
+	: m_name("unknown"),
+		m_endianness(ENDIANNESS_NATIVE),
+		m_data_width(0),
+		m_addr_width(0),
+		m_addr_shift(0),
+		m_logaddr_width(0),
+		m_page_shift(0),
+		m_is_octal(false),
+		m_internal_map(address_map_constructor())
+{
+}
+
+/*!
+ @param name
+ @param endian CPU endianness
+ @param datawidth CPU parallelism bits
+ @param addrwidth address bits
+ @param addrshift
+ @param internal
+ */
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal)
+	: m_name(name),
+		m_endianness(endian),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
+		m_logaddr_width(addrwidth),
+		m_page_shift(0),
+		m_is_octal(false),
+		m_internal_map(internal)
+{
+}
+
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal)
+	: m_name(name),
+		m_endianness(endian),
+		m_data_width(datawidth),
+		m_addr_width(addrwidth),
+		m_addr_shift(addrshift),
+		m_logaddr_width(logwidth),
+		m_page_shift(pageshift),
+		m_is_octal(false),
+		m_internal_map(internal)
+{
+}
+
+
+//**************************************************************************
 //  ADDRESS SPACE
 //**************************************************************************
 
@@ -955,14 +1019,14 @@ memory_bank *memory_manager::allocate(address_space &space, offs_t addrstart, of
 address_space::address_space(memory_manager &manager, device_memory_interface &memory, int spacenum)
 	: m_config(*memory.space_config(spacenum)),
 		m_device(memory.device()),
-		m_addrmask(make_bitmask<offs_t>(m_config.m_addr_width)),
-		m_logaddrmask(make_bitmask<offs_t>(m_config.m_logaddr_width)),
+		m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
+		m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
 		m_unmap(0),
 		m_spacenum(spacenum),
 		m_log_unmap(true),
 		m_name(memory.space_config(spacenum)->name()),
-		m_addrchars((m_config.m_addr_width + 3) / 4),
-		m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
+		m_addrchars((m_config.addr_width() + 3) / 4),
+		m_logaddrchars((m_config.logaddr_width() + 3) / 4),
 		m_notifier_id(0),
 		m_in_notification(0),
 		m_manager(manager)
@@ -1010,8 +1074,8 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 
 	// Check the validity of the addresses given their intrinsic width
 	// We assume that busses with non-zero address shift have a data width matching the shift (reality says yes)
-	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
-	offs_t lowbits_mask = width && !m_config.m_addr_shift ? (width >> 3) - 1 : default_lowbits_mask;
+	offs_t default_lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
+	offs_t lowbits_mask = width && !m_config.addr_shift() ? (width >> 3) - 1 : default_lowbits_mask;
 
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, addrstart & ~lowbits_mask);
@@ -1067,28 +1131,9 @@ void address_space::check_optimize_all(const char *function, int width, offs_t a
 		}
 	}
 
-	// Check if we have to adjust the unitmask and addresses
 	nunitmask = 0xffffffffffffffffU >> (64 - m_config.data_width());
 	if (unitmask)
 		nunitmask &= unitmask;
-	if ((addrstart & default_lowbits_mask) || ((~addrend) & default_lowbits_mask)) {
-		if ((addrstart ^ addrend) & ~default_lowbits_mask)
-			fatalerror("%s: In range %x-%x mask %x mirror %x select %x, start or end is unaligned while the range spans more than one slot (granularity = %d).\n", function, addrstart, addrend, addrmask, addrmirror, addrselect, default_lowbits_mask + 1);
-		offs_t lowbyte = m_config.addr2byte(addrstart & default_lowbits_mask);
-		offs_t highbyte = m_config.addr2byte((addrend & default_lowbits_mask) + 1);
-		if (m_config.endianness() == ENDIANNESS_LITTLE) {
-			u64 hmask = 0xffffffffffffffffU >> (64 - 8*highbyte);
-			nunitmask = (nunitmask << (8*lowbyte)) & hmask;
-		} else {
-			u64 hmask = 0xffffffffffffffffU >> ((64 - m_config.data_width()) + 8*lowbyte);
-			nunitmask = (nunitmask << (m_config.data_width() - 8*highbyte)) & hmask;
-		}
-
-		addrstart &= ~default_lowbits_mask;
-		addrend |= default_lowbits_mask;
-		if(changing_bits < default_lowbits_mask)
-			changing_bits = default_lowbits_mask;
-	}
 
 	nstart = addrstart;
 	nend = addrend;
@@ -1117,7 +1162,7 @@ void address_space::check_optimize_mirror(const char *function, offs_t addrstart
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x mirror %x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, addrmirror, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x mirror %x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrmirror, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -1167,7 +1212,7 @@ void address_space::check_address(const char *function, offs_t addrstart, offs_t
 	if (addrend & ~m_addrmask)
 		fatalerror("%s: In range %x-%x, end address is outside of the global address mask %x, did you mean %x ?\n", function, addrstart, addrend, m_addrmask, addrend & m_addrmask);
 
-	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.m_addr_shift)) - 1;
+	offs_t lowbits_mask = (m_config.data_width() >> (3 - m_config.addr_shift())) - 1;
 	if (addrstart & lowbits_mask)
 		fatalerror("%s: In range %x-%x, start address has low bits set, did you mean %x ?\n", function, addrstart, addrend, addrstart & ~lowbits_mask);
 	if ((~addrend) & lowbits_mask)
@@ -1190,7 +1235,7 @@ void address_space::prepare_map()
 	m_map = std::make_unique<address_map>(m_device, m_spacenum);
 
 	// merge in the submaps
-	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness());
+	m_map->import_submaps(m_manager.machine(), m_device.owner() ? *m_device.owner() : m_device, data_width(), endianness(), addr_shift());
 
 	// extract global parameters specified by the map
 	m_unmap = (m_map->m_unmapval == 0) ? 0 : ~0;
@@ -1240,7 +1285,7 @@ void address_space::prepare_map()
 			// find the region
 			memory_region *region = m_manager.machine().root_device().memregion(fulltag.c_str());
 			if (region == nullptr)
-				fatalerror("device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
+				fatalerror("device '%s' %s space memory map entry %X-%X references nonexistent region \"%s\"\n", m_device.tag(), m_name, entry.m_addrstart, entry.m_addrend, entry.m_region);
 
 			// validate the region
 			if (entry.m_rgnoffs + m_config.addr2byte(entry.m_addrend - entry.m_addrstart + 1) > region->bytes())
@@ -1437,14 +1482,14 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 		case AMH_PORT:
 			install_readwrite_port(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
-							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
+								   (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
+								   (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
 			break;
 
 		case AMH_BANK:
 			install_bank_generic(entry.m_addrstart, entry.m_addrend, entry.m_addrmirror,
-							(readorwrite == read_or_write::READ) ? data.m_tag : nullptr,
-							(readorwrite == read_or_write::WRITE) ? data.m_tag : nullptr);
+								 (readorwrite == read_or_write::READ) ? entry.m_devbase.subtag(data.m_tag) : "",
+								 (readorwrite == read_or_write::WRITE) ? entry.m_devbase.subtag(data.m_tag) : "");
 			break;
 
 		case AMH_DEVICE_SUBMAP:
@@ -1814,7 +1859,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 {
 	check_address("install_device_delegate", addrstart, addrend);
 	address_map map(*this, addrstart, addrend, unitmask, cswidth, m_device, delegate);
-	map.import_submaps(m_manager.machine(), device, data_width(), endianness());
+	map.import_submaps(m_manager.machine(), device, data_width(), endianness(), addr_shift());
 	populate_from_map(&map);
 }
 
@@ -1825,42 +1870,42 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  handler into this address space
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_readwrite_port(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_port(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(rtag != nullptr) ? rtag : "(none)", (wtag != nullptr) ? wtag : "(none)"));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_readwrite_port", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// read handler
-	if (rtag != nullptr)
+	if (rtag != "")
 	{
 		// find the port
 		ioport_port *port = device().owner()->ioport(rtag);
 		if (port == nullptr)
-			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
+			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag.c_str(), m_name, m_device.tag());
 
 		// map the range and set the ioport
 		auto hand_r = new handler_entry_read_ioport<Width, AddrShift, Endian>(this, port);
 		m_root_read->populate(nstart, nend, nmirror, hand_r);
 	}
 
-	if (wtag != nullptr)
+	if (wtag != "")
 	{
 		// find the port
 		ioport_port *port = device().owner()->ioport(wtag);
 		if (port == nullptr)
-			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
+			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag.c_str(), m_name, m_device.tag());
 
 		// map the range and set the ioport
 		auto hand_w = new handler_entry_write_ioport<Width, AddrShift, Endian>(this, port);
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
-	invalidate_caches(rtag ? wtag ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
+	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
 
 
@@ -1869,18 +1914,18 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 //  mapping to a particular bank
 //-------------------------------------------------
 
-template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, const char *rtag, const char *wtag)
+template<int Width, int AddrShift, endianness_t Endian> void address_space_specific<Width, AddrShift, Endian>::install_bank_generic(offs_t addrstart, offs_t addrend, offs_t addrmirror, std::string rtag, std::string wtag)
 {
 	VPRINTF(("address_space::install_readwrite_bank(%s-%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
 				core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 				core_i64_hex_format(addrmirror, m_addrchars),
-				(rtag != nullptr) ? rtag : "(none)", (wtag != nullptr) ? wtag : "(none)"));
+				rtag.empty() ? "(none)" : rtag.c_str(), wtag.empty() ? "(none)" : wtag.c_str()));
 
 	offs_t nstart, nend, nmask, nmirror;
 	check_optimize_mirror("install_bank_generic", addrstart, addrend, addrmirror, nstart, nend, nmask, nmirror);
 
 	// map the read bank
-	if (rtag != nullptr)
+	if (rtag != "")
 	{
 		std::string fulltag = device().siblingtag(rtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::READ);
@@ -1891,7 +1936,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 	}
 
 	// map the write bank
-	if (wtag != nullptr)
+	if (wtag != "")
 	{
 		std::string fulltag = device().siblingtag(wtag);
 		memory_bank &bank = bank_find_or_allocate(fulltag.c_str(), addrstart, addrend, addrmirror, read_or_write::WRITE);
@@ -1901,7 +1946,7 @@ template<int Width, int AddrShift, endianness_t Endian> void address_space_speci
 		m_root_write->populate(nstart, nend, nmirror, hand_w);
 	}
 
-	invalidate_caches(rtag ? wtag ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
+	invalidate_caches(rtag != "" ? wtag != "" ? read_or_write::READWRITE : read_or_write::READ : read_or_write::WRITE);
 }
 
 
@@ -2586,6 +2631,8 @@ template<int Width, int AddrShift, int Endian> memory_access_cache<Width, AddrSh
 }
 
 
+template class memory_access_cache<0,  1, ENDIANNESS_LITTLE>;
+template class memory_access_cache<0,  1, ENDIANNESS_BIG>;
 template class memory_access_cache<0,  0, ENDIANNESS_LITTLE>;
 template class memory_access_cache<0,  0, ENDIANNESS_BIG>;
 template class memory_access_cache<1,  3, ENDIANNESS_LITTLE>;
@@ -2678,7 +2725,6 @@ memory_block::~memory_block()
 
 memory_bank::memory_bank(address_space &space, int index, offs_t addrstart, offs_t addrend, const char *tag)
 	: m_machine(space.m_manager.machine()),
-	  m_baseptr(nullptr),
 	  m_anonymous(tag == nullptr),
 	  m_addrstart(addrstart),
 	  m_addrend(addrend),
@@ -2754,7 +2800,7 @@ void memory_bank::set_base(void *base)
 		m_entries.resize(1);
 		m_curentry = 0;
 	}
-	m_baseptr = m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
+	m_entries[m_curentry] = reinterpret_cast<u8 *>(base);
 	for(auto cb : m_alloc_notifier)
 		cb(base);
 	m_alloc_notifier.clear();
@@ -2785,7 +2831,6 @@ void memory_bank::set_entry(int entrynum)
 		throw emu_fatalerror("memory_bank::set_entry called for bank '%s' with invalid bank entry %d", m_tag.c_str(), entrynum);
 
 	m_curentry = entrynum;
-	m_baseptr = m_entries[entrynum];
 }
 
 
@@ -2805,10 +2850,6 @@ void memory_bank::configure_entry(int entrynum, void *base)
 
 	// set the entry
 	m_entries[entrynum] = reinterpret_cast<u8 *>(base);
-
-	// if the bank base is not configured, and we're the first entry, set us up
-	if (!m_baseptr && !entrynum)
-		m_baseptr = m_entries[0];
 }
 
 
@@ -2824,8 +2865,6 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 	// fill in the requested bank entries
 	for (int entrynum = 0; entrynum < numentries; entrynum ++)
 		m_entries[entrynum + startentry] = reinterpret_cast<u8 *>(base) +  entrynum * stride ;
-	if(!m_baseptr && !startentry)
-		m_baseptr = reinterpret_cast<u8 *>(base);
 }
 
 

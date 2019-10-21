@@ -18,6 +18,7 @@
 #include "sound/sn76496.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 
 class sega005_sound_device;
@@ -25,8 +26,8 @@ class sega005_sound_device;
 class segag80r_state : public segag80snd_common
 {
 public:
-	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
-		: segag80snd_common(mconfig, type, tag),
+	segag80r_state(const machine_config &mconfig, device_type type, const char *tag) :
+		segag80snd_common(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
 		m_sn1(*this, "sn1"),
@@ -41,8 +42,8 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
-		m_ppi(*this, "ppi8255"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_decrypted_opcodes(*this, "decrypted_opcodes")
+	{ }
 
 	void g80r_base(machine_config &config);
 	void monsterb(machine_config &config);
@@ -96,7 +97,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_device<i8255_device> m_ppi;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	std::vector<uint8_t> m_paletteram;
@@ -151,7 +151,6 @@ private:
 	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
 
 	DECLARE_WRITE8_MEMBER(usb_ram_w);
-	DECLARE_READ8_MEMBER(sindbadm_sound_data_r);
 	DECLARE_WRITE8_MEMBER(sindbadm_misc_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn1_SN76496_w);
 	DECLARE_WRITE8_MEMBER(sindbadm_sn2_SN76496_w);

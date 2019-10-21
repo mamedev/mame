@@ -132,9 +132,8 @@
 #include "j2trail.lh"
 #include "j2tstplt.lh"
 
-
-
-
+#define UART_IC5 "tms9902_ic5"
+#define UART_IC10 "tms9902_ic10"
 
 
 class jpmmps_state : public driver_device
@@ -144,7 +143,9 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_psg(*this, "sn"),
-			m_meters(*this, "meters")
+			m_meters(*this, "meters"),
+			m_uart_ic5(*this, UART_IC5),
+			m_uart_ic10(*this, UART_IC10)
 	{ }
 
 	void jpmmps(machine_config &config);
@@ -161,6 +162,8 @@ private:
 	required_device<tms9995_device> m_maincpu;
 	required_device<sn76489_device> m_psg;
 	required_device<meters_device> m_meters;
+	required_device<tms9902_device> m_uart_ic5;
+	required_device<tms9902_device> m_uart_ic10;
 
 	DECLARE_WRITE8_MEMBER(jpmmps_meters_w);
 	DECLARE_WRITE8_MEMBER(jpmmps_psg_buf_w);
@@ -181,19 +184,19 @@ void jpmmps_state::jpmmps_map(address_map &map)
 
 void jpmmps_state::jpmmps_io_map(address_map &map)
 {
-	map.global_mask(0xff);
-	map(0x0000, 0x001f).rw("tms9902_ic5", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map.global_mask(0x1ff);
+	map(0x0000, 0x003f).rw(UART_IC5, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
 
-//  AM_RANGE(0x0020, 0x0020) // power fail
-//  AM_RANGE(0x0021, 0x0021) // wd timeout
-//  AM_RANGE(0x0022, 0x0022) // invalid access
-//  AM_RANGE(0x0023, 0x0023) // clear down
+//  map(0x0040, 0x0041) // power fail
+//  map(0x0042, 0x0043) // wd timeout
+//  map(0x0044, 0x0045) // invalid access
+//  map(0x0046, 0x0047) // clear down
 
-//  AM_RANGE(0x0026, 0x0026) // uart4 int
-//  AM_RANGE(0x0027, 0x0027) // uart2 int
+//  map(0x004c, 0x004d) // uart4 int
+//  map(0x004e, 0x004f) // uart2 int
 
-	map(0x0040, 0x005f).rw("tms9902_ic10", FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
-	map(0x0060, 0x0067).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0x0080, 0x00bf).rw(UART_IC10, FUNC(tms9902_device::cruread), FUNC(tms9902_device::cruwrite));
+	map(0x00c0, 0x00cf).w("mainlatch", FUNC(ls259_device::write_d0));
 }
 
 
@@ -245,48 +248,49 @@ void jpmmps_state::machine_reset()
 	m_maincpu->reset_line(ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(jpmmps_state::jpmmps)
-
+void jpmmps_state::jpmmps(machine_config &config)
+{
 	// CPU TMS9995, standard variant; no line connections
-	MCFG_TMS99xx_ADD(m_maincpu, TMS9995, MAIN_CLOCK, jpmmps_map, jpmmps_io_map)
+	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &jpmmps_state::jpmmps_map);
+	m_maincpu->set_addrmap(AS_IO, &jpmmps_state::jpmmps_io_map);
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC10
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(NOOP) // watchdog
-	MCFG_ADDRESSABLE_LATCH_Q1_OUT_CB(NOOP) // ram en
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // alarm
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(NOOP) // nmi en
-	//MCFG_ADDRESSABLE_LATCH_Q4_OUT_CB(INPUTLINE("reelmcu", INPUT_LINE_RESET)) MCFG_DEVCB_INVERT // reel en
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(NOOP) // io en
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(NOOP) // bb
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(NOOP) // diagnostic led
+	ls259_device &mainlatch(LS259(config, "mainlatch")); // IC10
+	mainlatch.q_out_cb<0>().set_nop(); // watchdog
+	mainlatch.q_out_cb<1>().set_nop(); // ram en
+	mainlatch.q_out_cb<2>().set_nop(); // alarm
+	mainlatch.q_out_cb<3>().set_nop(); // nmi en
+	//mainlatch.q_out_cb<4>().set_inputline("reelmcu", INPUT_LINE_RESET).invert(); // reel en
+	mainlatch.q_out_cb<5>().set_nop(); // io en
+	mainlatch.q_out_cb<6>().set_nop(); // bb
+	mainlatch.q_out_cb<7>().set_nop(); // diagnostic led
 
-	//MCFG_DEVICE_ADD("reelmcu", TMS7041, XTAL(5'000'000))
+	//TMS7041(config, "reelmcu", XTAL(5'000'000));
 
-	MCFG_DEVICE_ADD("ppi8255_ic26", I8255, 0)
+	i8255_device &ic26(I8255(config, "ppi8255_ic26"));
 	// Port B 0 is coin lockout
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_meters_w))
+	ic26.out_pc_callback().set(FUNC(jpmmps_state::jpmmps_meters_w));
 
-	MCFG_DEVICE_ADD("ppi8255_ic21", I8255, 0)
+	I8255(config, "ppi8255_ic21");
 
-	MCFG_DEVICE_ADD("ppi8255_ic22", I8255, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, jpmmps_state, jpmmps_psg_buf_w)) // SN chip data
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, jpmmps_state, jpmmps_ic22_portc_w))  // C3 is last meter, C2 latches in data
+	i8255_device &ic22(I8255(config, "ppi8255_ic22"));
+	ic22.out_pb_callback().set(FUNC(jpmmps_state::jpmmps_psg_buf_w)); // SN chip data
+	ic22.out_pc_callback().set(FUNC(jpmmps_state::jpmmps_ic22_portc_w));  // C3 is last meter, C2 latches in data
 
-	MCFG_DEVICE_ADD("ppi8255_ic25", I8255, 0)
+	I8255(config, "ppi8255_ic25");
 
-	MCFG_DEVICE_ADD("tms9902_ic10", TMS9902, DUART_CLOCK) // Communication with Reel MCU
-	MCFG_DEVICE_ADD("tms9902_ic5", TMS9902, DUART_CLOCK) // Communication with Security / Printer
+	TMS9902(config, m_uart_ic10, DUART_CLOCK); // Communication with Reel MCU
+	TMS9902(config, m_uart_ic5, DUART_CLOCK); // Communication with Security / Printer
 
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("sn", SN76489, SOUND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489(config, m_psg, SOUND_CLOCK);
+	m_psg->add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	MCFG_DEVICE_ADD("meters", METERS, 0)
-	MCFG_METERS_NUMBER(9) // TODO: meters.cpp sets a max of 8
+	METERS(config, m_meters, 0).set_number(9); // TODO: meters.cpp sets a max of 8
 
 	config.set_default_layout(layout_jpmmps);
-MACHINE_CONFIG_END
+}
 
 
 
@@ -2161,8 +2165,8 @@ GAMEL( 198?, j2fasttk,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 GAMEL( 198?, j2fqueen,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Find The Queen (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fqueen )
 GAMEL( 198?, j2fiveal,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Alive (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fiveal )
 GAMEL( 198?, j2fiveln,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Liner (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fiveln )
-GAMEL( 198?, j2fws,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (Set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fws )
-GAMEL( 198?, j2fwsa,    j2fws,    jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (Set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fws )
+GAMEL( 198?, j2fws,     0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fws )
+GAMEL( 198?, j2fwsa,    j2fws,    jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Five Way Shuffle (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fws )
 GAME(  198?, j2frmtch,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Fruit Match (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAMEL( 198?, j2fullhs,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Full House Club (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2fullhs )
 GAMEL( 198?, j2ghostb,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Ghostbuster (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2ghostb )
@@ -2189,12 +2193,12 @@ GAMEL( 198?, j2monblt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 GAMEL( 198?, j2mongam,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Game (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2mongam )
 GAME(  198?, j2mongmd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Money Game Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2multwn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Multi Win (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  198?, j2notexc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (Set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  198?, j2notexca, j2notexc, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (Set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAME(  198?, j2notexcb, j2notexc, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (Set 3) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j2notexc,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j2notexca, j2notexc, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
+GAME(  198?, j2notexcb, j2notexc, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Exchange (set 3) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAMEL( 198?, j2notesh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Note Shoot (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2notesh )
-GAMEL( 198?, j2nudbnz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (Set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nudbnz )
-GAME(  198?, j2nudbnza, j2nudbnz, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (Set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
+GAMEL( 198?, j2nudbnz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2nudbnz )
+GAME(  198?, j2nudbnza, j2nudbnz, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Bonanza Deluxe (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2nuddup,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Double Up (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2nuddud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Double Up Deluxe (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2nudup3,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Nudge Double Up MkIII (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
@@ -2205,8 +2209,8 @@ GAMEL( 198?, j2plsnud,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 GAME(  198?, j2potlck,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pot Luck (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAMEL( 198?, j2pndrsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pound Rush (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2pndrsh )
 GAME(  198?, j2pyramd,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Pyramid (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
-GAMEL( 198?, j2reelbn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (Set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbn )
-GAMEL( 198?, j2reelbna, j2reelbn, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (Set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbn )
+GAMEL( 198?, j2reelbn,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (set 1) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbn )
+GAMEL( 198?, j2reelbna, j2reelbn, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bingo Club (set 2) (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbn )
 GAMEL( 198?, j2reelbo,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Bonus (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2reelbo )
 GAME(  198?, j2reelmg,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Magic (JPM) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2reelmgd, j2reelmg, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "JPM","Reel Magic (JPM) [Dutch] (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
@@ -2252,8 +2256,8 @@ GAMEL( 198?, j2paypkt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0
 GAMEL( 198?, j2silvcl,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Silver Classic (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2silvcl )
 GAMEL( 198?, j2silvsh,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Silver Shot (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2silvsh )
 GAMEL( 198?, j2sstrea,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Supa Streak (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2sstrea )
-GAMEL( 198?, j2tstplt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (Set 1) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2tstplt )
-GAMEL( 198?, j2tstplta, j2tstplt, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (Set 2) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2tstplt )
+GAMEL( 198?, j2tstplt,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (set 1) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2tstplt )
+GAMEL( 198?, j2tstplta, j2tstplt, jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Pcp","Test Pilot (set 2) (Pcp) (MPS)", MACHINE_IS_SKELETON_MECHANICAL, layout_j2tstplt )
 
 GAME(  198?, j2bonanz,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Eurocoin","Bonanza (Eurocoin) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )
 GAME(  198?, j2supchy,  0,        jpmmps, jpmmps, jpmmps_state, empty_init, ROT0, "Eurocoin","Super Cherry (Eurocoin) (MPS)", MACHINE_IS_SKELETON_MECHANICAL )

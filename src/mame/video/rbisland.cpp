@@ -14,16 +14,14 @@
 
 /***************************************************************************/
 
-WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
+void rbisland_state::rbisland_colpri_cb(u32 &sprite_colbank, u32 &pri_mask, u16 sprite_ctrl)
 {
-	if (offset == 0)
-	{
-		/* bits 0 and 1 always set */
-		/* bits 5-7 are the sprite palette bank */
-		/* other bits unknown */
+	/* bits 0 and 1 always set */
+	/* bits 5-7 are the sprite palette bank */
+	/* other bits unknown */
 
-		m_pc090oj->set_sprite_ctrl((data & 0xe0) >> 5);
-	}
+	sprite_colbank = (sprite_ctrl & 0xe0) >> 1;
+	pri_mask = 0xfc; /* sprites under top bg layer */
 }
 
 WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
@@ -54,7 +52,7 @@ uint32_t rbisland_state::screen_update_rainbow(screen_device &screen, bitmap_ind
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 	m_pc080sn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
-	m_pc090oj->draw_sprites(bitmap, cliprect, screen.priority(), 1);
+	m_pc090oj->draw_sprites(screen, bitmap, cliprect);
 	return 0;
 }
 

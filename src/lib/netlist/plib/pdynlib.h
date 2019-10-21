@@ -8,28 +8,31 @@
 #define PDYNLIB_H_
 
 #include "pstring.h"
+#include "ptypes.h"
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
 // pdynlib: dynamic loading of libraries  ...
 // ----------------------------------------------------------------------------------------
 
-class dynlib
+class dynlib : public nocopyassignmove
 {
 public:
-	explicit dynlib(const pstring libname);
-	dynlib(const pstring path, const pstring libname);
+	explicit dynlib(const pstring &libname);
+	dynlib(const pstring &path, const pstring &libname);
+
 	~dynlib();
+	COPYASSIGNMOVE(dynlib, delete)
 
 	bool isLoaded() const;
 
 	template <typename T>
-	T getsym(const pstring name)
+	T getsym(const pstring &name)
 	{
 		return reinterpret_cast<T>(getsym_p(name));
 	}
 private:
-	void *getsym_p(const pstring name);
+	void *getsym_p(const pstring &name);
 
 	bool m_isLoaded;
 	void *m_lib;
@@ -59,11 +62,11 @@ public:
 		//return m_sym(args...);
 	}
 
-	bool resolved() { return m_sym != nullptr; }
+	bool resolved() const { return m_sym != nullptr; }
 private:
 	calltype m_sym;
 };
 
-}
+} // namespace plib
 
 #endif /* PSTRING_H_ */

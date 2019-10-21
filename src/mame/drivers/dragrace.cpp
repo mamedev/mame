@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/dragrace.h"
+
 #include "cpu/m6800/m6800.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
@@ -42,7 +43,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 WRITE8_MEMBER(dragrace_state::speed1_w)
 {
 	unsigned freq = ~data & 0x1f;
-	m_discrete->write(machine().dummy_space(), DRAGRACE_MOTOR1_DATA, freq);
+	m_discrete->write(DRAGRACE_MOTOR1_DATA, freq);
 
 	// the tachometers are driven from the same frequency generator that creates the engine sound
 	output().set_value("tachometer", freq);
@@ -51,7 +52,7 @@ WRITE8_MEMBER(dragrace_state::speed1_w)
 WRITE8_MEMBER(dragrace_state::speed2_w)
 {
 	unsigned freq = ~data & 0x1f;
-	m_discrete->write(machine().dummy_space(), DRAGRACE_MOTOR2_DATA, freq);
+	m_discrete->write(DRAGRACE_MOTOR2_DATA, freq);
 
 	// the tachometers are driven from the same frequency generator that creates the engine sound
 	output().set_value("tachometer2", freq);
@@ -239,23 +240,23 @@ static GFXDECODE_START( gfx_dragrace )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(dragrace_state, dragrace)
+void dragrace_state::dragrace_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
+	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff));   // 2 color tiles
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(3, rgb_t(0xFF, 0xFF, 0xFF));
+	palette.set_pen_color(3, rgb_t(0xff, 0xff, 0xff));
 	palette.set_pen_color(4, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(5, rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(6, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(7, rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(8, rgb_t(0xFF, 0xFF, 0xFF));   /* 4 color tiles */
-	palette.set_pen_color(9, rgb_t(0xB0, 0xB0, 0xB0));
-	palette.set_pen_color(10,rgb_t(0x5F, 0x5F, 0x5F));
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(7, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(8, rgb_t(0xff, 0xff, 0xff));   // 4 color tiles
+	palette.set_pen_color(9, rgb_t(0xb0, 0xb0, 0xb0));
+	palette.set_pen_color(10,rgb_t(0x5f, 0x5f, 0x5f));
 	palette.set_pen_color(11,rgb_t(0x00, 0x00, 0x00));
-	palette.set_pen_color(12,rgb_t(0xFF, 0xFF, 0xFF));
-	palette.set_pen_color(13,rgb_t(0x5F, 0x5F, 0x5F));
-	palette.set_pen_color(14,rgb_t(0xB0, 0xB0, 0xB0));
+	palette.set_pen_color(12,rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(13,rgb_t(0x5f, 0x5f, 0x5f));
+	palette.set_pen_color(14,rgb_t(0xb0, 0xb0, 0xb0));
 	palette.set_pen_color(15,rgb_t(0x00, 0x00, 0x00));
 }
 
@@ -271,37 +272,35 @@ void dragrace_state::machine_reset()
 	m_gear[1] = 0;
 }
 
-MACHINE_CONFIG_START(dragrace_state::dragrace)
-
+void dragrace_state::dragrace(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6800, XTAL(12'096'000) / 12)
-	MCFG_DEVICE_PROGRAM_MAP(dragrace_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
+	M6800(config, m_maincpu, 12.096_MHz_XTAL / 12);
+	m_maincpu->set_addrmap(AS_PROGRAM, &dragrace_state::dragrace_map);
+	m_maincpu->set_periodic_int(FUNC(dragrace_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
+	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
+	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::dragrace_frame_callback), attotime::from_hz(60));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(256, 262)
-	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
-	MCFG_SCREEN_UPDATE_DRIVER(dragrace_state, screen_update_dragrace)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(256, 262);
+	m_screen->set_visarea(0, 255, 0, 239);
+	m_screen->set_screen_update(FUNC(dragrace_state::screen_update_dragrace));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_dragrace)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(dragrace_state, dragrace)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_dragrace);
+	PALETTE(config, "palette", FUNC(dragrace_state::dragrace_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("discrete", DISCRETE, dragrace_discrete)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
+	DISCRETE(config, m_discrete, dragrace_discrete);
+	m_discrete->add_route(0, "lspeaker", 1.0);
+	m_discrete->add_route(1, "rspeaker", 1.0);
 
 	f9334_device &latch_f5(F9334(config, "latch_f5")); // F5
 	latch_f5.parallel_out_cb().set(FUNC(dragrace_state::speed1_w)).mask(0x1f); // set 3SPEED1-7SPEED1
@@ -325,7 +324,7 @@ MACHINE_CONFIG_START(dragrace_state::dragrace)
 	latch_e5.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_MOTOR2_EN>)); // Motor2 enable
 	latch_e5.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<DRAGRACE_HITONE_EN>)); // HiTone enable
 	latch_e5.q_out_cb<7>().set_output("led1"); // Player 2 Start Lamp
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( dragrace )

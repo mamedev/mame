@@ -9,12 +9,6 @@
 #include "machine/k033906.h"
 #include "video/voodoo.h"
 
-#define MCFG_KONPPC_CGBOARD_NUMBER(_num) \
-	downcast<konppc_device &>(*device).set_num_boards(_num);
-
-#define MCFG_KONPPC_CGBOARD_TYPE(_cgtype) \
-	downcast<konppc_device &>(*device).set_cbboard_type(konppc_device::CGBOARD_TYPE_##_cgtype);
-
 class konppc_device :  public device_t
 {
 public:

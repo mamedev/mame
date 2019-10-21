@@ -16,7 +16,6 @@
 
 #include "debugger.h"
 
-
 void abstract_ata_interface_device::set_default_ata_devices(const char* _master, const char* _slave)
 {
 	for (size_t slot_index = 0; slot_index < SLOT_COUNT; slot_index++)
@@ -243,6 +242,7 @@ ata_interface_device::ata_interface_device(const machine_config &mconfig, const 
 	abstract_ata_interface_device(mconfig, ATA_INTERFACE, tag, owner, clock)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup

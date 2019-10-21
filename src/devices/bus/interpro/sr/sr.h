@@ -9,28 +9,31 @@
 class interpro_bus_device : public device_t
 {
 public:
+	// space configuration
+	template <typename T> void set_main_space(T &&tag, int spacenum) { m_main_space.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
+
 	// callback configuration
 	auto out_irq0_cb() { return m_out_irq0_cb.bind(); }
 	auto out_irq1_cb() { return m_out_irq1_cb.bind(); }
 	auto out_irq2_cb() { return m_out_irq2_cb.bind(); }
-	auto out_vblank_cb() { return m_out_vblank_cb.bind(); }
+	auto out_irq3_cb() { return m_out_irq3_cb.bind(); }
 
 	DECLARE_WRITE_LINE_MEMBER(irq0_w) { m_out_irq0_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1_w) { m_out_irq1_cb(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2_w) { m_out_irq2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank_w) { m_out_vblank_cb(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq3_w) { m_out_irq3_cb(state); }
 
 protected:
 	// construction/destruction
 	interpro_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)
-		, m_maincpu(*this, finder_base::DUMMY_TAG)
-		, m_main_space(nullptr)
-		, m_io_space(nullptr)
+		, m_main_space(*this, finder_base::DUMMY_TAG, -1)
+		, m_io_space(*this, finder_base::DUMMY_TAG, -1)
 		, m_out_irq0_cb(*this)
 		, m_out_irq1_cb(*this)
 		, m_out_irq2_cb(*this)
-		, m_out_vblank_cb(*this)
+		, m_out_irq3_cb(*this)
 	{
 	}
 
@@ -38,15 +41,14 @@ protected:
 	virtual void device_resolve_objects() override;
 
 	// internal state
-	required_device<cpu_device> m_maincpu;
-	address_space *m_main_space;
-	address_space *m_io_space;
+	required_address_space m_main_space;
+	required_address_space m_io_space;
 
 private:
 	devcb_write_line m_out_irq0_cb;
 	devcb_write_line m_out_irq1_cb;
 	devcb_write_line m_out_irq2_cb;
-	devcb_write_line m_out_vblank_cb;
+	devcb_write_line m_out_irq3_cb;
 };
 
 class device_cbus_card_interface;
@@ -55,12 +57,6 @@ class cbus_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	template <typename T>
-	cbus_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&cpu_device)
-		: cbus_bus_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_device));
-	}
 	cbus_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	static const u32 CBUS_BASE = 0x87000000;
@@ -133,7 +129,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq0) { m_bus->irq0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1) { m_bus->irq1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2) { m_bus->irq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_bus->vblank_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq3) { m_bus->irq3_w(state); }
 
 protected:
 	device_cbus_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")
@@ -158,12 +154,6 @@ class srx_bus_device : public interpro_bus_device
 {
 public:
 	// construction/destruction
-	template <typename T>
-	srx_bus_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, T &&cpu_device)
-		: srx_bus_device(mconfig, tag, owner, clock)
-	{
-		m_maincpu.set_tag(std::forward<T>(cpu_device));
-	}
 	srx_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	static const u32 SRX_BASE = 0x8f000000;
@@ -251,7 +241,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(irq0) { m_bus->irq0_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq1) { m_bus->irq1_w(state); }
 	DECLARE_WRITE_LINE_MEMBER(irq2) { m_bus->irq2_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(vblank) { m_bus->vblank_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(irq3) { m_bus->irq3_w(state); }
 
 protected:
 	device_srx_card_interface(const machine_config &mconfig, device_t &device, const char *idprom_region = "idprom")

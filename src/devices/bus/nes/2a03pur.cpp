@@ -7,7 +7,7 @@
 
 
  Here we emulate the PCB designed by infiniteneslives and
- rainwarrior for this homebew multicart [mapper 30?]
+ rainwarrior for this homebew multicart [mapper 31]
  The main difference of this PCB compared to others is that it
  uses 4k PRG banks!
 
@@ -46,7 +46,7 @@ void nes_2a03pur_device::device_start()
 	common_start();
 	save_item(NAME(m_reg));
 	memset(m_reg, 0x00, sizeof(m_reg));
-	m_reg[7] = 0xff;
+	m_reg[7] = 0xff & ((m_prg_chunks << 2) - 1);
 }
 
 void nes_2a03pur_device::pcb_reset()
@@ -88,20 +88,18 @@ void nes_2a03pur_device::pcb_reset()
  so any bank that is mapped to $F000 after power-on
  should contain a valid reset vector.
 
- At present, the project uses iNES mapper 30 to
- designate this mapper. No mapper number has been
- officially reserved yet.
+ This has been assigned to iNES mapper 31.
  -------------------------------------------------*/
 
-WRITE8_MEMBER(nes_2a03pur_device::write_l)
+void nes_2a03pur_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG_MMC(("2a03 puritans write_l, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 	if (offset >= 0x1000)
-		m_reg[offset & 7] = data;
+		m_reg[offset & 7] = data & ((m_prg_chunks << 2) - 1);
 }
 
-READ8_MEMBER(nes_2a03pur_device::read_h)
+uint8_t nes_2a03pur_device::read_h(offs_t offset)
 {
 	LOG_MMC(("2a03 puritans read_h, offset: %04x\n", offset));
 

@@ -181,22 +181,23 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 		return 0xff;
 }
 
-MACHINE_CONFIG_START(savia84_state::savia84)
+void savia84_state::savia84(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, XTAL(4'000'000) / 2)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
+	Z80(config, m_maincpu, XTAL(4'000'000) / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &savia84_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &savia84_state::io_map);
 
 	/* video hardware */
 	config.set_default_layout(layout_savia84);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(*this, savia84_state, savia84_8255_porta_w))
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, savia84_state, savia84_8255_portb_w))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, savia84_state, savia84_8255_portc_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, savia84_state, savia84_8255_portc_w))
-MACHINE_CONFIG_END
+	I8255(config, m_ppi8255);
+	m_ppi8255->out_pa_callback().set(FUNC(savia84_state::savia84_8255_porta_w));
+	m_ppi8255->out_pb_callback().set(FUNC(savia84_state::savia84_8255_portb_w));
+	m_ppi8255->in_pc_callback().set(FUNC(savia84_state::savia84_8255_portc_r));
+	m_ppi8255->out_pc_callback().set(FUNC(savia84_state::savia84_8255_portc_w));
+}
 
 /* ROM definition */
 ROM_START( savia84 )

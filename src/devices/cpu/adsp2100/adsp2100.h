@@ -174,24 +174,6 @@ enum
 	ADSP2100_SR1_SEC
 };
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_ADSP21XX_SPORT_RX_CB(_devcb) \
-	downcast<adsp21xx_device &>(*device).set_sport_rx_callback(DEVCB_##_devcb);
-
-#define MCFG_ADSP21XX_SPORT_TX_CB(_devcb) \
-	downcast<adsp21xx_device &>(*device).set_sport_tx_callback(DEVCB_##_devcb);
-
-#define MCFG_ADSP21XX_TIMER_FIRED_CB(_devcb) \
-	downcast<adsp21xx_device &>(*device).set_timer_fired_callback(DEVCB_##_devcb);
-
-#define MCFG_ADSP21XX_DMOVLAY_CB(_devcb) \
-	downcast<adsp21xx_device &>(*device).set_dmovlay_callback(DEVCB_##_devcb);
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -204,10 +186,10 @@ public:
 	virtual ~adsp21xx_device();
 
 	// inline configuration helpers
-	template <class Object> devcb_base &set_sport_rx_callback(Object &&cb) { return m_sport_rx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sport_tx_callback(Object &&cb) { return m_sport_tx_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_timer_fired_callback(Object &&cb) { return m_timer_fired_cb.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dmovlay_callback(Object &&cb) { return m_dmovlay_cb.set_callback(std::forward<Object>(cb)); }
+	auto sport_rx() { return m_sport_rx_cb.bind(); }
+	auto sport_tx() { return m_sport_tx_cb.bind(); }
+	auto timer_fired() { return m_timer_fired_cb.bind(); }
+	auto dmovlay() { return m_dmovlay_cb.bind(); }
 
 	// public interfaces
 	void load_boot_data(uint8_t *srcdata, uint32_t *dstdata);

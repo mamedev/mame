@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_XMEN_H
+#define MAME_INCLUDES_XMEN_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
@@ -14,8 +18,8 @@
 class xmen_state : public driver_device
 {
 public:
-	xmen_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	xmen_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_xmen6p_spriteramleft(*this, "spriteramleft"),
 		m_xmen6p_spriteramright(*this, "spriteramright"),
 		m_xmen6p_tilemapleft(*this, "tilemapleft"),
@@ -28,12 +32,13 @@ public:
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
 		m_k054321(*this, "k054321"),
-		m_z80bank(*this, "z80bank") { }
+		m_z80bank(*this, "z80bank")
+	{ }
 
 	void xmen(machine_config &config);
 	void xmen6p(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
+	DECLARE_READ_LINE_MEMBER(xmen_frame_r);
 
 private:
 	/* video-related */
@@ -83,3 +88,5 @@ private:
 	void main_map(address_map &map);
 	void sound_map(address_map &map);
 };
+
+#endif // MAME_INCLUDES_XMEN_H

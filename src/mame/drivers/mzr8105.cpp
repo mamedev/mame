@@ -192,8 +192,8 @@ void mzr8105_state::mzr8105_mem(address_map &map)
 	map(0x000000, 0x003fff).rom().region("roms", 0x000000); /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
 	map(0x004000, 0x01ffff).rom().region("roms", 0x004000);/* System EPROM Area 112Kb for System ROM - not verified    */
 	map(0x020000, 0x03ffff).ram(); /* Not verified */
-//  AM_RANGE (0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//  AM_RANGE (0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  map(0x100000, 0xfeffff).rw(FUNC(mzr8105_state::vme_a24_r), FUNC(mzr8105_state::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+//  map(0xff0000, 0xffffff).rw(FUNC(mzr8105_state::vme_a16_r), FUNC(mzr8105_state::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 /* Input ports */
@@ -208,13 +208,13 @@ static void mzr8105_vme_cards(device_slot_interface &device)
 /*
  * Machine configuration
  */
-MACHINE_CONFIG_START(mzr8105_state::mzr8105)
-	MCFG_DEVICE_ADD ("maincpu", M68000, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP (mzr8105_mem)
-	MCFG_VME_DEVICE_ADD("vme")
-	MCFG_VME_BUS_OWNER_SPACES()
-	MCFG_VME_SLOT_ADD ("vme", 1, mzr8105_vme_cards, "mzr8300")
-MACHINE_CONFIG_END
+void mzr8105_state::mzr8105(machine_config &config)
+{
+	M68000(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mzr8105_state::mzr8105_mem);
+	VME(config, "vme", 0).use_owner_spaces();
+	VME_SLOT(config, "slot1", mzr8105_vme_cards, "mzr8300", 1, "vme");
+}
 
 /* ROM definitions */
 /* mzr8300 UPD7201 init sequence

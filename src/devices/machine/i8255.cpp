@@ -229,6 +229,7 @@ i8255_device::i8255_device(const machine_config &mconfig, device_type type, cons
 	, m_out_pc_cb(*this)
 	, m_tri_pa_cb(*this)
 	, m_tri_pb_cb(*this)
+	, m_tri_pc_cb(*this)
 	, m_control(0)
 	, m_intr{ 0, 0 }
 {
@@ -250,6 +251,7 @@ void i8255_device::device_resolve_objects()
 	m_out_pc_cb.resolve_safe();
 	m_tri_pa_cb.resolve_safe(0xff);
 	m_tri_pb_cb.resolve_safe(0xff);
+	m_tri_pc_cb.resolve_safe(0xff);
 }
 
 //-------------------------------------------------
@@ -314,14 +316,17 @@ uint8_t i8255_device::read_mode1(int port)
 		// read data from input latch
 		data = m_input[port];
 
-		// clear input buffer full flag
-		set_ibf(port, 0);
+		if (!machine().side_effects_disabled())
+		{
+			// clear input buffer full flag
+			set_ibf(port, 0);
 
-		// clear interrupt
-		set_intr(port, 0);
+			// clear interrupt
+			set_intr(port, 0);
 
-		// clear input latch
-		m_input[port] = 0;
+			// clear input latch
+			m_input[port] = 0;
+		}
 	}
 
 	return data;
@@ -333,14 +338,17 @@ uint8_t i8255_device::read_mode2()
 	// read data from input latch
 	uint8_t const data = m_input[PORT_A];
 
-	// clear input buffer full flag
-	set_ibf(PORT_A, 0);
+	if (!machine().side_effects_disabled())
+	{
+		// clear input buffer full flag
+		set_ibf(PORT_A, 0);
 
-	// clear interrupt
-	set_intr(PORT_A, 0);
+		// clear interrupt
+		set_intr(PORT_A, 0);
 
-	// clear input latch
-	m_input[PORT_A] = 0;
+		// clear input latch
+		m_input[PORT_A] = 0;
+	}
 
 	return data;
 }
@@ -516,8 +524,8 @@ void i8255_device::output_pc()
 		}
 		else
 		{
-			// TTL inputs float high
-			data |= 0xf0;
+			// TTL inputs floating
+			data |= m_tri_pc_cb(0) & 0xf0;
 		}
 		break;
 
@@ -554,8 +562,8 @@ void i8255_device::output_pc()
 		}
 		else
 		{
-			// TTL inputs float high
-			data |= b_mask;
+			// TTL inputs floating
+			data |= m_tri_pc_cb(0) & b_mask;
 		}
 		break;
 
@@ -708,7 +716,7 @@ void i8255_device::set_pc_bit(int bit, int state)
 }
 
 
-READ8_MEMBER( i8255_device::read )
+uint8_t i8255_device::read(offs_t offset)
 {
 	uint8_t data = 0;
 
@@ -748,7 +756,7 @@ READ8_MEMBER( i8255_device::read )
 }
 
 
-WRITE8_MEMBER( i8255_device::write )
+void i8255_device::write(offs_t offset, uint8_t data)
 {
 	switch (offset & 0x03)
 	{
@@ -801,17 +809,11 @@ WRITE8_MEMBER( i8255_device::write )
 }
 
 
-READ8_MEMBER( i8255_device::pa_r )
-{
-	return read_pa();
-}
-
-
 //-------------------------------------------------
-//  read_pa - port A read
+//  pa_r - port A read
 //-------------------------------------------------
 
-uint8_t i8255_device::read_pa()
+uint8_t i8255_device::pa_r()
 {
 	uint8_t data = 0xff;
 
@@ -822,17 +824,29 @@ uint8_t i8255_device::read_pa()
 }
 
 
-READ8_MEMBER( i8255_device::pb_r )
+//-------------------------------------------------
+//  acka_r - port A read with PC6 strobe
+//-------------------------------------------------
+
+uint8_t i8255_device::acka_r()
 {
-	return read_pb();
+	if (!machine().side_effects_disabled())
+		pc6_w(0);
+
+	uint8_t data = pa_r();
+
+	if (!machine().side_effects_disabled())
+		pc6_w(1);
+
+	return data;
 }
 
 
 //-------------------------------------------------
-//  read_pb - port B read
+//  pb_r - port B read
 //-------------------------------------------------
 
-uint8_t i8255_device::read_pb()
+uint8_t i8255_device::pb_r()
 {
 	uint8_t data = 0xff;
 
@@ -840,6 +854,24 @@ uint8_t i8255_device::read_pb()
 	{
 		data = m_output[PORT_B];
 	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  ackb_r - port B read with PC2 strobe
+//-------------------------------------------------
+
+uint8_t i8255_device::ackb_r()
+{
+	if (!machine().side_effects_disabled())
+		pc2_w(0);
+
+	uint8_t data = pb_r();
+
+	if (!machine().side_effects_disabled())
+		pc2_w(1);
 
 	return data;
 }

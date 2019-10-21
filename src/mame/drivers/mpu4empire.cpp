@@ -500,8 +500,7 @@ ROM_START( m4gamblr )
 	ROM_LOAD( "gambsnd2.bin", 0x080000, 0x080000, CRC(bc8b78bc) SHA1(6a27804483eaed7912fb6a6e673d1ce9f36371cd) )
 	ROM_REGION( 0x100000, "altmsm6376", 0 )
 	// different SFX, does this belong to a specific revision?
-	ROM_LOAD( "gambsnd1f.bin", 0x000000, 0x080000, CRC(249ae0fd) SHA1(024ae694f6d09b7f2bf5b94e3a07e9267707f794) )
-	ROM_LOAD( "gambsnd2f.bin", 0x080000, 0x080000, CRC(bc8b78bc) SHA1(6a27804483eaed7912fb6a6e673d1ce9f36371cd) )
+	ROM_LOAD( "gambsnd1f.bin", 0x000000, 0x080000, CRC(249ae0fd) SHA1(024ae694f6d09b7f2bf5b94e3a07e9267707f794) )//replaces gambsnd1.bin
 ROM_END
 
 ROM_START( m4gamblra )

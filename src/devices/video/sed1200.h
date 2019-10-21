@@ -17,17 +17,6 @@
 
 #pragma once
 
-#define MCFG_SED1200D0A_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, SED1200D0A, 0 )
-
-#define MCFG_SED1200F0A_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, SED1200F0A, 0 )
-
-#define MCFG_SED1200D0B_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, SED1200D0B, 0 )
-
-#define MCFG_SED1200F0B_ADD( _tag ) \
-	MCFG_DEVICE_ADD( _tag, SED1200F0B, 0 )
 
 class sed1200_device : public device_t {
 public:

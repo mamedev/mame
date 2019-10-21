@@ -111,7 +111,7 @@ void mcr_state::video_start()
 			break;
 
 		default:
-			assert_always(0, "Unknown mcr board");
+			throw emu_fatalerror("mcr_state::video_start: Unknown mcr board");
 			break;
 	}
 }

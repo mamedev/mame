@@ -296,14 +296,14 @@ void prof80_state::prof80_mmu(address_map &map)
 void prof80_state::prof80_io(address_map &map)
 {
 	map(0x00, 0xd7).mirror(0xff00).rw(m_ecb, FUNC(ecbbus_device::io_r), FUNC(ecbbus_device::io_w));
-//  AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_DEVREADWRITE(UNIO_Z80STI_TAG, z80sti_device, read, write)
-//  AM_RANGE(0x94, 0x95) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
-//  AM_RANGE(0x96, 0x97) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(UNIO_Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
-//  AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
-//  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
-//  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_device, write)
-//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
-//  AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
+//  map(0x80, 0x8f).mirror(0xff00).rw(UNIO_Z80STI_TAG, FUNC(z80sti_device::read), FUNC(z80sti_device::write));
+//  map(0x94, 0x95).mirror(0xff00).rw(UNIO_Z80SIO_TAG, FUNC(z80sio_device::z80sio_d_r), FUNC(z80sio_device::z80sio_d_w)); // TODO: these methods don't exist anymore
+//  map(0x96, 0x97).mirror(0xff00).rw(UNIO_Z80SIO_TAG, FUNC(z80sio_device::z80sio_c_r), FUNC(z80sio_device::z80sio_c_w)); // TODO: these methods don't exist anymore
+//  map(0x9e, 0x9e).mirror(0xff00).w(FUNC(prof80_state::unio_ctrl_w));
+//  map(0x9c, 0x9c).mirror(0xff00).w(UNIO_CENTRONICS1_TAG, FUNC(centronics_device::write));
+//  map(0x9d, 0x9d).mirror(0xff00).w(UNIO_CENTRONICS1_TAG, FUNC(centronics_device::write));
+//  map(0xc0, 0xc0).mirror(0xff00).r(FUNC(prof80_state::gripc_r));
+//  map(0xc1, 0xc1).mirror(0xff00).rw(FUNC(prof80_state::gripd_r), FUNC(prof80_state::gripd_w));
 	map(0xd8, 0xd8).mirror(0xff00).w(FUNC(prof80_state::flr_w));
 	map(0xda, 0xda).mirror(0xff00).r(FUNC(prof80_state::status_r));
 	map(0xdb, 0xdb).mirror(0xff00).r(FUNC(prof80_state::status2_r));
@@ -447,36 +447,38 @@ void prof80_state::machine_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( prof80 )
+//  machine_config( prof80 )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(prof80_state::prof80)
+void prof80_state::prof80(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(Z80_TAG, Z80, XTAL(6'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(prof80_mem)
-	MCFG_DEVICE_IO_MAP(prof80_io)
+	Z80(config, m_maincpu, XTAL(6'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mem);
+	m_maincpu->set_addrmap(AS_IO, &prof80_state::prof80_io);
 
 	// MMU
-	MCFG_PROF80_MMU_ADD(m_mmu, prof80_mmu)
+	PROF80_MMU(config, m_mmu, 0);
+	m_mmu->set_addrmap(AS_PROGRAM, &prof80_state::prof80_mmu);
 
 	// RTC
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL(32'768), NOOP, NOOP)
+	UPD1990A(config, m_rtc);
 
 	// FDC
-	MCFG_UPD765A_ADD(UPD765_TAG, true, true)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":2", prof80_floppies, nullptr,    floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":3", prof80_floppies, nullptr,    floppy_image_device::default_floppy_formats)
+	UPD765A(config, m_fdc, 8'000'000, true, true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":0", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", prof80_floppies, "525qd", floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", prof80_floppies, nullptr, floppy_image_device::default_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":3", prof80_floppies, nullptr, floppy_image_device::default_floppy_formats);
 
 	// DEMUX latches
 	LS259(config, m_flra);
-	m_flra->q_out_cb<0>().set(UPD1990A_TAG, FUNC(upd1990a_device::data_in_w)); // TDI
-	m_flra->q_out_cb<0>().append(UPD1990A_TAG, FUNC(upd1990a_device::c0_w)); // C0
-	m_flra->q_out_cb<1>().set(UPD1990A_TAG, FUNC(upd1990a_device::c1_w)); // C1
-	m_flra->q_out_cb<2>().set(UPD1990A_TAG, FUNC(upd1990a_device::c2_w)); // C2
+	m_flra->q_out_cb<0>().set(m_rtc, FUNC(upd1990a_device::data_in_w)); // TDI
+	m_flra->q_out_cb<0>().append(m_rtc, FUNC(upd1990a_device::c0_w)); // C0
+	m_flra->q_out_cb<1>().set(m_rtc, FUNC(upd1990a_device::c1_w)); // C1
+	m_flra->q_out_cb<2>().set(m_rtc, FUNC(upd1990a_device::c2_w)); // C2
 	m_flra->q_out_cb<3>().set(FUNC(prof80_state::ready_w)); // READY
-	m_flra->q_out_cb<4>().set(UPD1990A_TAG, FUNC(upd1990a_device::clk_w)); // TCK
+	m_flra->q_out_cb<4>().set(m_rtc, FUNC(upd1990a_device::clk_w)); // TCK
 	m_flra->q_out_cb<5>().set(FUNC(prof80_state::inuse_w)); // IN USE
 	m_flra->q_out_cb<6>().set(FUNC(prof80_state::motor_w)); // _MOTOR
 	m_flra->q_out_cb<7>().set(FUNC(prof80_state::select_w)); // SELECT
@@ -487,28 +489,27 @@ MACHINE_CONFIG_START(prof80_state::prof80)
 	m_flrb->q_out_cb<3>().set(m_rs232a, FUNC(rs232_port_device::write_txd)); // TX
 	m_flrb->q_out_cb<4>().set(FUNC(prof80_state::mstop_w)); // _MSTOP
 	m_flrb->q_out_cb<5>().set(m_rs232b, FUNC(rs232_port_device::write_txd)); // TXP
-	m_flrb->q_out_cb<6>().set(UPD1990A_TAG, FUNC(upd1990a_device::stb_w)); // TSTB
+	m_flrb->q_out_cb<6>().set(m_rtc, FUNC(upd1990a_device::stb_w)); // TSTB
 	m_flrb->q_out_cb<7>().set(m_mmu, FUNC(prof80_mmu_device::mme_w)); // MME
 
 	// ECB bus
-	MCFG_ECBBUS_ADD()
-	MCFG_ECBBUS_SLOT_ADD(1, "ecb_1", ecbbus_cards, "grip21")
-	MCFG_ECBBUS_SLOT_ADD(2, "ecb_2", ecbbus_cards, nullptr)
-	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", ecbbus_cards, nullptr)
-	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", ecbbus_cards, nullptr)
-	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", ecbbus_cards, nullptr)
+	ECBBUS(config, m_ecb);
+	ECBBUS_SLOT(config, "ecb_1", 1, ecbbus_cards, "grip21");
+	ECBBUS_SLOT(config, "ecb_2", 2, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_3", 3, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_4", 4, ecbbus_cards, nullptr);
+	ECBBUS_SLOT(config, "ecb_5", 5, ecbbus_cards, nullptr);
 
 	// V24
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
 	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
 
 	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("128K")
+	RAM(config, RAM_TAG).set_default_size("128K");
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof80")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "flop_list").set_original("prof80");
+}
 
 
 

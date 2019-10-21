@@ -809,7 +809,7 @@ void mc6854_device::update_sr1( )
 
 
 
-READ8_MEMBER( mc6854_device::read )
+uint8_t mc6854_device::read(offs_t offset)
 {
 	switch ( offset )
 	{
@@ -850,7 +850,7 @@ READ8_MEMBER( mc6854_device::read )
 
 
 
-WRITE8_MEMBER( mc6854_device::write )
+void mc6854_device::write(offs_t offset, uint8_t data)
 {
 	switch ( offset )
 	{

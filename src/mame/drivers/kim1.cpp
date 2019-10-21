@@ -60,6 +60,7 @@ TODO:
 
 #include "emu.h"
 #include "includes/kim1.h"
+#include "speaker.h"
 #include "kim1.lh"
 
 //**************************************************************************
@@ -125,8 +126,8 @@ static INPUT_PORTS_START( kim1 )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x80, 0x00, IPT_UNUSED )
-	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, nullptr)
-	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, nullptr)
+	PORT_BIT( 0x40, 0x40, IPT_KEYBOARD ) PORT_NAME("sw1: ST") PORT_CODE(KEYCODE_F7) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_nmi, 0)
+	PORT_BIT( 0x20, 0x20, IPT_KEYBOARD ) PORT_NAME("sw2: RS") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, kim1_state, trigger_reset, 0)
 	PORT_DIPNAME(0x10, 0x10, "sw3: SS")                       PORT_CODE(KEYCODE_NUMLOCK) PORT_TOGGLE
 	PORT_DIPSETTING( 0x00, "single step")
 	PORT_DIPSETTING( 0x10, "run")
@@ -240,36 +241,39 @@ void kim1_state::machine_reset()
 //  MACHINE DRIVERS
 //**************************************************************************
 
-MACHINE_CONFIG_START(kim1_state::kim1)
+void kim1_state::kim1(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", M6502, 1000000)        /* 1 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(kim1_map)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	M6502(config, m_maincpu, 1000000);        /* 1 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::kim1_map);
+	config.m_minimum_quantum = attotime::from_hz(60);
 
 	// video hardware
 	config.set_default_layout(layout_kim1);
 
+	SPEAKER(config, "mono").front_center();
+
 	// devices
-	MCFG_DEVICE_ADD("miot_u2", MOS6530, 1000000)
-	MCFG_MOS6530_IN_PA_CB(READ8(*this, kim1_state, kim1_u2_read_a))
-	MCFG_MOS6530_OUT_PA_CB(WRITE8(*this, kim1_state, kim1_u2_write_a))
-	MCFG_MOS6530_IN_PB_CB(READ8(*this, kim1_state, kim1_u2_read_b))
-	MCFG_MOS6530_OUT_PB_CB(WRITE8(*this, kim1_state, kim1_u2_write_b))
+	MOS6530(config, m_riot2, 1000000);
+	m_riot2->in_pa_callback().set(FUNC(kim1_state::kim1_u2_read_a));
+	m_riot2->out_pa_callback().set(FUNC(kim1_state::kim1_u2_write_a));
+	m_riot2->in_pb_callback().set(FUNC(kim1_state::kim1_u2_read_b));
+	m_riot2->out_pb_callback().set(FUNC(kim1_state::kim1_u2_write_b));
 
-	MCFG_DEVICE_ADD("miot_u3", MOS6530, 1000000)
+	MOS6530(config, "miot_u3", 1000000);
 
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_FORMATS(kim1_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED)
-	MCFG_CASSETTE_INTERFACE ("kim1_cass")
+	CASSETTE(config, m_cass);
+	m_cass->set_formats(kim1_cassette_formats);
+	m_cass->set_default_state(CASSETTE_STOPPED);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface ("kim1_cass");
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("led_timer", kim1_state, kim1_update_leds, attotime::from_hz(60))
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("cassette_timer", kim1_state, kim1_cassette_input, attotime::from_hz(44100))
+	TIMER(config, "led_timer").configure_periodic(FUNC(kim1_state::kim1_update_leds), attotime::from_hz(60));
+	TIMER(config, "cassette_timer").configure_periodic(FUNC(kim1_state::kim1_cassette_input), attotime::from_hz(44100));
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD ("cass_list", "kim1_cass")
-
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cass_list").set_original("kim1_cass");
+}
 
 //**************************************************************************
 //  ROM DEFINITIONS

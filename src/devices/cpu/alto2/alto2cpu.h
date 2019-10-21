@@ -11,7 +11,6 @@
 #pragma once
 
 #include "machine/diablo_hd.h"
-#include "sound/spkrdev.h"
 
 #include "debugger.h"
 
@@ -185,11 +184,11 @@ public:
 	alto2_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~alto2_cpu_device();
 
-	//! driver interface to set diablo_hd_device
-	void set_diablo(int unit, diablo_hd_device* ptr);
+	auto kb_read_callback() { return m_kb_read_callback.bind(); }
+	auto utilout_callback() { return m_utilout_callback.bind(); }
 
-	//! driver interface to set a speaker sound device
-	void set_speaker(speaker_sound_device* speaker);
+	//! driver interface to set diablo_hd_device
+	template <typename T> void set_diablo(int unit, T &&tag) { m_drive[unit].set_tag(std::forward<T>(tag)); }
 
 	//! call in for the next sector callback
 	void next_sector(int unit);
@@ -199,11 +198,6 @@ public:
 
 	//! set the vblank bit for the display to synch upon
 	void screen_vblank();
-
-	void ucode_map(address_map &map);
-	void const_map(address_map &map);
-	void iomem_map(address_map &map);
-
 	//! register a mouse motion in x direction
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_motion_x );
 	//! register a mouse motion in y direction
@@ -241,8 +235,10 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-
 	void fatal(int level, const char *format, ...);
+
+	devcb_read16 m_kb_read_callback;
+	devcb_write16 m_utilout_callback;
 
 	address_space_config m_ucode_config;
 	address_space_config m_const_config;
@@ -261,6 +257,10 @@ private:
 	std::unique_ptr<uint8_t[]> m_ucode_cram;
 	uint8_t* m_const_data;
 
+	void ucode_map(address_map &map);
+	void const_map(address_map &map);
+	void iomem_map(address_map &map);
+
 	//! read microcode CROM or CRAM, depending on m_ucode_ram_base
 	DECLARE_READ32_MEMBER ( crom_cram_r );
 
@@ -277,8 +277,6 @@ private:
 	DECLARE_WRITE16_MEMBER( ioram_w );
 
 	int m_icount;
-
-	speaker_sound_device* m_speaker;
 
 	//! task numbers
 	enum {

@@ -7,13 +7,15 @@
     Bondwell 2 format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_BW2_DSK_H
+#define MAME_FORMATS_BW2_DSK_H
 
-#ifndef BW2_DSK_H_
-#define BW2_DSK_H_
+#pragma once
 
 #include "upd765_dsk.h"
 
-class bw2_format : public upd765_format {
+class bw2_format : public upd765_format
+{
 public:
 	bw2_format();
 
@@ -27,4 +29,4 @@ private:
 
 extern const floppy_format_type FLOPPY_BW2_FORMAT;
 
-#endif
+#endif // MAME_FORMATS_BW2_DSK_H

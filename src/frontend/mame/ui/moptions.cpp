@@ -88,3 +88,22 @@ ui_options::ui_options() : core_options()
 {
 	add_entries(ui_options::s_option_entries);
 }
+
+//-------------------------------------------------
+//  rgb_value - decode an RGB option
+//-------------------------------------------------
+
+rgb_t ui_options::rgb_value(const char *option) const
+{
+	// find the entry
+	core_options::entry::shared_ptr entry = get_entry(option);
+
+	// look up the value, and sanity check the result
+	const char *value = entry->value();
+	int len = strlen(value);
+	if (len != 8)
+		value = entry->default_value().c_str();
+
+	// convert to an rgb_t
+	return rgb_t((uint32_t)strtoul(value, nullptr, 16));
+}

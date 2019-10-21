@@ -67,15 +67,12 @@ ioport_constructor acorn_8k_device::device_input_ports() const
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(acorn_8k_device::device_add_mconfig)
+void acorn_8k_device::device_add_mconfig(machine_config &config)
+{
 	/* rom sockets */
-	MCFG_GENERIC_SOCKET_ADD("rom0", generic_plain_slot, "acrnsys_rom") // IC17
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(acorn_8k_device, rom0_load)
-	MCFG_GENERIC_SOCKET_ADD("rom1", generic_plain_slot, "acrnsys_rom") // IC18
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(acorn_8k_device, rom1_load)
-MACHINE_CONFIG_END
+	GENERIC_SOCKET(config, "rom0", generic_plain_slot, "acrnsys_rom", "bin,rom").set_device_load(FUNC(acorn_8k_device::rom0_load), this); // IC17
+	GENERIC_SOCKET(config, "rom1", generic_plain_slot, "acrnsys_rom", "bin,rom").set_device_load(FUNC(acorn_8k_device::rom1_load), this); // IC18
+}
 
 
 //**************************************************************************

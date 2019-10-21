@@ -598,7 +598,7 @@ void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		lynx_uart_timer(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in lynx_state::device_timer");
+		throw emu_fatalerror("Unknown id in lynx_state::device_timer");
 	}
 }
 
@@ -1020,7 +1020,7 @@ READ8_MEMBER(lynx_state::suzy_read)
 			break;
 		case RCART:
 			if (m_cart->exists())
-				value = m_cart->read_rom(space, (m_suzy.high * m_granularity) + m_suzy.low);
+				value = m_cart->read_rom((m_suzy.high * m_granularity) + m_suzy.low);
 			else
 				value = 0;
 			m_suzy.low = (m_suzy.low + 1) & (m_granularity - 1);
@@ -2040,7 +2040,7 @@ image_verify_result lynx_state::lynx_verify_cart(char *header, int kind)
 	return image_verify_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
+DEVICE_IMAGE_LOAD_MEMBER(lynx_state::cart_load)
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
 	11 bits are used to address data within the selected bank. Valid bank sizes are 256,

@@ -18,7 +18,7 @@ class sega_315_5641_pcm_device : public upd7756_device
 public:
 	sega_315_5641_pcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE8_MEMBER(port_w) override;
+	virtual void port_w(u8 data) override;
 
 	uint8_t get_fifo_space();
 

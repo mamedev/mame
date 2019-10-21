@@ -549,17 +549,18 @@ void bfm_adder2_device::adder2_memmap(address_map &map)
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(bfm_adder2_device::device_add_mconfig)
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_SIZE( 400, 280)
-	MCFG_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, bfm_adder2_device, update_screen)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, bfm_adder2_device, adder2_vbl_w))      // board has a VBL IRQ
+void bfm_adder2_device::device_add_mconfig(machine_config &config)
+{
+	M6809(config, m_cpu, ADDER_CLOCK/4);  // adder2 board 6809 CPU at 2 Mhz
+	m_cpu->set_addrmap(AS_PROGRAM, &bfm_adder2_device::adder2_memmap);             // setup adder2 board memorymap
 
-	MCFG_PALETTE_ADD("palette", 16)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(400, 280);
+	screen.set_visarea(0, 400-1, 0, 280-1);
+	screen.set_refresh_hz(50);
+	screen.set_palette("palette");
+	screen.set_screen_update(FUNC(bfm_adder2_device::update_screen));
+	screen.screen_vblank().set(FUNC(bfm_adder2_device::adder2_vbl_w));      // board has a VBL IRQ
 
-	MCFG_DEVICE_ADD("adder2", M6809, ADDER_CLOCK/4 )  // adder2 board 6809 CPU at 2 Mhz
-	MCFG_DEVICE_PROGRAM_MAP(adder2_memmap)             // setup adder2 board memorymap
-MACHINE_CONFIG_END
+	PALETTE(config, "palette").set_entries(16);
+}

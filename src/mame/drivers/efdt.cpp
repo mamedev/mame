@@ -157,9 +157,9 @@
 
 **********************************************************************************/
 
-
 #include "emu.h"
 #include "includes/efdt.h"
+
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6800.h"
 #include "machine/watchdog.h"
@@ -179,21 +179,19 @@
 *               Video Hardware               *
 *********************************************/
 
-PALETTE_INIT_MEMBER(efdt_state, efdt)
+void efdt_state::efdt_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("prom")->base();
+	uint8_t const *const color_prom = memregion("prom")->base();
 
 	for (int i = 0; i < 256; ++i)
 	{
-		uint8_t r, g, b;
+		uint8_t const v = color_prom[i];
 
-		uint8_t v = color_prom[i];
+		uint8_t const g = (v & 7) << 5;
+		uint8_t const r = ((v >> 3) & 7) << 5;
+		uint8_t const b = ((v >> 6) & 3) << 6;
 
-		g = (v & 7) << 5;
-		r = ((v >> 3) & 7) << 5;
-		b = ((v >> 6) & 3) << 6;
-
-		if((i & 7) == 0)
+		if ((i & 7) == 0)
 			palette.set_pen_color(i, 0);
 		else
 			palette.set_pen_color(i, rgb_t(r, g, b));
@@ -221,7 +219,7 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
 	SET_TILE_INFO_MEMBER(1, code, 0x1c, 0);
 }
 
-VIDEO_START_MEMBER(efdt_state, efdt)
+void efdt_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_0), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_1), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -546,15 +544,15 @@ GFXDECODE_END
 *              Machine Driver                *
 *********************************************/
 
-MACHINE_CONFIG_START( efdt_state::efdt )
-
+void efdt_state::efdt(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, Z80_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(efdt_map)
+	Z80(config, m_maincpu, Z80_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &efdt_state::efdt_map);
 
-	MCFG_DEVICE_ADD("audiocpu", M6802, F6802_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(efdt_snd_map)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(efdt_state, irq0_line_hold, F6802_CLOCK / 8192)
+	M6802(config, m_audiocpu, F6802_CLOCK);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &efdt_state::efdt_snd_map);
+	m_audiocpu->set_periodic_int(FUNC(efdt_state::irq0_line_hold), attotime::from_hz(F6802_CLOCK / 8192));
 
 	LS259(config, m_vlatch[0]);
 	m_vlatch[0]->q_out_cb<0>().set(FUNC(efdt_state::nmi_clear_w));
@@ -564,39 +562,35 @@ MACHINE_CONFIG_START( efdt_state::efdt )
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*8 - 1, 16, 30*8 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(efdt_state, screen_update_efdt)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, efdt_state, vblank_nmi_w))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(32*8, 32*8);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_visarea(0, 32*8 - 1, 16, 30*8 - 1);
+	screen.set_screen_update(FUNC(efdt_state::screen_update_efdt));
+	screen.set_palette(m_palette);
+	screen.screen_vblank().set(FUNC(efdt_state::vblank_nmi_w));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_efdt)
-	MCFG_PALETTE_ADD("palette", 64)
-	MCFG_PALETTE_INIT_OWNER(efdt_state, efdt)
-
-	MCFG_VIDEO_START_OVERRIDE(efdt_state, efdt)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_efdt);
+	PALETTE(config, m_palette, FUNC(efdt_state::efdt_palette), 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay1", AY8910, AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, efdt_state, soundlatch_0_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, efdt_state, soundlatch_1_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_0_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_1_w))
+	ay8910_device &ay1(AY8910(config, "ay1", AY8910_CLOCK));
+	ay1.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ay1.port_a_read_callback().set(FUNC(efdt_state::soundlatch_0_r));
+	ay1.port_b_read_callback().set(FUNC(efdt_state::soundlatch_1_r));
+	ay1.port_a_write_callback().set(FUNC(efdt_state::soundlatch_0_w));
+	ay1.port_b_write_callback().set(FUNC(efdt_state::soundlatch_1_w));
 
-	MCFG_DEVICE_ADD("ay2", AY8910, AY8910_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(*this, efdt_state, soundlatch_2_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(*this, efdt_state, soundlatch_3_r))
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_2_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, efdt_state, soundlatch_3_w))
-
-MACHINE_CONFIG_END
+	ay8910_device &ay2(AY8910(config, "ay2", AY8910_CLOCK));
+	ay2.add_route(ALL_OUTPUTS, "mono", 1.0);
+	ay2.port_a_read_callback().set(FUNC(efdt_state::soundlatch_2_r));
+	ay2.port_b_read_callback().set(FUNC(efdt_state::soundlatch_3_r));
+	ay2.port_a_write_callback().set(FUNC(efdt_state::soundlatch_2_w));
+	ay2.port_b_write_callback().set(FUNC(efdt_state::soundlatch_3_w));
+}
 
 
 /*********************************************

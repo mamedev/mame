@@ -27,7 +27,7 @@ READ8_MEMBER(orion_state::orion_romdisk_porta_r)
 {
 	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
-		return m_cart->read_rom(space, addr);
+		return m_cart->read_rom(addr);
 	else
 		return 0xff;
 }
@@ -49,22 +49,22 @@ void orion_state::machine_start()
 
 READ8_MEMBER(orion_state::orion128_system_r)
 {
-	return m_ppi8255_2->read(space, offset & 3);
+	return m_ppi8255_2->read(offset & 3);
 }
 
 WRITE8_MEMBER(orion_state::orion128_system_w)
 {
-	m_ppi8255_2->write(space, offset & 3, data);
+	m_ppi8255_2->write(offset & 3, data);
 }
 
 READ8_MEMBER(orion_state::orion128_romdisk_r)
 {
-	return m_ppi8255_1->read(space, offset & 3);
+	return m_ppi8255_1->read(offset & 3);
 }
 
 WRITE8_MEMBER(orion_state::orion128_romdisk_w)
 {
-	m_ppi8255_1->write(space, offset & 3, data);
+	m_ppi8255_1->write(offset & 3, data);
 }
 
 void orion_state::orion_set_video_mode(int width)
@@ -139,7 +139,7 @@ WRITE8_MEMBER(orion_state::orion128_memory_page_w)
 	}
 }
 
-MACHINE_RESET_MEMBER(orion_state,orion128)
+void orion_state::machine_reset()
 {
 	m_orion128_video_page = 0;
 	m_orion128_video_mode = 0;
@@ -198,7 +198,7 @@ READ8_MEMBER(orion_state::orionz80_floppy_rtc_r)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		return m_rtc->read(space,offset-0x60);
+		return m_rtc->read(offset-0x60);
 	}
 	else
 	{
@@ -210,7 +210,7 @@ WRITE8_MEMBER(orion_state::orionz80_floppy_rtc_w)
 {
 	if ((offset >= 0x60) && (offset <= 0x6f))
 	{
-		m_rtc->write(space,offset-0x60,data);
+		m_rtc->write(offset-0x60,data);
 	}
 	else
 	{
@@ -357,7 +357,7 @@ READ8_MEMBER(orion_state::orionz80_io_r)
 {
 	if (offset == 0xFFFD)
 	{
-		return m_ay8912->data_r(space, 0);
+		return m_ay8912->data_r();
 	}
 	return 0xff;
 }
@@ -375,10 +375,10 @@ WRITE8_MEMBER(orion_state::orionz80_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : m_ay8912->address_w(space, 0, data);
+		case 0xfffd : m_ay8912->address_w(data);
 						break;
 		case 0xbffd :
-		case 0xbefd : m_ay8912->data_w(space, 0, data);
+		case 0xbefd : m_ay8912->data_w(data);
 						break;
 	}
 }
@@ -548,7 +548,7 @@ READ8_MEMBER(orion_state::orionpro_io_r)
 	}
 	if (offset == 0xFFFD)
 	{
-		return m_ay8912->data_r(space, 0);
+		return m_ay8912->data_r();
 	}
 	return 0xff;
 }
@@ -586,10 +586,10 @@ WRITE8_MEMBER(orion_state::orionpro_io_w)
 	}
 	switch(offset)
 	{
-		case 0xfffd : m_ay8912->address_w(space, 0, data);
+		case 0xfffd : m_ay8912->address_w(data);
 						break;
 		case 0xbffd :
-		case 0xbefd : m_ay8912->data_w(space, 0, data);
+		case 0xbefd : m_ay8912->data_w(data);
 						break;
 	}
 }

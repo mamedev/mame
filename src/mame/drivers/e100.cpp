@@ -37,6 +37,7 @@
 // Features
 #include "imagedev/cassette.h"
 #include "bus/rs232/rs232.h"
+#include "speaker.h"
 #include "emupal.h"
 #include "screen.h"
 
@@ -258,12 +259,12 @@ WRITE8_MEMBER( e100_state::pia_w )
 	if ((offset & 0x08) == 0x08)
 	{
 		LOG("- PIA1\n");
-		m_pia1->write(space, offset, data);
+		m_pia1->write(offset, data);
 	}
 	if ((offset & 0x10) == 0x10)
 	{
 		LOG("- PIA2\n");
-		m_pia2->write(space, offset, data);
+		m_pia2->write(offset, data);
 	}
 	if (VERBOSE && (offset & 0x18) == 0x18)
 	{
@@ -284,19 +285,19 @@ READ8_MEMBER( e100_state::pia_r )
 	{
 	case 0x18: // read PIA1 and PIA2 at the same time, should really only happen for writes...
 		{
-			uint8_t data1 =  m_pia1->read(space, offset);
-			uint8_t data2 =  m_pia2->read(space, offset);
+			uint8_t data1 =  m_pia1->read(offset);
+			uint8_t data2 =  m_pia2->read(offset);
 			logerror("%s: Dual device read may have caused unpredictable results on real hardware\n", FUNCNAME);
 			data = data1 & data2; // We assume that the stable behaviour is that data lines with a low level by either device succeeds
 			LOGCS("%s %s[%02x] %02x & %02x -> %02x Dual device read!!\n", PIA1_TAG "/" PIA2_TAG, FUNCNAME, offset, data1, data2, data);
 		}
 		break;
 	case 0x08: // PIA1
-		data = m_pia1->read(space, offset);
+		data = m_pia1->read(offset);
 		LOGCS("%s %s(%02x)\n", PIA1_TAG, FUNCNAME, data);
 		break;
 	case 0x10: // PIA2
-		data = m_pia2->read(space, offset);
+		data = m_pia2->read(offset);
 		LOGCS("%s %s(%02x)\n", PIA2_TAG, FUNCNAME, data);
 		break;
 	default: // None of the devices are selected
@@ -344,7 +345,7 @@ READ8_MEMBER( e100_state::pia1_kbA_r )
   PB4-PB5 together with CA1, CA2, CB1 and CB2 are used for the printer interface
   PB6-PB7 forms the cassette interface
 
-  The serial bitbanging perform unreliable atm, can be poor original code or inexact CPU timing.
+  The serial bitbanging performs unreliably atm, can be poor original code or inexact CPU timing.
   Best results is achieved with 8 bit at 9600 baud as follows:
 
     mame e100 -window -rs232 null_modem -bitbngr socket.127.0.0.1:4321
@@ -538,12 +539,13 @@ static INPUT_PORTS_START( e100 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW,   IPT_KEYBOARD)                               PORT_CODE(KEYCODE_9_PAD)        PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 INPUT_PORTS_END
 
-MACHINE_CONFIG_START(e100_state::e100)
-	MCFG_DEVICE_ADD("maincpu", M6802, XTAL(4'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(e100_map)
+void e100_state::e100(machine_config &config)
+{
+	M6802(config, m_maincpu, XTAL(4'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &e100_state::e100_map);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("kbd_74145", TTL74145, 0)
+	TTL74145(config, m_kbd_74145, 0);
 
 	/* --PIA inits----------------------- */
 	/* 0xF883 0xC818 (PIA1 DDR A)     = 0x00 - Port A all inputs */
@@ -575,8 +577,9 @@ MACHINE_CONFIG_START(e100_state::e100)
 	m_pia2->irqa_handler().set_inputline("maincpu", M6800_IRQ_LINE);
 
 	/* Serial port support */
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
+	SPEAKER(config, "mono").front_center();
 	/* Cassette support - E100 uses 300 baud Kansas City Standard with 1200/2400 Hz modulation */
 	/* NOTE on usage: mame e100 -window -cass <wav file> -ui_active
 	 * Once running enable/disable internal UI by pressing Scroll Lock in case it interferes with target keys
@@ -585,19 +588,20 @@ MACHINE_CONFIG_START(e100_state::e100)
 	 * Once created it may be given on the commandline or mounted via TAB and select
 	 * E100 supports cassette through the 'LOAD' and 'SAVE' commands with no arguments
 	 */
-	MCFG_CASSETTE_ADD( "cassette" )
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_SPEAKER_MUTED | CASSETTE_MOTOR_ENABLED)
+	CASSETTE(config, m_cassette);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* screen TODO: simplify the screen config, look at zx.cpp */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265)
-	MCFG_SCREEN_UPDATE_DRIVER(e100_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(XTAL(4'000'000)/2, 265, 0, 265, 265, 0, 265);
+	screen.set_screen_update(FUNC(e100_state::screen_update));
+	screen.set_palette("palette");
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* There is a 50Hz signal from the video circuit to CA1 which generates interrupts and drives a software RTC */
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("video50hz", e100_state, rtc_w, attotime::from_hz(100)) /* Will be divided by two through toggle in the handler */
-MACHINE_CONFIG_END
+	TIMER(config, "video50hz").configure_periodic(FUNC(e100_state::rtc_w), attotime::from_hz(100)); /* Will be divided by two through toggle in the handler */
+}
 
 /* ROM sets from Didact was not versioned in general, so the numbering are just assumptions */
 ROM_START( e100 )

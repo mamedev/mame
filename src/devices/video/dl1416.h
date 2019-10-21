@@ -27,33 +27,22 @@ DECLARE_DEVICE_TYPE(DL1416T, dl1416_device)
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_DL1414_UPDATE_HANDLER(_devcb) \
-	downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
-
-#define MCFG_DL1416_UPDATE_HANDLER(_devcb) \
-	downcast<dl1414_device &>(*device).set_update_handler(DEVCB_##_devcb);
-
-
-/***************************************************************************
     TYPE DECLARATIONS
 ***************************************************************************/
 
 class dl1414_device : public device_t
 {
 public:
-	template <typename Object> devcb_base &set_update_handler(Object &&cb) { return m_update_cb.set_callback(std::forward<Object>(cb)); }
+	auto update() { return m_update_cb.bind(); }
 
 	// signal-level interface
 	DECLARE_WRITE_LINE_MEMBER(wr_w); // write strobe (rising edge)
 	DECLARE_WRITE_LINE_MEMBER(ce_w); // chip enable (active low)
-	void addr_w(uint8_t state);
-	void data_w(uint8_t state);
+	void addr_w(u8 state);
+	void data_w(u8 state);
 
 	// bus interface - still requires cu_w to set cursor enable state
-	virtual DECLARE_WRITE8_MEMBER(bus_w);
+	virtual void bus_w(offs_t offset, u8 data);
 
 protected:
 	dl1414_device(
@@ -61,27 +50,27 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock);
+			u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	void set_cursor_state(offs_t offset, bool state);
-	virtual uint16_t translate(u8 digit, bool cursor) const = 0;
+	virtual u16 translate(u8 digit, bool cursor) const = 0;
 
 private:
 	devcb_write16 m_update_cb;
 
 	// internal state
-	uint8_t m_digit_ram[4]; // holds the digit code for each position
+	u8 m_digit_ram[4]; // holds the digit code for each position
 	bool m_cursor_state[4]; // holds the cursor state for each position
 
 	// input line state
 	bool m_wr_in;
 	bool m_ce_in, m_ce_latch;
-	uint8_t m_addr_in, m_addr_latch;
-	uint8_t m_data_in;
+	u8 m_addr_in, m_addr_latch;
+	u8 m_data_in;
 };
 
 class dl1416_device : public dl1414_device
@@ -95,7 +84,7 @@ protected:
 			device_type type,
 			char const *tag,
 			device_t *owner,
-			uint32_t clock);
+			u32 clock);
 
 	// device-level overrides
 	virtual void device_start() override;

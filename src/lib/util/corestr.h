@@ -54,8 +54,6 @@ int core_strwildcmp(const char *sp1, const char *sp2);
 bool core_iswildstr(const char *sp);
 
 
-int strcatvprintf(std::string &str, const char *format, va_list args);
-
 void strdelchr(std::string& str, char chr);
 void strreplacechr(std::string& str, char ch, char newch);
 std::string &strtrimspace(std::string& str);
@@ -63,5 +61,12 @@ std::string &strtrimrightspace(std::string& str);
 std::string &strmakeupper(std::string& str);
 std::string &strmakelower(std::string& str);
 int strreplace(std::string &str, const std::string& search, const std::string& replace);
+
+namespace util {
+
+// based on Jaro-Winkler distance - returns value from 0.0 (totally dissimilar) to 1.0 (identical)
+double edit_distance(std::u32string const &lhs, std::u32string const &rhs);
+
+} // namespace util
 
 #endif // MAME_UTIL_CORESTR_H

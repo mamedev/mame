@@ -17,17 +17,15 @@ Taito Super Speed Race driver
 
 
 
-PALETTE_INIT_MEMBER(sspeedr_state, sspeedr)
+void sspeedr_state::sspeedr_palette(palette_device &palette) const
 {
-	int i;
-
-	for (i = 0; i < 16; i++)
+	for (int i = 0; i < 16; i++)
 	{
-		int r = (i & 1) ? 0xb0 : 0x20;
-		int g = (i & 2) ? 0xb0 : 0x20;
-		int b = (i & 4) ? 0xb0 : 0x20;
+		int r = BIT(i, 0) ? 0xb0 : 0x20;
+		int g = BIT(i, 1) ? 0xb0 : 0x20;
+		int b = BIT(i, 2) ? 0xb0 : 0x20;
 
-		if (i & 8)
+		if (BIT(i, 3))
 		{
 			r += 0x4f;
 			g += 0x4f;
@@ -190,32 +188,31 @@ static GFXDECODE_START( gfx_sspeedr )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(sspeedr_state::sspeedr)
-
+void sspeedr_state::sspeedr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, XTAL(19'968'000)/8)
-	MCFG_DEVICE_PROGRAM_MAP(sspeedr_map)
-	MCFG_DEVICE_IO_MAP(sspeedr_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
+	Z80(config, m_maincpu, XTAL(19'968'000)/8);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sspeedr_state::sspeedr_map);
+	m_maincpu->set_addrmap(AS_IO, &sspeedr_state::sspeedr_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(sspeedr_state::irq0_line_assert));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.39)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(16 * 1000000 / 15680))
-	MCFG_SCREEN_SIZE(376, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 375, 0, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(sspeedr_state, screen_update_sspeedr)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, sspeedr_state, screen_vblank_sspeedr))
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(59.39);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(16 * 1000000 / 15680));
+	screen.set_size(376, 256);
+	screen.set_visarea(0, 375, 0, 247);
+	screen.set_screen_update(FUNC(sspeedr_state::screen_update_sspeedr));
+	screen.screen_vblank().set(FUNC(sspeedr_state::screen_vblank_sspeedr));
+	screen.set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sspeedr)
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(sspeedr_state, sspeedr)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sspeedr);
+	PALETTE(config, m_palette, FUNC(sspeedr_state::sspeedr_palette), 16);
 
 	/* sound hardware */
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( sspeedr )

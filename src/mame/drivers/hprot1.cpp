@@ -78,17 +78,19 @@ public:
 
 	void init_hprot1();
 
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(henry_p1_w);
 	DECLARE_WRITE8_MEMBER(henry_p3_w);
-	DECLARE_PALETTE_INIT(hprot1);
+	void hprot1_palette(palette_device &palette) const;
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 	void i80c31_io(address_map &map);
 	void i80c31_prg(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-	required_device<cpu_device> m_maincpu;
+	required_device<i80c31_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
 };
 
@@ -133,10 +135,10 @@ void hprot1_state::i80c31_io(address_map &map)
 {
 	map(0x0000, 0x7fff).ram();
 /*TODO: verify the mirror mask value for the HD44780 device */
-	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_write));
-	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_write));
-	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_read));
-	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_read));
+	map(0xc000, 0xc000).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::control_w));
+	map(0xc010, 0xc010).mirror(0x13cf).w(m_lcdc, FUNC(hd44780_device::data_w));
+	map(0xc020, 0xc020).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::control_r));
+	map(0xc030, 0xc030).mirror(0x13cf).r(m_lcdc, FUNC(hd44780_device::data_r));
 /*TODO: attach the watchdog/brownout reset device:
     map(0xe000,0xe0??).mirror(?).r("adm965an", FUNC(adm965an_device::data_read)); */
 }
@@ -209,7 +211,7 @@ WRITE8_MEMBER(hprot1_state::henry_p3_w)
 		logerror("Write to P3: %02X\n", data);
 }
 
-PALETTE_INIT_MEMBER(hprot1_state, hprot1)
+void hprot1_state::hprot1_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -243,67 +245,69 @@ HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 	}
 }
 
-MACHINE_CONFIG_START(hprot1_state::hprot1)
+void hprot1_state::hprot1(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", I80C31, XTAL(10'000'000))
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
-	MCFG_MCS51_PORT_P1_IN_CB(IOPORT("inputs"))
-	MCFG_MCS51_PORT_P1_OUT_CB(WRITE8(*this, hprot1_state, henry_p1_w))
-	MCFG_MCS51_PORT_P3_OUT_CB(WRITE8(*this, hprot1_state, henry_p3_w))
+	I80C31(config, m_maincpu, XTAL(10'000'000));
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
+	m_maincpu->port_in_cb<1>().set_ioport("inputs");
+	m_maincpu->port_out_cb<1>().set(FUNC(hprot1_state::henry_p1_w));
+	m_maincpu->port_out_cb<3>().set(FUNC(hprot1_state::henry_p3_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
-	MCFG_SCREEN_SIZE(6*16, 9*2)
-	MCFG_SCREEN_VISIBLE_AREA(0, 6*16-1, 0, 9*2-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 9*2);
+	screen.set_visarea(0, 6*16-1, 0, 9*2-1);
+	screen.set_palette("palette");
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(hprot1_state, hprot1)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_hprot1)
+	PALETTE(config, "palette", FUNC(hprot1_state::hprot1_palette), 2);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_hprot1);
 
-	MCFG_HD44780_ADD("hd44780")
-	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_state,hprot1_pixel_update)
+	HD44780(config, m_lcdc, 0);
+	m_lcdc->set_lcd_size(2, 16);
+	m_lcdc->set_pixel_update_cb(FUNC(hprot1_state::hprot1_pixel_update), this);
 
 	/* TODO: figure out which RTC chip is in use. */
 
 	/* TODO: emulate the ADM695AN chip (watchdog/brownout reset)*/
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hprot1_state::hprotr8a)
+void hprot1_state::hprotr8a(machine_config &config)
+{
 	hprot1(config);
-	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
+
+	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip)
 	(the board has GND/VCC/RX/TX pins available in a connector) */
 
 	/* TODO: add an I2C interface (the board has GND/VCC/SDA/SCL pins available in a connector) */
-MACHINE_CONFIG_END
+}
 
-MACHINE_CONFIG_START(hprot1_state::hprot2r6)
+void hprot1_state::hprot2r6(machine_config &config)
+{
 	hprot1(config);
-	MCFG_DEVICE_REPLACE("maincpu", I80C31, 11059200) // value of X1 cristal on the PCB
-	MCFG_DEVICE_PROGRAM_MAP(i80c31_prg)
-	MCFG_DEVICE_IO_MAP(i80c31_io)
+
+	I80C31(config.replace(), m_maincpu, 11059200); // value of X1 crystal on the PCB
+	m_maincpu->set_addrmap(AS_PROGRAM, &hprot1_state::i80c31_prg);
+	m_maincpu->set_addrmap(AS_IO, &hprot1_state::i80c31_io);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* TODO: add an RS232 interface (emulate MAX232N chip) */
-MACHINE_CONFIG_END
+}
 
 ROM_START( hprot1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

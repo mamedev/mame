@@ -7,10 +7,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
+
+#include "cpu/z80/z80.h"
 #include "sound/astrocde.h"
 #include "video/resnet.h"
+
+#include <cmath>
+
 
 /*************************************
  *
@@ -75,7 +79,7 @@ inline int astrocde_state::mame_vpos_to_astrocade_vpos(int scanline)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(astrocde_state, astrocde)
+void astrocde_state::astrocade_palette(palette_device &palette) const
 {
 	/*
 	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
@@ -88,81 +92,71 @@ PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 	    that has a 4-bit resolution.
 	*/
 
-	int color, luma;
-
-	/* loop over color values */
-	for (color = 0; color < 32; color++)
+	// loop over color values
+	for (int color = 0; color < 32; color++)
 	{
-		float ry = 0.75 * sin((color / 32.0) * (2.0 * M_PI));
-		float by = 1.15 * cos((color / 32.0) * (2.0 * M_PI));
+		// color 0 maps to ry = by = 0
+		double const angle = (color / 32.0) * (2.0 * M_PI);
+		float const ry = color ? (0.75 * std::sin(angle)) : 0;
+		float const by = color ? (1.15 * std::cos(angle)) : 0;
 
-		/* color 0 maps to ry = by = 0 */
-		if (color == 0)
-			ry = by = 0;
-
-		/* iterate over luminence values */
-		for (luma = 0; luma < 16; luma++)
+		// iterate over luminence values
+		for (int luma = 0; luma < 16; luma++)
 		{
-			float y = luma / 15.0;
-			int r, g, b;
+			float const y = luma / 15.0;
 
-			/* transform to RGB */
-			r = (ry + y) * 255;
-			g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
-			b = (by + y) * 255;
+			// transform to RGB
+			int r = (ry + y) * 255;
+			int g = ((y - 0.299f * (ry + y) - 0.114f * (by + y)) / 0.587f) * 255;
+			int b = (by + y) * 255;
 
-			/* clamp and store */
-			r = std::max(r, 0);
-			r = std::min(r, 255);
-			g = std::max(g, 0);
-			g = std::min(g, 255);
-			b = std::max(b, 0);
-			b = std::min(b, 255);
+			// clamp and store
+			r = (std::min)((std::max)(r, 0), 255);
+			g = (std::min)((std::max)(g, 0), 255);
+			b = (std::min)((std::max)(b, 0), 255);
 			palette.set_pen_color(color * 16 + luma, rgb_t(r, g, b));
 		}
 	}
 }
 
 
-PALETTE_INIT_MEMBER(astrocde_state,profpac)
+void astrocde_state::profpac_palette(palette_device &palette) const
 {
-	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */
-	static const int resistances[4] = { 6200, 3000, 1500, 750 };
-	double weights[4];
-	int i;
+	// Professor Pac-Man uses a more standard 12-bit RGB palette layout
+	static constexpr int resistances[4] = { 6200, 3000, 1500, 750 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double weights[4];
 	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0,
 			4, resistances, weights, 1500, 0);
 
-	/* initialize the palette with these colors */
-	for (i = 0; i < 4096; i++)
+	// initialize the palette with these colors
+	for (int i = 0; i < 4096; i++)
 	{
 		int bit0, bit1, bit2, bit3;
-		int r, g, b;
 
-		/* blue component */
-		bit0 = (i >> 0) & 0x01;
-		bit1 = (i >> 1) & 0x01;
-		bit2 = (i >> 2) & 0x01;
-		bit3 = (i >> 3) & 0x01;
-		b = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		// blue component
+		bit0 = BIT(i, 0);
+		bit1 = BIT(i, 1);
+		bit2 = BIT(i, 2);
+		bit3 = BIT(i, 3);
+		int const b = combine_weights(weights, bit0, bit1, bit2, bit3);
 
-		/* green component */
-		bit0 = (i >> 4) & 0x01;
-		bit1 = (i >> 5) & 0x01;
-		bit2 = (i >> 6) & 0x01;
-		bit3 = (i >> 7) & 0x01;
-		g = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		// green component
+		bit0 = BIT(i, 4);
+		bit1 = BIT(i, 5);
+		bit2 = BIT(i, 6);
+		bit3 = BIT(i, 7);
+		int const g = combine_weights(weights, bit0, bit1, bit2, bit3);
 
-		/* red component */
-		bit0 = (i >> 8) & 0x01;
-		bit1 = (i >> 9) & 0x01;
-		bit2 = (i >> 10) & 0x01;
-		bit3 = (i >> 11) & 0x01;
-		r = combine_4_weights(weights, bit0, bit1, bit2, bit3);
+		// red component
+		bit0 = BIT(i, 8);
+		bit1 = BIT(i, 9);
+		bit2 = BIT(i, 10);
+		bit3 = BIT(i, 11);
+		int const r = combine_weights(weights, bit0, bit1, bit2, bit3);
 
 		palette.set_pen_color(i, rgb_t(r, g, b));
 	}
@@ -397,10 +391,18 @@ void astrocde_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		scanline_callback(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in astrocde_state::device_timer");
+		throw emu_fatalerror("Unknown id in astrocde_state::device_timer");
 	}
 }
 
+WRITE_LINE_MEMBER(astrocde_state::lightpen_trigger_w)
+{
+	if (state)
+	{
+		uint8_t res_shift = 1 - m_video_mode;
+		astrocade_trigger_lightpen(mame_vpos_to_astrocade_vpos(m_screen->vpos()) & ~res_shift, (m_screen->hpos() >> res_shift) + 12);
+	}
+}
 
 void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback)
 {
@@ -411,14 +413,14 @@ void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeed
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((m_interrupt_enabl & 0x01) == 0)
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector & 0xf0); // Z80
 			m_intoff_timer->adjust(m_screen->time_until_pos(vfeedback));
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector & 0xf0); // Z80
 			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 
@@ -451,14 +453,14 @@ TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((m_interrupt_enabl & 0x04) == 0)
 		{
-			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector);
+			m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_interrupt_vector); // Z80
 			m_intoff_timer->adjust(m_screen->time_until_vblank_end());
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, m_interrupt_vector); // Z80
 			m_intoff_timer->adjust(m_maincpu->cycles_to_attotime(1));
 		}
 	}

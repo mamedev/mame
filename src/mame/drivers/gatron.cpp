@@ -450,7 +450,7 @@ void gatron_state::gat_map(address_map &map)
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x63ff).ram().w(FUNC(gatron_state::videoram_w)).share("videoram");
 	map(0x8000, 0x87ff).ram().share("nvram");                          /* battery backed RAM */
-	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::command_w));       /* PSG */
+	map(0xa000, 0xa000).w("snsnd", FUNC(sn76489_device::write));       /* PSG */
 	map(0xe000, 0xe000).w(FUNC(gatron_state::output_port_0_w));  /* lamps */
 }
 
@@ -563,38 +563,37 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(gatron_state::gat)
-
+void gatron_state::gat(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(gat_map)
-	MCFG_DEVICE_IO_MAP(gat_portmap)
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &gatron_state::gat_map);
+	m_maincpu->set_addrmap(AS_IO, &gatron_state::gat_portmap);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, gatron_state, output_port_1_w))
+	i8255_device &ppi(I8255A(config, "ppi8255"));
+	ppi.in_pa_callback().set_ioport("IN0");
+	ppi.in_pb_callback().set_ioport("IN1");
+	ppi.out_pc_callback().set(FUNC(gatron_state::output_port_1_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(48*8, 16*16)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 16*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(gatron_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(48*8, 16*16);
+	screen.set_visarea(0*8, 48*8-1, 0*8, 16*16-1);
+	screen.set_screen_update(FUNC(gatron_state::screen_update));
+	screen.set_palette("palette");
+	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gat)
-	MCFG_PALETTE_ADD("palette", 8)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gat);
+	PALETTE(config, "palette").set_entries(8);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("snsnd", SN76489, MASTER_CLOCK/8 )   // Present in Bingo PCB. Clock need to be verified.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
-MACHINE_CONFIG_END
+	SN76489(config, "snsnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 2.00);   // Present in Bingo PCB. Clock need to be verified.
+}
 
 
 /*************************

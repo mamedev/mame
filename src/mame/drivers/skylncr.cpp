@@ -127,6 +127,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include <algorithm>
 
@@ -198,7 +199,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
 	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
-	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skylncr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
 	void bdream97_opcode_map(address_map &map);
 	void io_map_mbutrfly(address_map &map);
@@ -314,11 +315,11 @@ void skylncr_state::video_start()
 }
 
 
-uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t skylncr_state::screen_update_skylncr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
-	bitmap.fill(0, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 	m_reel_1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// are these hardcoded, or registers?
@@ -1645,91 +1646,90 @@ INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
 *           Machine Driver           *
 *************************************/
 
-MACHINE_CONFIG_START(skylncr_state::skylncr)
-
+void skylncr_state::skylncr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map_skylncr)
-	MCFG_DEVICE_IO_MAP(io_map_skylncr)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", skylncr_state,  skylncr_vblank_interrupt)
+	Z80(config, m_maincpu, MASTER_CLOCK/4);
+	m_maincpu->set_addrmap(AS_PROGRAM, &skylncr_state::mem_map_skylncr);
+	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_skylncr);
+	m_maincpu->set_vblank_int("screen", FUNC(skylncr_state::skylncr_vblank_interrupt));
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* 1x M5M82C255, or 2x PPI8255 */
-	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("DSW1"))
+	i8255_device &ppi0(I8255A(config, "ppi8255_0"));
+	ppi0.in_pa_callback().set_ioport("IN1");
+	ppi0.in_pb_callback().set_ioport("IN2");
+	ppi0.in_pc_callback().set_ioport("DSW1");
 
-	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("DSW2"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("IN3"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("IN4"))
+	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
+	ppi1.in_pa_callback().set_ioport("DSW2");
+	ppi1.in_pb_callback().set_ioport("IN3");
+	ppi1.in_pc_callback().set_ioport("IN4");
 
-	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
-	MCFG_SCREEN_UPDATE_DRIVER(skylncr_state, screen_update_skylncr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(512, 256);
+	screen.set_visarea(0, 512-1, 0, 256-1);
+	screen.set_screen_update(FUNC(skylncr_state::screen_update_skylncr));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_skylncr)
-	MCFG_PALETTE_ADD("palette", 0x200)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_skylncr);
+	PALETTE(config, m_palette).set_entries(0x200);
 
-	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0)
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac.set_addrmap(0, &skylncr_state::ramdac_map);
+	ramdac.set_color_base(0);
 
-	MCFG_RAMDAC_ADD("ramdac2", ramdac2_map, "palette")
-	MCFG_RAMDAC_COLOR_BASE(0x100)
+	ramdac_device &ramdac2(RAMDAC(config, "ramdac2", 0, m_palette));
+	ramdac2.set_addrmap(0, &skylncr_state::ramdac2_map);
+	ramdac2.set_color_base(0x100);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, MASTER_CLOCK/8)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSW4"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_CLOCK/8));
+	aysnd.port_a_read_callback().set_ioport("DSW3");
+	aysnd.port_b_read_callback().set_ioport("DSW4");
+	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
-MACHINE_CONFIG_START(skylncr_state::mbutrfly)
+void skylncr_state::mbutrfly(machine_config &config)
+{
 	skylncr(config);
 
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_IO_MAP(io_map_mbutrfly)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_IO, &skylncr_state::io_map_mbutrfly);
+}
 
 
-MACHINE_CONFIG_START(skylncr_state::neraidou)
+void skylncr_state::neraidou(machine_config &config)
+{
+	skylncr(config);
+
+	m_gfxdecode->set_info(gfx_neraidou);
+}
+
+
+void skylncr_state::sstar97(machine_config &config)
+{
+	skylncr(config);
+
+	m_gfxdecode->set_info(gfx_sstar97);
+}
+
+
+void skylncr_state::bdream97(machine_config &config)
+{
 	skylncr(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_neraidou)
-MACHINE_CONFIG_END
+	m_maincpu->set_addrmap(AS_OPCODES, &skylncr_state::bdream97_opcode_map);
 
-
-MACHINE_CONFIG_START(skylncr_state::sstar97)
-	skylncr(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_sstar97)
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_START(skylncr_state::bdream97)
-	skylncr(config);
-
-	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_OPCODES_MAP(bdream97_opcode_map)
-
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_bdream97)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_bdream97);
+}
 
 
 /**********************************

@@ -26,7 +26,7 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_vh)
 }
 
 
-PALETTE_INIT_MEMBER(_8080bw_state,rollingc)
+void _8080bw_state::rollingc_palette(palette_device &palette) const
 {
 	// palette is 3bpp + intensity
 	for (int i = 0; i < 8; i++)
@@ -42,13 +42,12 @@ PALETTE_INIT_MEMBER(_8080bw_state,rollingc)
 }
 
 
-PALETTE_INIT_MEMBER( _8080bw_state, sflush )
+void _8080bw_state::sflush_palette(palette_device &palette) const
 {
-	// standard 3-bit rbg palette
-	palette.palette_init_3bit_rbg(palette);
-
-	// but background color is bright blue
+	// standard 3-bit rbg palette, but background color is bright blue
 	palette.set_pen_color(0, 0x80, 0x80, 0xff);
+	for (int i = 1; i < 8; i++)
+		palette.set_pen_color(i, rgb_t(pal1bit(i >> 0), pal1bit(i >> 2), pal1bit(i >> 1)));
 }
 
 

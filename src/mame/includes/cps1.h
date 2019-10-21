@@ -18,6 +18,7 @@
 #include "cpu/m68000/m68000.h"
 #include "emupal.h"
 #include "screen.h"
+#include "tilemap.h"
 
 // Video raw params
 // measured clocks:
@@ -167,6 +168,7 @@ public:
 	void init_sf2thndr();
 	void init_dinohunt();
 	void init_sf2hack();
+	void init_sf2rk();
 	void init_slammast();
 	void init_pang3b();
 	void init_pang3();
@@ -197,7 +199,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(screen_vblank_cps1);
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
-	IRQ_CALLBACK_MEMBER(cps1_int_ack);
+	void cpu_space_map(address_map &map);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
@@ -206,6 +208,7 @@ public:
 	void init_cawingbl();
 	void init_dinopic();
 	void init_knightsb();
+	void init_mtwinsb();
 	void init_punipic();
 	void init_punipic3();
 	void init_sf2m1();
@@ -221,6 +224,7 @@ public:
 	DECLARE_MACHINE_START(dinopic);
 	DECLARE_MACHINE_START(knightsb);
 	DECLARE_MACHINE_START(kodb);
+	DECLARE_MACHINE_START(mtwinsb);
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(sf2mdt);
 	DECLARE_MACHINE_START(slampic);
@@ -230,9 +234,11 @@ public:
 	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
 	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
 	DECLARE_WRITE16_MEMBER(kodb_layer_w);
+	DECLARE_WRITE16_MEMBER(mtwinsb_layer_w);
 	DECLARE_WRITE16_MEMBER(punipic_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
@@ -269,6 +275,7 @@ public:
 	void sf2mdt(machine_config &config);
 	void sf2m1(machine_config &config);
 	void kodb(machine_config &config);
+	void mtwinsb(machine_config &config);
 	void varthb(machine_config &config);
 	void sgyxz(machine_config &config);
 	void wofabl(machine_config &config);
@@ -295,6 +302,7 @@ public:
 	void knightsb_z80map(address_map &map);
 	void kodb_sound_map(address_map &map);
 	void main_map(address_map &map);
+	void mtwinsb_map(address_map &map);
 	void punipic_map(address_map &map);
 	void qsound_decrypted_opcodes_map(address_map &map);
 	void qsound_main_map(address_map &map);
@@ -354,6 +362,7 @@ protected:
 	int          m_stars2y;
 	int          m_last_sprite_offset;      /* Offset of the last sprite */
 
+	bitmap_ind16 m_dummy_bitmap;
 
 	/* fcrash sound hw */
 	int          m_sample_buffer1;
@@ -460,6 +469,7 @@ private:
 	void cps2_objram_latch();
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_MACHINE_START(cps2);
 	virtual void video_start() override;
@@ -508,6 +518,7 @@ extern gfx_decode_entry const gfx_cps1[];
 
 INPUT_PORTS_EXTERN( dino );
 INPUT_PORTS_EXTERN( knights );
+INPUT_PORTS_EXTERN( mtwins );
 INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
 INPUT_PORTS_EXTERN( slammast );

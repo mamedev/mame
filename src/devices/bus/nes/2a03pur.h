@@ -16,8 +16,8 @@ public:
 	// construction/destruction
 	nes_2a03pur_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_h) override;
-	virtual DECLARE_WRITE8_MEMBER(write_l) override;
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_l(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 

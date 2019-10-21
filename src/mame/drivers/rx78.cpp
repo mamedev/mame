@@ -64,7 +64,6 @@ Summary of Monitor commands.
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "machine/ram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -100,7 +99,7 @@ private:
 	DECLARE_WRITE8_MEMBER( vdp_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_bg_reg_w );
 	DECLARE_WRITE8_MEMBER( vdp_pri_mask_w );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart_load );
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	virtual void machine_reset() override;
@@ -279,7 +278,7 @@ void rx78_state::rx78_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom().region("roms", 0);
-	//AM_RANGE(0x2000, 0x5fff)      // mapped by the cartslot
+	//map(0x2000, 0x5fff)      // mapped by the cartslot
 	map(0x6000, 0xafff).ram(); //ext RAM
 	map(0xb000, 0xebff).ram();
 	map(0xec00, 0xffff).rw(FUNC(rx78_state::vram_r), FUNC(rx78_state::vram_w));
@@ -289,8 +288,8 @@ void rx78_state::rx78_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
-//  AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
+//  map(0xe2, 0xe2).noprw(); //printer
+//  map(0xe3, 0xe3).nopw(); //printer
 	map(0xf0, 0xf0).rw(FUNC(rx78_state::cass_r), FUNC(rx78_state::cass_w)); //cmt
 	map(0xf1, 0xf1).w(FUNC(rx78_state::vram_read_bank_w));
 	map(0xf2, 0xf2).w(FUNC(rx78_state::vram_write_bank_w));
@@ -298,7 +297,7 @@ void rx78_state::rx78_io(address_map &map)
 	map(0xf5, 0xfb).w(FUNC(rx78_state::vdp_reg_w)); //vdp
 	map(0xfc, 0xfc).w(FUNC(rx78_state::vdp_bg_reg_w)); //vdp
 	map(0xfe, 0xfe).w(FUNC(rx78_state::vdp_pri_mask_w));
-	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::command_w)); //psg
+	map(0xff, 0xff).w("sn1", FUNC(sn76489a_device::write)); //psg
 }
 
 /* Input ports */
@@ -432,10 +431,10 @@ void rx78_state::machine_reset()
 {
 	address_space &prg = m_maincpu->space(AS_PROGRAM);
 	if (m_cart->exists())
-		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		prg.install_read_handler(0x2000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
+DEVICE_IMAGE_LOAD_MEMBER( rx78_state::cart_load )
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -470,48 +469,41 @@ static GFXDECODE_START( gfx_rx78 )
 GFXDECODE_END
 
 
-MACHINE_CONFIG_START(rx78_state::rx78)
+void rx78_state::rx78(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",Z80, MASTER_CLOCK/7) // unknown divider
-	MCFG_DEVICE_PROGRAM_MAP(rx78_mem)
-	MCFG_DEVICE_IO_MAP(rx78_io)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", rx78_state, irq0_line_hold)
+	Z80(config, m_maincpu, MASTER_CLOCK/7); // unknown divider
+	m_maincpu->set_addrmap(AS_PROGRAM, &rx78_state::rx78_mem);
+	m_maincpu->set_addrmap(AS_IO, &rx78_state::rx78_io);
+	m_maincpu->set_vblank_int("screen", FUNC(rx78_state::irq0_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-//  MCFG_SCREEN_REFRESH_RATE(60)
-//  MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-//  MCFG_SCREEN_SIZE(192, 184)
-//  MCFG_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+//  screen.set_refresh_hz(60);
+//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+//  screen.set_size(192, 184);
+//  screen.set_visarea(0, 192-1, 0, 184-1);
 	/* guess: generic NTSC video timing at 256x224, system runs at 192x184, suppose with some border area to compensate */
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224)
-	MCFG_SCREEN_UPDATE_DRIVER(rx78_state, screen_update)
+	screen.set_raw(MASTER_CLOCK/4, 442, 0, 256, 263, 0, 224);
+	screen.set_screen_update(FUNC(rx78_state::screen_update));
+	screen.set_palette("palette");
 
-	MCFG_SCREEN_PALETTE("palette")
+	PALETTE(config, m_palette).set_entries(16+1); //+1 for the background color
+	GFXDECODE(config, "gfxdecode", m_palette, gfx_rx78);
 
-	MCFG_PALETTE_ADD("palette", 16+1) //+1 for the background color
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_rx78)
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "rx78_cart", "bin,rom").set_device_load(FUNC(rx78_state::cart_load), this);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "rx78_cart")
-	MCFG_GENERIC_EXTENSIONS("bin,rom")
-	MCFG_GENERIC_LOAD(rx78_state, rx78_cart)
-
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("32k")
-	MCFG_RAM_EXTRA_OPTIONS("16k")
-
-	MCFG_CASSETTE_ADD( "cassette" )
+	RAM(config, RAM_TAG).set_default_size("32K").set_extra_options("16K");
 
 	SPEAKER(config, "mono").front_center();
+	SN76489A(config, "sn1", XTAL(28'636'363)/8).add_route(ALL_OUTPUTS, "mono", 0.50); // unknown divider
 
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
-
-	MCFG_DEVICE_ADD("sn1", SN76489A, XTAL(28'636'363)/8) // unknown divider
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	/* Software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","rx78")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("rx78");
+}
 
 /* ROM definition */
 ROM_START( rx78 )

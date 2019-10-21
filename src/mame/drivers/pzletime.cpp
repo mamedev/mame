@@ -23,13 +23,14 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 class pzletime_state : public driver_device
 {
 public:
-	pzletime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	pzletime_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_video_regs(*this, "video_regs"),
 		m_tilemap_regs(*this, "tilemap_regs"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -41,11 +42,12 @@ public:
 		m_eeprom(*this, "eeprom"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette%u", 0U)
+	{ }
 
 	void pzletime(machine_config &config);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
+	DECLARE_READ_LINE_MEMBER(ticket_status_r);
 
 private:
 	/* memory pointers */
@@ -73,14 +75,14 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pzletime);
-	uint32_t screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void pzletime_palette(palette_device &palette) const;
+	uint32_t screen_update_pzletime(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+	required_device_array<palette_device, 2> m_palette;
 	void pzletime_map(address_map &map);
 };
 
@@ -113,12 +115,12 @@ void pzletime_state::video_start()
 	m_txt_tilemap->set_transparent_pen(0);
 }
 
-uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int count;
 	int y, x;
 
-	bitmap.fill(m_palette->pen(0), cliprect); //bg pen
+	bitmap.fill(m_palette[0]->pen(0), cliprect); //bg pen
 
 	m_txt_tilemap->set_scrolly(0, m_tilemap_regs[0] - 3);
 	m_txt_tilemap->set_scrollx(0, m_tilemap_regs[1]);
@@ -135,7 +137,7 @@ uint32_t pzletime_state::screen_update_pzletime(screen_device &screen, bitmap_in
 			for (x = 0; x < 512; x++)
 			{
 				if (m_bg_videoram[count] & 0x8000)
-					bitmap.pix16((y - 18) & 0xff, (x - 32) & 0x1ff) = 0x300 + (m_bg_videoram[count] & 0x7fff);
+					bitmap.pix32((y - 18) & 0xff, (x - 32) & 0x1ff) = m_palette[1]->pen(m_bg_videoram[count] & 0x7fff);
 
 				count++;
 			}
@@ -201,29 +203,14 @@ WRITE16_MEMBER(pzletime_state::ticket_w)
 
 WRITE16_MEMBER(pzletime_state::video_regs_w)
 {
-	int i;
-
 	COMBINE_DATA(&m_video_regs[offset]);
 
-	if (offset == 0)
+	if (offset < 2 && m_video_regs[offset] > 0)
 	{
-		if (m_video_regs[0] > 0)
-		{
-			for (i = 0; i < 0x300; i++)
-			{
-				m_palette->set_pen_contrast(i, (double)0x8000/(double)m_video_regs[0]);
-			}
-		}
-	}
-	else if (offset == 1)
-	{
-		if (m_video_regs[1] > 0)
-		{
-			for (i = 0x300; i < 32768 + 0x300; i++)
-			{
-				m_palette->set_pen_contrast(i, (double)0x8000/(double)m_video_regs[1]);
-			}
-		}
+		double contrast = 32768.0 / static_cast<double>(m_video_regs[offset]);
+
+		for (unsigned i = 0; i < m_palette[offset]->entries(); i++)
+			m_palette[offset]->set_pen_contrast(i, contrast);
 	}
 }
 
@@ -232,7 +219,7 @@ WRITE16_MEMBER(pzletime_state::oki_bank_w)
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
+READ_LINE_MEMBER(pzletime_state::ticket_status_r)
 {
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }
@@ -242,7 +229,7 @@ void pzletime_state::pzletime_map(address_map &map)
 	map(0x000000, 0x3fffff).rom();
 	map(0x700000, 0x700005).ram().w(FUNC(pzletime_state::video_regs_w)).share("video_regs");
 	map(0x800001, 0x800001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x900000, 0x9005ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x900000, 0x9005ff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette0");
 	map(0xa00000, 0xa00007).ram().share("tilemap_regs");
 	map(0xb00000, 0xb3ffff).ram().share("bg_videoram");
 	map(0xc00000, 0xc00fff).ram().w(FUNC(pzletime_state::mid_videoram_w)).share("mid_videoram");
@@ -264,7 +251,7 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read) /* eeprom */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pzletime_state,ticket_status_r, nullptr) /* ticket dispenser */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(pzletime_state, ticket_status_r) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUT")
@@ -314,17 +301,6 @@ static GFXDECODE_START( gfx_pzletime )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(pzletime_state, pzletime)
-{
-	int i;
-
-	/* first 0x300 colors are dynamic */
-
-	/* initialize 555 RGB lookup */
-	for (i = 0; i < 32768; i++)
-		palette.set_pen_color(i + 0x300, pal5bit(i >> 10), pal5bit(i >> 5), pal5bit(i >> 0));
-}
-
 void pzletime_state::machine_start()
 {
 	save_item(NAME(m_ticket));
@@ -335,36 +311,34 @@ void pzletime_state::machine_reset()
 	m_ticket = 0;
 }
 
-MACHINE_CONFIG_START(pzletime_state::pzletime)
-
+void pzletime_state::pzletime(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",M68000,10000000)
-	MCFG_DEVICE_PROGRAM_MAP(pzletime_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", pzletime_state, irq4_line_hold)
-
+	M68000(config, m_maincpu, 10000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pzletime_state::pzletime_map);
+	m_maincpu->set_vblank_int("screen", FUNC(pzletime_state::irq4_line_hold));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pzletime_state, screen_update_pzletime)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
+	m_screen->set_size(64*8, 32*8);
+	m_screen->set_visarea(0*8, 48*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(pzletime_state::screen_update_pzletime));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_pzletime)
-	MCFG_PALETTE_ADD("palette", 0x300 + 32768)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_INIT_OWNER(pzletime_state, pzletime)
+	GFXDECODE(config, m_gfxdecode, m_palette[0], gfx_pzletime);
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)
+	PALETTE(config, m_palette[0]).set_format(palette_device::xRGB_555, 768);
 
+	PALETTE(config, m_palette[1], palette_device::RGB_555);
+
+	EEPROM_93C46_16BIT(config, "eeprom");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, 937500, okim6295_device::PIN7_HIGH) //freq & pin7 taken from stlforce
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, 937500, okim6295_device::PIN7_HIGH); //freq & pin7 taken from stlforce
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
 

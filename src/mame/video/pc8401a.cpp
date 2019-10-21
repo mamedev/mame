@@ -7,7 +7,7 @@
 
 /* PC-8401A */
 
-PALETTE_INIT_MEMBER(pc8401a_state,pc8401a)
+void pc8401a_state::pc8401a_palette(palette_device &palette) const
 {
 	palette.set_pen_color(0, rgb_t(39, 108, 51));
 	palette.set_pen_color(1, rgb_t(16, 37, 84));
@@ -58,49 +58,54 @@ void pc8401a_state::pc8500_lcdc(address_map &map)
 
 /* Machine Drivers */
 
-MACHINE_CONFIG_START(pc8401a_state::pc8401a_video)
+void pc8401a_state::pc8401a_video(machine_config &config)
+{
 //  config.set_default_layout(layout_pc8401a);
 
-	MCFG_PALETTE_ADD("palette", 2)
-	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
+	PALETTE(config, "palette", FUNC(pc8401a_state::pc8401a_palette), 2);
 
 	/* LCD */
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(44)
-	MCFG_SCREEN_UPDATE_DEVICE(SED1330_TAG, sed1330_device, screen_update)
-	MCFG_SCREEN_SIZE(480, 128)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 128-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen_lcd, SCREEN_TYPE_LCD);
+	m_screen_lcd->set_refresh_hz(44);
+	m_screen_lcd->set_screen_update(SED1330_TAG, FUNC(sed1330_device::screen_update));
+	m_screen_lcd->set_size(480, 128);
+	m_screen_lcd->set_visarea(0, 480-1, 0, 128-1);
+	m_screen_lcd->set_palette("palette");
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8401a_lcdc)
-MACHINE_CONFIG_END
+	SED1330(config, m_lcdc, 7.987_MHz_XTAL);
+	m_lcdc->set_screen(m_screen_lcd);
+	m_lcdc->set_addrmap(0, &pc8401a_state::pc8401a_lcdc);
+}
 
-MACHINE_CONFIG_START(pc8500_state::pc8500_video)
+void pc8500_state::pc8500_video(machine_config &config)
+{
 	config.set_default_layout(layout_pc8500);
 
-	MCFG_PALETTE_ADD("palette", 2+8)
-	MCFG_PALETTE_INIT_OWNER(pc8401a_state,pc8401a)
+	PALETTE(config, "palette", FUNC(pc8500_state::pc8401a_palette), 2 + 8);
 
 	/* LCD */
-	MCFG_SCREEN_ADD(SCREEN_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(44)
-	MCFG_SCREEN_UPDATE_DEVICE(SED1330_TAG, sed1330_device, screen_update)
-	MCFG_SCREEN_SIZE(480, 208)
-	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 200-1)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen_lcd, SCREEN_TYPE_LCD);
+	m_screen_lcd->set_refresh_hz(44);
+	m_screen_lcd->set_screen_update(SED1330_TAG, FUNC(sed1330_device::screen_update));
+	m_screen_lcd->set_size(480, 208);
+	m_screen_lcd->set_visarea(0, 480-1, 0, 200-1);
+	m_screen_lcd->set_palette("palette");
 
-	MCFG_SED1330_ADD(SED1330_TAG, 0, SCREEN_TAG, pc8500_lcdc)
+	SED1330(config, m_lcdc, 8000000);
+	m_lcdc->set_screen(SCREEN_TAG);
+	m_lcdc->set_addrmap(0, &pc8500_state::pc8500_lcdc);
 
 	/* PC-8441A CRT */
-	MCFG_SCREEN_ADD(CRT_SCREEN_TAG, RASTER)
-	MCFG_SCREEN_UPDATE_DRIVER(pc8500_state, screen_update)
-	MCFG_SCREEN_SIZE(80*8, 24*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 80*8-1, 0, 24*8-1)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, CRT_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen.set_screen_update(FUNC(pc8500_state::screen_update));
+	screen.set_size(80*8, 24*8);
+	screen.set_visarea(0, 80*8-1, 0, 24*8-1);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_refresh_hz(50);
+	screen.set_palette("palette");
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, CRT_SCREEN_TAG, 400000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(6)
-MACHINE_CONFIG_END
+	MC6845(config, m_crtc, 400000);
+	m_crtc->set_screen(CRT_SCREEN_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(6);
+}

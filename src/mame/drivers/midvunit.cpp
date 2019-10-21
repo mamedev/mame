@@ -18,8 +18,6 @@
         * in Cruis'n World attract mode, right side of sky looks like it has wrapped
         * Off Road Challenge has polygon sorting issues, among other problems
         * Issues for the Wargods sets:
-           Sound D/RAM      ERROR EE (during boot diag)
-           Listen for Tone  ERROR E1 (during boot diag)
            All sets report as Game Type: 452 (12/11/1995) [which is wrong for newer sets]
 
 Known to exist but not dumped:
@@ -56,6 +54,8 @@ void midvunit_state::machine_start()
 	save_item(NAME(m_wheel_board_output));
 	save_item(NAME(m_wheel_board_last));
 	save_item(NAME(m_wheel_board_u8_latch));
+	save_item(NAME(m_comm_flags));
+	save_item(NAME(m_comm_data));
 
 	m_optional_drivers.resolve();
 }
@@ -121,7 +121,7 @@ READ32_MEMBER(midvunit_state::port0_r)
 READ32_MEMBER( midvunit_state::adc_r )
 {
 	if (!(m_control_data & 0x40))
-		return m_adc->read(space, 0) << m_adc_shift;
+		return m_adc->read() << m_adc_shift;
 	else
 		logerror("adc_r without enabling reads!\n");
 
@@ -131,7 +131,7 @@ READ32_MEMBER( midvunit_state::adc_r )
 WRITE32_MEMBER( midvunit_state::adc_w )
 {
 	if (!(m_control_data & 0x20))
-		m_adc->write(space, 0, data >> m_adc_shift);
+		m_adc->write(data >> m_adc_shift);
 	else
 		logerror("adc_w without enabling writes!\n");
 }
@@ -179,7 +179,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_control_w)
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0008)
-		m_watchdog->reset_w(space, 0, 0);
+		m_watchdog->watchdog_reset();
 
 	/* bit 1 is the DCS sound reset */
 	m_dcs->reset_w((~m_control_data >> 1) & 1);
@@ -200,7 +200,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_control_w)
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ m_control_data) & 0x0200)
-		m_watchdog->reset_w(space, 0, 0);
+		m_watchdog->watchdog_reset();
 
 	/* bit 8 is the LED */
 
@@ -280,14 +280,14 @@ WRITE32_MEMBER(midvunit_state::tms32031_control_w)
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_status_r)
 {
-	int status = m_midway_serial_pic->status_r(space,0);
-	return (ioport("991030")->read() & 0x7fff7fff) | (status << 31) | (status << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic->status_r() << 15);
+	return in1 | in1 << 16;
 }
 
 
 READ32_MEMBER(midvunit_state::crusnwld_serial_data_r)
 {
-	return m_midway_serial_pic->read(space,0) << 16;
+	return m_midway_serial_pic->read() << 16;
 }
 
 
@@ -298,7 +298,7 @@ WRITE32_MEMBER(midvunit_state::crusnwld_serial_data_w)
 		m_midway_serial_pic->reset_w(1);
 		m_midway_serial_pic->reset_w(0);
 	}
-	m_midway_serial_pic->write(space,0,data >> 16);
+	m_midway_serial_pic->write(data >> 16);
 }
 
 
@@ -342,20 +342,20 @@ WRITE32_MEMBER(midvunit_state::bit_reset_w)
 
 READ32_MEMBER(midvunit_state::offroadc_serial_status_r)
 {
-	int status = m_midway_serial_pic2->status_r(space,0);
-	return (ioport("991030")->read()  & 0x7fff7fff) | (status << 31) | (status << 15);
+	uint16_t in1 = (m_in1->read() & 0x7fff) | (m_midway_serial_pic2->status_r() << 15);
+	return in1 | in1 << 16;
 }
 
 
 READ32_MEMBER(midvunit_state::offroadc_serial_data_r)
 {
-	return m_midway_serial_pic2->read(space, 0) << 16;
+	return m_midway_serial_pic2->read() << 16;
 }
 
 
 WRITE32_MEMBER(midvunit_state::offroadc_serial_data_w)
 {
-	m_midway_serial_pic2->write(space, 0, data >> 16);
+	m_midway_serial_pic2->write(data >> 16);
 }
 
 READ32_MEMBER(midvunit_state::midvunit_wheel_board_r)
@@ -500,6 +500,58 @@ DECLARE_CUSTOM_INPUT_MEMBER(midvunit_state::motion_r)
 }
 
 
+READ32_MEMBER(midvunit_state::midvunit_intcs_r)
+{
+	return 4;
+}
+
+uint16_t midvunit_state::comm_bus_out()
+{
+	uint16_t mask = 0;
+	if (m_comm_flags & 0x20) // COMCOE
+		mask |= (m_comm_data >> 4) & 0xf00;
+	if (m_comm_flags & 0x40) // COMDOE
+		mask |= 0xff;
+	return m_comm_data & mask;
+}
+
+// To link multiple machines together will require comm_bus_out()
+// to be called on each machine and bitwise ORed here.
+// This must be done in real time with proper synchronization.
+uint16_t midvunit_state::comm_bus_in()
+{
+	return comm_bus_out();
+}
+
+READ32_MEMBER(midvunit_state::midvunit_comcs_r)
+{
+	if (offset != 0)
+	{
+		logerror("midvunit_comcs_r(%d)\n", offset);
+		return 0;
+	}
+	else
+	{
+		uint16_t data = comm_bus_in();
+		if (m_comm_flags & 0x20) // COMCOE
+			data &= ~((m_comm_data >> 4) & 0xf00);
+		if (m_comm_flags & 0x40) // COMDOE
+			data &= ~0xff;
+		return data << 16;
+	}
+}
+
+WRITE32_MEMBER(midvunit_state::midvunit_comcs_w)
+{
+	switch (offset)
+	{
+		default: logerror("midvunit_comcs_w(%d) = %08X\n", offset, data); break;
+		case 0: m_comm_data = data >> 16; break;
+		case 1: m_comm_flags = (data >> 24) & 0xe0; break;
+	}
+}
+
+
 /*************************************
  *
  *  War Gods I/O ASICs
@@ -544,7 +596,7 @@ WRITE32_MEMBER(midvunit_state::midvplus_misc_w)
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ m_midvplus_misc[offset]) & 0x0010)
 			{
-				m_watchdog->reset_w(space, 0, 0);
+				m_watchdog->watchdog_reset();
 				logit = false;
 			}
 			break;
@@ -590,7 +642,6 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x400000, 0x41ffff).ram();
 	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
 	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
-	map(0x809800, 0x809fff).ram();
 	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
 	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
@@ -598,16 +649,16 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x980040, 0x980040).rw(FUNC(midvunit_state::midvunit_page_control_r), FUNC(midvunit_state::midvunit_page_control_w));
 	map(0x980080, 0x980080).noprw();
 	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
-	map(0x990000, 0x990000).nopr(); // link PAL (low 4 bits must == 4)
-	map(0x991030, 0x991030).portr("991030");
-//  AM_RANGE(0x991050, 0x991050) AM_READONLY // seems to be another port
+	map(0x990000, 0x990000).r(FUNC(midvunit_state::midvunit_intcs_r));
+	map(0x991030, 0x991030).lr16("991030", [this]() { return uint16_t(m_in1->read()); });
+//  map(0x991050, 0x991050).readonly(); // seems to be another port
 	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
-	map(0x992000, 0x992000).portr("992000");
+	map(0x992000, 0x992000).lr16("992000", [this]() { return uint16_t(m_dsw->read()); });
 	map(0x993000, 0x993000).rw(FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
 	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
 	map(0x995000, 0x995000).rw(FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
 	map(0x995020, 0x995020).w(FUNC(midvunit_state::midvunit_cmos_protect_w));
-	map(0x997000, 0x997000).noprw(); // communications
+	map(0x997000, 0x997008).rw(FUNC(midvunit_state::midvunit_comcs_r), FUNC(midvunit_state::midvunit_comcs_w));
 	map(0x9a0000, 0x9a0000).w(FUNC(midvunit_state::midvunit_sound_w));
 	map(0x9c0000, 0x9c1fff).rw(FUNC(midvunit_state::midvunit_cmos_r), FUNC(midvunit_state::midvunit_cmos_w)).share("nvram");
 	map(0x9e0000, 0x9e7fff).ram().w(FUNC(midvunit_state::midvunit_paletteram_w)).share("paletteram");
@@ -622,7 +673,6 @@ void midvunit_state::midvplus_map(address_map &map)
 	map(0x400000, 0x41ffff).ram().share("fastram_base");
 	map(0x600000, 0x600000).w(FUNC(midvunit_state::midvunit_dma_queue_w));
 	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share("32031_control");
-	map(0x809800, 0x809fff).ram();
 	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::midvunit_videoram_r), FUNC(midvunit_state::midvunit_videoram_w)).share("videoram");
 	map(0x980000, 0x980000).r(FUNC(midvunit_state::midvunit_dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvunit_state::midvunit_scanline_r));
@@ -649,14 +699,6 @@ void midvunit_state::midvplus_map(address_map &map)
  *************************************/
 
 static INPUT_PORTS_START( midvunit )
-	PORT_START("991030")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "IN1")
-
-	PORT_START("992000")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, driver_device,custom_port_read, "DSW")
-
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -715,7 +757,7 @@ static INPUT_PORTS_START( crusnusa )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 2")
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 3")
 	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_NAME("Motion Status - Device 4")
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midvunit_state, motion_r, nullptr )
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(midvunit_state, motion_r)
 
 	PORT_START("DSW")
 	/* DSW2 at U97 */
@@ -1063,83 +1105,84 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(midvunit_state::midvcommon)
-
+void midvunit_state::midvcommon(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", TMS32031, CPU_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(midvunit_map)
+	TMS32031(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
 
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_TIMER_ADD_NONE("timer0")
-	MCFG_TIMER_ADD_NONE("timer1")
+	TIMER(config, "timer0").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "timer1").configure_generic(timer_device::expired_delegate());
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, m_palette).set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(midvunit_state, screen_update_midvunit)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_ADC0844_ADD("adc")
-	MCFG_ADC0844_INTR_CB(INPUTLINE("maincpu", 3))
-	MCFG_ADC0844_CH1_CB(IOPORT("WHEEL"))
-	MCFG_ADC0844_CH2_CB(IOPORT("ACCEL"))
-	MCFG_ADC0844_CH3_CB(IOPORT("BRAKE"))
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MIDVUNIT_VIDEO_CLOCK/2, 666, 0, 512, 432, 0, 400);
+	m_screen->set_screen_update(FUNC(midvunit_state::screen_update_midvunit));
+	m_screen->set_palette(m_palette);
+}
 
 
-MACHINE_CONFIG_START(midvunit_state::midvunit)
+void midvunit_state::midvunit(machine_config &config)
+{
 	midvcommon(config);
 
+	ADC0844(config, m_adc);
+	m_adc->intr_callback().set_inputline("maincpu", 3);
+	m_adc->ch1_callback().set_ioport("WHEEL");
+	m_adc->ch2_callback().set_ioport("ACCEL");
+	m_adc->ch3_callback().set_ioport("BRAKE");
+
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_2K, 0)
-MACHINE_CONFIG_END
+	DCS_AUDIO_2K(config, "dcs", 0);
+}
 
 
-MACHINE_CONFIG_START(midvunit_state::crusnwld)
+void midvunit_state::crusnwld(machine_config &config)
+{
 	midvunit(config);
 	/* valid values are 450 or 460 */
-	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
-	MCFG_MIDWAY_SERIAL_PIC_UPPER(450)
-MACHINE_CONFIG_END
+	MIDWAY_SERIAL_PIC(config, m_midway_serial_pic, 0);
+	m_midway_serial_pic->set_upper(450);
+}
 
-MACHINE_CONFIG_START(midvunit_state::offroadc)
+void midvunit_state::offroadc(machine_config &config)
+{
 	midvunit(config);
 	/* valid values are 230 or 234 */
-	MCFG_DEVICE_ADD("serial_pic2", MIDWAY_SERIAL_PIC2, 0)
-	MCFG_MIDWAY_SERIAL_PIC2_UPPER(230)
-	MCFG_MIDWAY_SERIAL_PIC2_YEAR_OFFS(94)
-MACHINE_CONFIG_END
+	MIDWAY_SERIAL_PIC2(config, m_midway_serial_pic2, 0);
+	m_midway_serial_pic2->set_upper(230);
+	m_midway_serial_pic2->set_yearoffs(94);
+}
 
-MACHINE_CONFIG_START(midvunit_state::midvplus)
+void midvunit_state::midvplus(machine_config &config)
+{
 	midvcommon(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(midvplus_map)
-	MCFG_TMS3203X_XF1_CB(WRITE8(*this, midvunit_state, midvplus_xf1_w))
+	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvplus_map);
+	m_maincpu->xf1().set(FUNC(midvunit_state::midvplus_xf1_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(midvunit_state,midvplus)
-	MCFG_DEVICE_REMOVE("nvram")
+	config.device_remove("nvram");
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 
-	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
-	MCFG_MIDWAY_IOASIC_SHUFFLE(0)
-	MCFG_MIDWAY_IOASIC_UPPER(452) /* no alternates */
-	MCFG_MIDWAY_IOASIC_YEAR_OFFS(94)
-
-	MCFG_DEVICE_REMOVE("adc")
+	MIDWAY_IOASIC(config, m_midway_ioasic, 0);
+	m_midway_ioasic->set_shuffle(0);
+	m_midway_ioasic->set_upper(452); /* no alternates */
+	m_midway_ioasic->set_yearoffs(94);
 
 	/* sound hardware */
-	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2115, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(2)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x3839)
-MACHINE_CONFIG_END
+	DCS2_AUDIO_2115(config, m_dcs, 0);
+	m_dcs->set_dram_in_mb(2);
+	m_dcs->set_polling_offset(0x3839);
+}
 
 
 
@@ -1257,12 +1300,12 @@ ROM_START( crusnusa ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
 
 	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
-	ROM_LOAD("a-19993.u38.bin",  0x0000, 0x02dd, BAD_DUMP CRC(b6323e94) SHA1(a84e04db8838b35ad9d30416b86aba65a29dcd87) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19670.u43.bin",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
-	ROM_LOAD("a-19668.u52.bin",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
-	ROM_LOAD("a-19671.u54.bin",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19673.u111.bin", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
-	ROM_LOAD("a-19672.u114.bin", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19993.u38",  0x0000, 0x02e5, BAD_DUMP CRC(7e8b7b0d) SHA1(f9af19da171f949a11c5548da7b4277aecb6f2a8) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
 
@@ -1298,6 +1341,14 @@ ROM_START( crusnusa40 ) /* Version 4.0, Wed Feb 08 1995 - 10:45:14 */
 	ROM_LOAD32_BYTE( "cusa.u27",     0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
 	ROM_LOAD32_BYTE( "cusa.u28",     0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19993.u38",  0x0000, 0x02e5, BAD_DUMP CRC(7e8b7b0d) SHA1(f9af19da171f949a11c5548da7b4277aecb6f2a8) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
 
@@ -1333,6 +1384,14 @@ ROM_START( crusnusa21 ) /* Version 2.1, Wed Nov 09 1994 - 16:28:10 */
 	ROM_LOAD32_BYTE( "cusa.u27",     0x800001, 0x80000, CRC(2d977a8e) SHA1(8f4d511bfd6c3bee18daa7253be1a27d079aec8f) )
 	ROM_LOAD32_BYTE( "cusa.u28",     0x800002, 0x80000, CRC(cffa5fb1) SHA1(fb73bc8f65b604c374f88d0ecf06c50ef52f0547) )
 	ROM_LOAD32_BYTE( "cusa.u29",     0x800003, 0x80000, CRC(cbe52c60) SHA1(3f309ce8ef1784c830f4160cfe76dc3a0b438cac) )
+
+	ROM_REGION( 0x0b33, "pals", 0 ) // all protected
+	ROM_LOAD("a-19669.u38",  0x0000, 0x02dd, NO_DUMP ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19670.u43",  0x0000, 0x0144, BAD_DUMP CRC(acafcc97) SHA1(b6f916838d08590a536fe925ec62d66e6ea3dcbc) ) /* TIBPAL20L8-10CNT */
+	ROM_LOAD("a-19668.u52",  0x0000, 0x0157, BAD_DUMP CRC(7915134e) SHA1(aeb22e46abdc14a9e9b34cfe3b77da3e29b789fe) ) /* GAL20V8B */
+	ROM_LOAD("a-19671.u54",  0x0000, 0x02dd, BAD_DUMP CRC(b9cce038) SHA1(8d1df026bdac66ea5493e9e51c23f8eb182b024e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19673.u111", 0x0000, 0x02dd, BAD_DUMP CRC(8552977d) SHA1(a1a53d797697682b3f18893a90b6bef39ebb069e) ) /* TIBPAL22V10-15BCNT */
+	ROM_LOAD("a-19672.u114", 0x0000, 0x0001, NO_DUMP ) /* TIBPAL22V10-15BCNT */
 ROM_END
 
 

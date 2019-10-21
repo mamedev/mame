@@ -95,7 +95,7 @@ Static RAM: 256 Kibit
 
 PSS-62  - SUPER FAMICOM BOX Commercial Optional Cart
 GameData ROM: GROM2-1, 256Kibit
-Lower ROM: New Super 3D Golf Simulation - Waialae No Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
+Lower ROM: New Super 3D Golf Simulation - Waialae no Kiseki (Waialae Golf) (T&E SOFT), SHVC-GC-0, 4Mibit
 Lower ROM: Super Mahjong 2 (I'MAX), SHVC-2A-1, 8Mibit
 
 PSS-63  - SUPER FAMICOM BOX Commercial Optional Cart
@@ -178,12 +178,12 @@ void sfcbox_state::snes_map(address_map &map)
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
 {
-	return m_spc700->spc_ram_r(space, offset + 0x100);
+	return m_spc700->spc_ram_r(offset + 0x100);
 }
 
 WRITE8_MEMBER(sfcbox_state::spc_ram_100_w)
 {
-	m_spc700->spc_ram_w(space, offset + 0x100, data);
+	m_spc700->spc_ram_w(offset + 0x100, data);
 }
 
 void sfcbox_state::spc_mem(address_map &map)
@@ -294,12 +294,12 @@ void sfcbox_state::sfcbox_io(address_map &map)
 	map(0x0b, 0x0b).w(m_mb90082, FUNC(mb90082_device::write));
 	map(0x80, 0x80).portr("KEY").w(FUNC(sfcbox_state::port_80_w)); // Keyswitch and Button Inputs / SNES Transfer and Misc Output
 	map(0x81, 0x81).rw(FUNC(sfcbox_state::port_81_r), FUNC(sfcbox_state::port_81_w)); // SNES Transfer and Misc Input / Misc Output
-//  AM_RANGE(0x82, 0x82) // Unknown/unused
+//  map(0x82, 0x82) // Unknown/unused
 	map(0x83, 0x83).rw(FUNC(sfcbox_state::port_83_r), FUNC(sfcbox_state::port_83_w)); // Joypad Input/Status / Joypad Output/Control
-//  AM_RANGE(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-//  AM_RANGE(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
-//  AM_RANGE(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
-//  AM_RANGE(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  map(0x84, 0x84) // Joypad 1, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  map(0x85, 0x85) // Joypad 1, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
+//  map(0x86, 0x86) // Joypad 2, MSB (1st 8 bits) (eg. Bit7=ButtonB, 0=Low=Pressed)
+//  map(0x87, 0x87) // Joypad 2, LSB (2nd 8 bits) (eg. Bit0=LSB of ID, 0=Low=One)
 	map(0xa0, 0xa0).portr("RTC_R").portw("RTC_W"); //  Real Time Clock
 	map(0xc0, 0xc0).w(FUNC(sfcbox_state::snes_map_0_w)); // SNES Mapping Register 0
 	map(0xc1, 0xc1).w(FUNC(sfcbox_state::snes_map_1_w)); // SNES Mapping Register 1
@@ -456,56 +456,56 @@ void sfcbox_state::machine_reset()
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(sfcbox_state::sfcbox)
-
+void sfcbox_state::sfcbox(machine_config &config)
+{
 	/* base snes hardware */
-	MCFG_DEVICE_ADD("maincpu", _5A22, 3580000*6)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_DEVICE_PROGRAM_MAP(snes_map)
+	_5A22(config, m_maincpu, 3580000*6);   /* 2.68Mhz, also 3.58Mhz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &sfcbox_state::snes_map);
 
 	// runs at 24.576 MHz / 12 = 2.048 MHz
-	MCFG_DEVICE_ADD("soundcpu", SPC700, XTAL(24'576'000) / 12)
-	MCFG_DEVICE_PROGRAM_MAP(spc_mem)
+	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &sfcbox_state::spc_mem);
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+	config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	/* sfcbox hardware */
-	MCFG_DEVICE_ADD("bios", Z180, XTAL(12'000'000) / 2)  /* HD64180RF6X */
-	MCFG_DEVICE_PROGRAM_MAP(sfcbox_map)
-	MCFG_DEVICE_IO_MAP(sfcbox_io)
+	Z80180(config, m_bios, XTAL(12'000'000));  /* HD64180RF6X */
+	m_bios->set_addrmap(AS_PROGRAM, &sfcbox_state::sfcbox_map);
+	m_bios->set_addrmap(AS_IO, &sfcbox_state::sfcbox_io);
 
-	MCFG_MB90082_ADD("mb90082",XTAL(12'000'000) / 2) /* TODO: correct clock */
-	MCFG_S3520CF_ADD("s3520cf") /* RTC */
+	MB90082(config, m_mb90082, XTAL(12'000'000) / 2); /* TODO: correct clock */
+	S3520CF(config, m_s3520cf); /* RTC */
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("spc700", SNES_SOUND)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+	SNES_SOUND(config, m_spc700, XTAL(24'576'000) / 12);
+	m_spc700->add_route(0, "lspeaker", 1.00);
+	m_spc700->add_route(1, "rspeaker", 1.00);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
+	screen.set_screen_update(FUNC(snes_state::screen_update));
 
-	SNES_PPU(config, m_ppu, 0);
+	SNES_PPU(config, m_ppu, MCLK_NTSC);
 	m_ppu->open_bus_callback().set([this] { return snes_open_bus_r(); }); // lambda because overloaded function name
 	m_ppu->set_screen("screen");
 
 	// SFCBOX
-	MCFG_SCREEN_ADD("osd", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-//  MCFG_SCREEN_SIZE(24*12+22, 12*18+22)
-//  MCFG_SCREEN_VISIBLE_AREA(0*8, 24*12-1, 0*8, 12*18-1)
-	MCFG_SCREEN_SIZE(24*16+22, 12*16+22)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 24*16-1, 0*8, 12*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(sfcbox_state,screen_update)
-MACHINE_CONFIG_END
+	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	osd.set_refresh_hz(60);
+	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+//  osd.set_size(24*12+22, 12*18+22);
+//  osd.set_visarea(0*8, 24*12-1, 0*8, 12*18-1);
+	osd.set_size(24*16+22, 12*16+22);
+	osd.set_visarea(0*8, 24*16-1, 0*8, 12*16-1);
+	osd.set_screen_update(FUNC(sfcbox_state::screen_update));
+}
 
 /***************************************************************************
 
@@ -589,6 +589,6 @@ ROM_END
 
 GAME( 1994, sfcbox, 0,      sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Famicom Box BIOS", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
 GAME( 1994, pss61,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo",               "Super Mario Kart / Super Mario Collection / Star Fox (Super Famicom Box)", MACHINE_NOT_WORKING )
-GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae No Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
+GAME( 1994, pss62,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "T&E Soft / I'Max",       "New Super 3D Golf Simulation - Waialae no Kiseki / Super Mahjong 2 (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 1994, pss63,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / BPS",         "Super Donkey Kong / Super Tetris 2 + Bombliss (Super Famicom Box)", MACHINE_NOT_WORKING )
 GAME( 199?, pss64,  sfcbox, sfcbox, snes, sfcbox_state, init_snes, ROT0, "Nintendo / Hudson Soft", "Super Donkey Kong / Super Bomberman 2 (Super Famicom Box)", MACHINE_NOT_WORKING )

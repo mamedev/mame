@@ -5,9 +5,10 @@
  * includes/galaxy.h
  *
  ****************************************************************************/
-
 #ifndef MAME_INCLUDES_GALAXY_H
 #define MAME_INCLUDES_GALAXY_H
+
+#pragma once
 
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
@@ -23,7 +24,9 @@ public:
 		, m_screen(*this, "screen")
 		, m_cassette(*this, "cassette")
 		, m_ram(*this, RAM_TAG)
-		, m_region_gfx1(*this, "gfx1") {}
+		, m_region_gfx1(*this, "gfx1")
+	{
+	}
 
 	void galaxy(machine_config &config);
 	void galaxyp(machine_config &config);
@@ -43,7 +46,7 @@ private:
 	IRQ_CALLBACK_MEMBER(galaxy_irq_callback);
 	void galaxy_set_timer();
 	void galaxy_setup_snapshot (const uint8_t * data, uint32_t size);
-	DECLARE_SNAPSHOT_LOAD_MEMBER( galaxy );
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 	void galaxy_mem(address_map &map);
 	void galaxyp_io(address_map &map);
 	void galaxyp_mem(address_map &map);
@@ -64,6 +67,5 @@ private:
 	emu_timer *m_gal_video_timer;
 	bitmap_ind16 m_bitmap;
 };
-
 
 #endif // MAME_INCLUDES_GALAXY_H

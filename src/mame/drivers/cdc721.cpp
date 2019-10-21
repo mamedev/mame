@@ -31,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_bank_16k(*this, {"block0", "block4", "block8", "blockc"})
+		, m_crtc(*this, "crtc")
 		, m_rom_chargen(*this, "chargen")
 		, m_ram_chargen(*this, "chargen")
 		, m_videoram(*this, "videoram")
@@ -38,9 +39,14 @@ public:
 	{ }
 
 	void cdc721(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(cdc721);
+	void cdc721_palette(palette_device &palette) const;
 	DECLARE_WRITE8_MEMBER(interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(misc_w);
 	DECLARE_WRITE8_MEMBER(lights_w);
@@ -60,9 +66,6 @@ private:
 	void block8_map(address_map &map);
 	void blockc_map(address_map &map);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
-
 	u8 m_flashcnt;
 	u8 m_foreign_char_bank;
 
@@ -72,6 +75,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<address_map_bank_device, 4> m_bank_16k;
+	required_device<crt5037_device> m_crtc;
 	required_region_ptr<u8> m_rom_chargen;
 	required_shared_ptr<u8> m_ram_chargen;
 	required_shared_ptr<u8> m_videoram;
@@ -247,11 +251,11 @@ static GFXDECODE_START( gfx_cdc721 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cdc721_charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( cdc721_state, cdc721 )
+void cdc721_state::cdc721_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
-	palette.set_pen_color(1, 0, 255, 0 );   /* Full */
-	palette.set_pen_color(2, 0, 128, 0 );   /* Dimmed */
+	palette.set_pen_color(0, 0, 0, 0 );     // Black
+	palette.set_pen_color(1, 0, 255, 0 );   // Full
+	palette.set_pen_color(2, 0, 128, 0 );   // Dimmed
 }
 
 uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -264,7 +268,7 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		uint16_t ma = m_videoram[y * 2] | m_videoram[y * 2 + 1] << 8;
 
-		for (ra = 0; ra < 16; ra++)
+		for (ra = 0; ra < 15; ra++)
 		{
 			uint16_t *p = &bitmap.pix16(sy++);
 
@@ -300,62 +304,40 @@ uint32_t cdc721_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-MACHINE_CONFIG_START(cdc721_state::cdc721)
+void cdc721_state::cdc721(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD("maincpu", Z80, 6_MHz_XTAL) // Zilog Z8400B (Z80B)
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(cdc721_state, restart_cb)
+	Z80(config, m_maincpu, 6_MHz_XTAL); // Zilog Z8400B (Z80B)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cdc721_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &cdc721_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cdc721_state::restart_cb));
 
-	MCFG_DEVICE_ADD("block0", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, block0_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+	ADDRESS_MAP_BANK(config, "block0").set_map(&cdc721_state::block0_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "block4").set_map(&cdc721_state::block4_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "block8").set_map(&cdc721_state::block8_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
+	ADDRESS_MAP_BANK(config, "blockc").set_map(&cdc721_state::blockc_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x4000);
 
-	MCFG_DEVICE_ADD("block4", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, block4_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("block8", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, block8_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_DEVICE_ADD("blockc", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_ADDRESS_MAP(0, blockc_map)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
-
-	MCFG_NVRAM_ADD_0FILL("nvram") // MCM51L01C45 (256x4) + battery
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MCM51L01C45 (256x4) + battery
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(cdc721_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD("palette", 3)
-	MCFG_PALETTE_INIT_OWNER(cdc721_state, cdc721)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cdc721)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12.936_MHz_XTAL, 800, 0, 640, 539, 0, 450);
+	screen.set_screen_update(FUNC(cdc721_state::screen_update));
+	screen.set_palette("palette");
+	PALETTE(config, "palette", FUNC(cdc721_state::cdc721_palette), 3);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_cdc721);
 
-	MCFG_DEVICE_ADD("crtc", CRT5037, 12.936_MHz_XTAL / 8)
-	MCFG_TMS9927_CHAR_WIDTH(8)
+	CRT5037(config, m_crtc, 12.936_MHz_XTAL / 8).set_char_width(8);
+	m_crtc->set_screen("screen");
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 6_MHz_XTAL) // Zilog Z8430B (M1 pulled up)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(*this, cdc721_state, int_w<6>))
-	MCFG_Z80CTC_ZC1_CB(WRITELINE("ctc", z80ctc_device, trg2))
-	//MCFG_Z80CTC_ZC2_CB(WRITELINE("comuart", ins8250_device, rclk_w))
+	z80ctc_device& ctc(Z80CTC(config, "ctc", 6_MHz_XTAL)); // Zilog Z8430B (M1 pulled up)
+	ctc.intr_callback().set(FUNC(cdc721_state::int_w<6>));
+	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg2));
+	//ctc.zc_callback<2>().set("comuart", FUNC(ins8250_device::rclk_w));
 
-	MCFG_DEVICE_ADD("ppi", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(WRITE8(*this, cdc721_state, interrupt_mask_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, cdc721_state, misc_w))
+	i8255_device &ppi(I8255A(config, "ppi"));
+	ppi.out_pb_callback().set(FUNC(cdc721_state::interrupt_mask_w));
+	ppi.out_pc_callback().set(FUNC(cdc721_state::misc_w));
 
 	output_latch_device &ledlatch(OUTPUT_LATCH(config, "ledlatch"));
 	ledlatch.bit_handler<0>().set_output("error").invert();
@@ -367,55 +349,54 @@ MACHINE_CONFIG_START(cdc721_state::cdc721)
 	ledlatch.bit_handler<6>().set_output("prog3").invert();
 	ledlatch.bit_handler<7>().set_output("dsr").invert();
 
-	MCFG_DEVICE_ADD("comuart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<0>))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("comm", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("comm", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("comm", rs232_port_device, write_rts))
+	ins8250_device &comuart(INS8250(config, "comuart", 1.8432_MHz_XTAL));
+	comuart.out_int_callback().set(FUNC(cdc721_state::int_w<0>));
+	comuart.out_tx_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	comuart.out_dtr_callback().set("comm", FUNC(rs232_port_device::write_dtr));
+	comuart.out_rts_callback().set("comm", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("comm", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("comuart", ins8250_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("comuart", ins8250_device, dsr_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("comuart", ins8250_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("comuart", ins8250_device, cts_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("comuart", ins8250_device, ri_w))
+	rs232_port_device &comm(RS232_PORT(config, "comm", default_rs232_devices, nullptr));
+	comm.rxd_handler().set("comuart", FUNC(ins8250_device::rx_w));
+	comm.dsr_handler().set("comuart", FUNC(ins8250_device::dsr_w));
+	comm.dcd_handler().set("comuart", FUNC(ins8250_device::dcd_w));
+	comm.cts_handler().set("comuart", FUNC(ins8250_device::cts_w));
+	comm.ri_handler().set("comuart", FUNC(ins8250_device::ri_w));
 
-	MCFG_DEVICE_ADD("kbduart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(*this, cdc721_state, int_w<5>))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<2>))
-	//MCFG_INS8250_OUT_RTS_CB(WRITELINE(*this, cdc721_state, alarm_high_low_w))
-	MCFG_INS8250_OUT_OUT1_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<1>))
-	MCFG_INS8250_OUT_OUT2_CB(WRITELINE(*this, cdc721_state, foreign_char_bank_w<0>))
+	ins8250_device &kbduart(INS8250(config, "kbduart", 1.8432_MHz_XTAL));
+	kbduart.out_int_callback().set(FUNC(cdc721_state::int_w<5>));
+	kbduart.out_dtr_callback().set(FUNC(cdc721_state::foreign_char_bank_w<2>));
+	//kbduart.out_rts_callback().set(FUNC(cdc721_state::alarm_high_low_w));
+	kbduart.out_out1_callback().set(FUNC(cdc721_state::foreign_char_bank_w<1>));
+	kbduart.out_out2_callback().set(FUNC(cdc721_state::foreign_char_bank_w<0>));
 
-	MCFG_DEVICE_ADD("pauart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<1>))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("cha", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("cha", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("cha", rs232_port_device, write_rts))
+	ins8250_device &pauart(INS8250(config, "pauart", 1.8432_MHz_XTAL));
+	pauart.out_int_callback().set("int2", FUNC(input_merger_device::in_w<1>));
+	pauart.out_tx_callback().set("cha", FUNC(rs232_port_device::write_txd));
+	pauart.out_dtr_callback().set("cha", FUNC(rs232_port_device::write_dtr));
+	pauart.out_rts_callback().set("cha", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("cha", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("pauart", ins8250_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("pauart", ins8250_device, dsr_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("pauart", ins8250_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("pauart", ins8250_device, cts_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("pauart", ins8250_device, ri_w))
+	rs232_port_device &cha(RS232_PORT(config, "cha", default_rs232_devices, nullptr));
+	cha.rxd_handler().set("pauart", FUNC(ins8250_device::rx_w));
+	cha.dsr_handler().set("pauart", FUNC(ins8250_device::dsr_w));
+	cha.dcd_handler().set("pauart", FUNC(ins8250_device::dcd_w));
+	cha.cts_handler().set("pauart", FUNC(ins8250_device::cts_w));
+	cha.ri_handler().set("pauart", FUNC(ins8250_device::ri_w));
 
-	MCFG_DEVICE_ADD("pbuart", INS8250, 1.8432_MHz_XTAL)
-	MCFG_INS8250_OUT_INT_CB(WRITELINE("int2", input_merger_device, in_w<0>))
-	MCFG_INS8250_OUT_TX_CB(WRITELINE("chb", rs232_port_device, write_txd))
-	MCFG_INS8250_OUT_DTR_CB(WRITELINE("chb", rs232_port_device, write_dtr))
-	MCFG_INS8250_OUT_RTS_CB(WRITELINE("chb", rs232_port_device, write_rts))
+	ins8250_device &pbuart(INS8250(config, "pbuart", 1.8432_MHz_XTAL));
+	pbuart.out_int_callback().set("int2", FUNC(input_merger_device::in_w<0>));
+	pbuart.out_tx_callback().set("chb", FUNC(rs232_port_device::write_txd));
+	pbuart.out_dtr_callback().set("chb", FUNC(rs232_port_device::write_dtr));
+	pbuart.out_rts_callback().set("chb", FUNC(rs232_port_device::write_rts));
 
-	MCFG_DEVICE_ADD("chb", RS232_PORT, default_rs232_devices, nullptr)
-	MCFG_RS232_RXD_HANDLER(WRITELINE("pbuart", ins8250_device, rx_w))
-	MCFG_RS232_DSR_HANDLER(WRITELINE("pbuart", ins8250_device, dsr_w))
-	MCFG_RS232_DCD_HANDLER(WRITELINE("pbuart", ins8250_device, dcd_w))
-	MCFG_RS232_CTS_HANDLER(WRITELINE("pbuart", ins8250_device, cts_w))
-	MCFG_RS232_RI_HANDLER(WRITELINE("pbuart", ins8250_device, ri_w))
+	rs232_port_device &chb(RS232_PORT(config, "chb", default_rs232_devices, nullptr));
+	chb.rxd_handler().set("pbuart", FUNC(ins8250_device::rx_w));
+	chb.dsr_handler().set("pbuart", FUNC(ins8250_device::dsr_w));
+	chb.dcd_handler().set("pbuart", FUNC(ins8250_device::dcd_w));
+	chb.cts_handler().set("pbuart", FUNC(ins8250_device::cts_w));
+	chb.ri_handler().set("pbuart", FUNC(ins8250_device::ri_w));
 
-	MCFG_INPUT_MERGER_ANY_HIGH("int2") // 74S05 (open collector)
-	MCFG_INPUT_MERGER_OUTPUT_HANDLER(WRITELINE(*this, cdc721_state, int_w<2>))
-MACHINE_CONFIG_END
+	INPUT_MERGER_ANY_HIGH(config, "int2").output_handler().set(FUNC(cdc721_state::int_w<2>)); // 74S05 (open collector)
+}
 
 ROM_START( cdc721 )
 	ROM_REGION( 0x4000, "resident", 0 )

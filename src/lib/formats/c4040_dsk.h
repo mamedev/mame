@@ -7,9 +7,10 @@
     Commodore 4040 sector disk image format
 
 *********************************************************************/
+#ifndef MAME_FORMATS_C4040_DSK_H
+#define MAME_FORMATS_C4040_DSK_H
 
-#ifndef C4040_DSK_H_
-#define C4040_DSK_H_
+#pragma once
 
 #include "d64_dsk.h"
 
@@ -33,6 +34,4 @@ protected:
 
 extern const floppy_format_type FLOPPY_C4040_FORMAT;
 
-
-
-#endif
+#endif // MAME_FORMATS_C4040_DSK_H

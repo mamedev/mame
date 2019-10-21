@@ -156,7 +156,6 @@ Player 2 and Player 1 share the same controls !
 #include "includes/thepit.h"
 
 #include "cpu/z80/z80.h"
-#include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -218,7 +217,7 @@ void thepit_state::thepit_main_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -234,7 +233,7 @@ void thepit_state::desertdan_main_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r)).nopw(); // Not hooked up according to the schematics
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
@@ -251,10 +250,18 @@ void thepit_state::intrepid_main_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(thepit_state::input_port_0_r));
 	map(0xa800, 0xa800).portr("IN1");
 	map(0xb000, 0xb000).portr("DSW");
-	map(0xb000, 0xb007).w("mainlatch", FUNC(ls259_device::write_d0));
+	map(0xb000, 0xb007).w(m_mainlatch, FUNC(ls259_device::write_d0));
 	map(0xb800, 0xb800).r("watchdog", FUNC(watchdog_timer_device::reset_r)).w("soundlatch", FUNC(generic_latch_8_device::write));
 }
 
+void thepit_state::dockmanb_main_map(address_map &map)
+{
+	intrepid_main_map(map);
+
+	map(0x8800, 0x8bff).ram().w(FUNC(thepit_state::colorram_w)).share("colorram"); // moved here from 0x9400-0x97ff
+	map(0x8c00, 0x8fff).unmaprw();
+	map(0x9400, 0x97ff).unmaprw();
+}
 
 void thepit_state::audio_map(address_map &map)
 {
@@ -716,95 +723,95 @@ INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-MACHINE_CONFIG_START(thepit_state::thepit)
-
+void thepit_state::thepit(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(thepit_main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  vblank_irq)
+	Z80(config, m_maincpu, PIXEL_CLOCK/2);     /* 3.072 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::thepit_main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(thepit_state::vblank_irq));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(audio_map)
-	MCFG_DEVICE_IO_MAP(audio_io_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", thepit_state,  irq0_line_hold)
+	z80_device &audiocpu(Z80(config, "audiocpu", SOUND_CLOCK/4));     /* 2.5 MHz */
+	audiocpu.set_addrmap(AS_PROGRAM, &thepit_state::audio_map);
+	audiocpu.set_addrmap(AS_IO, &thepit_state::audio_io_map);
+	audiocpu.set_vblank_int("screen", FUNC(thepit_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("mainlatch", LS259, 0) // IC42
-	MCFG_ADDRESSABLE_LATCH_Q0_OUT_CB(WRITELINE(*this, thepit_state, nmi_mask_w))
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(NOOP) // marked "LOCK OUT" on Centuri schematic but never written
-	MCFG_ADDRESSABLE_LATCH_Q3_OUT_CB(WRITELINE(*this, thepit_state, sound_enable_w))
-	MCFG_ADDRESSABLE_LATCH_Q6_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_x_w))
-	MCFG_ADDRESSABLE_LATCH_Q7_OUT_CB(WRITELINE(*this, thepit_state, flip_screen_y_w))
+	LS259(config, m_mainlatch); // IC42
+	m_mainlatch->q_out_cb<0>().set(FUNC(thepit_state::nmi_mask_w));
+	m_mainlatch->q_out_cb<2>().set_nop(); // marked "LOCK OUT" on Centuri schematic but never written
+	m_mainlatch->q_out_cb<3>().set(FUNC(thepit_state::sound_enable_w));
+	m_mainlatch->q_out_cb<6>().set(FUNC(thepit_state::flip_screen_x_w));
+	m_mainlatch->q_out_cb<7>().set(FUNC(thepit_state::flip_screen_y_w));
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_thepit)
-	MCFG_PALETTE_ADD("palette", 32+8)
-	MCFG_PALETTE_INIT_OWNER(thepit_state, thepit)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_thepit);
+	PALETTE(config, m_palette, FUNC(thepit_state::thepit_palette), 32+8);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_screen_update(FUNC(thepit_state::screen_update));
+	screen.set_palette(m_palette);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, "soundlatch");
 
-	MCFG_DEVICE_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MCFG_AY8910_PORT_A_READ_CB(READ8("soundlatch", generic_latch_8_device, read))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	ay8910_device &ay1(AY8910(config, "ay1", PIXEL_CLOCK/4));
+	ay1.port_a_read_callback().set("soundlatch", FUNC(generic_latch_8_device::read));
+	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	MCFG_DEVICE_ADD("ay2", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_CONFIG_END
+	AY8910(config, "ay2", PIXEL_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 0.25);
+}
 
-MACHINE_CONFIG_START(thepit_state::fitter)
+void thepit_state::fitter(machine_config &config)
+{
 	thepit(config);
-	MCFG_DEVICE_MODIFY("mainlatch") // IC42
-	MCFG_ADDRESSABLE_LATCH_Q2_OUT_CB(WRITELINE(*this, thepit_state, coin_lockout_w))
-MACHINE_CONFIG_END
+	m_mainlatch->q_out_cb<2>().set(FUNC(thepit_state::coin_lockout_w));
+}
 
-MACHINE_CONFIG_START(thepit_state::desertdn)
+void thepit_state::desertdn(machine_config &config)
+{
 	fitter(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(desertdan_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::desertdan_main_map);
 
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(thepit_state, screen_update_desertdan)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(thepit_state::screen_update_desertdan));
 
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_intrepid);
+}
 
-MACHINE_CONFIG_START(thepit_state::intrepid)
+void thepit_state::intrepid(machine_config &config)
+{
 	fitter(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(intrepid_main_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::intrepid_main_map);
 
-	MCFG_DEVICE_MODIFY("mainlatch") // 2F on Funny Mouse main board; IC46 on Port Man main board
-	MCFG_ADDRESSABLE_LATCH_Q5_OUT_CB(WRITELINE(*this, thepit_state, intrepid_graphics_bank_w))
+	m_mainlatch->q_out_cb<5>().set(FUNC(thepit_state::intrepid_graphics_bank_w));
 
 	/* video hardware */
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_intrepid)
-MACHINE_CONFIG_END
+	m_gfxdecode->set_info(gfx_intrepid);
+}
 
-
-MACHINE_CONFIG_START(thepit_state::suprmous)
+void thepit_state::dockmanb(machine_config &config)
+{
 	intrepid(config);
 
-	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &thepit_state::dockmanb_main_map);
+}
+
+void thepit_state::suprmous(machine_config &config)
+{
+	intrepid(config);
 
 	/* video hardware */
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_INIT_OWNER(thepit_state,suprmous)
-	MCFG_GFXDECODE_MODIFY("gfxdecode", gfx_suprmous)
-MACHINE_CONFIG_END
+	m_palette->set_init(FUNC(thepit_state::suprmous_palette));
+	m_gfxdecode->set_info(gfx_suprmous);
+}
 
 
 
@@ -1116,6 +1123,46 @@ ROM_START( dockman )
 	ROM_LOAD( "mb7051.3",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) )
 ROM_END
 
+ROM_START( dockmanb ) // on original HT-01A and HT-01B PCBs, Taito license made for 'Seevend' cabinets
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dm1.38",       0x0000, 0x1000, CRC(e8078549) SHA1(b8c812980a8ddce32822d402d4a426433588fb20) )
+	ROM_LOAD( "dm2.39",       0x1000, 0x1000, CRC(f38fd1f7) SHA1(bcac489863a8cc0a5eed47d039d25d76d68d7c0b) )
+	ROM_LOAD( "dm3.40",       0x2000, 0x1000, CRC(759b3937) SHA1(3e6b119ec43813000f058e0f318f275d7693d7da) )
+	ROM_LOAD( "dm4.41",       0x3000, 0x1000, CRC(23af1cba) SHA1(4149367cc5198f4c38fe9665db7aed070cb8f95f) ) // only one identical to parent
+	ROM_LOAD( "dm5.33",       0x4000, 0x1000, CRC(04ef6324) SHA1(e461af0f5407fc57ab76f1c91b1e212336ec872d) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // identical to parent
+	ROM_LOAD( "dm7.30",       0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
+	ROM_LOAD( "dm6.31",       0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars and sprites, identical to parent
+	ROM_LOAD( "dm8.ic9",        0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) )
+	ROM_LOAD( "dm9.ic8",        0x1000, 0x1000, CRC(4e4ea162) SHA1(42ad2c82ce6a6eaae52efb75607552ca98e72a2a) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // identical to parent
+	ROM_LOAD( "colprom.ic4",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) ) // Signetic 82S123
+ROM_END
+
+ROM_START( dockmanc ) // on original HT-01A and HT-01B PCBs, Taito license made for 'Seevend' cabinets
+	ROM_REGION( 0x10000, "maincpu", 0 ) // ROMs 2 to 5 with hand-written labels 'Dockman II', title screen still shows 'Dockman'
+	ROM_LOAD( "dm1.38",          0x0000, 0x1000, CRC(e8078549) SHA1(b8c812980a8ddce32822d402d4a426433588fb20) ) // same as dockmanb
+	ROM_LOAD( "dockman-ii-2.39", 0x1000, 0x1000, CRC(3e3ecb55) SHA1(bd768f855bb4677d489adaa0bce2ba25752047c4) )
+	ROM_LOAD( "dockman-ii-3.39", 0x2000, 0x1000, CRC(5f84a2c0) SHA1(08e85f19fbf8042aa447568123450f2b783063dd) )
+	ROM_LOAD( "dockman-ii-4.41", 0x3000, 0x1000, CRC(5bcec819) SHA1(e6b864d8e96c514f5d0c0a36d1490b3032ae9e32) )
+	ROM_LOAD( "dockman-ii-5.33", 0x4000, 0x1000, CRC(ae03f9ae) SHA1(a191bf4495c7153bcc3e4e0d98d01c9e52dc046b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // identical to parent
+	ROM_LOAD( "dm7.30",       0x0000, 0x0800, CRC(d2094e4a) SHA1(57c12555e36017e217c5d4e12d0da1ef1990bc3c) )
+	ROM_LOAD( "dm6.31",       0x0800, 0x0800, CRC(1cf447f4) SHA1(d06e31805e13c868faed32358e2158e9ad18baf4) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // chars and sprites
+	ROM_LOAD( "dm8.ic9",        0x0000, 0x1000, CRC(4d8c2974) SHA1(417b8af3011ff1c4c92d680814cd8f0d902f2b1e) ) // identical to parent
+	ROM_LOAD( "dm9.ic8",        0x1000, 0x1000, BAD_DUMP CRC(e8572572) SHA1(89e6dcdc1a67c0abbc39746f209f59815b5b8e9c) ) // BADADDR            xxxxxxxxxxx-
+
+	ROM_REGION( 0x0020, "proms", 0 ) // identical to parent
+	ROM_LOAD( "colprom.ic4",     0x0000, 0x0020, CRC(6440dc61) SHA1(cf0e794626ad7d9d58095485b782f007436fd446) ) // Harris 7603
+ROM_END
+
 ROM_START( portman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pe1",          0x0000, 0x1000, CRC(a5cf6083) SHA1(0daa5ff2931c56241fdeb4c48511b9508440554f) )
@@ -1324,7 +1371,9 @@ GAME( 1982, thepitu1,   thepit,   thepit,   thepit,   thepit_state, empty_init, 
 GAME( 1982, thepitu2,   thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Centuri license)",         "The Pit (US set 2)", MACHINE_SUPPORTS_SAVE ) // Bally PCB
 GAME( 1982, thepitj,    thepit,   thepit,   thepit,   thepit_state, empty_init, ROT90, "Zilec Electronics (Taito license)",           "The Pit (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockman,    0,        intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanb,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, dockmanc,   dockman,  dockmanb, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Dock Man (set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // one GFX ROM is bad
 GAME( 1982, portman,    dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation (Nova Games Ltd. license)", "Port Man", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, portmanj,   dockman,  intrepid, dockman,  thepit_state, empty_init, ROT90, "Taito Corporation",                           "Port Man (Japan)", MACHINE_SUPPORTS_SAVE )
 

@@ -66,7 +66,7 @@ private:
 	virtual void machine_reset() override;
 	void line_update();
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void uzebox_data_map(address_map &map);
 	void uzebox_io_map(address_map &map);
@@ -87,7 +87,7 @@ void uzebox_state::machine_start()
 	m_screen->register_screen_bitmap(m_bitmap);
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
 void uzebox_state::machine_reset()
@@ -257,7 +257,7 @@ uint32_t uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
+DEVICE_IMAGE_LOAD_MEMBER(uzebox_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -284,38 +284,36 @@ DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
 * Machine definition                                 *
 \****************************************************/
 
-MACHINE_CONFIG_START(uzebox_state::uzebox)
-
+void uzebox_state::uzebox(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", ATMEGA644, MASTER_CLOCK)
-	MCFG_DEVICE_PROGRAM_MAP(uzebox_prg_map)
-	MCFG_DEVICE_DATA_MAP(uzebox_data_map)
-	MCFG_DEVICE_IO_MAP(uzebox_io_map)
-	MCFG_CPU_AVR8_EEPROM("eeprom")
+	ATMEGA644(config, m_maincpu, MASTER_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::uzebox_prg_map);
+	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::uzebox_data_map);
+	m_maincpu->set_addrmap(AS_IO, &uzebox_state::uzebox_io_map);
+	m_maincpu->set_eeprom_tag("eeprom");
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.99)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1395))
-	MCFG_SCREEN_SIZE(870, 525)
-	MCFG_SCREEN_VISIBLE_AREA(150, 870-1, 40, 488-1)
-	MCFG_SCREEN_UPDATE_DRIVER(uzebox_state, screen_update_uzebox)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(59.99);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
+	m_screen->set_size(870, 525);
+	m_screen->set_visarea(150, 870-1, 40, 488-1);
+	m_screen->set_screen_update(FUNC(uzebox_state::screen_update_uzebox));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(0, "mono", 1.00)
+	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
 
-	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "uzebox")
-	MCFG_GENERIC_EXTENSIONS("bin,uze")
-	MCFG_GENERIC_MANDATORY
-	MCFG_GENERIC_LOAD(uzebox_state, uzebox_cart)
+	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "uzebox", "bin,uze");
+	m_cart->set_must_be_loaded(true);
+	m_cart->set_device_load(FUNC(uzebox_state::cart_load), this);
 
-	MCFG_SNES_CONTROL_PORT_ADD("ctrl1", snes_control_port_devices, "joypad")
-	MCFG_SNES_CONTROL_PORT_ADD("ctrl2", snes_control_port_devices, "joypad")
+	SNES_CONTROL_PORT(config, m_ctrl1, snes_control_port_devices, "joypad");
+	SNES_CONTROL_PORT(config, m_ctrl2, snes_control_port_devices, "joypad");
 
-	MCFG_SOFTWARE_LIST_ADD("eprom_list","uzebox")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "eprom_list").set_original("uzebox");
+}
 
 ROM_START( uzebox )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )  /* Main program store */

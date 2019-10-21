@@ -307,9 +307,9 @@ protected:
 
 	uint8_t m_curr_field;
 
-	static const size_t FORMAT_PIXEL_WIDTHS[0x40];
-	static const char* FORMAT_NAMES[0x40];
-	static const uint32_t KICK_COUNTS[8];
+	static size_t const FORMAT_PIXEL_WIDTHS[0x40];
+	static char const *const FORMAT_NAMES[0x40];
+	static uint32_t const KICK_COUNTS[8];
 };
 
 DECLARE_DEVICE_TYPE(SONYPS2_GS, ps2_gs_device)

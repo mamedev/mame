@@ -19,78 +19,77 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m58_state, m58)
+void m58_state::m58_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	const uint8_t *char_lopal = color_prom + 0x000;
-	const uint8_t *char_hipal = color_prom + 0x100;
-	const uint8_t *sprite_pal = color_prom + 0x200;
-	const uint8_t *sprite_table = color_prom + 0x220;
-	const uint8_t *radar_lopal = color_prom + 0x320;
-	const uint8_t *radar_hipal = color_prom + 0x420;
-	static const int resistances_3[3] = { 1000, 470, 220 };
-	static const int resistances_2[2]  = { 470, 220 };
+	uint8_t const *const color_prom = memregion("proms")->base();
+	uint8_t const *const char_lopal = color_prom + 0x000;
+	uint8_t const *const char_hipal = color_prom + 0x100;
+	uint8_t const *const sprite_pal = color_prom + 0x200;
+	uint8_t const *const sprite_table = color_prom + 0x220;
+	uint8_t const *const radar_lopal = color_prom + 0x320;
+	uint8_t const *const radar_hipal = color_prom + 0x420;
+	static constexpr int resistances_3[3] = { 1000, 470, 220 };
+	static constexpr int resistances_2[2]  = { 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[3], scale;
-	int i;
 
-	/* compute palette information for characters/radar */
+	// compute palette information for characters/radar
 	scale = compute_resistor_weights(0, 255, -1.0,
 			2, resistances_2, weights_r, 0, 0,
 			3, resistances_3, weights_g, 0, 0,
 			3, resistances_3, weights_b, 0, 0);
 
-	/* character palette */
-	for (i = 0; i < 256; i++)
+	// character palette
+	for (int i = 0; i < 256; i++)
 	{
-		uint8_t promval = (char_lopal[i] & 0x0f) | (char_hipal[i] << 4);
-		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		uint8_t const promval = (char_lopal[i] & 0x0f) | (char_hipal[i] << 4);
+		int const r = combine_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int const g = combine_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int const b = combine_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(i, rgb_t(r,g,b));
+		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* radar palette */
-	for (i = 0; i < 256; i++)
+	// radar palette
+	for (int i = 0; i < 256; i++)
 	{
-		uint8_t promval = (radar_lopal[i] & 0x0f) | (radar_hipal[i] << 4);
-		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		uint8_t const promval = (radar_lopal[i] & 0x0f) | (radar_hipal[i] << 4);
+		int const r = combine_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int const g = combine_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int const b = combine_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(256+i, rgb_t(r,g,b));
+		palette.set_indirect_color(256 + i, rgb_t(r, g, b));
 	}
 
-	/* compute palette information for sprites */
+	// compute palette information for sprites
 	scale = compute_resistor_weights(0, 255, scale,
 			2, resistances_2, weights_r, 470, 0,
 			3, resistances_3, weights_g, 470, 0,
 			3, resistances_3, weights_b, 470, 0);
 
-	/* sprite palette */
-	for (i = 0; i < 16; i++)
+	// sprite palette
+	for (int i = 0; i < 16; i++)
 	{
-		uint8_t promval = sprite_pal[i];
-		int r = combine_2_weights(weights_r, BIT(promval,6), BIT(promval,7));
-		int g = combine_3_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
-		int b = combine_3_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
+		uint8_t const promval = sprite_pal[i];
+		int const r = combine_weights(weights_r, BIT(promval,6), BIT(promval,7));
+		int const g = combine_weights(weights_g, BIT(promval,3), BIT(promval,4), BIT(promval,5));
+		int const b = combine_weights(weights_b, BIT(promval,0), BIT(promval,1), BIT(promval,2));
 
-		palette.set_indirect_color(256+256+i, rgb_t(r,g,b));
+		palette.set_indirect_color(256 + 256 + i, rgb_t(r, g, b));
 	}
 
-	/* character lookup table */
-	for (i = 0; i < 256; i++)
+	// character lookup table
+	for (int i = 0; i < 256; i++)
 		palette.set_pen_indirect(i, i);
 
-	/* radar lookup table */
-	for (i = 0; i < 256; i++)
-		palette.set_pen_indirect(256+i, 256+i);
+	// radar lookup table
+	for (int i = 0; i < 256; i++)
+		palette.set_pen_indirect(256 + i, 256 + i);
 
-	/* sprite lookup table */
-	for (i = 0; i < 256; i++)
+	// sprite lookup table
+	for (int i = 0; i < 256; i++)
 	{
-		uint8_t promval = sprite_table[i] & 0x0f;
-		palette.set_pen_indirect(256+256+i, 256+256+promval);
+		uint8_t const promval = sprite_table[i] & 0x0f;
+		palette.set_pen_indirect(256 + 256 + i, 256 + 256 + promval);
 	}
 }
 

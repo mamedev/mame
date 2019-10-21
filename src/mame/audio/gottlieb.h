@@ -24,15 +24,6 @@ DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV1_VOTRAX, gottlieb_sound_r1_with_votrax_de
 DECLARE_DEVICE_TYPE(GOTTLIEB_SOUND_REV2,        gottlieb_sound_r2_device)
 
 
-
-//**************************************************************************
-//  DEVICE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_GOTTLIEB_ENABLE_COBRAM3_MODS() \
-	downcast<gottlieb_sound_r2_device &>(*device).enable_cobram3_mods();
-
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -80,7 +71,7 @@ public:
 	gottlieb_sound_r1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// read/write
-	DECLARE_WRITE8_MEMBER( write );
+	void write(u8 data);
 
 protected:
 	gottlieb_sound_r1_device(
@@ -144,7 +135,7 @@ public:
 	void enable_cobram3_mods() { m_cobram3_mod = true; }
 
 	// read/write
-	DECLARE_WRITE8_MEMBER( write );
+	void write(u8 data);
 
 	// internal communications
 	DECLARE_READ8_MEMBER( speech_data_r );

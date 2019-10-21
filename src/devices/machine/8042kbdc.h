@@ -28,8 +28,7 @@ public:
 	enum kbdc8042_type_t
 	{
 		KBDC8042_STANDARD,
-		KBDC8042_PS2,       /* another timing of integrated controller */
-		KBDC8042_AT386      /* hack for at386 driver */
+		KBDC8042_PS2
 	};
 
 	// construction/destruction
@@ -58,7 +57,10 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	virtual ioport_constructor device_input_ports() const override;
+
+	static const device_timer_id TIMER_UPDATE = 0;
 
 private:
 	uint8_t m_inport;
@@ -95,9 +97,9 @@ private:
 	int m_poll_delay;
 
 	required_device<at_keyboard_device> m_keyboard_dev;
-	required_ioport m_mousex_port;
-	required_ioport m_mousey_port;
-	required_ioport m_mousebtn_port;
+	optional_ioport m_mousex_port;
+	optional_ioport m_mousey_port;
+	optional_ioport m_mousebtn_port;
 
 	kbdc8042_type_t     m_keybtype;
 
@@ -111,6 +113,8 @@ private:
 	uint16_t            m_mouse_x;
 	uint16_t            m_mouse_y;
 	uint8_t             m_mouse_btn;
+
+	emu_timer *         m_update_timer;
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
 };

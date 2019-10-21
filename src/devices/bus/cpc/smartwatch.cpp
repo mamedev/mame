@@ -19,10 +19,11 @@
 DEFINE_DEVICE_TYPE(CPC_SMARTWATCH, cpc_smartwatch_device, "cpc_smartwatch", "Dobbertin Smartwatch")
 
 
-MACHINE_CONFIG_START(cpc_smartwatch_device::device_add_mconfig)
-	MCFG_DS1315_ADD("rtc")
+void cpc_smartwatch_device::device_add_mconfig(machine_config &config)
+{
+	DS1315(config, m_rtc, 0);
 	// no pass-through (?)
-MACHINE_CONFIG_END
+}
 
 
 ROM_START( cpc_smartwatch )
@@ -61,8 +62,7 @@ void cpc_smartwatch_device::device_start()
 
 void cpc_smartwatch_device::device_reset()
 {
-	device_t* cpu = machine().device(":maincpu");
-	address_space& space = cpu->memory().space(AS_PROGRAM);
+	address_space &space = m_slot->cpu().space(AS_PROGRAM);
 	space.install_read_handler(0xc000,0xc001,read8_delegate(FUNC(cpc_smartwatch_device::rtc_w),this));
 	space.install_read_handler(0xc004,0xc004,read8_delegate(FUNC(cpc_smartwatch_device::rtc_r),this));
 	m_bank = membank(":bank7");
@@ -71,15 +71,18 @@ void cpc_smartwatch_device::device_reset()
 READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 {
 	uint8_t* bank = (uint8_t*)m_bank->base();
-	if(offset & 1)
-		m_rtc->read_1(space,0);
-	else
-		m_rtc->read_0(space,0);
+	if (!machine().side_effects_disabled())
+	{
+		if(offset & 1)
+			m_rtc->read_1();
+		else
+			m_rtc->read_0();
+	}
 	return bank[offset & 1];
 }
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_r)
 {
 	uint8_t* bank = (uint8_t*)m_bank->base();
-	return ((bank[(offset & 1)+4]) & 0xfe) | (m_rtc->read_data(space,0) & 0x01);
+	return ((bank[(offset & 1)+4]) & 0xfe) | (m_rtc->read_data() & 0x01);
 }

@@ -111,43 +111,44 @@ DEVICE_INPUT_DEFAULTS_END
 
 void fruitpc_state::fruitpc_sb_conf(device_t *device)
 {
-	device = device->subdevice("pc_joy");
-	MCFG_DEVICE_SLOT_INTERFACE(pc_joysticks, nullptr, true) // remove joystick
+	device->subdevice<pc_joy_device>("pc_joy")->set_default_option(nullptr); // remove joystick
 }
 
-MACHINE_CONFIG_START(fruitpc_state::fruitpc)
-	MCFG_DEVICE_ADD("maincpu", I486, 66000000) // ST STPCD0166BTC3 66 MHz 486 CPU
-	MCFG_DEVICE_PROGRAM_MAP(fruitpc_map)
-	MCFG_DEVICE_IO_MAP(fruitpc_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE("pic8259_1", pic8259_device, inta_cb)
+void fruitpc_state::fruitpc(machine_config &config)
+{
+	I486(config, m_maincpu, 66000000); // ST STPCD0166BTC3 66 MHz 486 CPU
+	m_maincpu->set_addrmap(AS_PROGRAM, &fruitpc_state::fruitpc_map);
+	m_maincpu->set_addrmap(AS_IO, &fruitpc_state::fruitpc_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 	pcat_common(config);
 
-	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE("pic8259_2", pic8259_device, ir6_w))
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
 
 	/* video hardware */
 	pcvideo_vga(config);
 
 	m_dma8237_1->out_iow_callback<1>().set(FUNC(fruitpc_state::dma8237_1_dack_w));
 
-	MCFG_DEVICE_ADD("isa", ISA8, 0)
-	MCFG_ISA8_CPU("maincpu")
-	MCFG_ISA_OUT_IRQ2_CB(WRITELINE("pic8259_2", pic8259_device, ir2_w))
-	MCFG_ISA_OUT_IRQ3_CB(WRITELINE("pic8259_1", pic8259_device, ir3_w))
-	MCFG_ISA_OUT_IRQ4_CB(WRITELINE("pic8259_1", pic8259_device, ir4_w))
-	MCFG_ISA_OUT_IRQ5_CB(WRITELINE("pic8259_1", pic8259_device, ir5_w))
-	MCFG_ISA_OUT_IRQ6_CB(WRITELINE("pic8259_1", pic8259_device, ir6_w))
-	MCFG_ISA_OUT_IRQ7_CB(WRITELINE("pic8259_1", pic8259_device, ir7_w))
-	MCFG_ISA_OUT_DRQ1_CB(WRITELINE("dma8237_1", am9517a_device, dreq1_w))
-	MCFG_ISA_OUT_DRQ2_CB(WRITELINE("dma8237_1", am9517a_device, dreq2_w))
-	MCFG_ISA_OUT_DRQ3_CB(WRITELINE("dma8237_1", am9517a_device, dreq3_w))
+	ISA8(config, m_isabus, 0);
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
+	m_isabus->irq2_callback().set("pic8259_2", FUNC(pic8259_device::ir2_w));
+	m_isabus->irq3_callback().set("pic8259_1", FUNC(pic8259_device::ir3_w));
+	m_isabus->irq4_callback().set("pic8259_1", FUNC(pic8259_device::ir4_w));
+	m_isabus->irq5_callback().set("pic8259_1", FUNC(pic8259_device::ir5_w));
+	m_isabus->irq6_callback().set("pic8259_1", FUNC(pic8259_device::ir6_w));
+	m_isabus->irq7_callback().set("pic8259_1", FUNC(pic8259_device::ir7_w));
+	m_isabus->drq1_callback().set("dma8237_1", FUNC(am9517a_device::dreq1_w));
+	m_isabus->drq2_callback().set("dma8237_1", FUNC(am9517a_device::dreq2_w));
+	m_isabus->drq3_callback().set("dma8237_1", FUNC(am9517a_device::dreq3_w));
 
 	// FIXME: determine ISA bus clock
-	MCFG_DEVICE_ADD("isa1", ISA8_SLOT, 0, "isa", fruitpc_isa8_cards, "sb15", true)
-	MCFG_SLOT_OPTION_DEVICE_INPUT_DEFAULTS("sb15", fruitpc_sb_def)
-	MCFG_SLOT_OPTION_MACHINE_CONFIG("sb15", fruitpc_sb_conf)
-MACHINE_CONFIG_END
+	isa8_slot_device &isa1(ISA8_SLOT(config, "isa1", 0, "isa", fruitpc_isa8_cards, "sb15", true));
+	isa1.set_option_device_input_defaults("sb15", DEVICE_INPUT_DEFAULTS_NAME(fruitpc_sb_def));
+	isa1.set_option_machine_config("sb15", fruitpc_sb_conf);
+}
 
 ROM_START( fruitpc )
 	ROM_REGION( 0x20000, "bios", 0 )

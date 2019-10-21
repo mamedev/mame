@@ -460,6 +460,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 #include "majorpkr.lh"
 
@@ -488,6 +489,10 @@ public:
 
 	void init_majorpkr();
 
+protected:
+	virtual void machine_start() override { m_lamps.resolve(); }
+	virtual void video_start() override;
+
 private:
 	DECLARE_WRITE8_MEMBER(rom_bank_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
@@ -503,14 +508,11 @@ private:
 	DECLARE_WRITE8_MEMBER(pulses_w);
 	TILE_GET_INFO_MEMBER(bg_get_tile_info);
 	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void map(address_map &map);
 	void palettebanks(address_map &map);
 	void portmap(address_map &map);
 	void vrambanks(address_map &map);
-
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<address_map_bank_device> m_palette_bank;
@@ -561,7 +563,7 @@ void majorpkr_state::video_start()
 }
 
 
-uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t majorpkr_state::screen_update_majorpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0);
@@ -1003,50 +1005,38 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-MACHINE_CONFIG_START(majorpkr_state::majorpkr)
+void majorpkr_state::majorpkr(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, CPU_CLOCK)  // 6 MHz.
-	MCFG_DEVICE_PROGRAM_MAP(map)
-	MCFG_DEVICE_IO_MAP(portmap)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", majorpkr_state, irq0_line_hold)
+	z80_device &maincpu(Z80(config, "maincpu", CPU_CLOCK));  // 6 MHz.
+	maincpu.set_addrmap(AS_PROGRAM, &majorpkr_state::map);
+	maincpu.set_addrmap(AS_IO, &majorpkr_state::portmap);
+	maincpu.set_vblank_int("screen", FUNC(majorpkr_state::irq0_line_hold));
 
-	MCFG_DEVICE_ADD("palette_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(palettebanks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+	ADDRESS_MAP_BANK(config, "palette_bank").set_map(&majorpkr_state::palettebanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
+	ADDRESS_MAP_BANK(config, "vram_bank").set_map(&majorpkr_state::vrambanks).set_options(ENDIANNESS_LITTLE, 8, 13, 0x800);
 
-	MCFG_DEVICE_ADD("vram_bank", ADDRESS_MAP_BANK, 0)
-	MCFG_DEVICE_PROGRAM_MAP(vrambanks)
-	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
-	MCFG_ADDRESS_MAP_BANK_DATA_WIDTH(8)
-	MCFG_ADDRESS_MAP_BANK_ADDR_WIDTH(13)
-	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
-
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(CRTC_CLOCK*16, (47+1)*16, 0, (36*16)-16, (36+1)*8, 0, (28*8))  // from CRTC registers.
-	MCFG_SCREEN_UPDATE_DRIVER(majorpkr_state, screen_update_majorpkr)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(CRTC_CLOCK*16, (47+1)*16, 0, (36*16)-16, (36+1)*8, 0, (28*8));  // from CRTC registers.
+	screen.set_screen_update(FUNC(majorpkr_state::screen_update_majorpkr));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_majorpkr)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_majorpkr);
 
-	MCFG_PALETTE_ADD("palette", 0x100 * 16)
-	MCFG_PALETTE_FORMAT(xGGGGGRRRRRBBBBB)
+	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x100 * 16);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", CRTC_CLOCK)  // verified.
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_VISAREA_ADJUST(0, -16, 0, 0)
-	MCFG_MC6845_CHAR_WIDTH(16)
+	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));  // verified.
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_visarea_adjust(0, -16, 0, 0);
+	crtc.set_char_width(16);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("oki", OKIM6295, OKI_CLOCK, okim6295_device::PIN7_HIGH)  // clock frequency & pin 7 verified.
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
+	OKIM6295(config, "oki", OKI_CLOCK, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);  // clock frequency & pin 7 verified.
+}
 
 
 /*************************

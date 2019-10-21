@@ -8,6 +8,7 @@
 #include "bus/bw2/exp.h"
 #include "cpu/z80/z80.h"
 #include "formats/bw2_dsk.h"
+#include "imagedev/floppy.h"
 #include "bus/centronics/ctronics.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -88,7 +89,7 @@ public:
 
 	// video state
 	optional_shared_ptr<uint8_t> m_video_ram;
-	DECLARE_PALETTE_INIT(bw2);
+	void bw2_palette(palette_device &palette) const;
 
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
 	int m_centronics_busy;

@@ -1038,6 +1038,7 @@ bool floppy_image_format_t::type_data_mfm(int type, int p1, const gen_crc_info *
 		type == SIZE_ID ||
 		type == OFFSET_ID_O ||
 		type == OFFSET_ID_E ||
+		type == OFFSET_ID_FM ||
 		type == SECTOR_ID_O ||
 		type == SECTOR_ID_E ||
 		type == REMAIN_O ||
@@ -1521,6 +1522,14 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_half_w(buffer, 6, track*2+head);
 			break;
 
+		case OFFSET_ID_FM:
+			fm_w(buffer, 8, track*2+head);
+			break;
+
+		case OFFSET_ID:
+			mfm_w(buffer, 8, track*2+head);
+			break;
+
 		case SECTOR_ID_O:
 			mfm_half_w(buffer, 7, sector_idx);
 			break;
@@ -1647,6 +1656,37 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
 			for(int i=0; i != csect->size; i++)
 				_8n1_w(buffer, 8, csect->data[i]);
+			break;
+		}
+
+		case SECTOR_DATA_MX: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			uint16_t cksum = 0, data;
+			for(int i=0; i < csect->size; i+=2)
+			{
+				data = csect->data[i+1];
+				fm_w(buffer, 8, data);
+				data = (data << 8) | csect->data[i];
+				fm_w(buffer, 8, csect->data[i]);
+				cksum += data;
+			}
+			fm_w(buffer, 16, cksum);
+			break;
+		}
+
+		case SECTOR_DATA_DS9: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			uint8_t data;
+			int cksum = 0;
+			for(int i=0; i != csect->size; i++)
+			{
+				if (cksum > 255) { cksum++; cksum &= 255; }
+				data = csect->data[i];
+				mfm_w(buffer, 8, data);
+				cksum += data;
+			}
+			cksum &= 255;
+			mfm_w(buffer, 8, cksum);
 			break;
 		}
 

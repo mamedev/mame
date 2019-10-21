@@ -113,18 +113,17 @@ void orion_state::orion128(machine_config &config)
 	m_screen->set_screen_update(FUNC(orion_state::screen_update_orion128));
 	m_screen->set_palette(m_palette);
 
-	auto &palette(PALETTE(config, m_palette, 18));
-	palette.set_init(palette_init_delegate(FUNC(orion_state::palette_init_orion128), this));
+	PALETTE(config, m_palette, FUNC(orion_state::orion128_palette), 18);
 
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	auto &cassette(CASSETTE(config, "cassette"));
 	cassette.set_formats(rko_cassette_formats);
 	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
 	cassette.set_interface("orion_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("orion_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("orion_cass");
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 
@@ -132,13 +131,13 @@ void orion_state::orion128(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd2", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd3", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
-	SOFTWARE_LIST(config, "flop_list").set_type("orion_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("orion_flop");
 
 	auto &cart(GENERIC_CARTSLOT(config, "cartslot"));
 	generic_plain_slot(cart);
 	cart.set_interface("orion_cart");
 
-	SOFTWARE_LIST(config, "cart_list").set_type("orion_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("orion_cart");
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -184,14 +183,12 @@ void orion_z80_state::orionz80(machine_config &config)
 	m_screen->set_screen_update(FUNC(orion_z80_state::screen_update_orion128));
 	m_screen->set_palette(m_palette);
 
-	auto &palette(PALETTE(config, m_palette, 18));
-	palette.set_init(palette_init_delegate(FUNC(orion_z80_state::palette_init_orion128), this));
+	PALETTE(config, m_palette, FUNC(orion_z80_state::orion128_palette), 18);
 
 	MC146818(config, "rtc", 4.194304_MHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	auto &ay8912(AY8912(config, "ay8912", 1773400));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
@@ -199,9 +196,10 @@ void orion_z80_state::orionz80(machine_config &config)
 	auto &cassette(CASSETTE(config, "cassette"));
 	cassette.set_formats(rko_cassette_formats);
 	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
 	cassette.set_interface("orion_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("orion_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("orion_cass");
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 
@@ -209,13 +207,13 @@ void orion_z80_state::orionz80(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd2", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd3", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
-	SOFTWARE_LIST(config, "flop_list").set_type("orion_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("orion_flop");
 
 	auto &cart(GENERIC_CARTSLOT(config, "cartslot"));
 	generic_plain_slot(cart);
 	cart.set_interface("orion_cart");
 
-	SOFTWARE_LIST(config, "cart_list").set_type("orion_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("orion_cart");
 
 	/* internal ram */
 	RAM(config, m_ram);
@@ -260,22 +258,20 @@ void orion_pro_state::orionpro(machine_config &config)
 	m_screen->set_screen_update(FUNC(orion_pro_state::screen_update_orion128));
 	m_screen->set_palette(m_palette);
 
-	auto &palette(PALETTE(config, m_palette, 18));
-	palette.set_init(palette_init_delegate(FUNC(orion_pro_state::palette_init_orion128), this));
-
+	PALETTE(config, m_palette, FUNC(orion_pro_state::orion128_palette), 18);
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.0);
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 	auto &ay8912(AY8912(config, "ay8912", 1773400));
 	ay8912.add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	auto &cassette(CASSETTE(config, "cassette"));
 	cassette.set_formats(rko_cassette_formats);
 	cassette.set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
+	cassette.add_route(ALL_OUTPUTS, "mono", 0.05);
 	cassette.set_interface("orion_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_type("orion_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cass_list").set_original("orion_cass");
 
 	FD1793(config, m_fdc, 8_MHz_XTAL / 8);
 
@@ -283,13 +279,14 @@ void orion_pro_state::orionpro(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fd1", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd2", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
 	FLOPPY_CONNECTOR(config, "fd3", "525qd", FLOPPY_525_QD, true, orion_floppy_formats);
-	SOFTWARE_LIST(config, "flop_list").set_type("orion_flop", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "flop_list").set_original("orionpro_flop");
+	SOFTWARE_LIST(config, "flop128_list").set_compatible("orion_flop");
 
 	auto &cart(GENERIC_CARTSLOT(config, "cartslot"));
 	generic_plain_slot(cart);
 	cart.set_interface("orion_cart");
 
-	SOFTWARE_LIST(config, "cart_list").set_type("orion_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM);
+	SOFTWARE_LIST(config, "cart_list").set_original("orion_cart");
 
 	/* internal ram */
 	RAM(config, m_ram);

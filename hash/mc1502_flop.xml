@@ -21,7 +21,7 @@
 		<publisher>Sigma Four</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="737280">
-				<rom name="sigma-four-dos.ima" size="737280" sha1="d354bdcb4d5480e0cc8245a2c3c2fd61ada701ed" crc="ad8008ec" offset="0" />
+				<rom name="sigma-four-dos.ima" size="737280" sha1="d354bdcb4d5480e0cc8245a2c3c2fd61ada701ed" crc="ad8008ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>MMV</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="694040">
-				<rom name="one-track-system.imd" size="694040" sha1="962e15ec0501d1bd249d05984efd9e9871fa2ce9" crc="62d4ef70" offset="0" />
+				<rom name="one-track-system.imd" size="694040" sha1="962e15ec0501d1bd249d05984efd9e9871fa2ce9" crc="62d4ef70"/>
 			</dataarea>
 		</part>
 	</software>

@@ -35,9 +35,7 @@ void acorn_econet_device::device_add_mconfig(machine_config &config)
 	m_econet->clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
 	m_econet->data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
-	econet_slot_device &slot(ECONET_SLOT(config, "econet254", 0));
-	econet_devices(slot);
-	slot.set_slot(254);
+	ECONET_SLOT(config, "econet254", m_econet, econet_devices).set_slot(254);
 }
 
 //**************************************************************************
@@ -72,7 +70,7 @@ void acorn_econet_device::device_reset()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0x1940, 0x1943, read8_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8_delegate(FUNC(mc6854_device::write), m_adlc.target()));
+	space.install_readwrite_handler(0x1940, 0x1943, read8sm_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8sm_delegate(FUNC(mc6854_device::write), m_adlc.target()));
 	space.install_read_handler(0x1944, 0x1944, read8_delegate(FUNC(acorn_econet_device::statid_r), this));
 }
 

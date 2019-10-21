@@ -17,10 +17,12 @@
 #pragma once
 
 #include "peribox.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/mm58274c.h"
 #include "machine/wd_fdc.h"
 #include "machine/ram.h"
+#include "machine/74259.h"
+#include "machine/74123.h"
 
 namespace bus { namespace ti99 { namespace peb {
 
@@ -30,11 +32,11 @@ public:
 	snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
-	DECLARE_WRITE8_MEMBER(write) override;
+	void write(offs_t offset, uint8_t data) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
-	DECLARE_WRITE8_MEMBER(cruwrite) override;
+	void cruwrite(offs_t offset, uint8_t data) override;
 
 protected:
 	void device_start() override;
@@ -46,12 +48,26 @@ protected:
 	ioport_constructor device_input_ports() const override;
 
 private:
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+
+	// Latch callbacks
+	DECLARE_WRITE_LINE_MEMBER( den_w );
+	DECLARE_WRITE_LINE_MEMBER( mop_w );
+	DECLARE_WRITE_LINE_MEMBER( waiten_w );
+	DECLARE_WRITE_LINE_MEMBER( hlt_w );
+	DECLARE_WRITE_LINE_MEMBER( dsel1_w );
+	DECLARE_WRITE_LINE_MEMBER( dsel2_w );
+	DECLARE_WRITE_LINE_MEMBER( dsel3_w );
+	DECLARE_WRITE_LINE_MEMBER( dsel4_w );
+	DECLARE_WRITE_LINE_MEMBER( sidsel_w );
+	DECLARE_WRITE_LINE_MEMBER( dden_w );
+
+	DECLARE_WRITE_LINE_MEMBER( motorona_w );
+
+	void select_drive(int n, int state);
 
 	// Debugger accessors
 	void debug_read(offs_t offset, uint8_t* value);
@@ -63,22 +79,11 @@ private:
 	// Set the current floppy
 	void set_drive();
 
-	// Operate the floppy motors
-	void set_floppy_motors_running(bool run);
-
 	// Holds the status of the DRQ and IRQ lines.
-	int      m_DRQ, m_IRQ;
+	int m_DRQ, m_IRQ;
 
 	// DIP switch state
 	int m_dip1, m_dip2, m_dip34;
-
-	// Page selection for ROM and RAM
-	int m_ram_page;  // 0-1
-	int m_rom_page;  // 0-3
-
-	// When true, the READY line will be cleared (create wait states) when
-	// waiting for data from the controller.
-	bool m_WAITena;
 
 	// Address in card area
 	bool m_inDsrArea;
@@ -95,30 +100,11 @@ private:
 	// Data register +1 selected
 	bool m_dataregLB;
 
-	// Indicates whether the clock is mapped into the address space.
-	bool m_rtc_enabled;
-
 	// Signal motor_on. When true, makes all drives turning.
 	int m_MOTOR_ON;
 
-	// Needed for triggering the motor monoflop
-	uint8_t m_lastval;
-
 	// Recent address
 	int m_address;
-
-	/* Indicates which drive has been selected. Values are 0, 1, 2, and 4. */
-	// 000 = no drive
-	// 001 = drive 1
-	// 010 = drive 2
-	// 100 = drive 3
-	int m_DSEL;
-
-	// Signal SIDSEL. 0 or 1, indicates the selected head.
-	int m_SIDSEL;
-
-	// count 4.23s from rising edge of motor_on
-	emu_timer*      m_motor_on_timer;
 
 	// DSR ROM
 	uint8_t*          m_dsrrom;
@@ -129,14 +115,21 @@ private:
 	// Link to the attached floppy drives
 	floppy_image_device*    m_floppy[4];
 
-	// Currently selected floppy drive
-	floppy_image_device*    m_current_floppy;
+	// Currently selected floppy drive (1-4, 0=none)
+	int m_sel_floppy;
 
 	// Link to the WD1773 controller on the board.
 	required_device<wd1773_device>   m_wd1773;
 
 	// Link to the real-time clock on the board.
 	required_device<mm58274c_device> m_clock;
+
+	// Latched CRU outputs
+	required_device<hc259_device> m_crulatch0_7;
+	required_device<hc259_device> m_crulatch8_15;
+
+	// Motor monoflop
+	required_device<ttl74123_device> m_motormf;
 };
 
 } } } // end namespace bus::ti99::peb

@@ -60,6 +60,7 @@ public:
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
+	static void sound_hook();
 	static void layout_file_cb(util::xml::data_node const &layout);
 	static bool standalone();
 };
@@ -85,6 +86,7 @@ public:
 	virtual void create_custom(running_machine& machine) { }
 	virtual void load_cheatfiles(running_machine& machine) { }
 	virtual void ui_initialize(running_machine& machine) { }
+	virtual void before_load_settings(running_machine &machine) { }
 
 	virtual void update_machine() { }
 

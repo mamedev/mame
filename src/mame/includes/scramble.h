@@ -1,5 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+#ifndef MAME_INCLUDES_SCRAMBLE_H
+#define MAME_INCLUDES_SCRAMBLE_H
+
+#pragma once
 
 #include "machine/gen_latch.h"
 #include "machine/i8255.h"
@@ -12,15 +16,16 @@
 class scramble_state : public galaxold_state
 {
 public:
-	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag),
+	scramble_state(const machine_config &mconfig, device_type type, const char *tag) :
+		galaxold_state(mconfig, type, tag),
 		m_konami_7474(*this, "konami_7474"),
 		m_ppi8255_0(*this, "ppi8255_0"),
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_tmsprom(*this, "tmsprom"),
 		m_soundram(*this, "soundram"),
 		m_digitalker(*this, "digitalker"),
-		m_soundlatch(*this, "soundlatch")
+		m_soundlatch(*this, "soundlatch"),
+		m_dial(*this, "DIAL")
 	{
 	}
 
@@ -32,8 +37,10 @@ public:
 	optional_device<digitalker_device> m_digitalker;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
+	optional_ioport m_dial;
+
+	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_dial_r);
+	template <int Mask> DECLARE_READ_LINE_MEMBER(ckongs_coinage_r);
 	DECLARE_READ8_MEMBER(hncholms_prot_r);
 	DECLARE_READ8_MEMBER(scramble_soundram_r);
 	DECLARE_READ8_MEMBER(mars_ppi8255_0_r);
@@ -58,7 +65,6 @@ public:
 	void init_mariner();
 	void init_scramble_ppi();
 	void init_mars();
-	void init_ckongs();
 	void init_mimonscr();
 	void init_hotshock();
 	void init_ad2083();
@@ -70,6 +76,7 @@ public:
 	void init_scobra();
 	void init_stratgyx();
 	void init_tazmani2();
+	void init_tazmaniet();
 	void init_darkplnt();
 	void init_mimonkey();
 	void init_mimonsco();
@@ -147,3 +154,5 @@ private:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 };
+
+#endif // MAME_INCLUDES_SCRAMBLE_H

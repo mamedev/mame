@@ -53,7 +53,10 @@ public:
 	void post(char32_t ch);
 	void post(const char32_t *text, size_t length = 0, const attotime &rate = attotime::zero);
 	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post_utf8(const std::string &text, const attotime &rate = attotime::zero);
 	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
+	void post_coded(const std::string &text, const attotime &rate = attotime::zero);
+	void paste();
 
 	// debugging
 	void dump(std::ostream &str) const;
@@ -69,8 +72,8 @@ private:
 	// internal keyboard code information
 	struct keycode_map_entry
 	{
-		ioport_field *  field[SHIFT_COUNT + 1];
-		unsigned        shift;
+		std::array<ioport_field *, SHIFT_COUNT + 1> field;
+		unsigned                                    shift;
 	};
 	typedef std::unordered_map<char32_t, keycode_map_entry> keycode_map;
 
@@ -93,7 +96,6 @@ private:
 	unsigned                        m_fieldnum;         // current step in multi-key sequence
 	bool                            m_status_keydown;   // current keydown status
 	bool                            m_last_cr;          // was the last char a CR?
-	bool                            m_post_lf;          // should we post LFs?
 	emu_timer *                     m_timer;            // timer for posting characters
 	attotime                        m_current_rate;     // current rate for posting
 	ioport_queue_chars_delegate     m_queue_chars;      // queue characters callback

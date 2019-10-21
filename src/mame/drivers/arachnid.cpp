@@ -130,8 +130,8 @@ void arachnid_state::arachnid_map(address_map &map)
 	map(0x2000, 0x2007).rw(PTM6840_TAG, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x4004, 0x4007).rw(m_pia_u4, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x4008, 0x400b).rw(m_pia_u17, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_w));
-	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_w));
+	map(0x6000, 0x6000).w(TMS9118_TAG, FUNC(tms9928a_device::vram_write));
+	map(0x6002, 0x6002).w(TMS9118_TAG, FUNC(tms9928a_device::register_write));
 	map(0x8000, 0xffff).rom().region(M6809_TAG, 0);
 }
 
@@ -420,15 +420,16 @@ void arachnid_state::machine_start()
 ***************************************************************************/
 
 /*-------------------------------------------------
-    MACHINE_CONFIG_START( arachnid )
+    machine_config( arachnid )
 -------------------------------------------------*/
 
-MACHINE_CONFIG_START(arachnid_state::arachnid)
+void arachnid_state::arachnid(machine_config &config)
+{
 	// basic machine hardware
-	MCFG_DEVICE_ADD(M6809_TAG, MC6809, 10.738635_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(arachnid_map)
+	MC6809(config, m_maincpu, 10.738635_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &arachnid_state::arachnid_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram") // MK48Z02 (or DS1220Y)
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02 (or DS1220Y)
 
 	// devices
 	PIA6821(config, m_pia_u4, 0);
@@ -448,21 +449,20 @@ MACHINE_CONFIG_START(arachnid_state::arachnid)
 	m_pia_u17->cb2_handler().set(FUNC(arachnid_state::pia_u17_pcb_w));
 
 	// video hardware
-	MCFG_DEVICE_ADD(TMS9118_TAG, TMS9118, 10.738635_MHz_XTAL / 2)
-	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE(M6809_TAG, INPUT_LINE_IRQ0))
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
-	MCFG_SCREEN_UPDATE_DEVICE( TMS9118_TAG, tms9118_device, screen_update )
+	tms9118_device &vdp(TMS9118(config, TMS9118_TAG, 10.738635_MHz_XTAL));
+	vdp.set_screen("screen");
+	vdp.set_vram_size(0x4000);
+	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("speaker", SPEAKER_SOUND)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	ptm6840_device &ptm(PTM6840(config, PTM6840_TAG, 10.738635_MHz_XTAL / 3 / 4));
 	ptm.set_external_clocks(0, 0, 0);
 	ptm.o1_callback().set(FUNC(arachnid_state::ptm_o1_callback));
-MACHINE_CONFIG_END
+}
 
 /***************************************************************************
     ROMS

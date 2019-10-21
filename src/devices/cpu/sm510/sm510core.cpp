@@ -37,10 +37,9 @@ void sm510_device::data_96_32x4(address_map &map)
 
 
 // device definitions
-sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sm510_base_device(mconfig, SM510, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm510_device::program_2_7k), this), 7 /* data width */, address_map_constructor(FUNC(sm510_device::data_96_32x4), this))
-{
-}
+sm510_device::sm510_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	sm510_base_device(mconfig, SM510, tag, owner, clock, 2 /* stack levels */, 12 /* prg width */, address_map_constructor(FUNC(sm510_device::program_2_7k), this), 7 /* data width */, address_map_constructor(FUNC(sm510_device::data_96_32x4), this))
+{ }
 
 
 // disasm
@@ -59,7 +58,7 @@ void sm510_device::clock_melody()
 {
 	u8 out = 0;
 
-	if (m_r_mask_option == SM510_R_CONTROL_OUTPUT)
+	if (m_r_mask_option == RMASK_DIRECT)
 	{
 		// direct output
 		out = m_r & 3;

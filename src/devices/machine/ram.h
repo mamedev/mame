@@ -26,30 +26,6 @@
 
 
 /***************************************************************************
-    DEVICE CONFIGURATION MACROS
-***************************************************************************/
-
-#define MCFG_RAM_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, RAM, 0)
-
-#define MCFG_RAM_REMOVE(_tag) \
-	MCFG_DEVICE_REMOVE(_tag)
-
-#define MCFG_RAM_MODIFY(_tag) \
-	MCFG_DEVICE_MODIFY(_tag)    \
-	downcast<ram_device &>(*device).set_extra_options(nullptr);
-
-#define MCFG_RAM_DEFAULT_SIZE(_default_size) \
-	downcast<ram_device &>(*device).set_default_size(_default_size);
-
-#define MCFG_RAM_EXTRA_OPTIONS(_extra_options) \
-	downcast<ram_device &>(*device).set_extra_options(_extra_options);
-
-#define MCFG_RAM_DEFAULT_VALUE(_default_value) \
-	downcast<ram_device &>(*device).set_default_value(_default_value);
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -75,9 +51,14 @@ public:
 	void write(offs_t offset, u8 data)  { m_pointer[offset % m_size] = data; }
 
 	// inline configuration helpers
-	void set_default_size(char const *default_size)     { m_default_size = default_size; }
-	void set_extra_options(char const *extra_options)   { m_extra_options_string = extra_options && extra_options[0] ? extra_options : nullptr; m_extra_options.clear(); }
-	void set_default_value(u8 default_value)            { m_default_value = default_value; }
+	ram_device &set_default_size(char const *default_size) { m_default_size = default_size; return *this; }
+	ram_device &set_extra_options(char const *extra_options)
+	{
+		m_extra_options_string = extra_options && extra_options[0] ? extra_options : nullptr;
+		m_extra_options.clear();
+		return *this;
+	}
+	ram_device &set_default_value(u8 default_value) { m_default_value = default_value; return *this; }
 
 protected:
 	virtual void device_start() override;

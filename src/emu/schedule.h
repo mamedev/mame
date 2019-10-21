@@ -83,6 +83,7 @@ public:
 	attotime remaining() const;
 	attotime start() const { return m_start; }
 	attotime expire() const { return m_expire; }
+	attotime period() const { return m_period; }
 
 private:
 	// internal helpers

@@ -62,7 +62,7 @@ private:
 void nsg6809_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
-	map(0x2800, 0x280f).rw("via", FUNC(via6522_device::read), FUNC(via6522_device::write));
+	map(0x2800, 0x280f).m("via", FUNC(via6522_device::map));
 	map(0x3000, 0x3003).rw("acia", FUNC(mos6551_device::read), FUNC(mos6551_device::write));
 	map(0x3e00, 0x3e00).w("deadman", FUNC(watchdog_timer_device::reset_w));
 	map(0x8000, 0xffff).rom().region("maincpu", 0);

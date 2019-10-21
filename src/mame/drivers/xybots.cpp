@@ -25,6 +25,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprompar.h"
 #include "machine/watchdog.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -74,7 +75,7 @@ void xybots_state::main_map(address_map &map)
 	map(0x801000, 0x802dff).mirror(0x7f8000).ram();
 	map(0x802e00, 0x802fff).mirror(0x7f8000).ram().share("mob");
 	map(0x803000, 0x803fff).mirror(0x7f8000).ram().w(m_playfield_tilemap, FUNC(tilemap_device::write16)).share("playfield");
-	map(0x804000, 0x8047ff).mirror(0x7f8800).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x804000, 0x8047ff).mirror(0x7f8800).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x805000, 0x805fff).mirror(0x7f8000).rw("eeprom", FUNC(eeprom_parallel_28xx_device::read), FUNC(eeprom_parallel_28xx_device::write)).umask16(0x00ff);
 	map(0x806000, 0x8060ff).mirror(0x7f8000).r(m_jsa, FUNC(atari_jsa_i_device::main_response_r)).umask16(0x00ff);
 	map(0x806100, 0x8061ff).mirror(0x7f8000).portr("FFE100");
@@ -174,50 +175,49 @@ GFXDECODE_END
  *
  *************************************/
 
-MACHINE_CONFIG_START(xybots_state::xybots)
-
+void xybots_state::xybots(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
+	M68000(config, m_maincpu, ATARI_CLOCK_14MHz/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &xybots_state::main_map);
 
-	MCFG_DEVICE_ADD("slapstic", SLAPSTIC, 107, true)
+	SLAPSTIC(config, "slapstic", 107, true);
 
-	MCFG_EEPROM_2804_ADD("eeprom")
-	MCFG_EEPROM_28XX_LOCK_AFTER_WRITE(true)
+	EEPROM_2804(config, "eeprom").lock_after_write(true);
 
-	MCFG_WATCHDOG_ADD("watchdog")
+	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_xybots)
+	GFXDECODE(config, "gfxdecode", "palette", gfx_xybots);
+	PALETTE(config, "palette").set_format(palette_device::IRGB_4444, 1024);
 
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(IIIIRRRRGGGGBBBB)
+	TILEMAP(config, m_playfield_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(xybots_state::get_playfield_tile_info));
+	TILEMAP(config, m_alpha_tilemap, "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 32, 0).set_info_callback(FUNC(xybots_state::get_alpha_tile_info));
 
-	MCFG_TILEMAP_ADD_STANDARD("playfield", "gfxdecode", 2, xybots_state, get_playfield_tile_info, 8,8, SCAN_ROWS, 64,32)
-	MCFG_TILEMAP_ADD_STANDARD_TRANSPEN("alpha", "gfxdecode", 2, xybots_state, get_alpha_tile_info, 8,8, SCAN_ROWS, 64,32, 0)
-	MCFG_ATARI_MOTION_OBJECTS_ADD("mob", "screen", xybots_state::s_mob_config)
-	MCFG_ATARI_MOTION_OBJECTS_GFXDECODE("gfxdecode")
+	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, xybots_state::s_mob_config);
+	m_mob->set_gfxdecode(m_gfxdecode);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
-	MCFG_SCREEN_UPDATE_DRIVER(xybots_state, screen_update_xybots)
-	MCFG_SCREEN_PALETTE("palette")
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE(*this, xybots_state, video_int_write_line))
+	m_screen->set_raw(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240);
+	m_screen->set_screen_update(FUNC(xybots_state::screen_update_xybots));
+	m_screen->set_palette("palette");
+	m_screen->screen_vblank().set(FUNC(xybots_state::video_int_write_line));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_ATARI_JSA_I_ADD("jsa", INPUTLINE("maincpu", M68K_IRQ_2))
-	MCFG_ATARI_JSA_TEST_PORT("FFE200", 8)
-	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MCFG_DEVICE_REMOVE("jsa:pokey")
-	MCFG_DEVICE_REMOVE("jsa:tms")
-MACHINE_CONFIG_END
+	ATARI_JSA_I(config, m_jsa, 0);
+	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_2);
+	m_jsa->test_read_cb().set_ioport("FFE200").bit(8);
+	m_jsa->add_route(0, "rspeaker", 1.0);
+	m_jsa->add_route(1, "lspeaker", 1.0);
+	config.device_remove("jsa:pokey");
+	config.device_remove("jsa:tms");
+}
 
 
 

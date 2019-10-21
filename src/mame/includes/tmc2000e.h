@@ -65,7 +65,7 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<cassette_image_device> m_cassette;
 	required_shared_ptr<uint8_t> m_colorram;

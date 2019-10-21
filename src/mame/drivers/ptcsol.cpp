@@ -8,6 +8,10 @@
 
     Info from: http://www.sol20.org/
 
+    The Sol Terminal Computer was the first complete S-100 microcomputer
+    with a built-in keyboard and video output. However, its internal
+    architecture resembles a video display terminal more than anything else.
+
     Note that the SOLOS dump comes from the Solace emu. Confirmed as ok.
 
     The roms DPMON and CONSOL are widely available on the net as ENT files,
@@ -117,9 +121,9 @@
 //#include "bus/s100/s100.h"
 #include "imagedev/cassette.h"
 #include "machine/ay31015.h"
+#include "machine/clock.h"
 #include "machine/keyboard.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -148,10 +152,13 @@ public:
 	sol20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
 		, m_cass1(*this, "cassette")
 		, m_cass2(*this, "cassette2")
 		, m_uart(*this, "uart")
 		, m_uart_s(*this, "uart_s")
+		, m_uart_clock(*this, "uart_clock")
+		, m_uart_s_clock(*this, "uart_s_clock")
 		, m_rs232(*this, "rs232")
 		, m_p_videoram(*this, "videoram")
 		, m_p_chargen(*this, "chargen")
@@ -200,11 +207,14 @@ private:
 	cass_data_t m_cass_data;
 	emu_timer *m_cassette_timer;
 	cassette_image_device *cassette_device_image();
-	required_device<cpu_device> m_maincpu;
+	required_device<i8080a_cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_device<cassette_image_device> m_cass1;
 	required_device<cassette_image_device> m_cass2;
 	required_device<ay31015_device> m_uart;
 	required_device<ay31015_device> m_uart_s;
+	required_device<clock_device> m_uart_clock;
+	required_device<clock_device> m_uart_s_clock;
 	required_device<rs232_port_device> m_rs232;
 	required_shared_ptr<uint8_t> m_p_videoram;
 	required_region_ptr<u8> m_p_chargen;
@@ -240,7 +250,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		sol20_boot(ptr, param);
 		break;
 	default:
-		assert_always(false, "Unknown id in sol20_state::device_timer");
+		throw emu_fatalerror("Unknown id in sol20_state::device_timer");
 	}
 }
 
@@ -414,8 +424,7 @@ WRITE8_MEMBER( sol20_state::sol20_fa_w )
 		m_cassette_timer->adjust(attotime::zero);
 
 	// bit 5 baud rate */
-	m_uart->set_receiver_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
-	m_uart->set_transmitter_clock((BIT(data, 5)) ? 4800.0 : 19200.0);
+	m_uart_clock->set_unscaled_clock(BIT(data, 5) ? 4800 : 19200);
 }
 
 WRITE8_MEMBER( sol20_state::sol20_fd_w )
@@ -542,6 +551,13 @@ static INPUT_PORTS_START( sol20 )
 	PORT_CONFNAME( 0x02, 0x00, "Character Rom")
 	PORT_CONFSETTING(    0x00, "6574")
 	PORT_CONFSETTING(    0x02, "6575")
+	PORT_CONFNAME( 0x04, 0x04, "Field Rate") // modification described on page III-40 of Sol Systems Manual
+	PORT_CONFSETTING(    0x00, "50 Hz")
+	PORT_CONFSETTING(    0x04, "60 Hz")
+	PORT_CONFNAME( 0x18, 0x18, "CPU Clock")
+	PORT_CONFSETTING(    0x18, "2.04 MHz (8080A)")
+	PORT_CONFSETTING(    0x10, "2.36 MHz (8080A-2)")
+	PORT_CONFSETTING(    0x08, "2.86 MHz (8080A-1)")
 INPUT_PORTS_END
 
 
@@ -600,8 +616,7 @@ void sol20_state::machine_reset()
 		s_clock = s_bauds[s_count] << 4;
 
 	// these lines could be commented out for now if you want better performance
-	m_uart_s->set_receiver_clock(s_clock);
-	m_uart_s->set_transmitter_clock(s_clock);
+	m_uart_s_clock->set_unscaled_clock(s_clock);
 
 	// boot-bank
 	membank("boot")->set_entry(1);
@@ -609,6 +624,13 @@ void sol20_state::machine_reset()
 
 	m_rs232->write_dtr(0);
 	m_rs232->write_rts(1);
+
+	int lines = BIT(m_iop_config->read(), 2) ? 260 : 312;
+	m_screen->configure(918, lines, m_screen->visible_area(), attotime::from_ticks(918 * lines, 14.318181_MHz_XTAL).as_attoseconds());
+
+	// set CPU speed (TODO: also present on bus pin 49)
+	double freq = (14.318181_MHz_XTAL / (4 + ((m_iop_config->read() >> 3) & 3))).dvalue();
+	m_maincpu->set_unscaled_clock(freq);
 }
 
 void sol20_state::init_sol20()
@@ -716,61 +738,61 @@ void sol20_state::kbd_put(u8 data)
 	}
 }
 
-MACHINE_CONFIG_START(sol20_state::sol20)
+void sol20_state::sol20(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",I8080, XTAL(14'318'181) / 7) // divider selectable as 5, 6 or 7 through jumpers
-	MCFG_DEVICE_PROGRAM_MAP(sol20_mem)
-	MCFG_DEVICE_IO_MAP(sol20_io)
-	MCFG_I8085A_INTE(WRITELINE("speaker", speaker_sound_device, level_w))
+	I8080A(config, m_maincpu, 14.318181_MHz_XTAL / 7); // divider selectable as 5, 6 or 7 through jumpers
+	m_maincpu->set_addrmap(AS_PROGRAM, &sol20_state::sol20_mem);
+	m_maincpu->set_addrmap(AS_IO, &sol20_state::sol20_io);
+	m_maincpu->out_inte_func().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(sol20_state, screen_update)
-	MCFG_SCREEN_SIZE(576, 208)
-	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 207)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(14.318181_MHz_XTAL, 918, 0, 576, 260, 0, 208);
+	m_screen->set_screen_update(FUNC(sol20_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_sol20)
-	MCFG_PALETTE_ADD_MONOCHROME("palette")
+	GFXDECODE(config, "gfxdecode", "palette", gfx_sol20);
+	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 2.00); // music board
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
-	WAVE(config, "wave2", "cassette2").add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 
 	// devices
-	MCFG_CASSETTE_ADD("cassette")
-	MCFG_CASSETTE_FORMATS(sol20_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sol20_cass")
+	CASSETTE(config, m_cass1).set_formats(sol20_cassette_formats);
+	m_cass1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass1->add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
+	m_cass1->set_interface("sol20_cass");
 
-	MCFG_CASSETTE_ADD("cassette2")
-	MCFG_CASSETTE_FORMATS(sol20_cassette_formats)
-	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
-	MCFG_CASSETTE_INTERFACE("sol20_cass")
+	CASSETTE(config, m_cass2).set_formats(sol20_cassette_formats);
+	m_cass2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cass2->add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
+	m_cass2->set_interface("sol20_cass");
 
 	AY51013(config, m_uart); // TMS6011NC
-	m_uart->set_tx_clock(4800.0);
-	m_uart->set_rx_clock(4800.0);
 	m_uart->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("rs232", RS232_PORT, default_rs232_devices, nullptr)
+	CLOCK(config, m_uart_clock, 4800);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(ay51013_device::write_rcp));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(ay51013_device::write_tcp));
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	AY51013(config, m_uart_s); // TMS6011NC
-	m_uart_s->read_si_callback().set("rs232", FUNC(rs232_port_device::rxd_r));
-	m_uart_s->write_so_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_uart_s->set_tx_clock(4800.0);
-	m_uart_s->set_rx_clock(4800.0);
+	m_uart_s->read_si_callback().set(m_rs232, FUNC(rs232_port_device::rxd_r));
+	m_uart_s->write_so_callback().set(m_rs232, FUNC(rs232_port_device::write_txd));
 	m_uart_s->set_auto_rdav(true); // ROD (pin 4) tied to RDD (pin 18)
 
-	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
-	MCFG_GENERIC_KEYBOARD_CB(PUT(sol20_state, kbd_put))
+	CLOCK(config, m_uart_s_clock, 4800);
+	m_uart_s_clock->signal_handler().set(m_uart_s, FUNC(ay51013_device::write_rcp));
+	m_uart_s_clock->signal_handler().append(m_uart_s, FUNC(ay51013_device::write_tcp));
 
-	MCFG_SOFTWARE_LIST_ADD("cass_list", "sol20_cass")
-MACHINE_CONFIG_END
+	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
+	keyboard.set_keyboard_callback(FUNC(sol20_state::kbd_put));
+
+	SOFTWARE_LIST(config, "cass_list").set_original("sol20_cass");
+}
 
 /* ROM definition */
 ROM_START( sol20 )
@@ -792,8 +814,11 @@ ROM_START( sol20 )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
 	ROM_LOAD( "6575.bin", 0x0800, 0x0800, BAD_DUMP CRC(cfdb76c2) SHA1(ab00798161d13f07bee3cf0e0070a2f0a805591f) )
+
+	ROM_REGION( 0x100, "keyboard", 0 )
+	ROM_LOAD( "8574.u18", 0x000, 0x100, NO_DUMP ) // 256x4 bipolar PROM or mask ROM; second half unused
 ROM_END
 
 /* Driver */
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME  FLAGS
-COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "SOL-20", 0 )
+//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY                             FULLNAME                    FLAGS
+COMP( 1976, sol20, 0,      0,      sol20,   sol20, sol20_state, init_sol20, "Processor Technology Corporation", "Sol-20 Terminal Computer", 0 )

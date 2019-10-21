@@ -38,38 +38,6 @@
 #include "imagedev/chd_cd.h"
 #include "sound/cdda.h"
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_CR511B_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, CR511B, 0)
-#define MCFG_CR511B_STCH_HANDLER(_devcb) \
-	downcast<cr511b_device &>(*device).set_stch_handler(DEVCB_##_devcb);
-
-#define MCFG_CR511B_STEN_HANDLER(_devcb) \
-	downcast<cr511b_device &>(*device).set_sten_handler(DEVCB_##_devcb);
-
-#define MCFG_CR511B_DRQ_HANDLER(_devcb) \
-	downcast<cr511b_device &>(*device).set_drq_handler(DEVCB_##_devcb);
-
-#define MCFG_CR511B_DTEN_HANDLER(_devcb) \
-	downcast<cr511b_device &>(*device).set_dten_handler(DEVCB_##_devcb);
-
-#define MCFG_CR511B_SCOR_HANDLER(_devcb) \
-	downcast<cr511b_device &>(*device).set_scor_handler(DEVCB_##_devcb);
-
-#define MCFG_CR511B_XAEN_HANDLER(_devcb) \
-	downcast<cr511b_device &>(*device).set_xaen_handler(DEVCB_##_devcb);
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> cr511b_device
-
 class cr511b_device : public device_t
 {
 public:
@@ -77,12 +45,6 @@ public:
 	cr511b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
-	template <class Object> devcb_base &set_stch_handler(Object &&cb) { return m_stch_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sten_handler(Object &&cb) { return m_sten_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_drq_handler(Object &&cb) { return m_drq_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dten_handler(Object &&cb) { return m_dten_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_scor_handler(Object &&cb) { return m_scor_handler.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_xaen_handler(Object &&cb) { return m_xaen_handler.set_callback(std::forward<Object>(cb)); }
 	auto stch_handler() { return m_stch_handler.bind(); }
 	auto sten_handler() { return m_sten_handler.bind(); }
 	auto drq_handler() { return m_drq_handler.bind(); }
@@ -138,7 +100,6 @@ private:
 	//uint8_t m_sector_buffer[CD_MAX_SECTOR_DATA];
 };
 
-// device type definition
 DECLARE_DEVICE_TYPE(CR511B, cr511b_device)
 
 #endif // MAME_MACHINE_CR511B_H

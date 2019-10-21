@@ -23,11 +23,6 @@
 #include "bus/pc_kbd/pc_kbdc.h"
 
 
-#define MCFG_IBM5160_MOTHERBOARD_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, IBM5160_MOTHERBOARD, 0) \
-	downcast<ibm5160_mb_device &>(*device).set_cputag(_cputag); \
-	(*device->subdevice<isa8_device>("isa")).set_cputag(_cputag);
-
 // ======================> ibm5160_mb_device
 class ibm5160_mb_device : public device_t
 {
@@ -36,7 +31,12 @@ public:
 	ibm5160_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration
-	void set_cputag(const char *tag) { m_maincpu.set_tag(tag); }
+	template <typename T> void set_cputag(T &&tag)
+	{
+		m_maincpu.set_tag(std::forward<T>(tag));
+		subdevice<isa8_device>("isa")->set_memspace(std::forward<T>(tag), AS_PROGRAM);
+		subdevice<isa8_device>("isa")->set_iospace(std::forward<T>(tag), AS_IO);
+	}
 
 	void map(address_map &map);
 
@@ -48,7 +48,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
 
 	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
 
 	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
 
@@ -119,6 +119,7 @@ protected:
 	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+	DECLARE_WRITE_LINE_MEMBER( iochck_w );
 
 	void pc_select_dma_channel(int channel, bool state);
 };
@@ -128,11 +129,6 @@ protected:
 DECLARE_DEVICE_TYPE(IBM5160_MOTHERBOARD, ibm5160_mb_device)
 
 
-#define MCFG_IBM5150_MOTHERBOARD_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, IBM5150_MOTHERBOARD, 0) \
-	downcast<ibm5150_mb_device &>(*device).set_cputag(_cputag); \
-	(*device->subdevice<isa8_device>("isa")).set_cputag(_cputag);
-
 // ======================> ibm5150_mb_device
 class ibm5150_mb_device : public ibm5160_mb_device
 {
@@ -141,6 +137,8 @@ public:
 	ibm5150_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+
+	virtual DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed ) override;
 
 protected:
 	ibm5150_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -161,11 +159,6 @@ private:
 DECLARE_DEVICE_TYPE(IBM5150_MOTHERBOARD, ibm5150_mb_device)
 
 
-#define MCFG_EC1841_MOTHERBOARD_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, EC1841_MOTHERBOARD, 0) \
-	downcast<ec1841_mb_device &>(*device).set_cputag(_cputag); \
-	(*device->subdevice<isa8_device>("isa")).set_cputag(_cputag);
-
 class ec1841_mb_device : public ibm5160_mb_device
 {
 public:
@@ -173,6 +166,8 @@ public:
 	ec1841_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	ec1841_mb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual ioport_constructor device_input_ports() const override;
@@ -187,16 +182,33 @@ private:
 
 DECLARE_DEVICE_TYPE(EC1841_MOTHERBOARD, ec1841_mb_device)
 
-#define MCFG_PCNOPPI_MOTHERBOARD_ADD(_tag, _cputag) \
-	MCFG_DEVICE_ADD(_tag, PCNOPPI_MOTHERBOARD, 0) \
-	downcast<pc_noppi_mb_device &>(*device).set_cputag(_cputag); \
-	(*device->subdevice<isa8_device>("isa")).set_cputag(_cputag);
+
+class ec1840_mb_device : public ec1841_mb_device
+{
+public:
+	// construction/destruction
+	ec1840_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override;
+	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_start() override;
+
+private:
+	DECLARE_READ8_MEMBER ( pc_ppi_portc_r );
+	DECLARE_WRITE8_MEMBER( pc_ppi_portb_w );
+};
+
+DECLARE_DEVICE_TYPE(EC1840_MOTHERBOARD, ec1840_mb_device)
+
 
 class pc_noppi_mb_device : public ibm5160_mb_device
 {
 public:
 	// construction/destruction
 	pc_noppi_mb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	uint8_t pit_out2() { return m_pit_out2; } // helper for near-clones with multifunction ics instead of 8255s
 
 	void map(address_map &map);

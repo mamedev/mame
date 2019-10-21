@@ -28,61 +28,56 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(shaolins_state, shaolins)
+void shaolins_state::shaolins_palette(palette_device &palette) const
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	static const int resistances[4] = { 2200, 1000, 470, 220 };
-	double rweights[4], gweights[4], bweights[4];
-	int i;
+	static constexpr int resistances[4] = { 2200, 1000, 470, 220 };
 
-	/* compute the color output resistor weights */
+	// compute the color output resistor weights
+	double rweights[4], gweights[4], bweights[4];
 	compute_resistor_weights(0, 255, -1.0,
 			4, resistances, rweights, 470, 0,
 			4, resistances, gweights, 470, 0,
 			4, resistances, bweights, 470, 0);
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	// create a lookup table for the palette
+	for (int i = 0; i < 0x100; i++)
 	{
 		int bit0, bit1, bit2, bit3;
-		int r, g, b;
 
-		/* red component */
-		bit0 = (color_prom[i + 0x000] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x000] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x000] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x000] >> 3) & 0x01;
-		r = combine_4_weights(rweights, bit0, bit1, bit2, bit3);
+		// red component
+		bit0 = BIT(color_prom[i | 0x000], 0);
+		bit1 = BIT(color_prom[i | 0x000], 1);
+		bit2 = BIT(color_prom[i | 0x000], 2);
+		bit3 = BIT(color_prom[i | 0x000], 3);
+		int const r = combine_weights(rweights, bit0, bit1, bit2, bit3);
 
-		/* green component */
-		bit0 = (color_prom[i + 0x100] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x100] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x100] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x100] >> 3) & 0x01;
-		g = combine_4_weights(gweights, bit0, bit1, bit2, bit3);
+		// green component
+		bit0 = BIT(color_prom[i | 0x100], 0);
+		bit1 = BIT(color_prom[i | 0x100], 1);
+		bit2 = BIT(color_prom[i | 0x100], 2);
+		bit3 = BIT(color_prom[i | 0x100], 3);
+		int const g = combine_weights(gweights, bit0, bit1, bit2, bit3);
 
-		/* blue component */
-		bit0 = (color_prom[i + 0x200] >> 0) & 0x01;
-		bit1 = (color_prom[i + 0x200] >> 1) & 0x01;
-		bit2 = (color_prom[i + 0x200] >> 2) & 0x01;
-		bit3 = (color_prom[i + 0x200] >> 3) & 0x01;
-		b = combine_4_weights(bweights, bit0, bit1, bit2, bit3);
+		// blue component
+		bit0 = BIT(color_prom[i | 0x200], 0);
+		bit1 = BIT(color_prom[i | 0x200], 1);
+		bit2 = BIT(color_prom[i | 0x200], 2);
+		bit3 = BIT(color_prom[i | 0x200], 3);
+		int const b = combine_weights(bweights, bit0, bit1, bit2, bit3);
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 	}
 
-	/* color_prom now points to the beginning of the lookup table,*/
+	// color_prom now points to the beginning of the lookup table,
 	color_prom += 0x300;
 
-	/* characters use colors 0x10-0x1f of each 0x20 color bank,
-	   while sprites use colors 0-0x0f */
-	for (i = 0; i < 0x200; i++)
+	// characters use colors 0x10-0x1f of each 0x20 color bank, while sprites use colors 0-0x0f
+	for (int i = 0; i < 0x200; i++)
 	{
-		int j;
-
-		for (j = 0; j < 8; j++)
+		for (int j = 0; j < 8; j++)
 		{
-			uint8_t ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
+			uint8_t const ctabentry = (j << 5) | ((~i & 0x100) >> 4) | (color_prom[i] & 0x0f);
 			palette.set_pen_indirect(((i & 0x100) << 3) | (j << 8) | (i & 0xff), ctabentry);
 		}
 	}
@@ -124,6 +119,9 @@ WRITE8_MEMBER(shaolins_state::nmi_w)
 		flip_screen_set(data & 0x01);
 		machine().tilemap().mark_all_dirty();
 	}
+
+	machine().bookkeeping().coin_counter_w(0,data & 0x08);
+	machine().bookkeeping().coin_counter_w(1,data & 0x10);
 }
 
 TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
@@ -149,7 +147,14 @@ void shaolins_state::video_start()
 
 void shaolins_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
+	// area $3000-1f is written and never read to.
+	// Its values are filled to 0x00 when it's expected to have no sprites (cross hatch, service mode, between level transitions ...)
+	// May be a rudimentary per-sprite disable
+	// TODO: understand actual disabling conditions (either by schematics or by probing the real HW)
+	if (m_spriteram[0] == 0)
+		return;
+
+	for (int offs = m_spriteram.bytes() - 32; offs >= 0x100; offs -= 32 ) /* max 24 sprites */
 	{
 		if (m_spriteram[offs] && m_spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{

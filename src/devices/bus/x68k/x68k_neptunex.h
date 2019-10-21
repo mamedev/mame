@@ -36,6 +36,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_x68k_expansion_card_interface overrides
+	virtual uint8_t iack2() override;
+
 private:
 	DECLARE_READ8_MEMBER(x68k_neptune_mem_read);
 	DECLARE_WRITE8_MEMBER(x68k_neptune_mem_write);

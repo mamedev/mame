@@ -7,8 +7,8 @@ Ravensburger Selbstbaucomputer
 This is a project described in "Ravensburger" magazine. You had to make
 the entire thing (including the circuit boards) yourself.
 
-http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
 
+https://web.archive.org/web/20160321001634/http://petersieg.bplaced.com/?2650_Computer:2650_Selbstbaucomputer
         2013-04-23 Skeleton driver.
 
 
@@ -75,7 +75,6 @@ ToDo:
 #include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 #include "machine/terminal.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 #include "ravens.lh"
@@ -106,7 +105,7 @@ private:
 	DECLARE_MACHINE_RESET(ravens2);
 	DECLARE_READ_LINE_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 
 	void ravens2_io(address_map &map);
 	void ravens_io(address_map &map);
@@ -115,7 +114,7 @@ private:
 	uint8_t m_term_char;
 	uint8_t m_term_data;
 	virtual void machine_start() override { m_digits.resolve(); }
-	required_device<cpu_device> m_maincpu;
+	required_device<s2650_device> m_maincpu;
 	optional_device<generic_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cass;
 	output_finder<7> m_digits;
@@ -196,7 +195,7 @@ WRITE8_MEMBER( ravens_state::port1b_w )
 	else
 		data = m_term_char;
 
-	m_terminal->write(space, 0, data);
+	m_terminal->write(data);
 }
 
 WRITE8_MEMBER( ravens_state::port1c_w )
@@ -274,7 +273,7 @@ void ravens_state::kbd_put(u8 data)
 	m_term_data = data;
 }
 
-QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
+QUICKLOAD_LOAD_MEMBER(ravens_state::quickload_cb)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int i;
@@ -338,48 +337,52 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	return result;
 }
 
-MACHINE_CONFIG_START(ravens_state::ravens)
+void ravens_state::ravens(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
-	MCFG_DEVICE_IO_MAP(ravens_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
+	S2650(config, m_maincpu, XTAL(1'000'000)); // frequency is unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &ravens_state::ravens_mem);
+	m_maincpu->set_addrmap(AS_IO, &ravens_state::ravens_io);
+	m_maincpu->sense_handler().set(FUNC(ravens_state::cass_r));
+	m_maincpu->flag_handler().set(FUNC(ravens_state::cass_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_ravens);
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
-MACHINE_CONFIG_START(ravens_state::ravens2)
+void ravens_state::ravens2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu",S2650, XTAL(1'000'000)) // frequency is unknown
-	MCFG_DEVICE_PROGRAM_MAP(ravens_mem)
-	MCFG_DEVICE_IO_MAP(ravens2_io)
-	MCFG_S2650_SENSE_INPUT(READLINE(*this, ravens_state, cass_r))
-	MCFG_S2650_FLAG_OUTPUT(WRITELINE(*this, ravens_state, cass_w))
+	S2650(config, m_maincpu, XTAL(1'000'000)); // frequency is unknown
+	m_maincpu->set_addrmap(AS_PROGRAM, &ravens_state::ravens_mem);
+	m_maincpu->set_addrmap(AS_IO, &ravens_state::ravens2_io);
+	m_maincpu->sense_handler().set(FUNC(ravens_state::cass_r));
+	m_maincpu->flag_handler().set(FUNC(ravens_state::cass_w));
 
 	MCFG_MACHINE_RESET_OVERRIDE(ravens_state, ravens2)
 
 	/* video hardware */
-	MCFG_DEVICE_ADD(m_terminal, GENERIC_TERMINAL, 0)
-	MCFG_GENERIC_TERMINAL_KEYBOARD_CB(PUT(ravens_state, kbd_put))
+	GENERIC_TERMINAL(config, m_terminal, 0);
+	m_terminal->set_keyboard_callback(FUNC(ravens_state::kbd_put));
 
 	/* quickload */
-	MCFG_QUICKLOAD_ADD("quickload", ravens_state, ravens, "pgm", 1)
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(ravens_state::quickload_cb), this);
+
+	SPEAKER(config, "mono").front_center();
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( "cassette" )
-	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.05);
-MACHINE_CONFIG_END
+	CASSETTE(config, m_cass);
+	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+}
 
 /* ROM definition */
 ROM_START( ravens )

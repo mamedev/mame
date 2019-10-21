@@ -283,29 +283,30 @@ void midcoin24cdjuke_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(midcoin24cdjuke_state::midcoin24cdjuke)
+void midcoin24cdjuke_state::midcoin24cdjuke(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,6000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(midcoin24cdjuke_map)
-	MCFG_DEVICE_IO_MAP(midcoin24cdjuke_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(midcoin24cdjuke_state, irq0_line_hold, 500)
+	Z80(config, m_maincpu, 6000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &midcoin24cdjuke_state::midcoin24cdjuke_map);
+	m_maincpu->set_addrmap(AS_IO, &midcoin24cdjuke_state::midcoin24cdjuke_io);
+	m_maincpu->set_periodic_int(FUNC(midcoin24cdjuke_state::irq0_line_hold), attotime::from_hz(500));
 
 	config.set_default_layout(layout_24cdjuke);
 
-	MCFG_DEVICE_ADD("ic11", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("MD1"))
-	MCFG_I8255_IN_PORTB_CB(IOPORT("MD2"))
-	MCFG_I8255_IN_PORTC_CB(IOPORT("MD3"))
+	i8255_device &ic11(I8255A(config, "ic11"));
+	ic11.in_pa_callback().set_ioport("MD1");
+	ic11.in_pb_callback().set_ioport("MD2");
+	ic11.in_pc_callback().set_ioport("MD3");
 
-	MCFG_DEVICE_ADD("ic25", I8255A, 0)
-	MCFG_I8255_IN_PORTB_CB(IOPORT("PB"))
-	MCFG_I8255_IN_PORTC_CB(READ8(*this, midcoin24cdjuke_state, kb_row_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(*this, midcoin24cdjuke_state, kb_col_w))
+	i8255_device &ic25(I8255A(config, "ic25"));
+	ic25.in_pb_callback().set_ioport("PB");
+	ic25.in_pc_callback().set(FUNC(midcoin24cdjuke_state::kb_row_r));
+	ic25.out_pc_callback().set(FUNC(midcoin24cdjuke_state::kb_col_w));
 
-	i8255_device &ic32(I8255A(config, "ic31", 0));
-	ic32.out_pb_callback().set_log("PPI8255 - unmapped write port B");
-	ic32.in_pc_callback().set_ioport("MD4");
-MACHINE_CONFIG_END
+	i8255_device &ic31(I8255A(config, "ic31", 0));
+	ic31.out_pb_callback().set_log("PPI8255 - unmapped write port B");
+	ic31.in_pc_callback().set_ioport("MD4");
+}
 
 
 ROM_START( 24cdjuke )

@@ -20,12 +20,12 @@ VIDEO_START_MEMBER(taitoz_state,taitoz)
 ********************************************************/
 
 
-READ16_MEMBER(taitoz_state::sci_spriteframe_r)
+u16 taitoz_state::sci_spriteframe_r()
 {
 	return (m_sci_spriteframe << 8);
 }
 
-WRITE16_MEMBER(taitoz_state::sci_spriteframe_w)
+void taitoz_state::sci_spriteframe_w(u16 data)
 {
 	m_sci_spriteframe = (data >> 8) & 0xff;
 }
@@ -145,41 +145,34 @@ confirmed
 ********************************************************/
 
 
-void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void taitoz_state::contcirc_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
-	static const int primasks[2] = { 0xf0, 0xfc };
+	static const u32 primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
-		data = spriteram[offs + 0];
-		zoomy = (data & 0xfe00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0xfe00) >> 9;
+		int y =      data & 0x01ff;
 
-		data = spriteram[offs + 1];
-		tilenum = data & 0x7ff;     /* $80000 spritemap rom maps up to $7ff 128x128 sprites */
+		data = m_spriteram[offs + 1];
+		const u32 tilenum = data & 0x7ff;     /* $80000 spritemap rom maps up to $7ff 128x128 sprites */
 
-		data = spriteram[offs + 2];
-		priority = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		flipy = (data & 0x2000) >> 13;  // ???
-		x = data & 0x1ff;   // correct mask?
+		data = m_spriteram[offs + 2];
+		const u32 priority = (data & 0x8000) >> 15;
+		int flipx =          (data & 0x4000) >> 14;
+		int flipy =          (data & 0x2000) >> 13;  // ???
+		int x =               data & 0x01ff;   // correct mask?
 
-		data = spriteram[offs + 3];
-		color = (data & 0xff00) >> 8;
-		zoomx = (data & 0x7f);
+		data = m_spriteram[offs + 3];
+		const u32 color = (data & 0xff00) >> 8;
+		int zoomx =       (data & 0x007f);
 
 		if (!tilenum)
 			continue;
 
-		map_offset = tilenum << 7;
+		const u32 map_offset = tilenum << 7;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -191,26 +184,26 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
-		for (sprite_chunk = 0; sprite_chunk < 128; sprite_chunk++)
+		for (int sprite_chunk = 0; sprite_chunk < 128; sprite_chunk++)
 		{
-			k = sprite_chunk % 8;   /* 8 sprite chunks per row */
-			j = sprite_chunk / 8;   /* 16 rows */
+			const int k = sprite_chunk % 8;   /* 8 sprite chunks per row */
+			const int j = sprite_chunk / 8;   /* 16 rows */
 
-			px = flipx ?  (7 - k) : k;  /* pick tiles back to front for x and y flips */
-			py = flipy ? (15 - j) : j;
+			int px = flipx ?  (7 - k) : k;  /* pick tiles back to front for x and y flips */
+			int py = flipy ? (15 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 3)];
+			const u16 code = m_spritemap[map_offset + px + (py << 3)];
 
 			if (code == 0xffff)
 				bad_chunks++;
 
-			curx = x + ((k * zoomx) / 8);
-			cury = y + ((j * zoomy) / 16);
+			int curx = x + ((k * zoomx) / 8);
+			int cury = y + ((j * zoomy) / 16);
 
-			zx = x + (((k + 1) * zoomx) / 8) - curx;
-			zy = y + (((j + 1) * zoomy) / 16) - cury;
+			const int zx = x + (((k + 1) * zoomx) / 8) - curx;
+			const int zy = y + (((j + 1) * zoomy) / 16) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -229,7 +222,8 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,screen.priority(),primasks[priority],0);
+					zx << 12,zy << 13,
+					screen.priority(),primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -239,37 +233,30 @@ void taitoz_state::contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind
 
 
 
-void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void taitoz_state::chasehq_draw_sprites_16x16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
-	static const int primasks[2] = { 0xf0, 0xfc };
+	static const u32 primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram[offs + 0];
-		zoomy = (data & 0xfe00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0xfe00) >> 9;
+		int y =      data & 0x01ff;
 
-		data = spriteram[offs + 1];
-		priority = (data & 0x8000) >> 15;
-		color = (data & 0x7f80) >> 7;
-		zoomx = (data & 0x7f);
+		data = m_spriteram[offs + 1];
+		const u32 priority = (data & 0x8000) >> 15;
+		const u32 color =    (data & 0x7f80) >> 7;
+		int zoomx =          (data & 0x007f);
 
-		data = spriteram[offs + 2];
-		flipy = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		x = data & 0x1ff;
+		data = m_spriteram[offs + 2];
+		int flipy = (data & 0x8000) >> 15;
+		int flipx = (data & 0x4000) >> 14;
+		int x =      data & 0x01ff;
 
-		data = spriteram[offs + 3];
+		data = m_spriteram[offs + 3];
 		/* higher bits are sometimes used... e.g. sign over flashing enemy car...! */
-		tilenum = data & 0x7ff;
+		const u32 tilenum = data & 0x7ff;
 
 		if (!tilenum)
 			continue;
@@ -284,30 +271,30 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
 		if ((zoomx - 1) & 0x40) /* 128x128 sprites, $0-$3ffff in spritemap rom, OBJA */
 		{
-			map_offset = tilenum << 6;
+			const u32 map_offset = tilenum << 6;
 
-			for (sprite_chunk = 0; sprite_chunk < 64; sprite_chunk++)
+			for (int sprite_chunk = 0; sprite_chunk < 64; sprite_chunk++)
 			{
-				j = sprite_chunk / 8;   /* 8 rows */
-				k = sprite_chunk % 8;   /* 8 sprite chunks per row */
+				const int j = sprite_chunk / 8;   /* 8 rows */
+				const int k = sprite_chunk % 8;   /* 8 sprite chunks per row */
 
-				px = flipx ? (7 - k) : k;   /* pick tiles back to front for x and y flips */
-				py = flipy ? (7 - j) : j;
+				int px = flipx ? (7 - k) : k;   /* pick tiles back to front for x and y flips */
+				int py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 3)];
+				const u16 code = m_spritemap[map_offset + px + (py << 3)];
 
 				if (code == 0xffff)
 					bad_chunks++;
 
-				curx = x + ((k * zoomx) / 8);
-				cury = y + ((j * zoomy) / 8);
+				int curx = x + ((k * zoomx) / 8);
+				int cury = y + ((j * zoomy) / 8);
 
-				zx = x + (((k + 1) * zoomx) / 8) - curx;
-				zy = y + (((j + 1) * zoomy) / 8) - cury;
+				const int zx = x + (((k + 1) * zoomx) / 8) - curx;
+				const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 				if (sprites_flipscreen)
 				{
@@ -326,31 +313,31 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 						color,
 						flipx,flipy,
 						curx,cury,
-						zx<<12,zy<<12,
+						zx << 12,zy << 12,
 						screen.priority(),primasks[priority],0);
 			}
 		}
 		else if ((zoomx - 1) & 0x20)    /* 64x128 sprites, $40000-$5ffff in spritemap rom, OBJB */
 		{
-			map_offset = (tilenum << 5) + 0x20000;
+			const u32 map_offset = (tilenum << 5) + 0x20000;
 
-			for (sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
+			for (int sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
 			{
-				j = sprite_chunk / 4;   /* 8 rows */
-				k = sprite_chunk % 4;   /* 4 sprite chunks per row */
+				const int j = sprite_chunk / 4;   /* 8 rows */
+				const int k = sprite_chunk % 4;   /* 4 sprite chunks per row */
 
-				px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
-				py = flipy ? (7 - j) : j;
+				int px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
+				int py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 2)];
+				const u16 code = m_spritemap[map_offset + px + (py << 2)];
 
 				if (code == 0xffff) bad_chunks++;
 
-				curx = x + ((k * zoomx) / 4);
-				cury = y + ((j * zoomy) / 8);
+				int curx = x + ((k * zoomx) / 4);
+				int cury = y + ((j * zoomy) / 8);
 
-				zx = x + (((k + 1) * zoomx) / 4) - curx;
-				zy = y + (((j + 1) * zoomy) / 8) - cury;
+				const int zx = x + (((k + 1) * zoomx) / 4) - curx;
+				const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 				if (sprites_flipscreen)
 				{
@@ -364,36 +351,36 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(2)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_zoom_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						zx<<12,zy<<12,
+						zx << 12,zy << 12,
 						screen.priority(),primasks[priority],0);
 			}
 		}
 		else if (!((zoomx - 1) & 0x60)) /* 32x128 sprites, $60000-$7ffff in spritemap rom, OBJB */
 		{
-			map_offset = (tilenum << 4) + 0x30000;
+			const u32 map_offset = (tilenum << 4) + 0x30000;
 
-			for (sprite_chunk = 0; sprite_chunk < 16; sprite_chunk++)
+			for (int sprite_chunk = 0; sprite_chunk < 16; sprite_chunk++)
 			{
-				j = sprite_chunk / 2;   /* 8 rows */
-				k = sprite_chunk % 2;   /* 2 sprite chunks per row */
+				const int j = sprite_chunk / 2;   /* 8 rows */
+				const int k = sprite_chunk % 2;   /* 2 sprite chunks per row */
 
-				px = flipx ? (1 - k) : k;   /* pick tiles back to front for x and y flips */
-				py = flipy ? (7 - j) : j;
+				int px = flipx ? (1 - k) : k;   /* pick tiles back to front for x and y flips */
+				int py = flipy ? (7 - j) : j;
 
-				code = spritemap[map_offset + px + (py << 1)];
+				const u16 code = m_spritemap[map_offset + px + (py << 1)];
 
 				if (code == 0xffff) bad_chunks ++;
 
-				curx = x + ((k * zoomx) / 2);
-				cury = y + ((j * zoomy) / 8);
+				int curx = x + ((k * zoomx) / 2);
+				int cury = y + ((j * zoomy) / 8);
 
-				zx = x + (((k + 1) * zoomx) / 2) - curx;
-				zy = y + (((j + 1) * zoomy) / 8) - cury;
+				const int zx = x + (((k + 1) * zoomx) / 2) - curx;
+				const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 				if (sprites_flipscreen)
 				{
@@ -407,12 +394,12 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 					flipy = !flipy;
 				}
 
-				m_gfxdecode->gfx(2)->prio_zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(1)->prio_zoom_transpen(bitmap,cliprect,
 						code,
 						color,
 						flipx,flipy,
 						curx,cury,
-						zx<<12,zy<<12,
+						zx << 12,zy << 12,
 						screen.priority(),primasks[priority],0);
 			}
 		}
@@ -424,41 +411,34 @@ void taitoz_state::chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind
 
 
 
-void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void taitoz_state::bshark_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
-	static const int primasks[2] = { 0xf0, 0xfc };
+	static const u32 primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
+	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
-		data = spriteram[offs + 0];
-		zoomy = (data & 0x7e00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0x7e00) >> 9;
+		int y =      data & 0x01ff;
 
-		data = spriteram[offs + 1];
-		priority = (data & 0x8000) >> 15;
-		color = (data & 0x7f80) >> 7;
-		zoomx = (data & 0x3f);
+		data = m_spriteram[offs + 1];
+		const u32 priority = (data & 0x8000) >> 15;
+		const u32 color =    (data & 0x7f80) >> 7;
+		int zoomx =          (data & 0x003f);
 
-		data = spriteram[offs + 2];
-		flipy = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		x = data & 0x1ff;
+		data = m_spriteram[offs + 2];
+		int flipy = (data & 0x8000) >> 15;
+		int flipx = (data & 0x4000) >> 14;
+		int x =      data & 0x01ff;
 
-		data = spriteram[offs + 3];
-		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
+		data = m_spriteram[offs + 3];
+		const u32 tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
 			continue;
 
-		map_offset = tilenum << 5;
+		const u32 map_offset = tilenum << 5;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -470,26 +450,26 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
-		for (sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
+		for (int sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
 		{
-			k = sprite_chunk % 4;   /* 4 sprite chunks per row */
-			j = sprite_chunk / 4;   /* 8 rows */
+			const int k = sprite_chunk % 4;   /* 4 sprite chunks per row */
+			const int j = sprite_chunk / 4;   /* 8 rows */
 
-			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
-			py = flipy ? (7 - j) : j;
+			int px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
+			int py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			const u16 code = m_spritemap[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
 
-			curx = x + ((k * zoomx) / 4);
-			cury = y + ((j * zoomy) / 8);
+			int curx = x + ((k * zoomx) / 4);
+			int cury = y + ((j * zoomy) / 8);
 
-			zx = x + (((k + 1) * zoomx) / 4) - curx;
-			zy = y + (((j + 1) * zoomy) / 8) - cury;
+			const int zx = x + (((k + 1) * zoomx) / 4) - curx;
+			const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -508,7 +488,7 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -519,17 +499,10 @@ void taitoz_state::bshark_draw_sprites_16x8( screen_device &screen, bitmap_ind16
 
 
 
-void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void taitoz_state::sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
-	int offs, start_offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
-	static const int primasks[2] = { 0xf0, 0xfc };
+	static const u32 primasks[2] = { 0xf0, 0xfc };
 
 	/* SCI alternates between two areas of its spriteram */
 
@@ -537,32 +510,32 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 	// reversing it now only gives us sprite updates on alternate
 	// frames. So we probably have to partly buffer spriteram?
 
-	start_offs = (m_sci_spriteframe & 1) * 0x800;
+	int start_offs = (m_sci_spriteframe & 1) * 0x800;
 	start_offs = 0x800 - start_offs;
 
-	for (offs = (start_offs + 0x800 - 4); offs >= start_offs; offs -= 4)
+	for (int offs = (start_offs + 0x800 - 4); offs >= start_offs; offs -= 4)
 	{
-		data = spriteram[offs + 0];
-		zoomy = (data & 0x7e00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0x7e00) >> 9;
+		int y =      data & 0x01ff;
 
-		data = spriteram[offs + 1];
-		priority = (data & 0x8000) >> 15;
-		color = (data & 0x7f80) >> 7;
-		zoomx = (data & 0x3f);
+		data = m_spriteram[offs + 1];
+		const u32 priority = (data & 0x8000) >> 15;
+		const u32 color =    (data & 0x7f80) >> 7;
+		int zoomx =          (data & 0x003f);
 
-		data = spriteram[offs + 2];
-		flipy = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		x = data & 0x1ff;
+		data = m_spriteram[offs + 2];
+		int flipy = (data & 0x8000) >> 15;
+		int flipx = (data & 0x4000) >> 14;
+		int x =      data & 0x01ff;
 
-		data = spriteram[offs + 3];
-		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
+		data = m_spriteram[offs + 3];
+		const u32 tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
 			continue;
 
-		map_offset = tilenum << 5;
+		const u32 map_offset = tilenum << 5;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -574,26 +547,26 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
-		for (sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
+		for (int sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
 		{
-			j = sprite_chunk / 4;   /* 8 rows */
-			k = sprite_chunk % 4;   /* 4 sprite chunks per row */
+			const int j = sprite_chunk / 4;   /* 8 rows */
+			const int k = sprite_chunk % 4;   /* 4 sprite chunks per row */
 
-			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
-			py = flipy ? (7 - j) : j;
+			int px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
+			int py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			const u16 code = m_spritemap[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
 
-			curx = x + ((k * zoomx) / 4);
-			cury = y + ((j * zoomy) / 8);
+			int curx = x + ((k * zoomx) / 4);
+			int cury = y + ((j * zoomy) / 8);
 
-			zx = x + (((k + 1) * zoomx) / 4) - curx;
-			zy = y + (((j + 1) * zoomy) / 8) - cury;
+			const int zx = x + (((k + 1) * zoomx) / 4) - curx;
+			const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -612,7 +585,7 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -625,39 +598,32 @@ void taitoz_state::sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &b
 
 void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
-	static const int primasks[2] = { 0xf0, 0xfc };
+	static const u32 primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
-		data = spriteram[offs + 0];
-		zoomy = (data & 0x7e00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0x7e00) >> 9;
+		int y =      data & 0x01ff;
 
-		data = spriteram[offs + 1];
-		priority = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		x = data & 0x1ff;   // correct mask?
+		data = m_spriteram[offs + 1];
+		const u32 priority = (data & 0x8000) >> 15;
+		int flipx =          (data & 0x4000) >> 14;
+		int x =               data & 0x01ff;   // correct mask?
 
-		data = spriteram[offs + 2];
-		color = (data & 0xff00) >> 8;
-		zoomx = (data & 0x3f);
+		data = m_spriteram[offs + 2];
+		const u32 color = (data & 0xff00) >> 8;
+		int zoomx =       (data & 0x003f);
 
-		data = spriteram[offs + 3];
-		flipy = (data & 0x8000) >> 15;  // ???
-		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
+		data = m_spriteram[offs + 3];
+		int flipy =        (data & 0x8000) >> 15;  // ???
+		const u32 tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
 			continue;
 
-		map_offset = tilenum << 5;
+		const u32 map_offset = tilenum << 5;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -668,26 +634,26 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
-		for (sprite_chunk=0;sprite_chunk<32;sprite_chunk++)
+		for (int sprite_chunk=0;sprite_chunk<32;sprite_chunk++)
 		{
-			k = sprite_chunk % 4;   /* 4 sprite chunks per row */
-			j = sprite_chunk / 4;   /* 8 rows */
+			const int k = sprite_chunk % 4;   /* 4 sprite chunks per row */
+			const int j = sprite_chunk / 4;   /* 8 rows */
 
-			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
-			py = flipy ? (7 - j) : j;
+			int px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
+			int py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			const u16 code = m_spritemap[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
 
-			curx = x + ((k * zoomx)/4);
-			cury = y + ((j * zoomy)/8);
+			int curx = x + ((k * zoomx)/4);
+			int cury = y + ((j * zoomy)/8);
 
-			zx = x + (((k + 1) * zoomx)/4) - curx;
-			zy = y + (((j + 1) * zoomy)/8) - cury;
+			const int zx = x + (((k + 1) * zoomx)/4) - curx;
+			const int zy = y + (((j + 1) * zoomy)/8) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -706,7 +672,7 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -719,39 +685,32 @@ void taitoz_state::aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 
 void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
-	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
-	uint16_t *spriteram = m_spriteram;
-	int offs, data, tilenum, color, flipx, flipy;
-	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
-	int zoomx, zoomy, zx, zy;
-	int sprite_chunk, map_offset, code, j, k, px, py;
-	int bad_chunks;
-	static const int primasks[2] = { 0xf0, 0xfc };
+	static const u32 primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < m_spriteram.bytes() / 2 - 4; offs += 4)
+	for (int offs = 0; offs < m_spriteram.bytes() / 2 - 4; offs += 4)
 	{
-		data = spriteram[offs + 0];
-		zoomy = (data & 0xfe00) >> 9;
-		y = data & 0x1ff;
+		u16 data = m_spriteram[offs + 0];
+		int zoomy = (data & 0xfe00) >> 9;
+		int y =      data & 0x01ff;
 
-		data = spriteram[offs + 1];
-		priority = (data & 0x8000) >> 15;
-		flipx = (data & 0x4000) >> 14;
-		x = data & 0x1ff;   // correct mask?
+		data = m_spriteram[offs + 1];
+		const u32 priority = (data & 0x8000) >> 15;
+		int flipx =          (data & 0x4000) >> 14;
+		int x =               data & 0x01ff;   // correct mask?
 
-		data = spriteram[offs + 2];
-		color = (data & 0xff00) >> 8;
-		zoomx = (data & 0x7f);
+		data = m_spriteram[offs + 2];
+		const u32 color = (data & 0xff00) >> 8;
+		int zoomx =       (data & 0x007f);
 
-		data = spriteram[offs + 3];
-		flipy = (data & 0x8000) >> 15;  // ???
-		tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
+		data = m_spriteram[offs + 3];
+		int flipy =        (data & 0x8000) >> 15;  // ???
+		const u32 tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
 			continue;
 
-		map_offset = tilenum << 5;
+		const u32 map_offset = tilenum << 5;
 
 		zoomx += 1;
 		zoomy += 1;
@@ -762,26 +721,26 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 		if (x > 0x140) x -= 0x200;
 		if (y > 0x140) y -= 0x200;
 
-		bad_chunks = 0;
+		int bad_chunks = 0;
 
-		for (sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
+		for (int sprite_chunk = 0; sprite_chunk < 32; sprite_chunk++)
 		{
-			k = sprite_chunk % 4;   /* 4 sprite chunks per row */
-			j = sprite_chunk / 4;   /* 8 rows */
+			const int k = sprite_chunk % 4;   /* 4 sprite chunks per row */
+			const int j = sprite_chunk / 4;   /* 8 rows */
 
-			px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
-			py = flipy ? (7 - j) : j;
+			int px = flipx ? (3 - k) : k;   /* pick tiles back to front for x and y flips */
+			int py = flipy ? (7 - j) : j;
 
-			code = spritemap[map_offset + px + (py << 2)];
+			const u16 code = m_spritemap[map_offset + px + (py << 2)];
 
 			if (code == 0xffff)
 				bad_chunks++;
 
-			curx = x + ((k * zoomx) / 4);
-			cury = y + ((j * zoomy) / 8);
+			int curx = x + ((k * zoomx) / 4);
+			int cury = y + ((j * zoomy) / 8);
 
-			zx = x + (((k + 1) * zoomx) / 4) - curx;
-			zy = y + (((j + 1) * zoomy) / 8) - cury;
+			const int zx = x + (((k + 1) * zoomx) / 4) - curx;
+			const int zy = y + (((j + 1) * zoomy) / 8) - cury;
 
 			if (sprites_flipscreen)
 			{
@@ -800,7 +759,7 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
 					color,
 					flipx,flipy,
 					curx,cury,
-					zx<<12,zy<<13,
+					zx << 12,zy << 13,
 					screen.priority(),primasks[priority],0);
 		}
 
@@ -814,28 +773,25 @@ void taitoz_state::spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind1
                         SCREEN REFRESH
 **************************************************************/
 
-WRITE16_MEMBER(taitoz_state::contcirc_out_w)
+void taitoz_state::contcirc_out_w(u8 data)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		/* bit 0 = reset sub CPU */
-		m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	/* bit 0 = reset sub CPU */
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 
-		/* bits 1-3 n.c. */
+	/* bits 1-3 n.c. */
 
-		/* 3d glasses control */
-		/* bit 4 = SCPSW */
-		/* bit 5 = SCP */
+	/* 3d glasses control */
+	/* bit 4 = SCPSW */
+	/* bit 5 = SCP */
 
-		/* bits 6 and 7 select the road palette bank */
-		m_road_palbank = (data & 0xc0) >> 6;
-	}
+	/* bits 6 and 7 select the road palette bank */
+	m_road_palbank = (data & 0xc0) >> 6;
 }
 
 
-uint32_t taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -859,9 +815,9 @@ uint32_t taitoz_state::screen_update_contcirc(screen_device &screen, bitmap_ind1
 
 /* Nightstr and ChaseHQ */
 
-uint32_t taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -884,9 +840,9 @@ uint32_t taitoz_state::screen_update_chasehq(screen_device &screen, bitmap_ind16
 }
 
 
-uint32_t taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -909,9 +865,9 @@ uint32_t taitoz_state::screen_update_bshark(screen_device &screen, bitmap_ind16 
 }
 
 
-uint32_t taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -934,9 +890,9 @@ uint32_t taitoz_state::screen_update_sci(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-uint32_t taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -959,9 +915,9 @@ uint32_t taitoz_state::screen_update_aquajack(screen_device &screen, bitmap_ind1
 }
 
 
-uint32_t taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[3];
+	u8 layer[3];
 
 	m_tc0100scn->tilemap_update();
 
@@ -984,10 +940,10 @@ uint32_t taitoz_state::screen_update_spacegun(screen_device &screen, bitmap_ind1
 }
 
 
-uint32_t taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[5];
-	uint16_t priority;
+	u8 layer[5];
+	u16 priority;
 
 	m_tc0480scp->tilemap_update();
 
@@ -1019,10 +975,10 @@ uint32_t taitoz_state::screen_update_dblaxle(screen_device &screen, bitmap_ind16
 }
 
 
-uint32_t taitoz_state::screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 taitoz_state::screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t layer[5];
-	uint16_t priority;
+	u8 layer[5];
+	u16 priority;
 
 	m_tc0480scp->tilemap_update();
 

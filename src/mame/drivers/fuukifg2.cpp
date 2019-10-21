@@ -63,31 +63,48 @@ To Do:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(fuuki16_state::vregs_w)
+void fuuki16_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t old_data = m_vregs[offset];
-	uint16_t new_data = COMBINE_DATA(&m_vregs[offset]);
-	if ((offset == 0x1c/2) && old_data != new_data)
+	const u16 old = m_vregs[offset];
+	data = COMBINE_DATA(&m_vregs[offset]);
+	if (old != data)
 	{
-		const rectangle &visarea = m_screen->visible_area();
-		attotime period = m_screen->frame_period();
-		m_raster_interrupt_timer->adjust(m_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
+		if (offset == 0x1c / 2)
+		{
+			const rectangle &visarea = m_screen->visible_area();
+			attotime period = m_screen->frame_period();
+			m_raster_interrupt_timer->adjust(m_screen->time_until_pos(data, visarea.max_x + 1), 0, period);
+		}
+		if (offset == 0x1e / 2)
+		{
+			if ((old ^ data) & 0x40)
+				m_tilemap[2]->mark_all_dirty();
+		}
 	}
 }
 
-WRITE8_MEMBER( fuuki16_state::sound_command_w )
+void fuuki16_state::sound_command_w(u8 data)
 {
-	m_soundlatch->write(space,0,data & 0xff);
+	m_soundlatch->write(data & 0xff);
 	m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 //      m_maincpu->spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
 template<int Layer>
-WRITE16_MEMBER(fuuki16_state::vram_w)
+void fuuki16_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vram[Layer][offset]);
 	m_tilemap[Layer]->mark_tile_dirty(offset / 2);
+}
+
+template<int Layer>
+void fuuki16_state::vram_buffered_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const int buffer = (m_vregs[0x1e / 2] & 0x40) >> 6;
+	COMBINE_DATA(&m_vram[Layer][offset]);
+	if ((Layer & 1) == buffer)
+		m_tilemap[2]->mark_tile_dirty(offset / 2);
 }
 
 void fuuki16_state::fuuki16_map(address_map &map)
@@ -96,9 +113,9 @@ void fuuki16_state::fuuki16_map(address_map &map)
 	map(0x400000, 0x40ffff).ram();                                                                     // RAM
 	map(0x500000, 0x501fff).ram().w(FUNC(fuuki16_state::vram_w<0>)).share("vram.0");                  // Layers
 	map(0x502000, 0x503fff).ram().w(FUNC(fuuki16_state::vram_w<1>)).share("vram.1");                  //
-	map(0x504000, 0x505fff).ram().w(FUNC(fuuki16_state::vram_w<2>)).share("vram.2");                  //
-	map(0x506000, 0x507fff).ram().w(FUNC(fuuki16_state::vram_w<3>)).share("vram.3");                  //
-	map(0x600000, 0x601fff).mirror(0x008000).rw(m_fuukivid, FUNC(fuukivid_device::fuuki_sprram_r), FUNC(fuukivid_device::fuuki_sprram_w)).share("spriteram");   // Sprites, mirrored?
+	map(0x504000, 0x505fff).ram().w(FUNC(fuuki16_state::vram_buffered_w<2>)).share("vram.2");                  //
+	map(0x506000, 0x507fff).ram().w(FUNC(fuuki16_state::vram_buffered_w<3>)).share("vram.3");                  //
+	map(0x600000, 0x601fff).mirror(0x008000).ram().share("spriteram");   // Sprites, mirrored?
 	map(0x700000, 0x703fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
 	map(0x800000, 0x800001).portr("SYSTEM");
 	map(0x810000, 0x810001).portr("P1_P2");
@@ -118,7 +135,7 @@ void fuuki16_state::fuuki16_map(address_map &map)
 
 ***************************************************************************/
 
-WRITE8_MEMBER(fuuki16_state::sound_rombank_w)
+void fuuki16_state::sound_rombank_w(u8 data)
 {
 	if (data <= 2)
 		m_soundbank->set_entry(data);
@@ -126,7 +143,7 @@ WRITE8_MEMBER(fuuki16_state::sound_rombank_w)
 		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", m_audiocpu->pc(), data);
 }
 
-WRITE8_MEMBER(fuuki16_state::oki_banking_w)
+void fuuki16_state::oki_banking_w(u8 data)
 {
 	/*
 	    data & 0x06 is always equals to data & 0x60
@@ -373,10 +390,9 @@ static const gfx_layout layout_16x16x8 =
 };
 
 static GFXDECODE_START( gfx_fuuki16 )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x400*2, 0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400*0, 0x40 ) // [1] Layer 0
-	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [2] Layer 1
-	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [3] Layer 2/3
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400*0, 0x40 ) // [0] Layer 0
+	GFXDECODE_ENTRY( "gfx3", 0, layout_16x16x8, 0x400*1, 0x40 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx4", 0, layout_8x8x4,   0x400*3, 0x40 ) // [2] Layer 2
 GFXDECODE_END
 
 
@@ -418,14 +434,14 @@ void fuuki16_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(false, "Unknown id in fuuki16_state::device_timer");
+		throw emu_fatalerror("Unknown id in fuuki16_state::device_timer");
 	}
 }
 
 
 void fuuki16_state::machine_start()
 {
-	uint8_t *ROM = memregion("audiocpu")->base();
+	u8 *ROM = memregion("audiocpu")->base();
 
 	m_soundbank->configure_entries(0, 3, &ROM[0x8000], 0x8000);
 
@@ -445,53 +461,53 @@ void fuuki16_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(fuuki16_state::fuuki16)
-
+void fuuki16_state::fuuki16(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000) / 2) /* 16 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fuuki16_map)
+	M68000(config, m_maincpu, XTAL(32'000'000) / 2);    /* 16 MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_map);
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, XTAL(12'000'000) / 2) /* 6 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(fuuki16_sound_map)
-	MCFG_DEVICE_IO_MAP(fuuki16_sound_io_map)
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2);      /* 6 MHz */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &fuuki16_state::fuuki16_sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &fuuki16_state::fuuki16_sound_io_map);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(fuuki16_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 320-1, 0, 256-16-1);
+	m_screen->set_screen_update(FUNC(fuuki16_state::screen_update));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_fuuki16)
-	MCFG_PALETTE_ADD("palette", 0x4000 / 2)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki16);
+	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	MCFG_DEVICE_ADD("fuukivid", FUUKI_VIDEO, 0)
-	MCFG_FUUKI_VIDEO_GFXDECODE("gfxdecode")
+	FUUKI_VIDEO(config, m_fuukivid, 0);
+	m_fuukivid->set_palette(m_palette);
+	m_fuukivid->set_color_base(0x400*2);
+	m_fuukivid->set_color_num(0x40);
+	m_fuukivid->set_colpri_callback(FUNC(fuuki16_state::fuuki16_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	GENERIC_LATCH_8(config, m_soundlatch);
 
-	MCFG_DEVICE_ADD("ym1", YM2203, XTAL(28'640'000) / 8) /* 3.58 MHz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	ym2203_device &ym1(YM2203(config, "ym1", XTAL(28'640'000) / 8)); /* 3.58 MHz */
+	ym1.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	MCFG_DEVICE_ADD("ym2", YM3812, XTAL(28'640'000) / 8) /* 3.58 MHz */
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	ym3812_device &ym2(YM3812(config, "ym2", XTAL(28'640'000) / 8)); /* 3.58 MHz */
+	ym2.irq_handler().set_inputline(m_audiocpu, 0);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	MCFG_DEVICE_ADD("oki", OKIM6295, XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH) /* 1 Mhz */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki, XTAL(32'000'000) / 32, okim6295_device::PIN7_HIGH); /* 1 Mhz */
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.85);
+}
 
 
 /***************************************************************************
 
-
-                                ROMs Loading
-
+                                ROM Loading
 
 ***************************************************************************/
 
@@ -549,7 +565,7 @@ ROM_START( gogomile )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "fs1.rom24", 0x00000, 0x20000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
 	ROM_LOAD16_WORD_SWAP( "lh537k2r.rom20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
@@ -577,7 +593,7 @@ ROM_START( gogomileo )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "fs1.rom24", 0x00000, 0x20000, CRC(4e4bd371) SHA1(429e776135ce8960e147762763d952d16ed3f9d4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
 	ROM_LOAD16_WORD_SWAP( "lh537k2r.rom20", 0x000000, 0x200000, CRC(525dbf51) SHA1(f21876676cc60ed65bc86884da894b24830826bb) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */
@@ -639,7 +655,7 @@ ROM_START( pbancho )
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Z80 Code */
 	ROM_LOAD( "no4.rom23", 0x00000, 0x20000, CRC(dfbfdb81) SHA1(84b0cbe843a9bbae43975afdbd029a9b76fd488b) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )   /* 16x16x4 Sprites */
+	ROM_REGION( 0x200000, "fuukivid", 0 )   /* 16x16x4 Sprites */
 	ROM_LOAD16_WORD_SWAP( "58.rom20", 0x000000, 0x200000, CRC(4dad0a2e) SHA1(a4f70557503110a5457b9096a79a5f249095fa55) )
 
 	ROM_REGION( 0x200000, "gfx2", 0 )   /* 16x16x4 Tiles */

@@ -14,6 +14,7 @@
 #include "adamnet.h"
 #include "cpu/m6800/m6801.h"
 #include "formats/adam_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/wd_fdc.h"
 
 
@@ -44,7 +45,7 @@ protected:
 	virtual void adamnet_reset_w(int state) override;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m6801_cpu_device> m_maincpu;
 	required_device<wd2793_device> m_fdc;
 	required_device<floppy_connector> m_connector;
 	floppy_image_device *m_floppy;
@@ -59,7 +60,6 @@ private:
 	DECLARE_READ8_MEMBER( p2_r );
 	DECLARE_WRITE8_MEMBER( p2_w );
 
-	void adam_fdc_io(address_map &map);
 	void adam_fdc_mem(address_map &map);
 };
 

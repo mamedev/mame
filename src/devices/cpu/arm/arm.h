@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail, Phil Stroffolino
+
 #ifndef MAME_CPU_ARM_ARM_H
 #define MAME_CPU_ARM_ARM_H
 
@@ -15,10 +16,6 @@
 /****************************************************************************************************
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
-
-#define MCFG_ARM_COPRO(_type) \
-	downcast<arm_cpu_device &>(*device).set_copro_type(arm_cpu_device::copro_type::_type);
-
 
 class arm_cpu_device : public cpu_device
 {

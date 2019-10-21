@@ -58,20 +58,19 @@ static GFXDECODE_START( gfx_cshooter )
 	GFXDECODE_ENTRY( "fg_gfx", 0,     char16layout, 0, 16  )
 GFXDECODE_END
 
-MACHINE_CONFIG_START(airraid_video_device::device_add_mconfig)
-
+void airraid_video_device::device_add_mconfig(machine_config &config)
+{
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
-	MCFG_SCREEN_UPDATE_DRIVER(airraid_video_device, screen_update_airraid)
-	MCFG_SCREEN_PALETTE("^palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(256, 256);
+	m_screen->set_visarea(0, 256-1, 16, 256-1-16);
+	m_screen->set_screen_update(FUNC(airraid_video_device::screen_update_airraid));
+	m_screen->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "^palette", gfx_cshooter)
-
-MACHINE_CONFIG_END
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cshooter);
+}
 
 
 void airraid_video_device::device_start()

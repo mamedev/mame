@@ -11,16 +11,15 @@
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "imagedev/snapquik.h"
 #include "machine/ay31015.h"
-#include "machine/com8116.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
 #include "bus/rs232/rs232.h"
 #include "machine/buffer.h"
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
-#include "sound/wave.h"
 #include "emupal.h"
 
 #include "formats/trs_cas.h"
@@ -41,8 +40,8 @@ public:
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_cent_status_in(*this, "cent_status_in")
 		, m_uart(*this, "uart")
+		, m_uart_clock(*this, "uart_clock")
 		, m_ppi(*this, "ppi")  // Radionic only
-		, m_brg(*this, "brg")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
@@ -53,9 +52,10 @@ public:
 		, m_io_baud(*this, "BAUD")
 		, m_io_config(*this, "CONFIG")
 		, m_io_keyboard(*this, "LINE%u", 0)
-		{ }
+	{ }
 
 	void sys80(machine_config &config);
+	void sys80p(machine_config &config);
 	void trs80(machine_config &config);
 	void lnw80(machine_config &config);
 	void radionic(machine_config &config);
@@ -64,6 +64,10 @@ public:
 
 	void init_trs80l2();
 	void init_trs80();
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -90,9 +94,9 @@ private:
 	INTERRUPT_GEN_MEMBER(fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_WRITE_LINE_MEMBER(intrq_w);
-	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 	DECLARE_MACHINE_RESET(lnw80);
-	DECLARE_PALETTE_INIT(lnw80);
+	void lnw80_palette(palette_device &palette) const;
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -121,8 +125,6 @@ private:
 	uint8_t m_size_store;
 	uint16_t m_timeout;
 	floppy_image_device *m_floppy;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_region_maincpu;
 	required_region_ptr<u8> m_p_chargen;
@@ -133,8 +135,8 @@ private:
 	optional_device<output_latch_device> m_cent_data_out;
 	optional_device<input_buffer_device> m_cent_status_in;
 	optional_device<ay31015_device> m_uart;
+	optional_device<clock_device> m_uart_clock;
 	optional_device<i8255_device> m_ppi;
-	optional_device<com8116_device> m_brg;
 	optional_device<fd1793_device> m_fdc;
 	optional_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;

@@ -53,6 +53,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
+#include "emupal.h"
 #include "speaker.h"
 
 
@@ -75,7 +76,7 @@ void volfied_state::main_map(address_map &map)
 	map(0x400000, 0x47ffff).rw(FUNC(volfied_state::video_ram_r), FUNC(volfied_state::video_ram_w));
 	map(0x500000, 0x503fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x600000, 0x600001).w(FUNC(volfied_state::video_mask_w));
-	map(0x700000, 0x700001).w(FUNC(volfied_state::sprite_ctrl_w));
+	map(0x700000, 0x700001).w(m_pc090oj, FUNC(pc090oj_device::sprite_ctrl_w));
 	map(0xd00000, 0xd00001).rw(FUNC(volfied_state::video_ctrl_r), FUNC(volfied_state::video_ctrl_w));
 	map(0xe00001, 0xe00001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0xe00003, 0xe00003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
@@ -186,26 +187,6 @@ static INPUT_PORTS_START( volfiedj )
 INPUT_PORTS_END
 
 
-/**************************************************************
-                GFX DECODING
-**************************************************************/
-
-static const gfx_layout tilelayout =
-{
-	16, 16,
-	0x1800,
-	4,
-	{ 0, 1, 2, 3 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4, 8*4, 9*4, 10*4, 11*4, 12*4, 13*4, 14*4, 15*4 },
-	{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
-	128*8
-};
-
-static GFXDECODE_START( gfx_volfied )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 4096, 256 )
-GFXDECODE_END
-
-
 /***********************************************************
                 MACHINE DRIVERS
 ***********************************************************/
@@ -239,15 +220,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(volfied_state::cchip_irq_clear_cb)
 }
 
 
-MACHINE_CONFIG_START(volfied_state::volfied)
-
+void volfied_state::volfied(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, CPU_CLOCK)   /* 8MHz */
-	MCFG_DEVICE_PROGRAM_MAP(main_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", volfied_state,  interrupt)
+	M68000(config, m_maincpu, CPU_CLOCK);   /* 8MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &volfied_state::main_map);
+	m_maincpu->set_vblank_int("screen", FUNC(volfied_state::interrupt));
 
-	MCFG_DEVICE_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)   /* 4MHz sound CPU, required to run the game */
-	MCFG_DEVICE_PROGRAM_MAP(z80_map)
+	Z80(config, m_audiocpu, SOUND_CPU_CLOCK);   /* 4MHz sound CPU, required to run the game */
+	m_audiocpu->set_addrmap(AS_PROGRAM, &volfied_state::z80_map);
 
 	TAITO_CCHIP(config, m_cchip, 20_MHz_XTAL/2); // 20MHz OSC next to C-Chip
 	m_cchip->in_pa_callback().set_ioport("F00007");
@@ -256,43 +237,41 @@ MACHINE_CONFIG_START(volfied_state::volfied)
 	m_cchip->in_ad_callback().set_ioport("F0000D");
 	m_cchip->out_pb_callback().set(FUNC(volfied_state::counters_w));
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
+	config.m_minimum_quantum = attotime::from_hz(1200);
 
-	MCFG_TIMER_DRIVER_ADD("cchip_irq_clear", volfied_state, cchip_irq_clear_cb)
+	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(volfied_state::cchip_irq_clear_cb));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(320, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 319, 8, 247)
-	MCFG_SCREEN_UPDATE_DRIVER(volfied_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(320, 256);
+	m_screen->set_visarea(0, 319, 8, 247);
+	m_screen->set_screen_update(FUNC(volfied_state::screen_update));
+	m_screen->set_palette("palette");
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_volfied)
-	MCFG_PALETTE_ADD("palette", 8192)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 8192);
 
-	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
-	MCFG_PC090OJ_GFXDECODE("gfxdecode")
-	MCFG_PC090OJ_PALETTE("palette")
+	PC090OJ(config, m_pc090oj, 0);
+	m_pc090oj->set_palette("palette");
+	m_pc090oj->set_colpri_callback(FUNC(volfied_state::volfied_colpri_cb), this);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
-	MCFG_SOUND_ROUTE(2, "mono", 0.15)
-	MCFG_SOUND_ROUTE(3, "mono", 0.60)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 4000000));
+	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
+	ymsnd.port_a_read_callback().set_ioport("DSWA");
+	ymsnd.port_b_read_callback().set_ioport("DSWB");
+	ymsnd.add_route(0, "mono", 0.15);
+	ymsnd.add_route(1, "mono", 0.15);
+	ymsnd.add_route(2, "mono", 0.15);
+	ymsnd.add_route(3, "mono", 0.60);
 
-	MCFG_DEVICE_ADD("ciu", PC060HA, 0)
-	MCFG_PC060HA_MASTER_CPU("maincpu")
-	MCFG_PC060HA_SLAVE_CPU("audiocpu")
-MACHINE_CONFIG_END
+	pc060ha_device &ciu(PC060HA(config, "ciu", 0));
+	ciu.set_master_tag(m_maincpu);
+	ciu.set_slave_tag(m_audiocpu);
+}
 
 
 /***************************************************************************
@@ -313,7 +292,7 @@ ROM_START( volfied )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",   0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",   0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -345,7 +324,7 @@ ROM_START( volfiedo )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",  0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",  0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -377,7 +356,7 @@ ROM_START( volfiedu )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",   0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",   0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -409,7 +388,7 @@ ROM_START( volfieduo )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",  0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",  0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -441,7 +420,7 @@ ROM_START( volfiedj )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",   0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",   0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",   0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )
@@ -473,7 +452,7 @@ ROM_START( volfiedjo )
 	ROM_REGION( 0x2000, "cchip:cchip_eprom", 0 )
 	ROM_LOAD( "cchip_c04-23",  0x0000, 0x2000, CRC(46b0b479) SHA1(73aa2267eb468c5aa5db67183047e9aef8321215) )
 
-	ROM_REGION( 0xc0000, "gfx1", 0 )    /* sprites 16x16 */
+	ROM_REGION( 0xc0000, "pc090oj", 0 )    /* sprites 16x16 */
 	ROM_LOAD16_BYTE( "c04-16.2",  0x00000, 0x20000, CRC(8c2476ef) SHA1(972ddc8e47a669f1aeca67d02b4a0bed867ddb7d) )
 	ROM_LOAD16_BYTE( "c04-18.4",  0x00001, 0x20000, CRC(7665212c) SHA1(b816ac2a95ee273aaf90991f53766d7f0d5d9238) )
 	ROM_LOAD16_BYTE( "c04-15.1",  0x40000, 0x20000, CRC(7c50b978) SHA1(aa9cad5f09f5d9dceaf4e06bcd347f1d5d02d292) )

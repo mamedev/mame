@@ -340,7 +340,15 @@ READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (m_in_ports[0]->read() & 0xf0) | ((m_screen->vpos() & 0xf0) >> 4);
+	if (offset >= 4)
+		return BIT(m_in_ports[0]->read(), offset);
+	else
+		return BIT(m_screen->vpos(), offset + 4);
+}
+
+READ8_MEMBER(cosmic_state::cosmicg_port_1_r)
+{
+	return BIT(m_in_ports[1]->read(), offset);
 }
 
 READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
@@ -415,10 +423,10 @@ void cosmic_state::cosmicg_map(address_map &map)
 
 void cosmic_state::cosmicg_io_map(address_map &map)
 {
-	map(0x00, 0x00).r(FUNC(cosmic_state::cosmicg_port_0_r));
-	map(0x01, 0x01).portr("IN1");
-	map(0x00, 0x15).w(FUNC(cosmic_state::cosmicg_output_w));
-	map(0x16, 0x17).w(FUNC(cosmic_state::cosmic_color_register_w));
+	map(0x0000, 0x000f).r(FUNC(cosmic_state::cosmicg_port_0_r));
+	map(0x0010, 0x001f).r(FUNC(cosmic_state::cosmicg_port_1_r));
+	map(0x0000, 0x002b).w(FUNC(cosmic_state::cosmicg_output_w));
+	map(0x002c, 0x002f).w(FUNC(cosmic_state::cosmic_color_register_w));
 }
 
 
@@ -1005,187 +1013,167 @@ MACHINE_RESET_MEMBER(cosmic_state,cosmicg)
 	m_maincpu->set_input_line(INT_9980A_RESET, CLEAR_LINE);
 }
 
-MACHINE_CONFIG_START(cosmic_state::cosmic)
-
+void cosmic_state::cosmic(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,Z80_MASTER_CLOCK/6) /* 1.8026 MHz */
+	Z80(config, m_maincpu, Z80_MASTER_CLOCK/6); /* 1.8026 MHz */
 
 	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
 	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmic)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_PALETTE("palette")
-MACHINE_CONFIG_END
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_palette(m_palette);
+}
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 {
 	int scanline = param;
 
 	if(scanline == 224) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* RST 10h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); /* Z80 - RST 10h */
 
 	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* Z80 - RST 08h */
 }
 
 
-MACHINE_CONFIG_START(cosmic_state::panic)
+void cosmic_state::panic(machine_config &config)
+{
 	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(panic_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cosmic_state, panic_scanline, "screen", 0, 1)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::panic_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(cosmic_state::panic_scanline), "screen", 0, 1);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
-	MCFG_PALETTE_ADD("palette", 16+8*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(cosmic_state,panic)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panic);
+	PALETTE(config, m_palette, FUNC(cosmic_state::panic_palette), 16 + 8*4, 16);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_panic)
+	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_panic));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(9)
-	MCFG_SAMPLES_NAMES(panic_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(9);
+	m_samples->set_samples_names(panic_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-
-MACHINE_CONFIG_START(cosmic_state::cosmica)
+void cosmic_state::cosmica(machine_config &config)
+{
 	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(cosmica_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::cosmica_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_cosmica)
-	MCFG_PALETTE_ADD("palette", 8+16*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(8)
-	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmica)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cosmica);
+	PALETTE(config, m_palette, FUNC(cosmic_state::cosmica_palette), 8 + 16*4, 8);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmica)
+	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_cosmica));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(13)
-	MCFG_SAMPLES_NAMES(cosmica_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
-MACHINE_CONFIG_END
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(13);
+	m_samples->set_samples_names(cosmica_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
 
-MACHINE_CONFIG_START(cosmic_state::cosmicg)
-
+void cosmic_state::cosmicg(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_TMS99xx_ADD("maincpu", TMS9980A, COSMICG_MASTER_CLOCK/8, cosmicg_map, cosmicg_io_map)
-		/* 9.828 MHz Crystal */
-		/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
-		fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
-		1.5MHz.  So, if someone can check this... */
+	TMS9980A(config, m_maincpu, COSMICG_MASTER_CLOCK); // 9.828 MHz Crystal
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::cosmicg_map);
+	m_maincpu->set_addrmap(AS_IO, &cosmic_state::cosmicg_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(cosmic_state,cosmic)
 	MCFG_MACHINE_RESET_OVERRIDE(cosmic_state,cosmicg)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_cosmicg)
-	MCFG_SCREEN_PALETTE("palette")
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 4*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_cosmicg));
+	m_screen->set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_PALETTE_INIT_OWNER(cosmic_state,cosmicg)
+	PALETTE(config, m_palette, FUNC(cosmic_state::cosmicg_palette), 16);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("samples", SAMPLES)
-	MCFG_SAMPLES_CHANNELS(9)
-	MCFG_SAMPLES_NAMES(cosmicg_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	SAMPLES(config, m_samples);
+	m_samples->set_channels(9);
+	m_samples->set_samples_names(cosmicg_sample_names);
+	m_samples->add_route(ALL_OUTPUTS, "speaker", 0.25);
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // NE556
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // NE556
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 	// Other DACs include 3-bit binary-weighted (100K/50K/25K) DAC combined with another NE556 for attack march
-MACHINE_CONFIG_END
+}
 
-
-MACHINE_CONFIG_START(cosmic_state::magspot)
+void cosmic_state::magspot(machine_config &config)
+{
 	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_REPLACE("maincpu", Z80, Z80_MASTER_CLOCK/4) /* 2.704 MHz, verified via schematics */
-	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
+	Z80(config.replace(), m_maincpu, Z80_MASTER_CLOCK/4); /* 2.704 MHz, verified via schematics */
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::magspot_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
-	MCFG_PALETTE_ADD("palette", 16+8*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(cosmic_state,magspot)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panic);
+	PALETTE(config, m_palette, FUNC(cosmic_state::magspot_palette), 16 + 8*4, 16);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_magspot)
+	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_magspot));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
-
-MACHINE_CONFIG_START(cosmic_state::devzone)
+void cosmic_state::devzone(machine_config &config)
+{
 	magspot(config);
 
-	/* basic machine hardware */
-
 	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_devzone)
-MACHINE_CONFIG_END
+	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_devzone));
+}
 
-
-MACHINE_CONFIG_START(cosmic_state::nomnlnd)
+void cosmic_state::nomnlnd(machine_config &config)
+{
 	cosmic(config);
 
 	/* basic machine hardware */
-	MCFG_DEVICE_MODIFY("maincpu")
-	MCFG_DEVICE_PROGRAM_MAP(magspot_map)
+	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::magspot_map);
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_panic)
-	MCFG_PALETTE_ADD("palette", 16+8*4)
-	MCFG_PALETTE_INDIRECT_ENTRIES(16)
-	MCFG_PALETTE_INIT_OWNER(cosmic_state,nomnlnd)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panic);
+	PALETTE(config, m_palette, FUNC(cosmic_state::nomnlnd_palette), 16 + 8*4, 16);
 
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_DRIVER(cosmic_state, screen_update_nomnlnd)
+	m_screen->set_screen_update(FUNC(cosmic_state::screen_update_nomnlnd));
 
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	MCFG_DEVICE_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT)
-MACHINE_CONFIG_END
+	DAC_1BIT(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref", 0));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+}
 
 
 ROM_START( panic )

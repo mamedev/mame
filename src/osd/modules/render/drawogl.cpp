@@ -21,7 +21,11 @@
 #include "emu.h"
 #include "emuopts.h"
 
-#ifndef OSD_WINDOWS
+#ifdef OSD_MAC
+#define GL_SILENCE_DEPRECATION (1)
+#endif
+
+#if !defined(OSD_WINDOWS) && !defined(OSD_MAC)
 // standard SDL headers
 #define TOBEMIGRATED 1
 #include <SDL2/SDL.h>
@@ -36,7 +40,7 @@
 #include "modules/opengl/gl_shader_tool.h"
 #include "modules/opengl/gl_shader_mgr.h"
 
-#if defined(SDLMAME_MACOSX)
+#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
 #ifndef APIENTRY
 #define APIENTRY
 #endif
@@ -237,7 +241,7 @@ void renderer_ogl::set_blendmode(int blendmode)
 //============================================================
 
 // OGL 1.3
-#ifdef GL_ARB_multitexture
+#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
 static PFNGLACTIVETEXTUREARBPROC pfn_glActiveTexture    = nullptr;
 #else
 static PFNGLACTIVETEXTUREPROC pfn_glActiveTexture   = nullptr;
@@ -558,6 +562,9 @@ int renderer_ogl::create()
 	// create renderer
 #if defined(OSD_WINDOWS)
 	m_gl_context = global_alloc(win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window()));
+#elif defined(OSD_MAC)
+// TODO
+//  m_gl_context = global_alloc(mac_gl_context(std::static_pointer_cast<mac_window_info>(win)->platform_window()));
 #else
 	m_gl_context = global_alloc(sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window()));
 #endif
@@ -886,7 +893,7 @@ void renderer_ogl::loadGLExtensions()
 
 	if ( m_useglsl )
 	{
-		#ifdef GL_ARB_multitexture
+		#if defined(GL_ARB_multitexture) && !defined(OSD_MAC)
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREARBPROC) m_gl_context->getProcAddress("glActiveTextureARB");
 		#else
 		pfn_glActiveTexture = (PFNGLACTIVETEXTUREPROC) m_gl_context->getProcAddress("glActiveTexture");
@@ -1908,9 +1915,6 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 		case TEXFORMAT_PALETTE16:
 			texture->format = SDL_TEXFORMAT_PALETTE16;
 			break;
-		case TEXFORMAT_PALETTEA16:
-			texture->format = SDL_TEXFORMAT_PALETTE16A;
-			break;
 		case TEXFORMAT_YUY16:
 			if (texsource->palette != nullptr)
 				texture->format = SDL_TEXFORMAT_YUY16_PALETTED;
@@ -2022,10 +2026,11 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 				m_texhash[i] = texture;
 				break;
 			}
-		assert_always(i < HASH_SIZE + OVERFLOW_SIZE, "texture hash exhausted ...");
+		if ((HASH_SIZE + OVERFLOW_SIZE) <= i)
+			throw emu_fatalerror("renderer_ogl::texture_create: texture hash exhausted ...");
 	}
 
-	if(m_usevbo)
+	if (m_usevbo)
 	{
 		// Generate And Bind The Texture Coordinate Buffer
 		pfn_glGenBuffers( 1, &(texture->texCoordBufferName) );
@@ -2056,34 +2061,12 @@ static inline void copyline_palette16(uint32_t *dst, const uint16_t *src, int wi
 	for (x = 0; x < width; x++)
 	{
 		int srcpix = *src++;
+		uint32_t dstval = 0xff000000 | palette[srcpix];
 		for (int x2 = 0; x2 < xprescale; x2++)
-			*dst++ = 0xff000000 | palette[srcpix];
+			*dst++ = dstval;
 	}
 	if (xborderpix)
 		*dst++ = 0xff000000 | palette[*--src];
-}
-
-
-
-//============================================================
-//  copyline_palettea16
-//============================================================
-
-static inline void copyline_palettea16(uint32_t *dst, const uint16_t *src, int width, const rgb_t *palette, int xborderpix, int xprescale)
-{
-	int x;
-
-	assert(xborderpix == 0 || xborderpix == 1);
-	if (xborderpix)
-		*dst++ = palette[*src];
-	for (x = 0; x < width; x++)
-	{
-		int srcpix = *src++;
-		for (int x2 = 0; x2 < xprescale; x2++)
-			*dst++ = palette[srcpix];
-	}
-	if (xborderpix)
-		*dst++ = palette[*--src];
 }
 
 
@@ -2109,10 +2092,9 @@ static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width,
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
+			uint32_t dstval = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 			for (int x2 = 0; x2 < xprescale; x2++)
-			{
-				*dst++ = 0xff000000 | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
-			}
+				*dst++ = dstval;
 		}
 		if (xborderpix)
 		{
@@ -2129,11 +2111,9 @@ static inline void copyline_rgb32(uint32_t *dst, const uint32_t *src, int width,
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
-
+			uint32_t dstval = 0xff000000 | srcpix;
 			for (int x2 = 0; x2 < xprescale; x2++)
-			{
-				*dst++ = 0xff000000 | srcpix;
-			}
+				*dst++ = dstval;
 		}
 		if (xborderpix)
 			*dst++ = 0xff000000 | *--src;
@@ -2161,8 +2141,9 @@ static inline void copyline_argb32(uint32_t *dst, const uint32_t *src, int width
 		for (x = 0; x < width; x++)
 		{
 			rgb_t srcpix = *src++;
+			uint32_t dstval = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = (srcpix & 0xff000000) | palette[0x200 + srcpix.r()] | palette[0x100 + srcpix.g()] | palette[srcpix.b()];
+				*dst++ = dstval;
 		}
 		if (xborderpix)
 		{
@@ -2257,10 +2238,12 @@ static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, in
 			uint16_t srcpix1 = *src++;
 			uint8_t cb = srcpix0 & 0xff;
 			uint8_t cr = srcpix1 & 0xff;
+			uint32_t dstval0 = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+			uint32_t dstval1 = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix0 >> 8)], cb, cr);
+				*dst++ = dstval0;
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(palette[0x000 + (srcpix1 >> 8)], cb, cr);
+				*dst++ = dstval1;
 		}
 		if (xborderpix)
 		{
@@ -2291,10 +2274,12 @@ static inline void copyline_yuy16_to_argb(uint32_t *dst, const uint16_t *src, in
 			uint16_t srcpix1 = *src++;
 			uint8_t cb = srcpix0 & 0xff;
 			uint8_t cr = srcpix1 & 0xff;
+			uint32_t dstval0 = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+			uint32_t dstval1 = ycc_to_rgb(srcpix1 >> 8, cb, cr);
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(srcpix0 >> 8, cb, cr);
+				*dst++ = dstval0;
 			for (int x2 = 0; x2 < xprescale; x2++)
-				*dst++ = ycc_to_rgb(srcpix1 >> 8, cb, cr);
+				*dst++ = dstval1;
 		}
 		if (xborderpix)
 		{
@@ -2353,10 +2338,6 @@ static void texture_set_data(ogl_texture_info *texture, const render_texinfo *te
 				{
 					case TEXFORMAT_PALETTE16:
 						copyline_palette16((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
-						break;
-
-					case TEXFORMAT_PALETTEA16:
-						copyline_palettea16((uint32_t *)dst, (uint16_t *)texsource->base + y * texsource->rowpixels, texsource->width, texsource->palette, texture->borderpix, texture->xprescale);
 						break;
 
 					case TEXFORMAT_RGB32:

@@ -69,7 +69,7 @@ private:
 	void smc_write(uint8_t data);
 	DECLARE_READ32_MEMBER(s3c44b0_gpio_port_r);
 	DECLARE_WRITE32_MEMBER(s3c44b0_gpio_port_w);
-	DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
+	//DECLARE_WRITE16_MEMBER(s3c44b0_i2s_data_w);
 	void juicebox_map(address_map &map);
 };
 
@@ -252,7 +252,7 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 
 INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
 {
-	m_s3c44b0->request_eint((uintptr_t)param);
+	m_s3c44b0->request_eint(param);
 }
 
 // ...
@@ -308,43 +308,45 @@ void juicebox_state::init_juicebox()
 	// do nothing
 }
 
-MACHINE_CONFIG_START(juicebox_state::juicebox)
-	MCFG_DEVICE_ADD("maincpu", ARM7, 66000000)
-	MCFG_DEVICE_PROGRAM_MAP(juicebox_map)
+void juicebox_state::juicebox(machine_config &config)
+{
+	ARM7(config, m_maincpu, 66000000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &juicebox_state::juicebox_map);
 
-	MCFG_PALETTE_ADD("palette", 32768)
+	PALETTE(config, "palette").set_entries(32768);
 
-	MCFG_SCREEN_ADD("screen", LCD)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(240, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 240 - 1, 0, 160 - 1)
-
-	MCFG_SCREEN_UPDATE_DEVICE("s3c44b0", s3c44b0_device, video_update)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen.set_size(240, 160);
+	screen.set_visarea(0, 240 - 1, 0, 160 - 1);
+	screen.set_screen_update("s3c44b0", FUNC(s3c44b0_device::video_update));
 
 	SPEAKER(config, "speaker").front_center();
-	MCFG_DEVICE_ADD("dac", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
+	vref.add_route(0, "dac", -1.0, DAC_VREF_NEG_INPUT);
 
-	MCFG_DEVICE_ADD("s3c44b0", S3C44B0, 10000000)
-	MCFG_S3C44B0_GPIO_PORT_R_CB(READ32(*this, juicebox_state, s3c44b0_gpio_port_r))
-	MCFG_S3C44B0_GPIO_PORT_W_CB(WRITE32(*this, juicebox_state, s3c44b0_gpio_port_w))
-	MCFG_S3C44B0_I2S_DATA_W_CB(WRITE16("dac", dac_word_interface, data_w))
+	S3C44B0(config, m_s3c44b0, 10000000);
+	m_s3c44b0->set_cpu("maincpu");
+	m_s3c44b0->gpio_port_r_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_r));
+	m_s3c44b0->gpio_port_w_cb().set(FUNC(juicebox_state::s3c44b0_gpio_port_w));
+	m_s3c44b0->i2s_data_w_cb().set("dac", FUNC(dac_word_interface::data_w));
 
-	MCFG_DEVICE_ADD("smartmedia", SMARTMEDIA, 0)
+	SMARTMEDIA(config, m_smartmedia, 0);
 
 	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("cart_list","juicebox")
-MACHINE_CONFIG_END
+	SOFTWARE_LIST(config, "cart_list").set_original("juicebox");
+}
 
 static INPUT_PORTS_START( juicebox )
 	PORT_START( "PORTG" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("RETURN") PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("PLAY") PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("FORWARD") PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("REVERSE") PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, (void *)0) PORT_NAME("STAR") PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("RETURN") PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("PLAY") PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("FORWARD") PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("REVERSE") PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CHANGED_MEMBER(DEVICE_SELF, juicebox_state, port_changed, 0) PORT_NAME("STAR") PORT_PLAYER(1)
 INPUT_PORTS_END
 
 /***************************************************************************

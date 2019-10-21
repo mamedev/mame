@@ -133,98 +133,87 @@
 ***************************************************************************/
 
 
-PALETTE_INIT_MEMBER(tubep_state,tubep)
+void tubep_state::tubep_palette(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i,r,g,b;
 
-	/* background/sprites palette variables */
-
-	static const int resistors_0[6] = { 33000, 15000, 8200, 4700, 2200, 1000 };
-	static const int resistors_1[6] = { 15000,  8200, 4700, 2200, 1000,  470 };
-	static const int resistors_2[6] = {  8200,  4700, 2200, 1000,  470,  220 };
-
-	int active_resistors_r[3*6];
-	int active_resistors_g[3*6];
-	int active_resistors_b[2*6];
-
-	double weights_r[3*6];
-	double weights_g[3*6];
-	double weights_b[2*6];
-
-	//double output_scaler;
-
-	/* text palette variables */
-
-	static const int resistors_txt_rg[3] = { 1000, 470, 220 };
-	static const int resistors_txt_b [2] = { 470, 220 };
-	double weights_txt_rg[3];
-	double weights_txt_b[2];
-
-	memset(weights_r, 0, sizeof(weights_r));
-	memset(weights_g, 0, sizeof(weights_g));
-	memset(weights_b, 0, sizeof(weights_b));
-
-	compute_resistor_weights(0, 255,    -1.0,
-			3,  resistors_txt_rg,   weights_txt_rg, 470,    0,
-			2,  resistors_txt_b,    weights_txt_b,  470,    0,
-			0,  nullptr,  nullptr,  0,  0   );
-
-	/* create text palette */
-
-	for (i = 0; i < 32; i++)
 	{
-		int bit0,bit1,bit2;
+		// text palette variables
+		static constexpr int resistors_txt_rg[3] = { 1000, 470, 220 };
+		static constexpr int resistors_txt_b [2] = { 470, 220 };
 
-		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = combine_3_weights(weights_txt_rg, bit0, bit1, bit2);
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = combine_3_weights(weights_txt_rg, bit0, bit1, bit2);
-		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
-		b = combine_2_weights(weights_txt_b, bit0, bit1);
+		double weights_txt_rg[3];
+		double weights_txt_b[2];
+		compute_resistor_weights(0, 255, -1.0,
+				3,  resistors_txt_rg,   weights_txt_rg, 470,    0,
+				2,  resistors_txt_b,    weights_txt_b,  470,    0,
+				0,  nullptr,            nullptr,          0,    0   );
 
-		palette.set_pen_color(i, rgb_t(r,g,b));
+		// create text palette
+		for (int i = 0; i < 32; i++)
+		{
+			int bit0, bit1, bit2;
 
-		color_prom++;
+			// red component
+			bit0 = BIT(*color_prom, 0);
+			bit1 = BIT(*color_prom, 1);
+			bit2 = BIT(*color_prom, 2);
+			int const r = combine_weights(weights_txt_rg, bit0, bit1, bit2);
+			// green component
+			bit0 = BIT(*color_prom, 3);
+			bit1 = BIT(*color_prom, 4);
+			bit2 = BIT(*color_prom, 5);
+			int const g = combine_weights(weights_txt_rg, bit0, bit1, bit2);
+			// blue component
+			bit0 = BIT(*color_prom, 6);
+			bit1 = BIT(*color_prom, 7);
+			int const b = combine_weights(weights_txt_b, bit0, bit1);
+
+			palette.set_pen_color(i, rgb_t(r, g, b));
+
+			color_prom++;
+		}
 	}
 
-	/* sprites use the second PROM to control 8 x LS368. We copy content of this PROM over here */
-	for (i = 0; i < 32; i++)
-	{
-		m_prom2[i] = *color_prom;
-		color_prom++;
-	}
+	// sprites use the second PROM to control 8 x LS368. We copy content of this PROM over here
+	for (int i = 0; i < 32; i++)
+		m_prom2[i] = *color_prom++;
 
 
+	// background/sprites palette variables
+	static constexpr int resistors_0[6] = { 33000, 15000, 8200, 4700, 2200, 1000 };
+	static constexpr int resistors_1[6] = { 15000,  8200, 4700, 2200, 1000,  470 };
+	static constexpr int resistors_2[6] = {  8200,  4700, 2200, 1000,  470,  220 };
 
-	/* create background/sprites palette */
+	// create background/sprites palette
 
 	/* find the output scaler
 	   in order to do this we need to calculate the output with everything enabled.
 	*/
 
-	/* red component */
-	for (i=0; i<6; i++) active_resistors_r[ 0+i] = resistors_0[i];
-	for (i=0; i<6; i++) active_resistors_r[ 6+i] = resistors_1[i];
-	for (i=0; i<6; i++) active_resistors_r[12+i] = resistors_2[i];
-	/* green component */
-	for (i=0; i<6; i++) active_resistors_g[ 0+i] = resistors_0[i];
-	for (i=0; i<6; i++) active_resistors_g[ 6+i] = resistors_1[i];
-	for (i=0; i<6; i++) active_resistors_g[12+i] = resistors_2[i];
-	/* blue component */
-	for (i=0; i<6; i++) active_resistors_b[ 0+i] = resistors_1[i];
-	for (i=0; i<6; i++) active_resistors_b[ 6+i] = resistors_2[i];
+	int active_resistors_r[3 * 6];
+	int active_resistors_g[3 * 6];
+	int active_resistors_b[2 * 6];
+	for (int i = 0; i < 6; i++)
+	{
+		// red component
+		active_resistors_r[ 0+i] = resistors_0[i];
+		active_resistors_r[ 6+i] = resistors_1[i];
+		active_resistors_r[12+i] = resistors_2[i];
+		// green component
+		active_resistors_g[ 0+i] = resistors_0[i];
+		active_resistors_g[ 6+i] = resistors_1[i];
+		active_resistors_g[12+i] = resistors_2[i];
+		// blue component
+		active_resistors_b[ 0+i] = resistors_1[i];
+		active_resistors_b[ 6+i] = resistors_2[i];
+	}
 
-	/* calculate and store the scaler */
-	/*output_scaler = */compute_resistor_weights(0, 255,    -1.0,
+	// calculate and store the scaler
+	double weights_r[3 * 6];
+	double weights_g[3 * 6];
+	double weights_b[2 * 6];
+	/*double const output_scaler = */compute_resistor_weights(0, 255, -1.0,
 				3*6,    active_resistors_r, weights_r,  470,    0,
 				3*6,    active_resistors_g, weights_g,  470,    0,
 				2*6,    active_resistors_b, weights_b,  470,    0);
@@ -236,26 +225,21 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 */
 	/* now calculate all possible outputs from the circuit */
 
-	for (i=0; i<256; i++)
+	for (int i = 0; i < 256; i++)
 	{
-		int sh;
-
-		for (sh=0; sh<0x40; sh++)
+		for (int sh = 0; sh < 0x40; sh++)
 		{
 			int j     = i;          /* active low */
 			int shade = sh^0x3f;    /* negated outputs */
-
-			int bits_r[3*6];
-			int bits_g[3*6];
-			int bits_b[2*6];
-			double out;
-			int c;
 
 			//int active_r = 3*6;
 			//int active_g = 3*6;
 			//int active_b = 2*6;
 
-			for (c=0; c<6; c++)
+			int bits_r[3 * 6];
+			int bits_g[3 * 6];
+			int bits_b[2 * 6];
+			for (int c = 0; c < 6; c++)
 			{
 				bits_r[0 + c] = (shade>>c) & 1;
 				bits_r[6 + c] = (shade>>c) & 1;
@@ -272,67 +256,69 @@ PALETTE_INIT_MEMBER(tubep_state,tubep)
 			//j &= 0x7; /* only red; debug */
 
 			/* red component */
-			if ((j >> 0) & 0x01)    /* if LS368 @E9  is disabled */
+			if (BIT(j, 0))    /* if LS368 @E9  is disabled */
 			{
-				for (c=0; c<6; c++) bits_r[0 +c] = 0;
+				for (int c=0; c<6; c++) bits_r[0 +c] = 0;
 				//active_r-=6;
 			}
-			if ((j >> 1) & 0x01)    /* if LS368 @E10 is disabled */
+			if (BIT(j, 1))    /* if LS368 @E10 is disabled */
 			{
-				for (c=0; c<6; c++) bits_r[6 +c] = 0;
+				for (int c=0; c<6; c++) bits_r[6 +c] = 0;
 				//active_r-=6;
 			}
-			if ((j >> 2) & 0x01)    /* if LS368 @E11 is disabled */
+			if (BIT(j, 2))    /* if LS368 @E11 is disabled */
 			{
-				for (c=0; c<6; c++) bits_r[12 +c] = 0;
+				for (int c=0; c<6; c++) bits_r[12 +c] = 0;
 				//active_r-=6;
 			}
 
 			/* green component */
-			if ((j >> 3) & 0x01)    /* if LS368 @E12 is disabled */
+			if (BIT(j, 3))    /* if LS368 @E12 is disabled */
 			{
-				for (c=0; c<6; c++) bits_g[0 +c] = 0;
+				for (int c=0; c<6; c++) bits_g[0 +c] = 0;
 				//active_g-=6;
 			}
-			if ((j >> 4) & 0x01)    /* if LS368 @E13 is disabled */
+			if (BIT(j, 4))    /* if LS368 @E13 is disabled */
 			{
-				for (c=0; c<6; c++) bits_g[6 +c] = 0;
+				for (int c=0; c<6; c++) bits_g[6 +c] = 0;
 				//active_g-=6;
 			}
-			if ((j >> 5) & 0x01)    /* if LS368 @E14 is disabled */
+			if (BIT(j, 5))    /* if LS368 @E14 is disabled */
 			{
-				for (c=0; c<6; c++) bits_g[12+c] = 0;
+				for (int c=0; c<6; c++) bits_g[12+c] = 0;
 				//active_g-=6;
 			}
 
 			/* blue component */
-			if ((j >> 6) & 0x01)    /* if LS368 @E15 is disabled */
+			if (BIT(j, 6))    /* if LS368 @E15 is disabled */
 			{
-				for (c=0; c<6; c++) bits_b[0 +c] = 0;
+				for (int c=0; c<6; c++) bits_b[0 +c] = 0;
 				//active_b-=6;
 			}
-			if ((j >> 7) & 0x01)    /* if LS368 @E16 is disabled */
+			if (BIT(j, 7))    /* if LS368 @E16 is disabled */
 			{
-				for (c=0; c<6; c++) bits_b[6 +c] = 0;
+				for (int c=0; c<6; c++) bits_b[6 +c] = 0;
 				//active_b-=6;
 			}
 
-			out = 0.0;
-			for (c=0; c<3*6; c++)   out += weights_r[c] * bits_r[c];
-			r = (int)(out + 0.5);
+			double out;
 
 			out = 0.0;
-			for (c=0; c<3*6; c++)   out += weights_g[c] * bits_g[c];
-			g = (int)(out + 0.5);
+			for (int c = 0; c < 3*6; c++)   out += weights_r[c] * bits_r[c];
+			int const r = int(out + 0.5);
 
 			out = 0.0;
-			for (c=0; c<2*6; c++)   out += weights_b[c] * bits_b[c];
-			b = (int)(out + 0.5);
+			for (int c = 0; c < 3*6; c++)   out += weights_g[c] * bits_g[c];
+			int const g = int(out + 0.5);
 
-			/*logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);*/
-			/*logerror("r:%3i g:%3i b:%3i\n",r,g,b );*/
+			out = 0.0;
+			for (int c = 0; c < 2*6; c++)   out += weights_b[c] * bits_b[c];
+			int const b = int(out + 0.5);
 
-			palette.set_pen_color(32+i*0x40+sh, rgb_t(r,g,b));
+			//logerror("Calculate [%x:%x] (active resistors:r=%i g=%i b=%i) = ", i, shade, active_r, active_g, active_b);
+			//logerror("r:%3i g:%3i b:%3i\n",r,g,b);
+
+			palette.set_pen_color(32+ i*0x40 + sh, rgb_t(r, g, b));
 		}
 	}
 }
@@ -684,39 +670,38 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tubep_state,rjammer)
+void tubep_state::rjammer_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *color_prom = memregion("proms")->base();
 
-	static const int resistors_rg[3] = { 1000, 470, 220 };
-	static const int resistors_b [2] = { 470, 220 };
+	static constexpr int resistors_rg[3] = { 1000, 470, 220 };
+	static constexpr int resistors_b [2] = { 470, 220 };
+
 	double weights_rg[3];
 	double weights_b[2];
-
-	compute_resistor_weights(0, 255,    -1.0,
+	compute_resistor_weights(0, 255, -1.0,
 			3,  resistors_rg,   weights_rg, 470,    0,
 			2,  resistors_b,    weights_b,  470,    0,
-			0,  nullptr,  nullptr,  0,  0   );
+			0,  nullptr,        nullptr,      0,    0);
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2,r,g,b;
+		int bit0, bit1, bit2;
 
-		/* red component */
-		bit0 = (*color_prom >> 0) & 0x01;
-		bit1 = (*color_prom >> 1) & 0x01;
-		bit2 = (*color_prom >> 2) & 0x01;
-		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
-		/* green component */
-		bit0 = (*color_prom >> 3) & 0x01;
-		bit1 = (*color_prom >> 4) & 0x01;
-		bit2 = (*color_prom >> 5) & 0x01;
-		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
-		/* blue component */
-		bit0 = (*color_prom >> 6) & 0x01;
-		bit1 = (*color_prom >> 7) & 0x01;
-		b = combine_2_weights(weights_b, bit0, bit1);
+		// red component
+		bit0 = BIT(*color_prom, 0);
+		bit1 = BIT(*color_prom, 1);
+		bit2 = BIT(*color_prom, 2);
+		int const r = combine_weights(weights_rg, bit0, bit1, bit2);
+		// green component
+		bit0 = BIT(*color_prom, 3);
+		bit1 = BIT(*color_prom, 4);
+		bit2 = BIT(*color_prom, 5);
+		int const g = combine_weights(weights_rg, bit0, bit1, bit2);
+		// blue component
+		bit0 = BIT(*color_prom, 6);
+		bit1 = BIT(*color_prom, 7);
+		int const b = combine_weights(weights_b, bit0, bit1);
 
 		palette.set_pen_color(i, rgb_t(r,g,b));
 

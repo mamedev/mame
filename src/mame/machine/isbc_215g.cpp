@@ -353,22 +353,23 @@ WRITE_LINE_MEMBER(isbc_215g_device::isbx_irq_11_w)
 	m_isbx_irq[3] = state ? true : false;
 }
 
-MACHINE_CONFIG_START(isbc_215g_device::device_add_mconfig)
-	MCFG_DEVICE_ADD("u84", I8089, XTAL(15'000'000) / 3)
-	MCFG_DEVICE_PROGRAM_MAP(isbc_215g_mem)
-	MCFG_DEVICE_IO_MAP(isbc_215g_io)
-	MCFG_I8089_DATA_WIDTH(16)
+void isbc_215g_device::device_add_mconfig(machine_config &config)
+{
+	I8089(config, m_dmac, XTAL(15'000'000) / 3);
+	m_dmac->set_addrmap(AS_PROGRAM, &isbc_215g_device::isbc_215g_mem);
+	m_dmac->set_addrmap(AS_IO, &isbc_215g_device::isbc_215g_io);
+	m_dmac->set_data_width(16);
 
-	MCFG_HARDDISK_ADD("drive0")
-	MCFG_HARDDISK_ADD("drive1")
+	HARDDISK(config, "drive0", 0);
+	HARDDISK(config, "drive1", 0);
 
-	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_00_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_01_w))
-	MCFG_ISBX_SLOT_ADD("sbx2", 0, isbx_cards, "fdc_218a")
-	MCFG_ISBX_SLOT_MINTR0_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_10_w))
-	MCFG_ISBX_SLOT_MINTR1_CALLBACK(WRITELINE(*this, isbc_215g_device, isbx_irq_11_w))
-MACHINE_CONFIG_END
+	ISBX_SLOT(config, m_sbx1, 0, isbx_cards, nullptr);
+	m_sbx1->mintr0().set(FUNC(isbc_215g_device::isbx_irq_00_w));
+	m_sbx1->mintr1().set(FUNC(isbc_215g_device::isbx_irq_01_w));
+	ISBX_SLOT(config, m_sbx2, 0, isbx_cards, "fdc_218a");
+	m_sbx2->mintr0().set(FUNC(isbc_215g_device::isbx_irq_10_w));
+	m_sbx2->mintr1().set(FUNC(isbc_215g_device::isbx_irq_11_w));
+}
 
 
 ROM_START( isbc_215g )

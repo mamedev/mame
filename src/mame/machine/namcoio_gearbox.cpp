@@ -3,8 +3,10 @@
 /***************************************************************************
 
     Namco 6-speed Gearbox device
+    Ridge Racer Clutch Pedal assembly part # 88800032,
+    6 Speed Gear Shift assembly part # 88300672 + 88300683
 
-    Used in Ridge Racer deluxe cabinet, Ace Driver and Driver's Eyes
+    Used in Ridge Racer 1,2,Rave Racer deluxe cabinet and Driver's Eyes
     User side gear scheme:
     1 3 5
     |-|-|
@@ -15,10 +17,14 @@
     First one just uses whatever is read in the inputs, second one
     simulates clutch lock as in a real car.
 
+    On the arcade cabinet(goes for Ridge Racer), the clutch isn't mechanically
+    or electronically connected to the shifter. The clutch pedal simply connects
+    to a microswitch. The shifter itself is basically a loose 8-way joystick with
+    a panel on top to restrict movement. There is no software-controlled lock,
+    maybe magnets.
+
     TODO:
-    - check clutch lock via real HW, and get a way to lock current gear via
-      MAME's input system;
-    - Custom part #;
+    - Better way to lock current gear via MAME's input system; no clutch involved
     - gear output for artwork system;
 
 ***************************************************************************/

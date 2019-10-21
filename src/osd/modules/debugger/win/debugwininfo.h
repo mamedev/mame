@@ -98,6 +98,8 @@ protected:
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
 
+		ID_CLEAR_LOG,
+
 		ID_DEVICE_OPTIONS   // always keep this at the end
 	};
 

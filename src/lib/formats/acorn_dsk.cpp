@@ -127,6 +127,10 @@ const acorn_ssd_format::format acorn_ssd_format::formats[] =
 		floppy_image::FF_35, floppy_image::DSDD, floppy_image::FM,
 		4000, 10, 80, 2, 256,{}, 0,{}, 40, 10, 10
 	},
+	{ // 100k 40 track single sided single density
+		floppy_image::FF_3, floppy_image::SSSD, floppy_image::FM,
+		4000, 10, 40, 1, 256,{}, 0,{}, 40, 10, 10
+	},
 	{}
 };
 

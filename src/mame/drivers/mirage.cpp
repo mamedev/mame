@@ -54,10 +54,10 @@ MR_01-.3A    [a0b758aa]
 class miragemj_state : public driver_device
 {
 public:
-	miragemj_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	miragemj_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen(*this, "tilegen"),
 		m_eeprom(*this, "eeprom"),
 		m_oki_sfx(*this, "oki_sfx"),
 		m_oki_bgm(*this, "oki_bgm"),
@@ -77,7 +77,7 @@ private:
 
 	/* devices */
 	required_device<m68000_device> m_maincpu;
-	required_device<deco16ic_device> m_deco_tilegen1;
+	required_device<deco16ic_device> m_deco_tilegen;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<okim6295_device> m_oki_sfx;
 	required_device<okim6295_device> m_oki_bgm;
@@ -106,21 +106,20 @@ void miragemj_state::video_start()
 
 uint32_t miragemj_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().dummy_space();
-	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen->pf_control_r(0);
 
 	flip_screen_set(BIT(flip, 7));
 	m_sprgen->set_flip_screen(BIT(flip, 7));
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
-	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
+	m_deco_tilegen->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(256, cliprect); /* not verified */
 
-	m_deco_tilegen1->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+	m_deco_tilegen->tilemap_2_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
-	m_deco_tilegen1->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
+	m_deco_tilegen->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
 	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
@@ -165,8 +164,8 @@ void miragemj_state::mirage_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	/* tilemaps */
-	map(0x100000, 0x101fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w)); // 0x100000 - 0x101fff tested
-	map(0x102000, 0x103fff).rw(m_deco_tilegen1, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w)); // 0x102000 - 0x102fff tested
+	map(0x100000, 0x101fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf1_data_r), FUNC(deco16ic_device::pf1_data_w)); // 0x100000 - 0x101fff tested
+	map(0x102000, 0x103fff).rw(m_deco_tilegen, FUNC(deco16ic_device::pf2_data_r), FUNC(deco16ic_device::pf2_data_w)); // 0x102000 - 0x102fff tested
 	/* linescroll */
 	map(0x110000, 0x110bff).ram().share("pf1_rowscroll");
 	map(0x112000, 0x112bff).ram().share("pf2_rowscroll");
@@ -175,7 +174,7 @@ void miragemj_state::mirage_map(address_map &map)
 	map(0x140000, 0x14000f).rw(m_oki_sfx, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x150000, 0x15000f).rw(m_oki_bgm, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0x160000, 0x160001).nopw();
-	map(0x168000, 0x16800f).w(m_deco_tilegen1, FUNC(deco16ic_device::pf_control_w));
+	map(0x168000, 0x16800f).w(m_deco_tilegen, FUNC(deco16ic_device::pf_control_w));
 	map(0x16a000, 0x16a001).nopw();
 	map(0x16c000, 0x16c001).w(FUNC(miragemj_state::okim1_rombank_w));
 	map(0x16c002, 0x16c003).w(FUNC(miragemj_state::okim0_rombank_w));
@@ -241,8 +240,8 @@ static const gfx_layout tile_8x8_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP8(0,1) },
+	{ STEP8(0,8*2) },
 	8*16
 };
 
@@ -252,27 +251,15 @@ static const gfx_layout tile_16x16_layout =
 	RGN_FRAC(1,2),
 	4,
 	{ RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+0,RGN_FRAC(0,2)+8,RGN_FRAC(0,2)+0 },
-	{ 256,257,258,259,260,261,262,263,0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16,9*16,10*16,11*16,12*16,13*16,14*16,15*16 },
+	{ STEP8(8*2*16,1),STEP8(0,1) },
+	{ STEP16(0,8*2) },
 	32*16
 };
 
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 24,8,16,0 },
-	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
-	32*32
-};
-
 static GFXDECODE_START( gfx_mirage )
-	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,     0x000, 32)  /* Tiles (8x8) */
-	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout,   0x000, 32)  /* Tiles (16x16) */
-	GFXDECODE_ENTRY("gfx2", 0, spritelayout,        0x200, 32)  /* Sprites (16x16) */
+	GFXDECODE_ENTRY("gfx1", 0, tile_8x8_layout,   0x000, 32)  /* Tiles (8x8) */
+	GFXDECODE_ENTRY("gfx1", 0, tile_16x16_layout, 0x000, 32)  /* Tiles (16x16) */
+	GFXDECODE_ENTRY("gfx2", 0, tile_16x16_layout, 0x200, 32)  /* Sprites (16x16) */
 GFXDECODE_END
 
 
@@ -291,60 +278,55 @@ void miragemj_state::machine_reset()
 	m_mux_data = 0;
 }
 
-MACHINE_CONFIG_START(miragemj_state::mirage)
-
+void miragemj_state::mirage(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, 28000000/2)
-	MCFG_DEVICE_PROGRAM_MAP(mirage_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", miragemj_state,  irq6_line_hold)
+	M68000(config, m_maincpu, 28000000/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &miragemj_state::mirage_map);
+	m_maincpu->set_vblank_int("screen", FUNC(miragemj_state::irq6_line_hold));
 
-	MCFG_DEVICE_ADD("eeprom", EEPROM_SERIAL_93C46_16BIT)  // 93C45
+	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("spriteram", BUFFERED_SPRITERAM16)
+	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(58)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(miragemj_state, screen_update_mirage)
-	MCFG_SCREEN_VBLANK_CALLBACK(WRITELINE("spriteram", buffered_spriteram16_device, vblank_copy_rising))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(58);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
+	screen.set_size(40*8, 32*8);
+	screen.set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
+	screen.set_screen_update(FUNC(miragemj_state::screen_update_mirage));
+	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 
+	GFXDECODE(config, "gfxdecode", "palette", gfx_mirage);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_mirage)
-	MCFG_PALETTE_ADD("palette", 1024)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	DECO16IC(config, m_deco_tilegen, 0);
+	m_deco_tilegen->set_pf1_size(DECO_64x32);
+	m_deco_tilegen->set_pf2_size(DECO_64x32);
+	m_deco_tilegen->set_pf1_trans_mask(0x0f);
+	m_deco_tilegen->set_pf2_trans_mask(0x0f);
+	m_deco_tilegen->set_pf1_col_bank(0x00);
+	m_deco_tilegen->set_pf2_col_bank(0x10);
+	m_deco_tilegen->set_pf1_col_mask(0x0f);
+	m_deco_tilegen->set_pf2_col_mask(0x0f);
+	m_deco_tilegen->set_bank1_callback(FUNC(miragemj_state::bank_callback), this);
+	m_deco_tilegen->set_bank2_callback(FUNC(miragemj_state::bank_callback), this);
+	m_deco_tilegen->set_pf12_8x8_bank(0);
+	m_deco_tilegen->set_pf12_16x16_bank(1);
+	m_deco_tilegen->set_gfxdecode_tag("gfxdecode");
 
-	MCFG_DEVICE_ADD("tilegen1", DECO16IC, 0)
-	MCFG_DECO16IC_SPLIT(0)
-	MCFG_DECO16IC_PF1_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF2_SIZE(DECO_64x32)
-	MCFG_DECO16IC_PF1_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF2_TRANS_MASK(0x0f)
-	MCFG_DECO16IC_PF1_COL_BANK(0x00)
-	MCFG_DECO16IC_PF2_COL_BANK(0x10)
-	MCFG_DECO16IC_PF1_COL_MASK(0x0f)
-	MCFG_DECO16IC_PF2_COL_MASK(0x0f)
-	MCFG_DECO16IC_BANK1_CB(miragemj_state, bank_callback)
-	MCFG_DECO16IC_BANK2_CB(miragemj_state, bank_callback)
-	MCFG_DECO16IC_PF12_8X8_BANK(0)
-	MCFG_DECO16IC_PF12_16X16_BANK(1)
-	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	MCFG_DECO_SPRITE_GFX_REGION(2)
-	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
+	DECO_SPRITE(config, m_sprgen, 0);
+	m_sprgen->set_gfx_region(2);
+	m_sprgen->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("oki_bgm", OKIM6295, 2000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	OKIM6295(config, m_oki_bgm, 2000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.30); // clock frequency & pin 7 not verified
 
-	MCFG_DEVICE_ADD("oki_sfx", OKIM6295, 1000000, okim6295_device::PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_CONFIG_END
+	OKIM6295(config, m_oki_sfx, 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.70); // clock frequency & pin 7 not verified
+}
 
 
 ROM_START( mirage )
@@ -356,8 +338,8 @@ ROM_START( mirage )
 	ROM_LOAD( "mbl-00.7a", 0x000000, 0x100000, CRC(2e258b7b) SHA1(2dbd7d16a1eda97ae3de149b67e80e511aa9d0ba) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Sprites */
-	ROM_LOAD16_BYTE( "mbl-01.11a", 0x000001, 0x200000, CRC(895be69a) SHA1(541d8f37fb4cf99312b80a0eb0d729fbbeab5f4f) )
-	ROM_LOAD16_BYTE( "mbl-02.12a", 0x000000, 0x200000, CRC(474f6104) SHA1(ff81b32b90192c3d5f27c436a9246aa6caaeeeee) )
+	ROM_LOAD( "mbl-01.11a", 0x200000, 0x200000, CRC(895be69a) SHA1(541d8f37fb4cf99312b80a0eb0d729fbbeab5f4f) )
+	ROM_LOAD( "mbl-02.12a", 0x000000, 0x200000, CRC(474f6104) SHA1(ff81b32b90192c3d5f27c436a9246aa6caaeeeee) )
 
 	ROM_REGION( 0x200000, "oki_bgm_data", 0 )
 	ROM_LOAD( "mbl-03.10a", 0x000000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )

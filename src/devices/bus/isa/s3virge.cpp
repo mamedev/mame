@@ -16,9 +16,20 @@
 
 #include "screen.h"
 
+#define VERBOSE (LOG_REG | LOG_CMD | LOG_MMIO)
+
+#include "logmacro.h"
+
+#define LOG_REG  (1U << 1)
+#define LOG_CMD  (1U << 2)
+#define LOG_MMIO (1U << 3)
+
+#define LOGREG(...)  LOGMASKED(LOG_REG, __VA_ARGS__)
+#define LOGCMD(...)  LOGMASKED(LOG_CMD, __VA_ARGS__)
+#define LOGMMIO(...) LOGMASKED(LOG_MMIO, __VA_ARGS__)
+
 
 #define CRTC_PORT_ADDR ((vga.miscellaneous_output & 1) ? 0x3d0 : 0x3b0)
-#define LOG_REG        1
 
 DEFINE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device,        "virge_vga",      "S3 86C325")
 DEFINE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device,      "virgedx_vga",    "S3 86C375")
@@ -76,6 +87,8 @@ void s3virge_vga_device::device_start()
 	m_vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vga_device::vblank_timer_cb),this));
 
 	memset(&s3, 0, sizeof(s3));
+	memset(&s3virge, 0, sizeof(s3virge));
+	s3virge.linear_address = 0x70000000;
 	// Initialise hardware graphics cursor colours, Windows 95 doesn't touch the registers for some reason
 	for(x=0;x<4;x++)
 	{
@@ -224,6 +237,31 @@ uint8_t s3virge_vga_device::s3_crtc_reg_read(uint8_t index)
 			case 0x55:
 				res = s3.extended_dac_ctrl;
 				break;
+			case 0x58:
+				res = s3virge.linear_address_size & 0x03;
+				res |= s3virge.linear_address_enable ? 0x10 : 0x00;
+				break;
+			case 0x59:
+				res = (s3virge.linear_address & 0xff000000) >> 24;
+				break;
+			case 0x5a:
+				switch(s3virge.linear_address_size & 0x03)
+				{
+					case 0:  // 64kB
+					default:
+						res = (s3virge.linear_address & 0x00ff0000) >> 16;
+						break;
+					case 1:  // 1MB
+						res = (s3virge.linear_address & 0x00f00000) >> 16;
+						break;
+					case 2:  // 2MB
+						res = (s3virge.linear_address & 0x00e00000) >> 16;
+						break;
+					case 3:  // 4MB
+						res = (s3virge.linear_address & 0x00c00000) >> 16;
+						break;
+				}
+				break;
 			case 0x5c:
 				// if VGA dot clock is set to 3 (misc reg bits 2-3), then selected dot clock is read, otherwise read VGA clock select
 				if((vga.miscellaneous_output & 0xc) == 0x0c)
@@ -327,14 +365,14 @@ void s3virge_vga_device::s3_crtc_reg_write(uint8_t index, uint8_t data)
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xffffff00) | data;
-					logerror("CR36: Strapping data = %08x\n",s3.strapping);
+					LOGREG("CR36: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x37:
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xffff00ff) | (data << 8);
-					logerror("CR37: Strapping data = %08x\n",s3.strapping);
+					LOGREG("CR37: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x38:
@@ -355,8 +393,11 @@ void s3virge_vga_device::s3_crtc_reg_write(uint8_t index, uint8_t data)
 				break;
 			case 0x43:
 				s3.cr43 = data;  // bit 2 = bit 8 of offset register, but only if bits 4-5 of CR51 are 00h.
-				vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
-				s3_define_video_mode();
+				if((s3.cr51 & 0x30) == 0)
+				{
+					vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x04) << 6);
+					s3_define_video_mode();
+				}
 				break;
 /*
 3d4h index 45h (R/W):  CR45 Hardware Graphics Cursor Mode
@@ -482,6 +523,7 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 				s3.cursor_pattern_y = data;
 				break;
 			case 0x51:
+				s3.cr51 = data;
 				vga.crtc.start_addr_latch &= ~0xc0000;
 				vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 				svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
@@ -519,6 +561,36 @@ bit 0-1  DAC Register Select Bits. Passed to the RS2 and RS3 pins on the
 			case 0x55:
 				s3.extended_dac_ctrl = data;
 				break;
+
+			case 0x58:
+				s3virge.linear_address_size = data & 0x03;
+				s3virge.linear_address_enable = data & 0x10;
+				switch(data & 0x03)
+				{
+					case LAW_64K:
+						s3virge.linear_address_size_full = 0x10000;
+						break;
+					case LAW_1MB:
+						s3virge.linear_address_size_full = 0x100000;
+						break;
+					case LAW_2MB:
+						s3virge.linear_address_size_full = 0x200000;
+						break;
+					case LAW_4MB:
+						s3virge.linear_address_size_full = 0x400000;
+						break;
+				}
+				LOGREG("CR58: write %02x\n", data);
+				break;
+			case 0x59:
+				s3virge.linear_address = (s3virge.linear_address & 0x00ff0000) | (data << 24);
+				LOGREG("Linear framebuffer address = %08x\n",s3virge.linear_address);
+				break;
+			case 0x5a:
+				s3virge.linear_address = (s3virge.linear_address & 0xff000000) | (data << 16);
+				LOGREG("Linear framebuffer address = %08x\n",s3virge.linear_address);
+				break;
+
 /*
 3d4h index 5Dh (R/W):  Extended Horizontal Overflow Register           (80x +)
 bit    0  Horizontal Total bit 8. Bit 8 of the Horizontal Total register (3d4h
@@ -583,7 +655,7 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0xff00ffff) | (data << 16);
-					logerror("CR68: Strapping data = %08x\n",s3.strapping);
+					LOGREG("CR68: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			case 0x69:
@@ -599,11 +671,11 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 				if(s3.reg_lock2 == 0xa5)
 				{
 					s3.strapping = (s3.strapping & 0x00ffffff) | (data << 24);
-					logerror("CR6F: Strapping data = %08x\n",s3.strapping);
+					LOGREG("CR6F: Strapping data = %08x\n",s3.strapping);
 				}
 				break;
 			default:
-				if(LOG_REG) logerror("S3: CR%02X write %02x\n",index,data);
+				LOGREG("S3: CR%02X write %02x\n",index,data);
 				break;
 		}
 	}
@@ -778,3 +850,144 @@ WRITE8_MEMBER(s3virge_vga_device::mem_w)
 	if((offset + (svga.bank_w*0x10000)) < vga.svga_intf.vram_size)
 		vga_device::mem_w(space,offset,data,mem_mask);
 }
+
+READ8_MEMBER(s3virge_vga_device::fb_r)
+{
+	if(offset < s3virge.linear_address_size_full)
+		return vga.memory[offset % vga.svga_intf.vram_size];
+	return 0xff;
+}
+
+WRITE8_MEMBER(s3virge_vga_device::fb_w)
+{
+	if(offset < s3virge.linear_address_size_full)
+		vga.memory[offset % vga.svga_intf.vram_size] = data;
+}
+
+// 2D command register format - A500 (BitBLT), A900 (2D line), AD00 (2D Polygon)
+// bit 0 - Autoexecute, if set command is executed when the highest relevant register is written to (A50C / A97C / AD7C)
+// bit 1 - Enable hardware clipping
+// bits 2-4 - Destination colour format - (0 = 8bpp palettised, 1 = 16bpp RGB1555 or RGB565, 2 = 24bpp RGB888
+// bit 5 - Draw enable - if reset, doesn't draw anything, but is still executed
+// bit 6 - Image source Mono transfer, if set source is mono, otherwise source is the same pixel depth as the destination
+// bit 7 - Image data source - 0 = source is in video memory, 1 = source is from the image transfer port (CPU / system memory)
+// bit 8 - Mono pattern - if set, pattern data is mono, otherwise pattern data is the same pixel depth as the destination
+//         Cleared to 0 if using an ROP with a colour source  Must be set to 1 if doing a rectangle fill operation
+// bit 9 - Transparency - if set, does not update if a background colour is selected.  Effectively only if bit 7 is set,  Typically used for text display.
+// bits 10-11 - Image transfer alignment - Data for an image transfer is byte (0), word (1), or doubleword (2) aligned.  All image transfers are doubleword in size.
+// bits 12-13 - First doubleword offset - (Image transfers) - start with the given byte (+1) in a doubleword for an image transfer
+// bits 17-24 - MS Windows Raster Operation
+// bit 25 - X Positive - if set, BitBLT is performed from left to right, otherwise, from right to left
+// bit 26 - Y Positive - if set, BitBLT is performed from top to bottom, otherwise from bottom to top
+// bits 27-30 - 2D Command - 0000 = BitBLT, 0010 = Rectangle Fill, 0011 = Line Draw, 0101 = Polygon Fill, 1111 = NOP (Turns off autoexecute without executing a command)
+// bit 31 - 2D / 3D Select
+
+
+READ32_MEMBER(s3virge_vga_device::s3d_sub_status_r)
+{
+	return 0x00003000;  // S3D engine idle, all FIFO slots free
+}
+
+WRITE32_MEMBER(s3virge_vga_device::s3d_sub_control_w)
+{
+	s3virge.interrupt_enable = data & 0x00003f80;
+	// TODO: bits 14-15==10 - reset engine
+	LOGMMIO("Sub control = %08x\n", data);
+}
+
+READ32_MEMBER(s3virge_vga_device::s3d_register_r)
+{
+	uint32_t res = 0;
+	int op_type = (((offset*4) & 0x0f00) / 4) - 1;
+
+	switch(offset)
+	{
+		case 0x4d4/4:
+		case 0x8d4/4:
+		case 0xcd4/4:
+			res = s3virge.s3d.src_base[op_type];
+			break;
+		case 0xad8/4:
+		case 0x8d8/4:
+		case 0xcd8/4:
+			res = s3virge.s3d.dest_base[op_type];
+			break;
+		case 0x500/4:
+		case 0x900/4:
+		case 0xd00/4:
+			res = s3virge.s3d.command[op_type];
+			break;
+		case 0x504/4:
+			res = s3virge.s3d.rect_height[op_type];
+			res |= (s3virge.s3d.rect_width[op_type] << 16);
+			break;
+		case 0x508/4:
+			res = s3virge.s3d.source_y[op_type];
+			res |= (s3virge.s3d.source_x[op_type] << 16);
+			break;
+		case 0x50c/4:
+			res = s3virge.s3d.dest_y[op_type];
+			res |= (s3virge.s3d.dest_x[op_type] << 16);
+			break;
+		default:
+			res = 0xffffffff;
+			LOGMMIO("MMIO unknown/unused register read MM%04X\n", (offset*4)+0xa000);
+	}
+
+	return res;
+}
+
+WRITE32_MEMBER(s3virge_vga_device::s3d_register_w)
+{
+	int op_type = (((offset*4) & 0x0f00) / 4) - 1;
+
+	switch(offset)
+	{
+		case 0x4d4/4:
+		case 0x8d4/4:
+		case 0xcd4/4:
+			s3virge.s3d.src_base[op_type] = data;
+			LOGMMIO("MM%04X: Source Base = %08x\n", (offset*4)+0xa000, data);
+			break;
+		case 0xad8/4:
+		case 0x8d8/4:
+		case 0xcd8/4:
+			s3virge.s3d.dest_base[op_type] = data;
+			LOGMMIO("MM%04X: Destination base address = %08x\n", (offset*4)+0xa000, data);
+			break;
+		case 0x500/4:
+			s3virge.s3d.command[OP_BITBLT] = data;
+			// TODO:if bit 0 is reset, then execute now
+			LOGMMIO("MM%04X: Command [BitBLT/FilledRect] = %08x\n", (offset*4)+0xa000, data);
+			break;
+		case 0x900/4:
+			s3virge.s3d.command[OP_2DLINE] = data;
+			// TODO:if bit 0 is reset, then execute now
+			LOGMMIO("MM%04X: Command [2D Line] = %08x\n", (offset*4)+0xa000, data);
+			break;
+		case 0xd00/4:
+			s3virge.s3d.command[OP_2DPOLY] = data;
+			// TODO:if bit 0 is reset, then execute now
+			LOGMMIO("MM%04X: Command [2D Polygon] = %08x\n", (offset*4)+0xa000, data);
+			break;
+		case 0x504/4:
+			s3virge.s3d.rect_height[OP_BITBLT] = data & 0x000003ff;
+			s3virge.s3d.rect_width[OP_BITBLT] = (data & 0x03ff0000) >> 16;
+			LOGMMIO("MM%04X: Rectangle Width/Height = %08x (%ix%i)\n", (offset*4)+0xa000, data, s3virge.s3d.rect_width[OP_BITBLT], s3virge.s3d.rect_height[OP_BITBLT]);
+			break;
+		case 0x508/4:
+			s3virge.s3d.source_y[OP_BITBLT] = data & 0x000003ff;
+			s3virge.s3d.source_x[OP_BITBLT] = (data & 0x03ff0000) >> 16;
+			LOGMMIO("MM%04X: Rectangle Source X/Y = %08x (%i, %i)\n",(offset*4)+0xa000, data, s3virge.s3d.source_x[OP_BITBLT], s3virge.s3d.source_y[OP_BITBLT]);
+			break;
+		case 0x50c/4:
+			s3virge.s3d.dest_y[OP_BITBLT] = data & 0x000003ff;
+			s3virge.s3d.dest_x[OP_BITBLT] = (data & 0x03ff0000) >> 16;
+			// TODO:if previous command has bit 0 set, then execute here
+			LOGMMIO("MM%04X: Rectangle Destination X/Y = %08x (%i, %i)\n", (offset*4)+0xa000, data, s3virge.s3d.dest_x[OP_BITBLT], s3virge.s3d.dest_y[OP_BITBLT]);
+			break;
+		default:
+			LOGMMIO("MMIO unknown/unused register write MM%04X = %08x\n", (offset*4)+0xa000, data);
+	}
+}
+

@@ -16,8 +16,8 @@
 // reading the original raw data
 void mystwarr_state::decode_tiles()
 {
-	uint8_t *s = memregion("gfx1")->base();
-	int len = memregion("gfx1")->bytes();
+	uint8_t *s = memregion("k056832")->base();
+	int len = memregion("k056832")->bytes();
 	uint8_t *pFinish = s+len-3;
 	uint8_t *d;
 

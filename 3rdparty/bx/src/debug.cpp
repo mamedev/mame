@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,10 +9,12 @@
 #include <bx/readerwriter.h> // WriterI
 #include <inttypes.h>        // PRIx*
 
-#if BX_PLATFORM_ANDROID
+#if BX_CRT_NONE
+#	include "crt0.h"
+#elif BX_PLATFORM_ANDROID
 #	include <android/log.h>
 #elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_WINRT \
+	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
@@ -22,8 +24,8 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _
 #		include <CoreFoundation/CFString.h>
 extern "C" void NSLog(CFStringRef _format, ...);
 #	endif // defined(__OBJC__)
-#elif 0 // BX_PLATFORM_EMSCRIPTEN
-#	include <emscripten.h>
+#elif BX_PLATFORM_EMSCRIPTEN
+#	include <emscripten/emscripten.h>
 #else
 #	include <stdio.h> // fputs, fflush
 #endif // BX_PLATFORM_WINDOWS
@@ -41,6 +43,11 @@ namespace bx
 		// NaCl doesn't like int 3:
 		// NativeClient: NaCl module load failed: Validation failure. File violates Native Client safety rules.
 		__asm__ ("int $3");
+#elif BX_PLATFORM_EMSCRIPTEN
+		emscripten_log(EM_LOG_CONSOLE | EM_LOG_ERROR | EM_LOG_C_STACK | EM_LOG_JS_STACK | EM_LOG_DEMANGLE, "debugBreak!");
+		// Doing emscripten_debugger() disables asm.js validation due to an emscripten bug
+		//emscripten_debugger();
+		EM_ASM({ debugger; });
 #else // cross platform implementation
 		int* int3 = (int*)3L;
 		*int3 = 3;
@@ -49,29 +56,51 @@ namespace bx
 
 	void debugOutput(const char* _out)
 	{
-#if BX_PLATFORM_ANDROID
+#if BX_CRT_NONE
+		crt0::debugOutput(_out);
+#elif BX_PLATFORM_ANDROID
 #	ifndef BX_ANDROID_LOG_TAG
 #		define BX_ANDROID_LOG_TAG ""
 #	endif // BX_ANDROID_LOG_TAG
 		__android_log_write(ANDROID_LOG_DEBUG, BX_ANDROID_LOG_TAG, _out);
 #elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_WINRT \
+	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
 		OutputDebugStringA(_out);
-#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
+#elif  BX_PLATFORM_IOS \
+	|| BX_PLATFORM_OSX
 #	if defined(__OBJC__)
 		NSLog(@"%s", _out);
 #	else
 		NSLog(__CFStringMakeConstantString("%s"), _out);
 #	endif // defined(__OBJC__)
-#elif 0 // BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_EMSCRIPTEN
 		emscripten_log(EM_LOG_CONSOLE, "%s", _out);
-#elif !BX_CRT_NONE
+#else
 		fputs(_out, stdout);
 		fflush(stdout);
-#else
-		BX_UNUSED(_out);
 #endif // BX_PLATFORM_
+	}
+
+	void debugOutput(const StringView& _str)
+	{
+#if BX_CRT_NONE
+		crt0::debugOutput(_str);
+#else
+		const char* data = _str.getPtr();
+		int32_t size = _str.getLength();
+
+		char temp[4096];
+		while (0 != size)
+		{
+			uint32_t len = uint32_min(sizeof(temp)-1, size);
+			memCopy(temp, data, len);
+			temp[len] = '\0';
+			data += len;
+			size -= len;
+			debugOutput(temp);
+		}
+#endif // BX_CRT_NONE
 	}
 
 	void debugPrintfVargs(const char* _format, va_list _argList)
@@ -153,20 +182,8 @@ namespace bx
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
 		{
 			BX_UNUSED(_err);
-
-			int32_t total = 0;
-
-			char temp[4096];
-			while (total != _size)
-			{
-				uint32_t len = bx::uint32_min(sizeof(temp)-1, _size-total);
-				memCopy(temp, _data, len);
-				temp[len] = '\0';
-				debugOutput(temp);
-				total += len;
-			}
-
-			return total;
+			debugOutput(StringView( (const char*)_data, _size) );
+			return _size;
 		}
 	};
 

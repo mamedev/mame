@@ -11,6 +11,7 @@
 #define MAME_BUS_BBC_1MHZBUS_OPUS3_H
 
 #include "1mhzbus.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/wd_fdc.h"
 #include "formats/acorn_dsk.h"
@@ -28,26 +29,26 @@ public:
 	// construction/destruction
 	bbc_opus3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE8_MEMBER(wd1770l_write);
-	DECLARE_WRITE8_MEMBER(page_w);
-	DECLARE_READ8_MEMBER(ramdisk_r);
-	DECLARE_WRITE8_MEMBER(ramdisk_w);
-
 protected:
+	bbc_opus3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
+
+	virtual uint8_t fred_r(offs_t offset) override;
+	virtual void fred_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t jim_r(offs_t offset) override;
+	virtual void jim_w(offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 
-	required_memory_region m_dfs_rom;
 	required_device<ram_device> m_ramdisk;
 	required_device<wd1770_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -59,8 +60,24 @@ private:
 };
 
 
+class bbc_opusa_device : public bbc_opus3_device
+{
+public:
+	// construction/destruction
+	bbc_opusa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(BBC_OPUS3, bbc_opus3_device)
+DECLARE_DEVICE_TYPE(BBC_OPUSA, bbc_opusa_device)
 
 
 #endif // MAME_BUS_BBC_1MHZBUS_OPUS3_H

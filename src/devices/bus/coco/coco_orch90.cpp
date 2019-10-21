@@ -21,7 +21,7 @@
     addressing CPU registers to run the 6809 at 2x speed.
 
     "P" + "ENTER" will play at regular CPU speed.  The difference should be
-    very noticable.
+    very noticeable.
 
 ***************************************************************************/
 
@@ -61,6 +61,7 @@ namespace
 		coco_orch90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: device_t(mconfig, COCO_ORCH90, tag, owner, clock)
 			, device_cococart_interface(mconfig, *this)
+			, m_eprom(*this, "eprom")
 			, m_ldac(*this, "ldac")
 			, m_rdac(*this, "rdac")
 		{
@@ -89,14 +90,22 @@ namespace
 		// CoCo cartridge level overrides
 		virtual uint8_t *get_cart_base() override
 		{
-			return memregion("eprom")->base();
+			return m_eprom->base();
 		}
+
+		virtual memory_region* get_cart_memregion() override
+		{
+			return m_eprom;
+		}
+
+		virtual DECLARE_READ8_MEMBER(cts_read) override;
 
 	private:
 		WRITE8_MEMBER(write_left)   { m_ldac->write(data); }
 		WRITE8_MEMBER(write_right)  { m_rdac->write(data); }
 
 		// internal state
+		required_memory_region m_eprom;
 		required_device<dac_byte_interface> m_ldac;
 		required_device<dac_byte_interface> m_rdac;
 	};
@@ -107,15 +116,25 @@ namespace
 //  MACHINE AND ROM DECLARATIONS
 //**************************************************************************
 
-MACHINE_CONFIG_START(coco_orch90_device::device_add_mconfig)
+void coco_orch90_device::device_add_mconfig(machine_config &config)
+{
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
-	MCFG_DEVICE_ADD("ldac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
-	MCFG_DEVICE_ADD("rdac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
-MACHINE_CONFIG_END
+	DAC_8BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // ls374.ic5 + r7 (8x20k) + r9 (8x10k)
+	DAC_8BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // ls374.ic4 + r6 (8x20k) + r8 (8x10k)
+	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
+	vref.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
+	vref.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT); vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
+}
+
+//-------------------------------------------------
+//  cts_read
+//-------------------------------------------------
+
+READ8_MEMBER(coco_orch90_device::cts_read)
+{
+	return m_eprom->base()[offset & 0x1fff];
+}
 
 
 //**************************************************************************

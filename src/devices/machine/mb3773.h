@@ -13,22 +13,11 @@
 
 #pragma once
 
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_MB3773_ADD(_tag) \
-	MCFG_DEVICE_ADD(_tag, MB3773, 0)
-
-
-// ======================> mb3773_device
-
 class mb3773_device : public device_t
 {
 public:
 	// construction/destruction
-	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
+	mb3773_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// I/O operations
 	WRITE_LINE_MEMBER( write_line_ck );
@@ -48,8 +37,6 @@ private:
 	int m_ck;
 };
 
-
-// device type definition
 DECLARE_DEVICE_TYPE(MB3773, mb3773_device)
 
 #endif // MAME_MACHINE_MB3773_H

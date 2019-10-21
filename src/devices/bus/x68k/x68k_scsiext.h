@@ -31,6 +31,9 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	// device_x68k_expansion_card_interface overrides
+	virtual uint8_t iack2() override;
+
 private:
 	void irq_w(int state);
 	void drq_w(int state);

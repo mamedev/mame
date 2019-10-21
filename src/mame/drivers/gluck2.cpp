@@ -198,6 +198,7 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 #define MASTER_CLOCK    XTAL(10'000'000)
@@ -207,12 +208,13 @@
 class gluck2_state : public driver_device
 {
 public:
-	gluck2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+	gluck2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram") { }
+		m_colorram(*this, "colorram")
+	{ }
 
 	void gluck2(machine_config &config);
 
@@ -232,7 +234,7 @@ private:
 
 	virtual void video_start() override;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void gluck2_map(address_map &map);
 };
 
@@ -278,7 +280,7 @@ void gluck2_state::video_start()
 }
 
 
-uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -483,50 +485,48 @@ GFXDECODE_END
 *              Machine Drivers               *
 *********************************************/
 
-MACHINE_CONFIG_START(gluck2_state::gluck2)
-
+void gluck2_state::gluck2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
-	MCFG_DEVICE_PROGRAM_MAP(gluck2_map)
+	M6502(config, m_maincpu, MASTER_CLOCK/16); /* guess */
+	m_maincpu->set_addrmap(AS_PROGRAM, &gluck2_state::gluck2_map);
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 
 /* CRTC Register:  00   01   02   03   04   05   06
    CRTC Value   : 0x27 0x20 0x23 0x03 0x26 0x00 0x20
 */
-	MCFG_SCREEN_SIZE((39+1)*8, (38+1)*8)                /* from MC6845 init, registers 00 & 04. (value - 1) */
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)  /* from MC6845 init, registers 01 & 06. */
-	MCFG_SCREEN_UPDATE_DRIVER(gluck2_state, screen_update)
-	MCFG_SCREEN_PALETTE("palette")
+	screen.set_size((39+1)*8, (38+1)*8);                /* from MC6845 init, registers 00 & 04. (value - 1) */
+	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);  /* from MC6845 init, registers 01 & 06. */
+	screen.set_screen_update(FUNC(gluck2_state::screen_update));
 
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_gluck2)
-	MCFG_PALETTE_ADD_RRRRGGGGBBBB_PROMS("palette", "proms", 256)
+	GFXDECODE(config, m_gfxdecode, "palette", gfx_gluck2);
+	PALETTE(config, "palette", palette_device::RGB_444_PROMS, "proms", 256);
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
+	mc6845_device &crtc(MC6845(config, "crtc", MASTER_CLOCK/16));    /* guess */
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	MCFG_DEVICE_ADD("ay8910", AY8910, MASTER_CLOCK/8)    /* guess */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("SW3"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("SW2"))
+	ay8910_device &ay8910(AY8910(config, "ay8910", MASTER_CLOCK/8));    /* guess */
+	ay8910.port_a_read_callback().set_ioport("SW3");
+	ay8910.port_b_read_callback().set_ioport("SW2");
 /*  Output ports have a minimal activity during init.
     They seems unused (at least for Good Luck II)
 */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	ay8910.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	MCFG_DEVICE_ADD("ymsnd", YM2413, SND_CLOCK)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-MACHINE_CONFIG_END
+	YM2413(config, "ymsnd", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 
 /*********************************************

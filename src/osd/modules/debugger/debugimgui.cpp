@@ -173,7 +173,7 @@ private:
 	void refresh_typelist();
 	void update_cpu_view(device_t* device);
 	static bool get_view_source(void* data, int idx, const char** out_text);
-	static int history_set(ImGuiTextEditCallbackData* data);
+	static int history_set(ImGuiInputTextCallbackData* data);
 
 	running_machine* m_machine;
 	int32_t            m_mouse_x;
@@ -531,7 +531,7 @@ void debug_imgui::handle_console(running_machine* machine)
 	}
 }
 
-int debug_imgui::history_set(ImGuiTextEditCallbackData* data)
+int debug_imgui::history_set(ImGuiInputTextCallbackData* data)
 {
 	if(view_main_console->console_history.size() == 0)
 		return 0;
@@ -1341,7 +1341,7 @@ void debug_imgui::draw_console()
 		ImGui::PushItemWidth(-1.0f);
 		if(ImGui::InputText("##console_input",view_main_console->console_input,512,flags,history_set))
 			view_main_console->exec_cmd = true;
-		if ((ImGui::IsRootWindowOrAnyChildFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
+		if ((ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked(0)))
 			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
 		if(m_mount_open)
 		{

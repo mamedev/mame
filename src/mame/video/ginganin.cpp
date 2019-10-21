@@ -78,8 +78,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
-	uint8_t *gfx = memregion("gfx5")->base();
-	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
+	const u32 code = m_bgrom[2 * tile_index + 0] * 256 + m_bgrom[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(BG_GFX,
 			code,
 			code >> 12,
@@ -95,14 +94,14 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
 {
-	uint16_t code = m_fgram[tile_index];
+	const u16 code = m_fgram[tile_index];
 	SET_TILE_INFO_MEMBER(FG_GFX,
 			code,
 			code >> 12,
 			0);
 }
 
-WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
+void ginganin_state::fgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_fgram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset);
@@ -117,14 +116,14 @@ WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
 {
-	uint16_t code = m_txtram[tile_index];
+	const u16 code = m_txtram[tile_index];
 	SET_TILE_INFO_MEMBER(TXT_GFX,
 			code,
 			code >> 12,
 			0);
 }
 
-WRITE16_MEMBER(ginganin_state::ginganin_txtram16_w)
+void ginganin_state::txtram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_txtram[offset]);
 	m_tx_tilemap->mark_tile_dirty(offset);
@@ -142,7 +141,7 @@ void ginganin_state::video_start()
 }
 
 
-WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
+void ginganin_state::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_vregs[offset]);
 	data = m_vregs[offset];
@@ -172,7 +171,7 @@ WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
 		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
-		m_soundlatch->write(space, 0, data);
+		m_soundlatch->write(data);
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 		break;
 	default:
@@ -202,17 +201,14 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
+void ginganin_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	uint16_t *spriteram = m_spriteram;
-	int offs;
-
-	for (offs = 0; offs < (m_spriteram.bytes() >> 1); offs += 4)
+	for (int offs = 0; offs < (m_spriteram.bytes() >> 1); offs += 4)
 	{
-		int y = spriteram[offs + 0];
-		int x = spriteram[offs + 1];
-		int code = spriteram[offs + 2];
-		int attr = spriteram[offs + 3];
+		int y = m_spriteram[offs + 0];
+		int x = m_spriteram[offs + 1];
+		const u32 code = m_spriteram[offs + 2];
+		const u16 attr = m_spriteram[offs + 3];
 		int flipx = code & 0x4000;
 		int flipy = code & 0x8000;
 
@@ -237,7 +233,7 @@ void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprec
 }
 
 
-uint32_t ginganin_state::screen_update_ginganin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 ginganin_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl1 = m_layers_ctrl;
 
@@ -267,7 +263,6 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 }
 #endif
-
 
 	if (layers_ctrl1 & 1)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);

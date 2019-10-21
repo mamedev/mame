@@ -27,6 +27,7 @@
 #include "cpu/i86/i86.h"
 #include "cpu/m6800/m6801.h"
 #include "formats/apridisk.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/apricotkb.h"
 #include "machine/pic8259.h"
@@ -445,7 +446,7 @@ void fp_state::fp_io(address_map &map)
 	map(0x020, 0x020).w("cent_data_out", FUNC(output_latch_device::bus_w));
 	map(0x022, 0x022).w(FUNC(fp_state::pint_clr_w));
 	map(0x024, 0x024).r(FUNC(fp_state::prtr_snd_r));
-	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::command_w));
+	map(0x026, 0x026).w(SN76489AN_TAG, FUNC(sn76489a_device::write));
 	map(0x028, 0x028).w(FUNC(fp_state::contrast_w));
 	map(0x02a, 0x02a).w(FUNC(fp_state::palette_w));
 	map(0x02e, 0x02f).w(FUNC(fp_state::video_w));
@@ -463,19 +464,6 @@ void fp_state::fp_io(address_map &map)
 void fp_state::sound_mem(address_map &map)
 {
 	map(0xf000, 0xffff).rom().region(HD63B01V1_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  ADDRESS_MAP( sound_io )
-//-------------------------------------------------
-
-void fp_state::sound_io(address_map &map)
-{
-	map(M6801_PORT1, M6801_PORT1);
-	map(M6801_PORT2, M6801_PORT2);
-	map(M6801_PORT3, M6801_PORT3);
-	map(M6801_PORT4, M6801_PORT4);
 }
 
 
@@ -575,54 +563,54 @@ FLOPPY_FORMATS_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG( fp )
+//  machine_config( fp )
 //-------------------------------------------------
 
-MACHINE_CONFIG_START(fp_state::fp)
+void fp_state::fp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD(I8086_TAG, I8086, 15_MHz_XTAL / 3)
-	MCFG_DEVICE_PROGRAM_MAP(fp_mem)
-	MCFG_DEVICE_IO_MAP(fp_io)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DEVICE(I8259A_TAG, pic8259_device, inta_cb)
+	I8086(config, m_maincpu, 15_MHz_XTAL / 3);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fp_state::fp_mem);
+	m_maincpu->set_addrmap(AS_IO, &fp_state::fp_io);
+	m_maincpu->set_irq_acknowledge_callback(I8259A_TAG, FUNC(pic8259_device::inta_cb));
 
-	MCFG_DEVICE_ADD(HD63B01V1_TAG, HD6301, 2000000)
-	MCFG_DEVICE_PROGRAM_MAP(sound_mem)
-	MCFG_DEVICE_IO_MAP(sound_io)
-	MCFG_DEVICE_DISABLE()
+	HD6301(config, m_soundcpu, 2000000);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &fp_state::sound_mem);
+	m_soundcpu->set_disable();
 
 	/* video hardware */
 	config.set_default_layout(layout_apricotp);
 
-	MCFG_SCREEN_ADD(SCREEN_LCD_TAG, LCD)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DRIVER(fp_state, screen_update)
-	MCFG_SCREEN_SIZE(640, 200)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen_lcd(SCREEN(config, SCREEN_LCD_TAG, SCREEN_TYPE_RASTER));
+	screen_lcd.set_refresh_hz(50);
+	screen_lcd.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_lcd.set_screen_update(FUNC(fp_state::screen_update));
+	screen_lcd.set_size(640, 200);
+	screen_lcd.set_visarea_full();
+	screen_lcd.set_palette("palette");
 
-	MCFG_SCREEN_ADD(SCREEN_CRT_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_UPDATE_DEVICE(MC6845_TAG, mc6845_device, screen_update)
-	MCFG_SCREEN_SIZE(640, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 256-1)
+	screen_device &screen_crt(SCREEN(config, SCREEN_CRT_TAG, SCREEN_TYPE_RASTER));
+	screen_crt.set_refresh_hz(50);
+	screen_crt.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	screen_crt.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
+	screen_crt.set_size(640, 256);
+	screen_crt.set_visarea_full();
 
-	MCFG_PALETTE_ADD("palette", 16)
-	MCFG_DEVICE_ADD("gfxdecode", GFXDECODE, "palette", gfx_act_f1)
+	PALETTE(config, "palette").set_entries(16);
+	GFXDECODE(config, "gfxdecode", "palette", gfx_act_f1);
 
-	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_CRT_TAG, 4000000)
-	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
-	MCFG_MC6845_UPDATE_ROW_CB(fp_state, update_row)
+	MC6845(config, m_crtc, 4000000);
+	m_crtc->set_screen(SCREEN_CRT_TAG);
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(8);
+	m_crtc->set_update_row_callback(FUNC(fp_state::update_row), this);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD(SN76489AN_TAG, SN76489A, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	SN76489A(config, SN76489AN_TAG, 2000000).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	/* Devices */
-	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
+	APRICOT_KEYBOARD(config, APRICOT_KEYBOARD_TAG, 0);
 
 	AM9517A(config, m_dmac, 250000);
 	m_dmac->out_eop_callback().set(m_pic, FUNC(pic8259_device::ir7_w));
@@ -654,13 +642,12 @@ MACHINE_CONFIG_START(fp_state::fp)
 	m_centronics->fault_handler().set(FUNC(fp_state::write_centronics_fault));
 	m_centronics->perror_handler().set(FUNC(fp_state::write_centronics_perror));
 
-	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", CENTRONICS_TAG)
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
 
 	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("256K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1M")
-MACHINE_CONFIG_END
+	RAM(config, RAM_TAG).set_default_size("256K").set_extra_options("512K,1M");
+}
 
 
 

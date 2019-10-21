@@ -43,27 +43,28 @@ NETLIST_START(dummy)
 // IGNORED O_AUDIO0: O_AUDIO0  64 0
 // .END
 
-	PARAM(Solver.ACCURACY, 1e-8)
-	PARAM(Solver.NR_LOOPS, 90)
-	PARAM(Solver.SOR_FACTOR, 1.01)
-	PARAM(Solver.GS_LOOPS, 4)
+	PARAM(Solver.ACCURACY, 1e-7)
+	PARAM(Solver.NR_LOOPS, 90000)
+	PARAM(Solver.SOR_FACTOR, 1.0)
+	PARAM(Solver.GS_LOOPS, 99)
 	//PARAM(Solver.METHOD, "GMRES")
 	PARAM(Solver.METHOD, "MAT_CR")
 	//PARAM(Solver.METHOD, "SOR")
 
 #if USE_OPTMIZATIONS
 #if USE_FRONTIERS
-	SOLVER(Solver, 24000)
+	SOLVER(Solver, 48000)
 #else
 	SOLVER(Solver, 48000)
 #endif
-	PARAM(Solver.DYNAMIC_TS, 0	)
+	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.PARALLEL, 1)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 2e-6)
 #else
-	SOLVER(Solver, 24000)
+	SOLVER(Solver, 48000)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_LTE, 1e-4)
-	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
+	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 1e-7)
 	PARAM(Solver.PARALLEL, 0)
 	PARAM(Solver.PIVOT, 0)
 #endif
@@ -91,8 +92,9 @@ NETLIST_START(dummy)
 	NET_C(CO.2, RO.1)
 	NET_C(RO.2, GND)
 
-	// FIXME: Same as 1N4148
-	NET_MODEL("1S2075 D(Is=2.52n Rs=.568 N=1.752 Cjo=4p M=.4 tt=20n Iave=200m Vpk=75)")
+	// Found here: https://hamesspam.sakura.ne.jp/hes2016/160521.html
+	NET_MODEL("1S2075 D(IS=1.387E-9 N=1.702 RS=1.53 CJO=1.92pf VJ=0.4996 M=0.0605 TT=5ns BV=75 IBV=100E-15)")
+
 	NET_MODEL("2SC1941 NPN(IS=46.416f BF=210 NF=1.0022 VAF=600 IKF=500m ISE=60f NE=1.5 BR=2.0122 NR=1.0022 VAR=10G IKR=10G ISC=300p NC=2 RB=13.22 IRB=10G RBM=13.22 RE=100m RC=790m CJE=26.52p VJE=900m MJE=518m TF=1.25n XTF=10 VTF=10 ITF=500m PTF=0 CJC=4.89p VJC=750m MJC=237m XCJC=500m TR=100n CJS=0 VJS=750m MJS=500m XTB=1.5 EG=1.11 XTI=3 KF=0 AF=1 FC=500m)")
 
 	INCLUDE(CongoBongo_schematics)
@@ -103,16 +105,18 @@ NETLIST_START(dummy)
 	 * to the feedback loop consisting of D9 and Q2.
 	 */
 
+#if 0
 	RES(RX1, 1e100)
 	NET_C(RX1.1, Q2.C)
 	NET_C(RX1.2, XU16.7)
+#endif
 
-	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
+	/* The opamp actually has an FPF of about 1000k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
 	 */
-	PARAM(XU16.B.MODEL, "MB3614(UGF=11k)")
-	PARAM(XU17.C.MODEL, "MB3614(UGF=11k)")
-
+	PARAM(XU16.B.MODEL, "MB3614(TYPE=3)")
+	PARAM(XU17.C.MODEL, "MB3614(TYPE=3 UGF=44k)")
+#if 0
 	PARAM(XU17.A.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU17.B.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU17.D.MODEL, "MB3614(TYPE=1)")
@@ -120,7 +124,7 @@ NETLIST_START(dummy)
 	//PARAM(XU16.A.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU16.C.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU16.D.MODEL, "MB3614(TYPE=1)")
-
+#endif
 #if 0
 	PARAM(XU13.A.MODEL, "MB3614(TYPE=1)")
 	PARAM(XU13.B.MODEL, "MB3614(TYPE=1)")

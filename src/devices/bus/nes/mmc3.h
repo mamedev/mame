@@ -16,10 +16,10 @@ public:
 	// construction/destruction
 	nes_txrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(txrom_write);
-	virtual DECLARE_WRITE8_MEMBER(write_h) override { txrom_write(space, offset, data, mem_mask); }
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void txrom_write(offs_t offset, uint8_t data);
+	virtual void write_h(offs_t offset, uint8_t data) override { txrom_write(offset, data); }
 	virtual void prg_cb(int start, int bank);
 	virtual void chr_cb(int start, int bank, int source);
 
@@ -62,9 +62,9 @@ public:
 	// construction/destruction
 	nes_hkrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_READ8_MEMBER(read_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual uint8_t read_m(offs_t offset) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
@@ -89,7 +89,7 @@ public:
 	nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_h) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
 	virtual void chr_cb(int start, int bank, int source) override;
 
 protected:
@@ -119,7 +119,7 @@ public:
 	nes_qj_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 	virtual void pcb_reset() override;
 };
 
@@ -133,7 +133,7 @@ public:
 	nes_zz_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual DECLARE_WRITE8_MEMBER(write_m) override;
+	virtual void write_m(offs_t offset, uint8_t data) override;
 	virtual void pcb_reset() override;
 };
 

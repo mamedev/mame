@@ -130,11 +130,11 @@ ioport_constructor a2bus_mouse_device::device_input_ports() const
 void a2bus_mouse_device::device_add_mconfig(machine_config &config)
 {
 	M68705P3(config, m_mcu, 2043600);
-	m_mcu->porta_r_cb().set(FUNC(a2bus_mouse_device::mcu_port_a_r));
-	m_mcu->portb_r_cb().set(FUNC(a2bus_mouse_device::mcu_port_b_r));
-	m_mcu->porta_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_a_w));
-	m_mcu->portb_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
-	m_mcu->portc_w_cb().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
+	m_mcu->porta_r().set(FUNC(a2bus_mouse_device::mcu_port_a_r));
+	m_mcu->portb_r().set(FUNC(a2bus_mouse_device::mcu_port_b_r));
+	m_mcu->porta_w().set(FUNC(a2bus_mouse_device::mcu_port_a_w));
+	m_mcu->portb_w().set(FUNC(a2bus_mouse_device::mcu_port_b_w));
+	m_mcu->portc_w().set(FUNC(a2bus_mouse_device::mcu_port_c_w));
 
 	PIA6821(config, m_pia, 1021800);
 	m_pia->writepa_handler().set(FUNC(a2bus_mouse_device::pia_out_a));
@@ -203,7 +203,7 @@ void a2bus_mouse_device::device_reset()
 
 uint8_t a2bus_mouse_device::read_c0nx(uint8_t offset)
 {
-	return m_pia->reg_r(offset & 3);
+	return m_pia->read(offset & 3);
 }
 
 /*-------------------------------------------------
@@ -212,7 +212,7 @@ uint8_t a2bus_mouse_device::read_c0nx(uint8_t offset)
 
 void a2bus_mouse_device::write_c0nx(uint8_t offset, uint8_t data)
 {
-	m_pia->reg_w(offset & 3, data);
+	m_pia->write(offset & 3, data);
 }
 
 /*-------------------------------------------------
@@ -251,7 +251,7 @@ READ8_MEMBER(a2bus_mouse_device::mcu_port_a_r)
 
 WRITE8_MEMBER(a2bus_mouse_device::mcu_port_a_w)
 {
-	m_pia->set_a_input(data, ~mem_mask);
+	m_pia->set_a_input(data);
 }
 
 READ8_MEMBER(a2bus_mouse_device::mcu_port_b_r)

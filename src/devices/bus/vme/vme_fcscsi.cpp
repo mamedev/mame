@@ -193,13 +193,57 @@ void vme_fcscsi1_card_device::fcscsi1_mem(address_map &map)
 	map(0x002000, 0x01ffff).ram(); /* Dual Ported RAM */
 	map(0xe00000, 0xe7ffff).rom(); /* System EPROM Area 32Kb DEBUGGER supplied */
 	map(0xd00000, 0xd0003f).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
-//  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
+//  map(0xc40000, 0xc4001f).rw("scsi", FUNC(ncr5386_device::read), FUNC(ncr5386_device::write)).umask16(0x00ff); /* SCSI Controller interface - device support not yet available*/
 	map(0xc40000, 0xc4001f).rw(FUNC(vme_fcscsi1_card_device::scsi_r), FUNC(vme_fcscsi1_card_device::scsi_w)).umask16(0x00ff);
 	map(0xc80000, 0xc800ff).rw("mc68450", FUNC(hd63450_device::read), FUNC(hd63450_device::write));  /* DMA Controller interface */
 	map(0xcc0000, 0xcc0007).rw("fdc", FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);      /* Floppy Controller interface */
 	map(0xcc0009, 0xcc0009).rw(FUNC(vme_fcscsi1_card_device::tcr_r), FUNC(vme_fcscsi1_card_device::tcr_w)); /* The Control Register, SCSI ID and FD drive select bits */
 }
 
+/*
+----------------------------------------------------
+ IRQ  IRQ
+Level Source       B4l inserted     B4l removed (Def)
+-----------------------------------------------------
+ 1     P3 Pin #13   AV1 Autovector   AV1 Autovector
+ 2     DMAC         DMAC             AV2 Autovector
+ 3     SCSIBC       AV3 Autovector   AV3 Autovector
+ 4     FDC          AV4 Autovector   AV4 Autovector
+ 5     PI/T Timer   PI/T Timer Vect  PI/T Timer Vect
+ 6     --           --               --
+ 7     PI/T Port    PI/T Port Vect   PI/T Port Vect
+------------------------------------------------------
+Default configuration: B41 jumper removed
+
+The PI/T port interrupt can be used under software control to
+cause non-maskable (Level 7) interrupts if the watchdog timer
+elapses and/or if the VMEbus interrupt trigger call occurs.
+*/
+
+/* TODO: Add configurable B41 jumper */
+#define B41 0
+
+void vme_fcscsi1_card_device::update_irq_to_maincpu() {
+	if (fdc_irq_state) {
+		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	} else if (dmac_irq_state) {
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	} else {
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
+}
+
+void vme_fcscsi1_card_device::cpu_space_map(address_map &map)
+{
+	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
+	map(0xfffff5, 0xfffff5).r(FUNC(vme_fcscsi1_card_device::dma_iack));
+}
 
 FLOPPY_FORMATS_MEMBER( vme_fcscsi1_card_device::floppy_formats )
 	FLOPPY_PC_FORMAT
@@ -228,37 +272,36 @@ ROM_START (fcscsi1)
 ROM_END
 
 
-MACHINE_CONFIG_START(vme_fcscsi1_card_device::device_add_mconfig)
+void vme_fcscsi1_card_device::device_add_mconfig(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68010, CPU_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
-	MCFG_DEVICE_PROGRAM_MAP(fcscsi1_mem)
-	MCFG_DEVICE_IRQ_ACKNOWLEDGE_DRIVER(vme_fcscsi1_card_device, maincpu_irq_acknowledge_callback)
+	M68010(config, m_maincpu, CPU_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
+	m_maincpu->set_addrmap(AS_PROGRAM, &vme_fcscsi1_card_device::fcscsi1_mem);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &vme_fcscsi1_card_device::cpu_space_map);
 
 	/* FDC  */
-	MCFG_DEVICE_ADD("fdc", WD1772, PIT_CRYSTAL / 2)
-	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(*this, vme_fcscsi1_card_device, fdc_irq))
-	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE("mc68450", hd63450_device, drq1_w))
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats)
+	WD1772(config, m_fdc, PIT_CRYSTAL / 2);
+	m_fdc->intrq_wr_callback().set(FUNC(vme_fcscsi1_card_device::fdc_irq));
+	m_fdc->drq_wr_callback().set("mc68450", FUNC(hd63450_device::drq1_w));
+	FLOPPY_CONNECTOR(config, "fdc:0", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", fcscsi_floppies, "525qd", vme_fcscsi1_card_device::floppy_formats);
 
 	/* PIT Parallel Interface and Timer device */
 	PIT68230(config, m_pit, PIT_CRYSTAL / 2); /* 7474 based frequency divide by 2 */
 	m_pit->pb_out_callback().set(FUNC(vme_fcscsi1_card_device::led_w));
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
-	MCFG_DEVICE_ADD("mc68450", HD63450, CPU_CRYSTAL / 2)   // MC68450 compatible
-	MCFG_HD63450_CPU("maincpu")
-	MCFG_HD63450_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2))
-	MCFG_HD63450_BURST_CLOCKS(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50))
-	MCFG_HD63450_DMA_END_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_end))
-	MCFG_HD63450_DMA_ERROR_CB(WRITE8(*this, vme_fcscsi1_card_device, dma_error))
-	//MCFG_HD63450_DMA_READ_0_CB(READ8(*this, vme_fcscsi1_card_device, scsi_read_byte))  // ch 0 = SCSI
-	//MCFG_HD63450_DMA_WRITE_0_CB(WRITE8(*this, vme_fcscsi1_card_device, scsi_write_byte))
-	MCFG_HD63450_DMA_READ_1_CB(READ8(*this, vme_fcscsi1_card_device, fdc_read_byte))  // ch 1 = fdc
-	MCFG_HD63450_DMA_WRITE_1_CB(WRITE8(*this, vme_fcscsi1_card_device, fdc_write_byte))
-MACHINE_CONFIG_END
+	HD63450(config, m_dmac, CPU_CRYSTAL / 2, "maincpu");   // MC68450 compatible
+	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
+	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
+	m_dmac->irq_callback().set(FUNC(vme_fcscsi1_card_device::dma_irq));
+	//m_dmac->dma_read<0>().set(FUNC(vme_fcscsi1_card_device::scsi_read_byte));  // ch 0 = SCSI
+	//m_dmac->dma_write<0>().set(FUNC(vme_fcscsi1_card_device::scsi_write_byte));
+	m_dmac->dma_read<1>().set(FUNC(vme_fcscsi1_card_device::fdc_read_byte));  // ch 1 = fdc
+	m_dmac->dma_write<1>().set(FUNC(vme_fcscsi1_card_device::fdc_write_byte));
+}
 
 const tiny_rom_entry *vme_fcscsi1_card_device::device_rom_region() const
 {
@@ -371,12 +414,12 @@ WRITE8_MEMBER (vme_fcscsi1_card_device::led_w){
 	return;
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::dma_end)
+WRITE_LINE_MEMBER(vme_fcscsi1_card_device::dma_irq)
 {
-	if (data != 0)
+	if(state != CLEAR_LINE)
 	{
+		logerror("DMAC IRQ, vector = %x\n", m_dmac->iack());
 		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
 	}
 	else
 	{
@@ -386,25 +429,17 @@ WRITE8_MEMBER(vme_fcscsi1_card_device::dma_end)
 	update_irq_to_maincpu();
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::dma_error)
+uint8_t vme_fcscsi1_card_device::dma_iack()
 {
-	if(data != 0)
-	{
-		logerror("DMAC error, vector = %x\n", m_dmac->get_error_vector(offset));
-		dmac_irq_state = 1;
-		dmac_irq_vector = m_dmac->get_vector(offset);
-	}
+	if (B41)
+		return m_dmac->iack();
 	else
-	{
-		dmac_irq_state = 0;
-	}
-
-	update_irq_to_maincpu();
+		return m68000_base_device::autovector(2);
 }
 
-WRITE8_MEMBER(vme_fcscsi1_card_device::fdc_irq)
+WRITE_LINE_MEMBER(vme_fcscsi1_card_device::fdc_irq)
 {
-	if (data != 0)
+	if (state != 0)
 	{
 		fdc_irq_state = 1;
 	}
@@ -459,67 +494,6 @@ WRITE8_MEMBER (vme_fcscsi1_card_device::not_implemented_w){
 		printf(TODO);
 	}
 	return;
-}
-
-/*
-----------------------------------------------------
- IRQ  IRQ
-Level Source       B4l inserted     B4l removed (Def)
------------------------------------------------------
- 1     P3 Pin #13   AV1 Autovector   AV1 Autovector
- 2     DMAC         DMAC             AV2 Autovector
- 3     SCSIBC       AV3 Autovector   AV3 Autovector
- 4     FDC          AV4 Autovector   AV4 Autovector
- 5     PI/T Timer   PI/T Timer Vect  PI/T Timer Vect
- 6     --           --               --
- 7     PI/T Port    PI/T Port Vect   PI/T Port Vect
-------------------------------------------------------
-Default configuration: B41 jumper removed
-
-The PI/T port interrupt can be used under software control to
-cause non-maskable (Level 7) interrupts if the watchdog timer
-elapses and/or if the VMEbus interrupt trigger call occurs.
-*/
-
-/* TODO: Add configurable B41 jumper */
-#define B41 0
-
-void vme_fcscsi1_card_device::update_irq_to_maincpu() {
-	if (fdc_irq_state) {
-		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	} else if (dmac_irq_state) {
-		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-#if B41 == 1
-		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
-#else
-		m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
-#endif
-	} else {
-		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-	}
-}
-
-IRQ_CALLBACK_MEMBER(vme_fcscsi1_card_device::maincpu_irq_acknowledge_callback)
-{
-	// We immediately update the interrupt presented to the CPU, so that it doesn't
-	// end up retrying the same interrupt over and over. We then return the appropriate vector.
-	int vector = 0;
-	switch(irqline) {
-	case 2:
-		dmac_irq_state = 0;
-		vector = dmac_irq_vector;
-		break;
-	default:
-		logerror("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
-		return 0;
-	}
-	update_irq_to_maincpu();
-	return vector;
 }
 
 // This info isn't kept in a card driver atm so storing it as a comment for later use

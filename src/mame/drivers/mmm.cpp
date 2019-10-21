@@ -26,26 +26,29 @@ public:
 	void mmm(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(strobe_w);
-	DECLARE_READ8_MEMBER(inputs_r);
-	DECLARE_WRITE8_MEMBER(ay_porta_w);
+	void strobe_w(u8 data);
+	u8 inputs_r();
+	void ay_porta_w(u8 data);
+
+	u8 ctc_r(offs_t offset);
+	void ctc_w(offs_t offset, u8 data);
 
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_ioport_array<8> m_inputs;
 	u8 m_strobe;
 };
 
 
-WRITE8_MEMBER(mmm_state::strobe_w)
+void mmm_state::strobe_w(u8 data)
 {
 	m_strobe = data;
 }
 
-READ8_MEMBER(mmm_state::inputs_r)
+u8 mmm_state::inputs_r()
 {
 	u8 result = 0xff;
 	for (int i = 0; i < 8; i++)
@@ -54,9 +57,19 @@ READ8_MEMBER(mmm_state::inputs_r)
 	return result;
 }
 
-WRITE8_MEMBER(mmm_state::ay_porta_w)
+void mmm_state::ay_porta_w(u8 data)
 {
 	logerror("Writing %02X to AY-3-8910 port A\n", data);
+}
+
+u8 mmm_state::ctc_r(offs_t offset)
+{
+	return m_ctc->read(offset >> 4);
+}
+
+void mmm_state::ctc_w(offs_t offset, u8 data)
+{
+	m_ctc->write(offset >> 4, data);
 }
 
 void mmm_state::mem_map(address_map &map)
@@ -72,13 +85,7 @@ void mmm_state::io_map(address_map &map)
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x04, 0x04).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x05, 0x05).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x06, 0x06).select(0x30).lrw8("ctc_rw",
-									  [this](address_space &space, offs_t offset, u8 mem_mask) {
-										  return m_ctc->read(space, offset >> 4, mem_mask);
-									  },
-									  [this](address_space &space, offs_t offset, u8 data, u8 mem_mask) {
-										  m_ctc->write(space, offset >> 4, data, mem_mask);
-									  });
+	map(0x06, 0x06).select(0x30).rw(FUNC(mmm_state::ctc_r), FUNC(mmm_state::ctc_w));
 	map(0x07, 0x07).r(FUNC(mmm_state::inputs_r));
 }
 
@@ -173,22 +180,23 @@ static const z80_daisy_config mmm_daisy_chain[] =
 };
 
 
-MACHINE_CONFIG_START(mmm_state::mmm)
+void mmm_state::mmm(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80,2000000)         /* ? MHz */
-	MCFG_DEVICE_PROGRAM_MAP(mem_map)
-	MCFG_DEVICE_IO_MAP(io_map)
-	MCFG_Z80_DAISY_CHAIN(mmm_daisy_chain)
+	Z80(config, m_maincpu, 2000000);         /* ? MHz */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mmm_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &mmm_state::io_map);
+	m_maincpu->set_daisy_config(mmm_daisy_chain);
 
-	MCFG_DEVICE_ADD("ctc", Z80CTC, 2000000)
-	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+	Z80CTC(config, m_ctc, 2000000);
+	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	MCFG_DEVICE_ADD("aysnd", AY8910, 1000000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, mmm_state, ay_porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_CONFIG_END
+	ay8910_device& ay(AY8910(config, "aysnd", 1000000));
+	ay.port_a_write_callback().set(FUNC(mmm_state::ay_porta_w));
+	ay.add_route(ALL_OUTPUTS, "mono", 0.30);
+}
 
 
 ROM_START( mmm_ldip )

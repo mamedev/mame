@@ -132,8 +132,8 @@ WRITE16_MEMBER(qdrmfgp_state::gp2_control_w)
 
 READ16_MEMBER(qdrmfgp_state::v_rom_r)
 {
-	uint8_t *mem8 = memregion("gfx1")->base();
-	int bank = m_k056832->word_r(space, 0x34/2, 0xffff);
+	uint8_t *mem8 = memregion("k056832")->base();
+	int bank = m_k056832->word_r(0x34/2);
 
 	offset += bank * 0x800 * 4;
 
@@ -147,33 +147,33 @@ READ16_MEMBER(qdrmfgp_state::v_rom_r)
 READ16_MEMBER(qdrmfgp_state::gp2_vram_r)
 {
 	if (offset < 0x1000 / 2)
-		return m_k056832->ram_word_r(space, offset * 2 + 1, mem_mask);
+		return m_k056832->ram_word_r(offset * 2 + 1);
 	else
-		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2, mem_mask);
+		return m_k056832->ram_word_r((offset - 0x1000 / 2) * 2);
 }
 
 READ16_MEMBER(qdrmfgp_state::gp2_vram_mirror_r)
 {
 	if (offset < 0x1000 / 2)
-		return m_k056832->ram_word_r(space, offset * 2, mem_mask);
+		return m_k056832->ram_word_r(offset * 2);
 	else
-		return m_k056832->ram_word_r(space, (offset - 0x1000 / 2) * 2 + 1, mem_mask);
+		return m_k056832->ram_word_r((offset - 0x1000 / 2) * 2 + 1);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_w)
 {
 	if (offset < 0x1000 / 2)
-		m_k056832->ram_word_w(space, offset * 2 + 1, data, mem_mask);
+		m_k056832->ram_word_w(offset * 2 + 1, data, mem_mask);
 	else
-		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2, data, mem_mask);
+		m_k056832->ram_word_w((offset - 0x1000 / 2) * 2, data, mem_mask);
 }
 
 WRITE16_MEMBER(qdrmfgp_state::gp2_vram_mirror_w)
 {
 	if (offset < 0x1000 / 2)
-		m_k056832->ram_word_w(space, offset * 2, data, mem_mask);
+		m_k056832->ram_word_w(offset * 2, data, mem_mask);
 	else
-		m_k056832->ram_word_w(space, (offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
+		m_k056832->ram_word_w((offset - 0x1000 / 2) * 2 + 1, data, mem_mask);
 }
 
 
@@ -382,7 +382,7 @@ static INPUT_PORTS_START( qdrmfgp )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, qdrmfgp_state,battery_sensor_r, nullptr)   /* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(qdrmfgp_state, battery_sensor_r)   /* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -462,7 +462,7 @@ static INPUT_PORTS_START( qdrmfgp2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(DEVICE_SELF, qdrmfgp_state,battery_sensor_r, nullptr)   /* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(qdrmfgp_state, battery_sensor_r)   /* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -523,96 +523,96 @@ void qdrmfgp_state::machine_reset()
  *  Machine driver
  *
  *************************************/
-MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp)
 
+void qdrmfgp_state::qdrmfgp(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", qdrmfgp_state, qdrmfgp_interrupt, "screen", 0, 1)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qdrmfgp_state::qdrmfgp_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(qdrmfgp_state::qdrmfgp_interrupt), "screen", 0, 1);
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
-	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, qdrmfgp_state, ide_interrupt))
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(qdrmfgp_state::ide_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(40, 40+384-1, 16, 16+224-1);
+	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp_tile_callback), this);
+	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	m_k053252->set_offsets(40, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
-	MCFG_K054539_TIMER_HANDLER(WRITELINE(*this, qdrmfgp_state, k054539_irq1_gen))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, m_k054539, XTAL(18'432'000)));
+	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
+	k054539.timer_handler().set(FUNC(qdrmfgp_state::k054539_irq1_gen));
+	k054539.add_route(0, "lspeaker", 1.0);
+	k054539.add_route(1, "rspeaker", 1.0);
+}
 
-MACHINE_CONFIG_START(qdrmfgp_state::qdrmfgp2)
-
+void qdrmfgp_state::qdrmfgp2(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", M68000, XTAL(32'000'000)/2) /*  16.000 MHz */
-	MCFG_DEVICE_PROGRAM_MAP(qdrmfgp2_map)
-	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", qdrmfgp_state,  qdrmfgp2_interrupt)
+	M68000(config, m_maincpu, XTAL(32'000'000)/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qdrmfgp_state::qdrmfgp2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(qdrmfgp_state::qdrmfgp2_interrupt));
 
 	MCFG_MACHINE_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
-	MCFG_NVRAM_ADD_1FILL("nvram")
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
-	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(*this, qdrmfgp_state, gp2_ide_interrupt))
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
+	m_ata->irq_handler().set(FUNC(qdrmfgp_state::gp2_ide_interrupt));
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
-	MCFG_SCREEN_UPDATE_DRIVER(qdrmfgp_state, screen_update_qdrmfgp)
-	MCFG_SCREEN_PALETTE("palette")
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(40, 40+384-1, 16, 16+224-1);
+	screen.set_screen_update(FUNC(qdrmfgp_state::screen_update_qdrmfgp));
+	screen.set_palette(m_palette);
 
-	MCFG_PALETTE_ADD("palette", 2048)
-	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 
 	MCFG_VIDEO_START_OVERRIDE(qdrmfgp_state,qdrmfgp2)
 
-	MCFG_DEVICE_ADD("k056832", K056832, 0)
-	MCFG_K056832_CB(qdrmfgp_state, qdrmfgp2_tile_callback)
-	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4dj, 1, 0)
-	MCFG_K056832_PALETTE("palette")
+	K056832(config, m_k056832, 0);
+	m_k056832->set_tile_callback(FUNC(qdrmfgp_state::qdrmfgp2_tile_callback), this);
+	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
+	m_k056832->set_palette(m_palette);
 
-	MCFG_DEVICE_ADD("k053252", K053252, XTAL(32'000'000)/4)
-	MCFG_K053252_OFFSETS(40, 16)
+	K053252(config, m_k053252, XTAL(32'000'000)/4);
+	m_k053252->set_offsets(40, 16);
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	MCFG_DEVICE_ADD("k054539", K054539, XTAL(18'432'000))
-	MCFG_DEVICE_ADDRESS_MAP(0, qdrmfgp_k054539_map)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_CONFIG_END
+	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
+	k054539.set_addrmap(0, &qdrmfgp_state::qdrmfgp_k054539_map);
+	k054539.add_route(0, "lspeaker", 1.0);
+	k054539.add_route(1, "rspeaker", 1.0);
+}
 
 
 /*************************************
@@ -626,7 +626,7 @@ ROM_START( qdrmfgp )
 	ROM_LOAD16_WORD_SWAP( "gq_460_b04.20e", 0x000000, 0x80000, CRC(293d8174) SHA1(cf507d0b29dab161190f0160c05c640f16306bae) )
 	ROM_LOAD16_WORD_SWAP( "gq_460_a05.22e", 0x080000, 0x80000, CRC(4128cb3c) SHA1(4a16d85a66934a20afd074546de362c40a1ea785) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )       /* TILEMAP */
+	ROM_REGION( 0x100000, "k056832", 0 )       /* TILEMAP */
 	ROM_LOAD( "gq_460_a01.15e", 0x000000, 0x80000, CRC(6536b700) SHA1(47ffe0cfbf80810179560150b23d825fe1a5c5ca) )
 	ROM_LOAD( "gq_460_a02.17e", 0x080000, 0x80000, CRC(ac01d675) SHA1(bf66433ace95f4ef14699d03add7cbc2e5d90eea) )
 
@@ -643,7 +643,7 @@ ROM_START( qdrmfgp2 )
 	ROM_LOAD16_WORD_SWAP( "ge_557_c05.20e", 0x000000, 0x80000, CRC(336df99f) SHA1(46fb36d40371761be0cfa17b34f28cc893a44a22) )
 	ROM_LOAD16_WORD_SWAP( "ge_557_a06.22e", 0x080000, 0x80000, CRC(ad77e10f) SHA1(4a762a59fe3096d48e3cbf0da3bb0d75c5087e78) )
 
-	ROM_REGION( 0x100000, "gfx1", 0 )       /* TILEMAP */
+	ROM_REGION( 0x100000, "k056832", 0 )       /* TILEMAP */
 	ROM_LOAD( "ge_557_a01.13e", 0x000000, 0x80000, CRC(c301d406) SHA1(5fad8cc611edd83380972abf37ec80561b9317a6) )
 	ROM_LOAD( "ge_557_a02.15e", 0x080000, 0x80000, CRC(3bfe1e56) SHA1(9e4df512a804a96fcb545d4e0eb58b5421d65ea4) )
 

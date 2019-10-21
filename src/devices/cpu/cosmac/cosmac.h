@@ -53,10 +53,10 @@
                   _MRD   7 |             | 34  TPA
                  BUS 7   8 |             | 33  TPB
                  BUS 6   9 |   CDP1802   | 32  MA7
-                 BUS 5  10 |   CDP1803   | 31  MA6
-                 BUS 4  11 |   CDP1804   | 30  MA5
-                 BUS 3  12 |   CDP1805   | 29  MA4
-                 BUS 2  13 |   CDP1806   | 28  MA3
+                 BUS 5  10 |   CDP1804   | 31  MA6
+                 BUS 4  11 |   CDP1805   | 30  MA5
+                 BUS 3  12 |   CDP1806   | 29  MA4
+                 BUS 2  13 |             | 28  MA3
                  BUS 1  14 |             | 27  MA2
                  BUS 0  15 |             | 26  MA1
                      *  16 |             | 25  MA0
@@ -68,9 +68,9 @@
 
     Type            Internal ROM    Internal RAM    Timer   Pin 16 (*)
     ------------------------------------------------------------------
+    CDP1801         none            none            no          Vcc
     CDP1802         none            none            no          Vcc
-    CDP1803         ?               ?               ?           ?
-    CDP1804         2 KB            64 bytes        yes         ?
+    CDP1804         2 KB            64 bytes        yes         _EMS
     CDP1805         none            64 bytes        yes         _ME
     CDP1806         none            none            yes         Vdd
 
@@ -81,42 +81,7 @@
 
 #pragma once
 
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_COSMAC_WAIT_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_wait_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_CLEAR_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_clear_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_EF1_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_ef1_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_EF2_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_ef2_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_EF3_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_ef3_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_EF4_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_ef4_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_Q_CALLBACK(_write) \
-	downcast<cosmac_device &>(*device).set_q_wr_callback(DEVCB_##_write);
-
-#define MCFG_COSMAC_DMAR_CALLBACK(_read) \
-	downcast<cosmac_device &>(*device).set_dma_rd_callback(DEVCB_##_read);
-
-#define MCFG_COSMAC_DMAW_CALLBACK(_write) \
-	downcast<cosmac_device &>(*device).set_dma_wr_callback(DEVCB_##_write);
-
-#define MCFG_COSMAC_SC_CALLBACK(_write) \
-	downcast<cosmac_device &>(*device).set_sc_wr_callback(DEVCB_##_write);
-
+#include "cosdasm.h"
 
 
 //**************************************************************************
@@ -155,12 +120,11 @@ enum cosmac_state_code
 
 // ======================> cosmac_device
 
-class cosmac_device : public cpu_device
+class cosmac_device : public cpu_device, public cosmac_disassembler::config
 {
 public:
 	// registers
 	// public because machine/pecom.cpp accesses registers through the state interface - there should be a proper way to get address on bus for this
-	// drivers/microkit.cpp and drivers/eti660.cpp are even worse setting R0 through the state interface to hack around running boot code or something
 	enum
 	{
 		COSMAC_P,
@@ -178,12 +142,12 @@ public:
 		COSMAC_R7,
 		COSMAC_R8,
 		COSMAC_R9,
-		COSMAC_Ra,
-		COSMAC_Rb,
-		COSMAC_Rc,
-		COSMAC_Rd,
-		COSMAC_Re,
-		COSMAC_Rf,
+		COSMAC_R10,
+		COSMAC_R11,
+		COSMAC_R12,
+		COSMAC_R13,
+		COSMAC_R14,
+		COSMAC_R15,
 		COSMAC_DF,
 		COSMAC_IE,
 		COSMAC_Q,
@@ -203,17 +167,6 @@ public:
 	auto dma_wr_cb() { return m_write_dma.bind(); }
 	auto sc_cb() { return m_write_sc.bind(); }
 	auto tpb_cb() { return m_write_tpb.bind(); }
-
-	template <class Object> devcb_base &set_wait_rd_callback(Object &&cb) { return m_read_wait.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_clear_rd_callback(Object &&cb) { return m_read_clear.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ef1_rd_callback(Object &&cb) { return m_read_ef[0].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ef2_rd_callback(Object &&cb) { return m_read_ef[1].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ef3_rd_callback(Object &&cb) { return m_read_ef[2].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_ef4_rd_callback(Object &&cb) { return m_read_ef[3].set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_q_wr_callback(Object &&cb) { return m_write_q.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_rd_callback(Object &&cb) { return m_read_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_dma_wr_callback(Object &&cb) { return m_write_dma.set_callback(std::forward<Object>(cb)); }
-	template <class Object> devcb_base &set_sc_wr_callback(Object &&cb) { return m_write_sc.set_callback(std::forward<Object>(cb)); }
 
 	// public interfaces
 	offs_t get_memory_address();
@@ -250,6 +203,10 @@ protected:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
+	// cosmac_disassembler::config overrides
+	virtual uint8_t get_p() const override { return m_p; }
+	virtual uint8_t get_x() const override { return m_x; }
 
 	// helpers
 	inline uint8_t read_opcode(offs_t pc);
@@ -381,6 +338,16 @@ protected:
 	void out();
 	void inp();
 
+	// extended opcodes
+	void rldi();
+	void rlxa();
+	void rsxd();
+	void rnx();
+	void bci();
+	void bxi();
+	void ldc();
+	void gec();
+
 	const address_space_config      m_program_config;
 	const address_space_config      m_io_config;
 
@@ -407,6 +374,7 @@ protected:
 	enum class cosmac_state : u8
 	{
 		STATE_0_FETCH = 0,
+		STATE_0_FETCH_2ND,
 		STATE_1_INIT,
 		STATE_1_EXECUTE,
 		STATE_1_EXECUTE_2ND,
@@ -417,7 +385,7 @@ protected:
 
 	// internal state
 	uint16_t              m_pc;               // fake program counter
-	uint8_t               m_op;               // current opcode
+	uint16_t              m_op;               // current opcode
 	uint8_t               m_flagsio;          // flags storage for state saving
 	cosmac_state        m_state;            // state
 	cosmac_mode         m_mode;             // control mode
@@ -453,7 +421,8 @@ protected:
 
 	// opcode/condition tables
 	typedef void (cosmac_device::*ophandler)();
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const = 0;
+	virtual cosmac_device::ophandler get_ophandler(uint16_t opcode) const = 0;
+	virtual bool has_extended_opcodes() { return false; }
 };
 
 
@@ -469,10 +438,11 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
+	virtual cosmac_device::ophandler get_ophandler(uint16_t opcode) const override;
 
 	virtual void output_state_code() override;
 
+private:
 	static const ophandler s_opcodetable[256];
 };
 
@@ -486,18 +456,69 @@ public:
 	cdp1802_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) const override;
+	virtual cosmac_device::ophandler get_ophandler(uint16_t opcode) const override;
 
+private:
 	static const ophandler s_opcodetable[256];
+};
+
+
+// ======================> cdp1804_device
+
+class cdp1804_device : public cdp1802_device
+{
+public:
+	// construction/destruction
+	cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual cosmac_device::ophandler get_ophandler(uint16_t opcode) const override;
+	virtual bool has_extended_opcodes() override { return true; }
+
+private:
+	static const ophandler s_opcodetable_ex[256];
+};
+
+
+// ======================> cdp1805_device
+
+class cdp1805_device : public cdp1804_device
+{
+public:
+	// construction/destruction
+	cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+};
+
+
+// ======================> cdp1806_device
+
+class cdp1806_device : public cdp1805_device
+{
+public:
+	// construction/destruction
+	cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(CDP1801, cdp1801_device)
 DECLARE_DEVICE_TYPE(CDP1802, cdp1802_device)
+DECLARE_DEVICE_TYPE(CDP1804, cdp1804_device)
+DECLARE_DEVICE_TYPE(CDP1805, cdp1805_device)
+DECLARE_DEVICE_TYPE(CDP1806, cdp1806_device)
 
 
 #endif // MAME_CPU_COSMAC_COSMAC_H

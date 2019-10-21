@@ -53,7 +53,7 @@ public:
 		, m_dpl(*this, "dpl_%u", 0U)
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	template <int Mask> DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 	void init_peyper();
 	void init_odin();
 	void init_wolfman();
@@ -186,18 +186,17 @@ WRITE8_MEMBER(peyper_state::sol_w)
 }
 
 
+template <int Mask>
 CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 {
-	int bit_mask = (uintptr_t)param;
-
-	switch (bit_mask)
+	switch (Mask)
 	{
 		case 0x03:
-			return ((ioport("REPLAY")->read() & bit_mask) >> 0);
+			return ((ioport("REPLAY")->read() & Mask) >> 0);
 		case 0x40:
-			return ((ioport("REPLAY")->read() & bit_mask) >> 6);
+			return ((ioport("REPLAY")->read() & Mask) >> 6);
 		default:
-			logerror("wolfman_replay_hs_r : invalid %02X bit_mask\n",bit_mask);
+			logerror("wolfman_replay_hs_r : invalid %02X bit_mask\n",Mask);
 			return 0;
 	}
 }
@@ -511,14 +510,14 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPSETTING(    0x20, "01" )
 //  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
 //  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
-	PORT_BIT( 0x03, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, peyper_state,wolfman_replay_hs_r, (void *)0x03)
+	PORT_BIT( 0x03, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(peyper_state, wolfman_replay_hs_r<0x03>)
 
 	/* DSW1 : port 0x24 - DSW1-1 is bit 7 ... DSW1-8 is bit 0 */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x80, 0x00, "Adjust Replay" )             // Premios por Puntuacion - code at 0x0aa3 - stored at 0x60c4 and 0x60cc (0x00 NO / 0x05 YES)
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(DEVICE_SELF, peyper_state,wolfman_replay_hs_r, (void *)0x40)
+	PORT_BIT( 0x40, 0x00, IPT_CUSTOM) PORT_CUSTOM_MEMBER(peyper_state, wolfman_replay_hs_r<0x40>)
 	PORT_DIPNAME( 0x20, 0x00, "Clear RAM on Reset" )        // Borrador RAM - code at 0x0ace - range 0x6141..0x616f - 0x616d = 0x5a and 0x616e = 0xa5
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
@@ -601,13 +600,14 @@ void peyper_state::machine_reset()
 }
 
 
-MACHINE_CONFIG_START(peyper_state::peyper)
+void peyper_state::peyper(machine_config &config)
+{
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", Z80, 2'500'000)
-	MCFG_DEVICE_PROGRAM_MAP(peyper_map)
-	MCFG_DEVICE_IO_MAP(peyper_io)
-	MCFG_DEVICE_PERIODIC_INT_DRIVER(peyper_state, irq0_line_hold,  1250)
-	MCFG_NVRAM_ADD_0FILL("nvram")
+	Z80(config, m_maincpu, 2'500'000);
+	m_maincpu->set_addrmap(AS_PROGRAM, &peyper_state::peyper_map);
+	m_maincpu->set_addrmap(AS_IO, &peyper_state::peyper_io);
+	m_maincpu->set_periodic_int(FUNC(peyper_state::irq0_line_hold), attotime::from_hz(1250));
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	config.set_default_layout(layout_peyper);
@@ -615,23 +615,23 @@ MACHINE_CONFIG_START(peyper_state::peyper)
 	/* Sound */
 	genpin_audio(config);
 	SPEAKER(config, "ayvol").front_center();
-	MCFG_DEVICE_ADD("ay1", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p1a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p1b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
-	MCFG_DEVICE_ADD("ay2", AY8910, 2500000)
-	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(*this, peyper_state, p2a_w))
-	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(*this, peyper_state, p2b_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "ayvol", 1.0)
+	ay8910_device &ay1(AY8910(config, "ay1", 2500000));
+	ay1.port_a_write_callback().set(FUNC(peyper_state::p1a_w));
+	ay1.port_b_write_callback().set(FUNC(peyper_state::p1b_w));
+	ay1.add_route(ALL_OUTPUTS, "ayvol", 1.0);
+	ay8910_device &ay2(AY8910(config, "ay2", 2500000));
+	ay2.port_a_write_callback().set(FUNC(peyper_state::p2a_w));
+	ay2.port_b_write_callback().set(FUNC(peyper_state::p2b_w));
+	ay2.add_route(ALL_OUTPUTS, "ayvol", 1.0);
 
 	/* Devices */
-	MCFG_DEVICE_ADD("i8279", I8279, 2500000)
-	MCFG_I8279_OUT_SL_CB(WRITE8(*this, peyper_state, col_w))             // scan SL lines
-	MCFG_I8279_OUT_DISP_CB(WRITE8(*this, peyper_state, disp_w))          // display A&B
-	MCFG_I8279_IN_RL_CB(READ8(*this, peyper_state, sw_r))                // kbd RL lines
-	MCFG_I8279_IN_SHIFT_CB(CONSTANT(1))                                  // Shift key
-	MCFG_I8279_IN_CTRL_CB(CONSTANT(1))
-MACHINE_CONFIG_END
+	i8279_device &kbdc(I8279(config, "i8279", 2500000));
+	kbdc.out_sl_callback().set(FUNC(peyper_state::col_w));      // scan SL lines
+	kbdc.out_disp_callback().set(FUNC(peyper_state::disp_w));   // display A&B
+	kbdc.in_rl_callback().set(FUNC(peyper_state::sw_r));        // kbd RL lines
+	kbdc.in_shift_callback().set_constant(1);                   // Shift key
+	kbdc.in_ctrl_callback().set_constant(1);
+}
 
 // Not allowed to set up an array all at once, so we have this mess
 void peyper_state::init_peyper()

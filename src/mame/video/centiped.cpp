@@ -282,15 +282,13 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(centiped_state,warlords)
+void centiped_state::warlords_palette(palette_device &palette) const
 {
-	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
+	uint8_t const *const color_prom = memregion("proms")->base();
 
-	for (i = 0; i < palette.entries(); i++)
+	for (unsigned i = 0; i < palette.entries(); i++)
 	{
 		uint8_t pen;
-		int r, g, b;
 
 		if (i < 0x20)
 			/* characters */
@@ -299,16 +297,16 @@ PALETTE_INIT_MEMBER(centiped_state,warlords)
 			/* sprites */
 			pen = (((i - 0x20) & 0x1c) << 2) | (((i - 0x20) & 0x03) << 2);
 
-		r = ((color_prom[pen] >> 2) & 0x01) * 0xff;
-		g = ((color_prom[pen] >> 1) & 0x01) * 0xff;
-		b = ((color_prom[pen] >> 0) & 0x01) * 0xff;
+		int r = ((color_prom[pen] >> 2) & 0x01) * 0xff;
+		int g = ((color_prom[pen] >> 1) & 0x01) * 0xff;
+		int b = ((color_prom[pen] >> 0) & 0x01) * 0xff;
 
 		/* colors 0x40-0x7f are converted to grey scale as it's used on the
 		   upright version that had an overlay */
 		if (pen >= 0x40)
 		{
 			/* use the standard ratios: r = 30%, g = 59%, b = 11% */
-			int grey = (r * 0x4d / 0xff) + (g * 0x96 / 0xff) + (b * 0x1c / 0xff);
+			int const grey = (r * 0x4d / 0xff) + (g * 0x96 / 0xff) + (b * 0x1c / 0xff);
 			r = g = b = grey;
 		}
 

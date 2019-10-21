@@ -57,7 +57,7 @@ void vis_audio_device::device_start()
 	set_isa_device();
 	m_isa->set_dma_channel(7, this, false);
 	m_isa->install_device(0x0220, 0x022f, read8_delegate(FUNC(vis_audio_device::pcm_r), this), write8_delegate(FUNC(vis_audio_device::pcm_w), this));
-	m_isa->install_device(0x0388, 0x038b, read8_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
+	m_isa->install_device(0x0388, 0x038b, read8sm_delegate(FUNC(ymf262_device::read), subdevice<ymf262_device>("ymf262")), write8sm_delegate(FUNC(ymf262_device::write), subdevice<ymf262_device>("ymf262")));
 	m_pcm = timer_alloc();
 	m_pcm->adjust(attotime::never);
 }
@@ -143,7 +143,6 @@ void vis_audio_device::device_add_mconfig(machine_config &config)
 	m_rdac->add_route(ALL_OUTPUTS, "rspeaker", 1.0); // sanyo lc7883k
 
 	voltage_regulator_device &vreg(VOLTAGE_REGULATOR(config, "vref"));
-	vreg.set_output(5.0);
 	vreg.add_route(0, "ldac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "rdac", 1.0, DAC_VREF_POS_INPUT);
 	vreg.add_route(0, "ldac", -1.0, DAC_VREF_NEG_INPUT);
@@ -224,7 +223,7 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 		m_samples = 0;
 		m_sample_byte = 0;
 		m_isa->drq7_w(ASSERT_LINE);
-		attotime rate = attotime::from_ticks((double)(1 << ((m_mode >> 5) & 3)), 44100.0); // TODO : Unknown clock
+		attotime rate = attotime::from_ticks(1 << ((m_mode >> 5) & 3), 44100); // TODO : Unknown clock
 		m_pcm->adjust(rate, 0, rate);
 	}
 	else if(!(m_mode & 0x10))
@@ -918,7 +917,7 @@ void vis_state::vis(machine_config &config)
 	config.device_remove("mb:pc_kbdc");
 
 	kbdc8042_device &kbdc(KBDC8042(config, "kbdc"));
-	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_AT386);
+	kbdc.set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	kbdc.system_reset_callback().set_inputline("maincpu", INPUT_LINE_RESET);
 	kbdc.gate_a20_callback().set_inputline("maincpu", INPUT_LINE_A20);
 	kbdc.input_buffer_full_callback().set("mb:pic8259_master", FUNC(pic8259_device::ir1_w));
