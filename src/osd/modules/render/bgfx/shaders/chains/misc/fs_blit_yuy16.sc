@@ -8,6 +8,8 @@ $input v_color0, v_texcoord0
 // Samplers
 SAMPLER2D(s_tex, 0);
 
+#define round(X) floor((X)+0.5)
+
 vec4 u_tex_size0;
 vec4 u_inv_tex_size0;
 
