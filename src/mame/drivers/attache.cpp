@@ -514,7 +514,7 @@ READ8_MEMBER(attache_state::pio_portA_r)
 		m_rtc->write_w(0);
 		m_rtc->read_w(1);
 		m_rtc->address_w((porta & 0xf0) >> 4);
-		ret = m_rtc->data_r(space,0);
+		ret = m_rtc->data_r();
 		logerror("RTC: read %02x from %02x (write)\n",ret,(porta & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5832_READ:
@@ -522,7 +522,7 @@ READ8_MEMBER(attache_state::pio_portA_r)
 		m_rtc->write_w(0);
 		m_rtc->read_w(1);
 		m_rtc->address_w((porta & 0xf0) >> 4);
-		ret = m_rtc->data_r(space,0);
+		ret = m_rtc->data_r();
 		logerror("RTC: read %02x from %02x\n",ret,(porta & 0xf0) >> 4);
 		break;
 	case PIO_SEL_5101_WRITE:
@@ -569,7 +569,7 @@ void attache_state::operation_strobe(address_space& space, uint8_t data)
 		m_rtc->cs_w(1);
 		m_rtc->read_w(0);
 		m_rtc->address_w((data & 0xf0) >> 4);
-		m_rtc->data_w(space,0,data & 0x0f);
+		m_rtc->data_w(data & 0x0f);
 		m_rtc->write_w(1);
 		logerror("RTC: write %01x to %01x\n",data & 0x0f,(data & 0xf0) >> 4);
 		break;

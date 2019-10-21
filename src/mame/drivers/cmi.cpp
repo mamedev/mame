@@ -1476,7 +1476,7 @@ READ8_MEMBER( cmi_state::q133_1_porta_r )
 {
 	if (BIT(m_q133_pia[0]->b_output(), 1))
 	{
-		return m_msm5832->data_r(space, m_msm5832_addr) << 4;
+		return m_msm5832->data_r() << 4;
 	}
 	return 0xff;
 }
