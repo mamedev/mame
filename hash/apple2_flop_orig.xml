@@ -8174,4 +8174,89 @@
 		</part>
 	</software>
 
+	<software name="gauntlet">
+		<description>Gauntlet</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-10-19"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+		<!-- This was released with several different copy protections;
+		this version was protected with the E7 bitstream. Game code and data
+		is identical to other protected variants. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235440">
+				<rom name="gauntlet side a.woz" size="235440" crc="adcde10f" sha1="ac3bf5d9d37e76d286188a35dbcbfbf4b4977640" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235440">
+				<rom name="gauntlet side b.woz" size="235440" crc="2a6a240f" sha1="6279fc79ce45a7df2d506a8c47223c506f725c2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gohayden">
+		<description>Go (Hayden)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<!--"Go" is a 1982 board game by Stan Erwin and published by Hayden Book Company. It requires a 48K Apple ][+ or later.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="go.woz" size="234775" crc="aa3a005d" sha1="d96d7d67c1a2f664735f412c25229b91306cd5bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbusters">
+		<description>Ghostbusters</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241426">
+				<rom name="ghostbusters.woz" size="241426" crc="c4176675" sha1="3e5be969ad5a6fc56188397d60b9616f3f3cb785" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galwars">
+		<description>Galactic Wars</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="galactic wars.woz" size="234768" crc="f285f463" sha1="c830b95c49a107569d424803344732fed6523983" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guderian">
+		<description>Guderian</description>
+		<year>1986</year>
+		<publisher>The Avalon Hill</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234755">
+				<rom name="guderian.woz" size="234755" crc="8415b9d0" sha1="62c4582dcbb181e42052e81671c27f2dace6865e" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
