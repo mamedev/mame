@@ -159,15 +159,12 @@ private:
 	void soundram_w(offs_t offset, u8 data);
 
 	// m72_i8751 specific
-	DECLARE_WRITE16_MEMBER(main_mcu_sound_w);
 	void main_mcu_w(offs_t offset, u16 data, u16 mem_mask);
 	void mcu_data_w(offs_t offset, u8 data);
 	u8 mcu_data_r(offs_t offset);
 	u8 mcu_sample_r();
-	void mcu_port1_w(u8 data);
 	void mcu_low_w(u8 data);
 	void mcu_high_w(u8 data);
-	u8 snd_cpu_sample_r();
 
 	DECLARE_READ16_MEMBER(protection_r);
 	DECLARE_WRITE16_MEMBER(protection_w);

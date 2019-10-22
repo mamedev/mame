@@ -350,14 +350,6 @@ u8 m72_state::mcu_sample_r()
 	return sample;
 }
 
-void m72_state::mcu_port1_w(u8 data)
-{
-	m_mcu_sample_latch = data;
-
-	// FIXME: this can't be the NMI trigger
-	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-}
-
 void m72_state::mcu_low_w(u8 data)
 {
 	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
@@ -370,14 +362,8 @@ void m72_state::mcu_high_w(u8 data)
 	logerror("high: %02x %08x\n", data, m_mcu_sample_addr);
 }
 
-u8 m72_state::snd_cpu_sample_r()
-{
-	return m_mcu_sample_latch;
-}
-
 void m72_state::init_m72_8751()
 {
-	save_item(NAME(m_mcu_sample_latch));
 	save_item(NAME(m_mcu_sample_addr));
 
 	/* lohtb2 */
@@ -977,7 +963,7 @@ void m72_state::m72_portmap(address_map &map)
 void m72_state::m72_protected_portmap(address_map &map)
 {
 	m72_portmap(map);
-	map(0xc0, 0xc0).w("mculatch", FUNC(generic_latch_8_device::write));
+	map(0xc0, 0xc0).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
 void m72_state::m84_portmap(address_map &map)
@@ -1104,8 +1090,8 @@ void m72_state::sound_protected_portmap(address_map &map)
 {
 	rtype_sound_portmap(map);
 	map.global_mask(0xff);
-	map(0x82, 0x82).w(m_dac, FUNC(dac_byte_interface::data_w));
-	map(0x84, 0x84).r(FUNC(m72_state::snd_cpu_sample_r));
+	map(0x82, 0x82).w("mculatch", FUNC(generic_latch_8_device::write));
+	map(0x84, 0x84).r("soundlatch2", FUNC(generic_latch_8_device::read));
 }
 
 void m72_state::rtype2_sound_portmap(address_map &map)
@@ -1936,9 +1922,11 @@ void m72_state::m72_8751(machine_config &config)
 	mculatch.data_pending_callback().set_inputline(m_mcu, MCS51_INT1_LINE);
 	mculatch.set_separate_acknowledge(true);
 
+	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
+
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000))); /* Uses its own XTAL */
 	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
-	mcu.port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
+	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
 }
 
 void m72_state::imgfightb(machine_config &config)
@@ -1947,7 +1935,6 @@ void m72_state::imgfightb(machine_config &config)
 	i80c31_device &mcu(I80C31(config.replace(), m_mcu, XTAL(7'200'000)));
 	mcu.set_addrmap(AS_PROGRAM, &m72_state::i80c31_mem_map);
 	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
-	mcu.port_out_cb<1>().set(FUNC(m72_state::mcu_port1_w));
 
 	// TODO: uses 6116 type RAM instead of MB8421 and MB8431
 }
