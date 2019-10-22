@@ -5,7 +5,7 @@
     TODO:
 
     - floating bus writes to peripheral registers in m6502.c
-    - sort out kernals between PAL/NTSC
+    - sort out kernels between PAL/NTSC
     - tsuit215 test failures
         - IRQ (WRONG $DC0D)
         - NMI (WRONG $DD0D)
