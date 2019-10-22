@@ -17,7 +17,6 @@
 
 #include "chainentry.h"
 
-class render_primitive;
 class bgfx_slider;
 class bgfx_parameter;
 class texture_manager;
@@ -31,7 +30,7 @@ public:
 	bgfx_chain(std::string name, std::string author, bool transform, target_manager& targets, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::vector<bgfx_target*> target_list, uint32_t screen_index);
 	~bgfx_chain();
 
-	void process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
+	void process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
 	void repopulate_targets();
 
 	// Getters

@@ -76,14 +76,14 @@ void bgfx_chain::repopulate_targets()
 	}
 }
 
-void bgfx_chain::process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
+void bgfx_chain::process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window& window, uint64_t blend)
 {
 	screen_device_iterator screen_iterator(window.machine().root_device());
 	screen_device* screen_device = screen_iterator.byindex(screen);
 
 	uint16_t screen_count(window.target()->current_view()->screens().count());
-	uint16_t screen_width(floorf(prim->get_quad_width() + 0.5f));
-	uint16_t screen_height(floorf(prim->get_quad_height() + 0.5f));
+	uint16_t screen_width = prim.m_quad_width;
+	uint16_t screen_height = prim.m_quad_height;
 	uint32_t rotation_type =
 		(window.target()->orientation() & ROT90)  == ROT90  ? 1 :
 		(window.target()->orientation() & ROT180) == ROT180 ? 2 :

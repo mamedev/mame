@@ -467,6 +467,15 @@ void renderer_bgfx::put_packed_quad(render_primitive *prim, uint32_t hash, Scree
 	float u[4] = { u0, u1, u0, u1 };
 	float v[4] = { v0, v0, v1, v1 };
 
+	if (bgfx::getRendererType() == bgfx::RendererType::Direct3D9)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			u[i] += 0.5f / size;
+			v[i] += 0.5f / size;
+		}
+	}
+
 	if (PRIMFLAG_GET_TEXORIENT(prim->flags) & ORIENTATION_SWAP_XY)
 	{
 		std::swap(u[1], u[2]);
@@ -834,8 +843,13 @@ int renderer_bgfx::draw(int update)
 	}
 
 	win->m_primlist->acquire_lock();
-	s_current_view += m_chains->handle_screen_chains(s_current_view, win->m_primlist->first(), *win.get());
+	uint32_t num_screens = m_chains->update_screen_textures(s_current_view, win->m_primlist->first(), *win.get());
 	win->m_primlist->release_lock();
+
+	if (num_screens)
+	{
+		s_current_view += m_chains->process_screen_chains(s_current_view, *win.get());
+	}
 
 	bool skip_frame = update_dimensions();
 	if (skip_frame)
