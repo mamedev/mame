@@ -829,6 +829,8 @@ void squale_state::squale(machine_config &config)
 	m_ef9365->set_palette_tag("palette");
 	m_ef9365->set_nb_bitplanes(4);
 	m_ef9365->set_display_mode(ef9365_device::DISPLAY_MODE_256x256);
+	m_ef9365->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+
 	TIMER(config, "squale_sl").configure_scanline(FUNC(squale_state::squale_scanline), "screen", 0, 10);
 
 	/* Floppy */
