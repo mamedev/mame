@@ -68,6 +68,7 @@ public:
 	void m72_audio_chips(machine_config &config);
 	void m72_xmultipl(machine_config &config);
 	void m72_dbreed(machine_config &config);
+	void m72_dbreedw(machine_config &config);
 	void cosmccop(machine_config &config);
 	void poundfor(machine_config &config);
 	void m72(machine_config &config);
@@ -90,6 +91,7 @@ public:
 	void init_bchopper();
 	void init_gallop();
 	void init_m72_8751();
+	void init_dbreedm72();
 	void init_nspirit();
 	void init_loht();
 	void init_imgfight();
@@ -226,6 +228,7 @@ private:
 
 	void dbreed_map(address_map &map);
 	void dbreedm72_map(address_map &map);
+	void dbreedwm72_map(address_map &map);
 	void hharry_map(address_map &map);
 	void hharryu_map(address_map &map);
 	void kengo_map(address_map &map);
