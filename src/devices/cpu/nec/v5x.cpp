@@ -399,8 +399,6 @@ device_memory_interface::space_config_vector v50_base_device::memory_space_confi
 			std::make_pair(AS_IO,          &m_io_config),
 			std::make_pair(AS_INTERNAL_IO, &m_internal_io_config)
 		};
-	if(has_configured_map(AS_OPCODES))
-		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcodes_config));
 	return spaces;
 }
 
@@ -656,14 +654,11 @@ void v53_device::device_add_mconfig(machine_config &config)
 
 device_memory_interface::space_config_vector v53_device::memory_space_config() const
 {
-	space_config_vector spaces = {
+	return space_config_vector {
 			std::make_pair(AS_PROGRAM,     &m_program_config),
 			std::make_pair(AS_IO,          &m_io_config),
 			std::make_pair(AS_INTERNAL_IO, &m_internal_io_config)
 		};
-	if(has_configured_map(AS_OPCODES))
-		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcodes_config));
-	return spaces;
 }
 
 v53_device::v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)

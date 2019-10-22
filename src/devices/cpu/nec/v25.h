@@ -71,7 +71,6 @@ protected:
 
 private:
 	address_space_config m_program_config;
-	address_space_config m_opcodes_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
@@ -117,7 +116,7 @@ private:
 	uint16_t  m_WTC;
 	uint32_t  m_IDB;
 
-	address_space *m_program, *m_opcodes;
+	address_space *m_program;
 	std::function<u8 (offs_t address)> m_or8;
 	address_space *m_data;
 	address_space *m_io;

@@ -53,7 +53,6 @@ DEFINE_DEVICE_TYPE(V35, v35_device, "v35", "NEC V35")
 v25_common_device::v25_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
-	, m_opcodes_config("opcodes", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 20, 0)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 9, 0, address_map_constructor(FUNC(v25_common_device::ida_sfr_map), this))
 	, m_io_config("io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, 16, 0)
 	, m_internal_ram(*this, "internal_ram")
@@ -86,14 +85,11 @@ v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t 
 
 device_memory_interface::space_config_vector v25_common_device::memory_space_config() const
 {
-	space_config_vector spaces = {
+	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
 		std::make_pair(AS_DATA,    &m_data_config),
 		std::make_pair(AS_IO,      &m_io_config)
 	};
-	if(has_configured_map(AS_OPCODES))
-		spaces.push_back(std::make_pair(AS_OPCODES, &m_opcodes_config));
-	return spaces;
 }
 
 TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
@@ -620,12 +616,11 @@ void v25_common_device::device_start()
 	save_item(NAME(m_prefetch_reset));
 
 	m_program = &space(AS_PROGRAM);
-	m_opcodes = has_space(AS_OPCODES) ? &space(AS_OPCODES) : m_program;
-	if(m_opcodes->data_width() == 8) {
-		auto cache = m_opcodes->cache<0, 0, ENDIANNESS_LITTLE>();
+	if(m_program->data_width() == 8) {
+		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
 		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	} else {
-		auto cache = m_opcodes->cache<1, 0, ENDIANNESS_LITTLE>();
+		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
 		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
 	m_data = &space(AS_DATA);

@@ -61,7 +61,6 @@ protected:
 	void set_poll_line(int state);
 
 	address_space_config m_program_config;
-	address_space_config m_opcodes_config;
 	address_space_config m_io_config;
 
 private:
@@ -97,7 +96,7 @@ private:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
 
-	address_space *m_program, *m_opcodes;
+	address_space *m_program;
 	std::function<u8 (offs_t address)> m_or8;
 	address_space *m_io;
 	int     m_icount;
