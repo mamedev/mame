@@ -77,6 +77,7 @@ public:
 	void kengo(machine_config &config);
 	void m81_dbreed(machine_config &config);
 	void m72_8751(machine_config &config);
+	void m72_airduel(machine_config &config);
 	void hharryu(machine_config &config);
 	void rtype2(machine_config &config);
 	void m82(machine_config &config);
@@ -236,6 +237,7 @@ private:
 	void m72_protected_map(address_map &map);
 	void m72_portmap(address_map &map);
 	void m72_protected_portmap(address_map &map);
+	void m72_airduel_portmap(address_map &map);
 	void m81_cpu1_common_map(address_map &map);
 	void m81_portmap(address_map &map);
 	void m82_map(address_map &map);

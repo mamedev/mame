@@ -966,6 +966,12 @@ void m72_state::m72_protected_portmap(address_map &map)
 	map(0xc0, 0xc0).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
+void m72_state::m72_airduel_portmap(address_map &map)
+{
+	m72_portmap(map);
+	map(0xc0, 0xc0).w("mculatch", FUNC(generic_latch_8_device::write));
+}
+
 void m72_state::m84_portmap(address_map &map)
 {
 	map(0x00, 0x01).portr("IN0");
@@ -1927,6 +1933,12 @@ void m72_state::m72_8751(machine_config &config)
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000))); /* Uses its own XTAL */
 	mcu.set_addrmap(AS_IO, &m72_state::mcu_io_map);
 	mcu.port_out_cb<1>().set(m_dac, FUNC(dac_byte_interface::write));
+}
+
+void m72_state::m72_airduel(machine_config &config)
+{
+	m72_8751(config);
+	m_maincpu->set_addrmap(AS_IO, &m72_state::m72_airduel_portmap);
 }
 
 void m72_state::imgfightb(machine_config &config)
@@ -4332,7 +4344,7 @@ GAME( 1989, dbreedm72j,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m
 
 GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, airduelm72,  airduel,  m72_8751,     airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72_airduel,  airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 PCB version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
