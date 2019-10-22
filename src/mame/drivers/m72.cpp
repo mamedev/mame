@@ -3452,7 +3452,7 @@ ROM_START( dbreedm72 )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dbreedm72.mcu",  0x00000, 0x01000, CRC(8bf2910c) SHA1(65842c928626077f613e0ab56074e83301a64a2e) )
+	ROM_LOAD( "dbreedm72.mcu",  0x00000, 0x01000, NO_DUMP ) // Requires different currently undumped MCU code - i8751 MCU labeled  DB C-PR-B??
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
