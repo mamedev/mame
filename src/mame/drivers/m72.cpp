@@ -470,14 +470,6 @@ WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
 	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m_audio->set_sample_start(a[data & 0xff]);
 }
 
-WRITE16_MEMBER(m72_state::airduelm72_sample_trigger_w)
-{
-	static const int a[16] = {
-		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
-		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m_audio->set_sample_start(a[data & 0xff]);
-}
-
 WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
 {
 	static const int a[28] = {
