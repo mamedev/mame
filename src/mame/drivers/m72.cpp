@@ -231,6 +231,10 @@ void m72_state::machine_reset()
 
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_state::synch_callback),this));
+
+	// Hold sound CPU in reset if main CPU has to upload the program into RAM
+	if (m_soundram.found())
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 MACHINE_RESET_MEMBER(m72_state,kengo)
