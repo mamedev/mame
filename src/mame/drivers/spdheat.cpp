@@ -105,15 +105,15 @@ void spdheat_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 	 0:  .... .... .... .... = ?
 	 
 	 1:  .... .... xxxx xxxx = Y position
-	 .... ..x. .... .... = Y position
-	 x... .... .... .... = 0 = 16x16, 1 = 16x32
+	     .... ..x. .... .... = Y position
+	     x... .... .... .... = 0 = 16x16, 1 = 16x32
 	 
 	 2:  .... ..xx xxxx xxxx = Code
-	 ..xx xx.. .... .... = Color
-	 .x.. .... .... .... = X flip
-	 x... .... .... .... = Y flip
+	     ..xx xx.. .... .... = Color
+	     .x.. .... .... .... = X flip
+	     x... .... .... .... = Y flip
 	 
-	 3:  .... .xxx xxxx xxxx = X position
+	 3:  .... ..xx xxxx xxxx = X position
 	 */
 	
 	for (int offs = (0x800 / 2) - 4; offs >= 0; offs -= 4)
@@ -122,21 +122,19 @@ void spdheat_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 		int color = (m_spriteram[offs + 2] >> 10) & 0x0f;
 		
 		int y = 256 - ((m_spriteram[offs + 1] & 0x0ff));
-		int x = (int16_t)(m_spriteram[offs + 3] & 0xffff);
+		int x = (m_spriteram[offs + 3] & 0x3ff);
 		
 		int flipx = BIT(m_spriteram[offs + 2], 14);
 		int flipy = BIT(m_spriteram[offs + 2], 15);
-		
-		// TODO: revisit
-		if (xo == 0 && x >= 0)
-			x &= 0x3ff;
-		
+				
 		if (xo == 1)
+		{			
+			x -= 0x200;
+		}
+		else
 		{
-			if (x < 384)
-				continue;
-			
-			x -= 512;
+			if (x & 0x200)
+				x -= 0x400;
 		}
 		
 		if (yo != BIT(m_spriteram[offs + 1], 9))
@@ -496,7 +494,7 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPNAME( 0x0040, 0x0040, "Round Skip (With Select Buttons)" ) PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Functions of CPU-Controlled Cars" ) PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Functions of CPU-Controlled Cars" ) PORT_DIPLOCATION("DSWA:8") // what does this do?
 	PORT_DIPSETTING(      0x0080, "Continuous" )
 	PORT_DIPSETTING(      0x0000, "Not Continuous" )
 
@@ -542,16 +540,16 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) ) // 200
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) ) // 190
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) ) // 180
-	PORT_DIPNAME( 0x0010, 0x0000, "Coin Display" ) PORT_DIPLOCATION("DSWC:5")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, "Display Coins per Credit" ) PORT_DIPLOCATION("DSWC:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("DSWC:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWC:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Coin System" ) PORT_DIPLOCATION("DSWC:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin System" ) PORT_DIPLOCATION("DSWC:8") // what does this do?
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
