@@ -502,7 +502,7 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		}
 
 		bgfx_chain* chain = screen_chain(screen);
-		if (needs_conversion && !chain->has_converter())
+		if (chain && needs_conversion && !chain->has_converter())
 		{
 			chain->prepend_converter(m_converters[src_format], *this);
 		}
