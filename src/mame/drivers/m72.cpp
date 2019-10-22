@@ -723,7 +723,6 @@ void m72_state::init_bchopper()
 	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
 }
 
-
 void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
@@ -744,19 +743,6 @@ void m72_state::init_loht()
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m_videoram[1],0,0x4000);
-}
-
-
-void m72_state::init_dbreedm72()
-{
-	install_protection_handler(dbreedm72_code,dbreedm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
-}
-
-void m72_state::init_airduelm72()
-{
-	install_protection_handler(airduelm72_code,airduelm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduelm72_sample_trigger_w),this));
 }
 
 void m72_state::init_dkgenm72()
@@ -868,6 +854,7 @@ void m72_state::dbreedm72_map(address_map &map)
 	m72_cpu1_common_map(map);
 	map(0x00000, 0x7ffff).rom();
 	map(0x90000, 0x93fff).ram();    /* work RAM */
+	map(0xb0000, 0xb0fff).r(m_dpram, FUNC(mb8421_mb8431_16_device::left_r)).w(FUNC(m72_state::main_mcu_w));
 }
 
 void m72_state::m81_cpu1_common_map(address_map &map)
@@ -1988,7 +1975,7 @@ void m72_state::m72_xmultipl(machine_config &config)
 
 void m72_state::m72_dbreed(machine_config &config)
 {
-	m72_base(config);
+	m72_8751(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m72_state::dbreedm72_map);
 
 	/* Sample rate verified (Gallop : https://youtu.be/aozd0dbPzOw) */
@@ -3447,15 +3434,15 @@ ROM_END
 
 ROM_START( dbreedm72 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "db_c-h3.rom",  0x00001, 0x20000, CRC(4bf3063c) SHA1(3f970c9ece2ac700738e217e0b31b3aba2848ab2) )
-	ROM_LOAD16_BYTE( "db_c-l3.rom",  0x00000, 0x20000, CRC(e4b89b79) SHA1(c312925940633e60fb5d0f05044c6e73e4f7fd54) )
+	ROM_LOAD16_BYTE( "db_c-h3.rom",  0x00001, 0x20000, CRC(4bf3063c) SHA1(3f970c9ece2ac700738e217e0b31b3aba2848ab2) ) /* likely World version? with MCU DB C-PR- below shows ROM NG  1  2 */
+	ROM_LOAD16_BYTE( "db_c-l3.rom",  0x00000, 0x20000, CRC(e4b89b79) SHA1(c312925940633e60fb5d0f05044c6e73e4f7fd54) ) /* likely World version? labels should be DB C-L3-B?? */
 	ROM_LOAD16_BYTE( "db_c-h0.rom",  0x60001, 0x10000, CRC(5aa79fb2) SHA1(b7b862699ddccf90cf18d3822703078668aa1dc7) )
 	ROM_RELOAD(                      0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "db_c-l0.rom",  0x60000, 0x10000, CRC(ed0f5e06) SHA1(9030840b15e83c18d59c884ed08c93c05fa70c5b) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "dbreedm72_i8751.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "dbreedm72.mcu",  0x00000, 0x01000, CRC(8bf2910c) SHA1(65842c928626077f613e0ab56074e83301a64a2e) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
@@ -3479,7 +3466,7 @@ ROM_START( dbreedm72 )
 	ROM_LOAD( "db_c-v0.rom",  0x00000, 0x20000, CRC(312f7282) SHA1(742d56980b4618180e9a0e02051c5aec4d5cdae4) )
 ROM_END
 
-ROM_START( dbreedm72j ) // with matching i8751 this set boots with a Japanese warning screen
+ROM_START( dbreedm72j )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "db_c-h3.ic43",  0x00001, 0x20000, CRC(43425d67) SHA1(a87339bf299f7e84b9a181f3827278f64a6a29ea) )
 	ROM_LOAD16_BYTE( "db_c-l3.ic34",  0x00000, 0x20000, CRC(9c1abc85) SHA1(6c73fbec12a7795e327381d886a87bca09a7dff0) )
@@ -3489,7 +3476,7 @@ ROM_START( dbreedm72j ) // with matching i8751 this set boots with a Japanese wa
 	ROM_RELOAD(                       0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "db_c-pr-.mcu", 0x00000, 0x10000, NO_DUMP ) // read protected
+	ROM_LOAD( "db_c-pr-.mcu",  0x00000, 0x01000, CRC(8bf2910c) SHA1(65842c928626077f613e0ab56074e83301a64a2e) ) /* i8751 MCU labeled  DB C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "db_k800m.00", 0x00000, 0x20000, CRC(c027a8cf) SHA1(534dc416b8f5587168c7f644d3f9438c8a190491) )   /* sprites */
@@ -3559,7 +3546,7 @@ ROM_START( airduelm72 )
 	ROM_RELOAD(                       0xc0000, 0x20000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "ad_c-pr-.mcu",  0x00000, 0x1000, NO_DUMP ) // D8751H, read protected
+	ROM_LOAD( "ad_c-pr-.mcu",  0x00000, 0x01000, CRC(45584e52) SHA1(647826f1bec9b39ae971ecb58d921d363ee4cf45) ) /* i8751 MCU labeled  AD C-PR- */
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "ad-00.ic53",    0x00000, 0x20000, CRC(2f0d599b) SHA1(a966f806b5e25bb98cc63c46c49e0e676a62afcf) )
@@ -4343,12 +4330,12 @@ GAME( 1997, lohtb3,      loht,     m72_8751,     loht,         m72_state, init_m
 
 GAME( 1989, xmultiplm72, xmultipl, m72_xmultipl, xmultipl,     m72_state, init_m72_8751,   ROT0,   "Irem", "X Multiply (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // probably Japan version
-GAME( 1989, dbreedm72j,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_dbreedm72,  ROT0,   "Irem", "Dragon Breed (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // Japan version with correct i8751 MCU
+GAME( 1989, dbreedm72,   dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // fails rom check as "ROM NG  1  2" if used with japanese mcu rom (World version?)
+GAME( 1989, dbreedm72j,  dbreed,   m72_dbreed,   dbreed,       m72_state, init_m72_8751,   ROT0,   "Irem", "Dragon Breed (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, gallop,      cosmccop, m72,          gallop,       m72_state, init_gallop,     ROT0,   "Irem", "Gallop - Armed Police Unit (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1990, airduelm72,  airduel,  m72,          airduel,      m72_state, init_airduelm72, ROT270, "Irem", "Air Duel (Japan, M72 PCB version)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, airduelm72,  airduel,  m72_8751,     airduel,      m72_state, init_m72_8751,   ROT270, "Irem", "Air Duel (Japan, M72 PCB version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, dkgensanm72, hharry,   m72,          hharry,       m72_state, init_dkgenm72,   ROT0,   "Irem", "Daiku no Gensan (Japan, M72 PCB version)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
