@@ -494,9 +494,9 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPNAME( 0x0040, 0x0040, "Round Skip (With Select Buttons)" ) PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Functions of CPU-Controlled Cars" ) PORT_DIPLOCATION("DSWA:8") // what does this do?
-	PORT_DIPSETTING(      0x0080, "Continuous" )
-	PORT_DIPSETTING(      0x0000, "Not Continuous" )
+	PORT_DIPNAME( 0x0080, 0x0080, "CPU Keeps Collected Upgrades Between Races" ) PORT_DIPLOCATION("DSWA:8") // "Functions of CPU-Controlled Cars"
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) ) // "Not Continuous"
+	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) ) // "Continuous"
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x000F, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSWB:1,2,3,4")
