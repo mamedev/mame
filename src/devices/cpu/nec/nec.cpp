@@ -148,9 +148,9 @@ v30_device::v30_device(const machine_config &mconfig, const char *tag, device_t 
 device_memory_interface::space_config_vector nec_common_device::memory_space_config() const
 {
 	return space_config_vector {
-			std::make_pair(AS_PROGRAM, &m_program_config),
-			std::make_pair(AS_IO,      &m_io_config)
-		};
+		std::make_pair(AS_PROGRAM, &m_program_config),
+		std::make_pair(AS_IO,      &m_io_config)
+	};
 }
 
 
@@ -199,7 +199,7 @@ offs_t nec_common_device::v33_translate(offs_t addr)
 
 bool v33_base_device::memory_translate(int spacenum, int intention, offs_t &address)
 {
-	if (spacenum == AS_PROGRAM || spacenum == AS_OPCODES)
+	if (spacenum == AS_PROGRAM)
 		address = v33_translate(address);
 	return true;
 }
@@ -253,7 +253,7 @@ void nec_common_device::do_prefetch(int previous_ICount)
 uint8_t nec_common_device::fetch()
 {
 	prefetch();
-	return m_or8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 uint16_t nec_common_device::fetchword()
@@ -273,7 +273,7 @@ static uint8_t parity_table[256];
 uint8_t nec_common_device::fetchop()
 {
 	prefetch();
-	return m_or8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 
@@ -483,18 +483,18 @@ void nec_common_device::device_start()
 	if (m_program->data_width() == 8)
 	{
 		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
 	else if (m_chip_type == V33_TYPE)
 	{
 		save_item(NAME(m_xa));
 		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
+		m_dr8 = [cache, this](offs_t address) -> u8 { return cache->read_byte(v33_translate(address)); };
 	}
 	else
 	{
 		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
 
 	m_io = &space(AS_IO);

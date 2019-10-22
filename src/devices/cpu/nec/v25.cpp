@@ -139,7 +139,7 @@ void v25_common_device::do_prefetch(int previous_ICount)
 uint8_t v25_common_device::fetch()
 {
 	prefetch();
-	return m_or8((Sreg(PS)<<4)+m_ip++);
+	return m_dr8((Sreg(PS)<<4)+m_ip++);
 }
 
 uint16_t v25_common_device::fetchword()
@@ -163,7 +163,7 @@ uint8_t v25_common_device::fetchop()
 	uint8_t ret;
 
 	prefetch();
-	ret = m_or8((Sreg(PS)<<4)+m_ip++);
+	ret = m_dr8((Sreg(PS)<<4)+m_ip++);
 
 	if (m_MF == 0)
 		if (m_v25v35_decryptiontable)
@@ -618,10 +618,10 @@ void v25_common_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	if(m_program->data_width() == 8) {
 		auto cache = m_program->cache<0, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	} else {
 		auto cache = m_program->cache<1, 0, ENDIANNESS_LITTLE>();
-		m_or8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
+		m_dr8 = [cache](offs_t address) -> u8 { return cache->read_byte(address); };
 	}
 	m_data = &space(AS_DATA);
 	m_io = &space(AS_IO);

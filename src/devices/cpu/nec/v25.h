@@ -117,7 +117,7 @@ private:
 	uint32_t  m_IDB;
 
 	address_space *m_program;
-	std::function<u8 (offs_t address)> m_or8;
+	std::function<u8 (offs_t address)> m_dr8;
 	address_space *m_data;
 	address_space *m_io;
 	int     m_icount;
