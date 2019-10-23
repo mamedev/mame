@@ -103,7 +103,6 @@ private:
 	uint32_t m_bios_bank_addr;
 
 	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_ctrl[6];
 	uint8_t m_bios_6600;
 	uint8_t m_bios_6403;
 	uint8_t m_bios_6404;
@@ -472,7 +471,7 @@ READ8_MEMBER(mplay_state::bank_r)
 		}
 		else
 		{
-			return memregion("maincpu")->base()[fulladdress ^ 1];
+			return memregion("maincpu")->as_u8(BYTE_XOR_BE(fulladdress));
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO access
