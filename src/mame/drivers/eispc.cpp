@@ -4,7 +4,7 @@
  *
  *   Ericsson Information Systems PC "compatibles"
  *
- * The Ericsson PC was the the first original Ericsson design for the office PC market replacing the
+ * The Ericsson PC was the first original Ericsson design for the office PC market replacing the
  * Step/One which was an OEM:ed clone of the Matsushita Mybrain 3000 (see myb3k.cpp driver).
  *
  **************************************************************
