@@ -94,7 +94,6 @@ public:
 	void init_m72_8751();
 	void init_dbreedm72();
 	void init_nspirit();
-	void init_loht();
 	void init_imgfight();
 
 private:
