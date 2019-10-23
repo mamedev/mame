@@ -7,156 +7,155 @@ Games on this system include....
 
 GD build date
     yyyymmdd   Game                                                 Manufacturer / Developer   Media    Number       Key Chip
-+-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------|
-|*| 20021029 | The House of the Dead III                          | Sega / Wow Entertainment | GDROM  | GDX-0001   | 317-0348-COM |
-| | 2003     | Crazy Taxi High Roller                             | Sega / Hitmaker          | GDROM  | GDX-0002   | 317-0353-COM |
-| | 2003     | Crazy Taxi High Roller (Rev A)                     | Sega / Hitmaker          | GDROM  | GDX-0002A  | 317-0353-COM |
-|*| 20030224 | Crazy Taxi High Roller (Rev B)                     | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
-| | 2003     | Virtua Cop 3                                       | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
-|*| 20030226 | Virtua Cop 3 (Rev A)                               | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
-| | 20030226 | Virtua Cop 3 (Rev A)                               | Sega                     | CF     | MDA-G0010  | 317-0354-COM |
-|*| 20030521 | Virtua Cop 3 (Rev B)                               | Sega                     | GDROM  | GDX-0003B  | 317-0354-COM |
-| | 2003     | OutRun 2                                           | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
-|*| 20031017 | OutRun 2 (Rev A)                                   | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
-| | 200312   | OutRun 2 (Rev A)                                   | Sega                     | CF     | MDA-G0011  | 317-0372-COM |
-| | 20030911 | OutRun 2 prototype (Rev P)                         | Sega                     | GDROM  | GDX-0004P  | 317-0372-COM |
-| | 2004     | Sega Golf Club Network Pro Tour                    | Sega                     | GDROM  | GDX-0005   |              |
-| | 2004     | Sega Network Taisen Mahjong MJ 2                   | Sega                     | GDROM  | GDX-0006   | 317-0374-JPN |
-| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev A)           | Sega                     | GDROM  | GDX-0006A  | 317-0374-JPN |
-| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev B)           | Sega                     | GDROM  | GDX-0006B  | 317-0374-JPN |
-|*| 20041102 | Sega Network Taisen Mahjong MJ 2 (Rev C)           | Sega                     | GDROM  | GDX-0006C  | 317-0374-JPN |
-| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev D)           | Sega                     | GDROM  | GDX-0006D  | 317-0374-JPN |
-| | 2005     | Sega Network Taisen Mahjong MJ 2 (Rev E)           | Sega                     | GDROM  | GDX-0006E  | 317-0374-JPN |
-|*| 2005     | Sega Network Taisen Mahjong MJ 2 (Rev F)           | Sega                     | GDROM  | GDX-0006F  | 317-0374-JPN |
-|*| 20050202 | Sega Network Taisen Mahjong MJ 2 (Rev G)           | Sega                     | GDROM  | GDX-0006G  | 317-0374-JPN |
-|*| 20031211 | Ollie King                                         | Sega / Amusement Vision  | GDROM  | GDX-0007   | 317-0377-COM |
-| | 2004     | Wangan Midnight Maximum Tune (Japan)               | Namco                    | GDROM  | GDX-0008   | 317-5101-JPN |
-| | 2004     | Wangan Midnight Maximum Tune (Japan, Rev A)        | Namco                    | GDROM  | GDX-0008A  | 317-5101-JPN |
-|*| 20040610 | Wangan Midnight Maximum Tune (Japan, Rev B)        | Namco                    | GDROM  | GDX-0008B  | 317-5101-JPN |
-| | 2004     | Wangan Midnight Maximum Tune (Export)              | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
-| | 2004     | Wangan Midnight Maximum Tune (Export, Rev A)       | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
-|*| 20040610 | Wangan Midnight Maximum Tune (Export, Rev B)       | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
-| | 2004     | Sega Club Golf                                     | Sega                     | GDROM  | GDX-0010   |              |
-|*| 20040909 | OutRun 2 Special Tours (Japan)                     | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
-|*| 20041229 | OutRun 2 Special Tours (Japan, Rev A)              | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
-|*| 20040914 | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
-|*| 20041209 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
-| | 20041209 | Ghost Squad (Rev A)                                | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
-|*| 20050208 | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
-|*| 20040910 | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
-|*| 20041229 | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
-| | 20041229 | OutRun 2 Special Tours (Rev A)                     | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
-|*| 20050218 | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
-|*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan, Rev A)      | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
-|*| 20050218 | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
-|*| 20050908 | Wangan Midnight Maximum Tune 2 (Export, Rev A)     | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
-| | 2005     | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
-| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
-| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
-|*| 20051109 | Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega                     | GDROM  | GDX-0017C  | 317-0414-JPN |
-|*| 20060217 | Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega                     | GDROM  | GDX-0017D  | 317-0414-JPN |
-| | 2006     | Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
-|*| 2006     | Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
-| | 2005     | Sega Club Golf 2006: Next Tours                    | Sega                     | GDROM  | GDX-0018   |              |
-|*| 20051107 | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  | 317-0428-JPN |
-| | 2005     | Firmware Update For MJ 3                           | Sega                     | GDROM  | GDX-0019   |              |
-| | 200?     | Sega Club Golf 2006                                | Sega                     | GDROM  | GDX-0020   |              |
-| | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   | 317-0457-JPN |
-|*| 20070217 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  | 317-0457-JPN |
-|*| 20070525 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | 317-0457-JPN |
-| | 200?     | Sega Network Taisen Mahjong MJ 3 Evo Test Ver      | Sega                     | GDROM  | GDX-0022   |              |
-|*| 20061222 | Mahjong MJ 3 Evolution Firmware Update             | Sega                     | GDROM  | GDX-0023   | 317-0457-JPN |
-| | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
-|*| 20090331 | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
-|*| 20030226 | Chihiro Change Region GD USA                       | Sega                     | GDROM  | 611-0028A  | 317-0351-EXP |
-|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
-|*| 2005     | Sangokushi Taisen Ver.1.002                        | Sega                     | DVDROM | CDV-10009D |              |
-|*| 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
-|*| 2006     | Sangokushi Taisen 2 Ver.2.007                      | Sega                     | DVDROM | CDV-10019A |              |
-|*| 2005     | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
-|*| 2006     | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
-|*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
-|*| 2006     | Sangokushi Taisen 2 Ver.2.100                      | Sega                     | DVDROM | CDV-10029  |              |
-|*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
-|*| 2008     | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
-|*| 2008     | Sangokushi Taisen 3 Ver.J                          | Sega                     | DVDROM | CDV-10036J |              |
-|*| 2008     | Mobile Suit Gundam 0083 Card Builder Ver.2.10      | Bandai Namco - Banpresto | DVDROM | CDV-10037B | 317-0484-JPN |
-|*| 2008     | Sangokushi Taisen 3 War Begins Ver.3.59            | Sega                     | DVDROM | CDV-10041  |              |
-|*| 2008     | Sangokushi Taisen 3 War Begins                     | Sega                     | DVDROM | CDV-10042  |              |
-+-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------+
++-+----------+------------------------------------------------------+--------------------------+--------+------------+--------------|
+|*| 20021029 | The House of the Dead III                            | Sega / Wow Entertainment | GDROM  | GDX-0001   | 317-0348-COM |
+| | 2003     | Crazy Taxi High Roller                               | Sega / Hitmaker          | GDROM  | GDX-0002   | 317-0353-COM |
+| | 2003     | Crazy Taxi High Roller (Rev A)                       | Sega / Hitmaker          | GDROM  | GDX-0002A  | 317-0353-COM |
+|*| 20030224 | Crazy Taxi High Roller (Rev B)                       | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
+| | 2003     | Virtua Cop 3                                         | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
+|*| 20030226 | Virtua Cop 3 (Rev A)                                 | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
+| | 20030226 | Virtua Cop 3 (Rev A)                                 | Sega                     | CF     | MDA-G0010  | 317-0354-COM |
+|*| 20030521 | Virtua Cop 3 (Rev B)                                 | Sega                     | GDROM  | GDX-0003B  | 317-0354-COM |
+| | 2003     | OutRun 2                                             | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
+|*| 20031017 | OutRun 2 (Rev A)                                     | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
+| | 200312   | OutRun 2 (Rev A)                                     | Sega                     | CF     | MDA-G0011  | 317-0372-COM |
+| | 20030911 | OutRun 2 prototype (Rev P)                           | Sega                     | GDROM  | GDX-0004P  | 317-0372-COM |
+| | 2004     | Sega Golf Club Network Pro Tour                      | Sega                     | GDROM  | GDX-0005   |              |
+| | 2004     | Sega Network Taisen Mahjong MJ 2                     | Sega                     | GDROM  | GDX-0006   | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev A)             | Sega                     | GDROM  | GDX-0006A  | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev B)             | Sega                     | GDROM  | GDX-0006B  | 317-0374-JPN |
+|*| 20041102 | Sega Network Taisen Mahjong MJ 2 (Rev C)             | Sega                     | GDROM  | GDX-0006C  | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev D)             | Sega                     | GDROM  | GDX-0006D  | 317-0374-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 2 (Rev E)             | Sega                     | GDROM  | GDX-0006E  | 317-0374-JPN |
+|*| 2005     | Sega Network Taisen Mahjong MJ 2 (Rev F)             | Sega                     | GDROM  | GDX-0006F  | 317-0374-JPN |
+|*| 20050202 | Sega Network Taisen Mahjong MJ 2 (Rev G)             | Sega                     | GDROM  | GDX-0006G  | 317-0374-JPN |
+|*| 20031211 | Ollie King                                           | Sega / Amusement Vision  | GDROM  | GDX-0007   | 317-0377-COM |
+| | 2004     | Wangan Midnight Maximum Tune (Japan)                 | Namco                    | GDROM  | GDX-0008   | 317-5101-JPN |
+| | 2004     | Wangan Midnight Maximum Tune (Japan, Rev A)          | Namco                    | GDROM  | GDX-0008A  | 317-5101-JPN |
+|*| 20040610 | Wangan Midnight Maximum Tune (Japan, Rev B)          | Namco                    | GDROM  | GDX-0008B  | 317-5101-JPN |
+| | 2004     | Wangan Midnight Maximum Tune (Export)                | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
+| | 2004     | Wangan Midnight Maximum Tune (Export, Rev A)         | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
+|*| 20040610 | Wangan Midnight Maximum Tune (Export, Rev B)         | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
+| | 2004     | Sega Club Golf                                       | Sega                     | GDROM  | GDX-0010   |              |
+|*| 20040909 | OutRun 2 Special Tours (Japan)                       | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
+|*| 20041229 | OutRun 2 Special Tours (Japan, Rev A)                | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
+|*| 20040914 | Ghost Squad                                          | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
+|*| 20041209 | Ghost Squad (Rev A)                                  | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
+| | 20041209 | Ghost Squad (Rev A)                                  | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
+|*| 20050208 | Gundam Battle Operating Simulator                    | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
+|*| 20040910 | OutRun 2 Special Tours                               | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
+|*| 20041229 | OutRun 2 Special Tours (Rev A)                       | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
+| | 20041229 | OutRun 2 Special Tours (Rev A)                       | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
+|*| 20050218 | Wangan Midnight Maximum Tune 2 (Japan)               | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
+|*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan, Rev A)        | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
+|*| 20050218 | Wangan Midnight Maximum Tune 2 (Export)              | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
+|*| 20050908 | Wangan Midnight Maximum Tune 2 (Export, Rev A)       | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
+| | 2005     | Sega Network Taisen Mahjong MJ 3                     | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev A)             | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev B)             | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
+|*| 20051109 | Sega Network Taisen Mahjong MJ 3 (Rev C)             | Sega                     | GDROM  | GDX-0017C  | 317-0414-JPN |
+|*| 20060217 | Sega Network Taisen Mahjong MJ 3 (Rev D)             | Sega                     | GDROM  | GDX-0017D  | 317-0414-JPN |
+| | 2006     | Sega Network Taisen Mahjong MJ 3 (Rev E)             | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
+|*| 2006     | Sega Network Taisen Mahjong MJ 3 (Rev F)             | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
+| | 2005     | Sega Club Golf 2006: Next Tours                      | Sega                     | GDROM  | GDX-0018   |              |
+|*| 20051107 | Sega Club Golf 2006: Next Tours (Rev A)              | Sega                     | GDROM  | GDX-0018A  | 317-0428-JPN |
+| | 2005     | Firmware Update For MJ 3                             | Sega                     | GDROM  | GDX-0019   |              |
+| | 200?     | Sega Club Golf 2006                                  | Sega                     | GDROM  | GDX-0020   |              |
+| | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution           | Sega                     | GDROM  | GDX-0021   | 317-0457-JPN |
+|*| 20070217 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A)   | Sega                     | GDROM  | GDX-0021A  | 317-0457-JPN |
+|*| 20070525 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B)   | Sega                     | GDROM  | GDX-0021B  | 317-0457-JPN |
+| | 200?     | Sega Network Taisen Mahjong MJ 3 Evo Test Ver        | Sega                     | GDROM  | GDX-0022   |              |
+|*| 20061222 | Sega Network Taisen Mahjong MJ 3 Evo Firmware Update | Sega                     | GDROM  | GDX-0023   | 317-0457-JPN |
+| | 2009     | Firmware Update For Compact Flash Box                | Sega                     | GDROM  | GDX-0024   |              |
+|*| 20090331 | Firmware Update For Compact Flash Box (Rev A)        | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
+|*| 20030226 | Chihiro Change Region GD USA                         | Sega                     | GDROM  | 611-0028A  | 317-0351-EXP |
+|*| 200412   | Quest Of D Ver.1.01C                                 | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
+|*| 2005     | Sangokushi Taisen Ver.1.002                          | Sega                     | DVDROM | CDV-10009D |              |
+|*| 2005     | Mobile Suit Gundam 0079 Card Builder                 | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.007                        | Sega                     | DVDROM | CDV-10019A |              |
+|*| 2005     | Sangokushi Taisen                                    | Sega                     | DVDROM | CDV-10022  |              |
+|*| 2006     | Sangokushi Taisen 2 Firmware Update                  | Sega                     | DVDROM | CDV-10023  |              |
+|*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02        | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.100                        | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2007     | Mobile Suit Gundam 0083 Card Builder                 | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
+|*| 2008     | Sangokushi Taisen 3                                  | Sega                     | DVDROM | CDV-10036  |              |
+|*| 2008     | Sangokushi Taisen 3 Ver.J                            | Sega                     | DVDROM | CDV-10036J |              |
+|*| 2008     | Mobile Suit Gundam 0083 Card Builder Ver.2.10        | Bandai Namco - Banpresto | DVDROM | CDV-10037B | 317-0484-JPN |
+|*| 2008     | Sangokushi Taisen 3 War Begins Ver.3.59              | Sega                     | DVDROM | CDV-10041  |              |
+|*| 2008     | Sangokushi Taisen 3 War Begins                       | Sega                     | DVDROM | CDV-10042  |              |
++-+----------+------------------------------------------------------+--------------------------+--------+------------+--------------+
 * denotes these games are archived.
 
-
-  Year   Game (Unknown media)                                  Manufacturer   Number
+  Year    Game (Unknown media)                                  Manufacturer   Number
 +-+-----------------------------------------------------------+------------+------------+
 | | 2004 | Quest Of D                                         | Sega       | CDV-10005  |
 | | 2004 | Quest Of D                                         | Sega       | CDV-10005A |
 | | 2004 | Quest Of D                                         | Sega       | CDV-10005B |
-| | 2004 | Quest Of D 1.01D                                   | Sega       | CDV-10005D |
-| | 2004 | Quest Of D 1.02                                    | Sega       | CDV-10005E |
+| | 2004 | Quest Of D Ver.1.01D                               | Sega       | CDV-10005D |
+| | 2004 | Quest Of D Ver.1.02                                | Sega       | CDV-10005E |
 | | 2004 | Quest Of D Senko Habai                             | Sega       | CDV-10005P |
-| | 2004 | Quest Of D 1.10                                    | Sega       | CDV-10006  |
-| | 2004 | Quest Of D 1.10A                                   | Sega       | CDV-10006A |
+| | 2004 | Quest Of D Ver.1.10                                | Sega       | CDV-10006  |
+| | 2004 | Quest Of D Ver.1.10A                               | Sega       | CDV-10006A |
 | | 200? | Sangokushi Taisen                                  | Sega       | CDV-10009  |
-| | 200? | Sangokushi Taisen 0.94                             | Sega       | CDV-10009A |
-| | 200? | Sangokushi Taisen 1.00                             | Sega       | CDV-10009B |
-| | 200? | Sangokushi Taisen 1.001                            | Sega       | CDV-10009C |
-| | 200? | Sangokushi Taisen 1.002                            | Sega       | CDV-10009E |
-| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009F |
-| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009G |
-| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009H |
-| | 200? | Sangokushi Taisen 1.003                            | Sega       | CDV-10009J |
-| | 200? | Sangokushi Taisen 1.100                            | Sega       | CDV-10009K |
-| | 200? | Sangokushi Taisen 1.110                            | Sega       | CDV-10009L |
-| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009M |
-| | 200? | Sangokushi Taisen 1.120                            | Sega       | CDV-10009N |
-| | 200? | Sangokushi Taisen 1.100 (kakinhenkou)              | Sega       | CDV-10009P |
-| | 200? | Sangokushi Taisen 1.121                            | Sega       | CDV-10009Q |
-| | 200? | Sangokushi Taisen 1.122                            | Sega       | CDV-10009R |
-| | 200? | Mobile Suit Gundam 0079 Card Builder               | Banpresto  | CDV-10010A |
-| | 200? | Quest Of D 1.20                                    | Sega       | CDV-10012  |
-| | 200? | Quest Of D 1.20A                                   | Sega       | CDV-10012A |
-| | 200? | Sangokushi Taisen 1.00 (Asia)                      | Sega       | CDV-10014  |
+| | 200? | Sangokushi Taisen Ver.0.94                         | Sega       | CDV-10009A |
+| | 200? | Sangokushi Taisen Ver.1.00                         | Sega       | CDV-10009B |
+| | 200? | Sangokushi Taisen Ver.1.001                        | Sega       | CDV-10009C |
+| | 200? | Sangokushi Taisen Ver.1.002                        | Sega       | CDV-10009E |
+| | 200? | Sangokushi Taisen Ver.1.003                        | Sega       | CDV-10009F |
+| | 200? | Sangokushi Taisen Ver.1.003                        | Sega       | CDV-10009G |
+| | 200? | Sangokushi Taisen Ver.1.100                        | Sega       | CDV-10009H |
+| | 200? | Sangokushi Taisen Ver.1.003                        | Sega       | CDV-10009J |
+| | 200? | Sangokushi Taisen Ver.1.100                        | Sega       | CDV-10009K |
+| | 200? | Sangokushi Taisen Ver.1.110                        | Sega       | CDV-10009L |
+| | 200? | Sangokushi Taisen Ver.1.120                        | Sega       | CDV-10009M |
+| | 200? | Sangokushi Taisen Ver.1.120                        | Sega       | CDV-10009N |
+| | 200? | Sangokushi Taisen Ver.1.100 (kakinhenkou)          | Sega       | CDV-10009P |
+| | 200? | Sangokushi Taisen Ver.1.121                        | Sega       | CDV-10009Q |
+| | 200? | Sangokushi Taisen Ver.1.122                        | Sega       | CDV-10009R |
+| | 200? | Mobile Suit Gundam 0079 Card Builder Ver.1.007     | Banpresto  | CDV-10010A |
+| | 200? | Quest Of D Ver.1.20                                | Sega       | CDV-10012  |
+| | 200? | Quest Of D Ver.1.20A                               | Sega       | CDV-10012A |
+| | 200? | Sangokushi Taisen Ver.1.00 (Asia)                  | Sega       | CDV-10014  |
 | | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014B |
 | | 200? | Sangokushi Taisen (Asia)                           | Sega       | CDV-10014C |
-| | 200? | Quest Of D 1.21                                    | Sega       | CDV-10016  |
-| | 200? | Quest Of D: Gofu no Keisyousya 2.00                | Sega       | CDV-10017  |
-| | 200? | Quest Of D: Gofu no Keisyousya 2.01                | Sega       | CDV-10017A |
-| | 200? | Quest Of D: Gofu no Keisyousya 2.02                | Sega       | CDV-10017B |
-| | 200? | Quest Of D: Gofu no Keisyousya 2.02B               | Sega       | CDV-10017C |
-| | 200? | Quest Of D: Gofu no Keisyousya 2.02C               | Sega       | CDV-10017D |
+| | 200? | Quest Of D Ver.1.21                                | Sega       | CDV-10016  |
+| | 200? | Quest Of D: Gofu no Keisyousya Ver.2.00            | Sega       | CDV-10017  |
+| | 200? | Quest Of D: Gofu no Keisyousya Ver.2.01            | Sega       | CDV-10017A |
+| | 200? | Quest Of D: Gofu no Keisyousya Ver.2.02            | Sega       | CDV-10017B |
+| | 200? | Quest Of D: Gofu no Keisyousya Ver.2.02B           | Sega       | CDV-10017C |
+| | 200? | Quest Of D: Gofu no Keisyousya Ver.2.02C           | Sega       | CDV-10017D |
 | | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10019  |
-| | 200? | Sangokushi Taisen 2 2.010                          | Sega       | CDV-10019B |
-| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024  |
-| | 200? | Mobile Suit Gundam 0079 Card Builder 2.00          | Banpresto  | CDV-10024A |
+| | 200? | Sangokushi Taisen 2 Ver.2.010                      | Sega       | CDV-10019B |
+| | 200? | Mobile Suit Gundam 0079 Card Builder Ver.2.00      | Banpresto  | CDV-10024  |
+| | 200? | Mobile Suit Gundam 0079 Card Builder Ver.2.01      | Banpresto  | CDV-10024A |
 | | 200? | Quest Of D: Oukoku no Syugosya 3.00                | Sega       | CDV-10026  |
 | | 200? | Quest Of D: Oukoku no Syugosya 3.01                | Sega       | CDV-10026A |
 | | 200? | Quest Of D: Oukoku no Syugosya 3.01A               | Sega       | CDV-10026B |
 | | 200? | Quest Of D: Oukoku no Syugosya 3.01B               | Sega       | CDV-10026C |
 | | 200? | Quest Of D: Oukoku no Syugosya 3.02                | Sega       | CDV-10026D |
-| | 200? | Sangokushi Taisen 2                                | Sega       | CDV-10029A |
-| | 200? | Mobile Suit Gundam 0083 Card Builder               | Banpresto  | CDV-10030A |
+| | 200? | Sangokushi Taisen 2 (Rev A)                        | Sega       | CDV-10029A |
+| | 200? | Mobile Suit Gundam 0083 Card Builder (Rev A)       | Banpresto  | CDV-10030A |
 | | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032  |
-| | 200? | Sangokushi Taisen 2 (Asia)                         | Sega       | CDV-10032A |
+| | 200? | Sangokushi Taisen 2 (Asia, Rev A)                  | Sega       | CDV-10032A |
 | | 200? | Sangokushi Taisen 2 (Asia) Check disc              | Sega       | CDV-10033  |
 | | 200? | Sangokushi Taisen 2 (Asia) Firmware update         | Sega       | CDV-10034  |
 | | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035  |
-| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035A |
-| | 200? | Quest Of D: The Battle Kingdom                     | Sega       | CDV-10035C |
-| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036A |
-| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036B |
-| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036D |
-| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036G |
-| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036H |
-| | 200? | Sangokushi Taisen 3                                | Sega       | CDV-10036K |
-| | 200? | Mobile Suit Gundam 0083 Card Builder 2.00          | Banpresto  | CDV-10037  |
-| | 200? | Mobile Suit Gundam 0083 Card Builder 2.02          | Banpresto  | CDV-10037A |
+| | 200? | Quest Of D: The Battle Kingdom (Rev A)             | Sega       | CDV-10035A |
+| | 200? | Quest Of D: The Battle Kingdom (Rev C)             | Sega       | CDV-10035C |
+| | 200? | Sangokushi Taisen 3 (Rev A)                        | Sega       | CDV-10036A |
+| | 200? | Sangokushi Taisen 3 (Rev B)                        | Sega       | CDV-10036B |
+| | 200? | Sangokushi Taisen 3 (Rev D)                        | Sega       | CDV-10036D |
+| | 200? | Sangokushi Taisen 3 (Rev G)                        | Sega       | CDV-10036G |
+| | 200? | Sangokushi Taisen 3 (Rev H)                        | Sega       | CDV-10036H |
+| | 200? | Sangokushi Taisen 3 (Rev K)                        | Sega       | CDV-10036K |
+| | 200? | Mobile Suit Gundam 0083 Card Builder Ver.2.00      | Banpresto  | CDV-10037  |
+| | 200? | Mobile Suit Gundam 0083 Card Builder Ver.2.02      | Banpresto  | CDV-10037A |
 | | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038  |
-| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038A |
-| | 200? | Sangokushi Taisen 2 (Export)                       | Sega       | CDV-10038B |
+| | 200? | Sangokushi Taisen 2 (Export, Rev A)                | Sega       | CDV-10038A |
+| | 200? | Sangokushi Taisen 2 (Export, Rev B)                | Sega       | CDV-10038B |
 | | 200? | Sega Golf Club Network Pro Tour 2005 (DVD NMC TJP) | Sega       | CDV-10039  |
 | | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040  |
-| | 200? | Sangokushi Taisen 3 (Export)                       | Sega       | CDV-10040A |
+| | 200? | Sangokushi Taisen 3 (Export, Rev A)                | Sega       | CDV-10040A |
 +-+------+----------------------------------------------------+------------+------------+
 
 A Chihiro system consists of several boards.
