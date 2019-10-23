@@ -21666,6 +21666,7 @@ bup                             // Mephisto B&P
 mm4tk                           // Mephisto MM IV (Turbo Kit)
 mm4                             // Mephisto MM IV
 mm5                             // Mephisto MM V
+mm5p
 rebel5                          // Mephisto Rebell 5.0
 
 @source:mephisto_modena.cpp

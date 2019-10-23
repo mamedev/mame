@@ -63,8 +63,16 @@ Mephisto 4 Turbo Kit 18mhz - (mm4tk)
 
     -- Cowering (2011)
 
-***********************************************************************************************/
+The MM V prototype was the program that Ed Schroeder participated with as "Rebel" at the
+1989 WMCCC in Portorose. It was used with the TK20 TurboKit.
+http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm
 
+
+TODO:
+- need to emulate TurboKit properly, also for mm5p (it's not as simple as a CPU
+  overclock plus ROM patch)
+
+******************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
@@ -101,6 +109,7 @@ public:
 	void mm4(machine_config &config);
 	void mm4tk(machine_config &config);
 	void mm5(machine_config &config);
+	void mm5p(machine_config &config);
 	void mm2(machine_config &config);
 	void bup(machine_config &config);
 
@@ -127,6 +136,7 @@ private:
 	void bup_mem(address_map &map);
 	void mm2_mem(address_map &map);
 	void mm4_mem(address_map &map);
+	void mm5p_mem(address_map &map);
 	void rebel5_mem(address_map &map);
 };
 
@@ -239,18 +249,23 @@ void mephisto_state::rebel5_mem(address_map &map)
 	map(0x8000, 0xffff).rom();
 }
 
-void mephisto_state::mm4_mem(address_map &map)
+void mephisto_state::mm5p_mem(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x2000).w(FUNC(mephisto_state::write_lcd));
-	map(0x2400, 0x2407).w("board", FUNC(mephisto_board_device::led_w));
+	map(0x2400, 0x2407).w("board", FUNC(mephisto_board_device::led_w)).nopr();
 	map(0x2800, 0x2800).w("board", FUNC(mephisto_board_device::mux_w));
 	map(0x2c00, 0x2c07).r(FUNC(mephisto_state::read_keys));
 	map(0x3000, 0x3000).r("board", FUNC(mephisto_board_device::input_r));
-	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7));
+	map(0x3400, 0x3407).w("outlatch", FUNC(hc259_device::write_d7)).nopr();
 	map(0x3800, 0x3800).w(FUNC(mephisto_state::mephisto_nmi_w));
+	map(0x4000, 0xffff).rom();
+}
+
+void mephisto_state::mm4_mem(address_map &map)
+{
+	mm5p_mem(map);
 	map(0x4000, 0x7fff).r("cartslot", FUNC(generic_slot_device::read_rom));
-	map(0x8000, 0xffff).rom();
 }
 
 
@@ -382,15 +397,23 @@ void mephisto_state::rebel5(machine_config &config)
 	VOLTAGE_REGULATOR(config, "vref").add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);
 }
 
-void mephisto_state::mm4(machine_config &config)
+void mephisto_state::mm5p(machine_config &config)
 {
 	rebel5(config);
 
 	/* basic machine hardware */
 	m_maincpu->set_clock(4.9152_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm4_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm5p_mem);
 
 	TIMER(config.replace(), "nmi_timer").configure_periodic(FUNC(mephisto_state::update_nmi), attotime::from_hz(600));
+}
+
+void mephisto_state::mm4(machine_config &config)
+{
+	mm5p(config);
+
+	/* basic machine hardware */
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mm4_mem);
 
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "mephisto_cart");
 	SOFTWARE_LIST(config, "cart_list").set_original("mephisto_mm4");
@@ -501,6 +524,12 @@ ROM_START(mm5)
 	ROMX_LOAD("mephisto5.rom", 0x8000, 0x8000, CRC(89c3d9d2) SHA1(77cd6f8eeb03c713249db140d2541e3264328048), ROM_BIOS(1))
 ROM_END
 
+ROM_START(mm5p)
+	ROM_REGION(0x10000,"maincpu",0)
+	ROM_LOAD("buch.bin", 0x0000, 0x8000, CRC(534607c7) SHA1(d0347a5f8dc4cf6001f649aa13e7a7fe75bec5b9)) // 1st half empty
+	ROM_LOAD("programm.bin", 0x8000, 0x8000, CRC(ee22b974) SHA1(37267507be30ee84051bc94c3a63fb1298a00261))
+ROM_END
+
 
 
 /******************************************************************************
@@ -512,5 +541,6 @@ CONS( 1984, mm2,    0,      0,      mm2,      mephisto, mephisto_state, empty_in
 CONS( 1985, bup,    0,      0,      bup,      bup,      mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Blitz- und Problemloesungs-Modul", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1986, rebel5, 0,      0,      rebel5,   mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto Rebell 5,0", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1987, mm4,    0,      0,      mm4,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM IV", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1987, mm4tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, mm5,    0,      0,      mm5,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM V",  MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1987, mm4tk,  mm4,    0,      mm4tk,    mephisto, mephisto_state, empty_init, "hack",             "Mephisto MM IV (TurboKit)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
+CONS( 1990, mm5,    0,      0,      mm5,      mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM V", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, mm5p,   mm5,    0,      mm5p,     mephisto, mephisto_state, empty_init, "Hegener + Glaser", "Mephisto MM V (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_TIMING )
