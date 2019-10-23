@@ -233,8 +233,8 @@ public:
 	/// \brief Attempt discovery
 	///
 	/// Concrete derived classes must implement this member function.
-	/// Should return false if the the object is required but not found,
-	/// or true otherwise (the report_missing member function can assist
+	/// Should return false if the object is required but not found, or
+	/// true otherwise (the report_missing member function can assist
 	/// in implementing this behaviour).
 	/// \param [in] isvalidation Pass true if this is a dry run (i.e. no
 	///   intention to actually start the device), or false otherwise.
