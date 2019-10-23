@@ -218,6 +218,27 @@ You need to use a web server instead of opening the local files directly due to 
 
 If the result fails to run, you can open the Web Console in your browser to see any error output which may have been produced (e.g. missing or incorrect ROM files). A "ReferenceError: foo is not defined" error most likely indicates that a needed source file was omitted from the SOURCES list.
 
+.. _compiling-docs:
+
+Compiling the Documentation
+---------------------------
+
+Compiling the documentation will require you to install several packages depending on your operating system.
+
+On Debian/Ubuntu flavors of Linux, you'll need python3-sphinx/python-sphinx and the python3-pip/python-pip packages.
+
+**sudo apt-get install python3-sphinx python3-pip** or **sudo apt-get install python-sphinx python-pip** depending on whether you're using Python 3 or Python 2.
+
+You'll then need to install the SVG handler.
+
+**pip3 install sphinxcontrib-svg2pdfconverter** or **pip install sphinxcontrib-svg2pdfconverter** depending on whether you're using Python 3 or Python 2.
+
+If you intend on making a PDF via LaTeX, you'll need to install a LaTeX distribution such as TeX Live.
+
+**sudo apt-get install latexmk texlive texlive-science texlive-formats-extra**
+
+From this point you can do **make html** or **make latexpdf** from the docs folder to generate the output of your choice. Typing **make** by itself will tell you all available formats. The output will be in the docs/build folder in a subfolder based on the type chosen (e.g. **make html** will create *docs/build/html* with the output.)
+
 
 .. _compiling-options:
 
