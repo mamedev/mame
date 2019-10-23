@@ -63,7 +63,8 @@ enum
 	SCORES_VIEW,
 	SELECT_VIEW,
 	MARQUEES_VIEW,
-	LAST_VIEW = MARQUEES_VIEW
+	COVERS_VIEW,
+	LAST_VIEW = COVERS_VIEW
 };
 
 std::pair<char const *, char const *> const arts_info[] =
