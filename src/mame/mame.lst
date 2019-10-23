@@ -2630,6 +2630,13 @@ ms4125                          // MSI MS-4125 motherboard (486)
 pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherboard (486)
 fic4386vcv                      // FIC 4386-VC-V motherboard (486)
 v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
+op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
+ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
+pm486pu                         // PROTECH PM486PU-S7 motherboard (486)
+ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
+ms4144                          // MSI MS-4144 motherboard (486)
+pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
+ochipdca2                       // Octek Hippo DCA2 motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
