@@ -990,7 +990,7 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 
 /* Not confirmed to exist:
 
-system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
+system16.com used to list 'Streets of Rage', but this seems unlikely, as there are no gaps in
 the numbering prior to 'Streets of Rage 2'
 
 */
