@@ -806,6 +806,7 @@ BUSES["JAKKS_GAMEKEY"] = true
 BUSES["HP_OPTROM"] = true
 BUSES["HP80_OPTROM"] = true
 BUSES["HP80_IO"] = true
+BUSES["HP9825_OPTROM"] = true
 BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
 BUSES["LPCI"] = true
