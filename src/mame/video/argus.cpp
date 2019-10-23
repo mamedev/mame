@@ -994,7 +994,7 @@ u32 argus_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 
 	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 0);
-	if (m_bg_status & 1)    /* Backgound enable */
+	if (m_bg_status & 1)    /* Background enable */
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 	draw_sprites(bitmap, cliprect, 1);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -1005,7 +1005,7 @@ u32 valtric_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 {
 	bg_setting();
 
-	if (m_bg_status & 1)    /* Backgound enable */
+	if (m_bg_status & 1)    /* Background enable */
 		draw_mosaic(screen, bitmap, cliprect);
 	else
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -1018,7 +1018,7 @@ u32 butasan_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 {
 	bg_setting();
 
-	if (m_bg_status & 1)    /* Backgound enable */
+	if (m_bg_status & 1)    /* Background enable */
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(m_palette->black_pen(), cliprect);
