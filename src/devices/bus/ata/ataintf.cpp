@@ -11,21 +11,7 @@
 #include "emu.h"
 #include "ataintf.h"
 
-#include "atapicdr.h"
-#include "idehd.h"
-
 #include "debugger.h"
-
-void abstract_ata_interface_device::set_default_ata_devices(const char* _master, const char* _slave)
-{
-	for (size_t slot_index = 0; slot_index < SLOT_COUNT; slot_index++)
-	{
-		slot(slot_index).option_add("hdd", IDE_HARDDISK);
-		slot(slot_index).option_add("cdrom", ATAPI_CDROM);
-	}
-	slot(SLOT_MASTER).set_default_option(_master);
-	slot(SLOT_SLAVE).set_default_option(_slave);
-}
 
 ata_slot_device &abstract_ata_interface_device::slot(int index)
 {
@@ -220,12 +206,6 @@ WRITE_LINE_MEMBER( abstract_ata_interface_device::write_dmack )
 			elem->dev()->write_dmack(state);
 }
 
-void ata_devices(device_slot_interface &device)
-{
-	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_CDROM);
-}
-
 abstract_ata_interface_device::abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_slot(*this, "%u", 0U),
@@ -293,42 +273,4 @@ void abstract_ata_interface_device::device_add_mconfig(machine_config &config)
 {
 	for (size_t slot = 0; slot < SLOT_COUNT; slot++)
 		ATA_SLOT(config, m_slot[slot]);
-}
-
-
-//**************************************************************************
-//  ATA SLOT DEVICE
-//**************************************************************************
-
-// device type definition
-DEFINE_DEVICE_TYPE(ATA_SLOT, ata_slot_device, "ata_slot", "ATA Connector")
-
-//-------------------------------------------------
-//  ata_slot_device - constructor
-//-------------------------------------------------
-
-ata_slot_device::ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATA_SLOT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		m_dev(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ata_slot_device::device_config_complete()
-{
-	m_dev = dynamic_cast<device_ata_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ata_slot_device::device_start()
-{
 }

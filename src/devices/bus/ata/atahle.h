@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATAHLE_H
-#define MAME_MACHINE_ATAHLE_H
+#ifndef MAME_BUS_ATA_ATAHLE_H
+#define MAME_BUS_ATA_ATAHLE_H
 
 #pragma once
 
@@ -216,4 +216,4 @@ private:
 	emu_timer *m_buffer_empty_timer;
 };
 
-#endif // MAME_MACHINE_ATAHLE_H
+#endif // MAME_BUS_ATA_ATAHLE_H

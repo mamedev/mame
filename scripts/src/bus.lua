@@ -282,6 +282,36 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/ata/atadev.h,BUSES["ATA"] = true
+--@src/devices/bus/ata/ataintf.h,BUSES["ATA"] = true
+---------------------------------------------------
+
+if (MACHINES["ATAFLASH"]~=null) then
+	BUSES["ATA"] = true
+end
+
+if (BUSES["ATA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ata/atadev.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atadev.h",
+		MAME_DIR .. "src/devices/bus/ata/atahle.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atahle.h",
+		MAME_DIR .. "src/devices/bus/ata/ataintf.cpp",
+		MAME_DIR .. "src/devices/bus/ata/ataintf.h",
+		MAME_DIR .. "src/devices/bus/ata/atapicdr.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atapicdr.h",
+		MAME_DIR .. "src/devices/bus/ata/atapihle.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atapihle.h",
+		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
+		MAME_DIR .. "src/devices/bus/ata/cr589.h",
+		MAME_DIR .. "src/devices/bus/ata/idehd.cpp",
+		MAME_DIR .. "src/devices/bus/ata/idehd.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/fdc/fdc.h,BUSES["BBC_FDC"] = true
 ---------------------------------------------------
 

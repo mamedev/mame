@@ -30,12 +30,12 @@
 ***********************************************************************************************************/
 
 #include "emu.h"
+#include "bus/ata/atadev.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/tmp68301.h"
 #include "machine/idectrl.h"
-#include "machine/idehd.h"
 #include "machine/timer.h"
 #include "video/v9938.h"
 #include "audio/nichisnd.h"

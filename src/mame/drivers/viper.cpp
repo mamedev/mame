@@ -350,8 +350,8 @@ some other components. It will be documented at a later date.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"

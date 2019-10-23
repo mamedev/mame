@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_CR589_H
-#define MAME_MACHINE_CR589_H
+#ifndef MAME_BUS_ATA_CR589_H
+#define MAME_BUS_ATA_CR589_H
 
 #pragma once
 
@@ -46,4 +46,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(CR589, matsushita_cr589_device)
 
-#endif // MAME_MACHINE_CR589_H
+#endif // MAME_BUS_ATA_CR589_H

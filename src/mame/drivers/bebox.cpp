@@ -210,7 +210,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	scsictrl.set_scsi_port("scsi");
 
 	ide_controller_device &idectrl(IDE_CONTROLLER(config, "ide"));
-	idectrl.set_default_ata_devices("hdd", nullptr);
+	idectrl.options(ata_devices, "hdd", nullptr, false);
 	idectrl.irq_handler().set(FUNC(bebox_state::bebox_ide_interrupt));
 
 	/* pci */

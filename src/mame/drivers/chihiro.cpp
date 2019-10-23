@@ -433,8 +433,8 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "includes/xbox_pci.h"
 #include "includes/xbox.h"
 
+#include "bus/ata/idehd.h"
 #include "cpu/i386/i386.h"
-#include "machine/idehd.h"
 #include "machine/jvs13551.h"
 #include "machine/jvshost.h"
 #include "machine/naomigd.h"

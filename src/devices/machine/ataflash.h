@@ -6,7 +6,7 @@
 #pragma once
 
 #include "pccard.h"
-#include "machine/idehd.h"
+#include "bus/ata/idehd.h"
 
 DECLARE_DEVICE_TYPE(ATA_FLASH_PCCARD, ata_flash_pccard_device)
 

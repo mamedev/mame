@@ -217,9 +217,9 @@ Notes:
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/cr589.h"
 #include "machine/3dom2.h"
-#include "machine/ataintf.h"
-#include "machine/cr589.h"
 #include "machine/eepromser.h"
 #include "machine/timekpr.h"
 #include "sound/dac.h"
