@@ -428,7 +428,7 @@ Notes:
       29F400       - Fujitsu 29F400TA-90PFTN 512k x8 FlashROM (TSOP48)
       Custom ASIC  - CAPCOM DL-3229 SCU (QFP144). Decapping reveals this is a Hitachi HD6417099 SH2 variant
                      with built-in encryption, clocked at 6.250MHz
-      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated)
+      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated on type D boards)
       MACH111      - AMD MACH111 CPLD stamped 'CP3B1A' (PLCC44)
       *            - These components located on the other side of the PCB
 
