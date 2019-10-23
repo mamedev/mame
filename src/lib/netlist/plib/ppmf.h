@@ -232,8 +232,8 @@ namespace plib {
 		}
 		bool is_set() const {
 #if defined(_MSC_VER) || (defined (__INTEL_COMPILER) && defined (_M_X64))
-			int *p = reinterpret_cast<int *>(&m_func);
-			int *e = p + sizeof(generic_function) / sizeof(int);
+			const int *p = reinterpret_cast<const int *>(&m_func);
+			const int *e = p + sizeof(generic_function) / sizeof(int);
 			for (; p < e; p++)
 				if (*p != 0)
 					return true;
