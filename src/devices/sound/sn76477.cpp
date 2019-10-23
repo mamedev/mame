@@ -894,7 +894,9 @@ void sn76477_device::open_wav_file()
 {
 	char wav_file_name[30];
 
-	sprintf(wav_file_name, LOG_WAV_FILE_NAME, tag());
+	std::string s = tag();
+	std::replace(s.begin(), s.end(), ':', '_');	
+	sprintf(wav_file_name, LOG_WAV_FILE_NAME, s.c_str());
 	m_file = wav_open(wav_file_name, m_our_sample_rate, 2);
 
 	LOG(1, "SN76477:         Logging output: %s\n", wav_file_name);
