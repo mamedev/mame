@@ -2816,7 +2816,7 @@ end
 --
 ---------------------------------------------------
 
-if (BUSES["IDE"]~=null) or (BUSES["SCSI"]~=null) then
+if (BUSES["ATA"]~=null) or (BUSES["SCSI"]~=null) then
 	MACHINES["T10"] = true
 end
 
