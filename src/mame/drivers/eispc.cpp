@@ -21,13 +21,13 @@
  * On board ports: Beeper,
  * Ports: serial, parallel
  * Internal Options: Up to 640K RAM through add-on RAM card
- * Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
+ * Misc: The hardware was not 100% PC compatible so non BIOS based software would not always run. 50.000+ units sold
  *
- * TODO:
- * - Add keyboard, first HLE as in pc.cpp and then LLE when the keyboard controller is dumped
- * - Add the on-board FDC and boot DOS 1.xx
- * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes inclusing 640x400 (aka HR)
+ * TODO:s in selection
+ * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
+ * - Implement the descrete baudrate generator
+ * - Implement logic around enabling/resetting NMI and ISA bus I/O CHK
  *
  * Credits: The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
@@ -175,8 +175,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	uint8_t m_nmi_enabled;
 	uint8_t m_8087_int = 0;
-	const uint8_t m_parer_int = 0;
-	const uint8_t m_iochck_int = 0;
+	uint8_t m_parer_int = 0;
+	uint8_t m_iochck_int = 0;
 	void update_nmi();
 
 	// Timer
@@ -185,6 +185,8 @@ private:
 	// Speaker
 	DECLARE_WRITE_LINE_MEMBER(speaker_ck_w);
 	required_device<speaker_sound_device> m_speaker;
+	bool m_pc4;
+	bool m_pc5;
 
 	void epc_map(address_map &map);
 	void epc_io(address_map &map);
@@ -429,33 +431,53 @@ void epc_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	std::fill_n(&m_dma_segment[0], 4, 0);
-	m_dma_active = 0;
-	m_tc = false;
-	m_int = 1;
-	m_txd = false;
-	m_rxrdy = false;
-	m_dreq0_ck = true;
-	m_rxtx_clk_state = 0;
 
 	save_item(NAME(m_dma_segment));
 	save_item(NAME(m_dma_active));
 	save_item(NAME(m_tc));
-	save_item(NAME(m_int));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_rxrdy));
-	save_item(NAME(m_ocr));
-	m_ocr = 0x00;
-	save_item(NAME(m_ppi_portb));
+	save_item(NAME(m_int));
 	save_item(NAME(m_dreq0_ck));
+	save_item(NAME(m_ppi_portb));
 	save_item(NAME(m_rxtx_clk_state));
+	save_item(NAME(m_nmi_enabled));
+	save_item(NAME(m_8087_int));
+	save_item(NAME(m_parer_int));
+	save_item(NAME(m_iochck_int));
+	save_item(NAME(m_pc4));
+	save_item(NAME(m_pc5));
+	save_item(NAME(m_ocr));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
 }
 
 void epc_state::machine_reset()
 {
+	m_dma_active = 0;
+	m_tc = false;
+	m_txd = false;
+	m_rxrdy = false;
+	m_int = 1;
+	m_dreq0_ck = true;
 	m_ppi_portb = 0;
-	m_keyboard->rst_line_w(ASSERT_LINE);
+	m_rxtx_clk_state = 0;
 	m_nmi_enabled = 0;
-	m_kbd8251->write_cts(0); // Held low always
+	m_8087_int = 0;
+	m_parer_int = 0;
+	m_iochck_int = 0;
+	m_pc4 = 0;
+	m_pc5 = 0;
+	m_ocr = 0;
+	m_irq = 0;
+	m_drq = 0;
+	m_fdc_irq = 0;
+	m_fdc_drq = 0;
+
+	m_keyboard->rst_line_w(ASSERT_LINE);
+	m_kbd8251->write_cts(0); // Tied to GND
 }
 
 void epc_state::init_epc()
@@ -550,7 +572,9 @@ WRITE_LINE_MEMBER(epc_state::dreq0_ck_w)
 
 WRITE_LINE_MEMBER(epc_state::speaker_ck_w)
 {
-	m_speaker->level_w((m_ppi_portb & 0x02) && state ? 1 : 0);
+	m_pc5 = state;
+	m_pc4 = (m_ppi_portb & 0x02) && state ? 1 : 0;
+	m_speaker->level_w(m_pc4);
 }
 
 /**********************************************************
@@ -614,7 +638,8 @@ READ8_MEMBER( epc_state::ppi_portc_r )
 	// Read 4 configurations dip switches depending on PB3
 	data = (m_io_dsw->read() >> ((m_ppi_portb & 0x08) ? 4 : 0) & 0x0f);
 
-	// TODO: verify what PC4-PC7 is used for, if anything
+	data |= (m_pc4 ? 1U << 4 : 0); // Feedback from gated speaker beep
+	data |= (m_pc5 ? 1U << 5 : 0); // Feedback from timer source for speaker beep
 
 	LOGPPI("PPI Port C read: %02x\n", data);
 
@@ -785,7 +810,7 @@ void epc_state::epc(machine_config &config)
 	ISA8(config, m_isabus,  XTAL(14'318'181) / 3.0); // TEW crystal marked X1 verified
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
-	//m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w)); // Reserved in service manual
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w)); // Reserved in service manual
 	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
@@ -794,7 +819,6 @@ void epc_state::epc(machine_config &config)
 	m_isabus->drq1_callback().set(m_dma8237a, FUNC(am9517a_device::dreq1_w));
 	m_isabus->drq2_callback().set(m_dma8237a, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq3_callback().set(m_dma8237a, FUNC(am9517a_device::dreq3_w));
-	//m_isabus->iochck_callback().set(FUNC(epc_state::chck_w)); // TODO: Check schematics
 	m_isabus->iochck_callback().set([this] (int state)
 	{
 		if (m_nmi_enabled && !state && 0)
@@ -814,8 +838,10 @@ void epc_state::epc(machine_config &config)
 	// System board has 128kB memory with parity, expansion can be achieved through the
 	// 128kB Memory Expansion Board 1090 and/or the 128kB Multifunction Board MB1080-001
 	// and/or the 384kB MB1080-002. The MB1080 DRAM might need to be dynamically added as
-	// base address and also a video memory hole is configuarable.
-	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
+	// base address and also a video memory hole is configurable.
+	// Some RAM sizes are disabled because they trigger issue #5776, just until that is sorted out
+	//RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("384K");
 
 	// FDC
 	I8272A(config, m_fdc, XTAL(16'000'000) / 2, false); // TEW crystal marked X3 verified
@@ -853,7 +879,7 @@ void epc_state::update_nmi()
 		 (m_parer_int != 0) || // Parity error is always false as it is an emulator, at least for now
 		 (m_iochck_int != 0))) // Same goes for ISA board errors
 	{
-		LOGNMI(" NMI asserted\n");
+		LOGNMI(" NMI Asserted\n");
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	else
