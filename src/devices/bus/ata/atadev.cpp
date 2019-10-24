@@ -11,6 +11,7 @@
 
 #include "atapicdr.h"
 #include "idehd.h"
+#include "px320a.h"
 
 //-------------------------------------------------
 //  device_ata_interface - constructor
@@ -68,4 +69,5 @@ void ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("px320a", PX320A);
 }
