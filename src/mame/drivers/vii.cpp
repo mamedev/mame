@@ -178,7 +178,6 @@ public:
 	{ }
 
 	void spg2xx_base(machine_config &config);
-	void spg2xx_basep(machine_config &config);
 	void jakks(machine_config &config);
 	void jakks_i2c(machine_config &config);
 	void walle(machine_config &config);
@@ -189,10 +188,13 @@ public:
 	void rad_crik(machine_config &config);
 	void non_spg_base(machine_config &config);
 	void lexizeus(machine_config &config);
+	void pvmil(machine_config &config);
+	void taikeegr(machine_config &config);
 
 	void init_crc();
 	void init_zeus();
 	void init_zone40();
+	void init_taikeegr();
 
 protected:
 	virtual void machine_start() override;
@@ -214,6 +216,10 @@ protected:
 
 	DECLARE_WRITE16_MEMBER(jakks_porta_w);
 	DECLARE_WRITE16_MEMBER(jakks_portb_w);
+
+	DECLARE_WRITE16_MEMBER(pvmil_porta_w);
+	DECLARE_WRITE16_MEMBER(pvmil_portb_w);
+	DECLARE_WRITE16_MEMBER(pvmil_portc_w);
 
 	required_device<spg2xx_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -603,6 +609,24 @@ READ16_MEMBER(spg2xx_game_state::rad_portc_r)
 	logerror("Port C Read: %04x\n", data);
 	return data;
 }
+
+WRITE16_MEMBER(spg2xx_game_state::pvmil_porta_w)
+{
+	logerror("%s: pvmil_porta_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(spg2xx_game_state::pvmil_portb_w)
+{
+	logerror("%s: pvmil_portb_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(spg2xx_game_state::pvmil_portc_w)
+{
+	// related to P4 inputs?
+	logerror("%s: pvmil_portc_w %04x\n", machine().describe_context(), data);
+}
+
+
 
 void spg2xx_game_state::mem_map_4m(address_map &map)
 {
@@ -1668,7 +1692,142 @@ static INPUT_PORTS_START( tvgogo )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pvmil ) // hot console start + console select on boot for test mode
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Player 1 A")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Player 1 B")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Player 1 C")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Player 1 D")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Player 2 A")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Player 2 B")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Player 2 C")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Player 2 D")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_NAME("Player 3 A")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_NAME("Player 3 B")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3) PORT_NAME("Player 3 C")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(3) PORT_NAME("Player 3 D")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("Player 1 Lifeline")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_START ) PORT_CODE(KEYCODE_1) PORT_NAME("Console Start")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START ) PORT_CODE(KEYCODE_5) PORT_NAME("Console Select")
 
+	PORT_START("P2")
+	PORT_DIPNAME( 0x0001, 0x0001, "P2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("P3") // Player 4 buttons are read with some kind of serial / multiplexing protocol?
+	PORT_DIPNAME( 0x0001, 0x0001, "P3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) ) // this triggers all P4 buttons, must be some multiplexing (or a core bug)
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("Player 2 Lifeline")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(3) PORT_NAME("Player 3 Lifeline")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(4) PORT_NAME("Player 4 Lifeline")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
+static INPUT_PORTS_START( taikeegr )
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )   PORT_NAME("Strum Bar Down")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Strum Bar Up")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Whamming Bar")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Blue")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pink")
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 READ16_MEMBER(dreamlif_state::portb_r)
 {
@@ -2012,14 +2171,6 @@ void spg2xx_game_state::non_spg_base(machine_config &config)
 	spg2xx_base(config);
 }
 
-void spg2xx_game_state::spg2xx_basep(machine_config &config)
-{
-	spg2xx_base(config);
-
-	m_screen->set_refresh_hz(50);
-	m_screen->set_size(320, 312);
-}
-
 void vii_state::vii(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -2339,6 +2490,8 @@ void spg2xx_game_state::rad_skatp(machine_config &config)
 {
 	rad_skat(config);
 	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+//	m_screen->set_size(320, 312);
 }
 
 void spg2xx_game_state::rad_sktv(machine_config &config)
@@ -2369,6 +2522,45 @@ void spg2xx_game_state::rad_crik(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->eeprom_w().set(FUNC(spg2xx_game_state::eeprom_w));
 	m_maincpu->eeprom_r().set(FUNC(spg2xx_game_state::eeprom_r));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+}
+
+void spg2xx_game_state::pvmil(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+	m_maincpu->set_pal(true);
+
+	spg2xx_base(config);
+
+	m_screen->set_refresh_hz(50);
+	//m_screen->set_size(320, 312);
+
+	m_maincpu->porta_in().set_ioport("P1");
+	m_maincpu->portb_in().set_ioport("P2");
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_state::pvmil_porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_state::pvmil_portb_w));
+	m_maincpu->portc_out().set(FUNC(spg2xx_game_state::pvmil_portc_w));
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+}
+
+void spg2xx_game_state::taikeegr(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_4m);
+	m_maincpu->set_pal(true);
+
+	spg2xx_base(config);
+
+	m_screen->set_refresh_hz(50);
+//	m_screen->set_size(320, 312);
+
+	m_maincpu->porta_in().set_ioport("P1");
+//	m_maincpu->portb_in().set_ioport("P2");
+//	m_maincpu->portc_in().set_ioport("P3");
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
@@ -2572,6 +2764,16 @@ ROM_START( tvgogo )
 	// no internal ROM? (Camera might have an MCU tho)
 ROM_END
 
+ROM_START( pvmil ) 
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) // Fujistu 29Z0002TN, read as ST M29W320FB
+	ROM_LOAD16_WORD_SWAP( "millionare4.bin", 0x000000, 0x400000, CRC(9c43d0f2) SHA1(fb4ba0115000b10b7c0e0d44b9fa3234c900e694) )
+ROM_END
+
+ROM_START( taikeegr )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "taikee_guitar.bin", 0x000000, 0x800000, CRC(8cbe2feb) SHA1(d72e816f259ba6a6260d6bbaf20c5e9b2cf7140b) )
+ROM_END
+
 
 void spg2xx_game_state::init_crc()
 {
@@ -2628,6 +2830,42 @@ void spg2xx_game_state::init_zone40()
 	}
 	//there is also bitswapping as above, and some kind of address scramble as the vectors are not exactly where expected
 }
+
+void spg2xx_game_state::init_taikeegr()
+{
+	u16 *src = (u16*)memregion("maincpu")->base();
+
+	for (int i = 0x00000; i < 0x800000/2; i++)
+	{
+		u16 dat = src[i];
+		dat = bitswap<16>(dat,  15,14,13,12,   11,10,9,8,    7,6,5,4,   0,1,2,3 );
+		src[i] = dat;
+	}
+	
+	std::vector<u16> buffer(0x800000/2);
+
+	for (int i = 0; i < 0x800000/2; i++)
+	{
+		int j = 0;
+
+		switch (i & 0x00e00)
+		{
+		case 0x00000: j = (i & 0xfff1ff) | 0x000; break;
+		case 0x00200: j = (i & 0xfff1ff) | 0x800; break;
+		case 0x00400: j = (i & 0xfff1ff) | 0x400; break;
+		case 0x00600: j = (i & 0xfff1ff) | 0xc00; break;
+		case 0x00800: j = (i & 0xfff1ff) | 0x200; break;
+		case 0x00a00: j = (i & 0xfff1ff) | 0xa00; break;
+		case 0x00c00: j = (i & 0xfff1ff) | 0x600; break;
+		case 0x00e00: j = (i & 0xfff1ff) | 0xe00; break;
+		}
+
+		buffer[j] = src[i];
+	}
+
+	std::copy(buffer.begin(), buffer.end(), &src[0]);
+}
+
 
 // year, name, parent, compat, machine, input, class, init, company, fullname, flags
 
@@ -2694,4 +2932,12 @@ CONS( 2005, tvgogo,  0,        0, tvgogo, tvgogo,   tvgogo_state, empty_init, "T
 CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_state, init_zone40, "Jungle Soft / Ultimate Products (HK) Ltd",          "Zone 40",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Similar, SPG260?, scrambled
-CONS( 200?, lexizeus,    0,       0,        lexizeus, lexizeus, spg2xx_game_state, init_zeus, "Lexibook",          "Zeus IG900 20-in-1 (US?)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// there are other regions of this, including a Finnish version "Haluatko miljonääriksi?" (see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game) )
+CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    spg2xx_game_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire (Play Vision, Plug and Play, UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // p4 inputs need mapping
+
+// there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)
+// for the UK version the title screen always shows "Guitar Rock", however there are multiple boxes with different titles and song selections.
+// ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
+CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_state, init_taikeegr, "TaiKee", "Guitar Rockstar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
