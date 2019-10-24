@@ -28,7 +28,7 @@ protected:
 
 	// devices
 	required_device<i8274_new_device> m_uart8274;
-	required_device<sdlc_bitbanger_device> m_sdlcbitbanger;
+	required_device<sdlc_logger_device> m_sdlclogger;
 
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override;
