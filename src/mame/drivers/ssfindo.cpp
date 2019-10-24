@@ -246,18 +246,19 @@ WRITE8_MEMBER(ssfindo_state::iolines_w)
 }
 
 // inverted compared to riscpc.cpp?
+// TODO: investigate about why with this arrangement doesn't work (gut feeling tells me that i2c doesn't like double reading)
 READ_LINE_MEMBER(tetfight_state::iocr_od1_r)
 {
 	// TODO: completely get rid of this speedup fn or move anywhere else
 	//if (m_speedup) (this->*m_speedup)();
-	// returning 0 here causes a tight loop with cyan border.
 	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
 }
 
 READ_LINE_MEMBER(tetfight_state::iocr_od0_r)
 {
 	// TODO: presuming same as Acorn Archimedes, where i2c clock can be readback
-	return m_i2cmem_clock;
+	return (m_i2cmem->read_sda() ? 1 : 0); //eeprom read
+//	return m_i2cmem_clock;
 }
 
 // TODO: correct hookup

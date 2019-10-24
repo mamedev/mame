@@ -332,7 +332,7 @@ void arm_iomd_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	{
 		case T0_TIMER:
 		case T1_TIMER: 
-			trigger_irq(IRQA, id == T1_TIMER ? 0x40 : 0x20);
+			trigger_irq<IRQA>(id == T1_TIMER ? 0x40 : 0x20);
 			break;
 	}
 }
@@ -437,7 +437,7 @@ inline void arm_iomd_device::flush_irq(unsigned Which)
 		m_host_cpu->pulse_input_line(ARM7_IRQ_LINE, m_host_cpu->minimum_quantum_time());
 }
 
-inline void arm_iomd_device::trigger_irq(unsigned Which, u8 irq_type)
+template <unsigned Which> inline void arm_iomd_device::trigger_irq(u8 irq_type)
 {
 	m_irq_status[Which] |= irq_type;
 	flush_irq(Which);
@@ -670,7 +670,7 @@ WRITE_LINE_MEMBER( arm_iomd_device::vblank_irq )
 	if (!state)
 		return;
 
-	trigger_irq(IRQA, 0x08);
+	trigger_irq<IRQA>(0x08);
 	if (m_video_enable == true)
 	{
 		// TODO: much more complex, last/end regs, start regs and eventually LCD hooks
@@ -755,7 +755,7 @@ WRITE_LINE_MEMBER( arm_iomd_device::keyboard_irq )
 	if (!state)
 		return;
 
-	trigger_irq(IRQB, 0x80);
+	trigger_irq<IRQB>(0x80);
 }
 
 WRITE_LINE_MEMBER( arm_iomd_device::keyboard_reset )

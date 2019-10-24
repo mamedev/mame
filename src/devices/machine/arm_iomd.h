@@ -137,7 +137,7 @@ private:
 	u8 m_irq_status[IRQ_SOURCES_SIZE], m_irq_mask[IRQ_SOURCES_SIZE];
 	inline u8 update_irqa_type(u8 data);
 	inline void flush_irq(unsigned Which);
-	inline void trigger_irq(unsigned Which, u8 irq_type);
+	template <unsigned Which> inline void trigger_irq(u8 irq_type);
 
 	static constexpr int timer_ch_size = 2;
 	enum {
