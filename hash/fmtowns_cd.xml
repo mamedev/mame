@@ -776,7 +776,8 @@ User/save disks that can be created from the game itself are not included.
 <!-- OS & System Disks -->
 
 
-	<software name="debian13">
+	<!-- These Debian CDs probably also work on IBM-compatible PCs -->
+	<software name="debian13" supported="no">
 		<!--
 		Origin: Tokugawa Corporate Forums (akira_2020)
 		<rom name="debian-GNU-linux-1.3.1-JP-FMTOWNS.BINARY.LASER5.iso" size="614449152" crc="83dc41e1" sha1="eff4b4d9bc562cf23108153c2434f4e67d884699"/>
@@ -799,7 +800,7 @@ User/save disks that can be created from the game itself are not included.
 		</part>
 	</software>
 
-	<software name="debian20">
+	<software name="debian20" supported="no">
 		<!--
 		Origin: Tokugawa Corporate Forums (akira_2020)
 		<rom name="debian-GNU-linux-2.0r2-with-hamm-JP-i38-3CDset-BINARY-CD.LASER5.iso" size="675663872" crc="3da23432" sha1="18ff0c09ffac9a8c2dfd1bf9f7115a666ec00527"/>
