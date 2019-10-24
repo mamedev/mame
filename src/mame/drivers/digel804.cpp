@@ -695,10 +695,10 @@ void ep804_state::ep804(machine_config &config)
 
 /*
 "Hardware Revisions"
-For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes)
-which revison the hardware is is shown on the sticker on the bottom.
+For pcb 1.0, there are at least 6 hardware revisions (i.e. small changes/component changes/greenwire fixes).
+The hardware revision is shown on the sticker on the bottom.
 
-known features:
+Known features:
 
 1.0 - ?
 1.1 - does not support driving pin 1 of the socket, i.e. max size is 27256; pin 1 is pulled high; several components unpopulated

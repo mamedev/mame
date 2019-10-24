@@ -814,7 +814,7 @@ uint8_t corvus_hdc_device::corvus_get_drive_parameters(uint8_t drv) {
 	//
 	if ( ! corvus_hdc_file( drv ) )
 	{
-		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existant drive: %d\n", drv);
+		logerror("corvus_get_drive_parameters: Attempt to retrieve parameters from non-existent drive: %d\n", drv);
 		m_xmit_bytes = 1;
 		return STAT_FATAL_ERR | STAT_DRIVE_NOT_ONLINE;
 	}

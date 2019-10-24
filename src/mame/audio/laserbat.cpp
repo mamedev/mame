@@ -302,7 +302,7 @@ WRITE8_MEMBER(laserbat_state::csound2_w)
     There could well be other connections on the sound board - these are
     just what can be deduced by tracing the sound program.
 
-    The game board makes the the audio output from the first S2636 PVI
+    The game board makes the audio output from the first S2636 PVI
     (5E) available on a pin at the sound board interface connector, but
     it isn't routed anywhere.
 */

@@ -1563,7 +1563,7 @@ struct dsk_fdr
 	UINT16BE xreclen;       /* extended record len: if record len is >= 256, */
 								/* reclen is set to 0 and the actual reclen is */
 								/* stored here (Myarc HFDC only).  TI reserved */
-								/* this  field for data chain pointer extension, */
+								/* this field for data chain pointer extension, */
 								/* but this was never implemented. */
 	uint8_t flags;            /* file status flags (see enum above) */
 	uint8_t recsperphysrec;   /* logical records per physrec */
@@ -1581,7 +1581,7 @@ struct dsk_fdr
 								/* field, so program field saved by the HFDC */
 								/* DSR may be larger than they should. */
 	uint8_t eof;              /* EOF offset in last physrec for variable length */
-								/* record files and program files (0->256)*/
+								/* record files and program files (0->256) */
 	uint8_t reclen;           /* logical record size in bytes ([1,255] 0->256) */
 								/* Maximum allowable record size for variable */
 								/* length record files.  Reserved for program */
@@ -1625,7 +1625,7 @@ struct win_fdr
 								/* implementation is regarded as a bug because */
 								/* program files do not define the fixrecs field */
 								/* field, so program field saved by the HFDC */
-								/* DSR may be larger whan they should. */
+								/* DSR may be larger than they should. */
 							/* other sibling FDRs: index of the first file */
 								/* physrec in this particular sibling FDR */
 	uint8_t eof;              /* EOF offset in last physrec for variable length */
