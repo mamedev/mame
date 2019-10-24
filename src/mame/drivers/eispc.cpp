@@ -23,20 +23,20 @@
  * Internal Options: Up to 640K RAM through add-on RAM card
  * Misc: The hardware was not 100% PC compatible so non BIOS based software would not always run. 50.000+ units sold
  *
- * TODO:s in selection
+ * TODO
  * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
  * - Implement the descrete baudrate generator
  * - Implement logic around enabling/resetting NMI and ISA bus I/O CHK
  *
- * Credits: The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
+ * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
  *          A dead pcb was donated by rfka01 and rom dumps by ZnaxQue@sweclockers.com
  *
  ************************************************************************************************************/
 /*
- Links:
- ------
+ Links
+ -----
 
  */
 
