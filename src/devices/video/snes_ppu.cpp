@@ -1865,7 +1865,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	if (m_screen_disabled) /* screen is forced blank */
 		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
-			bitmap.pix32(curline, x) = rgb_t::black();
+			bitmap.pix32(0, x) = rgb_t::black();
 	else
 	{
 		/* Update clip window masks if necessary */
@@ -1947,8 +1947,8 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				int g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				int b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
-				bitmap.pix32(curline, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
-				bitmap.pix32(curline, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(0, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(0, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 			}
 			else
 			{
@@ -1986,7 +1986,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				int g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				int b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
-				bitmap.pix32(curline, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(0, x * 2 + 0) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 				prev_colour = tmp_col0;
 
 				/* average the second pixel if required, or draw it directly*/
@@ -1999,7 +1999,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 				g = (((c & 0x3e0) >> 5) * fade) >> 4;
 				b = (((c & 0x7c00) >> 10) * fade) >> 4;
 
-				bitmap.pix32(curline, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
+				bitmap.pix32(0, x * 2 + 1) = rgb_t(pal5bit(r), pal5bit(g), pal5bit(b));
 				prev_colour = tmp_col1;
 			}
 		}

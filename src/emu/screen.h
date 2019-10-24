@@ -63,6 +63,9 @@ constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
  @def VIDEO_UPDATE_SCANLINE
  calls VIDEO_UPDATE for every visible scanline, even for skipped frames
 
+ @def VIDEO_VARIABLE_WIDTH
+ causes the screen to construct its final bitmap from a composite upscale of individual scanline bitmaps
+
  @}
  */
 
@@ -72,6 +75,7 @@ constexpr u32 VIDEO_UPDATE_AFTER_VBLANK     = 0x0004;
 constexpr u32 VIDEO_SELF_RENDER             = 0x0008;
 constexpr u32 VIDEO_ALWAYS_UPDATE           = 0x0080;
 constexpr u32 VIDEO_UPDATE_SCANLINE         = 0x0100;
+constexpr u32 VIDEO_VARIABLE_WIDTH          = 0x0200;
 
 
 //**************************************************************************
@@ -182,7 +186,7 @@ public:
 		set_type(type);
 		set_color(color);
 	}
-	~screen_device();
+	virtual ~screen_device();
 
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
@@ -224,7 +228,7 @@ public:
 	/// \param [in] vbstart Index of first line in vertical blanking
 	///   period after visible lines.
 	/// \return Reference to device for method chaining.
-	screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
+	virtual screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		assert(pixclock != 0);
 		m_clock = pixclock;
@@ -389,7 +393,7 @@ public:
 
 	// beam positioning and state
 	int vpos() const;
-	int hpos() const;
+	virtual int hpos() const;
 	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
 	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
 
@@ -403,14 +407,14 @@ public:
 	u64 frame_number() const { return m_frame_number; }
 
 	// pixel-level access
-	u32 pixel(s32 x, s32 y);
-	void pixels(u32* buffer);
+	virtual u32 pixel(s32 x, s32 y);
+	virtual void pixels(u32* buffer);
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
-	bool update_partial(int scanline);
-	void update_now();
-	void reset_partial_updates();
+	virtual bool update_partial(int scanline);
+	virtual void update_now();
+	virtual void reset_partial_updates();
 
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
@@ -424,7 +428,9 @@ public:
 	static constexpr int DEFAULT_FRAME_RATE = 60;
 	static const attotime DEFAULT_FRAME_PERIOD;
 
-private:
+protected:
+	screen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	class svg_renderer;
 
 	// timer IDs
@@ -453,6 +459,9 @@ private:
 	void vblank_end();
 	void finalize_burnin();
 	void load_effect_overlay(const char *filename);
+	void update_scan_bitmap_size(int y);
+	void pre_update_scanline(int y);
+	void create_composited_bitmap();
 
 	// inline configuration data
 	screen_type_enum    m_type;                     // type of screen
@@ -475,14 +484,17 @@ private:
 	render_container *  m_container;                // pointer to our container
 	std::unique_ptr<svg_renderer> m_svg; // the svg renderer
 	// dimensions
+	int                 m_max_width;                // maximum width encountered
 	int                 m_width;                    // current width (HTOTAL)
 	int                 m_height;                   // current height (VTOTAL)
 	rectangle           m_visarea;                  // current visible area (HBLANK end/start, VBLANK end/start)
+	std::vector<int>	m_scan_widths;				// current width, in samples, of each individual scanline
 
 	// textures and bitmaps
 	texture_format      m_texformat;                // texture format
 	render_texture *    m_texture[2];               // 2x textures for the screen bitmap
 	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
+	std::vector<bitmap_t *> m_scan_bitmaps[2];		// 2x bitmaps for each individual scanline
 	bitmap_ind8         m_priority;                 // priority bitmap
 	bitmap_ind64        m_burnin;                   // burn-in bitmap
 	u8                  m_curbitmap;                // current bitmap index

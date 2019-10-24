@@ -38,6 +38,7 @@ constexpr int MAX_FRAMESKIP = FRAMESKIP_LEVELS - 2;
 class video_manager
 {
 	friend class screen_device;
+	friend class variable_width_screen_device;
 
 public:
 	// movie format options
