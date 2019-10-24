@@ -82,11 +82,7 @@ WRITE8_MEMBER(markham_state::strnskil_master_output_w)
 {
 	m_scroll_ctrl = data >> 5;
 	
-	if (flip_screen() != (BIT(data, 3)))
-	{
-		flip_screen_set(BIT(data, 3));
-		machine().tilemap().mark_all_dirty();
-	}
+	flipscreen_w(space, 0, (data >> 3) & 1);
 
 	// bit 0: master CPU bus request?
 }
