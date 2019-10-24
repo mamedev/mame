@@ -1692,7 +1692,7 @@ static INPUT_PORTS_START( tvgogo )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( pvmil ) // hot console start + console select on boot for test mode
+static INPUT_PORTS_START( pvmil ) // hold "console start" + "console select" on boot for test mode
 	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Player 1 A")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Player 1 B")
@@ -2940,4 +2940,4 @@ CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    spg2xx_game_st
 // there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)
 // for the UK version the title screen always shows "Guitar Rock", however there are multiple boxes with different titles and song selections.
 // ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
-CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_state, init_taikeegr, "TaiKee", "Guitar Rockstar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
+CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
