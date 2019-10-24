@@ -40165,8 +40165,11 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<!-- boot OK -->
     <software name="bblade2j" cloneof="bblade2" supported="yes">
-        <!-- Unknown source -->
+        <!-- 
+		Unknown source 
+		-->
         <description>Bushido Blade 2 (Jpn)</description>
         <year>1998</year>
         <publisher>Squaresoft</publisher>
@@ -41264,7 +41267,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	<!-- unsure if this is the regular or the limited release -->
 	<!-- boot OK -->
     <software name="dungcr" supported="yes">
-        <!-- Unknown source -->
+        <!-- 
+		Unknown source 
+		-->
         <description>Dungeon Creator (Jpn)</description>
         <year>1996</year>
         <publisher>Electronic Arts Victor</publisher>
@@ -43826,7 +43831,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- boot OK -->
     <software name="garouwa" cloneof="fatfurwa" supported="yes">
-        <!-- Unknown source -->
+        <!-- 
+		Unknown source 
+		-->
         <description>Garou Densetsu - Wild Ambition (Jpn)</description>
         <year>1999</year>
         <publisher>SNK</publisher>
@@ -44878,7 +44885,9 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- boot OK -->
     <software name="gunpey" supported="yes">
-        <!-- Unknown source -->
+        <!-- 
+		Unknown source 
+		-->
         <description>Gunpey (Jpn)</description>
         <year>1999</year>
         <publisher>Bandai</publisher>
@@ -44942,8 +44951,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="hanabifn" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="hanabifn" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Hanabi Fantast (Japan) (Track 01) [SLPS-01439].bin" size="134247456" crc="5e35fa1a" sha1="ea43337dab53a7aa9e53ad88be57e85d77f83f4b"/>
 		<rom name="Hanabi Fantast (Japan) (Track 02) [SLPS-01439].bin" size="50575056" crc="eb9cd4b1" sha1="fe55bffc7af60cba45996ef17b0874b5b96623b6"/>
 		<rom name="Hanabi Fantast (Japan) (Track 03) [SLPS-01439].bin" size="25074672" crc="68fbeefe" sha1="f4713611655fa8654589fa4e9a49a581874f1b86"/>
@@ -44978,13 +44989,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="hanabi fantast (japan) [slps-01439]" sha1="fcdc674b9afe6fdfe6c3e20518a1ab458b288d13"/>
+				<disk name="hanabi fantast (japan) [slps-01439]" sha1="fcdc674b9afe6fdfe6c3e20518a1ab458b288d13" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="happyhtl" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="happyhtl" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Happy Hotel (Japan) [SLPS-01110].bin" size="480944016" crc="661fbf2b" sha1="d4c6e81440bc93a80b749e59113c4c9adcfd6236"/>
 		<rom name="Happy Hotel (Japan) [SLPS-01110].cue" size="98" crc="a31cd07a" sha1="f8bb605844e4693ad494aff7ae769800b678f30f"/>
 		-->
@@ -44997,7 +45010,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="happy hotel (japan) [slps-01110]" sha1="35f58d0987259b0ed6515bfc6de767c5b21000ec"/>
+				<disk name="happy hotel (japan) [slps-01110]" sha1="35f58d0987259b0ed6515bfc6de767c5b21000ec" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -48730,8 +48743,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="megatudo" supported="no">
-		<!-- Unknown source
+	<!-- Banpresto logo display is offset, has timing issues -->
+	<software name="megatudo" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Megatudo 2096 (Japan) [SLPS-00435].bin" size="301768656" crc="87226780" sha1="a4cc0e11178b891d423cbb6b3d4698bd8b265b79"/>
 		<rom name="Megatudo 2096 (Japan) [SLPS-00435].cue" size="100" crc="2aeab3e6" sha1="e7883bc291ebb116098d6cd5fc98eea0193c95ac"/>
 		-->
@@ -48744,7 +48759,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="megatudo 2096 (japan) [slps-00435]" sha1="36303ed8e1fe7f01c803d84a3240d7cef7ff9913"/>
+				<disk name="megatudo 2096 (japan) [slps-00435]" sha1="36303ed8e1fe7f01c803d84a3240d7cef7ff9913" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49069,8 +49084,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="michinok" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="michinok" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Michinoku Hitou Koimonogatari Kai (Japan) [SLPS-02502].bin" size="253404480" crc="ef2dc3cc" sha1="f3683d04f8ac9b41d907d8a08a2b03004efd727c"/>
 		<rom name="Michinoku Hitou Koimonogatari Kai (Japan) [SLPS-02502].cue" size="120" crc="a641b038" sha1="bc139b47198e36ea54c86cd1a32ffd1e67045a3d"/>
 		-->
@@ -49083,7 +49100,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="michinoku hitou koimonogatari kai (japan) [slps-02502]" sha1="bcb5514958fb0afc003c4f584880c675a9ddf0aa"/>
+				<disk name="michinoku hitou koimonogatari kai (japan) [slps-02502]" sha1="bcb5514958fb0afc003c4f584880c675a9ddf0aa" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49136,8 +49153,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="minimnst" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, missing maracas controller -->
+	<software name="minimnst" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Mini Moni - Shaker &amp; Tambourine! Dapyon! (Japan) [SLPM-87132].bin" size="338796192" crc="bdb22495" sha1="535f1a2f63ff460b65801db820836c93629536cc"/>
 		<rom name="Mini Moni - Shaker &amp; Tambourine! Dapyon! (Japan) [SLPM-87132].CUE" size="127" crc="508563e7" sha1="e76b7c3775c057b2b25a0b5f87e81ccf5543a882"/>
 		-->
@@ -49150,13 +49169,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mini moni - shaker &amp; tambourine! dapyon! (japan) [slpm-87132]" sha1="da020789e94ef440bb46eb4e9c5b61cafc8d2340"/>
+				<disk name="mini moni - shaker &amp; tambourine! dapyon! (japan) [slpm-87132]" sha1="da020789e94ef440bb46eb4e9c5b61cafc8d2340" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
+	<!-- Hangs at Sony logo -->
 	<software name="miniyonk" supported="no">
-		<!-- Unknown source
+		<!-- 
+		Unknown source
 		<rom name="Mini-Yonku Hakusou Kyoudai - Rettsu &amp; Go!! - WGP Hyper Heat (Japan) [SLPS-01078].bin" size="460620384" crc="cbf98acb" sha1="42ce9088906df3ee3f7d2203983affeb4ae2c067"/>
 		<rom name="Mini-Yonku Hakusou Kyoudai - Rettsu &amp; Go!! - WGP Hyper Heat (Japan) [SLPS-01078].cue" size="144" crc="0da04544" sha1="d4c7eb29d098d7e402662ef1db9b7329cdbe79fa"/>
 		-->
@@ -49169,13 +49190,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mini-yonku hakusou kyoudai - rettsu &amp; go!! - wgp hyper heat (japan) [slps-01078]" sha1="81fbd10222fcdc35ca2160933c5005e272d788c5"/>
+				<disk name="mini-yonku hakusou kyoudai - rettsu &amp; go!! - wgp hyper heat (japan) [slps-01078]" sha1="81fbd10222fcdc35ca2160933c5005e272d788c5" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="misakiag" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="misakiag" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Misaki-Aggressive! (Japan) [SLPS-01474].bin" size="621405456" crc="d81b8a74" sha1="afc2c60f30f13a4f6cbca248765aaed8e9b3e03d"/>
 		<rom name="Misaki-Aggressive! (Japan) [SLPS-01474].cue" size="103" crc="d609e6ef" sha1="5b784800f4ad8346c3358e84b472f9c307667694"/>
 		-->
@@ -49188,13 +49211,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="misaki-aggressive! (japan) [slps-01474]" sha1="9a17567c640c6c5a775dbe183f3e7795c6deda0c"/>
+				<disk name="misaki-aggressive! (japan) [slps-01474]" sha1="9a17567c640c6c5a775dbe183f3e7795c6deda0c" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="mitocho" supported="no">
-		<!-- Unknown source
+	<!-- boot OK, locks when trying to save -->
+	<software name="mitocho" supported="partial">
+		<!-- 
+		Unknown source
 		<rom name="Mitouhou he no Chousen - Alps-hen (Japan) [SLPS-00662].bin" size="588333984" crc="e00abc12" sha1="5ac5b58093c05199a7ef05bdcf0011978fe3b1bc"/>
 		<rom name="Mitouhou he no Chousen - Alps-hen (Japan) [SLPS-00662].cue" size="981" crc="f1215d95" sha1="8fd294b62741dcd8989c555bf2404b0239550754"/>
 		-->
@@ -49207,7 +49232,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="mitouhou he no chousen - alps-hen (japan) [slps-00662]" sha1="51f496d6fa45671d0507e9e7d58df564158367d0"/>
+				<disk name="mitouhou he no chousen - alps-hen (japan) [slps-00662]" sha1="51f496d6fa45671d0507e9e7d58df564158367d0" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49334,8 +49359,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="momo" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="momo" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="Momotarou Densetsu (Japan) [SLPS-01785].bin" size="144048240" crc="c591c72f" sha1="850eaabb0feb0dda476471f4b69c67537755a7db"/>
 		<rom name="Momotarou Densetsu (Japan) [SLPS-01785].cue" size="103" crc="b0ba1495" sha1="9b2f445cb1ef9a4a71dae4afd2cecde1447c8e46"/>
 		-->
@@ -49348,7 +49375,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="momotarou densetsu (japan) [slps-01785]" sha1="766aad00ed067d9beeb06437da0769a33f02748b"/>
+				<disk name="momotarou densetsu (japan) [slps-01785]" sha1="766aad00ed067d9beeb06437da0769a33f02748b" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -49822,8 +49849,10 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="nankuro" supported="no">
-		<!-- Unknown source
+	<!-- boot OK -->
+	<software name="nankuro" supported="yes">
+		<!-- 
+		Unknown source
 		<rom name="SuperLite 1500 Extra Series Vol.02 - Nankuro (Japan) [SLPS-02067].bin" size="34743744" crc="1a54533d" sha1="5f640fd373e852c53153dfa14a2648326fb34c15"/>
 		<rom name="SuperLite 1500 Extra Series Vol.02 - Nankuro (Japan) [SLPS-02067].cue" size="129" crc="a5fbc0b4" sha1="5ea34c9bc8c62418bcec8b50f41348eae9ba6b83"/>
 		-->
@@ -49836,7 +49865,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
-				<disk name="superlite 1500 extra series vol.02 - nankuro (japan) [slps-02067]" sha1="8f17ac2169a351af67437fd79cfd66a13e51062e"/>
+				<disk name="superlite 1500 extra series vol.02 - nankuro (japan) [slps-02067]" sha1="8f17ac2169a351af67437fd79cfd66a13e51062e" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
