@@ -55,6 +55,7 @@ public:
 	// construction/destruction
 	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	void set_hcounter_divide(unsigned divide) { m_hcounter_divide = divide; }
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
 	auto vblank() { return m_vblank_cb.bind(); }
@@ -102,6 +103,7 @@ protected:
 
 	void sega315_5124(address_map &map);
 
+	virtual int screen_hpos() { return screen().hpos() / ((m_hcounter_divide == 0) ? 1 : m_hcounter_divide); }
 	void set_display_settings();
 	void set_frame_timing();
 	virtual void vblank_end(int vpos);
@@ -130,6 +132,7 @@ protected:
 	void draw_scanline_mode0(int *line_buffer, int line);
 	void check_pending_flags();
 
+	unsigned         m_hcounter_divide;
 	u8               m_reg[16];                  /* All the registers */
 	u8               m_status;                   /* Status register */
 	u8               m_pending_status;           /* Pending status flags */
