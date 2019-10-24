@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
         NCR Decision Mate V
@@ -626,6 +627,21 @@ INPUT_PORTS_END
 void dmv_state::machine_start()
 {
 	m_leds.resolve();
+
+	// register for state saving
+	save_item(NAME(m_ramoutdis));
+	save_item(NAME(m_switch16));
+	save_item(NAME(m_thold7));
+	save_item(NAME(m_dma_hrq));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_color_mode));
+	save_item(NAME(m_eop_line));
+	save_item(NAME(m_dack3_line));
+	save_item(NAME(m_sd_poll_state));
+	save_item(NAME(m_floppy_motor));
+	save_item(NAME(m_busint));
+	save_item(NAME(m_irqs));
+	save_pointer(NAME(m_ram->base()), m_ram->bytes());
 }
 
 void dmv_state::machine_reset()
@@ -914,4 +930,4 @@ ROM_END
 /* Driver */
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME           FLAGS
-COMP( 1984, dmv,  0,      0,      dmv,     dmv,   dmv_state, empty_init, "NCR",   "Decision Mate V", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1984, dmv,  0,      0,      dmv,     dmv,   dmv_state, empty_init, "NCR",   "Decision Mate V", MACHINE_SUPPORTS_SAVE)

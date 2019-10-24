@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K806 Mouse module
@@ -81,6 +82,17 @@ dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag,
 void dmv_k806_device::device_start()
 {
 	m_bus = static_cast<dmvcart_slot_device*>(owner());
+
+	// register for state saving
+	save_item(NAME(m_mouse.phase));
+	save_item(NAME(m_mouse.x));
+	save_item(NAME(m_mouse.y));
+	save_item(NAME(m_mouse.prev_x));
+	save_item(NAME(m_mouse.prev_y));
+	save_item(NAME(m_mouse.xa));
+	save_item(NAME(m_mouse.xb));
+	save_item(NAME(m_mouse.ya));
+	save_item(NAME(m_mouse.yb));
 }
 
 //-------------------------------------------------

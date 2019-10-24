@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K210 Centronics module
@@ -47,6 +48,10 @@ void dmv_k210_device::device_start()
 {
 	m_clk1_timer = timer_alloc(0, nullptr);
 	m_bus = static_cast<dmvcart_slot_device*>(owner());
+
+	// register for state saving
+	save_item(NAME(m_portb));
+	save_item(NAME(m_portc));
 }
 
 //-------------------------------------------------
