@@ -242,7 +242,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
 {
 	int scanline = param;
 
-	if(scanline == 240 || scanline == 120) // TODO: where non-timer IRQ happens?
+	// TODO: where non-vblank IRQ happens?
+	if(scanline == 240 || scanline == 120)
 	{
 		m_maincpu->set_input_line(0,HOLD_LINE);
 
