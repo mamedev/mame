@@ -614,7 +614,7 @@ READ8_MEMBER( epc_state::ppi_portc_r )
 	// Read 4 configurations dip switches depending on PB3
 	data = (m_io_dsw->read() >> ((m_ppi_portb & 0x08) ? 4 : 0) & 0x0f);
 
-	// TODO: verify what PC4-PC7 is used for, if anything
+	// TODO:  implement PC4/PC5, ibmPCjr compatible cassette feedback 
 
 	LOGPPI("PPI Port C read: %02x\n", data);
 
@@ -814,8 +814,10 @@ void epc_state::epc(machine_config &config)
 	// System board has 128kB memory with parity, expansion can be achieved through the
 	// 128kB Memory Expansion Board 1090 and/or the 128kB Multifunction Board MB1080-001
 	// and/or the 384kB MB1080-002. The MB1080 DRAM might need to be dynamically added as
-	// base address and also a video memory hole is configuarable.
-	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
+	// base address and also a video memory hole is configurable.
+	// Some RAM sizes are disabled because they trigger issue #5776, just until that is sorted out
+	//RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("384K");
 
 	// FDC
 	I8272A(config, m_fdc, XTAL(16'000'000) / 2, false); // TEW crystal marked X3 verified

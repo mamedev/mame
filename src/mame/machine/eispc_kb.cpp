@@ -267,6 +267,7 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::hold_w)
 	m_hold = CLEAR_LINE == state;
 }
 
+// TODO: Fix proper HOLD of reset line for MCU until released by hist CPU
 WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 {
 	if (state == CLEAR_LINE)
@@ -278,7 +279,7 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 	else
 	{
 		// set_input_line suspends with a true argument which causes "Keyboard error" 
-		m_mcu->suspend(SUSPEND_REASON_RESET, false);
+		m_mcu->suspend(SUSPEND_REASON_RESET, false);  // This causes an assert later when DEBUG==1
 		//m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		LOGRST("KBD: Keyboard mcu reset line is asserted\n");
 	}
