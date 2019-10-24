@@ -1852,8 +1852,8 @@ void sega_32x_device::device_reset()
 
 
 // install these now, otherwise we'll get the following (incorrect) warnings on startup..
-//   SH-2 device ':sega32x:32x_slave_sh2': program space memory map entry 0-3FFF references non-existant region ':slave'
-//   SH-2 device ':sega32x:32x_master_sh2': program space memory map entry 0-3FFF references non-existant region ':master'
+//   SH-2 device ':sega32x:32x_slave_sh2': program space memory map entry 0-3FFF references non-existent region ':slave'
+//   SH-2 device ':sega32x:32x_master_sh2': program space memory map entry 0-3FFF references non-existent region ':master'
 	uint8_t* masterbios = (uint8_t*)machine().root_device().memregion(":master")->base();
 	uint8_t* slavebios = (uint8_t*)machine().root_device().memregion(":slave")->base();
 	membank("masterbios")->configure_entries(0, 1, masterbios, 0x4000);
