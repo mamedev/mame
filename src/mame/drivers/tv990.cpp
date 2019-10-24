@@ -98,6 +98,8 @@ private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
 	int m_rowh, m_width, m_height;
+
+	uint8_t m_kbd_key0, m_kbd_key1;
 };
 
 WRITE_LINE_MEMBER(tv990_state::vblank_irq)
@@ -113,11 +115,15 @@ WRITE_LINE_MEMBER(tv990_state::vblank_irq)
 void tv990_state::machine_start()
 {
 	m_rowtimer = timer_alloc();
+	m_kbd_key0 = 0;
+	m_kbd_key1 = 0;
 
 	save_item(NAME(tvi1111_regs));
 	save_item(NAME(m_rowh));
 	save_item(NAME(m_width));
 	save_item(NAME(m_height));
+	save_item(NAME(m_kbd_key0));
+	save_item(NAME(m_kbd_key1));
 }
 
 void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -298,12 +304,28 @@ uint32_t tv990_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
+
 READ8_MEMBER(tv990_state::kbdc_r)
 {
-	if(offset)
+	if (offset)
 		return m_kbdc->data_r(space, 4);
-	else
-		return m_kbdc->data_r(space, 0);
+
+	uint8_t data = m_kbdc->data_r(space, 0);
+
+	// Left Control and left Alt.
+	if ((m_kbd_key0 == 0x38 && m_kbd_key1 == 0x1d) ||
+	    (m_kbd_key0 == 0x1d && m_kbd_key1 == 0x38))
+	{
+		// Translate 'S' to 'Esc', the 'setup' sequence for this
+		// terminal.
+		if (data == 0x1f)
+			return 0x01;
+		else if (data == 0x9f)
+			return 0x91;
+	}
+	m_kbd_key0 = m_kbd_key1;
+	m_kbd_key1 = data;
+	return data;
 }
 
 WRITE8_MEMBER(tv990_state::kbdc_w)
