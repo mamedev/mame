@@ -24,6 +24,7 @@
 
 // expansion slots
 #include "bus/dmv/dmvbus.h"
+#include "bus/dmv/k012.h"
 #include "bus/dmv/k210.h"
 #include "bus/dmv/k220.h"
 #include "bus/dmv/k230.h"
@@ -258,8 +259,8 @@ WRITE8_MEMBER(dmv_state::fdd_motor_w)
 	m_pit->write_gate0(0);
 
 	m_floppy_motor = 0;
-	m_floppy0->get_device()->mon_w(m_floppy_motor);
-	m_floppy1->get_device()->mon_w(m_floppy_motor);
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(m_floppy_motor);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(m_floppy_motor);
 }
 
 READ8_MEMBER(dmv_state::sys_status_r)
@@ -284,7 +285,7 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	if (!(m_slot7->av16bit() || m_slot7a->av16bit()))
 		data |= 0x02;
 
-	if (!m_floppy0->get_device()->ready_r())
+	if (m_floppy0->get_device() && !m_floppy0->get_device()->ready_r())
 		data |= 0x04;
 
 	if (m_fdc->get_irq())
@@ -617,7 +618,7 @@ void dmv_state::upd7220_map(address_map &map)
 /* Input ports */
 INPUT_PORTS_START( dmv )
 	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Video Board" )
+	PORT_CONFNAME( 0x01, 0x01, "Video Board" )
 	PORT_CONFSETTING( 0x00, "Monochrome" )
 	PORT_CONFSETTING( 0x01, "Color" )
 INPUT_PORTS_END
@@ -709,8 +710,8 @@ WRITE_LINE_MEMBER( dmv_state::pit_out0 )
 	if (!state)
 	{
 		m_floppy_motor = 1;
-		m_floppy0->get_device()->mon_w(m_floppy_motor);
-		m_floppy1->get_device()->mon_w(m_floppy_motor);
+		if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(m_floppy_motor);
+		if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(m_floppy_motor);
 	}
 }
 
@@ -752,6 +753,7 @@ static void dmv_slot2_6(device_slot_interface &device)
 	device.option_add("k801", DMV_K801);        // K801 RS-232 Switchable Interface
 	device.option_add("k803", DMV_K803);        // K803 RTC module
 	device.option_add("k806", DMV_K806);        // K806 Mouse module
+	device.option_add("c3282", DMV_C3282);      // C3282 External HD Interface
 }
 
 static void dmv_slot7(device_slot_interface &device)
@@ -764,7 +766,7 @@ static void dmv_slot7(device_slot_interface &device)
 
 static void dmv_slot2a(device_slot_interface &device)
 {
-
+	device.option_add("k012", DMV_K012);        // K012 Internal HD Interface
 }
 
 static void dmv_slot7a(device_slot_interface &device)

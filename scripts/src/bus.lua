@@ -832,6 +832,8 @@ if (BUSES["DMV"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/dmv/dmvbus.cpp",
 		MAME_DIR .. "src/devices/bus/dmv/dmvbus.h",
+		MAME_DIR .. "src/devices/bus/dmv/k012.cpp",
+		MAME_DIR .. "src/devices/bus/dmv/k012.h",
 		MAME_DIR .. "src/devices/bus/dmv/k210.cpp",
 		MAME_DIR .. "src/devices/bus/dmv/k210.h",
 		MAME_DIR .. "src/devices/bus/dmv/k220.cpp",
