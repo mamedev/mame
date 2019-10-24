@@ -98,7 +98,7 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_button)
 
 	LOG("mouse_button 0x%08x\n", data);
 
-	state_w(machine().dummy_space(), 0, data & MOUSE_BUTTONS, MOUSE_BUTTONS);
+	state_w(data & MOUSE_BUTTONS, MOUSE_BUTTONS);
 }
 
 INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_x)
@@ -112,7 +112,7 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_x)
 
 	LOG("mouse_x delta %d\n", delta);
 
-	state_w(machine().dummy_space(), 0, (delta << 8) & MOUSE_XPOS, MOUSE_XPOS);
+	state_w((delta << 8) & MOUSE_XPOS, MOUSE_XPOS);
 }
 
 INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_y)
@@ -126,5 +126,5 @@ INPUT_CHANGED_MEMBER(interpro_mouse_device::mouse_y)
 
 	LOG("mouse_y delta %d\n", delta);
 
-	state_w(machine().dummy_space(), 0, (delta << 0) & MOUSE_YPOS, MOUSE_YPOS);
+	state_w((delta << 0) & MOUSE_YPOS, MOUSE_YPOS);
 }

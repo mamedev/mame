@@ -107,6 +107,12 @@
 
 #include "gt.h"
 
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/loopback.h"
+
+#include "bus/interpro/keyboard/keyboard.h"
+#include "bus/interpro/mouse/mouse.h"
+
 #define LOG_GENERAL (1U << 0)
 #define LOG_LINE    (1U << 1)
 #define LOG_BLIT    (1U << 2)
