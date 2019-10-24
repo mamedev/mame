@@ -65,17 +65,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(clock_active) { m_clock_active = state ? 1U : 0U; }
 
 protected:
-	sdlc_logger_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, std::uint32_t clock);
-
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	using device_t::logerror;
-
-	std::uint32_t get_frame_bits(){ return m_frame_bits; }
-	std::size_t get_buffer_bytes(){ return BUFFER_BYTES; }
-	std::size_t get_buffer_bits(){ return BUFFER_BITS; }
-	std::uint8_t *get_buffer(){ return (std::uint8_t *) (&m_buffer[0]); }
 
 private:
 	enum : std::size_t
@@ -90,7 +83,7 @@ private:
 	virtual void data_bit(bool value) override;
 
 	void shift_residual_bits();
-	virtual void log_frame(bool partial);
+	void log_frame(bool partial) const;
 
 	std::uint8_t    m_data_nrzi;
 	std::uint8_t    m_clock_active;
@@ -105,19 +98,6 @@ private:
 };
 
 
-class sdlc_bitbanger_device : public sdlc_logger_device
-{
-public:
-	sdlc_bitbanger_device(machine_config const &mconfig, char const *tag, device_t *owner, std::uint32_t clock);
-
-protected:
-
-private:
-	virtual void log_frame(bool partial) override;
-};
-
-
 DECLARE_DEVICE_TYPE(SDLC_LOGGER, sdlc_logger_device)
-DECLARE_DEVICE_TYPE(SDLC_BITBANGER, sdlc_bitbanger_device)
 
 #endif // MAME_MACHINE_SDLC_H
