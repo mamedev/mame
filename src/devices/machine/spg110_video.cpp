@@ -35,6 +35,14 @@ void spg110_video_device::draw(const rectangle &cliprect, uint32_t line, uint32_
 
 	uint32_t nc = (bpp + 1) << 1;
 
+	switch (bpp)
+	{
+	case 0x03: pal = 0; break; // 8 bpp
+	case 0x02: pal &=0x03; break; // 6 bpp
+	case 0x01: break; // 4 bpp
+	case 0x00: break; // 2 bpp
+	}
+
 	uint32_t palette_offset = pal;
 
 	palette_offset <<= nc;
