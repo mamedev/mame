@@ -228,6 +228,7 @@
 #include "emu.h"
 
 #include "includes/interpro.h"
+#include "machine/input_merger.h"
 
 #include "debugger.h"
 
@@ -704,6 +705,8 @@ FLOPPY_FORMATS_END
 
 void interpro_state::interpro_serial(machine_config &config)
 {
+	input_merger_device &scc_int(INPUT_MERGER_ANY_HIGH(config, "scc_int"));
+
 	/*
 	 * Documentation states that all three serial ports have RxD, TxD, CTS and
 	 * RTS signals connected, and serial port 0 also has RI, DTR and DTS(?).
@@ -733,7 +736,7 @@ void interpro_state::interpro_serial(machine_config &config)
 	m_scc1->out_txdb_callback().set(port2, FUNC(rs232_port_device::write_txd));
 	m_scc1->out_wreqb_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial2)).invert();
 
-	m_scc1->out_int_callback().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
+	m_scc1->out_int_callback().set(scc_int, FUNC(input_merger_device::in_w<0>));
 
 	// scc2 channel B (serial port 0)
 	rs232_port_device &port0(RS232_PORT(config, INTERPRO_SERIAL_PORT0_TAG, default_rs232_devices, nullptr));
@@ -746,7 +749,9 @@ void interpro_state::interpro_serial(machine_config &config)
 	m_scc2->out_txdb_callback().set(port0, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_wreqb_callback().set(m_ioga, FUNC(interpro_ioga_device::drq_serial0)).invert();
 
-	m_scc2->out_int_callback().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
+	m_scc2->out_int_callback().set(scc_int, FUNC(input_merger_device::in_w<1>));
+
+	scc_int.output_handler().set(m_ioga, FUNC(interpro_ioga_device::ir11_w));
 }
 
 static void interpro_scsi_devices(device_slot_interface &device)
