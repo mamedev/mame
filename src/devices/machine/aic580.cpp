@@ -141,8 +141,11 @@ u8 aic580_device::r80_r()
 
 void aic580_device::transfer_speed_w(u8 data)
 {
-	const unsigned div = BIT(data, 3) ? (data & 3) + 5 : 4;
-	logerror("Transfer speed = %.2f MB/s\n", clock() * 2.0E-6 / div);
+	logerror("Transfer speed: %dns read pulse, %dns strobe off, %dns write pulse (%.2f MB/s)\n",
+		int(1.0E9 * (((data & 0x30) >> 4) + 2) / clock()),
+		int(1.0E9 * (((data & 0x08) >> 3) + 2) / clock()),
+		int(1.0E9 * ((data & 0x07) + 2) / clock()),
+		clock() * 2.0E-6 / ((BIT(data, 3) ? 5 : 4) + (data & 7)));
 }
 
 
