@@ -3811,7 +3811,7 @@
 	<software name="lotus">
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>19??</year>
-		<publisher>Gremlin Graphics (GBH)</publisher>
+		<publisher>GBH</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -3975,7 +3975,7 @@
 	<software name="missomega">
 		<description>Mission Omega</description>
 		<year>1989</year>
-		<publisher>Grandslam (Bug Byte)</publisher>
+		<publisher>Bug Byte</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="520994">
@@ -6233,7 +6233,7 @@
 	<software name="spokerc" cloneof="spoker">
 		<description>Strip Poker (CDS)</description>
 		<year>19??</year>
-		<publisher>CDS Software (Blue Ribbon)</publisher>
+		<publisher>Blue Ribbon</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Suzi"/>
