@@ -148,6 +148,7 @@ private:
 	std::vector<bgfx_texture*>	m_screen_palettes;
 	std::vector<bgfx_effect*>   m_converters;
 	std::vector<screen_prim>	m_screen_prims;
+	std::vector<uint8_t>        m_palette_temp;
 
 	static const uint32_t       CHAIN_NONE;
 };

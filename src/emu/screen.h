@@ -186,7 +186,7 @@ public:
 		set_type(type);
 		set_color(color);
 	}
-	virtual ~screen_device();
+	~screen_device();
 
 	// configuration readers
 	screen_type_enum screen_type() const { return m_type; }
@@ -228,7 +228,7 @@ public:
 	/// \param [in] vbstart Index of first line in vertical blanking
 	///   period after visible lines.
 	/// \return Reference to device for method chaining.
-	virtual screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
+	screen_device &set_raw(u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart)
 	{
 		assert(pixclock != 0);
 		m_clock = pixclock;
@@ -393,7 +393,7 @@ public:
 
 	// beam positioning and state
 	int vpos() const;
-	virtual int hpos() const;
+	int hpos() const;
 	DECLARE_READ_LINE_MEMBER(vblank) const { return (machine().time() < m_vblank_end_time) ? 1 : 0; }
 	DECLARE_READ_LINE_MEMBER(hblank) const { int const curpos = hpos(); return (curpos < m_visarea.left() || curpos > m_visarea.right()) ? 1 : 0; }
 
@@ -407,14 +407,14 @@ public:
 	u64 frame_number() const { return m_frame_number; }
 
 	// pixel-level access
-	virtual u32 pixel(s32 x, s32 y);
-	virtual void pixels(u32* buffer);
+	u32 pixel(s32 x, s32 y);
+	void pixels(u32* buffer);
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
-	virtual bool update_partial(int scanline);
-	virtual void update_now();
-	virtual void reset_partial_updates();
+	bool update_partial(int scanline);
+	void update_now();
+	void reset_partial_updates();
 
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
@@ -428,9 +428,7 @@ public:
 	static constexpr int DEFAULT_FRAME_RATE = 60;
 	static const attotime DEFAULT_FRAME_PERIOD;
 
-protected:
-	screen_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
-
+private:
 	class svg_renderer;
 
 	// timer IDs

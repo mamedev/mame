@@ -476,9 +476,9 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			{
 				uint16_t palette_width = (uint16_t)std::min(prim.m_palette_length, 256U);
 				uint16_t palette_height = (uint16_t)std::max((prim.m_palette_length + 255) / 256, 1U);
-				uint8_t palette_temp[palette_width * palette_height * 4];
-				memcpy(palette_temp, prim.m_prim->texture.palette, prim.m_palette_length * 4);
-				const bgfx::Memory *palmem = bgfx::copy(palette_temp, palette_width * palette_height * 4);
+				m_palette_temp.resize(palette_width * palette_height * 4);
+				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
+				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_width * palette_height * 4);
 				palette = new bgfx_texture(palette_name, bgfx::TextureFormat::BGRA8, palette_width, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
 				m_textures.add_provider(palette_name, palette);
 			}
@@ -498,9 +498,9 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 			if (prim.m_prim->texture.palette)
 			{
-				uint8_t palette_temp[palette->width() * palette->height() * 4];
-				memcpy(palette_temp, prim.m_prim->texture.palette, prim.m_palette_length * 4);
-				const bgfx::Memory *palmem = bgfx::copy(palette_temp, palette->width() * palette->height() * 4);
+				m_palette_temp.resize(palette->width() * palette->height() * 4);
+				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
+				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette->width() * palette->height() * 4);
 				palette->update(palmem);
 			}
 		}
