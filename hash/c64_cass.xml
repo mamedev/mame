@@ -567,7 +567,7 @@
 	<software name="batman">
 		<description>Batman</description>
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -1069,7 +1069,7 @@
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="763836">
@@ -1554,7 +1554,7 @@
 	<software name="crazycar">
 		<description>Crazy Cars</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="813145">
@@ -1710,7 +1710,7 @@
 	<software name="daleydech" cloneof="daleydec">
 		<description>Daley Thompson's Decathlon (Hit Squad)</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="582574">
@@ -1920,7 +1920,7 @@
 	<software name="enduro">
 		<description>Enduro Racer</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="495807">
@@ -2319,7 +2319,7 @@
 	<software name="fs2_6to8">
 		<description>Fun School 2 for 6-8 Year Olds</description>
 		<year>1992</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Train / Maze / Shopping / Treasure"/>
@@ -2698,7 +2698,7 @@
 	<software name="gryzor">
 		<description>Gryzor</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="738562">
@@ -3168,7 +3168,7 @@
 	<software name="lic2kill">
 		<description>James Bond 007: Licence To Kill</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="514499">
@@ -4095,7 +4095,7 @@
 	<software name="tnzs">
 		<description>The Newzealand Story</description>
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4225,7 +4225,7 @@
 	<software name="opthunder">
 		<description>Operation Thunderbolt</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4245,7 +4245,7 @@
 	<software name="opwolf">
 		<description>Operation Wolf</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="720182">
@@ -4402,7 +4402,7 @@
 	<software name="parallax">
 		<description>Parallax</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="702891">
@@ -4516,7 +4516,7 @@
 	<software name="platoon">
 		<description>Platoon</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -4937,7 +4937,7 @@
 	<software name="rbisland">
 		<description>Rainbow Islands</description>
 		<year>1992</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4969,7 +4969,7 @@
 	<software name="rambo3">
 		<description>Rambo III</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4989,7 +4989,7 @@
 	<software name="rambo2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="642762">
@@ -5021,7 +5021,7 @@
 	<software name="redheat">
 		<description>Red Heat</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="726358">
@@ -5045,7 +5045,7 @@
 	<software name="renegade">
 		<description>Renegade</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="500294">
@@ -5810,7 +5810,7 @@
 	<software name="cobra">
 		<description>Stallone: Cobra</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="524590">
@@ -5822,7 +5822,7 @@
 	<software name="rotj">
 		<description>Star Wars: Return of the Jedi</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="622110">
@@ -6256,7 +6256,7 @@
 	<software name="shangon">
 		<description>Super Hang On</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Africa and Asia"/>
@@ -6760,7 +6760,7 @@
 	<software name="thevindc">
 		<description>The Vindicator</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1508734">
@@ -6922,7 +6922,7 @@
 	<software name="wizball">
 		<description>Wizball</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="567846">
@@ -6966,7 +6966,7 @@
 	<software name="wsb">
 		<description>World Series Baseball</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="402702">
