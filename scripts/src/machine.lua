@@ -4080,6 +4080,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/aic580.h,MACHINES["AIC580"] = true
+---------------------------------------------------
+
+if (MACHINES["AIC580"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/aic580.cpp",
+		MAME_DIR .. "src/devices/machine/aic580.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/aic6250.h,MACHINES["AIC6250"] = true
 ---------------------------------------------------
 
