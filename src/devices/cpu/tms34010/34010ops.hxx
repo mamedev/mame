@@ -2112,7 +2112,7 @@ void tms340x0_device::clip(uint16_t op)
 	XY wend = WEND_XY();
 	XY dydx = DYDX_XY();
 	// logerror("020:clip PC=0x%08x: WSTART=(%dx%d) WEND=(%dx%d) DADDR=(%dx%d) DYDX=(%dx%d)\n",
-	//		m_pc, wstart.x, wstart.y, wend.x, wend.y, daddr.x, daddr.y, dydx.x, dydx.y);
+	//      m_pc, wstart.x, wstart.y, wend.x, wend.y, daddr.x, daddr.y, dydx.x, dydx.y);
 
 	// Check whether array intersects with window...
 	bool is_l = wstart.x < (daddr.x + dydx.x);

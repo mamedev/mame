@@ -3987,7 +3987,7 @@ static INPUT_PORTS_START( blandia )
 
 
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(      0x0200, "1, 1 Round" ) // Test mode shows 1 in both blandia and blandiap 
+	PORT_DIPSETTING(      0x0200, "1, 1 Round" ) // Test mode shows 1 in both blandia and blandiap
 	PORT_DIPSETTING(      0x0300, "1, 2 Rounds" ) // Test mode shows 0 in blandia, 2 in blandiap (neither match actual behaviour)
 	PORT_DIPSETTING(      0x0100, "2" ) // Test mode shows 2 in blandia, 3 in blandiap (blandiap test mode is wrong)
 	PORT_DIPSETTING(      0x0000, "3" ) // Test mode shows 3 in blandia, 4 in blandiap (blandiap test mode is wrong)

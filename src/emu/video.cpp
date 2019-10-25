@@ -166,7 +166,7 @@ video_manager::video_manager(running_machine &machine)
 	// extract snap resolution if present
 	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
-	
+
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
 	{

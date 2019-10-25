@@ -70,14 +70,14 @@
                     ---- ---- ---4 ----     Layer Disable
                     ---- ---- ---- 3210     Varies*
 
-		*color bank for mcatadv or Layer-Layer priority for cave
+        *color bank for mcatadv or Layer-Layer priority for cave
 
 There are more!
 
 ***************************************************************************
 
 TODO:
-	de-fragmentation and merge drawing behavior into tmap038.cpp
+    de-fragmentation and merge drawing behavior into tmap038.cpp
 
 ***************************************************************************
 

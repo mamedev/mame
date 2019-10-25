@@ -227,7 +227,7 @@ struct ti990_fdr
 	UINT32BE    eom;            /* end of medium record number */
 	UINT32BE    bkm;            /* end of medium block number */
 	UINT16BE    ofm;            /* end of medium offset / */
-	                            /* prelog number for KIF */
+								/* prelog number for KIF */
 	UINT32BE    fbq;            /* free block queue head */
 	UINT16BE    btr;            /* B-tree roots block # */
 	UINT32BE    ebq;            /* empty block queue head */

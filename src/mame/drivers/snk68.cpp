@@ -595,7 +595,7 @@ void snk68_state::pow(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pow);
-	
+
 	ALPHA68K_PALETTE(config, m_palette, 0);
 	m_palette->set_entries(2048);
 

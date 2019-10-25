@@ -734,7 +734,7 @@ inline uint32_t snes_ppu_device::get_tile( uint8_t layer_idx, uint32_t hoffset, 
 	if (tilex & 0x20) offset += screenx;
 	if (tiley & 0x20) offset += screeny;
 	uint32_t addr = ((self.tilemap + offset) & 0x7fff) << 1;
-    return m_vram[addr] | (m_vram[addr + 1] << 8);
+	return m_vram[addr] | (m_vram[addr + 1] << 8);
 }
 
 /*********************************************
@@ -770,11 +770,11 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 {
 	layer_t &layer = m_layer[layer_idx];
 
-    if (layer.tile_mode == SNES_COLOR_DEPTH_NONE) return;
+	if (layer.tile_mode == SNES_COLOR_DEPTH_NONE) return;
 
 #if SNES_LAYER_DEBUG
-    if (m_debug_options.bg_disabled[layer_idx])
-        return;
+	if (m_debug_options.bg_disabled[layer_idx])
+		return;
 #endif /* SNES_LAYER_DEBUG */
 
 	m_scanlines[SNES_MAINSCREEN].enable = layer.main_bg_enabled;
@@ -819,10 +819,10 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 	uint32_t mosaic_priority = 0;
 	uint32_t mosaic_color = 0;
 
-    int x = 0 - (hscroll & 7);
+	int x = 0 - (hscroll & 7);
 	while (x < width)
 	{
-        uint32_t hoffset = x + hscroll;
+		uint32_t hoffset = x + hscroll;
 		uint32_t voffset = y + vscroll;
 		if (opt_mode)
 		{
@@ -886,7 +886,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 		data |= (uint64_t)m_vram[address +  48] << 48;
 		data |= (uint64_t)m_vram[address +  49] << 56;
 
-        for (uint32_t tilex = 0; tilex < 8; tilex++, x++)
+		for (uint32_t tilex = 0; tilex < 8; tilex++, x++)
 		{
 			if (x & width) continue;
 			if (!layer.mosaic_enabled || --mosaic_counter == 0)
@@ -925,7 +925,7 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 
 			if (!hires)
 			{
-                if (layer.main_bg_enabled && mosaic_priority > m_scanlines[SNES_MAINSCREEN].priority[x])
+				if (layer.main_bg_enabled && mosaic_priority > m_scanlines[SNES_MAINSCREEN].priority[x])
 				{
 					if (!m_scanlines[SNES_MAINSCREEN].clip || m_clipmasks[layer_idx][x])
 					{
@@ -2303,8 +2303,8 @@ uint16_t snes_ppu_device::direct_color(uint16_t palette, uint16_t group)
   //group   = -------- -----bgr
   //output  = 0BBb00GG Gg0RRRr0
   return (palette << 7 & 0x6000) + (group << 10 & 0x1000)
-       + (palette << 4 & 0x0380) + (group <<  5 & 0x0040)
-       + (palette << 2 & 0x001c) + (group <<  1 & 0x0002);
+	   + (palette << 4 & 0x0380) + (group <<  5 & 0x0040)
+	   + (palette << 2 & 0x001c) + (group <<  1 & 0x0002);
 }
 
 void snes_ppu_device::cache_background()

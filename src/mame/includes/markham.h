@@ -125,7 +125,7 @@ private:
 	uint8_t m_packet_buffer[2];
 	uint8_t m_packet_write_pos;
 	bool m_packet_reset;
-	
+
 	u8 m_strnskil_slave_irq;
 };
 

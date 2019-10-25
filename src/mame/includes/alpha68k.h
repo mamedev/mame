@@ -60,7 +60,7 @@ protected:
 	optional_shared_ptr<u16> m_shared_ram;
 	required_shared_ptr<u16> m_spriteram;
 	optional_shared_ptr<u16> m_videoram;
-	
+
 	optional_ioport_array<7> m_in;
 	optional_memory_bank m_audiobank;
 
@@ -95,10 +95,10 @@ public:
 		, m_sprites(*this, "sprites")
 		, m_palette(*this, "palette")
 	{}
-	
+
 	void alpha68k_II(machine_config &config);
 	void btlfieldb(machine_config &config);
-	
+
 	void init_skysoldr();
 	void init_timesold();
 	void init_timesold1();
@@ -108,7 +108,7 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<snk68_spr_device> m_sprites;
 	required_device<alpha68k_palette_device> m_palette;
-	
+
 	void base_config(machine_config &config);
 	DECLARE_VIDEO_START(alpha68k);
 	void video_config(machine_config &config, u16 num_pens);
@@ -154,7 +154,7 @@ public:
 	goldmedal_II_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_II_state(mconfig, type, tag)
 	{}
-	
+
 	void init_goldmedl();
 	void goldmedal(machine_config &config);
 };
@@ -165,7 +165,7 @@ public:
 	alpha68k_III_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_II_state(mconfig, type, tag)
 	{}
-	
+
 	void alpha68k_III(machine_config &config);
 protected:
 	DECLARE_MACHINE_START(alpha68k_V);
@@ -181,7 +181,7 @@ public:
 	goldmedal_III_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_III_state(mconfig, type, tag)
 	{}
-	
+
 	void init_goldmedla();
 	void goldmedal(machine_config &config);
 };
@@ -234,8 +234,8 @@ public:
 		m_palette(*this, "palette"),
 		m_color_proms(*this, "color_proms")
 	{}
-	
-protected:	
+
+protected:
 	void palette_init(palette_device &palette) const;
 
 	required_device<palette_device> m_palette;
@@ -259,10 +259,10 @@ protected:
 
 	void base_config(machine_config &config);
 	void video_config(machine_config &config, u8 tile_transchar, u8 tile_bankshift, bool is_super_stingray);
-	
+
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	
+
 	u16 kyros_alpha_trigger_r(offs_t offset);
 	void sound_map(address_map &map);
 	void sound_iomap(address_map &map);
@@ -310,7 +310,7 @@ public:
 	kyros_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_N_state(mconfig, type, tag)
 	{}
-	
+
 	void kyros(machine_config &config);
 	void init_kyros();
 };
@@ -321,7 +321,7 @@ public:
 	jongbou_state(const machine_config &mconfig, device_type type, const char *tag)
 		: alpha68k_N_state(mconfig, type, tag)
 	{}
-	
+
 	void jongbou(machine_config &config);
 	void init_jongbou();
 
@@ -344,7 +344,7 @@ public:
 		: alpha68k_prom_state(mconfig, type, tag)
 	{}
 
-	
+
 protected:
 	void base_config(machine_config &config);
 	void video_config(machine_config &config, int yshift);

@@ -81,7 +81,7 @@ READ8_MEMBER(markham_state::strnskil_d800_r)
 WRITE8_MEMBER(markham_state::strnskil_master_output_w)
 {
 	m_scroll_ctrl = data >> 5;
-	
+
 	flipscreen_w(space, 0, (data >> 3) & 1);
 
 	// bit 0: master CPU bus request?

@@ -413,7 +413,7 @@ WRITE16_MEMBER(spg110_video_device::dma_len_trigger_w)
 	/*
 	if (m_dma_unk_2061 != 0x0000)
 	{
-		logerror("unknown DMA params are not zero!\n");
+	    logerror("unknown DMA params are not zero!\n");
 	}
 	*/
 

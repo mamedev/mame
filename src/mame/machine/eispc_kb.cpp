@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 	}
 	else
 	{
-		// set_input_line suspends with a true argument which causes "Keyboard error" 
+		// set_input_line suspends with a true argument which causes "Keyboard error"
 		//m_mcu->suspend(SUSPEND_REASON_RESET, false);  // This causes an assert later when DEBUG==1
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		LOGRST("KBD: Keyboard mcu reset line is asserted\n");

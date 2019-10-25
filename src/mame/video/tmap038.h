@@ -47,10 +47,10 @@ public:
 
 	u16 lineram_r(offs_t offset) { return m_lineram[offset]; }
 	void lineram_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_lineram[offset]); }
- 
+
 	u16 vregs_r(offs_t offset) { return m_vregs[offset]; }
 	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_vregs[offset]); }
- 
+
 	void mark_all_dirty() { m_tmap->mark_all_dirty(); };
 	void set_flip(u32 attributes) { m_tmap->set_flip(attributes); }
 	void set_palette_offset(u32 offset) { m_tmap->set_palette_offset(offset); }

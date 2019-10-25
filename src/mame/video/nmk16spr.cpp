@@ -2,32 +2,32 @@
 // copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
 // thanks-to:Richard Bush
 /*
-	NMK 16 bit sprite hardware
+    NMK 16 bit sprite hardware
 
-	Configured in NMK008 + one or more NMK009s or TTL logics or FPGA
+    Configured in NMK008 + one or more NMK009s or TTL logics or FPGA
 
-	From hardware manual : http://upl-gravedigger.boo.jp/pcb_info/pcb_manual_7.jpg
+    From hardware manual : http://upl-gravedigger.boo.jp/pcb_info/pcb_manual_7.jpg
 
-	used by:
-	nmk16.cpp
-	powerins.cpp
+    used by:
+    nmk16.cpp
+    powerins.cpp
 
-	Sprite format (16 byte per each sprite):
+    Sprite format (16 byte per each sprite):
 
-	Offset Bits              Description
-	       fedcba98 76543210
-	00     -------- -------s Visible
-	02     ---x---- -------- Flip X (powerins)
-	       ------x- -------- Flip Y (manybloc)
-		   -------x -------- Flip X (manybloc) or Code hi bits (powerins)
-		   -------- xxxx---- Number of tiles along Y, minus 1 (1-16)
-		   -------- ----xxxx Number of tiles along X, minus 1 (1-16)
-	04     -------- -------- Unused
-	06     xxxxxxxx xxxxxxxx Code (low 15 bit for powerins)
-	08     ------xx xxxxxxxx X (10 bit for powerins, 9 bit for others)
-	0a     -------- -------- Unused
-	0c     ------xx xxxxxxxx Y (10 bit for powerins, 9 bit for others)
-	0e     -------- --xxxxxx Palette select (differ bits per game (4/5/6 bits))
+    Offset Bits              Description
+           fedcba98 76543210
+    00     -------- -------s Visible
+    02     ---x---- -------- Flip X (powerins)
+           ------x- -------- Flip Y (manybloc)
+           -------x -------- Flip X (manybloc) or Code hi bits (powerins)
+           -------- xxxx---- Number of tiles along Y, minus 1 (1-16)
+           -------- ----xxxx Number of tiles along X, minus 1 (1-16)
+    04     -------- -------- Unused
+    06     xxxxxxxx xxxxxxxx Code (low 15 bit for powerins)
+    08     ------xx xxxxxxxx X (10 bit for powerins, 9 bit for others)
+    0a     -------- -------- Unused
+    0c     ------xx xxxxxxxx Y (10 bit for powerins, 9 bit for others)
+    0e     -------- --xxxxxx Palette select (differ bits per game (4/5/6 bits))
 */
 
 

@@ -101,14 +101,14 @@
             Game seems unhappy with NVRAM, clears contents on each boot.
         jak_pooh:
             In the 'Light Tag' minigame (select the rock) the game usually softlocks when you find a friend (with or without DRC)
-		jak_care:
-			All but one mini-game waits on RAM address 0x0165 changing from 0x00f9 to 0x00f8
-			The bottom left game "Wish Bear's Wishing Tree" appears to fail for more complex reasons.
+        jak_care:
+            All but one mini-game waits on RAM address 0x0165 changing from 0x00f9 to 0x00f8
+            The bottom left game "Wish Bear's Wishing Tree" appears to fail for more complex reasons.
         jak_disf:
             Shows corrupt logo on first boot with no valid nvram (possibly hardware does too - verify if possible to invalidate EEPROM on device)
-		lexizeus:
-			Some corrupt sound effects and a few corrupt ground tiles a few minutes in. (checksum is good, and a video recorded
-			 from one of these doesn't exhibit these problems, so either emulation issue or alt revision?)
+        lexizeus:
+            Some corrupt sound effects and a few corrupt ground tiles a few minutes in. (checksum is good, and a video recorded
+             from one of these doesn't exhibit these problems, so either emulation issue or alt revision?)
 
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
@@ -128,18 +128,18 @@
         Disney Friends, MS Pacman, WallE, Batman (and some other HotGen GameKeys) for test mode, hold UP,
         press A, press DOWN during startup
 
-		Capcom test (same access as other Hotgen games) mode looks like this (tested on PAL unit, same ROM as dumped one)
+        Capcom test (same access as other Hotgen games) mode looks like this (tested on PAL unit, same ROM as dumped one)
 
-		RAM OK     2800
-				111111
-				5432109876543210
-		IOA    ............111.          (values go from . to 1 when inputs are moved, never 0 as in MAME!, core bug?)
-						GAMEKEY E0
-		IOB0
-		IOC    XXX.........X...
-		SPRITES
+        RAM OK     2800
+                111111
+                5432109876543210
+        IOA    ............111.          (values go from . to 1 when inputs are moved, never 0 as in MAME!, core bug?)
+                        GAMEKEY E0
+        IOB0
+        IOC    XXX.........X...
+        SPRITES
 
-		Care Bears : Hold analog stck up, rotate stick 360 degress back to up, press 'A' while still holding up
+        Care Bears : Hold analog stck up, rotate stick 360 degress back to up, press 'A' while still holding up
 
     TODO:
         Work out how to access the hidden TEST menus for all games (most JAKKS games should have one at least)
@@ -2491,7 +2491,7 @@ void spg2xx_game_state::rad_skatp(machine_config &config)
 	rad_skat(config);
 	m_maincpu->set_pal(true);
 	m_screen->set_refresh_hz(50);
-//	m_screen->set_size(320, 312);
+//  m_screen->set_size(320, 312);
 }
 
 void spg2xx_game_state::rad_sktv(machine_config &config)
@@ -2556,11 +2556,11 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 	spg2xx_base(config);
 
 	m_screen->set_refresh_hz(50);
-//	m_screen->set_size(320, 312);
+//  m_screen->set_size(320, 312);
 
 	m_maincpu->porta_in().set_ioport("P1");
-//	m_maincpu->portb_in().set_ioport("P2");
-//	m_maincpu->portc_in().set_ioport("P3");
+//  m_maincpu->portb_in().set_ioport("P2");
+//  m_maincpu->portc_in().set_ioport("P3");
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
@@ -2764,7 +2764,7 @@ ROM_START( tvgogo )
 	// no internal ROM? (Camera might have an MCU tho)
 ROM_END
 
-ROM_START( pvmil ) 
+ROM_START( pvmil )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) // Fujistu 29Z0002TN, read as ST M29W320FB
 	ROM_LOAD16_WORD_SWAP( "millionare4.bin", 0x000000, 0x400000, CRC(9c43d0f2) SHA1(fb4ba0115000b10b7c0e0d44b9fa3234c900e694) )
 ROM_END
@@ -2841,7 +2841,7 @@ void spg2xx_game_state::init_taikeegr()
 		dat = bitswap<16>(dat,  15,14,13,12,   11,10,9,8,    7,6,5,4,   0,1,2,3 );
 		src[i] = dat;
 	}
-	
+
 	std::vector<u16> buffer(0x800000/2);
 
 	for (int i = 0; i < 0x800000/2; i++)
@@ -2934,7 +2934,7 @@ CONS( 2009, zone40,    0,       0,        non_spg_base, wirels60, spg2xx_game_st
 // Similar, SPG260?, scrambled
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_game_state, init_zeus, "Lexibook", "Zeus IG900 20-in-1 (US?)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-// there are other regions of this, including a Finnish version "Haluatko miljonääriksi?" (see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game) )
+// there are other regions of this, including a Finnish version "Haluatko miljonÃ¤Ã¤riksi?" (see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game) )
 CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    spg2xx_game_state, empty_init, "Play Vision", "Who Wants to Be a Millionaire (Play Vision, Plug and Play, UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // p4 inputs need mapping
 
 // there are multiple versions of this with different songs, was also sold by dreamGEAR as 'Shredmaster Jr.' (different title screen)

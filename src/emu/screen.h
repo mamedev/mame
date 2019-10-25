@@ -486,13 +486,13 @@ private:
 	int                 m_width;                    // current width (HTOTAL)
 	int                 m_height;                   // current height (VTOTAL)
 	rectangle           m_visarea;                  // current visible area (HBLANK end/start, VBLANK end/start)
-	std::vector<int>	m_scan_widths;				// current width, in samples, of each individual scanline
+	std::vector<int>    m_scan_widths;              // current width, in samples, of each individual scanline
 
 	// textures and bitmaps
 	texture_format      m_texformat;                // texture format
 	render_texture *    m_texture[2];               // 2x textures for the screen bitmap
 	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
-	std::vector<bitmap_t *> m_scan_bitmaps[2];		// 2x bitmaps for each individual scanline
+	std::vector<bitmap_t *> m_scan_bitmaps[2];      // 2x bitmaps for each individual scanline
 	bitmap_ind8         m_priority;                 // priority bitmap
 	bitmap_ind64        m_burnin;                   // burn-in bitmap
 	u8                  m_curbitmap;                // current bitmap index

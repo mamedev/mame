@@ -382,13 +382,13 @@ void sidepckt_state::sidepckt(machine_config &config)
 
 Ports to be corrected once MCU is dumped
 
-	I8751(config, m_mcu, 8_MHz_XTAL); // 8.0MHz OSC on PCB
-	m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
-	m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
-	m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
-	m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
-	m_mcu->port_out_cb<2>().set(FUNC(karnov_state::mcu_p2_w));
-	m_mcu->port_in_cb<3>().set_ioport("COIN");
+    I8751(config, m_mcu, 8_MHz_XTAL); // 8.0MHz OSC on PCB
+    m_mcu->port_in_cb<0>().set([this](){ return m_mcu_p0; });
+    m_mcu->port_out_cb<0>().set([this](u8 data){ m_mcu_p0 = data; });
+    m_mcu->port_in_cb<1>().set([this](){ return m_mcu_p1; });
+    m_mcu->port_out_cb<1>().set([this](u8 data){ m_mcu_p1 = data; });
+    m_mcu->port_out_cb<2>().set(FUNC(karnov_state::mcu_p2_w));
+    m_mcu->port_in_cb<3>().set_ioport("COIN");
 */
 
 	/* video hardware */

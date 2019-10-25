@@ -30,7 +30,7 @@
 
 */
 
-/* 
+/*
 
 Regular models:
 
@@ -2980,7 +2980,7 @@ void towns_state::townssj(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
 	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
 	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
@@ -3045,7 +3045,7 @@ void marty_state::marty(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &marty_state::towns16_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	
+
 	FLOPPY_CONNECTOR(config.replace(), m_flop[1], towns_floppies, nullptr, towns_state::floppy_formats);
 
 	// 2 MB onboard, expandable to 4 MB with a Marty-only expansion card
@@ -3056,9 +3056,9 @@ void marty_state::marty(machine_config &config)
 
 /* ROM definitions */
 
-/* These ROMs were dumped from an FM Towns Model 2. Model 1 is assumed to use the same ROMs, since they were 
-   released at the same time, and the only differences are the amount of RAM and floppy drives. 
-   
+/* These ROMs were dumped from an FM Towns Model 2. Model 1 is assumed to use the same ROMs, since they were
+   released at the same time, and the only differences are the amount of RAM and floppy drives.
+
    The ROM is physically contained in three 4 Mbit chips: two MB834200-20 (DIP40) and one MB834200-25 (QFP44) */
 ROM_START( fmtowns )
 	ROM_REGION32_LE( 0x280000, "user", 0)

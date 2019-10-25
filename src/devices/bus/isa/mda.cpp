@@ -985,7 +985,7 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::crtc_update_row )
 /* PCB layouts and assembly years from online pictures and physical unit.
  Ericsson   -  marked SPVT02 8301 60 53-10, assembled in 1985 indicated by chip dates
  +--------------------------------------------------------------------------------------+ ___
- |	IC1  IC2   IC3   IC4   IC5 +-IC15--EPROM-+   IC6      IC7      IC8    S1        ||
+ |  IC1  IC2   IC3   IC4   IC5 +-IC15--EPROM-+   IC6      IC7      IC8    S1        ||
  |                                 |8363 65 14-80|                                      ||
  | IC9  IC10 IC11  IC12  IC13  IC14|CG 50821 A64 |+------------------++-IC24 EPROM--+   ||
  |                                 +-------------+| CRTC HD46505SP-1 ||10-40VP      |   ||
@@ -1028,7 +1028,7 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::crtc_update_row )
  IC20 74LS299                             IC45 74LS109                              IC70 74LS109
  IC21 74LS273                             IC46 74LS00                               IC71 74LS138
  IC22 74ALS574                            IC47 74F194                               IC72 74LS139
- IC23 CRTC HD46505SP,HD68A45SP            IC48 74F04 
+ IC23 CRTC HD46505SP,HD68A45SP            IC48 74F04
  IC24 EPROM 2764, 10-40 VP 402 28 A19     IC49 74LS174
  IC25 74ALS109                            IC50 TMS4416-15NL 4 x 16Kbits DRAM
 
@@ -1044,16 +1044,16 @@ MC6845_UPDATE_ROW( isa8_ec1840_0002_device::crtc_update_row )
  ---------------------------------------------------
   Ericsson       2  +VS             4  Ericsson
   Monochrome     3  VS return       2  Monochrome HR
-  HR Graphics	10  +VS            17  Monitors 3111 (Amber) or 
-  Board 1070	11  VS return      15  3712/3715 (Black & White)
-		 4  VSYNC           6
-		12  VSYNC          19
-		 5  HSYNC           7
-		13  HSYNC          20
-		 6  High intensity  8
-		14  High intensity 21
-		 7  Video           9
-		15  Video          22
+  HR Graphics   10  +VS            17  Monitors 3111 (Amber) or
+  Board 1070    11  VS return      15  3712/3715 (Black & White)
+         4  VSYNC           6
+        12  VSYNC          19
+         5  HSYNC           7
+        13  HSYNC          20
+         6  High intensity  8
+        14  High intensity 21
+         7  Video           9
+        15  Video          22
                  8  GND            11
 
   This board is normaly used with an Ericsson monitor due to the non standard connector.
@@ -1194,7 +1194,7 @@ void isa8_epc_mda_device::device_reset()
  *-------------------------------------------------------------------------------
  * 6845 Address Registers 0x3b4      0x3d4     wo CRT Index reg
  * 6845 Data Registers    0x3b5      0x3d5     wo CRT Data reg
- * Mode Register 1        0x3b8      0x3d8     rw MDA/CGA mode reg (bit 0,1 & 4 incompatible) 
+ * Mode Register 1        0x3b8      0x3d8     rw MDA/CGA mode reg (bit 0,1 & 4 incompatible)
  * Mode Register 2        0x3bf      0x3df     rw CRT/CPU page reg (incompatible w PCjr only)
  * Status Register        0x3ba      0x3da     r  CGA/MDA status reg (incompatible)
  *                                              w EGA/VGA feature ccontrol reg (not used by this board)
@@ -1296,7 +1296,7 @@ inline int isa8_epc_mda_device::get_yres()
 
 MC6845_UPDATE_ROW(isa8_epc_mda_device::crtc_update_row)
 {
-  	uint32_t  *p = &bitmap.pix32(y);
+	uint32_t  *p = &bitmap.pix32(y);
 	uint16_t  chr_base = ra;
 	int i;
 
@@ -1304,7 +1304,7 @@ MC6845_UPDATE_ROW(isa8_epc_mda_device::crtc_update_row)
 	if ( y < (16 * 0 + 0x20) && (m_framecnt & 0xff) == 0 )
 	{
 		LOGROW("%11.6f %s\n - y:%d chr_base:%d ra:%d ma:%d x_count:%d\n", machine().time().as_double(), FUNCNAME,
-		       y, y % 16, ra, ma, x_count);
+			   y, y % 16, ra, ma, x_count);
 	}
 
 	// Video Off handling
@@ -1376,7 +1376,7 @@ MC6845_UPDATE_ROW(isa8_epc_mda_device::crtc_update_row)
 				}
 			}
 
-			// Handle intense foreground 
+			// Handle intense foreground
 			if ((attr & ATTR_INTEN) != 0 && fg == 2)
 			{
 				fg = 3;
@@ -1384,7 +1384,7 @@ MC6845_UPDATE_ROW(isa8_epc_mda_device::crtc_update_row)
 
 			// Handle intense background if blinking is disabled
 			if ((m_mode_control & MR1_BLINK) == 0 &&
-			    (attr & ATTR_BLINK) != 0 && bg == 2)
+				(attr & ATTR_BLINK) != 0 && bg == 2)
 			{
 				bg = 3;
 			}
@@ -1400,12 +1400,12 @@ MC6845_UPDATE_ROW(isa8_epc_mda_device::crtc_update_row)
 			else
 			{
 				if ( (m_mode_control & MR1_BLINK) &&
-				     ( attr & ATTR_BLINK ) && ( m_framecnt & 0x10 ) )
+					 ( attr & ATTR_BLINK ) && ( m_framecnt & 0x10 ) )
 				{
 					data = 0x00;
 				}
 			}
-			
+
 			*p = (*m_pal)[( data & 0x80 ) ? fg : bg]; p++;
 			*p = (*m_pal)[( data & 0x40 ) ? fg : bg]; p++;
 			*p = (*m_pal)[( data & 0x20 ) ? fg : bg]; p++;

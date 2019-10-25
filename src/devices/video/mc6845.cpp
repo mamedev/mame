@@ -54,9 +54,9 @@
 
 #include "logmacro.h"
 
-#define LOGSETUP(...)	LOGMASKED(LOG_SETUP,  __VA_ARGS__)
-#define LOGREGS(...)	LOGMASKED(LOG_REGS,  __VA_ARGS__)
-#define LOGCONF(...)	LOGMASKED(LOG_CONF,  __VA_ARGS__)
+#define LOGSETUP(...)   LOGMASKED(LOG_SETUP,  __VA_ARGS__)
+#define LOGREGS(...)    LOGMASKED(LOG_REGS,  __VA_ARGS__)
+#define LOGCONF(...)    LOGMASKED(LOG_CONF,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
@@ -223,15 +223,15 @@ void mc6845_device::register_w(uint8_t data)
 
 	/* Omits LOGSETUP logs of cursor registers as they tend to be spammy */
 	if (m_register_address_latch < 0x0e &&
-	    m_register_address_latch != 0x0a &&
-	    m_register_address_latch != 0x0b) LOGSETUP(" * %02x <= %3u [%02x] %s\n", m_register_address_latch,
-						      data, data, std::array<char const *, 16>
+		m_register_address_latch != 0x0a &&
+		m_register_address_latch != 0x0b) LOGSETUP(" * %02x <= %3u [%02x] %s\n", m_register_address_latch,
+							  data, data, std::array<char const *, 16>
 		 {{ "R0 - Horizontal Total",       "R1 - Horizontal Displayed",   "R2 - Horizontal Sync Position",
-		    "R3 - Sync Width",	           "R4 - Vertical Total",	  "R5 - Vertical Total Adjust",
-		    "R6 - Vertical Displayed",     "R7 - Vertical Sync Position", "R8 - Interlace & Skew",
-		    "R9 - Maximum Raster Address", "R10 - Cursor Start Address",  "R11 - Cursor End Address",
-		    "R12 - Start Address (H)",	   "R13 - Start Address (L)",     "R14 - Cursor (H)",
-		    "R15 - Cursor (L)" }}[(m_register_address_latch & 0x0f)]);
+			"R3 - Sync Width",             "R4 - Vertical Total",         "R5 - Vertical Total Adjust",
+			"R6 - Vertical Displayed",     "R7 - Vertical Sync Position", "R8 - Interlace & Skew",
+			"R9 - Maximum Raster Address", "R10 - Cursor Start Address",  "R11 - Cursor End Address",
+			"R12 - Start Address (H)",     "R13 - Start Address (L)",     "R14 - Cursor (H)",
+			"R15 - Cursor (L)" }}[(m_register_address_latch & 0x0f)]);
 
 	switch (m_register_address_latch)
 	{

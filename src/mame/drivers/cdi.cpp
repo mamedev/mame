@@ -48,7 +48,7 @@ TODO:
 
 #define LOG_SERVO       (1 << 0)
 #define LOG_SLAVE       (1 << 1)
-#define LOG_ALL			(LOG_SERVO | LOG_SLAVE)
+#define LOG_ALL         (LOG_SERVO | LOG_SLAVE)
 
 #define VERBOSE         (LOG_ALL)
 #include "logmacro.h"
@@ -112,7 +112,7 @@ void cdi_state::cdi910_mem(address_map &map)
 //  map(0x00318000, 0x0031ffff).noprw();
 	map(0x00320000, 0x00323fff).rw("mk48t08", FUNC(timekeeper_device::read), FUNC(timekeeper_device::write)).umask16(0xff00);    /* nvram (only low bytes used) */
 	map(0x004fffe0, 0x004fffff).rw(m_mcd212, FUNC(mcd212_device::regs_r), FUNC(mcd212_device::regs_w));
-//  map(0x00500000, 0x0057ffff).ram(); 
+//  map(0x00500000, 0x0057ffff).ram();
 	map(0x00500000, 0x00ffffff).noprw();
 //  map(0x00e00000, 0x00efffff).ram(); // DVC
 }

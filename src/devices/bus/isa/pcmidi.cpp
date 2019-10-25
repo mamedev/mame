@@ -28,8 +28,8 @@ Y1  : 12,000 MHz crystal 2 pin
 R1  : 15K ohm resistor +-5%
 R2  : 390 ohm resistor +-5%
 
-RP1 : 10K ohm Commoned (?) resistor network 2% SIP package (code used A103GA) 
-RP2 : 220 ohm Commoned (?) resistor network 2% SIP package (code used B221GA) 
+RP1 : 10K ohm Commoned (?) resistor network 2% SIP package (code used A103GA)
+RP2 : 220 ohm Commoned (?) resistor network 2% SIP package (code used B221GA)
 
 
 

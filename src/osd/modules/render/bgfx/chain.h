@@ -55,7 +55,7 @@ private:
 	std::map<std::string, bgfx_target*> m_target_map;
 	int64_t                             m_current_time;
 	uint32_t                            m_screen_index;
-	bool								m_has_converter;
+	bool                                m_has_converter;
 };
 
 #endif // __DRAWBGFX_CHAIN__

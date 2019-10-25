@@ -149,7 +149,7 @@ public:
 
 	virtual DECLARE_READ8_MEMBER(io_read) override;
 	virtual DECLARE_WRITE8_MEMBER(io_write) override;
-	
+
 	/* Monitor */
 	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
 

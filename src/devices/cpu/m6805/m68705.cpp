@@ -865,7 +865,7 @@ void m6805_mrom_device::internal_map(address_map &map)
 	 *   6805S3  0000-007f  0080-00ff  0100-0eff  0f00-0ff7   0ff8-0fff
 	 *   6805U2  0000-007f  0080-00ff  07c0-0f37  0f38-0ff7   0ff8-0fff
 	 *   6805U3  0000-007f             0080-0f37  0f38-0ff7   0ff8-0fff
-         *   6805U1  0000-007f  0080-00ff  0800-0f7f  0f80-0ff7   0ff8-0fff
+	 *   6805U1  0000-007f  0080-00ff  0800-0f7f  0f80-0ff7   0ff8-0fff
 	 *
 	 * This code assumes that dumps are captured contiguously from address 0 to
 	 * the end of the address range, and are not split by range. Register, RAM

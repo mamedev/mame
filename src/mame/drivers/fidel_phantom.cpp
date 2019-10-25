@@ -155,10 +155,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 	if (m_motors_ctrl & 0x0c)  m_hmotor_sensor0_ff = true;
 	if (m_motors_ctrl & 0x04)  m_hmotor_sensor1_ff = true;
 
-	if ((m_motors_ctrl & 0x01) && m_vmotor_pos > 0x00)	m_vmotor_pos--;
-	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0xff)	m_vmotor_pos++;
-	if ((m_motors_ctrl & 0x04) && m_hmotor_pos > 0x00)	m_hmotor_pos--;
-	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xff)	m_hmotor_pos++;
+	if ((m_motors_ctrl & 0x01) && m_vmotor_pos > 0x00)  m_vmotor_pos--;
+	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0xff)  m_vmotor_pos++;
+	if ((m_motors_ctrl & 0x04) && m_hmotor_pos > 0x00)  m_hmotor_pos--;
+	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xff)  m_hmotor_pos++;
 }
 
 void phantom_state::update_pieces_position(int state)

@@ -378,15 +378,15 @@ void fp1100_state::handle_int_to_main()
 		{
 			m_maincpu->set_input_line(0, HOLD_LINE);
 			LOG("%s: Main IRQ asserted\n",machine().describe_context());
-//			m_main_irq_status = true;
+//          m_main_irq_status = true;
 		}
 	}
 	else
 	{
 		if (m_main_irq_status)
 		{
-//			m_maincpu->set_input_line(0, CLEAR_LINE);
-//			LOG("%s: Main IRQ cleared\n",machine().describe_context());
+//          m_maincpu->set_input_line(0, CLEAR_LINE);
+//          LOG("%s: Main IRQ cleared\n",machine().describe_context());
 			m_main_irq_status = false;
 		}
 	}

@@ -222,42 +222,42 @@ void sgi_gr1_device::device_reset()
 u8 sgi_gr1_device::dr0_r()
 {
 	LOG("dr0_r 0x%02x (%s)\n", m_dr0, machine().describe_context());
-	
+
 	return m_dr0;
 }
 
 u8 sgi_gr1_device::dr1_r()
 {
 	LOG("dr1_r 0x%02x (%s)\n", m_dr1, machine().describe_context());
-	
+
 	return m_dr1;
 }
 
 u8 sgi_gr1_device::dr2_r()
 {
 	LOG("dr2_r 0x%02x (%s)\n", m_dr2, machine().describe_context());
-	
+
 	return m_dr2;
 }
 
 u8 sgi_gr1_device::dr3_r()
 {
 	LOG("dr3_r 0x%02x (%s)\n", m_dr3, machine().describe_context());
-	
+
 	return m_dr3;
 }
 
 u8 sgi_gr1_device::dr4_r()
 {
 	LOG("dr4_r 0x%02x (%s)\n", m_dr4, machine().describe_context());
-	
+
 	return (m_dr4 | (m_ge->suspended() ? 0 : DR4_GESTALL)) & DR4_RM;
 }
 
 void sgi_gr1_device::dr0_w(u8 data)
 {
 	LOG("dr0_w 0x%02x (%s)\n", data, machine().describe_context());
-	
+
 	m_dr0 = (m_dr0 & ~DR0_WM) | (data & DR0_WM);
 }
 
@@ -280,7 +280,7 @@ void sgi_gr1_device::dr2_w(u8 data)
 void sgi_gr1_device::dr3_w(u8 data)
 {
 	LOG("dr3_w 0x%02x (%s)\n", data, machine().describe_context());
-	
+
 	m_dr3 = (m_dr3 & ~DR3_WM) | (data & DR3_WM);
 }
 

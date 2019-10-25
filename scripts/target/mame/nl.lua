@@ -150,7 +150,7 @@ files{
 	MAME_DIR .. "src/mame/video/1942.cpp",
 	MAME_DIR .. "src/mame/audio/nl_1942.cpp",
   MAME_DIR .. "src/mame/audio/nl_1942.h",
-	
+
 	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
   MAME_DIR .. "src/mame/audio/nl_gamemachine.h",
   MAME_DIR .. "src/mame/audio/nl_gamemachine.cpp",
