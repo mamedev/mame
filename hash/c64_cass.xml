@@ -138,7 +138,7 @@
 	<software name="5thgear">
 		<description>5th Gear</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="556826">
@@ -340,7 +340,7 @@
 	<software name="anarchy">
 		<description>Anarchy</description>
 		<year>1987</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="386234">
@@ -718,7 +718,7 @@
 	<software name="bvalley">
 		<description>Battle Valley</description>
 		<year>1987</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="446958">
@@ -2715,7 +2715,7 @@
 	<software name="golfmstr">
 		<description>Golf Master</description>
 		<year>19??</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="395010">
@@ -5520,7 +5520,7 @@
 	<software name="scorpion">
 		<description>Scorpion</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="581494">
@@ -5652,7 +5652,7 @@
 	<software name="slayer">
 		<description>Slayer</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="558266">
@@ -6037,7 +6037,7 @@
 	<software name="steel">
 		<description>Steel</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="420211">
@@ -6643,7 +6643,7 @@
 	<software name="thndforc">
 		<description>Thunderforce</description>
 		<year>1987</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="591004">
