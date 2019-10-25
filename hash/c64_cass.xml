@@ -2,7 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018. -->
-<!-- Others based on c64tapes.org dumps -->
+<!-- Some others are based on c64tapes.org dumps -->
+<!-- Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm -->
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
 
@@ -70,6 +71,46 @@
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="540664">
 				<rom name="1985_-_The_Day_After_a2.tap" size="540664" crc="8dcdb246" sha1="f5551c42c206c8ff90986b645822a486209c5ba0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dpinbl">
+		<description>3D Pinball</description>
+		<year>1989</year>
+		<publisher>Mastertronic Plus</publisher>
+
+		<part name="3dpinbla" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="192466">
+				<rom name="3dpinbla.tap" size="192466" crc="fa7d00d8" sha1="9e547ac4ee11b6b6f034f4cac5c31079c23373b3"/>
+			</dataarea>
+		</part>
+
+		<part name="3dpinblb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="192466">
+				<rom name="3dpinblb.tap" size="192466" crc="f91f841d" sha1="2ed915985ef8192df097b420b17dfbe87ed358bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a3dpool">
+		<description>American 3D Pool</description>
+		<year>1991</year>
+		<publisher>Zeppelin Games</publisher>
+
+		<part name="a3dpoola" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="861564">
+				<rom name="a3dpoola.tap" size="861564" crc="3381e127" sha1="a3cca3ad5638f9e2e08b223cfd2526f72fdeb063"/>
+			</dataarea>
+		</part>
+
+		<part name="a3dpoolb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="867657">
+				<rom name="a3dpoolb.tap" size="867657" crc="acc6f5fe" sha1="f21761d9d86e1bc98ea081a7405193e1eae6e30e"/>
 			</dataarea>
 		</part>
 	</software>
