@@ -257,6 +257,7 @@ const double XTAL::known_xtals[] = {
 	 18'432'000, /* 18.432_MHz_XTAL        Extremely common, used on 100's of PCBs (48000 * 384) */
 	 18'480'000, /* 18.48_MHz_XTAL         Wyse WY-100 video */
 	 18'575'000, /* 18.575_MHz_XTAL        Visual 102, Visual 220 */
+	 18'600'000, /* 18.6_MHz_XTAL          Teleray Model 10 */
 	 18'720'000, /* 18.72_MHz_XTAL         Nokia MikroMikko 1 */
 	 18'867'000, /* 18.867_MHz_XTAL        Decision Data IS-482 */
 	 18'869'600, /* 18.8696_MHz_XTAL       Memorex 2178 */
