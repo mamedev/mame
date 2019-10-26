@@ -379,6 +379,26 @@
 		</part>
 	</software>
 
+	<software name="anglebl">
+		<description>Angle Ball</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="anglebla" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="267415">
+				<rom name="anglebla.tap" size="267415" crc="8a71c7cf" sha1="f60d649fd0087ae4692947750c56733159bffd2a"/>
+			</dataarea>
+		</part>
+
+		<part name="angleblb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="267414">
+				<rom name="angleblb.tap" size="267414" crc="8c58c3c3" sha1="f4db67b46dec798230fea7291445c1cbddf74c0d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="annihiltr">
 		<description>Annihilator</description>
 		<year>1983</year>
@@ -581,6 +601,26 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="578780">
 				<rom name="Back_to_the_Future.tap" size="578780" crc="e6eac89d" sha1="9c9272a7dee502d2ed0ff6166703e53a914e784a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballcrz">
+		<description>Ball Crazy</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="ballcrza" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="531341">
+				<rom name="ballcrza.tap" size="531341" crc="e0b0dfce" sha1="d97966c12248724d0334c8ccfb03bfb877d92d03"/>
+			</dataarea>
+		</part>
+
+		<part name="ballcrzb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="528497">
+				<rom name="ballcrzb.tap" size="528497" crc="ddb141fb" sha1="d8e3ebaee70fcaa1b81d2ab02111bb7d0e033a4d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1538,6 +1578,26 @@
 		</part>
 	</software>
 
+	<software name="circus">
+		<description>Continental Circus</description>
+		<year>1991</year>
+		<publisher>Mastertronic Plus</publisher>
+
+		<part name="circusa" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="569886">
+				<rom name="circusa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
+			</dataarea>
+		</part>
+
+		<part name="circusb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="569886">
+				<rom name="circusb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="corp">
 		<description>Corporation</description>
 		<year>1990</year>
@@ -2062,6 +2122,26 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="741073">
 				<rom name="Fast_Food.tap" size="741073" crc="6e0f6d68" sha1="a7e41c82248d1276abc1db92acc1e690e2ab68a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feud">
+		<description>Feud</description>
+		<year>1987</year>
+		<publisher>Bulldog Software</publisher>
+
+		<part name="feuda" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="611910">
+				<rom name="feuda.tap" size="611910" crc="9ac57691" sha1="ff53d728123469ce40c8c1553cb03912aa897e60"/>
+			</dataarea>
+		</part>
+
+		<part name="feudb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="611910">
+				<rom name="feudb.tap" size="611910" crc="0cbe87c1" sha1="b06e65952e8d2c8ee0b8cb227134136ba53b62b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4263,6 +4343,26 @@
 		</part>
 	</software>
 
+	<software name="omahd">
+		<description>One Man and His Droid</description>
+		<year>1985</year>
+		<publisher>199 Range</publisher>
+
+		<part name="omahda" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="611660">
+				<rom name="omahda.tap" size="611660" crc="6da4096b" sha1="263e452ba8e5f69411a873ba8ce1907f2610d24f"/>
+			</dataarea>
+		</part>
+
+		<part name="omahdb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="598097">
+				<rom name="omahdb.tap" size="598097" crc="30661926" sha1="60d822dc311a72b197483b79b29ea9daab4366de"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="opthunder">
 		<description>Operation Thunderbolt</description>
 		<year>19??</year>
@@ -5253,6 +5353,26 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="229645">
 				<rom name="Robin_to_the_Rescue.tap" size="229645" crc="cf705e34" sha1="dcf6d4beafd1f42f13158bf9944c5ace2e035b12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop">
+		<description>Robocop</description>
+		<year>1988</year>
+		<publisher>The Hit Squad</publisher>
+
+		<part name="robocopa" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1510854">
+				<rom name="robocopa.tap" size="1510854" crc="66624f2c" sha1="e8d137e6a345c0e3cafd1bf56eb7215a7a6dc597"/>
+			</dataarea>
+		</part>
+
+		<part name="robocopb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1510854">
+				<rom name="robocopb.tap" size="1510854" crc="a018d08f" sha1="b4730e17a2566994c017dcfe893968375c30d3ec"/>
 			</dataarea>
 		</part>
 	</software>
