@@ -80,6 +80,7 @@ public:
 	void schaser(machine_config &config);
 	void cane(machine_config &config);
 	void cane_audio(machine_config &config);
+	void orbite(machine_config &config);
 
 	void init_invmulti();
 	void init_spacecom();
@@ -198,6 +199,9 @@ private:
 	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
 
+	DECLARE_READ8_MEMBER(orbite_scattered_colorram_r);
+	DECLARE_WRITE8_MEMBER(orbite_scattered_colorram_w);
+
 	DECLARE_MACHINE_START(extra_8080bw);
 	DECLARE_MACHINE_START(rollingc);
 	DECLARE_MACHINE_START(sflush);
@@ -216,6 +220,9 @@ private:
 	DECLARE_MACHINE_START(cane);
 	DECLARE_MACHINE_RESET(cane);
 
+	DECLARE_MACHINE_START(orbite);
+	DECLARE_MACHINE_RESET(orbite);
+
 	void rollingc_palette(palette_device &palette) const;
 	void sflush_palette(palette_device &palette) const;
 
@@ -231,6 +238,7 @@ private:
 	uint32_t screen_update_ballbomb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(polaris_60hz_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
@@ -288,6 +296,8 @@ private:
 	void yosakdon_map(address_map &map);
 	void cane_io_map(address_map &map);
 	void cane_map(address_map &map);
+	void orbite_io_map(address_map &map);
+	void orbite_map(address_map &map);
 };
 
 

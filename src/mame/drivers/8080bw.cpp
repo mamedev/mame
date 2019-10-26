@@ -3891,6 +3891,112 @@ MACHINE_RESET_MEMBER(_8080bw_state, cane)
   MACHINE_RESET_CALL_MEMBER(mw8080bw);
 }
 
+/*******************************************************/
+/*                                                     */
+/* Model Racing "Orbite"                               */
+/* Derived from schaser definition                     */
+/*                                                     */
+/*******************************************************/
+/***********************************************************************************************************************************
+  This game was never completed and released by Model Racing to the public.
+  It's in a nearly incomplete form (eg: doesn't have any sound or score routine in the code) and it's barely playable.
+ 
+  The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer 
+  Adolfo Melilli (adolfo@melilli.com).
+  Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and 
+  dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
+  Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
+  romset and wrote a mame driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
+ 
+  The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
+  code and comments written into the source files of the game. Several of those hypothesis came following the directions of 
+  previous yet contemporary Model Racing works (Eg: Claybuster) and where confirmed by Melilli himself.
+ 
+  Being unreleased this games has not an official name, thus the name used in the source files was used instead.
+
+***********************************************************************************************************************************/
+
+READ8_MEMBER(_8080bw_state::orbite_scattered_colorram_r)
+{
+  return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
+}
+
+WRITE8_MEMBER(_8080bw_state::orbite_scattered_colorram_w)
+{
+  m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
+}
+
+void _8080bw_state::orbite_map(address_map &map)
+{
+  map(0x0000, 0x1fff).rom();
+  map(0x2000, 0x3fff).ram().share("main_ram");
+  map(0xc000, 0xdfff).rw(FUNC(_8080bw_state::orbite_scattered_colorram_r), FUNC(_8080bw_state::orbite_scattered_colorram_w));
+}
+
+
+void _8080bw_state::orbite_io_map(address_map &map)
+{
+  map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+
+  // Ports verified on sources
+  map(0x08, 0x08).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
+  map(0x20, 0x20).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
+  map(0x40, 0x40).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+
+  map(0x66, 0x66).portr("IN0");
+  map(0x76, 0x76).portr("IN1");
+  map(0x7A, 0x7A).portr("IN2");
+}
+
+
+static INPUT_PORTS_START( orbite )
+  PORT_START("IN0")
+  PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+  PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+  PORT_START("IN1")
+  PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+
+  PORT_START("IN2")   // port 2
+  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+INPUT_PORTS_END
+
+
+MACHINE_START_MEMBER(_8080bw_state,orbite)
+{
+  m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
+  save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
+  mw8080bw_state::machine_start();  
+}
+
+MACHINE_RESET_MEMBER(_8080bw_state,orbite)
+{
+  MACHINE_RESET_CALL_MEMBER(mw8080bw);
+}
+
+void _8080bw_state::orbite(machine_config &config)
+{
+  mw8080bw_root(config);
+
+  // basic machine hardware
+  I8080(config.replace(), m_maincpu, 1996800); /* 19.968MHz / 10 */
+  m_maincpu->set_addrmap(AS_PROGRAM, &_8080bw_state::orbite_map);
+  m_maincpu->set_addrmap(AS_IO, &_8080bw_state::orbite_io_map);
+  m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
+
+  WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
+  MCFG_MACHINE_START_OVERRIDE(_8080bw_state,orbite)
+  MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,orbite)
+
+  // add shifter
+  MB14241(config, m_mb14241);
+
+  // video hardware
+  m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_orbite));
+
+  PALETTE(config, m_palette, palette_device::RGB_3BIT);
+}
+
 /**************************************************************************************************************/
 
 ROM_START( searthin )
@@ -5514,6 +5620,13 @@ ROM_START( cane )
   ROM_LOAD( "mrcane.62",     0x1800, 0x0800, CRC(0d37cc00) SHA1(02f136b499cca35c70a6aaae475c516d91392e36) )
 ROM_END
 
+ROM_START( orbite )
+  ROM_REGION( 0x10000, "maincpu", 0 )
+  ROM_LOAD( "mrxx.71",     0x0000, 0x0800, CRC(78cf0c8a) SHA1(0bda9352c35e2ac175bd5ce6ee42e94247f5149a) )
+  ROM_LOAD( "mrxx.70",     0x0800, 0x0800, CRC(2914a5c4) SHA1(ac38c3a1c537ab22301bede0013db0d485012237) )
+  ROM_LOAD( "mrxx.69",     0x1000, 0x0800, CRC(46a8468b) SHA1(bf5dfed67fa4986994b8a74971e094bbff57c873) )
+ROM_END
+
 //    year  rom          parent    machine    inp        class           init           monitor ...
 
 // Taito games (+clones), starting with Space Invaders
@@ -5667,3 +5780,4 @@ GAME( 2002, invmultis1a, invmulti, invmulti,  invmulti,  _8080bw_state,  init_in
 GAME( 2002, invmultip,   invmulti, invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME(1979?, cane,     0,     cane,      cane,   _8080bw_state,  empty_init,    ROT0, "Model Racing", "Cane", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
+GAME(1979?, orbite,   0,   orbite,    orbite,   _8080bw_state,  empty_init,    ROT270, "Model Racing", "Orbite", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
