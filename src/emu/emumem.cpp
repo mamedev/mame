@@ -208,8 +208,62 @@ static char *core_i64_hex_format(u64 value, u8 mindigits)
 //  CONSTANTS
 //**************************************************************************
 
+namespace {
+
+template <typename Delegate> struct handler_width;
+template <> struct handler_width<read8_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<read8m_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<read8s_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<read8sm_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<read8mo_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<read8smo_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<write8_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<write8m_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<write8s_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<write8sm_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<write8mo_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<write8smo_delegate> { static constexpr int value = 0; };
+template <> struct handler_width<read16_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<read16m_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<read16s_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<read16sm_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<read16mo_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<read16smo_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<write16_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<write16m_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<write16s_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<write16sm_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<write16mo_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<write16smo_delegate> { static constexpr int value = 1; };
+template <> struct handler_width<read32_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<read32m_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<read32s_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<read32sm_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<read32mo_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<read32smo_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<write32_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<write32m_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<write32s_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<write32sm_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<write32mo_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<write32smo_delegate> { static constexpr int value = 2; };
+template <> struct handler_width<read64_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<read64m_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<read64s_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<read64sm_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<read64mo_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<read64smo_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<write64_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<write64m_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<write64s_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<write64sm_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<write64mo_delegate> { static constexpr int value = 3; };
+template <> struct handler_width<write64smo_delegate> { static constexpr int value = 3; };
+
 // other address map constants
 const int MEMORY_BLOCK_CHUNK = 65536;                   // minimum chunk size of allocated memory blocks
+
+} // anonymous namespace
 
 
 //**************************************************************************
@@ -225,56 +279,6 @@ class address_space_specific : public address_space
 	using uX = typename emu::detail::handler_entry_size<Width>::uX;
 	using NativeType = uX;
 	using this_type = address_space_specific<Width, AddrShift, Endian>;
-
-	template <typename Delegate, typename Dummy = void> struct handler_width;
-	template <typename Dummy> struct handler_width<read8_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<read8m_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<read8s_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<read8sm_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<read8mo_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<read8smo_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<write8_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<write8m_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<write8s_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<write8sm_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<write8mo_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<write8smo_delegate, Dummy> { static constexpr int value = 0; };
-	template <typename Dummy> struct handler_width<read16_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<read16m_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<read16s_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<read16sm_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<read16mo_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<read16smo_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<write16_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<write16m_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<write16s_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<write16sm_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<write16mo_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<write16smo_delegate, Dummy> { static constexpr int value = 1; };
-	template <typename Dummy> struct handler_width<read32_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<read32m_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<read32s_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<read32sm_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<read32mo_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<read32smo_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<write32_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<write32m_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<write32s_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<write32sm_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<write32mo_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<write32smo_delegate, Dummy> { static constexpr int value = 2; };
-	template <typename Dummy> struct handler_width<read64_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<read64m_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<read64s_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<read64sm_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<read64mo_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<read64smo_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<write64_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<write64m_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<write64s_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<write64sm_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<write64mo_delegate, Dummy> { static constexpr int value = 3; };
-	template <typename Dummy> struct handler_width<write64smo_delegate, Dummy> { static constexpr int value = 3; };
 
 	// constants describing the native size
 	static constexpr u32 NATIVE_BYTES = 1 << Width;
