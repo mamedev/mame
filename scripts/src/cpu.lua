@@ -2944,3 +2944,20 @@ if (CPUS["CR16B"]~=null or _OPTIONS["with-tools"]) then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cr16b/cr16bdasm.h")
 end
+
+--------------------------------------------------
+-- Gigatron CPU device
+--@src/devices/cpu/gigatron.h,CPUS["GTRON"] = true
+--------------------------------------------------
+
+if (CPUS["GTRON"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/gigatron/gigatron.cpp",
+		MAME_DIR .. "src/devices/cpu/gigatron/gogatron.h",
+	}
+end
+
+if (CPUS["GTRON"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/gigatron/gigatrondasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/gigatron/gigatrondasm.h")
+end
