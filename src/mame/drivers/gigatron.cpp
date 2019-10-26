@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:<author_name>
+// copyright-holders:Sterophonick
 /***************************************************************************
 
    Skeleton driver for Gigatron TTL Microcomputer
