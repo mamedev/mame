@@ -5421,6 +5421,26 @@
 		</part>
 	</software>
 
+	<software name="rockfrd">
+		<description>Rockford / Back to Reality</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="breality" interface="cbm_cass">
+			<feature name="part_id" value="Back to Reality"/>
+			<dataarea name="cass" size="570317">
+				<rom name="breality.tap" size="570317" crc="2f561e28" sha1="ed091ed18ac721772d567d2a6e24cef44a3a3b7a"/>
+			</dataarea>
+		</part>
+
+		<part name="rockford" interface="cbm_cass">
+			<feature name="part_id" value="Rockford"/>
+			<dataarea name="cass" size="333295">
+				<rom name="rockford.tap" size="333295" crc="ec352a42" sha1="b74140b6c605c914f5d983eabff74b38167c1777"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rollarnd">
 		<description>Rollaround</description>
 		<year>1988</year>
