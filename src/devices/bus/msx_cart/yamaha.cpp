@@ -106,7 +106,7 @@ void msx_cart_sfg_device::device_start()
 
 	// This should probably moved up in the bus/slot hierarchy for the msx driver
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
-	maincpu->set_irq_acknowledge_callback(FUNC(msx_cart_sfg_device::irq_callback));
+	maincpu->set_irq_acknowledge_callback(*this, FUNC(msx_cart_sfg_device::irq_callback));
 }
 
 

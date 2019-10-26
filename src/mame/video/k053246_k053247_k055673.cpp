@@ -902,6 +902,9 @@ void k055673_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// resolve callbacks
+	m_k053247_cb.resolve();
+
 	int gfx_index = 0;
 	u32 total;
 
@@ -1064,6 +1067,9 @@ void k053247_device::device_start()
 {
 	if (!palette().device().started())
 		throw device_missing_dependencies();
+
+	// resolve callbacks
+	m_k053247_cb.resolve();
 
 	u32 total;
 	static const gfx_layout spritelayout =
