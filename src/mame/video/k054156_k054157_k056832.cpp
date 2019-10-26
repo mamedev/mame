@@ -1107,7 +1107,6 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 		return(1);
 
 	{
-		rectangle zerorect;
 		tilemap_t *tmap;
 		uint32_t *dirty;
 		int all_dirty;
@@ -1126,9 +1125,8 @@ int k056832_device::update_linemap( screen_device &screen, _BitmapClass &bitmap,
 			m_all_lines_dirty[page] = 0;
 
 			// force tilemap into a clean, static state
-			// *really ugly but it minimizes alteration to tilemap.cpp
-			memset(&zerorect, 0, sizeof(rectangle));    // zero dimension
-			tmap->draw(screen, bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
+			tmap->mark_all_dirty();
+			tmap->pixmap();                     // dummy call to reset tile_dirty_map
 			xprmap.fill(0);                     // reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
 		}
@@ -2039,7 +2037,6 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 
 
 	{
-		rectangle zerorect;
 		tilemap_t *tmap;
 		uint32_t *dirty;
 		int all_dirty;
@@ -2058,9 +2055,8 @@ int k056832_device::altK056832_update_linemap(screen_device &screen, bitmap_rgb3
 			m_all_lines_dirty[page] = 0;
 
 			// force tilemap into a clean, static state
-			// *really ugly but it minimizes alteration to tilemap.cpp
-			memset (&zerorect, 0, sizeof(rectangle));   // zero dimension
-			tmap->draw(screen, bitmap, zerorect, 0, 0); // dummy call to reset tile_dirty_map
+			tmap->mark_all_dirty();
+			tmap->pixmap();                     // dummy call to reset tile_dirty_map
 			xprmap.fill(0);                     // reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);   // reset tile transparency_data;
 		}
