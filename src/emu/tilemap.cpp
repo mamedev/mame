@@ -947,10 +947,10 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 
 g_profiler.start(PROFILER_TILEMAP_DRAW);
 	// configure the blit parameters based on the input parameters
-	assert(dest.cliprect().contains(cliprect));
-	assert(screen.cliprect().contains(cliprect));
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
+	assert(dest.cliprect().contains(cliprect));
+	assert(screen.cliprect().contains(cliprect) || blit.tilemap_priority_code == 0xff00);
 
 	// flush the dirty state to all tiles as appropriate
 	realize_all_dirty_tiles();
@@ -1084,10 +1084,10 @@ void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const
 
 g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	// configure the blit parameters
-	assert(dest.cliprect().contains(cliprect));
-	assert(screen.cliprect().contains(cliprect));
 	blit_parameters blit;
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
+	assert(dest.cliprect().contains(cliprect));
+	assert(screen.cliprect().contains(cliprect) || blit.tilemap_priority_code == 0xff00);
 
 	// get the full pixmap for the tilemap
 	pixmap();
@@ -1303,7 +1303,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 	const int ymask = m_pixmap.height() - 1;
 	const int widthshifted = m_pixmap.width() << 16;
 	const int heightshifted = m_pixmap.height() << 16;
-	u32 priority = blit.tilemap_priority_code;
+	const u32 priority = blit.tilemap_priority_code;
 	u8 mask = blit.mask;
 	u8 value = blit.value;
 	u8 alpha = blit.alpha;
@@ -1344,7 +1344,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				u32 cy = starty >> 16;
 
 				// get source and priority pointers
-				u8 *pri = &priority_bitmap.pix8(sy, sx);
+				u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix8(sy, sx) : nullptr;
 				const u16 *src = &m_pixmap.pix16(cy);
 				const u8 *maskptr = &m_flagsmap.pix8(cy);
 				typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
@@ -1356,14 +1356,16 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 					if ((maskptr[cx >> 16] & mask) == value)
 					{
 						ROZ_PLOT_PIXEL(src[cx >> 16]);
-						*pri = (*pri & (priority >> 8)) | priority;
+						if (priority != 0xff00)
+							*pri = (*pri & (priority >> 8)) | priority;
 					}
 
 					// advance in X
 					cx += incxx;
 					x++;
 					++dest;
-					pri++;
+					if (priority != 0xff00)
+						pri++;
 				}
 			}
 
@@ -1386,7 +1388,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 
 			// get dest and priority pointers
 			typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
-			u8 *pri = &priority_bitmap.pix8(sy, sx);
+			u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix8(sy, sx) : nullptr;
 
 			// loop over columns
 			while (x <= ex)
@@ -1395,7 +1397,8 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				if ((m_flagsmap.pix8((cy >> 16) & ymask, (cx >> 16) & xmask) & mask) == value)
 				{
 					ROZ_PLOT_PIXEL(m_pixmap.pix16((cy >> 16) & ymask, (cx >> 16) & xmask));
-					*pri = (*pri & (priority >> 8)) | priority;
+					if (priority != 0xff00)
+						*pri = (*pri & (priority >> 8)) | priority;
 				}
 
 				// advance in X
@@ -1403,7 +1406,8 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				cy += incxy;
 				x++;
 				++dest;
-				pri++;
+				if (priority != 0xff00)
+					pri++;
 			}
 
 			// advance in Y
@@ -1426,7 +1430,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 
 			// get dest and priority pointers
 			typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
-			u8 *pri = &priority_bitmap.pix8(sy, sx);
+			u8 *pri = (priority != 0xff00) ? &priority_bitmap.pix8(sy, sx) : nullptr;
 
 			// loop over columns
 			while (x <= ex)
@@ -1436,7 +1440,8 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 					if ((m_flagsmap.pix8(cy >> 16, cx >> 16) & mask) == value)
 					{
 						ROZ_PLOT_PIXEL(m_pixmap.pix16(cy >> 16, cx >> 16));
-						*pri = (*pri & (priority >> 8)) | priority;
+						if (priority != 0xff00)
+							*pri = (*pri & (priority >> 8)) | priority;
 					}
 
 				// advance in X
@@ -1444,7 +1449,8 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 				cy += incxy;
 				x++;
 				++dest;
-				pri++;
+				if (priority != 0xff00)
+					pri++;
 			}
 
 			// advance in Y
