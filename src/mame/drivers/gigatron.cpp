@@ -112,7 +112,7 @@ void gigatron_state::gigatron(machine_config &config)
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 //  screen.set_size(32*8, 32*8);
 //  screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
-	screen.set_raw(MAIN_CLOCK/2, 442, 0, 160, 264, 0, 120);          /* generic NTSC video timing at 320x240 */
+	screen.set_raw(MAIN_CLOCK/2, 442, 0, 640, 264, 0, 480);          /* generic NTSC video timing at 320x240 */
 //  screen.set_raw(XTAL(12'000'000)/2, 384, 0, 256, 264, 16, 240);  /* generic NTSC video timing at 256x224 */
 	screen.set_palette(m_palette);
 
