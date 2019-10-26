@@ -132,7 +132,7 @@ void gigatron_state::gigatron(machine_config &config)
 
 ROM_START( gigatron )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "gigatron.rom",  0x0000, 0x20000, CRC(78995109) SHA1(2395fc48e64099836111f5aeca39ddbf4650ea4e) )  // 0x2000 of data repeated along the dump
+	ROM_LOAD( "gigatron.rom",  0x0000, 0x20000, CRC(78995109) SHA1(2395fc48e64099836111f5aeca39ddbf4650ea4e) )
 ROM_END
 
 
