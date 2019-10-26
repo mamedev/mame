@@ -13,7 +13,7 @@
 
 #define LOG_NVRAM           (0)
 
-#define PRINTF_DEBUG        (0)
+#define PRINTF_DEBUG        (1)
 #define LOG_IOASIC          (0)
 #define LOG_FIFO            (0)
 
