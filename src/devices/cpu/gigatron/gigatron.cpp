@@ -11,7 +11,7 @@
 #include "debugger.h"
 
 
-DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron", "Gigatron CPU Device")
+DEFINE_DEVICE_TYPE(GTRON, gigatron_cpu_device, "gigatron", "Gigatron")
 
 
 #define gigatron_readop(A) m_program->read_dword(A)
