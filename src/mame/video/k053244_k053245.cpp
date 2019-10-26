@@ -122,6 +122,9 @@ void k05324x_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// bind callbacks
+	m_k05324x_cb.resolve();
+
 	/* decode the graphics */
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -134,9 +137,6 @@ void k05324x_device::device_start()
 	m_z_rejection = -1;
 	m_ram = make_unique_clear<uint16_t[]>(m_ramsize / 2);
 	m_buffer = make_unique_clear<uint16_t[]>(m_ramsize / 2);
-
-	// bind callbacks
-	m_k05324x_cb.resolve();
 
 	save_pointer(NAME(m_ram), m_ramsize / 2);
 	save_pointer(NAME(m_buffer), m_ramsize / 2);

@@ -153,6 +153,9 @@ void k051316_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// bind callbacks
+	m_k051316_cb.resolve();
+
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
@@ -167,9 +170,6 @@ void k051316_device::device_start()
 	}
 	else
 		m_tmap->set_transparent_pen(0);
-
-	// bind callbacks
-	m_k051316_cb.resolve();
 
 	save_item(NAME(m_ram));
 	save_item(NAME(m_ctrlram));

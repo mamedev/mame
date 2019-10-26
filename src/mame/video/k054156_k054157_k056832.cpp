@@ -336,6 +336,9 @@ void k056832_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// bind callbacks
+	m_k056832_cb.resolve();
+
 	memset(m_regs,     0x00, sizeof(m_regs) );
 	memset(m_regsb,    0x00, sizeof(m_regsb) );
 
@@ -347,9 +350,6 @@ void k056832_device::device_start()
 	create_tilemaps();
 
 	finalize_init();
-
-	// bind callbacks
-	m_k056832_cb.resolve();
 }
 
 /*****************************************************************************
