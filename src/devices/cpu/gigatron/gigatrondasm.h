@@ -3,8 +3,8 @@
 
 // Gigatron disassembler
 
-#ifndef MAME_CPU_GTRON_NUONDASM_H
-#define MAME_CPU_GTRON_NUONDASM_H
+#ifndef MAME_CPU_GIGATRON_GIGATRONDASM_H
+#define MAME_CPU_GIGATRON_GIGATRONDASM_H
 
 #pragma once
 

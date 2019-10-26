@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "gigatrondasm.h"
 
-
 u32 gigatron_disassembler::opcode_alignment() const
 {
 	return 0;
