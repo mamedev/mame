@@ -1536,7 +1536,7 @@ void c64_state::ntsc(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
@@ -1708,7 +1708,7 @@ void c64_state::pal(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");
@@ -1854,7 +1854,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_user->pl_handler().set(FUNC(c64_state::write_user_pb7));
 	m_user->pm_handler().set(FUNC(c64_state::write_user_pa2));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c64_state::quickload_c64));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("PAL");

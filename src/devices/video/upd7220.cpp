@@ -615,6 +615,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, UPD7220, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_display_cb(*this),
+	m_draw_text_cb(*this),
 	m_write_drq(*this),
 	m_write_hsync(*this),
 	m_write_vsync(*this),
@@ -676,8 +678,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 void upd7220_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
-	m_draw_text_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
+	m_draw_text_cb.resolve();
 
 	m_write_drq.resolve_safe();
 	m_write_hsync.resolve_safe();

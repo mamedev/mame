@@ -433,7 +433,7 @@ void tourvision_state::tourvision(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tourvision_cart", "bin"));
-	cartslot.set_device_load(FUNC(tourvision_state::cart_load), this);
+	cartslot.set_device_load(FUNC(tourvision_state::cart_load));
 	cartslot.set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tv_list").set_original("pce_tourvision");

@@ -500,12 +500,12 @@ void xexex_state::xexex(machine_config &config)
 	m_palette->enable_hilights();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(xexex_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
 	K053246(config, m_k053246, 0);
-	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback), this);
+	m_k053246->set_sprite_callback(FUNC(xexex_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -48, 32);
 	m_k053246->set_palette(m_palette);
 

@@ -465,7 +465,7 @@ void fc100_state::machine_start()
 	m_inv = 0;
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x6000, 0x6fff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 
 	save_item(NAME(m_ag));
 	save_item(NAME(m_gm2));

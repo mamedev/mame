@@ -614,7 +614,7 @@ void psion_state::psion_4lines(machine_config &config)
 	subdevice<screen_device>("screen")->set_visarea(0, 6*20-1, 0, 9*4-1);
 
 	m_lcdc->set_lcd_size(4, 20);
-	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(psion_state::lz_pixel_update));
 }
 
 void psion1_state::psion1(machine_config &config)
@@ -628,7 +628,7 @@ void psion1_state::psion1(machine_config &config)
 	subdevice<screen_device>("screen")->set_visarea(0, 6*16-1, 0, 8*1-1);
 
 	m_lcdc->set_lcd_size(1, 16);
-	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update), this);
+	m_lcdc->set_pixel_update_cb(FUNC(psion1_state::psion1_pixel_update));
 
 	/* Software lists */
 	SOFTWARE_LIST(config.replace(), "pack_list").set_original("psion1");

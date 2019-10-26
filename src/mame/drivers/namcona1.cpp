@@ -643,9 +643,9 @@ void namcona1_state::na1mcu_shared_w(offs_t offset, u16 data, u16 mem_mask)
 void namcona1_state::namcona1_mcu_map(address_map &map)
 {
 	map(0x000800, 0x000fff).rw(FUNC(namcona1_state::mcu_mailbox_r), FUNC(namcona1_state::mcu_mailbox_w_mcu)); // "Mailslot" communications ports
-	map(0x001000, 0x001fff).lrw8("c219_rw",
-		[this](offs_t offset) { return m_c140->c140_r(offset ^ 1)/* need ^ 1 because endian issue */; },
-		[this](offs_t offset, u8 data) { m_c140->c140_w(offset ^ 1, data); }); // C140-alike sound chip
+	map(0x001000, 0x001fff).lrw8(
+		NAME([this](offs_t offset) { return m_c140->c140_r(offset ^ 1)/* need ^ 1 because endian issue */; }),
+		NAME([this](offs_t offset, u8 data) { m_c140->c140_w(offset ^ 1, data); })); // C140-alike sound chip
 	map(0x002000, 0x002fff).rw(FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // mirror of first page of shared work RAM
 	map(0x003000, 0x00afff).ram();                     // there is a 32k RAM chip according to CGFM
 	map(0x200000, 0x27ffff).rw(FUNC(namcona1_state::na1mcu_shared_r), FUNC(namcona1_state::na1mcu_shared_w)); // shared work RAM

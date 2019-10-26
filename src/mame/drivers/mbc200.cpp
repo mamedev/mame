@@ -327,7 +327,7 @@ void mbc200_state::mbc200(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mbc200_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(mbc200_state::update_row));
 
 	// sound
 	SPEAKER(config, "mono").front_center();

@@ -162,7 +162,7 @@ TILE_GET_INFO_MEMBER(spool99_state::get_tile_info)
 
 void spool99_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spool99_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spool99_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 uint32_t spool99_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

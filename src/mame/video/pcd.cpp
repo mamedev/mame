@@ -399,8 +399,8 @@ WRITE8_MEMBER(pcx_video_device::p1_w)
 
 void pcd_video_device::device_start()
 {
-	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
+	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(*this, FUNC(pcdx_video_device::detect_r)), write8_delegate(*this, FUNC(pcdx_video_device::detect_w)), 0xff00);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, read8_delegate(*this, FUNC(pcd_video_device::vram_r)), write8_delegate(*this, FUNC(pcd_video_device::vram_w)), 0xffff);
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), pcd_charlayout, &m_charram[0], 0, 1, 0));
 }
 
@@ -425,7 +425,7 @@ void pcd_video_device::map(address_map &map)
 
 void pcx_video_device::device_start()
 {
-	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0x00ff);
+	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(*this, FUNC(pcdx_video_device::detect_r)), write8_delegate(*this, FUNC(pcdx_video_device::detect_w)), 0x00ff);
 	m_txd_handler.resolve_safe();
 
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);

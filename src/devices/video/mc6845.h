@@ -72,11 +72,11 @@ public:
 	}
 	void set_char_width(int pixels) { m_hpixels_per_column = pixels; }
 
-	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb = reconfigure_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb = begin_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb = update_row_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb = end_update_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_on_update_addr_change_callback(T &&... args) { m_on_update_addr_changed_cb = on_update_addr_changed_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_reconfigure_callback(T &&... args) { m_reconfigure_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_begin_update_callback(T &&... args) { m_begin_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_update_row_callback(T &&... args) { m_update_row_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_end_update_callback(T &&... args) { m_end_update_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_on_update_addr_change_callback(T &&... args) { m_on_update_addr_changed_cb.set(std::forward<T>(args)...); }
 
 	auto out_de_callback() { return m_out_de_cb.bind(); }
 	auto out_cur_callback() { return m_out_cur_cb.bind(); }

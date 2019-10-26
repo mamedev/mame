@@ -585,13 +585,13 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(aussiebyte_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(aussiebyte_state::crtc_update_addr));
 
 	MSM5832(config, m_rtc, 32.768_kHz_XTAL);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(aussiebyte_state::quickload_cb));
 }
 
 

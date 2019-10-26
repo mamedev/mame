@@ -646,7 +646,7 @@ void multi8_state::multi8(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(multi8_state::crtc_update_row));
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set(FUNC(multi8_state::porta_r));

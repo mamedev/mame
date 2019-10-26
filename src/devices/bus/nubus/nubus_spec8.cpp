@@ -97,9 +97,9 @@ void nubus_spec8s3_device::device_start()
 
 	m_vram.resize(VRAM_SIZE);
 	m_vram32 = (uint32_t *)&m_vram[0];
-	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
-	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(FUNC(nubus_spec8s3_device::vram_r), this), write32_delegate(FUNC(nubus_spec8s3_device::vram_w), this));
-	nubus().install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(FUNC(nubus_spec8s3_device::spec8s3_r), this), write32_delegate(FUNC(nubus_spec8s3_device::spec8s3_w), this));
+	nubus().install_device(slotspace, slotspace+VRAM_SIZE-1, read32_delegate(*this, FUNC(nubus_spec8s3_device::vram_r)), write32_delegate(*this, FUNC(nubus_spec8s3_device::vram_w)));
+	nubus().install_device(slotspace+0x900000, slotspace+VRAM_SIZE-1+0x900000, read32_delegate(*this, FUNC(nubus_spec8s3_device::vram_r)), write32_delegate(*this, FUNC(nubus_spec8s3_device::vram_w)));
+	nubus().install_device(slotspace+0xd0000, slotspace+0xfffff, read32_delegate(*this, FUNC(nubus_spec8s3_device::spec8s3_r)), write32_delegate(*this, FUNC(nubus_spec8s3_device::spec8s3_w)));
 
 	m_timer = timer_alloc(0, nullptr);
 	m_timer->adjust(screen().time_until_pos(767, 0), 0);

@@ -47,17 +47,7 @@ public:
 	// configuration helpers
 	auto external_func() { return m_external_input.bind(); }
 
-	template <typename Object> void set_vector_func(Object &&cb) { m_vector_callback = std::forward<Object>(cb); }
-	void set_vector_func(vector_delegate callback) { m_vector_callback = callback; }
-	template <class FunctionClass> void set_vector_func(const char *devname,
-		void (FunctionClass::*callback)(int16_t, int16_t, int16_t, int16_t, uint8_t), const char *name)
-	{
-		set_vector_func(vector_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_vector_func(void (FunctionClass::*callback)(int16_t, int16_t, int16_t, int16_t, uint8_t), const char *name)
-	{
-		set_vector_func(vector_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_vector_func(T &&... args) { m_vector_callback.set(std::forward<T>(args)...); }
 
 	DECLARE_READ8_MEMBER( read_jmi );
 	void wdt_timer_trigger();

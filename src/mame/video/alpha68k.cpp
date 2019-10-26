@@ -70,7 +70,7 @@ void alpha68k_II_state::videoram_w(offs_t offset, u16 data)
 
 VIDEO_START_MEMBER(alpha68k_II_state,alpha68k)
 {
-	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(alpha68k_II_state::get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fix_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(alpha68k_II_state::get_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_fix_tilemap->set_transparent_pen(0);
 }
 

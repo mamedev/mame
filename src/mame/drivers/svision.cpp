@@ -507,7 +507,7 @@ void svision_state::svision_base(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "svision_cart", "bin,ws,sv");
 	m_cart->set_must_be_loaded(true);
-	m_cart->set_device_load(FUNC(svision_state::cart_load), this);
+	m_cart->set_device_load(FUNC(svision_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("svision");
 }

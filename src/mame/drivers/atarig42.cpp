@@ -830,7 +830,7 @@ void atarig42_0x200_state::init_roadriot()
 	m_playfield_base = 0x400;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_0x200_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_0x200_state::roadriot_sloop_data_w),this));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_r)), write16_delegate(*this, FUNC(atarig42_0x200_state::roadriot_sloop_data_w)));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*
@@ -865,7 +865,7 @@ void atarig42_0x400_state::init_guardian()
 	*(uint16_t *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
 	address_space &main = m_maincpu->space(AS_PROGRAM);
-	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_0x400_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_0x400_state::guardians_sloop_data_w),this));
+	main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_r)), write16_delegate(*this, FUNC(atarig42_0x400_state::guardians_sloop_data_w)));
 	m_sloop_base = (uint16_t *)memregion("maincpu")->base();
 
 	/*

@@ -618,7 +618,7 @@ void ti85_state::ti85(machine_config &config)
 void ti85_state::ti85d(machine_config &config)
 {
 	ti85(config);
-	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb));
 	//TI85SERIAL(config, "tiserial");
 }
 
@@ -672,7 +672,7 @@ void ti85_state::ti86(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(ti85_state, ti86)
 	MCFG_MACHINE_RESET_OVERRIDE(ti85_state, ti85)
 
-	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(ti85_state::snapshot_cb));
 }
 
 void ti85_state::ti83p(machine_config &config)

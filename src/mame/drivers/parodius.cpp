@@ -251,12 +251,12 @@ void parodius_state::parodius(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(parodius_state::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette("palette");
-	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback), this);
+	m_k053245->set_sprite_callback(FUNC(parodius_state::sprite_callback));
 
 	K053251(config, m_k053251, 0);
 

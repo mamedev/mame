@@ -428,10 +428,10 @@ void tandy1000_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - (128*1024) - 1, &m_ram->pointer()[128*1024]);
 	if(m_maincpu->space(AS_PROGRAM).data_width() == 8)
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this));
+				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(m_ram->size() - (128*1024), 640*1024 - 1,
-			read8_delegate(FUNC(tandy1000_state::vram_r), this), write8_delegate(FUNC(tandy1000_state::vram_w), this), 0xffff);
+				read8_delegate(*this, FUNC(tandy1000_state::vram_r)), write8_delegate(*this, FUNC(tandy1000_state::vram_w)), 0xffff);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom_ee, sizeof(m_eeprom_ee));
 }
 

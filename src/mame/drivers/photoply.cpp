@@ -32,8 +32,8 @@ TODO:
 class photoply_state : public pcat_base_state
 {
 public:
-	photoply_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
+	photoply_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pcat_base_state(mconfig, type, tag),
 		m_eeprom(*this, "eeprom"),
 		m_main_bios(*this, "bios"),
 		m_video_bios(*this, "video_bios"),
@@ -319,8 +319,7 @@ void photoply_state::photoply(machine_config &config)
 	ide2.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir7_w));
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (5, FUNC(photoply_state::sis_pcm_r), this);
-	pcibus.set_device_write(5, FUNC(photoply_state::sis_pcm_w), this);
+	pcibus.set_device(5, FUNC(photoply_state::sis_pcm_r), FUNC(photoply_state::sis_pcm_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);

@@ -111,9 +111,9 @@ WRITE8_MEMBER(tbowl_state::bg2yscroll_hi)
 
 void tbowl_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	m_tx_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tbowl_state::get_tx_tile_info)),  TILEMAP_SCAN_ROWS,  8, 8,  64,32);
+	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tbowl_state::get_bg_tile_info)),  TILEMAP_SCAN_ROWS, 16,16, 128,32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tbowl_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 128,32);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);

@@ -151,7 +151,7 @@ void atari_cage_device::device_start()
 	m_cpu_h1_clock_period = cage_cpu_clock_period * 2;
 
 	if (m_speedup) {
-		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(FUNC(atari_cage_device::speedup_w),this));
+		m_cpu->space(AS_PROGRAM).install_write_handler(m_speedup, m_speedup, write32_delegate(*this, FUNC(atari_cage_device::speedup_w)));
 		m_speedup_ram = m_cageram + m_speedup;
 	}
 

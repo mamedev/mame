@@ -1511,9 +1511,9 @@ void bbc_state::machine_reset()
 
 	/* install econet hardware */
 	if (m_bbcconfig.read_safe(0) & 0x04)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8sm_delegate(FUNC(mc6854_device::read), m_adlc.target()), write8sm_delegate(FUNC(mc6854_device::write), m_adlc.target()));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfea0, 0xfebf, read8sm_delegate(*m_adlc, FUNC(mc6854_device::read)), write8sm_delegate(*m_adlc, FUNC(mc6854_device::write)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8_delegate(FUNC(bbc_state::bbc_fe_r), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfea0, 0xfebf, read8_delegate(*this, FUNC(bbc_state::bbc_fe_r)));
 
 	/* power-on reset timer, should produce "boo...beep" startup sound before sn76496 is initialised */
 	//m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

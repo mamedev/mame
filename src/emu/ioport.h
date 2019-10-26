@@ -1710,25 +1710,45 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 
 // read callbacks
 #define PORT_CUSTOM_MEMBER(_class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(owner, DEVICE_SELF, &_class::_member, #_class "::" #_member));
 #define PORT_CUSTOM_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(owner, _device, &_class::_member, #_class "::" #_member));
 
 // write callbacks
 #define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (_param));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate(owner, _device, &_class::_member, #_class "::" #_member), (_param));
 
 // input device handler
 #define PORT_READ_LINE_MEMBER(_class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+	configurer.field_set_dynamic_read( \
+			ioport_field_read_delegate( \
+				owner, \
+				DEVICE_SELF, \
+				static_cast<ioport_value (*)(_class &)>([] (_class &device) -> ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; }), \
+				#_class "::" #_member));
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_read( \
+			ioport_field_read_delegate( \
+				owner, \
+				_device, \
+				static_cast<ioport_value (*)(_class &)>([] (_class &device) -> ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; }), \
+				#_class "::" #_member));
 
 // output device handler
 #define PORT_WRITE_LINE_MEMBER(_class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, DEVICE_SELF, (_class *)nullptr));
+	configurer.field_set_dynamic_write( \
+			ioport_field_write_delegate( \
+				owner, \
+				DEVICE_SELF, \
+				static_cast<void (*)(_class &, ioport_field &, u32, ioport_value, ioport_value)>([] (_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }), \
+				#_class "::" #_member));
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)nullptr));
+	configurer.field_set_dynamic_write( \
+			ioport_field_write_delegate( \
+				owner, \
+				_device, \
+				static_cast<void (*)(_class &, ioport_field &, u32, ioport_value, ioport_value)>([] (_class &device, ioport_field &field, u32 param, ioport_value oldval, ioport_value newval) { device._member(newval); }), \
+				#_class "::" #_member));
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \

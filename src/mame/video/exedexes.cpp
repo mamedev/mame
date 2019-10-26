@@ -158,9 +158,9 @@ TILEMAP_MAPPER_MEMBER(exedexes_state::fg_tilemap_scan)
 
 void exedexes_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exedexes_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::bg_tilemap_scan),this), 32, 32, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exedexes_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(exedexes_state::fg_tilemap_scan),this), 16, 16, 128, 128);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(exedexes_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exedexes_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(exedexes_state::bg_tilemap_scan)), 32, 32, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exedexes_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(exedexes_state::fg_tilemap_scan)), 16, 16, 128, 128);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(exedexes_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 0xcf);

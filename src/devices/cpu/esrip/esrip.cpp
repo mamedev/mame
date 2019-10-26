@@ -187,7 +187,7 @@ void esrip_device::device_start()
 	m_fdt_w.resolve_safe();
 	m_lbrm = (uint8_t*)machine().root_device().memregion(m_lbrm_prom)->base();
 	m_status_in.resolve_safe(0);
-	m_draw.bind_relative_to(*owner());
+	m_draw.resolve();
 
 	/* Allocate image pointer table RAM */
 	m_ipt_ram.resize(IPT_RAM_SIZE/2);
@@ -1674,6 +1674,7 @@ esrip_device::esrip_device(const machine_config &mconfig, const char *tag, devic
 	, m_fdt_r(*this)
 	, m_fdt_w(*this)
 	, m_status_in(*this)
+	, m_draw(*this)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_lbrm_prom(nullptr)
 {

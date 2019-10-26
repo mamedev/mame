@@ -207,7 +207,7 @@ TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
 
 void hvyunit_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hvyunit_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hvyunit_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	save_item(NAME(m_scrollx));
 	save_item(NAME(m_scrolly));
@@ -216,8 +216,8 @@ void hvyunit_state::video_start()
 
 uint32_t hvyunit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#define SX_POS  96
-#define SY_POS  0
+	constexpr int SX_POS = 96;
+	constexpr int SY_POS = 0;
 
 	m_bg_tilemap->set_scrollx(0, ((m_port0_data & 0x40) << 2) + m_scrollx + SX_POS); // TODO
 	m_bg_tilemap->set_scrolly(0, ((m_port0_data & 0x80) << 1) + m_scrolly + SY_POS); // TODO

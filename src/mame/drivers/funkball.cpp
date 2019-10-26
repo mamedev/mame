@@ -773,10 +773,8 @@ void funkball_state::funkball(machine_config &config)
 	pcat_common(config);
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read (7, FUNC(funkball_state::voodoo_0_pci_r), this);
-	pcibus.set_device_write(7, FUNC(funkball_state::voodoo_0_pci_w), this);
-	pcibus.set_device_read (18, FUNC(funkball_state::cx5510_pci_r), this);
-	pcibus.set_device_write(18, FUNC(funkball_state::cx5510_pci_w), this);
+	pcibus.set_device(7, FUNC(funkball_state::voodoo_0_pci_r), FUNC(funkball_state::voodoo_0_pci_w));
+	pcibus.set_device(18, FUNC(funkball_state::cx5510_pci_r), FUNC(funkball_state::cx5510_pci_w));
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));

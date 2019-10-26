@@ -251,17 +251,14 @@ void pi4d2x_state::map(address_map &map)
 	//map(0x1f000000, 0x1fbfffff); // local I/O (duarts, timers, etc.)
 	map(0x1f000000, 0x1f007fff).m(m_gfx, FUNC(sgi_gr1_device::map)).mirror(0x8000);
 
-	map(0x1f800000, 0x1f800003).lrw8("memcfg", [this]() { return m_memcfg; }, [this](u8 data) { m_memcfg = data; }).umask32(0xff000000);
+	map(0x1f800000, 0x1f800003).lrw8(NAME([this]() { return m_memcfg; }), NAME([this](u8 data) { m_memcfg = data; })).umask32(0xff000000);
 	map(0x1f800000, 0x1f800003).r(FUNC(pi4d2x_state::sysid_r)).umask32(0x00ff0000);
 
-	map(0x1f840000, 0x1f840003).lrw8("vme_isr", [this]() { return m_vme_isr; }, [this](u8 data) { m_vme_isr = data; }).umask32(0x000000ff);
-	map(0x1f840008, 0x1f84000b).lrw8("vme_imr", [this]() { return m_vme_imr; }, [this](u8 data) { m_vme_imr = data; }).umask32(0x000000ff);
+	map(0x1f840000, 0x1f840003).lrw8(NAME([this]() { return m_vme_isr; }), NAME([this](u8 data) { m_vme_isr = data; })).umask32(0x000000ff);
+	map(0x1f840008, 0x1f84000b).lrw8(NAME([this]() { return m_vme_imr; }), NAME([this](u8 data) { m_vme_imr = data; })).umask32(0x000000ff);
 
-	map(0x1f880000, 0x1f880003).lrw16("cpuctrl",
-		[this]()
-		{
-			return m_cpuctrl;
-		},
+	map(0x1f880000, 0x1f880003).lrw16(
+		NAME([this]() { return m_cpuctrl; }),
 		[this](u16 data)
 		{
 			m_eeprom->di_write(BIT(data, 8));
@@ -278,13 +275,10 @@ void pi4d2x_state::map(address_map &map)
 			//BIT(data, 15); // fast peripheral cycle
 
 			m_cpuctrl = data;
-		}).umask32(0x0000ffff);
+		}, "cpuctrl_w").umask32(0x0000ffff);
 	//map(0x1f8c0000, 0x1f8c0003); // lca readback trigger (b)
-	map(0x1f8e0000, 0x1f8e0003).lrw8("cpuauxctrl",
-		[this]()
-		{
-			return m_cpuauxctl;
-		},
+	map(0x1f8e0000, 0x1f8e0003).lrw8(
+		NAME([this]() { return m_cpuauxctl; }),
 		[this](u8 data)
 		{
 			// cpu leds
@@ -303,59 +297,41 @@ void pi4d2x_state::map(address_map &map)
 			m_gfx->reset_w(BIT(data, 7));
 
 			m_cpuauxctl = data;
-		}).umask32(0xff000000);
+		}, "cpuauxctl_w").umask32(0xff000000);
 
-	map(0x1f900000, 0x1f900003).lrw16("dmalo",
-		[this]()
-		{
-			return m_dmalo;
-		},
+	map(0x1f900000, 0x1f900003).lrw16(
+		NAME([this]() { return m_dmalo; }),
 		[this](u16 data)
 		{
 			m_dmalo = data;
 			m_mapindex = 0;
 
 			m_dmaaddr = (u32(m_dmahi[m_mapindex]) << 12) | (m_dmalo & 0x0ffc);
-		}).umask32(0x0000ffff);
+		}, "dmalo_w").umask32(0x0000ffff);
 
-	map(0x1f910000, 0x1f910003).lrw8("mapindex",
-		[this]()
-		{
-			return m_mapindex;
-		},
-		[this](u8 data)
-		{
-			m_mapindex = data;
-		}).umask32(0x000000ff);
+	map(0x1f910000, 0x1f910003).lrw8(
+		NAME([this]() { return m_mapindex; }),
+		NAME([this](u8 data) { m_mapindex = data; })).umask32(0x000000ff);
 
 	/*
 	 * DMA address mapping table is a pair of CY7C128-35PC 2048x8 SRAMs which
 	 * read/write to data bus D27-12. A10 is tied high, giving 1024 entries.
 	 */
-	map(0x1f920000, 0x1f920fff).lrw16("dmahi",
-		[this](offs_t offset)
-		{
-			return m_dmahi[offset];
-		},
-		[this](offs_t offset, u16 data, u16 mem_mask)
-		{
-			COMBINE_DATA(&m_dmahi[offset]);
-		}).umask32(0x0000ffff);
+	map(0x1f920000, 0x1f920fff).lrw16(
+		NAME([this](offs_t offset) { return m_dmahi[offset]; }),
+		NAME([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_dmahi[offset]); })).umask32(0x0000ffff);
 
 	// emulation can ignore dma flush
 	map(0x1f940000, 0x1f940003).nopw();
 
 	map(0x1f950000, 0x1f9501ff).rw(m_enet, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff0000);
-	map(0x1f960000, 0x1f960003).lr8("etherrdy", [this]() { m_enet->reset_w(1); return 0; }).umask32(0xff000000);
-	map(0x1f960004, 0x1f960007).lr8("etherrst", [this]() { m_enet->reset_w(0); return 0; }).umask32(0xff000000);
+	map(0x1f960000, 0x1f960003).lr8([this]() { m_enet->reset_w(1); return 0; }, "etherrdy").umask32(0xff000000);
+	map(0x1f960004, 0x1f960007).lr8([this]() { m_enet->reset_w(0); return 0; }, "etherrst").umask32(0xff000000);
 	//map(0x1f960008, 0x1f96000b).rw().umask32(0xff000000); // etherwait: wait state control
 
-	map(0x1f980000, 0x1f980003).lr16("lio_isr", [this]() { return m_lio_isr; }).umask32(0x0000ffff);
-	map(0x1f980008, 0x1f98000b).lrw8("lio_imr",
-		[this]()
-		{
-			return m_lio_imr;
-		},
+	map(0x1f980000, 0x1f980003).lr16(NAME([this]() { return m_lio_isr; })).umask32(0x0000ffff);
+	map(0x1f980008, 0x1f98000b).lrw8(
+		NAME([this]() { return m_lio_imr; }),
 		[this](u8 data)
 		{
 			m_lio_imr = data;
@@ -376,7 +352,7 @@ void pi4d2x_state::map(address_map &map)
 				m_lio_int = lio_int;
 				m_cpu->set_input_line(INPUT_LINE_IRQ1, m_lio_int);
 			}
-		}).umask32(0x000000ff);
+		}, "lio_imr_w").umask32(0x000000ff);
 
 	// 1 0 a7 a6 a5 a4 a3 a2 a1 a0 1 0  lance dmahi
 	// 0 0 a7 a6 a5 a4 a3 a2 a1 a0 1 0  scsi dmahi
@@ -406,12 +382,12 @@ void pi4d2x_state::map(address_map &map)
 	map(0x1f9e0000, 0x1f9e0003).ram().umask32(0x000000ff);
 	map(0x1f9f000c, 0x1f9f000f).ram().umask32(0xffffffff);
 
-	map(0x1fa00000, 0x1fa00003).lr8("timer1_ack", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ4, 0); return 0; }).umask32(0xff000000);
-	map(0x1fa20000, 0x1fa20003).lr8("timer0_ack", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ2, 0); return 0; }).umask32(0xff000000);
+	map(0x1fa00000, 0x1fa00003).lr8([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ4, 0); return 0; }, "timer1_ack").umask32(0xff000000);
+	map(0x1fa20000, 0x1fa20003).lr8([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ2, 0); return 0; }, "timer0_ack").umask32(0xff000000);
 
-	map(0x1fa40000, 0x1fa40003).lr32("erradr", [this]() { m_cpu->set_input_line(INPUT_LINE_IRQ5, 0); m_cpu->berr_w(0); return m_erradr; });
+	map(0x1fa40000, 0x1fa40003).lr32([this]() { m_cpu->set_input_line(INPUT_LINE_IRQ5, 0); m_cpu->berr_w(0); return m_erradr; }, "erradr");
 
-	map(0x1fa40004, 0x1fa40007).lrw32("refadr",
+	map(0x1fa40004, 0x1fa40007).lrw32(
 		[this]()
 		{
 			if (m_memcfg & MEMCFG_TIMERDIS)
@@ -425,51 +401,45 @@ void pi4d2x_state::map(address_map &map)
 			}
 			else
 				return m_refadr;
-		},
+		}, "refadr_r",
 		[this](u32 data)
 		{
 			m_refadr = data;
 			m_refresh_timer = machine().time();
-		});
+		}, "refadr_w");
 
-	map(0x1fa40008, 0x1fa4000b).lrw32("gdma_dabr_phys", [this]() { return m_gdma_dabr; }, [this](u32 data) { m_gdma_dabr = data; });
-	map(0x1fa4000c, 0x1fa4000f).lrw32("gdma_bufadr_phys", [this]() { return m_gdma_bufadr; }, [this](u32 data) { m_gdma_bufadr = data; });
-	map(0x1fa40010, 0x1fa40013).lrw16("gdma_burst_phys", [this]() { return m_gdma_burst; }, [this](u16 data) { m_gdma_burst = data; }).umask32(0xffff0000);
-	map(0x1fa40010, 0x1fa40013).lrw16("gdma_buflen_phys", [this]() { return m_gdma_buflen; }, [this](u16 data) { m_gdma_buflen = data; }).umask32(0x0000ffff);
+	map(0x1fa40008, 0x1fa4000b).lrw32(NAME([this]() { return m_gdma_dabr; }), NAME([this](u32 data) { m_gdma_dabr = data; }));
+	map(0x1fa4000c, 0x1fa4000f).lrw32(NAME([this]() { return m_gdma_bufadr; }), NAME([this](u32 data) { m_gdma_bufadr = data; }));
+	map(0x1fa40010, 0x1fa40013).lrw16(NAME([this]() { return m_gdma_burst; }), NAME([this](u16 data) { m_gdma_burst = data; })).umask32(0xffff0000);
+	map(0x1fa40010, 0x1fa40013).lrw16(NAME([this]() { return m_gdma_buflen; }), NAME([this](u16 data) { m_gdma_buflen = data; })).umask32(0x0000ffff);
 
-	map(0x1fa60000, 0x1fa60003).lrw8("vmermw", [this]() { m_sysid |= SYSID_VMERMW; return 0; }, [this](u8 data) { m_sysid |= SYSID_VMERMW; }).umask32(0xff000000);
+	map(0x1fa60000, 0x1fa60003).lrw8([this]() { m_sysid |= SYSID_VMERMW; return 0; }, "vmermw_r", [this](u8 data) { m_sysid |= SYSID_VMERMW; }, "vmermw_w").umask32(0xff000000);
 	//map(0x1fa60004, 0x1fa60007).rw("actpup").umask32(0xff000000); // turn on active bus pullup
-	map(0x1fa60018, 0x1fa6001b).lrw8("vmefbon", [this]() { m_sysid |= SYSID_VMEFBT; return 0; }, [this](u8 data) { m_sysid |= SYSID_VMEFBT; }).umask32(0xff000000);
-	map(0x1fa6001c, 0x1fa6001f).lrw8("vmefbof", [this]() { m_sysid &= ~SYSID_VMEFBT; return 0; }, [this](u8 data) { m_sysid &= ~SYSID_VMEFBT; }).umask32(0xff000000);
+	map(0x1fa60018, 0x1fa6001b).lrw8([this]() { m_sysid |= SYSID_VMEFBT; return 0; }, "vmefbon_r", [this](u8 data) { m_sysid |= SYSID_VMEFBT; }, "vmefbon_w").umask32(0xff000000);
+	map(0x1fa6001c, 0x1fa6001f).lrw8([this]() { m_sysid &= ~SYSID_VMEFBT; return 0; }, "vmefbof_r", [this](u8 data) { m_sysid &= ~SYSID_VMEFBT; }, "vmefbof_w").umask32(0xff000000);
 	map(0x1fa60020, 0x1fa60023).nopr(); // reload gfx dma burst/delay reg (FIXME: silenced)
 	//map(0x1fa60024, 0x1fa60027).rw("enraso").umask32(0xff000000); // enable ctl ras decoder
 
-	map(0x1fa80000, 0x1fa80003).lr8("scsirdy", [this]() { m_scsi->reset_w(0); return 0; }).umask32(0xff000000);
-	map(0x1fa80004, 0x1fa80007).lr8("scsirst", [this]() { m_scsi->reset_w(1); return 0; }).umask32(0xff000000);
-	map(0x1fa80008, 0x1fa8000b).lr8("scsibstat", []() { return 0; }).umask32(0x00ff0000);
+	map(0x1fa80000, 0x1fa80003).lr8([this]() { m_scsi->reset_w(0); return 0; }, "scsirdy").umask32(0xff000000);
+	map(0x1fa80004, 0x1fa80007).lr8([this]() { m_scsi->reset_w(1); return 0; }, "scsirst").umask32(0xff000000);
+	map(0x1fa80008, 0x1fa8000b).lr8([]() { return 0; }, "scsibstat").umask32(0x00ff0000);
 
 	// TODO: IOC2 configuration register, bus error on IOC1
 	//map(0x1fa80008, 0x1fa8000b).rw(FUNC(pi4d2x_state::buserror_r), FUNC(pi4d2x_state::buserror_w));
 
-	map(0x1faa0000, 0x1faa0003).lrw8("clrerr", [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); return 0; }, [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); });
-	map(0x1faa0004, 0x1faa0007).lr8("parerr", [this]() { return m_parerr; }).umask32(0x00ff0000);
+	map(0x1faa0000, 0x1faa0003).lrw8([this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); return 0; }, "clrerr_r", [this](offs_t offset) { m_parerr &= ~(PARERR_BYTE | (1 << offset)); }, "clrerr_w");
+	map(0x1faa0004, 0x1faa0007).lr8(NAME([this]() { return m_parerr; })).umask32(0x00ff0000);
 
-	map(0x1fac0000, 0x1fac0003).lrw8("vrrst", [this]() { lio_interrupt<LIO_VR>(1); return 0; }, [this](u8 data) { lio_interrupt<LIO_VR>(1); }).umask32(0xff000000);
+	map(0x1fac0000, 0x1fac0003).lrw8([this]() { lio_interrupt<LIO_VR>(1); return 0; }, "vrrst_r", [this](u8 data) { lio_interrupt<LIO_VR>(1); }, "vrrst_w").umask32(0xff000000);
 
 	map(0x1fb00000, 0x1fb00003).rw(m_scsi, FUNC(wd33c93_device::indir_addr_r), FUNC(wd33c93_device::indir_addr_w)).umask32(0x00ff0000);
 	map(0x1fb00100, 0x1fb00103).rw(m_scsi, FUNC(wd33c93_device::indir_reg_r), FUNC(wd33c93_device::indir_reg_w)).umask32(0x00ff0000);
 
 	map(0x1fb40000, 0x1fb4000f).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0xff000000);
 
-	map(0x1fb80000, 0x1fb800ff).lrw8("duarts",
-		[this](offs_t offset)
-		{
-			return m_duart[BIT(offset, 0)]->read(offset >> 2);
-		},
-		[this](offs_t offset, u8 data)
-		{
-			m_duart[BIT(offset, 0)]->write(offset >> 2, data);
-		}).umask32(0xff000000);
+	map(0x1fb80000, 0x1fb800ff).lrw8(
+		NAME([this](offs_t offset) { return m_duart[BIT(offset, 0)]->read(offset >> 2); }),
+		NAME([this](offs_t offset, u8 data) { m_duart[BIT(offset, 0)]->write(offset >> 2, data); })).umask32(0xff000000);
 
 	map(0x1fbc0000, 0x1fbc007f).rw(m_rtc, FUNC(dp8573_device::read), FUNC(dp8573_device::write)).umask32(0xff000000);
 

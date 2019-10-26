@@ -71,9 +71,9 @@ const tiny_rom_entry *msx_cart_moonsound_device::device_rom_region() const
 void msx_cart_moonsound_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_readwrite_handler(0x7e, 0x7f, read8sm_delegate(FUNC(msx_cart_moonsound_device::read_ymf278b_pcm), this), write8sm_delegate(FUNC(msx_cart_moonsound_device::write_ymf278b_pcm), this));
-	io_space().install_readwrite_handler(0xc4, 0xc7, read8sm_delegate(FUNC(msx_cart_moonsound_device::read_ymf278b_fm), this), write8sm_delegate(FUNC(msx_cart_moonsound_device::write_ymf278b_fm), this));
-	io_space().install_read_handler(0xc0, 0xc0, read8smo_delegate(FUNC(msx_cart_moonsound_device::read_c0), this));
+	io_space().install_readwrite_handler(0x7e, 0x7f, read8sm_delegate(*this, FUNC(msx_cart_moonsound_device::read_ymf278b_pcm)), write8sm_delegate(*this, FUNC(msx_cart_moonsound_device::write_ymf278b_pcm)));
+	io_space().install_readwrite_handler(0xc4, 0xc7, read8sm_delegate(*this, FUNC(msx_cart_moonsound_device::read_ymf278b_fm)), write8sm_delegate(*this, FUNC(msx_cart_moonsound_device::write_ymf278b_fm)));
+	io_space().install_read_handler(0xc0, 0xc0, read8smo_delegate(*this, FUNC(msx_cart_moonsound_device::read_c0)));
 }
 
 

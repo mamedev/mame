@@ -86,7 +86,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(reg_w) = 0;
 
 	// SC getter
-	uint8_t get_sc(void);
+	uint8_t get_sc();
 
 	virtual bool has_dual_sc() const;
 

@@ -541,7 +541,7 @@ void h19_state::h19(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(h19_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI); // frame pulse
 
 	ins8250_device &uart(INS8250(config, "ins8250", INS8250_CLOCK));

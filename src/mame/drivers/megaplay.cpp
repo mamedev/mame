@@ -927,17 +927,17 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(*this, FUNC(mplay_state::mp_io_read)), write16_delegate(*this, FUNC(mplay_state::mp_io_write)));
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	// instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::extra_ram_r),this), write16_delegate(FUNC(mplay_state::extra_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(*this, FUNC(mplay_state::extra_ram_r)), write16_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
 
 /*

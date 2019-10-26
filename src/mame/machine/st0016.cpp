@@ -7,6 +7,8 @@
 #include "emupal.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 
 DEFINE_DEVICE_TYPE(ST0016_CPU, st0016_cpu_device, "st0016_cpu", "ST0016")
 
@@ -33,23 +35,23 @@ void st0016_cpu_device::st0016_cpu_internal_io_map(address_map &map)
 // note: a lot of bits are left uninitialized by the games, the default values are uncertain
 
 st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z80_device(mconfig, ST0016_CPU, tag, owner, clock),
-		device_gfx_interface(mconfig, *this, nullptr, "palette"),
-		st0016_spr_bank(0),
-		st0016_spr2_bank(0),
-		st0016_pal_bank(0),
-		st0016_char_bank(0),
-		spr_dx(0),
-		spr_dy(0),
-		st0016_ramgfx(0),
-		m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_io_map), this)),
-		m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_map), this)),
-		m_screen(*this, ":screen"),
-		m_rom(*this, DEVICE_SELF),
-		m_game_flag(-1)
+	: z80_device(mconfig, ST0016_CPU, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this, nullptr, "palette")
+	, st0016_spr_bank(0)
+	, st0016_spr2_bank(0)
+	, st0016_pal_bank(0)
+	, st0016_char_bank(0)
+	, spr_dx(0)
+	, spr_dy(0)
+	, st0016_ramgfx(0)
+	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_io_map), this))
+	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::st0016_cpu_internal_map), this))
+	, m_screen(*this, ":screen")
+	, m_rom(*this, DEVICE_SELF)
+	, m_dma_offs_cb(*this)
+	, m_game_flag(-1)
 {
-	for (auto & elem : st0016_vregs)
-		elem = 0;
+	std::fill(std::begin(st0016_vregs), std::end(st0016_vregs), 0);
 }
 
 
@@ -72,7 +74,7 @@ void st0016_cpu_device::device_start()
 {
 	z80_device::device_start();
 	startup();
-	m_dma_offs_cb.bind_relative_to(*owner());
+	m_dma_offs_cb.resolve();
 }
 
 
@@ -230,23 +232,21 @@ WRITE8_MEMBER(st0016_cpu_device::st0016_character_ram_w)
 
 READ8_MEMBER(st0016_cpu_device::st0016_vregs_r)
 {
-/*
-        $0, $1 = max scanline(including vblank)/timer? ($3e7)
+	/*
+	    $0, $1 = max scanline(including vblank)/timer? ($3e7)
 
-        $8-$40 = bg tilemaps  (8 bytes each) :
-                   0 - ? = usually 0/20/ba*
-                   1 - 0 = disabled , !zero = address of tilemap in spriteram /$1000  (for example: 3 -> tilemap at $3000 )
-                   2 - ? = usually ff/1f/af*
-                   3 - priority ? = 0 - under sprites , $ff - over sprites \
-                   4 - ? = $7f/$ff
-                   5 - ? = $29/$20 (29 when tilemap must be drawn over sprites . maybe this is real priority ?)
-                   6 - ? = 0
-                   7 - ? =$20/$10/$12*
+	    $8-$40 = bg tilemaps  (8 bytes each) :
+	               0 - ? = usually 0/20/ba*
+	               1 - 0 = disabled , !zero = address of tilemap in spriteram /$1000  (for example: 3 -> tilemap at $3000 )
+	               2 - ? = usually ff/1f/af*
+	               3 - priority ? = 0 - under sprites , $ff - over sprites \
+	               4 - ? = $7f/$ff
+	               5 - ? = $29/$20 (29 when tilemap must be drawn over sprites . maybe this is real priority ?)
+	               6 - ? = 0
+	               7 - ? =$20/$10/$12*
 
-
-        $40-$60 = scroll registers , X.w, Y.w
-
-*/
+	    $40-$60 = scroll registers , X.w, Y.w
+	*/
 
 	switch (offset)
 	{

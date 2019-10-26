@@ -76,9 +76,9 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
 
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_fg_tile_info_raiga)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 //  m_background->set_transparent_pen(0);
 //  m_foreground->set_transparent_pen(0);
@@ -100,9 +100,9 @@ VIDEO_START_MEMBER(gaiden_state,raiga)
 	m_screen->register_screen_bitmap(m_tile_bitmap_fg);
 	m_screen->register_screen_bitmap(m_tile_bitmap_tx);
 
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info_raiga),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_fg_tile_info_raiga)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 //  m_background->set_transparent_pen(0);
 //  m_foreground->set_transparent_pen(0);
@@ -116,9 +116,9 @@ VIDEO_START_MEMBER(gaiden_state,raiga)
 VIDEO_START_MEMBER(gaiden_state,drgnbowl)
 {
 	/* set up tile layers */
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gaiden_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_text_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(gaiden_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_foreground->set_transparent_pen(15);
 	m_text_layer->set_transparent_pen(15);

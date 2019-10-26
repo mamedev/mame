@@ -2131,9 +2131,9 @@ ROM_END
 void cps_state::init_kodb()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x800000, 0x800007, "IN1");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800180, 0x800187, write16_delegate(FUNC(cps_state::cps1_soundlatch_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x98002f, write16_delegate(FUNC(cps_state::kodb_layer_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(*this, FUNC(cps_state::cps1_dsw_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800180, 0x800187, write16_delegate(*this, FUNC(cps_state::cps1_soundlatch_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x98002f, write16_delegate(*this, FUNC(cps_state::kodb_layer_w)));
 
 	/* the original game alternates between 2 sprite ram areas to achieve flashing sprites - the bootleg doesn't do the write to the register to achieve this
 	mapping both sprite ram areas to the same bootleg sprite ram - similar to how sf2mdt works */
@@ -2269,8 +2269,8 @@ ROM_END
 void cps_state::init_cawingbl()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x882000, 0x882001, "IN1");
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16_delegate(FUNC(cps_state::cawingbl_soundlatch_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x882008, 0x88200f, read16_delegate(FUNC(cps_state::cps1_dsw_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x882006, 0x882007, write16_delegate(*this, FUNC(cps_state::cawingbl_soundlatch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x882008, 0x88200f, read16_delegate(*this, FUNC(cps_state::cps1_dsw_r)));
 
 	init_cps1();
 }
@@ -3099,7 +3099,7 @@ void cps_state::init_sf2mdt()
 		rom[i + 6] = tmp;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x708100, 0x7081ff, write16_delegate(FUNC(cps_state::sf2mdt_layer_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x708100, 0x7081ff, write16_delegate(*this, FUNC(cps_state::sf2mdt_layer_w)));
 	init_sf2mdta();
 }
 

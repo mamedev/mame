@@ -655,8 +655,8 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(*this, FUNC(m72_state::protection_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xb0000, 0xb0fff, write16_delegate(*this, FUNC(m72_state::protection_w)));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
 
 	save_pointer(NAME(m_protection_ram), 0x1000/2);
@@ -665,36 +665,36 @@ void m72_state::install_protection_handler(const u8 *code,const u8 *crc)
 void m72_state::init_bchopper()
 {
 	install_protection_handler(bchopper_code,bchopper_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::bchopper_sample_trigger_w)));
 }
 
 void m72_state::init_nspirit()
 {
 	install_protection_handler(nspirit_code,nspirit_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::nspirit_sample_trigger_w)));
 }
 
 void m72_state::init_imgfight()
 {
 	install_protection_handler(imgfight_code,imgfightj_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::imgfight_sample_trigger_w)));
 }
 
 void m72_state::init_dbreedm72()
 {
 	install_protection_handler(dbreedm72_code,dbreedm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::dbreedm72_sample_trigger_w)));
 }
 
 void m72_state::init_dkgenm72()
 {
 	install_protection_handler(dkgenm72_code,dkgenm72_crc);
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::dkgenm72_sample_trigger_w)));
 }
 
 void m72_state::init_gallop()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0xc0, 0xc1, write16_delegate(*this, FUNC(m72_state::gallop_sample_trigger_w)));
 }
 
 

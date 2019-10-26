@@ -59,7 +59,7 @@ void tc0280grd_device::device_start()
 	decode_gfx(gfxinfo);
 	gfx(0)->set_colorbase(m_colorbase);
 
-	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(tc0280grd_device::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(tc0280grd_device::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 	m_tilemap->set_transparent_pen(0);
 
 	m_ram = make_unique_clear<u16[]>(TC0280GRD_RAM_SIZE / 2);

@@ -139,9 +139,9 @@ WRITE16_MEMBER(powerbls_state::powerbls_bg_tileram_w)
 
 void sslam_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_md_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sslam_state::get_sslam_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sslam_state::get_sslam_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_md_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sslam_state::get_sslam_md_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sslam_state::get_sslam_tx_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
 
 	m_md_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);
@@ -152,7 +152,7 @@ void sslam_state::video_start()
 
 void powerbls_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(powerbls_state::get_powerbls_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(powerbls_state::get_powerbls_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_sprites_x_offset = -21;
 	save_item(NAME(m_sprites_x_offset));

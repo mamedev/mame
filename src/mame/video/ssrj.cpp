@@ -220,9 +220,9 @@ static constexpr rgb_t fakecols[4 * 4][8] =
 
 void ssrj_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info1),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info2),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	m_tilemap4 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ssrj_state::get_tile_info4),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ssrj_state::get_tile_info1)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ssrj_state::get_tile_info2)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_tilemap4 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ssrj_state::get_tile_info4)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap4->set_transparent_pen(0);
 

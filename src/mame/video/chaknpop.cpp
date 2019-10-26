@@ -150,7 +150,7 @@ void chaknpop_state::video_start()
 	uint8_t *RAM = memregion("maincpu")->base();
 
 	/*                          info                       offset             type             w   h  col row */
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chaknpop_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(chaknpop_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,   8,  8, 32, 32);
 
 	m_vram1 = &RAM[0x10000];
 	m_vram2 = &RAM[0x12000];

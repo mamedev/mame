@@ -295,8 +295,8 @@ void powerins_state::powerins(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	NMK_16BIT_SPRITE(config, m_spritegen, XTAL(14'000'000) / 2);
-	m_spritegen->set_colpri_callback(FUNC(powerins_state::get_colour_6bit), this);
-	m_spritegen->set_ext_callback(FUNC(powerins_state::get_flip_extcode), this);
+	m_spritegen->set_colpri_callback(FUNC(powerins_state::get_colour_6bit));
+	m_spritegen->set_ext_callback(FUNC(powerins_state::get_flip_extcode));
 	m_spritegen->set_mask(0x3ff, 0x3ff);
 	m_spritegen->set_screen_size(320, 256);
 	m_spritegen->set_max_sprite_clock(448 * 263); // not verified?

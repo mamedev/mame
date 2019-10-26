@@ -1176,7 +1176,7 @@ WRITE8_MEMBER(galivan_state::youmab_86_w)
 
 void galivan_state::init_youmab()
 {
-	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),this)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	m_maincpu->space(AS_IO).install_write_handler(0x82, 0x82, write8_delegate(*this, FUNC(galivan_state::youmab_extra_bank_w))); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x7fff, "bank3");
 	membank("bank3")->set_base(memregion("maincpu")->base());
 
@@ -1184,14 +1184,14 @@ void galivan_state::init_youmab()
 	membank("bank2")->configure_entries(0, 2, memregion("user2")->base(), 0x4000);
 	membank("bank2")->set_entry(0);
 
-	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8_delegate(FUNC(galivan_state::youmab_81_w),this)); // ?? often, alternating values
-	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8_delegate(FUNC(galivan_state::youmab_84_w),this)); // ?? often, sequence..
+	m_maincpu->space(AS_IO).install_write_handler(0x81, 0x81, write8_delegate(*this, FUNC(galivan_state::youmab_81_w))); // ?? often, alternating values
+	m_maincpu->space(AS_IO).install_write_handler(0x84, 0x84, write8_delegate(*this, FUNC(galivan_state::youmab_84_w))); // ?? often, sequence..
 
 	m_maincpu->space(AS_PROGRAM).nop_write(0xd800, 0xd81f); // scrolling isn't here..
 
-	m_maincpu->space(AS_IO).install_read_handler(0x8a, 0x8a, read8_delegate(FUNC(galivan_state::youmab_8a_r),this)); // ???
+	m_maincpu->space(AS_IO).install_read_handler(0x8a, 0x8a, read8_delegate(*this, FUNC(galivan_state::youmab_8a_r))); // ???
 
-	m_maincpu->space(AS_IO).install_write_handler(0x86, 0x86, write8_delegate(FUNC(galivan_state::youmab_86_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x86, 0x86, write8_delegate(*this, FUNC(galivan_state::youmab_86_w)));
 
 }
 

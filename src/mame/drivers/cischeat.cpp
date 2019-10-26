@@ -2205,8 +2205,8 @@ void captflag_state::captflag(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_tmap[2], m_palette, 0x4e00/2);
 
 	// Motors
-	TIMER(config, m_motor_left).configure_generic(timer_device::expired_delegate());
-	TIMER(config, m_motor_right).configure_generic(timer_device::expired_delegate());
+	TIMER(config, m_motor_left).configure_generic(nullptr);
+	TIMER(config, m_motor_right).configure_generic(nullptr);
 
 	// Layout
 	config.set_default_layout(layout_captflag);

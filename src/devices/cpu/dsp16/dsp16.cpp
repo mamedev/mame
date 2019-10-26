@@ -2092,7 +2092,7 @@ void dsp16_device::external_memory_enable(address_space &space, bool enable)
 	// this assumes internal ROM is mirrored above 2KiB, but actual hardware behaviour is unknown
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(FUNC(dsp16_device::external_memory_r<0x0000>), this));
+		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
 	else
 		space.install_rom(0x0000, 0x07ff, 0xf800, &m_rom[0]);
 }
@@ -2123,12 +2123,12 @@ void dsp16a_device::external_memory_enable(address_space &space, bool enable)
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
 	{
-		space.install_read_handler(0x0000, 0xffff, read16_delegate(FUNC(dsp16a_device::external_memory_r<0x0000>), this));
+		space.install_read_handler(0x0000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x0000>)));
 	}
 	else
 	{
 		space.install_rom(0x0000, 0x0fff, &m_rom[0]);
-		space.install_read_handler(0x1000, 0xffff, read16_delegate(FUNC(dsp16a_device::external_memory_r<0x1000>), this));
+		space.install_read_handler(0x1000, 0xffff, read16_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
 	}
 }
 

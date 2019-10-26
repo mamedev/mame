@@ -539,7 +539,7 @@ void trs80_state::model1(machine_config &config)      // model I, level II
 	m_cassette->set_formats(trs80l2_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_PLAY);
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(trs80_state::quickload_cb));
 
 	FD1793(config, m_fdc, 4_MHz_XTAL / 4); // todo: should be fd1771
 	m_fdc->intrq_wr_callback().set(FUNC(trs80_state::intrq_w));

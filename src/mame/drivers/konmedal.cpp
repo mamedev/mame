@@ -416,7 +416,7 @@ void konmedal_state::tsukande(machine_config &config)
 	//m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -449,7 +449,7 @@ void konmedal_state::ddboy(machine_config &config)
 	//m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(konmedal_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4, 1, 0);
 	m_k056832->set_palette(m_palette);
 
@@ -564,7 +564,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
-	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
@@ -588,7 +588,7 @@ void konmedal_state::fuusenpn(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_fuusenpn));
 	screen.set_palette(m_palette);
 
-	m_k052109->set_tile_callback(FUNC(konmedal_state::fuusenpn_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(konmedal_state::fuusenpn_tile_callback));
 }
 
 ROM_START( tsukande )

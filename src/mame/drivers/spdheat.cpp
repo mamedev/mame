@@ -58,10 +58,10 @@ void spdheat_state::machine_reset()
 
 void spdheat_state::video_start()
 {
-	m_fg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<2>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<3>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 

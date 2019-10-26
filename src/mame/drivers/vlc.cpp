@@ -300,7 +300,7 @@ TILE_GET_INFO_MEMBER( nevada_state::get_bg_tile_info )
 /***************************************************************************/
 void nevada_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nevada_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,31,31);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(nevada_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 31,31);
 }
 
 /***************************************************************************/

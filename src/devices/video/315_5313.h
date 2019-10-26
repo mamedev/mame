@@ -37,9 +37,9 @@ public:
 	template <typename T> void set_ext_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
 
 	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
-	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func = md_32x_scanline_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func = md_32x_interrupt_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_md_32x_scanline_helper(T &&... args) { m_32x_scanline_helper_func = md_32x_scanline_helper_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_md_32x_scanline_helper(T &&... args) { m_32x_scanline_helper_func.set(std::forward<T>(args)...); }
 
 	int m_use_alt_timing; // use MAME scanline timer instead, render only one scanline to a single line buffer, to be rendered by a partial update call.. experimental
 

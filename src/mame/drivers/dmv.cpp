@@ -896,7 +896,7 @@ void dmv_state::dmv(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("dmv");
 
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(dmv_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(dmv_state::quickload_cb));
 }
 
 /* ROM definition */

@@ -542,6 +542,8 @@ screen_device::screen_device(const machine_config &mconfig, const char *tag, dev
 	, m_yoffset(0.0f)
 	, m_xscale(1.0f)
 	, m_yscale(1.0f)
+	, m_screen_update_ind16(*this)
+	, m_screen_update_rgb32(*this)
 	, m_screen_vblank(*this)
 	, m_scanline_cb(*this)
 	, m_palette(*this, finder_base::DUMMY_TAG)
@@ -700,8 +702,8 @@ std::pair<unsigned, unsigned> screen_device::physical_aspect() const
 void screen_device::device_resolve_objects()
 {
 	// bind our handlers
-	m_screen_update_ind16.bind_relative_to(*owner());
-	m_screen_update_rgb32.bind_relative_to(*owner());
+	m_screen_update_ind16.resolve();
+	m_screen_update_rgb32.resolve();
 	m_screen_vblank.resolve_safe();
 	m_scanline_cb.resolve();
 

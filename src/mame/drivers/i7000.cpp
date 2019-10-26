@@ -238,7 +238,7 @@ void i7000_state::machine_start()
 	if (m_card->exists())
 	{
 		// 0x4000 - 0xbfff   32KB ROM
-		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_card));
+		program.install_read_handler(0x4000, 0xbfff, read8sm_delegate(*m_card, FUNC(generic_slot_device::read_rom)));
 	}
 }
 
@@ -326,7 +326,7 @@ TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
 
 void i7000_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(i7000_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(i7000_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
 uint32_t i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -364,7 +364,7 @@ void i7000_state::i7000(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(true);
 	crtc.set_char_width(8);
-	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr), this);
+	crtc.set_on_update_addr_change_callback(FUNC(i7000_state::crtc_addr));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -387,7 +387,7 @@ void i7000_state::i7000(machine_config &config)
 	kbdc.in_ctrl_callback().set_constant(1);                            // TODO: Ctrl key
 
 	/* Cartridge slot */
-	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "i7000_card", "rom").set_device_load(FUNC(i7000_state::card_load), this);
+	GENERIC_CARTSLOT(config, "cardslot", generic_romram_plain_slot, "i7000_card", "rom").set_device_load(FUNC(i7000_state::card_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "card_list").set_original("i7000_card");

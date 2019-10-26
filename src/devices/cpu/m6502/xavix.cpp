@@ -34,28 +34,16 @@
 DEFINE_DEVICE_TYPE(XAVIX, xavix_device, "xavix", "XaviX (SSD 97 / SSD 98)")
 
 xavix_device::xavix_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	m6502_device(mconfig, XAVIX, tag, owner, clock),
-	XPC(0),
-	m_lowbus_config("lowbus", ENDIANNESS_LITTLE, 8, 15),
-	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24)
+	xavix_device(mconfig, XAVIX, tag, owner, clock)
 {
-	program_config.m_addr_width = 24;
-	program_config.m_logaddr_width = 24;
-	sprogram_config.m_addr_width = 24;
-	sprogram_config.m_logaddr_width = 24;
-	// XaviX specific spaces
-	m_lowbus_config.m_addr_width = 15;
-	m_lowbus_config.m_logaddr_width = 15;
-	m_extbus_config.m_addr_width = 24;
-	m_extbus_config.m_logaddr_width = 24;
-
 }
 
 xavix_device::xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
 	XPC(0),
 	m_lowbus_config("lowbus", ENDIANNESS_LITTLE, 8, 15),
-	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24)
+	m_extbus_config("extbus", ENDIANNESS_LITTLE, 8, 24),
+	m_vector_callback(*this)
 {
 	program_config.m_addr_width = 24;
 	program_config.m_logaddr_width = 24;
@@ -89,7 +77,7 @@ void xavix_device::device_start()
 		mintf = std::make_unique<mi_xavix_normal>(this);
 
 	// bind delegates
-	m_vector_callback.bind_relative_to(*owner());
+	m_vector_callback.resolve();
 
 	init();
 

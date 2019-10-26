@@ -37,22 +37,12 @@ public:
 	// inline configuration helpers
 	void set_lbrm_prom_region(const char *name) { m_lbrm_prom = name; }
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	void set_draw_callback(draw_delegate callback) { m_draw = callback; }
-	template <class FunctionClass> void set_draw_callback(const char *devname, int (FunctionClass::*callback)(int, int, int, int, int, int, int, int),
-		const char *name)
-	{
-		set_draw_callback(draw_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_draw_callback(int (FunctionClass::*callback)(int, int, int, int, int, int, int, int), const char *name)
-	{
-		set_draw_callback(draw_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_draw_callback(T &&... args) { m_draw.set(std::forward<T>(args)...); }
 
 	// devcb3 accessors
 	auto fdt_r() { return m_fdt_r.bind(); }
 	auto fdt_w() { return m_fdt_w.bind(); }
 	auto status_in() { return m_status_in.bind(); }
-
 
 	// public interfaces
 	uint8_t get_rip_status();

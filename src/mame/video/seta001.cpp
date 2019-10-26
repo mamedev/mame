@@ -42,6 +42,7 @@ DEFINE_DEVICE_TYPE(SETA001_SPRITE, seta001_device, "seta001", "Seta SETA001 Spri
 seta001_device::seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SETA001_SPRITE, tag, owner, clock)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	, m_gfxbank_cb(*this)
 {
 }
 
@@ -96,7 +97,7 @@ void seta001_device::device_start()
 
 	m_bgflag = 0x00;
 
-	m_gfxbank_cb.bind_relative_to(*owner());
+	m_gfxbank_cb.resolve();
 
 	save_item(NAME(m_bgflag));
 	save_item(NAME(m_spritectrl));

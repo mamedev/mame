@@ -220,13 +220,13 @@ void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void angelkds_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(angelkds_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(angelkds_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tx_tilemap->set_transparent_pen(0);
 
-	m_bgbot_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(angelkds_state::get_bgbot_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bgbot_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(angelkds_state::get_bgbot_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bgbot_tilemap->set_transparent_pen(15);
 
-	m_bgtop_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(angelkds_state::get_bgtop_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bgtop_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(angelkds_state::get_bgtop_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bgtop_tilemap->set_transparent_pen(15);
 }
 

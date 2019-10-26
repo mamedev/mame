@@ -1820,7 +1820,7 @@ void blitz68k_state::cjffruit(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
 	ramdac_config(config);
@@ -1853,7 +1853,7 @@ void blitz68k_state::bankrob(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
@@ -1884,7 +1884,7 @@ void blitz68k_state::bankroba(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq5));
 
 	ramdac_config(config);
@@ -1914,7 +1914,7 @@ void blitz68k_state::deucesw2(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
@@ -1946,7 +1946,7 @@ void blitz68k_state::dualgame(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);
@@ -1976,7 +1976,7 @@ void blitz68k_state::hermit(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq1));
 
 	ramdac_config(config);
@@ -2010,7 +2010,7 @@ void blitz68k_state::maxidbl(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(4);
-	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr), this);
+	m_crtc->set_on_update_addr_change_callback(FUNC(blitz68k_state::crtc_addr));
 	m_crtc->out_vsync_callback().set(FUNC(blitz68k_state::crtc_vsync_irq3));
 
 	ramdac_config(config);

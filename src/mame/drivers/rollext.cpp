@@ -572,7 +572,7 @@ INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
 
 void rollext_state::init_rollext()
 {
-	m_maincpu->set_command_callback(write32_delegate(FUNC(rollext_state::cmd_callback),this));
+	m_maincpu->set_command_callback(*this, FUNC(rollext_state::cmd_callback));
 }
 
 

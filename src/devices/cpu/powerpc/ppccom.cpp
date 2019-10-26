@@ -217,6 +217,12 @@ ppc_device::ppc_device(const machine_config &mconfig, device_type type, const ch
 	, m_flavor(flavor)
 	, m_cap(cap)
 	, m_tb_divisor(tb_divisor)
+	, m_spu(*this)
+	, m_dcr_read_func(*this)
+	, m_dcr_write_func(*this)
+	, m_dcstore_cb(*this)
+	, m_ext_dma_read_cb(*this)
+	, m_ext_dma_write_cb(*this)
 	, m_cache(CACHE_SIZE + sizeof(internal_ppc_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
@@ -740,8 +746,8 @@ void ppc_device::device_start()
 			};
 	}
 	m_system_clock = c_bus_frequency != 0 ? c_bus_frequency : clock();
-	m_dcr_read_func = read32_delegate();
-	m_dcr_write_func = write32_delegate();
+	m_dcr_read_func.set(nullptr);
+	m_dcr_write_func.set(nullptr);
 
 	m_tb_divisor = (m_tb_divisor * clock() + m_system_clock / 2 - 1) / m_system_clock;
 

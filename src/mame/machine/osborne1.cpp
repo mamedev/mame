@@ -266,7 +266,7 @@ void osborne1_state::init_osborne1()
 	m_video_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::video_callback), this));
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(osborne1_state::get_tile_info), this), TILEMAP_SCAN_ROWS,
+			tilemap_get_info_delegate(*this, FUNC(osborne1_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 10, 128, 32);
 
 	m_acia_rxc_txc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(osborne1_state::acia_rxc_txc_callback), this));

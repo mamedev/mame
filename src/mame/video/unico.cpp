@@ -113,15 +113,15 @@ WRITE16_MEMBER(unico_state::spriteram_w)  { COMBINE_DATA(&m_spriteram[offset]); 
 void unico_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unico_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
 
 	m_tilemap[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unico_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
 
 	m_tilemap[2] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(unico_state::get_tile_info),this),TILEMAP_SCAN_ROWS,
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unico_state::get_tile_info)), TILEMAP_SCAN_ROWS,
 			16,16,  0x40, 0x40);
 
 	m_tilemap[0]->set_user_data(&m_vram[0x8000/2]);

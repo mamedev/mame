@@ -137,72 +137,32 @@ public:
 	auto output_int() { return m_output_int_cb.bind(); }
 	auto ioreg_pre_write() { return m_ioreg_pre_write_cb.bind(); }
 
-	// Setters for ind16 scanline callback
-	template <class FunctionClass>
-	void set_scanline_ind16_callback(void (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, int, const display_params *),
-		const char *name)
+	// Setter for ind16 scanline callback
+	template <typename... T>
+	void set_scanline_ind16_callback(T &&... args)
 	{
-		set_scanline_ind16_callback(scanline_ind16_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_scanline_ind16_callback(const char *devname, void (FunctionClass::*callback)(screen_device &, bitmap_ind16 &, int, const display_params *),
-		const char *name)
-	{
-		set_scanline_ind16_callback(scanline_ind16_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_scanline_ind16_callback(scanline_ind16_cb_delegate callback)
-	{
-		m_scanline_ind16_cb = callback;
+		m_scanline_ind16_cb.set(std::forward<T>(args)...);
 	}
 
-	// Setters for rgb32 scanline callback
-	template <class FunctionClass>
-	void set_scanline_rgb32_callback(void (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, int, const display_params *),
-		const char *name)
+	// Setter for rgb32 scanline callback
+	template <typename... T>
+	void set_scanline_rgb32_callback(T &&... args)
 	{
-		set_scanline_rgb32_callback(scanline_rgb32_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_scanline_rgb32_callback(const char *devname, void (FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, int, const display_params *),
-		const char *name)
-	{
-		set_scanline_rgb32_callback(scanline_rgb32_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_scanline_rgb32_callback(scanline_rgb32_cb_delegate callback)
-	{
-		m_scanline_rgb32_cb = callback;
+		m_scanline_rgb32_cb.set(std::forward<T>(args)...);
 	}
 
-	// Setters for shift register input callback
-	template <class FunctionClass>
-	void set_shiftreg_in_callback(void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
+	// Setter for shift register input callback
+	template <typename... T>
+	void set_shiftreg_in_callback(T &&... args)
 	{
-		set_shiftreg_in_callback(shiftreg_in_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_shiftreg_in_callback(const char *devname, void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
-	{
-		set_shiftreg_in_callback(shiftreg_in_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_shiftreg_in_callback(shiftreg_in_cb_delegate callback)
-	{
-		m_to_shiftreg_cb = callback;
+		m_to_shiftreg_cb.set(std::forward<T>(args)...);
 	}
 
 	// Setters for shift register output callback
-	template <class FunctionClass>
-	void set_shiftreg_out_callback(void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
+	template <typename... T>
+	void set_shiftreg_out_callback(T &&... args)
 	{
-		set_shiftreg_out_callback(shiftreg_out_cb_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass>
-	void set_shiftreg_out_callback(const char *devname, void (FunctionClass::*callback)(address_space &, offs_t, uint16_t *), const char *name)
-	{
-		set_shiftreg_out_callback(shiftreg_out_cb_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	void set_shiftreg_out_callback(shiftreg_out_cb_delegate callback)
-	{
-		m_from_shiftreg_cb = callback;
+		m_from_shiftreg_cb.set(std::forward<T>(args)...);
 	}
 
 	void get_display_params(display_params *params);

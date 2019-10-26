@@ -327,8 +327,8 @@ void rallyx_state::rallyx_video_start_common(  )
 
 VIDEO_START_MEMBER(rallyx_state,rallyx)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	/* the scrolling tilemap is slightly misplaced in Rally X */
 	m_bg_tilemap->set_scrolldx(3, 3);
@@ -341,8 +341,8 @@ VIDEO_START_MEMBER(rallyx_state,rallyx)
 
 VIDEO_START_MEMBER(rallyx_state,jungler)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::rallyx_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::rallyx_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	m_spriteram_base = 0x14;
 
@@ -353,8 +353,8 @@ VIDEO_START_MEMBER(rallyx_state,jungler)
 
 VIDEO_START_MEMBER(rallyx_state,locomotn)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	m_spriteram_base = 0x14;
 
@@ -365,8 +365,8 @@ VIDEO_START_MEMBER(rallyx_state,locomotn)
 
 VIDEO_START_MEMBER(rallyx_state,commsega)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(rallyx_state::locomotn_fg_get_tile_info),this), tilemap_mapper_delegate(FUNC(rallyx_state::fg_tilemap_scan),this), 8, 8, 8, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_bg_get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(rallyx_state::locomotn_fg_get_tile_info)), tilemap_mapper_delegate(*this, FUNC(rallyx_state::fg_tilemap_scan)), 8, 8, 8, 32);
 
 	/* commsega has more sprites and bullets than the other games */
 	m_spriteram_base = 0x00;

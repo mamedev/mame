@@ -1449,8 +1449,8 @@ ROM_END
 
 void konamim2_state::install_m48t58()
 {
-	read8sm_delegate read_delegate(FUNC(m48t58_device::read), &(*m_m48t58));
-	write8sm_delegate write_delegate(FUNC(m48t58_device::write), &(*m_m48t58));
+	read8sm_delegate read_delegate(*m_m48t58, FUNC(m48t58_device::read));
+	write8sm_delegate write_delegate(*m_m48t58, FUNC(m48t58_device::write));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x36c00000, 0x36c03fff, read_delegate, write_delegate, 0xff00ff00ff00ff00ULL);
@@ -1458,8 +1458,8 @@ void konamim2_state::install_m48t58()
 
 void konamim2_state::install_ymz280b()
 {
-	read8sm_delegate read_delegate(FUNC(ymz280b_device::read), &(*m_ymz280b));
-	write8sm_delegate write_delegate(FUNC(ymz280b_device::write), &(*m_ymz280b));
+	read8sm_delegate read_delegate(*m_ymz280b, FUNC(ymz280b_device::read));
+	write8sm_delegate write_delegate(*m_ymz280b, FUNC(ymz280b_device::write));
 
 	m_ppc1->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);
 	m_ppc2->space(AS_PROGRAM).install_readwrite_handler(0x3e800000, 0x3e80000f, read_delegate, write_delegate, 0xff00ff0000000000ULL);

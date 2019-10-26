@@ -184,8 +184,8 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 
 DEFINE_DEVICE_TYPE(K056832, k056832_device, "k056832", "K056832 Tilemap Generator")
 
-k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K056832, tag, owner, clock),
+k056832_device::k056832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K056832, tag, owner, clock),
 	device_gfx_interface(mconfig, *this),
 	//m_tilemap[K056832_PAGE_COUNT],
 	//*m_pixmap[K056832_PAGE_COUNT],
@@ -194,6 +194,7 @@ k056832_device::k056832_device(const machine_config &mconfig, const char *tag, d
 	m_rombase(*this, DEVICE_SELF),
 	m_num_gfx_banks(0),
 	m_cur_gfx_banks(0),
+	m_k056832_cb(*this),
 	m_gfx_num(0),
 	m_bpp(-1),
 	m_big(0),
@@ -263,22 +264,22 @@ void k056832_device::create_tilemaps()
 	m_videoram.resize(0x2000 * (K056832_PAGE_COUNT + 1) / 2);
 	memset(&m_videoram[0], 0, 2*m_videoram.size());
 
-	m_tilemap[0x0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info0),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info1),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info2),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info3),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info4),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info5),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x6] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info6),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x7] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info7),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x8] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info8),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0x9] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_info9),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xa] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoa),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xb] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infob),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xc] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoc),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xd] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infod),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xe] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infoe),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_tilemap[0xf] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(k056832_device::get_tile_infof),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_tilemap[0x0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info2)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info3)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x4] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info4)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x5] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info5)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x6] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info6)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x7] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info7)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x8] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info8)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0x9] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_info9)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0xa] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_infoa)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0xb] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_infob)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0xc] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_infoc)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0xd] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_infod)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0xe] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_infoe)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap[0xf] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(k056832_device::get_tile_infof)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	for (i = 0; i < K056832_PAGE_COUNT; i++)
 	{
@@ -348,7 +349,7 @@ void k056832_device::device_start()
 	finalize_init();
 
 	// bind callbacks
-	m_k056832_cb.bind_relative_to(*owner());
+	m_k056832_cb.resolve();
 }
 
 /*****************************************************************************

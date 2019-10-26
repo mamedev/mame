@@ -188,10 +188,10 @@ TILE_GET_INFO_MEMBER(luckgrln_state::get_reel_tile_info)
 
 void luckgrln_state::video_start()
 {
-	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<2>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(luckgrln_state::get_reel_tile_info<3>), this), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(luckgrln_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(luckgrln_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(luckgrln_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(luckgrln_state::get_reel_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	for (uint8_t i = 0; i < 4; i++)
 	{

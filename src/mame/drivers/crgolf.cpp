@@ -757,7 +757,7 @@ ROM_END
 
 void crgolf_state::init_crgolfhi()
 {
-	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(FUNC(crgolf_state::crgolfhi_sample_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa000, 0xa003, write8_delegate(*this, FUNC(crgolf_state::crgolfhi_sample_w)));
 }
 
 

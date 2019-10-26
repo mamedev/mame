@@ -50,10 +50,10 @@ TILE_GET_INFO_MEMBER(m90_state::get_tile_info)
 
 void m90_state::common_tilemap_init()
 {
-	m_pf_layer[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64,64);
-	m_pf_layer[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
-	m_pf_layer[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8, 64,64);
-	m_pf_layer[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m90_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_pf_layer[0][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m90_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8,  64,64);
+	m_pf_layer[0][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m90_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 128,64);
+	m_pf_layer[1][0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m90_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8,  64,64);
+	m_pf_layer[1][1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m90_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 128,64);
 
 	// fix for bootlegs
 	m_pf_layer[0][0]->set_user_data(&m_video_data[0x0000]);

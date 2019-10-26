@@ -150,8 +150,8 @@ void buddha_device::autoconfig_base_address(offs_t address)
 
 	// install autoconfig handler to new location
 	m_slot->space().install_readwrite_handler(address, address + 0x7f,
-		read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
-		write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
+			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 
 	// install access to the rom space
 	m_slot->space().install_rom(address + 0x1000, address + 0xffff, memregion("bootrom")->base() + 0x1000);
@@ -182,8 +182,8 @@ WRITE_LINE_MEMBER( buddha_device::cfgin_w )
 
 		// install autoconfig handler
 		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
-			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
+				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

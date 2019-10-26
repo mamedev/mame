@@ -308,15 +308,9 @@ void rx2030_state::iop_program_map(address_map &map)
 
 void rx2030_state::iop_io_map(address_map &map)
 {
-	map(0x0000, 0x003f).lrw16("mmu",
-		[this](offs_t offset, u16 mem_mask)
-		{
-			return m_mmu[offset];
-		},
-		[this](offs_t offset, u16 data, u16 mem_mask)
-		{
-			m_mmu[offset] = data;
-		});
+	map(0x0000, 0x003f).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) { return m_mmu[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) { m_mmu[offset] = data; }));
 
 	map(0x0040, 0x0043).m(m_fdc, FUNC(wd37c65c_device::map)).umask16(0xff);
 	map(0x0044, 0x0045).w(m_fdc, FUNC(wd37c65c_device::dor_w)).umask16(0xff);
@@ -332,33 +326,34 @@ void rx2030_state::iop_io_map(address_map &map)
 	 * scan code set. Possibly caused by imperfect V50 timing and/or memory
 	 * wait states that make the IOP code execute more slowly than emulated.
 	 */
-	map(0x00c0, 0x00c1).lrw8("kbdc_data", [this]() { return m_kbdc->data_r(); }, [this](u8 data) { m_kbdc->data_w(data == 0xff ? 0xf6 : data); }).umask16(0xff);
+	map(0x00c0, 0x00c1).lrw8(NAME([this] () { return m_kbdc->data_r(); }), NAME([this] (u8 data) { m_kbdc->data_w(data == 0xff ? 0xf6 : data); })).umask16(0xff);
 	map(0x00c4, 0x00c5).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask16(0xff);
 
 	map(0x0100, 0x0107).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask16(0xff);
 
 	map(0x0140, 0x0143).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w));
 
-	map(0x0180, 0x018b).lr8("mac", [](offs_t offset)
-	{
-		// Ethernet MAC address (LSB first)
-		static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
+	map(0x0180, 0x018b).lr8(
+			[] (offs_t offset)
+			{
+				// Ethernet MAC address (LSB first)
+				static u8 const mac[] = { 0x00, 0x00, 0x6b, 0x12, 0x34, 0x56 };
 
-		return mac[offset];
-	}).umask16(0xff);
+				return mac[offset];
+			}, "mac_r").umask16(0xff);
 
 	// iop tests bits 0x04, 0x10 and 0x20
-	map(0x01c0, 0x01c1).lr8("?", [this]() { return m_iop_interface; }); // maybe?
+	map(0x01c0, 0x01c1).lr8(NAME([this] () { return m_iop_interface; })); // maybe?
 
 	map(0x0200, 0x0201).rw(m_fio, FUNC(z8038_device::fifo_r<1>), FUNC(z8038_device::fifo_w<1>)).umask16(0xff);
 	map(0x0202, 0x0203).rw(m_fio, FUNC(z8038_device::reg_r<1>), FUNC(z8038_device::reg_w<1>)).umask16(0xff);
 
-	map(0x0240, 0x0241).lw8("rtc", [this](u8 data) { m_rtc->write(0, data); }).umask16(0xff00);
-	map(0x0280, 0x0281).lrw8("rtc",
-		[this]() { return m_rtc->read(1); },
-		[this](u8 data) { m_rtc->write(1, data); }).umask16(0xff00);
+	map(0x0240, 0x0241).lw8(NAME([this] (u8 data) { m_rtc->write(0, data); })).umask16(0xff00);
+	map(0x0280, 0x0281).lrw8(
+			NAME([this] () { return m_rtc->read(1); }),
+			NAME([this] (u8 data) { m_rtc->write(1, data); })).umask16(0xff00);
 
-	map(0x02c0, 0x2c1).lw8("cpu_interface", [this](u8 data)
+	map(0x02c0, 0x2c1).lw8([this](u8 data)
 	{
 		switch (data)
 		{
@@ -389,15 +384,15 @@ void rx2030_state::iop_io_map(address_map &map)
 			// something to do with shared memory access?
 			//break;
 		}
-	}).umask16(0xff);
+	}, "cpu_interface_w").umask16(0xff);
 
-	map(0x0380, 0x0381).lw8("led", [this](u8 data) { logerror("led_w 0x%02x\n", data); }).umask16(0xff00);
+	map(0x0380, 0x0381).lw8(NAME([this](u8 data) { logerror("led_w 0x%02x\n", data); })).umask16(0xff00);
 }
 
 void rx2030_state::rx2030_map(address_map &map)
 {
-	map(0x02000000, 0x02000003).lrw8("iop_interface",
-		[this]() { return m_iop_interface; },
+	map(0x02000000, 0x02000003).lrw8(
+		NAME([this]() { return m_iop_interface; }),
 		[this](u8 data)
 		{
 			switch (data)
@@ -479,7 +474,7 @@ void rx2030_state::rx2030_map(address_map &map)
 				LOG("iop interface command 0x%02x (%s)\n", data, machine().describe_context());
 				break;
 			}
-		}
+		}, "iop_interface_w"
 	).umask32(0xff);
 }
 
@@ -695,7 +690,7 @@ void rx3230_state::rx3230_map(address_map &map)
 	map(0x18000000, 0x1800003f).m(m_scsi, FUNC(ncr53c94_device::map)).umask32(0xff);
 	map(0x19000000, 0x19000003).rw(m_kbdc, FUNC(at_keyboard_controller_device::data_r), FUNC(at_keyboard_controller_device::data_w)).umask32(0xff);
 	map(0x19000004, 0x19000007).rw(m_kbdc, FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w)).umask32(0xff);
-	map(0x19800000, 0x19800003).lr8("int_reg", [this]() { return m_int_reg; }).umask32(0xff);
+	map(0x19800000, 0x19800003).lr8(NAME([this]() { return m_int_reg; })).umask32(0xff);
 	map(0x1a000000, 0x1a000007).rw(m_net, FUNC(am7990_device::regs_r), FUNC(am7990_device::regs_w)).umask32(0xffff);
 	map(0x1b000000, 0x1b00001f).rw(m_scc, FUNC(z80scc_device::ab_dc_r), FUNC(z80scc_device::ab_dc_w)).umask32(0xff); // TODO: order?
 
@@ -713,8 +708,8 @@ void rx3230_state::rs3230_map(address_map &map)
 {
 	rx3230_map(map);
 
-	map(0x10000000, 0x12ffffff).lrw32("vram",
-		[this](offs_t offset)
+	map(0x10000000, 0x12ffffff).lrw32(
+		NAME([this](offs_t offset)
 		{
 			u32 const ram_offset = ((offset >> 13) * 0x500) + ((offset & 0x1ff) << 2);
 
@@ -725,8 +720,8 @@ void rx3230_state::rs3230_map(address_map &map)
 				u32(m_vram->read(ram_offset | 3)) << 0;
 
 			return data;
-		},
-		[this](offs_t offset, u32 data)
+		}),
+		NAME([this](offs_t offset, u32 data)
 		{
 			u32 const ram_offset = ((offset >> 13) * 0x500) + ((offset & 0x1ff) << 2);
 
@@ -734,19 +729,19 @@ void rx3230_state::rs3230_map(address_map &map)
 			m_vram->write(ram_offset | 1, data >> 16);
 			m_vram->write(ram_offset | 2, data >> 8);
 			m_vram->write(ram_offset | 3, data >> 0);
-		});
+		}));
 
 	map(0x14000000, 0x14000003).rw(m_ramdac, FUNC(bt459_device::address_lo_r), FUNC(bt459_device::address_lo_w)).umask32(0xff);
 	map(0x14080000, 0x14080003).rw(m_ramdac, FUNC(bt459_device::address_hi_r), FUNC(bt459_device::address_hi_w)).umask32(0xff);
 	map(0x14100000, 0x14100003).rw(m_ramdac, FUNC(bt459_device::register_r), FUNC(bt459_device::register_w)).umask32(0xff);
 	map(0x14180000, 0x14180003).rw(m_ramdac, FUNC(bt459_device::palette_r), FUNC(bt459_device::palette_w)).umask32(0xff);
 
-	map(0x16080004, 0x16080007).lr8("gfx_reg", [this]()
+	map(0x16080004, 0x16080007).lr8(NAME([this] ()
 	{
 		u8 const data = (m_screen->vblank() ? GFX_V_BLANK : 0) | (m_screen->hblank() ? GFX_H_BLANK : 0);
 
 		return data;
-	}).umask32(0xff); // also write 0
+	})).umask32(0xff); // also write 0
 
 	//map(0x16000004, 0x16000007).w(); // write 0x00000001
 	//map(0x16100000, 0x16100003).w(); // write 0xffffffff

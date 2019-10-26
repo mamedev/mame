@@ -359,21 +359,21 @@ void ygv608_device::device_start()
 	save_item(NAME(m_namcond1_gfxbank));
 
 	/* create tilemaps of all sizes and combinations */
-	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+	m_tilemap_A_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,32);
+	m_tilemap_A_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 64,32);
+	m_tilemap_A_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,64);
 
-	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_A_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+	m_tilemap_A_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,32);
+	m_tilemap_A_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 64,32);
+	m_tilemap_A_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_A_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,64);
 
-	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,32);
-	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 64,32);
-	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_8),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  8,8, 32,64);
+	m_tilemap_B_cache_8[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,32);
+	m_tilemap_B_cache_8[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 64,32);
+	m_tilemap_B_cache_8[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_8)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  8,8, 32,64);
 
-	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,32);
-	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 64,32);
-	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(ygv608_device::get_tile_info_B_16),this), tilemap_mapper_delegate(FUNC(ygv608_device::get_tile_offset),this),  16,16, 32,64);
+	m_tilemap_B_cache_16[0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,32);
+	m_tilemap_B_cache_16[1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 64,32);
+	m_tilemap_B_cache_16[2] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(ygv608_device::get_tile_info_B_16)), tilemap_mapper_delegate(*this, FUNC(ygv608_device::get_tile_offset)),  16,16, 32,64);
 
 	m_tilemap_A = nullptr;
 	m_tilemap_B = nullptr;

@@ -242,8 +242,8 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x20);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag(m_gfxdecode);
@@ -257,14 +257,14 @@ void vaportra_state::vaportra(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(vaportra_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(vaportra_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(vaportra_state::vaportra_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

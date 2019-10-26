@@ -1271,21 +1271,21 @@ void hng64_state::video_start()
 	m_old_tileflags[2] = -1;
 	m_old_tileflags[3] = -1;
 
-	m_tilemap[0].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[0].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile0_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[0].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[0].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile0_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
 
-	m_tilemap[1].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[1].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile1_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[1].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[1].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile1_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
 
-	m_tilemap[2].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[2].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile2_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[2].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[2].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile2_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
 
-	m_tilemap[3].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_8x8_info),this),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); /* 128x128x4 = 0x10000 */
-	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hng64_state::get_hng64_tile3_16x16_info),this), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); /* 128x128x4 = 0x10000 */
+	m_tilemap[3].m_tilemap_8x8       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_8x8_info)),   TILEMAP_SCAN_ROWS,  8,   8, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_16x16     = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 128, 128); // 128x128x4 = 0x10000
+	m_tilemap[3].m_tilemap_16x16_alt = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hng64_state::get_hng64_tile3_16x16_info)), TILEMAP_SCAN_ROWS,  16, 16, 256,  64); // 128x128x4 = 0x10000
 
 	for (auto & elem : m_tilemap)
 	{

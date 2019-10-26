@@ -56,12 +56,14 @@
 class tapatune_state : public driver_device
 {
 public:
-	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	tapatune_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_videocpu(*this, "videocpu"),
 		m_bsmt(*this, "bsmt"),
-		m_videoram(*this, "videoram") {}
+		m_videoram(*this, "videoram")
+	{
+	}
 
 	void tapatune(machine_config &config);
 	void tapatune_base(machine_config &config);
@@ -556,8 +558,8 @@ void tapatune_state::tapatune(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(5);
-	crtc.set_begin_update_callback(FUNC(tapatune_state::crtc_begin_update), this);
-	crtc.set_update_row_callback(FUNC(tapatune_state::crtc_update_row), this);
+	crtc.set_begin_update_callback(FUNC(tapatune_state::crtc_begin_update));
+	crtc.set_update_row_callback(FUNC(tapatune_state::crtc_update_row));
 	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */

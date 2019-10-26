@@ -9930,7 +9930,7 @@ void cps2_state::init_digital_volume()
 	m_cps2disabledigitalvolume = 0;
 
 	/* create a timer to update our volume state from the fake switches - read it every 6 frames or so to enable some granularity */
-	m_digital_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cps2_state::cps2_update_digital_volume),this));
+	m_digital_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cps2_state::cps2_update_digital_volume), this));
 	m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
 }
 
@@ -9977,7 +9977,7 @@ void cps2_state::init_pzloop2()
 
 	save_item(NAME(m_readpaddle));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(FUNC(cps2_state::joy_or_paddle_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(*this, FUNC(cps2_state::joy_or_paddle_r)));
 }
 
 void cps2_state::init_singbrd()
@@ -10025,7 +10025,7 @@ void cps2_state::init_gigaman2()
 	m_gigaman2_dummyqsound_ram = std::make_unique<uint16_t[]>(0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
-	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps2_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps2_state::gigaman2_dummyqsound_w), this)); // no qsound..
+	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_r)), write16_delegate(*this, FUNC(cps2_state::gigaman2_dummyqsound_w))); // no qsound..
 
 	memcpy(m_decrypted_opcodes, memregion("maincpu")->base()+0x200000, 0x200000);
 
@@ -10042,7 +10042,7 @@ void cps2_state::init_ecofghtr()
 
 	save_item(NAME(m_readpaddle));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(FUNC(cps2_state::joy_or_paddle_ecofghtr_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(*this, FUNC(cps2_state::joy_or_paddle_ecofghtr_r)));
 
 }
 

@@ -111,9 +111,9 @@ void sbus_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_space = &space(0);
-	m_space->install_readwrite_handler(0x00000000, 0x01ffffff, read32_delegate(FUNC(sbus_device::slot_timeout_r<0>), this), write32_delegate(FUNC(sbus_device::slot_timeout_w<0>), this));
-	m_space->install_readwrite_handler(0x02000000, 0x03ffffff, read32_delegate(FUNC(sbus_device::slot_timeout_r<1>), this), write32_delegate(FUNC(sbus_device::slot_timeout_w<1>), this));
-	m_space->install_readwrite_handler(0x04000000, 0x05ffffff, read32_delegate(FUNC(sbus_device::slot_timeout_r<2>), this), write32_delegate(FUNC(sbus_device::slot_timeout_w<2>), this));
+	m_space->install_readwrite_handler(0x00000000, 0x01ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<0>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<0>)));
+	m_space->install_readwrite_handler(0x02000000, 0x03ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<1>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<1>)));
+	m_space->install_readwrite_handler(0x04000000, 0x05ffffff, read32_delegate(*this, FUNC(sbus_device::slot_timeout_r<2>)), write32_delegate(*this, FUNC(sbus_device::slot_timeout_w<2>)));
 }
 
 template <unsigned Slot> READ32_MEMBER(sbus_device::slot_timeout_r)

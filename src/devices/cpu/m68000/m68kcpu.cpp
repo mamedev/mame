@@ -1652,11 +1652,6 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 	};
 }
 
-void m68000_base_device::set_reset_callback(write_line_delegate callback)
-{
-	m_reset_instr_callback = callback;
-}
-
 // fault_addr = address to indicate fault at
 // rw = 1 for read, 0 for write
 // fc = 3-bit function code of access (usually you'd just put what m68k_get_fc() returns here)
@@ -1666,21 +1661,6 @@ void m68000_base_device::set_buserror_details(u32 fault_addr, u8 rw, u8 fc)
 	m_aerr_write_mode = (rw << 4);
 	m_aerr_fc = fc;
 	m_mmu_tmp_buserror_address = fault_addr; // Hack for x68030
-}
-
-void m68000_base_device::set_cmpild_callback(write32_delegate callback)
-{
-	m_cmpild_instr_callback = callback;
-}
-
-void m68000_base_device::set_rte_callback(write_line_delegate callback)
-{
-	m_rte_instr_callback = callback;
-}
-
-void m68000_base_device::set_tas_write_callback(write8_delegate callback)
-{
-	m_tas_write_callback = callback;
 }
 
 u16 m68000_base_device::get_fc()
@@ -2342,7 +2322,11 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
 		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
 		m_interrupt_mixer(true),
-		m_cpu_space_id(AS_CPU_SPACE)
+		m_cpu_space_id(AS_CPU_SPACE),
+		m_reset_instr_callback(*this),
+		m_cmpild_instr_callback(*this),
+		m_rte_instr_callback(*this),
+		m_tas_write_callback(*this)
 {
 	clear_all();
 }
@@ -2355,7 +2339,11 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
 		m_cpu_space_config("cpu space", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, address_map_constructor(FUNC(m68000_base_device::default_autovectors_map), this)),
 		m_interrupt_mixer(true),
-		m_cpu_space_id(AS_CPU_SPACE)
+		m_cpu_space_id(AS_CPU_SPACE),
+		m_reset_instr_callback(*this),
+		m_cmpild_instr_callback(*this),
+		m_rte_instr_callback(*this),
+		m_tas_write_callback(*this)
 {
 	clear_all();
 }
@@ -2480,13 +2468,13 @@ void m68000_base_device::autovectors_map(address_map &map)
 {
 	// Eventually add the sync to E due to vpa
 	// 8-bit handlers are used here to be compatible with all bus widths
-	map(0x3, 0x3).lr8("avec1", []() -> u8 { return autovector(1); });
-	map(0x5, 0x5).lr8("avec2", []() -> u8 { return autovector(2); });
-	map(0x7, 0x7).lr8("avec3", []() -> u8 { return autovector(3); });
-	map(0x9, 0x9).lr8("avec4", []() -> u8 { return autovector(4); });
-	map(0xb, 0xb).lr8("avec5", []() -> u8 { return autovector(5); });
-	map(0xd, 0xd).lr8("avec6", []() -> u8 { return autovector(6); });
-	map(0xf, 0xf).lr8("avec7", []() -> u8 { return autovector(7); });
+	map(0x3, 0x3).lr8(NAME([] () -> u8 { return autovector(1); }));
+	map(0x5, 0x5).lr8(NAME([] () -> u8 { return autovector(2); }));
+	map(0x7, 0x7).lr8(NAME([] () -> u8 { return autovector(3); }));
+	map(0x9, 0x9).lr8(NAME([] () -> u8 { return autovector(4); }));
+	map(0xb, 0xb).lr8(NAME([] () -> u8 { return autovector(5); }));
+	map(0xd, 0xd).lr8(NAME([] () -> u8 { return autovector(6); }));
+	map(0xf, 0xf).lr8(NAME([] () -> u8 { return autovector(7); }));
 }
 
 void m68000_base_device::default_autovectors_map(address_map &map)
@@ -2499,6 +2487,10 @@ void m68000_base_device::default_autovectors_map(address_map &map)
 
 void m68000_base_device::device_start()
 {
+	m_reset_instr_callback.resolve();
+	m_cmpild_instr_callback.resolve();
+	m_rte_instr_callback.resolve();
+	m_tas_write_callback.resolve();
 }
 
 void m68000_base_device::device_stop()

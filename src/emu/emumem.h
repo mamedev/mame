@@ -156,372 +156,275 @@ using write64smo_delegate = device_delegate<void (u64)>;
 
 namespace emu { namespace detail {
 
+// TODO: replace with std::void_t when we move to C++17
+template <typename... T> struct void_wrapper { using type = void; };
+template <typename... T> using void_t = typename void_wrapper<T...>::type;
+
 template <typename D, typename T, typename Enable = void> struct rw_device_class  { };
 
 template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...), const char *, const char *, T *>::value> > { using type = T; };
+struct rw_device_class<D, Ret (T::*)(Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...), const char *>::value> > { using type = T; };
 template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, Ret (T::*)(Params...) const, const char *, const char *, T *>::value> > { using type = T; };
+struct rw_device_class<D, Ret (T::*)(Params...) const, std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (T::*)(Params...) const, const char *>::value> > { using type = T; };
 template <typename D, typename T, typename Ret, typename... Params>
-struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, Ret (*)(T &, Params...), const char *, const char *, T *>::value> > { using type = T; };
+struct rw_device_class<D, Ret (*)(T &, Params...), std::enable_if_t<std::is_constructible<D, device_t &, const char *, Ret (*)(T &, Params...), const char *>::value> > { using type = T; };
 
-template <typename D, typename T> using rw_device_class_t  = typename rw_device_class <D, T>::type;
+template <typename D, typename T> using rw_device_class_t  = typename rw_device_class<D, T>::type;
 
-template <typename T>
-inline read8_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8_delegate, std::remove_reference_t<T> > *obj)
-{ return read8_delegate(func, name, tag, obj); }
-template <typename T>
-inline read16_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16_delegate, std::remove_reference_t<T> > *obj)
-{ return read16_delegate(func, name, tag, obj); }
-template <typename T>
-inline read32_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32_delegate, std::remove_reference_t<T> > *obj)
-{ return read32_delegate(func, name, tag, obj); }
-template <typename T>
-inline read64_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64_delegate, std::remove_reference_t<T> > *obj)
-{ return read64_delegate(func, name, tag, obj); }
-
-template <typename T>
-inline write8_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8_delegate, std::remove_reference_t<T> > *obj)
-{ return write8_delegate(func, name, tag, obj); }
-template <typename T>
-inline write16_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16_delegate, std::remove_reference_t<T> > *obj)
-{ return write16_delegate(func, name, tag, obj); }
-template <typename T>
-inline write32_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32_delegate, std::remove_reference_t<T> > *obj)
-{ return write32_delegate(func, name, tag, obj); }
-template <typename T>
-inline write64_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64_delegate, std::remove_reference_t<T> > *obj)
-{ return write64_delegate(func, name, tag, obj); }
-
-
-template <typename T>
-inline read8m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8m_delegate, std::remove_reference_t<T> > *obj)
-{ return read8m_delegate(func, name, tag, obj); }
-template <typename T>
-inline read16m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16m_delegate, std::remove_reference_t<T> > *obj)
-{ return read16m_delegate(func, name, tag, obj); }
-template <typename T>
-inline read32m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32m_delegate, std::remove_reference_t<T> > *obj)
-{ return read32m_delegate(func, name, tag, obj); }
-template <typename T>
-inline read64m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64m_delegate, std::remove_reference_t<T> > *obj)
-{ return read64m_delegate(func, name, tag, obj); }
-
-template <typename T>
-inline write8m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8m_delegate, std::remove_reference_t<T> > *obj)
-{ return write8m_delegate(func, name, tag, obj); }
-template <typename T>
-inline write16m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16m_delegate, std::remove_reference_t<T> > *obj)
-{ return write16m_delegate(func, name, tag, obj); }
-template <typename T>
-inline write32m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32m_delegate, std::remove_reference_t<T> > *obj)
-{ return write32m_delegate(func, name, tag, obj); }
-template <typename T>
-inline write64m_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64m_delegate, std::remove_reference_t<T> > *obj)
-{ return write64m_delegate(func, name, tag, obj); }
-
-
-template <typename T>
-inline read8s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > *obj)
-{ return read8s_delegate(func, name, tag, obj); }
-template <typename T>
-inline read16s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > *obj)
-{ return read16s_delegate(func, name, tag, obj); }
-template <typename T>
-inline read32s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > *obj)
-{ return read32s_delegate(func, name, tag, obj); }
-template <typename T>
-inline read64s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > *obj)
-{ return read64s_delegate(func, name, tag, obj); }
-
-template <typename T>
-inline write8s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > *obj)
-{ return write8s_delegate(func, name, tag, obj); }
-template <typename T>
-inline write16s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > *obj)
-{ return write16s_delegate(func, name, tag, obj); }
-template <typename T>
-inline write32s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > *obj)
-{ return write32s_delegate(func, name, tag, obj); }
-template <typename T>
-inline write64s_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > *obj)
-{ return write64s_delegate(func, name, tag, obj); }
+template <typename T, typename Enable = void> struct rw_delegate_type;
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8m_delegate, std::remove_reference_t<T> > > > { using type = read8m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16m_delegate, std::remove_reference_t<T> > > > { using type = read16m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32m_delegate, std::remove_reference_t<T> > > > { using type = read32m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64m_delegate, std::remove_reference_t<T> > > > { using type = read64m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > { using type = read8s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > { using type = read16s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > { using type = read32s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > { using type = read64s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > { using type = read8sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > { using type = read16sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > { using type = read32sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > { using type = read64sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8mo_delegate, std::remove_reference_t<T> > > > { using type = read8mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16mo_delegate, std::remove_reference_t<T> > > > { using type = read16mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32mo_delegate, std::remove_reference_t<T> > > > { using type = read32mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64mo_delegate, std::remove_reference_t<T> > > > { using type = read64mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > { using type = read8smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > { using type = read16smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > { using type = read32smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > { using type = read64smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8m_delegate, std::remove_reference_t<T> > > > { using type = write8m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16m_delegate, std::remove_reference_t<T> > > > { using type = write16m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32m_delegate, std::remove_reference_t<T> > > > { using type = write32m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64m_delegate, std::remove_reference_t<T> > > > { using type = write64m_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > { using type = write8s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > { using type = write16s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > { using type = write32s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > { using type = write64s_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > { using type = write8sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > { using type = write16sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > { using type = write32sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > { using type = write64sm_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8mo_delegate, std::remove_reference_t<T> > > > { using type = write8mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16mo_delegate, std::remove_reference_t<T> > > > { using type = write16mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32mo_delegate, std::remove_reference_t<T> > > > { using type = write32mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64mo_delegate, std::remove_reference_t<T> > > > { using type = write64mo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > { using type = write8smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > { using type = write16smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > { using type = write32smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { using type = write64smo_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> using rw_delegate_type_t = typename rw_delegate_type<T>::type;
+template <typename T> using rw_delegate_device_class_t = typename rw_delegate_type<T>::device_class;
 
 
 template <typename T>
-inline read8sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > *obj)
-{ return read8sm_delegate(func, name, tag, obj); }
-template <typename T>
-inline read16sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > *obj)
-{ return read16sm_delegate(func, name, tag, obj); }
-template <typename T>
-inline read32sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > *obj)
-{ return read32sm_delegate(func, name, tag, obj); }
-template <typename T>
-inline read64sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > *obj)
-{ return read64sm_delegate(func, name, tag, obj); }
+inline rw_delegate_type_t<T> make_delegate(device_t &base, char const *tag, T &&func, char const *name)
+{ return rw_delegate_type_t<T>(base, tag, std::forward<T>(func), name); }
 
 template <typename T>
-inline write8sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > *obj)
-{ return write8sm_delegate(func, name, tag, obj); }
-template <typename T>
-inline write16sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > *obj)
-{ return write16sm_delegate(func, name, tag, obj); }
-template <typename T>
-inline write32sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > *obj)
-{ return write32sm_delegate(func, name, tag, obj); }
-template <typename T>
-inline write64sm_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > *obj)
-{ return write64sm_delegate(func, name, tag, obj); }
-
-
-template <typename T>
-inline read8mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8mo_delegate, std::remove_reference_t<T> > *obj)
-{ return read8mo_delegate(func, name, tag, obj); }
-template <typename T>
-inline read16mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16mo_delegate, std::remove_reference_t<T> > *obj)
-{ return read16mo_delegate(func, name, tag, obj); }
-template <typename T>
-inline read32mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32mo_delegate, std::remove_reference_t<T> > *obj)
-{ return read32mo_delegate(func, name, tag, obj); }
-template <typename T>
-inline read64mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64mo_delegate, std::remove_reference_t<T> > *obj)
-{ return read64mo_delegate(func, name, tag, obj); }
-
-template <typename T>
-inline write8mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8mo_delegate, std::remove_reference_t<T> > *obj)
-{ return write8mo_delegate(func, name, tag, obj); }
-template <typename T>
-inline write16mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16mo_delegate, std::remove_reference_t<T> > *obj)
-{ return write16mo_delegate(func, name, tag, obj); }
-template <typename T>
-inline write32mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32mo_delegate, std::remove_reference_t<T> > *obj)
-{ return write32mo_delegate(func, name, tag, obj); }
-template <typename T>
-inline write64mo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64mo_delegate, std::remove_reference_t<T> > *obj)
-{ return write64mo_delegate(func, name, tag, obj); }
-
-
-template <typename T>
-inline read8smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > *obj)
-{ return read8smo_delegate(func, name, tag, obj); }
-template <typename T>
-inline read16smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > *obj)
-{ return read16smo_delegate(func, name, tag, obj); }
-template <typename T>
-inline read32smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > *obj)
-{ return read32smo_delegate(func, name, tag, obj); }
-template <typename T>
-inline read64smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > *obj)
-{ return read64smo_delegate(func, name, tag, obj); }
-
-template <typename T>
-inline write8smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > *obj)
-{ return write8smo_delegate(func, name, tag, obj); }
-template <typename T>
-inline write16smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > *obj)
-{ return write16smo_delegate(func, name, tag, obj); }
-template <typename T>
-inline write32smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > *obj)
-{ return write32smo_delegate(func, name, tag, obj); }
-template <typename T>
-inline write64smo_delegate make_delegate(T &&func, const char *name, const char *tag, rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > *obj)
-{ return write64smo_delegate(func, name, tag, obj); }
-
+inline rw_delegate_type_t<T> make_delegate(rw_delegate_device_class_t<T> &object, T &&func, char const *name)
+{ return rw_delegate_type_t<T>(object, std::forward<T>(func), name); }
 
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8_delegate, L, const char *>::value, read8_delegate> make_lr8_delegate(L l, const char *name)
-{ return read8_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read8_delegate, device_t &, L, const char *>::value, read8_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+{ return read8_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8m_delegate, L, const char *>::value, read8m_delegate> make_lr8_delegate(L l, const char *name)
-{ return read8m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read8m_delegate, device_t &, L, const char *>::value, read8m_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+{ return read8m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8s_delegate, L, const char *>::value, read8s_delegate> make_lr8_delegate(L l, const char *name)
-{ return read8s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read8s_delegate, device_t &, L, const char *>::value, read8s_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+{ return read8s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8sm_delegate, L, const char *>::value, read8sm_delegate> make_lr8_delegate(L l, const char *name)
-{ return read8sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read8sm_delegate, device_t &, L, const char *>::value, read8sm_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+{ return read8sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8mo_delegate, L, const char *>::value, read8mo_delegate> make_lr8_delegate(L l, const char *name)
-{ return read8mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read8mo_delegate, device_t &, L, const char *>::value, read8mo_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+{ return read8mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read8smo_delegate, L, const char *>::value, read8smo_delegate> make_lr8_delegate(L l, const char *name)
-{ return read8smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read8smo_delegate, device_t &, L, const char *>::value, read8smo_delegate> make_lr8_delegate(device_t &owner, L &&l, const char *name)
+{ return read8smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16_delegate, L, const char *>::value, read16_delegate> make_lr16_delegate(L l, const char *name)
-{ return read16_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read16_delegate, device_t &, L, const char *>::value, read16_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+{ return read16_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16m_delegate, L, const char *>::value, read16m_delegate> make_lr16_delegate(L l, const char *name)
-{ return read16m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read16m_delegate, device_t &, L, const char *>::value, read16m_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+{ return read16m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16s_delegate, L, const char *>::value, read16s_delegate> make_lr16_delegate(L l, const char *name)
-{ return read16s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read16s_delegate, device_t &, L, const char *>::value, read16s_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+{ return read16s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16sm_delegate, L, const char *>::value, read16sm_delegate> make_lr16_delegate(L l, const char *name)
-{ return read16sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read16sm_delegate, device_t &, L, const char *>::value, read16sm_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+{ return read16sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16mo_delegate, L, const char *>::value, read16mo_delegate> make_lr16_delegate(L l, const char *name)
-{ return read16mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read16mo_delegate, device_t &, L, const char *>::value, read16mo_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+{ return read16mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read16smo_delegate, L, const char *>::value, read16smo_delegate> make_lr16_delegate(L l, const char *name)
-{ return read16smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read16smo_delegate, device_t &, L, const char *>::value, read16smo_delegate> make_lr16_delegate(device_t &owner, L &&l, const char *name)
+{ return read16smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32_delegate, L, const char *>::value, read32_delegate> make_lr32_delegate(L l, const char *name)
-{ return read32_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read32_delegate, device_t &, L, const char *>::value, read32_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+{ return read32_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32m_delegate, L, const char *>::value, read32m_delegate> make_lr32_delegate(L l, const char *name)
-{ return read32m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read32m_delegate, device_t &, L, const char *>::value, read32m_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+{ return read32m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32s_delegate, L, const char *>::value, read32s_delegate> make_lr32_delegate(L l, const char *name)
-{ return read32s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read32s_delegate, device_t &, L, const char *>::value, read32s_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+{ return read32s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32sm_delegate, L, const char *>::value, read32sm_delegate> make_lr32_delegate(L l, const char *name)
-{ return read32sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read32sm_delegate, device_t &, L, const char *>::value, read32sm_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+{ return read32sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32mo_delegate, L, const char *>::value, read32mo_delegate> make_lr32_delegate(L l, const char *name)
-{ return read32mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read32mo_delegate, device_t &, L, const char *>::value, read32mo_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+{ return read32mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read32smo_delegate, L, const char *>::value, read32smo_delegate> make_lr32_delegate(L l, const char *name)
-{ return read32smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read32smo_delegate, device_t &, L, const char *>::value, read32smo_delegate> make_lr32_delegate(device_t &owner, L &&l, const char *name)
+{ return read32smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64_delegate, L, const char *>::value, read64_delegate> make_lr64_delegate(L l, const char *name)
-{ return read64_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read64_delegate, device_t &, L, const char *>::value, read64_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+{ return read64_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64m_delegate, L, const char *>::value, read64m_delegate> make_lr64_delegate(L l, const char *name)
-{ return read64m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read64m_delegate, device_t &, L, const char *>::value, read64m_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+{ return read64m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64s_delegate, L, const char *>::value, read64s_delegate> make_lr64_delegate(L l, const char *name)
-{ return read64s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read64s_delegate, device_t &, L, const char *>::value, read64s_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+{ return read64s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64sm_delegate, L, const char *>::value, read64sm_delegate> make_lr64_delegate(L l, const char *name)
-{ return read64sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read64sm_delegate, device_t &, L, const char *>::value, read64sm_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+{ return read64sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64mo_delegate, L, const char *>::value, read64mo_delegate> make_lr64_delegate(L l, const char *name)
-{ return read64mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read64mo_delegate, device_t &, L, const char *>::value, read64mo_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+{ return read64mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<read64smo_delegate, L, const char *>::value, read64smo_delegate> make_lr64_delegate(L l, const char *name)
-{ return read64smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<read64smo_delegate, device_t &, L, const char *>::value, read64smo_delegate> make_lr64_delegate(device_t &owner, L &&l, const char *name)
+{ return read64smo_delegate(owner, std::forward<L>(l), name); }
 
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8_delegate, L, const char *>::value, write8_delegate> make_lw8_delegate(L l, const char *name)
-{ return write8_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write8_delegate, device_t &, L, const char *>::value, write8_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+{ return write8_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8m_delegate, L, const char *>::value, write8m_delegate> make_lw8_delegate(L l, const char *name)
-{ return write8m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write8m_delegate, device_t &, L, const char *>::value, write8m_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+{ return write8m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8s_delegate, L, const char *>::value, write8s_delegate> make_lw8_delegate(L l, const char *name)
-{ return write8s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write8s_delegate, device_t &, L, const char *>::value, write8s_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+{ return write8s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8sm_delegate, L, const char *>::value, write8sm_delegate> make_lw8_delegate(L l, const char *name)
-{ return write8sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write8sm_delegate, device_t &, L, const char *>::value, write8sm_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+{ return write8sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8mo_delegate, L, const char *>::value, write8mo_delegate> make_lw8_delegate(L l, const char *name)
-{ return write8mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write8mo_delegate, device_t &, L, const char *>::value, write8mo_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+{ return write8mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write8smo_delegate, L, const char *>::value, write8smo_delegate> make_lw8_delegate(L l, const char *name)
-{ return write8smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write8smo_delegate, device_t &, L, const char *>::value, write8smo_delegate> make_lw8_delegate(device_t &owner, L &&l, const char *name)
+{ return write8smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16_delegate, L, const char *>::value, write16_delegate> make_lw16_delegate(L l, const char *name)
-{ return write16_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write16_delegate, device_t &, L, const char *>::value, write16_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+{ return write16_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16m_delegate, L, const char *>::value, write16m_delegate> make_lw16_delegate(L l, const char *name)
-{ return write16m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write16m_delegate, device_t &, L, const char *>::value, write16m_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+{ return write16m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16s_delegate, L, const char *>::value, write16s_delegate> make_lw16_delegate(L l, const char *name)
-{ return write16s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write16s_delegate, device_t &, L, const char *>::value, write16s_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+{ return write16s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16sm_delegate, L, const char *>::value, write16sm_delegate> make_lw16_delegate(L l, const char *name)
-{ return write16sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write16sm_delegate, device_t &, L, const char *>::value, write16sm_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+{ return write16sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16mo_delegate, L, const char *>::value, write16mo_delegate> make_lw16_delegate(L l, const char *name)
-{ return write16mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write16mo_delegate, device_t &, L, const char *>::value, write16mo_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+{ return write16mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write16smo_delegate, L, const char *>::value, write16smo_delegate> make_lw16_delegate(L l, const char *name)
-{ return write16smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write16smo_delegate, device_t &, L, const char *>::value, write16smo_delegate> make_lw16_delegate(device_t &owner, L &&l, const char *name)
+{ return write16smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32_delegate, L, const char *>::value, write32_delegate> make_lw32_delegate(L l, const char *name)
-{ return write32_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write32_delegate, device_t &, L, const char *>::value, write32_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+{ return write32_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32m_delegate, L, const char *>::value, write32m_delegate> make_lw32_delegate(L l, const char *name)
-{ return write32m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write32m_delegate, device_t &, L, const char *>::value, write32m_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+{ return write32m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32s_delegate, L, const char *>::value, write32s_delegate> make_lw32_delegate(L l, const char *name)
-{ return write32s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write32s_delegate, device_t &, L, const char *>::value, write32s_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+{ return write32s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32sm_delegate, L, const char *>::value, write32sm_delegate> make_lw32_delegate(L l, const char *name)
-{ return write32sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write32sm_delegate, device_t &, L, const char *>::value, write32sm_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+{ return write32sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32mo_delegate, L, const char *>::value, write32mo_delegate> make_lw32_delegate(L l, const char *name)
-{ return write32mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write32mo_delegate, device_t &, L, const char *>::value, write32mo_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+{ return write32mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write32smo_delegate, L, const char *>::value, write32smo_delegate> make_lw32_delegate(L l, const char *name)
-{ return write32smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write32smo_delegate, device_t &, L, const char *>::value, write32smo_delegate> make_lw32_delegate(device_t &owner, L &&l, const char *name)
+{ return write32smo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64_delegate, L, const char *>::value, write64_delegate> make_lw64_delegate(L l, const char *name)
-{ return write64_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write64_delegate, device_t &, L, const char *>::value, write64_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+{ return write64_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64m_delegate, L, const char *>::value, write64m_delegate> make_lw64_delegate(L l, const char *name)
-{ return write64m_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write64m_delegate, device_t &, L, const char *>::value, write64m_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+{ return write64m_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64s_delegate, L, const char *>::value, write64s_delegate> make_lw64_delegate(L l, const char *name)
-{ return write64s_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write64s_delegate, device_t &, L, const char *>::value, write64s_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+{ return write64s_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64sm_delegate, L, const char *>::value, write64sm_delegate> make_lw64_delegate(L l, const char *name)
-{ return write64sm_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write64sm_delegate, device_t &, L, const char *>::value, write64sm_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+{ return write64sm_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64mo_delegate, L, const char *>::value, write64mo_delegate> make_lw64_delegate(L l, const char *name)
-{ return write64mo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write64mo_delegate, device_t &, L, const char *>::value, write64mo_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+{ return write64mo_delegate(owner, std::forward<L>(l), name); }
 
 template <typename L>
-inline std::enable_if_t<std::is_constructible<write64smo_delegate, L, const char *>::value, write64smo_delegate> make_lw64_delegate(L l, const char *name)
-{ return write64smo_delegate(l, name); }
+inline std::enable_if_t<std::is_constructible<write64smo_delegate, device_t &, L, const char *>::value, write64smo_delegate> make_lw64_delegate(device_t &owner, L &&l, const char *name)
+{ return write64smo_delegate(owner, std::forward<L>(l), name); }
 
 
 
@@ -1836,25 +1739,6 @@ private:
 #define DECLARE_WRITE32_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 data, ATTR_UNUSED u32 mem_mask = 0xffffffff)
 #define DECLARE_READ64_MEMBER(name)     u64    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
 #define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 data, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
-
-// device delegate macros
-#define READ8_DELEGATE(_class, _member)                     read8_delegate(FUNC(_class::_member), this)
-#define WRITE8_DELEGATE(_class, _member)                    write8_delegate(FUNC(_class::_member), this)
-#define READ16_DELEGATE(_class, _member)                    read16_delegate(FUNC(_class::_member), this)
-#define WRITE16_DELEGATE(_class, _member)                   write16_delegate(FUNC(_class::_member), this)
-#define READ32_DELEGATE(_class, _member)                    read32_delegate(FUNC(_class::_member), this)
-#define WRITE32_DELEGATE(_class, _member)                   write32_delegate(FUNC(_class::_member), this)
-#define READ64_DELEGATE(_class, _member)                    read64_delegate(FUNC(_class::_member), this)
-#define WRITE64_DELEGATE(_class, _member)                   write64_delegate(FUNC(_class::_member), this)
-
-#define READ8_DEVICE_DELEGATE(_device, _class, _member)     read8_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE8_DEVICE_DELEGATE(_device, _class, _member)    write8_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ16_DEVICE_DELEGATE(_device, _class, _member)    read16_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE16_DEVICE_DELEGATE(_device, _class, _member)   write16_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ32_DEVICE_DELEGATE(_device, _class, _member)    read32_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE32_DEVICE_DELEGATE(_device, _class, _member)   write32_delegate(FUNC(_class::_member), (_class *)_device)
-#define READ64_DEVICE_DELEGATE(_device, _class, _member)    read64_delegate(FUNC(_class::_member), (_class *)_device)
-#define WRITE64_DEVICE_DELEGATE(_device, _class, _member)   write64_delegate(FUNC(_class::_member), (_class *)_device)
 
 
 // helper macro for merging data with the memory mask

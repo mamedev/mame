@@ -131,7 +131,7 @@ void isa8_mda_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(MDA_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(isa8_mda_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(isa8_mda_device::crtc_update_row));
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 
@@ -182,7 +182,7 @@ void isa8_mda_device::device_start()
 
 	set_isa_device();
 	m_videoram.resize(0x1000);
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_mda_device::io_read), this ), write8_delegate( FUNC(isa8_mda_device::io_write), this ) );
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_mda_device::io_write)));
 	m_isa->install_bank(0xb0000, 0xb0fff, "bank_mda", &m_videoram[0]);
 	m_isa->install_bank(0xb1000, 0xb1fff, "bank_mda", &m_videoram[0]);
 	m_isa->install_bank(0xb2000, 0xb2fff, "bank_mda", &m_videoram[0]);
@@ -558,7 +558,7 @@ void isa8_hercules_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(HERCULES_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(isa8_hercules_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(isa8_hercules_device::crtc_update_row));
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 
@@ -601,7 +601,7 @@ void isa8_hercules_device::device_start()
 
 	m_videoram.resize(0x10000);
 	set_isa_device();
-	m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_hercules_device::io_read), this ), write8_delegate( FUNC(isa8_hercules_device::io_write), this ) );
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_hercules_device::io_read)), write8_delegate(*this, FUNC(isa8_hercules_device::io_write)));
 	m_isa->install_bank(0xb0000, 0xbffff, "bank_hercules", &m_videoram[0]);
 
 	/* Initialise the mda palette */
@@ -772,7 +772,7 @@ void isa8_ec1840_0002_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(MDA_SCREEN_NAME);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(isa8_mda_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(isa8_mda_device::crtc_update_row));
 	m_crtc->out_hsync_callback().set(FUNC(isa8_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_mda_device::vsync_changed));
 }
@@ -1094,7 +1094,7 @@ void isa8_epc_mda_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
 
-	m_crtc->set_update_row_callback(FUNC(isa8_epc_mda_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(isa8_epc_mda_device::crtc_update_row));
 	m_crtc->out_hsync_callback().set(FUNC(isa8_epc_mda_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_epc_mda_device::vsync_changed));
 
@@ -1175,13 +1175,13 @@ void isa8_epc_mda_device::device_reset()
 
 	if (m_installed == false)
 	{
-		m_isa->install_device(0x3b0, 0x3bf, read8_delegate( FUNC(isa8_epc_mda_device::io_read), this ), write8_delegate( FUNC(isa8_epc_mda_device::io_write), this ) );
+		m_isa->install_device(0x3b0, 0x3bf, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
 		m_isa->install_bank(0xb0000, 0xb7fff, "bank_epc", &m_videoram[0]); // Monochrome emulation mode VRAM address
 
 		// This check allows a color monitor adapter to be installed at this address range if color emulation is disabled
 		if (m_color_mode & 1)
 		{
-			m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_epc_mda_device::io_read), this ), write8_delegate( FUNC(isa8_epc_mda_device::io_write), this ) );
+			m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_epc_mda_device::io_read)), write8_delegate(*this, FUNC(isa8_epc_mda_device::io_write)));
 			m_isa->install_bank(0xb8000, 0xbffff, "bank_epc", &m_videoram[0]); // Color emulation mode VRAM address, but same 32KB areas as there are only this amount on the board
 		}
 		m_installed = true;

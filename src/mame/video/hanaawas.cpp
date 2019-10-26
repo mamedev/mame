@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
 
 void hanaawas_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(hanaawas_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(hanaawas_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t hanaawas_state::screen_update_hanaawas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

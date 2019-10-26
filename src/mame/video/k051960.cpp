@@ -136,6 +136,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_ram(nullptr)
 	, m_sprite_rom(*this, DEVICE_SELF)
 	, m_scanline_timer(nullptr)
+	, m_k051960_cb(*this)
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
@@ -193,7 +194,7 @@ void k051960_device::device_start()
 	m_ram = make_unique_clear<uint8_t[]>(0x400);
 
 	// bind callbacks
-	m_k051960_cb.bind_relative_to(*owner());
+	m_k051960_cb.resolve();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();

@@ -339,7 +339,7 @@ void d64plus_state::d64plus(machine_config &config)
 	m_crtc->set_screen("plus_screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(d64plus_state::crtc_update_row));
 }
 
 void dragon_alpha_state::dgnalpha(machine_config &config)

@@ -127,9 +127,7 @@ void p1_hdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_rom(this, 0xe2000, 0xe27ff, "XXX", "p1_hdc");
-	m_isa->install_memory(0xd0000, 0xd0fff,
-		READ8_DELEGATE(p1_hdc_device, p1_HDC_r),
-		WRITE8_DELEGATE(p1_hdc_device, p1_HDC_w) );
+	m_isa->install_memory(0xd0000, 0xd0fff, read8_delegate(*this, FUNC(p1_hdc_device::p1_HDC_r)), write8_delegate(*this, FUNC(p1_hdc_device::p1_HDC_w)));
 }
 
 

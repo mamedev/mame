@@ -2064,7 +2064,9 @@ void mappy_state::init_grobda()
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the 15XX may still play some part in conveying speech to the DAC.
 	  */
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::data_w), (dac_byte_interface *)m_dac));
+	write8_delegate dac_w(*this);
+	dac_w.set(*m_dac, FUNC(dac_byte_interface::data_w));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, dac_w);
 }
 
 

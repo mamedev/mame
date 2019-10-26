@@ -899,8 +899,8 @@ void rohga_state::rohga(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -914,15 +914,15 @@ void rohga_state::rohga(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback), this);
-	m_sprgen[0]->set_col_callback(FUNC(rohga_state::rohga_col_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
+	m_sprgen[0]->set_col_callback(FUNC(rohga_state::rohga_col_callback));
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
@@ -989,8 +989,8 @@ void rohga_state::wizdfire(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -1004,8 +1004,8 @@ void rohga_state::wizdfire(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
@@ -1084,8 +1084,8 @@ void rohga_state::nitrobal(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -1099,8 +1099,8 @@ void rohga_state::nitrobal(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0);
 	m_deco_tilegen[1]->set_pf1_col_mask(0);
 	m_deco_tilegen[1]->set_pf2_col_mask(0);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
@@ -1180,8 +1180,8 @@ void rohga_state::schmeisr(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -1195,15 +1195,15 @@ void rohga_state::schmeisr(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x10);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(rohga_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(rohga_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(2);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[0], 0);
-	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback), this);
-	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback), this);  // wire mods on pcb...
+	m_sprgen[0]->set_pri_callback(FUNC(rohga_state::rohga_pri_callback));
+	m_sprgen[0]->set_col_callback(FUNC(rohga_state::schmeisr_col_callback));  // wire mods on pcb...
 	m_sprgen[0]->set_gfx_region(3);
 	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 

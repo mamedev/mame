@@ -790,7 +790,7 @@ void ace_state::ace(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("jupace_cass");
 
-	SNAPSHOT(config, "snapshot", "ace", attotime::from_seconds(1)).set_load_callback(FUNC(ace_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "ace", attotime::from_seconds(1)).set_load_callback(FUNC(ace_state::snapshot_cb));
 
 	I8255A(config, m_ppi);
 	m_ppi->in_pb_callback().set(FUNC(ace_state::sby_r));

@@ -7,7 +7,6 @@
    Hewlett Packard HP48 S/SX & G/GX and HP49 G
 
 **********************************************************************/
-
 #ifndef MAME_MACHINE_HP84_PORT_H
 #define MAME_MACHINE_HP84_PORT_H
 
@@ -58,6 +57,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
 private:
 	void fill_port();
 	void unfill_port();

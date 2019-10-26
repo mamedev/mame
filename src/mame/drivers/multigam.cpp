@@ -599,11 +599,11 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 
 		case 0x6000: /* disable irqs */
 			m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
+			m_ppu->set_scanline_callback(nullptr);
 		break;
 
 		case 0x6001: /* enable irqs */
-			m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(multigam_state::multigam3_mmc3_scanline_cb),this));
+			m_ppu->set_scanline_callback(*this, FUNC(multigam_state::multigam3_mmc3_scanline_cb));
 		break;
 	}
 }
@@ -619,7 +619,7 @@ void multigam_state::multigam_init_mmc3(uint8_t *prg_base, int prg_size, int chr
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigam3_mmc3_rom_switch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(*this, FUNC(multigam_state::multigam3_mmc3_rom_switch_w)));
 
 	m_multigam3_mmc3_banks[0] = 0x1e;
 	m_multigam3_mmc3_banks[1] = 0x1f;
@@ -664,7 +664,7 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 	}
 	else
 	{
-		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigm3_mapper2_w),this) );
+		space.install_write_handler(0x8000, 0xffff, write8_delegate(*this, FUNC(multigam_state::multigm3_mapper2_w)) );
 		membank("bank10")->set_base(memregion("maincpu")->base() + 0x6000);
 	}
 
@@ -725,11 +725,11 @@ void multigam_state::multigam_init_mapper02(uint8_t* prg_base, int prg_size)
 {
 	uint8_t* mem = memregion("maincpu")->base();
 	memcpy(mem + 0x8000, prg_base + prg_size - 0x8000, 0x8000);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigam3_mapper02_rom_switch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(*this, FUNC(multigam_state::multigam3_mapper02_rom_switch_w)));
 
 	m_mapper02_prg_base = prg_base;
 	m_mapper02_prg_size = prg_size;
-	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
+	m_ppu->set_scanline_callback(nullptr);
 }
 
 /******************************************************
@@ -878,7 +878,7 @@ void multigam_state::multigam_init_mmc1(uint8_t *prg_base, int prg_size, int chr
 
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x8000), 0x8000);
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::mmc1_rom_switch_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x8000, 0xffff, write8_delegate(*this, FUNC(multigam_state::mmc1_rom_switch_w)));
 
 	m_mmc1_reg_write_enable = 1;
 	m_mmc1_rom_mask = (prg_size / 0x4000) - 1;
@@ -886,7 +886,7 @@ void multigam_state::multigam_init_mmc1(uint8_t *prg_base, int prg_size, int chr
 	m_mmc1_prg_size = prg_size;
 	m_mmc1_chr_bank_base = chr_bank_base;
 
-	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
+	m_ppu->set_scanline_callback(nullptr);
 }
 
 
@@ -949,7 +949,7 @@ void multigam_state::supergm3_set_bank()
 		// title screen
 		memcpy(mem + 0x8000, mem + 0x18000, 0x8000);
 		membank("bank10")->set_base(mem + 0x6000);
-		m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate());
+		m_ppu->set_scanline_callback(nullptr);
 	}
 	else if ((m_supergm3_prg_bank & 0x40) == 0)
 	{
@@ -1168,7 +1168,7 @@ void multigam_state::machine_start()
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),this), write8_delegate(FUNC(multigam_state::multigam_nt_w),this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->set_base(memregion("gfx1")->base());
 }
@@ -1181,7 +1181,7 @@ MACHINE_START_MEMBER(multigam_state,multigm3)
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),this), write8_delegate(FUNC(multigam_state::multigam_nt_w),this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
 
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x03ff, "bank2");
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0400, 0x07ff, "bank3");
@@ -1203,7 +1203,7 @@ MACHINE_START_MEMBER(multigam_state,supergm3)
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(multigam_state::multigam_nt_r),this), write8_delegate(FUNC(multigam_state::multigam_nt_w),this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(multigam_state::multigam_nt_r)), write8_delegate(*this, FUNC(multigam_state::multigam_nt_w)));
 
 	m_vram = std::make_unique<uint8_t[]>(0x2000);
 	m_multigmc_mmc3_6000_ram = std::make_unique<uint8_t[]>(0x2000);

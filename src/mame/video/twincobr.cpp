@@ -61,16 +61,16 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
 
 void twincobr_state::twincobr_create_tilemaps()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(twincobr_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(twincobr_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(twincobr_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(twincobr_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(twincobr_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(twincobr_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
-	m_bg_tilemap->set_scrolldx(-55, -134 );
-	m_fg_tilemap->set_scrolldx(-55, -134 );
-	m_tx_tilemap->set_scrolldx(-55, -134 );
-	m_bg_tilemap->set_scrolldy(-30, -243 );
-	m_fg_tilemap->set_scrolldy(-30, -243 );
-	m_tx_tilemap->set_scrolldy(-30, -243 );
+	m_bg_tilemap->set_scrolldx(-55, -134);
+	m_fg_tilemap->set_scrolldx(-55, -134);
+	m_tx_tilemap->set_scrolldx(-55, -134);
+	m_bg_tilemap->set_scrolldy(-30, -243);
+	m_fg_tilemap->set_scrolldy(-30, -243);
+	m_tx_tilemap->set_scrolldy(-30, -243);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);

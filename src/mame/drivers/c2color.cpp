@@ -140,7 +140,7 @@ void c2_color_state::c2_color(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "c2color_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(c2_color_state::cart_load), this);
+	m_cart->set_device_load(FUNC(c2_color_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("c2color_cart");
 }

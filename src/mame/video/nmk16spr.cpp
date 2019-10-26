@@ -39,6 +39,8 @@ DEFINE_DEVICE_TYPE(NMK_16BIT_SPRITE, nmk_16bit_sprite_device, "nmk16spr", "NMK 1
 
 nmk_16bit_sprite_device::nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NMK_16BIT_SPRITE, tag, owner, clock)
+	, m_colpri_cb(*this)
+	, m_ext_cb(*this)
 	, m_flip_screen(false)
 	, m_videoshift(0)
 	, m_xmask(0x1ff), m_ymask(0x1ff)
@@ -255,8 +257,8 @@ void nmk_16bit_sprite_device::draw_sprites(screen_device &screen, bitmap_ind16 &
 
 void nmk_16bit_sprite_device::device_start()
 {
-	m_colpri_cb.bind_relative_to(*owner());
-	m_ext_cb.bind_relative_to(*owner());
+	m_colpri_cb.resolve();
+	m_ext_cb.resolve();
 	m_flip_screen = false;
 	m_spritelist = make_unique_clear<struct sprite_t[]>((0x1000/0x10) * 16 * 16);
 

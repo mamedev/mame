@@ -50,9 +50,9 @@ void taitol_state::video_start()
 {
 	m_buff_spriteram = make_unique_clear<u8[]>(SPRITERAM_SIZE);
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_tile_info<0x8000>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_tile_info<0x9000>),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_tx_tile_info),this),      TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitol_state::get_tile_info<0x8000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitol_state::get_tile_info<0x9000>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitol_state::get_tx_tile_info)),      TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_tx_tilemap->set_transparent_pen(0);

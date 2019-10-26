@@ -242,10 +242,10 @@ void argus_common_state::reset_common()
 void argus_state::video_start()
 {
 	/*                           info                     offset             w   h  col  row */
-//  m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_bg0_tile_info),this),   TILEMAP_SCAN_COLS, 16, 16, 4096,    32); // full 65536 width tilemap
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_bg0_tile_info),this),   TILEMAP_SCAN_COLS, 16, 16, 1024/16, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_bg1_tile_info),this),   TILEMAP_SCAN_COLS, 16, 16, 32,      32);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(argus_state::get_tx_tile_info<3>),this), TILEMAP_SCAN_COLS,  8,  8, 32,      32);
+//  m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(argus_state::get_bg0_tile_info)),   TILEMAP_SCAN_COLS, 16, 16, 4096,    32); // full 65536 width tilemap
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(argus_state::get_bg0_tile_info)),   TILEMAP_SCAN_COLS, 16, 16, 1024/16, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(argus_state::get_bg1_tile_info)),   TILEMAP_SCAN_COLS, 16, 16, 32,      32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(argus_state::get_tx_tile_info<3>)), TILEMAP_SCAN_COLS,  8,  8, 32,      32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);
@@ -265,8 +265,8 @@ void argus_state::video_reset()
 void valtric_state::video_start()
 {
 	/*                           info                      offset             w   h  col  row */
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(valtric_state::get_bg_tile_info),this),    TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(valtric_state::get_tx_tile_info<2>),this), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(valtric_state::get_bg_tile_info)),    TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(valtric_state::get_tx_tile_info<2>)), TILEMAP_SCAN_COLS,  8,  8, 32, 32);
 
 	m_tx_tilemap->set_transparent_pen(15);
 
@@ -289,9 +289,9 @@ void valtric_state::video_reset()
 void butasan_state::video_start()
 {
 	/*                           info                       offset             w   h  col  row */
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(butasan_state::get_bg0_tile_info),this), tilemap_mapper_delegate(FUNC(butasan_state::bg_scan),this), 16, 16, 32, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(butasan_state::get_bg1_tile_info),this), tilemap_mapper_delegate(FUNC(butasan_state::bg_scan),this), 16, 16, 32, 32);
-	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(butasan_state::get_tx_tile_info),this),  tilemap_mapper_delegate(FUNC(butasan_state::tx_scan),this),  8,  8, 32, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(butasan_state::get_bg0_tile_info)), tilemap_mapper_delegate(*this, FUNC(butasan_state::bg_scan)), 16, 16, 32, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(butasan_state::get_bg1_tile_info)), tilemap_mapper_delegate(*this, FUNC(butasan_state::bg_scan)), 16, 16, 32, 32);
+	m_tx_tilemap    = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(butasan_state::get_tx_tile_info)),  tilemap_mapper_delegate(*this, FUNC(butasan_state::tx_scan)),  8,  8, 32, 32);
 
 	m_bg_tilemap[1]->set_transparent_pen(15);
 	m_tx_tilemap->set_transparent_pen(15);

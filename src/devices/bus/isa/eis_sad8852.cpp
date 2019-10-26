@@ -236,8 +236,8 @@ void isa16_sad8852_device::device_reset()
 	{
 		m_isa->install_device(
 				0x378, 0x378, // Wrong, need to find real i/o addresses
-				read8_delegate(FUNC( isa16_sad8852_device::sad8852_r ), this),
-				write8_delegate(FUNC( isa16_sad8852_device::sad8852_w ), this));
+				read8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_r)),
+				write8_delegate(*this, FUNC(isa16_sad8852_device::sad8852_w)));
 		m_irq = m_isairq->read();
 		m_installed = true;
 	}

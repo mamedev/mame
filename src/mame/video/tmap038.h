@@ -10,6 +10,8 @@
 class tilemap038_device : public device_t
 {
 public:
+	typedef device_delegate<void (bool tiledim, u32 &color, u32 &pri, u32 &code)> tmap038_cb_delegate;
+
 	tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner)
 		: tilemap038_device(mconfig, tag, owner, (u32)0)
 	{
@@ -19,8 +21,7 @@ public:
 
 	// configurations
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	typedef device_delegate<void (bool tiledim, u32 &color, u32 &pri, u32 &code)> tmap038_cb_delegate;
-	void set_tile_callback(tmap038_cb_delegate cb) { m_038_cb = cb; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_038_cb.set(std::forward<T>(args)...); }
 	void set_gfx(u16 no) { m_gfxno = no; }
 
 	// call to do the rendering etc.

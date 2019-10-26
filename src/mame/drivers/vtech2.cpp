@@ -93,10 +93,10 @@ void vtech2_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x1f).rw(FUNC(vtech2_state::laser_fdc_r), FUNC(vtech2_state::laser_fdc_w));
-	map(0x40, 0x40).lw8("set_bankA", [this] (u8 data) { m_banka->set_bank(data & 15); });
-	map(0x41, 0x41).lw8("set_bankB", [this] (u8 data) { m_bankb->set_bank(data & 15); });
-	map(0x42, 0x42).lw8("set_bankC", [this] (u8 data) { m_bankc->set_bank(data & 15); });
-	map(0x43, 0x43).lw8("set_bankD", [this] (u8 data) { m_bankd->set_bank(data & 15); });
+	map(0x40, 0x40).lw8(NAME([this] (u8 data) { m_banka->set_bank(data & 15); }));
+	map(0x41, 0x41).lw8(NAME([this] (u8 data) { m_bankb->set_bank(data & 15); }));
+	map(0x42, 0x42).lw8(NAME([this] (u8 data) { m_bankc->set_bank(data & 15); }));
+	map(0x43, 0x43).lw8(NAME([this] (u8 data) { m_bankd->set_bank(data & 15); }));
 	map(0x44, 0x44).w(FUNC(vtech2_state::laser_bg_mode_w));
 	map(0x45, 0x45).w(FUNC(vtech2_state::laser_two_color_w));
 }
@@ -521,7 +521,7 @@ void vtech2_state::laser350(machine_config &config)
 	VTECH_IOEXP_SLOT(config, "io").set_io_space(m_maincpu, AS_IO);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "vtech_cart", "rom,bin").set_device_load(FUNC(vtech2_state::cart_load));
 
 	/* 5.25" Floppy drive */
 	LEGACY_FLOPPY(config, FLOPPY_0, 0, &vtech2_floppy_interface);

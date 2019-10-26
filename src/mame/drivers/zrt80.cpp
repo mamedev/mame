@@ -304,7 +304,7 @@ void zrt80_state::zrt80(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8); /*?*/
-	m_crtc->set_update_row_callback(FUNC(zrt80_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(zrt80_state::crtc_update_row));
 
 	INS8250(config, m_8250, 2457600);
 	m_8250->out_int_callback().set_inputline("maincpu", INPUT_LINE_IRQ0);

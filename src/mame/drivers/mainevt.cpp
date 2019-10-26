@@ -443,13 +443,13 @@ void mainevt_state::mainevt(machine_config &config)
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(mainevt_state::mainevt_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(mainevt_state::mainevt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(mainevt_state::mainevt_sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(mainevt_state::mainevt_sprite_callback));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -492,13 +492,13 @@ void mainevt_state::devstors(machine_config &config)
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen("screen");
-	m_k052109->set_tile_callback(FUNC(mainevt_state::dv_tile_callback), this);
+	m_k052109->set_tile_callback(FUNC(mainevt_state::dv_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
-	m_k051960->set_sprite_callback(FUNC(mainevt_state::dv_sprite_callback), this);
+	m_k051960->set_sprite_callback(FUNC(mainevt_state::dv_sprite_callback));
 
 	K051733(config, "k051733", 0);
 

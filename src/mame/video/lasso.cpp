@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
 void lasso_state::video_start()
 {
 	/* create tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::lasso_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 }
@@ -162,8 +162,8 @@ void lasso_state::video_start()
 VIDEO_START_MEMBER(lasso_state,wwjgtin)
 {
 	/* create tilemaps */
-	m_bg_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::lasso_get_bg_tile_info),this),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
-	m_track_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::wwjgtin_get_track_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
+	m_bg_tilemap =    &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::lasso_get_bg_tile_info)),      TILEMAP_SCAN_ROWS,  8,  8,  32, 32);
+	m_track_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::wwjgtin_get_track_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 128, 64);
 
 	m_bg_tilemap->set_transparent_pen(0);
 }
@@ -171,7 +171,7 @@ VIDEO_START_MEMBER(lasso_state,wwjgtin)
 VIDEO_START_MEMBER(lasso_state,pinbo)
 {
 	/* create tilemap */
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lasso_state::pinbo_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lasso_state::pinbo_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 }

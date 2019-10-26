@@ -2361,7 +2361,7 @@ void p500_state::p500_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500));
 
 	// internal ram
 	_128k(config);
@@ -2492,7 +2492,7 @@ void p500_state::p500_pal(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(p500_state::quickload_p500));
 
 	// internal ram
 	_128k(config);
@@ -2535,7 +2535,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(cbm2_state::crtc_update_row));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -2622,7 +2622,7 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
 	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
-	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb), this);
+	QUICKLOAD(config, "quickload", "p00,prg,t64", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(cbm2_state::quickload_cbmb));
 
 	// software list
 	SOFTWARE_LIST(config, "cart_list").set_original("cbm2_cart").set_filter("NTSC");

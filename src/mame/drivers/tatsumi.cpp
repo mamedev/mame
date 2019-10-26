@@ -860,7 +860,7 @@ MACHINE_RESET_MEMBER(apache3_state,apache3)
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
 
 	/* Hook the RESET line, which resets the Z80 */
-	m_subcpu->set_reset_callback(write_line_delegate(FUNC(apache3_state::apache3_68000_reset),this));
+	m_subcpu->set_reset_callback(*this, FUNC(apache3_state::apache3_68000_reset));
 }
 
 

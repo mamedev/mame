@@ -93,9 +93,9 @@ void gio64_device::device_start()
 	std::fill(std::begin(m_device_list), std::end(m_device_list), nullptr);
 
 	m_space = &space(0);
-	m_space->install_readwrite_handler(0x00000000, 0x003fffff, read64_delegate(FUNC(gio64_device::no_gfx_r), this), write64_delegate(FUNC(gio64_device::no_gfx_w), this));
-	m_space->install_readwrite_handler(0x00400000, 0x005fffff, read64_delegate(FUNC(gio64_device::no_exp0_r), this), write64_delegate(FUNC(gio64_device::no_exp0_w), this));
-	m_space->install_readwrite_handler(0x00600000, 0x009fffff, read64_delegate(FUNC(gio64_device::no_exp1_r), this), write64_delegate(FUNC(gio64_device::no_exp1_w), this));
+	m_space->install_readwrite_handler(0x00000000, 0x003fffff, read64_delegate(*this, FUNC(gio64_device::no_gfx_r)), write64_delegate(*this, FUNC(gio64_device::no_gfx_w)));
+	m_space->install_readwrite_handler(0x00400000, 0x005fffff, read64_delegate(*this, FUNC(gio64_device::no_exp0_r)), write64_delegate(*this, FUNC(gio64_device::no_exp0_w)));
+	m_space->install_readwrite_handler(0x00600000, 0x009fffff, read64_delegate(*this, FUNC(gio64_device::no_exp1_r)), write64_delegate(*this, FUNC(gio64_device::no_exp1_w)));
 }
 
 READ64_MEMBER(gio64_device::no_gfx_r)  { return ~0ULL; }

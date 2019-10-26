@@ -8,9 +8,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/mc6845.h"
 #include "includes/qix.h"
+
 #include "cpu/m6809/m6809.h"
+#include "video/mc6845.h"
 
 
 /*************************************
@@ -389,14 +390,14 @@ void qix_state::qix_video(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(qix_state::crtc_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(qix_state::crtc_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(qix_state::crtc_begin_update));
+	m_crtc->set_update_row_callback(FUNC(qix_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(qix_state::display_enable_changed));
 	m_crtc->out_vsync_callback().set(FUNC(qix_state::qix_vsync_changed));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(QIX_CHARACTER_CLOCK*8, 0x148, 0, 0x100, 0x111, 0, 0x100); /* from CRTC */
-	m_screen->set_screen_update("vid_u18", FUNC(mc6845_device::screen_update));
+	m_screen->set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 }
 
 void qix_state::kram3_video(machine_config &config)

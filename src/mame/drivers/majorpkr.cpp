@@ -557,8 +557,8 @@ TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
 
 void majorpkr_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(majorpkr_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(majorpkr_state::fg_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(majorpkr_state::bg_get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(majorpkr_state::fg_get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 36, 28);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 

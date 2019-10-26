@@ -399,13 +399,13 @@ void f1gp_state::f1gp(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_pritype(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<1>));
 	m_spr_old[1]->set_gfx_region(2);
 	m_spr_old[1]->set_pritype(2);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -488,8 +488,9 @@ void f1gp2_state::f1gp2(machine_config &config)
 	config.device_remove("gga");
 	config.device_remove("vsystem_spr_old1");
 	config.device_remove("vsystem_spr_old2");
+
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>), this);
+	m_spr->set_tile_indirect_cb(FUNC(f1gp2_state::tile_callback<0>));
 	m_spr->set_gfx_region(1);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 

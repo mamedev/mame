@@ -445,7 +445,7 @@ void d6800_state::d6800(machine_config &config)
 	TIMER(config, "kansas_r").configure_periodic(FUNC(d6800_state::kansas_r), attotime::from_hz(40000));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin,c8,ch8", attotime::from_seconds(1)).set_load_callback(FUNC(d6800_state::quickload_cb));
 }
 
 /* ROMs */

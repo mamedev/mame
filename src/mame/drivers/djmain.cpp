@@ -1403,7 +1403,7 @@ void djmain_state::djmainj(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_djmain);
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(djmain_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(djmain_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4dj, 1, 1);
 	m_k056832->set_palette(m_palette);
 

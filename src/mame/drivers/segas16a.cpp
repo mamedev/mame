@@ -2041,7 +2041,7 @@ void segas16a_state::aceattaca_fd1094(machine_config &config)
 void segas16a_state::system16a_i8751(machine_config &config)
 {
 	system16a(config);
-	m_maincpu->set_vblank_int(device_interrupt_delegate(), nullptr);
+	m_maincpu->remove_vblank_int();
 
 	I8751(config, m_mcu, 8000000);
 	m_mcu->set_addrmap(AS_IO, &segas16a_state::mcu_io_map);
@@ -3882,8 +3882,8 @@ void segas16a_state::init_generic()
 	m_nvram->set_base(m_workram, m_workram.bytes());
 
 	// create default read/write handlers
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::standard_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segas16a_state::standard_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::standard_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segas16a_state::standard_io_w));
 
 	// save state
 	save_item(NAME(m_video_control));
@@ -3904,8 +3904,8 @@ void segas16a_state::init_generic()
 void segas16a_state::init_aceattaca()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaca_custom_io_r), this);
-	m_custom_io_w = write16_delegate(FUNC(segas16a_state::aceattaca_custom_io_w), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_r));
+	m_custom_io_w = write16_delegate(*this, FUNC(segas16a_state::aceattaca_custom_io_w));
 }
 
 void segas16a_state::init_dumpmtmt()
@@ -3917,25 +3917,25 @@ void segas16a_state::init_dumpmtmt()
 void segas16a_state::init_mjleague()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::mjleague_custom_io_r), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::mjleague_custom_io_r));
 }
 
 void segas16a_state::init_passsht16a()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::passsht16a_custom_io_r), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::passsht16a_custom_io_r));
 }
 
 void segas16a_state::init_sdi()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sdi_custom_io_r), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::sdi_custom_io_r));
 }
 
 void segas16a_state::init_sjryukoa()
 {
 	init_generic();
-	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
+	m_custom_io_r = read16_delegate(*this, FUNC(segas16a_state::sjryuko_custom_io_r));
 	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 

@@ -527,7 +527,7 @@ void spiders_state::spiders(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(spiders_state::crtc_update_row));
 	crtc.out_de_callback().set("ic60", FUNC(ttl74123_device::a_w));
 
 	PIA6821(config, m_pia[0], 0);

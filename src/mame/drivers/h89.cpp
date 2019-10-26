@@ -31,8 +31,8 @@ class h89_state : public driver_device
 {
 public:
 	h89_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
 	{
 	}
 
@@ -199,7 +199,7 @@ void h89_state::h89(machine_config & config)
 	rs232.rxd_handler().set("ins8250", FUNC(ins8250_uart_device::rx_w));
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	TIMER(config, "irq_timer", 0).configure_periodic(timer_device::expired_delegate(FUNC(h89_state::h89_irq_timer), this), attotime::from_hz(100));
+	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(h89_state::h89_irq_timer), attotime::from_hz(100));
 }
 
 /* ROM definition */

@@ -1255,7 +1255,7 @@ void cuebrickj_state::init_cuebrickj()
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	space.install_readwrite_bank(0x0b0000, 0x0b03ff, "nvrambank");
-	space.install_write_handler( 0x0b0400, 0x0b0401, WRITE8_DELEGATE(cuebrickj_state, nvram_bank_w), 0xff00);
+	space.install_write_handler( 0x0b0400, 0x0b0401, write8_delegate(*this, FUNC(cuebrickj_state::nvram_bank_w)), 0xff00);
 
 	membank("nvrambank")->configure_entries(0, 0x20, m_nvram, 0x400);
 

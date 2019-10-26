@@ -233,9 +233,9 @@ void bfm_adder2_device::device_start()
 	save_item(NAME(m_adder_ram));
 	save_item(NAME(m_screen_ram));
 
-	m_tilemap0 = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile0_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	m_tilemap0 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(bfm_adder2_device::get_tile0_info)), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
-	m_tilemap1 = &machine().tilemap().create(*this, tilemap_get_info_delegate(FUNC(bfm_adder2_device::get_tile1_info),this), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
+	m_tilemap1 = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(bfm_adder2_device::get_tile1_info)), TILEMAP_SCAN_ROWS,  8, 8, 50, 35);
 
 	palette().set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette().set_pen_color(1,rgb_t(0x00,0x00,0xFF));

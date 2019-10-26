@@ -1422,7 +1422,7 @@ void pc9801_state::pc9821_io(address_map &map)
 {
 //  map.unmap_value_high(); // TODO: a read to somewhere makes this to fail at POST
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
-	map(0x0000, 0x001f).r(read8_delegate([this](address_space &s, offs_t o, u8 mm) { return BIT(o, 1) ? 0xff : pic_r(s, o, mm); }, "pc9821_pic")).umask32(0x00ff00ff);
+	map(0x0000, 0x001f).lr8(NAME([this] (address_space &s, offs_t o, u8 mm) { return BIT(o, 1) ? 0xff : pic_r(s, o, mm); })).umask32(0x00ff00ff);
 	map(0x0000, 0x001f).w(FUNC(pc9801_state::pic_w)).umask32(0x00ff00ff);  // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask32(0x000000ff);
 	map(0x0020, 0x002f).w(FUNC(pc9801_state::dmapg8_w)).umask32(0xff00ff00);
@@ -1471,7 +1471,7 @@ void pc9801_state::pc9821_io(address_map &map)
 //  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
-	map(0x2ed0, 0x2edf).r(read8_delegate([](address_space &s, offs_t o, u8 mm) { return 0xff; }, "pc9821_unkaudio")).umask32(0xffffffff); // unknown sound related
+	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask32(0xff00ff00); // <undefined> / pit mirror ports
 	map(0x7fd8, 0x7fdf).rw("ppi8255_mouse", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
 	map(0x841c, 0x841f).rw(FUNC(pc9801_state::sdip_0_r), FUNC(pc9801_state::sdip_0_w));

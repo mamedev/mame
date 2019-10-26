@@ -161,7 +161,7 @@ void poly88_state::poly88(machine_config &config)
 	m_brg->output_cb().set(FUNC(poly88_state::cassette_clock_w));
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "img", attotime::from_seconds(2)).set_load_callback(FUNC(poly88_state::snapshot_cb));
 
 	S100_BUS(config, m_s100, 16.5888_MHz_XTAL / 9);
 	m_s100->vi2().set(FUNC(poly88_state::vi2_w));

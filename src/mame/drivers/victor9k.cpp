@@ -701,7 +701,7 @@ void victor9k_state::victor9k(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(10);
-	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(victor9k_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(victor9k_state::vert_w));
 
 	// sound hardware

@@ -115,12 +115,12 @@ human_interface_device::human_interface_device(const machine_config &mconfig, de
 void human_interface_device::device_start()
 {
 	program_space().install_readwrite_handler(0x420000, 0x420003, 0x0003, 0xfffc, 0,
-		read8_delegate(FUNC(upi41_cpu_device::upi41_master_r), &(*m_iocpu)),
-		write8_delegate(FUNC(upi41_cpu_device::upi41_master_w), &(*m_iocpu)), 0x00ff00ff);
+			read8_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_r)),
+			write8_delegate(*m_iocpu, FUNC(upi41_cpu_device::upi41_master_w)), 0x00ff00ff);
 
 	program_space().install_readwrite_handler(0x470000, 0x47001f, 0x1f, 0xffe0, 0,
-		read8_delegate(FUNC(human_interface_device::gpib_r), this),
-		write8_delegate(FUNC(human_interface_device::gpib_w), this), 0x00ff00ff);
+			read8_delegate(*this, FUNC(human_interface_device::gpib_r)),
+			write8_delegate(*this, FUNC(human_interface_device::gpib_w)), 0x00ff00ff);
 
 	save_item(NAME(m_hil_read));
 	save_item(NAME(m_kbd_nmi));

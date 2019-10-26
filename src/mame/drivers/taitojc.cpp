@@ -528,7 +528,7 @@ WRITE16_MEMBER(taitojc_state::main_to_dsp_7ff_w)
 void taitojc_state::cpu_space_map(address_map &map)
 {
 	map(0xfffffff0, 0xffffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffffff4, 0xfffffff5).lr16("vblank irq", []() -> u16 { return 0x82; });
+	map(0xfffffff4, 0xfffffff5).lr16(NAME([] () -> u16 { return 0x82; }));
 }
 
 INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
@@ -1176,7 +1176,7 @@ void taitojc_state::init_taitojc()
 	m_has_dsp_hack = 1;
 
 	if (DSP_IDLESKIP)
-		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::taitojc_dsp_idle_skip_r),this));
+		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(*this, FUNC(taitojc_state::taitojc_dsp_idle_skip_r)));
 }
 
 void taitojc_state::init_dendego2()
@@ -1184,7 +1184,7 @@ void taitojc_state::init_dendego2()
 	init_taitojc();
 
 	if (DSP_IDLESKIP)
-		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(FUNC(taitojc_state::dendego2_dsp_idle_skip_r),this));
+		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16_delegate(*this, FUNC(taitojc_state::dendego2_dsp_idle_skip_r)));
 }
 
 void taitojc_state::init_dangcurv()

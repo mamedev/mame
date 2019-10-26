@@ -58,6 +58,8 @@ public:
 		, m_workram(*this, "workram")
 		, m_romboard(ROM_BOARD_INVALID)
 		, m_tilemap_type(segaic16_video_device::TILEMAP_16B)
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_disable_screen_blanking(false)
 		, m_i8751_initial_config(nullptr)
 		, m_atomicp_sound_divisor(0)

@@ -51,7 +51,9 @@ void e0c6s46_device::e0c6s46_data(address_map &map)
 e0c6s46_device::e0c6s46_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: e0c6200_cpu_device(mconfig, E0C6S46, tag, owner, clock, address_map_constructor(FUNC(e0c6s46_device::e0c6s46_program), this), address_map_constructor(FUNC(e0c6s46_device::e0c6s46_data), this))
 	, m_vram1(*this, "vram1")
-	, m_vram2(*this, "vram2"), m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
+	, m_vram2(*this, "vram2")
+	, m_osc(0), m_svd(0), m_lcd_control(0), m_lcd_contrast(0)
+	, m_pixel_update_cb(*this)
 	, m_write_r{{*this}, {*this}, {*this}, {*this}, {*this}}
 	, m_read_p{{*this}, {*this}, {*this}, {*this}}
 	, m_write_p{{*this}, {*this}, {*this}, {*this}}
@@ -83,7 +85,7 @@ void e0c6s46_device::device_start()
 		m_write_p[i].resolve_safe();
 	}
 
-	m_pixel_update_cb.bind_relative_to(*owner());
+	m_pixel_update_cb.resolve();
 
 	// create timers
 	m_core_256_handle = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(e0c6s46_device::core_256_cb), this));

@@ -229,7 +229,7 @@ void mindset_sound_module::map(address_map &map)
 
 void mindset_sound_module::idmap(address_map &map)
 {
-	map(0x00, 0x3f).lr8("id", []() -> u8 { return 0x13; }).umask16(0x00ff);
+	map(0x00, 0x3f).lr8(NAME([]() -> u8 { return 0x13; })).umask16(0x00ff);
 }
 
 ROM_START(mindset_sound_module)
@@ -288,7 +288,7 @@ void mindset_rs232_module::map(address_map &map)
 
 void mindset_rs232_module::idmap(address_map &map)
 {
-	map(0x00, 0x3f).lr8("id", [this]() -> u8 { return 0x73 | (m_irq_state ? 0x80 : 0x00); }).umask16(0x00ff);
+	map(0x00, 0x3f).lr8(NAME([this]() -> u8 { return 0x73 | (m_irq_state ? 0x80 : 0x00); })).umask16(0x00ff);
 }
 
 void mindset_rs232_module::device_add_mconfig(machine_config &config)

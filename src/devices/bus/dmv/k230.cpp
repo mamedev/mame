@@ -148,7 +148,7 @@ void dmv_k230_device::device_start()
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	m_bus->m_iospace->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+	m_bus->m_iospace->install_readwrite_handler(0xd8, 0xdf, read8_delegate(*this, FUNC(dmv_k234_device::snr_r)), write8_delegate(*this, FUNC(dmv_k234_device::snr_w)), 0);
 
 	// register for state saving
 	save_item(NAME(m_snr));

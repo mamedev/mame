@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(homerun_state::get_tile_info)
 
 void homerun_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(homerun_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(homerun_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	save_item(NAME(m_gfx_ctrl));
 	save_item(NAME(m_scrolly));

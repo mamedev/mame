@@ -1789,7 +1789,7 @@ void pokemini_state::pokemini(machine_config &config)
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min").set_device_load(FUNC(pokemini_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "pokemini_cart", "bin,min").set_device_load(FUNC(pokemini_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pokemini");

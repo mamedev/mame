@@ -244,145 +244,164 @@ void epc_state::epc_map(address_map &map)
 
 void epc_state::epc_io(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0x10).lrw8("dma8237_rw",
+	map(0x0000, 0x000f).mirror(0x10).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_dma8237a->read(offset);
 			LOGDMA("dma8237_r %04x\n", offset);
 			return data;
 		},
+		"dma8237_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGDMA("dma8237_w %04x: %02x\n", offset, data);
 			m_dma8237a->write(offset, data);
-		}
+		},
+		"dma8237_w"
 	);
 
-	map(0x0020, 0x0021).mirror(0x1e).lrw8("pic8259_rw",
+	map(0x0020, 0x0021).mirror(0x1e).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_pic8259->read(offset);
 			LOGPIC("pic8259_r %04x: %02x\n", offset, data);
 			return data;
 		},
+		"pic8259_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPIC("pic8259_w %04x: %02x\n", offset, data);
 			m_pic8259->write(offset, data);
-		}
+		},
+		"pic8259_w"
 	);
 
-	map(0x0040, 0x0043).mirror(0x1c).lrw8("pit8253_rw",
+	map(0x0040, 0x0043).mirror(0x1c).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_pit8253->read(offset);
 			LOGPIT("pit8253_r %04x\n", offset);
 			return data;
 		},
+		"pit8253_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPIT("pit8253_w %04x: %02x\n", offset, data);
 			m_pit8253->write(offset, data);
-		}
+		},
+		"pit8253_w"
 	);
 
-	map(0x0060, 0x0060).mirror(0x1c).lrw8("kbd_8251_data_rw",
+	map(0x0060, 0x0060).mirror(0x1c).lrw8(
 		[this]() -> uint8_t
 		{
 			uint8_t data = m_kbd8251->data_r();
 			LOGKBD("kbd8251_r %02x\n", data);
 			return data;
 		},
+		"kbd_8251_data_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_w 0x60 %02x\n", data);
 			m_kbd8251->data_w(data);
-		}
+		},
+		"kbd_8251_data_w"
 	);
 									// NOTE: PPI Port A is not mapped
-	map(0x0061, 0x0061).mirror(0x1c).lrw8("ppi8255_rw", // PPI Port B
+	map(0x0061, 0x0061).mirror(0x1c).lrw8(              // PPI Port B
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(1);
 			LOGPPI("ppi8255_r Port B: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Port B: %02x\n", data);
 			m_ppi8255->write(1, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0062, 0x0062).mirror(0x1c).lrw8("ppi8255_rw", // PPI Port C
+	map(0x0062, 0x0062).mirror(0x1c).lrw8(              // PPI Port C
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(2);
 			LOGPPI("ppi8255_r Port C: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Port C: %02x\n", data);
 			m_ppi8255->write(2, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0063, 0x0063).lrw8("ppi8255_rw",  // PPI Control register
+	map(0x0063, 0x0063).lrw8(               // PPI Control register
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(3);
 			LOGPPI("ppi8255_r Control: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Control: %02x\n", data);
 			m_ppi8255->write(3, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0070, 0x0070).mirror(0x0e).lw8("i8251_data_w",
+	map(0x0070, 0x0070).mirror(0x0e).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_w 0x70: %02x\n", data);
 			m_kbd8251->data_w(data);
-		}
+		},
+		"i8251_data_w"
 	);
 
-	map(0x0071, 0x0071).mirror(0x0e).lrw8("kbd_8251_stat_ctrl_rw",
+	map(0x0071, 0x0071).mirror(0x0e).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t stat = m_kbd8251->status_r();
 			//LOGKBD("kbd8251_status_r %02x\n", stat);
 			return stat;
 		},
+		"kbd_8251_stat_ctrl_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_control_w 0x71: %02x\n", data);
 			m_kbd8251->control_w(data);
-		}
+		},
+		"kbd_8251_stat_ctrl_w"
 	);
 
-	map(0x0080, 0x0083).mirror(0xc).lw8("dma_segement_w",
+	map(0x0080, 0x0083).mirror(0xc).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGDMA("dma_segment_w %04x: %02x\n", offset, data);
 			m_dma_segment[offset] = data & 0x0f;
-		}
+		},
+		"dma_segement_w"
 	);
 
-	map(0x00a0, 0x00a1).mirror(0xe).lw8("nmi_enable_w",
+	map(0x00a0, 0x00a1).mirror(0xe).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGNMI("nmi_enable_w %04x: %02x\n", offset, data);
 			m_nmi_enabled = BIT(data,7);
 			update_nmi();
-		}
+		},
+		"nmi_enable_w"
 	);
 
 	// FDC Output Control Register (same as PC XT DOR)
-	map(0x03f2, 0x03f3).lw8("ocr_w",        // B0-B1 Drive select 0-3
+	map(0x03f2, 0x03f3).lw8(                // B0-B1 Drive select 0-3
 		[this](offs_t offset, uint8_t data) // B2 FDC Reset line
 		{                   // B3 Enable FDC DMA/IRQ
 			LOGFDC("FDC OCR: %02x\n", data);// B4-B7 Motor on for selected drive
@@ -404,23 +423,26 @@ void epc_state::epc_io(address_map &map)
 				m_fdc->reset();
 			check_fdc_irq();
 			check_fdc_drq();
-		}
+		},
+		"ocr_w"
 	);
 
 	map(0x03f4, 0x03f5).m(m_fdc, FUNC(i8272a_device::map));
 
-	map(0x03bc, 0x03be).lrw8("lpt_rw",
+	map(0x03bc, 0x03be).lrw8(
 		[this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t data = m_lpt->read(space, offset);
 			LOGLPT("LPT read offset %02x: %02x\n", offset, data);
 			return data;
 		},
+		"lpt_r",
 		[this](address_space &space, offs_t offset, uint8_t data)
 		{
 			LOGLPT("LPT write offset %02x: %02x\n", offset, data);
 			m_lpt->write(space, offset, data);
-		}
+		},
+		"lpt_w"
 	);
 
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));

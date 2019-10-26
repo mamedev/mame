@@ -821,10 +821,10 @@ void sc4_state::machine_start()
 	m_nvram->set_base(m_mainram, sizeof(m_mainram));
 
 	m_maincpu->set_port_callbacks(
-			m68307_cpu_device::porta_read_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_r), this),
-			m68307_cpu_device::porta_write_delegate(FUNC(sc4_state::bfm_sc4_68307_porta_w), this),
-			m68307_cpu_device::portb_read_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_r), this),
-			m68307_cpu_device::portb_write_delegate(FUNC(sc4_state::bfm_sc4_68307_portb_w), this));
+			m68307_cpu_device::porta_read_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_porta_r)),
+			m68307_cpu_device::porta_write_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_porta_w)),
+			m68307_cpu_device::portb_read_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_portb_r)),
+			m68307_cpu_device::portb_write_delegate(*this, FUNC(sc4_state::bfm_sc4_68307_portb_w)));
 }
 
 

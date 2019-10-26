@@ -10469,7 +10469,7 @@ READ64_MEMBER(atomiswave_state::xtrmhnt2_hack_r)
 void atomiswave_state::init_xtrmhnt2()
 {
 	init_atomiswave();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64_delegate(FUNC(atomiswave_state::xtrmhnt2_hack_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000000, 0x100011f, read64_delegate(*this, FUNC(atomiswave_state::xtrmhnt2_hack_r)));
 }
 
 ROM_START( fotns )

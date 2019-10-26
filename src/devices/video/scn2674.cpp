@@ -86,6 +86,7 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 	, m_dbl1(0)
 	, m_char_buffer(0), m_attr_buffer(0)
 	, m_linecounter(0), m_address(0), m_start1change(0)
+	, m_display_cb(*this)
 	, m_scanline_timer(nullptr)
 	, m_breq_timer(nullptr)
 	, m_vblank_timer(nullptr)
@@ -97,18 +98,15 @@ scn2674_device::scn2674_device(const machine_config &mconfig, device_type type, 
 
 device_memory_interface::space_config_vector scn2674_device::memory_space_config() const
 {
-	return has_configured_map(1) ? space_config_vector {
-		std::make_pair(0, &m_char_space_config),
-		std::make_pair(1, &m_attr_space_config)
-	} : space_config_vector {
-		std::make_pair(0, &m_char_space_config)
-	};
+	return has_configured_map(1)
+			? space_config_vector{ std::make_pair(0, &m_char_space_config), std::make_pair(1, &m_attr_space_config) }
+			: space_config_vector{ std::make_pair(0, &m_char_space_config) };
 }
 
 void scn2674_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
 	m_intr_cb.resolve_safe();
 	m_breq_cb.resolve_safe();
 	m_mbc_cb.resolve_safe();

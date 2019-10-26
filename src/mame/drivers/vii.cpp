@@ -2186,7 +2186,7 @@ void vii_state::vii(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "vii_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(vii_state::cart_load_vii), this);
+	m_cart->set_device_load(FUNC(vii_state::cart_load_vii));
 
 	SOFTWARE_LIST(config, "vii_cart").set_original("vii");
 }
@@ -2208,7 +2208,7 @@ void icanguit_state::icanguit(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanguit_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit), this);
+	m_cart->set_device_load(FUNC(icanguit_state::cart_load_icanguit));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanguit_cart").set_original("icanguit");
@@ -2234,7 +2234,7 @@ void icanpian_state::icanpian(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "icanpian_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(icanpian_state::cart_load_icanguit), this);
+	m_cart->set_device_load(FUNC(icanpian_state::cart_load_icanguit));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
@@ -2253,7 +2253,7 @@ void tvgogo_state::tvgogo(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "tvgogo_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo), this);
+	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo));
 	m_cart->set_must_be_loaded(true);
 
 	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");

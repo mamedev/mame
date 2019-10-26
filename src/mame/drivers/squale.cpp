@@ -840,7 +840,7 @@ void squale_state::squale(machine_config &config)
 	SOFTWARE_LIST(config, "flop525_list").set_original("squale");
 
 	/* Cartridge slot */
-	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_linear_slot, "squale_cart").set_device_load(FUNC(squale_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("squale_cart");
 }
 

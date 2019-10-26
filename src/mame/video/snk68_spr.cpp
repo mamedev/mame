@@ -51,13 +51,13 @@ DEFINE_DEVICE_TYPE(SNK68_SPR, snk68_spr_device, "snk68_spr", "SNK68 Sprites")
 
 snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNK68_SPR, tag, owner, clock)
+	, m_newtilecb(*this, FUNC(snk68_spr_device::tile_callback_noindirect))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, "^spriteram")
 	, m_screen(*this, "^screen")
 	, m_flipscreen(false)
 	, m_partialupdates(1)
 {
-	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
 }
 
 void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int& region)
@@ -67,7 +67,7 @@ void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int
 void snk68_spr_device::device_start()
 {
 	// bind our handler
-	m_newtilecb.bind_relative_to(*owner());
+	m_newtilecb.resolve();
 }
 
 void snk68_spr_device::device_reset()

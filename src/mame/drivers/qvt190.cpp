@@ -135,7 +135,7 @@ void qvt190_state::qvt190(machine_config &config)
 	mc6845_device &crtc(MC6845(config, "crtc", 16.6698_MHz_XTAL / 9));
 	crtc.set_screen("screen");
 	crtc.set_char_width(9);
-	crtc.set_update_row_callback(FUNC(qvt190_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(qvt190_state::update_row));
 }
 
 ROM_START( qvt190 )

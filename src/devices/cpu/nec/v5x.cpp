@@ -194,7 +194,7 @@ void v50_base_device::device_start()
 {
 	nec_common_device::device_start();
 
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v5x_icu_device::inta_cb), m_icu.target()));
+	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
 	save_item(NAME(m_OPCN));
 }
@@ -209,8 +209,8 @@ void v40_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_DULA) & 0xfff0;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
-			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()));
+				read8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::read)),
+				write8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::write)));
 	}
 
 	if (m_OPSEL & OPSEL_IS)
@@ -218,8 +218,8 @@ void v40_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_IULA) & 0xfff0;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x01,
-			read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()));
+				read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+				write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)));
 	}
 
 	if (m_OPSEL & OPSEL_TS)
@@ -227,8 +227,8 @@ void v40_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_TULA) & 0xfff0;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
-			read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()));
+				read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+				write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)));
 	}
 
 	if (m_OPSEL & OPSEL_SS)
@@ -236,8 +236,8 @@ void v40_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_SULA) & 0xfff0;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
-			read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()));
+				read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+				write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)));
 	}
 }
 
@@ -251,8 +251,8 @@ void v50_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_DULA) & 0xfffe;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
-			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+				read8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::read)),
+				write8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::write)), 0xffff);
 	}
 
 	if (m_OPSEL & OPSEL_IS)
@@ -260,8 +260,8 @@ void v50_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_IULA) & 0xfffe;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
-			read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0x00ff);
+				read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+				write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)), 0x00ff);
 	}
 
 	if (m_OPSEL & OPSEL_TS)
@@ -269,8 +269,8 @@ void v50_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_TULA) & 0xfffe;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
-			read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0x00ff);
+				read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+				write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)), 0x00ff);
 	}
 
 	if (m_OPSEL & OPSEL_SS)
@@ -278,8 +278,8 @@ void v50_device::install_peripheral_io()
 		u16 const base = ((m_OPHA << 8) | m_SULA) & 0xfffe;
 
 		space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
-			read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0x00ff);
+				read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+				write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)), 0x00ff);
 	}
 }
 
@@ -359,7 +359,7 @@ void v53_device::device_start()
 {
 	v33_base_device::device_start();
 
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v5x_icu_device::inta_cb), m_icu.target()));
+	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
 	save_item(NAME(m_SCTL));
 }
@@ -390,8 +390,8 @@ void v53_device::install_peripheral_io()
 		}
 		else // uPD71071 mode
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x0f,
-				read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-				write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+					read8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::read)),
+					write8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::write)), 0xffff);
 	}
 
 	if (m_OPSEL & OPSEL_IS)
@@ -400,12 +400,12 @@ void v53_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x01,
-				read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0xffff);
+					read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+					write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)), 0xffff);
 		else
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
-				read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0x00ff);
+					read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+					write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)), 0x00ff);
 	}
 
 	if (m_OPSEL & OPSEL_TS)
@@ -414,12 +414,12 @@ void v53_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
-				read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0xffff);
+					read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+					write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)), 0xffff);
 		else
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
-				read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0x00ff);
+					read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+					write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)), 0x00ff);
 	}
 
 	if (m_OPSEL & OPSEL_SS)
@@ -428,12 +428,12 @@ void v53_device::install_peripheral_io()
 
 		if (IOAG) // 8-bit
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x03,
-				read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0xffff);
+					read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+					write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)), 0xffff);
 		else
 			space(AS_IO).install_readwrite_handler(base + 0x00, base + 0x07,
-				read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0x00ff);
+					read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+					write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)), 0x00ff);
 	}
 }
 

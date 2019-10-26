@@ -1181,7 +1181,7 @@ void x68k_state::cpu_space_map(address_map &map)
 	map(0xfffff9, 0xfffff9).r(FUNC(x68k_state::iack4));
 	map(0xfffffb, 0xfffffb).r(FUNC(x68k_state::iack5));
 	map(0xfffffd, 0xfffffd).r(m_mfpdev, FUNC(mc68901_device::get_vector));
-	map(0xffffff, 0xffffff).lr8("nmiack", []() { return m68000_base_device::autovector(7); });
+	map(0xffffff, 0xffffff).lr8(NAME([] () { return m68000_base_device::autovector(7); }));
 }
 
 WRITE_LINE_MEMBER(x68ksupr_state::scsi_irq)

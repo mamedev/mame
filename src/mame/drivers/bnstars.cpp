@@ -489,25 +489,21 @@ void bnstars_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void bnstars_state::video_start()
 {
-	m_ms32_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx0_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
-	m_ms32_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_tx1_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,64);
+	m_ms32_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bnstars_state::get_ms32_tx0_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64,64);
+	m_ms32_tx_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bnstars_state::get_ms32_tx1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64,64);
 	m_ms32_tx_tilemap[0]->set_transparent_pen(0);
 	m_ms32_tx_tilemap[1]->set_transparent_pen(0);
 
-	m_ms32_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_ms32_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_ms32_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bnstars_state::get_ms32_bg0_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
+	m_ms32_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bnstars_state::get_ms32_bg1_tile_info)), TILEMAP_SCAN_ROWS, 16,16, 64,64);
 	m_ms32_bg_tilemap[0]->set_transparent_pen(0);
 	m_ms32_bg_tilemap[1]->set_transparent_pen(0);
 
-	m_ms32_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
-	m_ms32_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bnstars_state::get_ms32_roz1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,128,128);
+	m_ms32_roz_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bnstars_state::get_ms32_roz0_tile_info)),TILEMAP_SCAN_ROWS, 16,16,128,128);
+	m_ms32_roz_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bnstars_state::get_ms32_roz1_tile_info)),TILEMAP_SCAN_ROWS, 16,16,128,128);
 	m_ms32_roz_tilemap[0]->set_transparent_pen(0);
 	m_ms32_roz_tilemap[1]->set_transparent_pen(0);
-
-
 }
-
-
 
 
 

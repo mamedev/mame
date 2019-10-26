@@ -305,7 +305,7 @@ void k28_state::k28(machine_config &config)
 
 	TMS6100(config, m_tms6100, 3.579545_MHz_XTAL / 15); // CLK tied to 8021 ALE pin
 
-	TIMER(config, "on_button").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "on_button").configure_generic(nullptr);
 
 	/* video hardware */
 	MM5445(config, m_vfd).output_cb().set(FUNC(k28_state::vfd_output_w));

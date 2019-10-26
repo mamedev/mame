@@ -68,7 +68,7 @@ a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type 
 
 void a1bus_cffa_device::device_start()
 {
-	install_device(0xafe0, 0xafff, read8_delegate(FUNC(a1bus_cffa_device::cffa_r), this), write8_delegate(FUNC(a1bus_cffa_device::cffa_w), this));
+	install_device(0xafe0, 0xafff, read8_delegate(*this, FUNC(a1bus_cffa_device::cffa_r)), write8_delegate(*this, FUNC(a1bus_cffa_device::cffa_w)));
 	install_bank(0x9000, 0xafdf, "bank_cffa1", &m_rom[0]);
 
 	save_item(NAME(m_lastdata));

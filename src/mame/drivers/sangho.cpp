@@ -221,7 +221,7 @@ void pzlestar_state::pzlestar_map_banks()
 		break;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(FUNC(pzlestar_state::sec_slot_r),this), write8_delegate(FUNC(pzlestar_state::sec_slot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xffff, 0xffff, read8_delegate(*this, FUNC(pzlestar_state::sec_slot_r)), write8_delegate(*this, FUNC(pzlestar_state::sec_slot_w)));
 }
 
 WRITE8_MEMBER(pzlestar_state::pzlestar_bank_w)

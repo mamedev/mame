@@ -235,8 +235,8 @@ WRITE8_MEMBER(combatsc_state::combatscb_bankselect_w)
 		if (data == 0x1f)
 		{
 			membank("bank1")->set_entry(8 + (data & 1));
-			space.install_write_handler(0x4000, 0x7fff, write8_delegate(FUNC(combatsc_state::combatscb_io_w),this));
-			space.install_read_handler(0x4400, 0x4403, read8_delegate(FUNC(combatsc_state::combatscb_io_r),this));/* IO RAM & Video Registers */
+			space.install_write_handler(0x4000, 0x7fff, write8_delegate(*this, FUNC(combatsc_state::combatscb_io_w)));
+			space.install_read_handler(0x4400, 0x4403, read8_delegate(*this, FUNC(combatsc_state::combatscb_io_r))); // IO RAM & Video Registers
 		}
 		else
 		{

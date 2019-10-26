@@ -522,7 +522,7 @@ void alpha68k_III_state::alpha68k_V_map(address_map &map)
 	map(0x080000, 0x080001).r(FUNC(alpha68k_III_state::control_1_r)); /* Joysticks */
 	map(0x080000, 0x080000).w(FUNC(alpha68k_III_state::video_bank_w));
 	map(0x080001, 0x080001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c0000, 0x0c0001).lr16("control_2_V_r", [this]() -> u16 { return m_in[3]->read(); }); /* Dip 2 */
+	map(0x0c0000, 0x0c0001).lr16(NAME([this] () -> u16 { return m_in[3]->read(); })); /* Dip 2 */
 	map(0x0c0001, 0x0c0001).select(0x78).w(FUNC(alpha68k_III_state::outlatch_w));
 	map(0x0d8000, 0x0d8001).nopr(); /* IRQ ack? */
 	map(0x0e0000, 0x0e0001).nopr(); /* IRQ ack? */
@@ -1275,7 +1275,7 @@ void alpha68k_II_state::video_config(machine_config &config, u16 num_pens)
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(alpha68k_II_state::tile_callback), this);
+	m_sprites->set_tile_indirect_cb(FUNC(alpha68k_II_state::tile_callback));
 	m_sprites->set_xpos_shift(15);
 	m_sprites->set_color_entry_mask((num_pens / 16) - 1);
 
@@ -1357,13 +1357,13 @@ void alpha68k_V_state::alpha68k_V(machine_config &config)
 void skyadventure_state::skyadventure(machine_config &config)
 {
 	alpha68k_V_state::alpha68k_V(config);
-	m_sprites->set_tile_indirect_cb(FUNC(skyadventure_state::tile_callback_noflipx), this);
+	m_sprites->set_tile_indirect_cb(FUNC(skyadventure_state::tile_callback_noflipx));
 }
 
 void gangwars_state::gangwars(machine_config &config)
 {
 	alpha68k_V_state::alpha68k_V(config);
-	m_sprites->set_tile_indirect_cb(FUNC(gangwars_state::tile_callback_noflipy), this);
+	m_sprites->set_tile_indirect_cb(FUNC(gangwars_state::tile_callback_noflipy));
 }
 
 /******************************************************************************/
