@@ -2031,8 +2031,8 @@ if (CPUS["SATURN"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.cpp",
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.h",
-		MAME_DIR .. "src/devices/cpu/saturn/satops.hxx",
-		MAME_DIR .. "src/devices/cpu/saturn/sattable.hxx",
+		MAME_DIR .. "src/devices/cpu/saturn/satops.ipp",
+		MAME_DIR .. "src/devices/cpu/saturn/sattable.ipp",
 	}
 end
 
