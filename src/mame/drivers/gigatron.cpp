@@ -107,7 +107,7 @@ void gigatron_state::gigatron(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
+    screen.set_refresh_hz(60);
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(gigatron_state::screen_update));
 //  screen.set_size(32*8, 32*8);
