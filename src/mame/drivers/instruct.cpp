@@ -435,7 +435,7 @@ void instruct_state::instruct(machine_config &config)
 	config.set_default_layout(layout_instruct);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "pgm", attotime::from_seconds(1)).set_load_callback(FUNC(instruct_state::quickload_cb));
 
 	SPEAKER(config, "mono").front_center();
 

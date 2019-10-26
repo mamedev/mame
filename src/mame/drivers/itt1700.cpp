@@ -108,7 +108,7 @@ void itt1700_state::itt1700(machine_config &config)
 	crtc.set_char_width(9);
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
-	crtc.set_update_row_callback(FUNC(itt1700_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(itt1700_state::update_row));
 }
 
 ROM_START(itt1700)

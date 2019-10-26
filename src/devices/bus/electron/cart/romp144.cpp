@@ -26,19 +26,19 @@ void electron_romp144_device::device_add_mconfig(machine_config &config)
 {
 	/* rom sockets */
 	GENERIC_SOCKET(config, m_romslot[0], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[0]->set_device_load(FUNC(electron_romp144_device::rom0), this);
+	m_romslot[0]->set_device_load(FUNC(electron_romp144_device::rom0));
 	GENERIC_SOCKET(config, m_romslot[1], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[1]->set_device_load(FUNC(electron_romp144_device::rom1), this);
+	m_romslot[1]->set_device_load(FUNC(electron_romp144_device::rom1));
 	GENERIC_SOCKET(config, m_romslot[2], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[2]->set_device_load(FUNC(electron_romp144_device::rom2), this);
+	m_romslot[2]->set_device_load(FUNC(electron_romp144_device::rom2));
 	GENERIC_SOCKET(config, m_romslot[3], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[3]->set_device_load(FUNC(electron_romp144_device::rom3), this);
+	m_romslot[3]->set_device_load(FUNC(electron_romp144_device::rom3));
 	GENERIC_SOCKET(config, m_romslot[4], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[4]->set_device_load(FUNC(electron_romp144_device::rom4), this);
+	m_romslot[4]->set_device_load(FUNC(electron_romp144_device::rom4));
 	GENERIC_SOCKET(config, m_romslot[5], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[5]->set_device_load(FUNC(electron_romp144_device::rom5), this);
+	m_romslot[5]->set_device_load(FUNC(electron_romp144_device::rom5));
 	GENERIC_SOCKET(config, m_romslot[6], generic_plain_slot, "electron_rom", "bin,rom");
-	m_romslot[6]->set_device_load(FUNC(electron_romp144_device::rom6), this);
+	m_romslot[6]->set_device_load(FUNC(electron_romp144_device::rom6));
 }
 
 //**************************************************************************

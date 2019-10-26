@@ -606,7 +606,7 @@
 		<element ref="disk_black"><bounds x="108.5" y="7.5" width="3" height="3" /></element>
 		<element ref="disk_white"><bounds x="109" y="8" width="2" height="2" /></element>
 		<element ref="hlr" inputtag="IN.0" inputmask="0x80"><bounds x="107.5" y="5" width="5" height="8" /><color alpha="0.3" /></element>
-		
+
 		<element ref="cwhite"><bounds x="28" y="5" width="18.2" height="0.2" /></element>
 		<element ref="cwhite"><bounds x="28" y="8.75" width="18.2" height="0.2" /></element>
 		<element ref="cwhite"><bounds x="28" y="12.5" width="18.2" height="0.2" /></element>
@@ -651,6 +651,43 @@
 		<element name="5.7" ref="ldot"><bounds x="13.3925" y="9.2375" width="0.45" height="0.45" /></element>
 	</group>
 
+<!-- motor status -->
+
+	<element name="text_motor"><text string="MOTOR:"><color red="0.843" green="0.678" blue="0.482" /></text></element>
+	<element name="text_motoru">
+		<text string="U" state="0"><color red="0.209" green="0.209" blue="0.201" /></text>
+		<text string="U" state="1"><color red="0.9" green="0.9" blue="0.85" /></text>
+	</element>
+	<element name="text_motord">
+		<text string="D" state="0"><color red="0.209" green="0.209" blue="0.201" /></text>
+		<text string="D" state="1"><color red="0.9" green="0.9" blue="0.85" /></text>
+	</element>
+	<element name="text_motorl">
+		<text string="L" state="0" align="2"><color red="0.209" green="0.209" blue="0.201" /></text>
+		<text string="L" state="1" align="2"><color red="0.9" green="0.9" blue="0.85" /></text>
+	</element>
+	<element name="text_motorr">
+		<text string="R" state="0" align="1"><color red="0.209" green="0.209" blue="0.201" /></text>
+		<text string="R" state="1" align="1"><color red="0.9" green="0.9" blue="0.85" /></text>
+	</element>
+	<element name="text_motorx">
+		<text string="X" state="0"><color red="0.209" green="0.209" blue="0.201" /></text>
+		<text string="X" state="1"><color red="0.9" green="0.9" blue="0.85" /></text>
+	</element>
+
+	<group name="motor">
+		<bounds x="0" y="0" width="10" height="12" />
+		<element ref="text_motor"><bounds x="0" y="0" width="10" height="2" /></element>
+		<element ref="cwhite"><bounds x="0" y="11" width="10" height="1" /></element>
+
+		<element name="motor.1" ref="text_motoru"><bounds x="0" y="3" width="10" height="2" /></element>
+		<element name="motor.2" ref="text_motorl"><bounds x="0" y="5" width="3.5" height="2" /></element>
+		<element name="motor.3" ref="text_motorr"><bounds x="6.5" y="5" width="3.5" height="2" /></element>
+		<element name="motor.4" ref="text_motorx"><bounds x="0" y="5" width="10" height="2" /></element>
+		<element name="motor.0" ref="text_motord"><bounds x="0" y="7" width="10" height="2" /></element>
+	</group>
+
+
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -663,6 +700,7 @@
 		<group ref="sb_board"><bounds x="-20.5" y="3.5" width="121" height="80" /></group>
 
 		<group ref="sb_ui"><bounds x="-33" y="3" width="10" height="80" /></group>
+		<group ref="motor"><bounds x="-33" y="84.5" width="10" height="12" /></group>
 
 		<group ref="panel"><bounds x="-21" y="85" width="122" height="17" /></group>
 	</view>

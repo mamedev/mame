@@ -223,7 +223,7 @@ mcs48_cpu_device::mcs48_cpu_device(const machine_config &mconfig, device_type ty
 	, m_bus_in_cb(*this)
 	, m_bus_out_cb(*this)
 	, m_test_in_cb{{*this}, {*this}}
-	, m_t0_clk_func()
+	, m_t0_clk_func(*this)
 	, m_prog_out_cb(*this)
 	, m_psw(0)
 	, m_dataptr(*this, "data")
@@ -1085,7 +1085,7 @@ const mcs48_cpu_device::mcs48_ophandler mcs48_cpu_device::s_i8022_opcodes[256] =
 
 void mcs48_cpu_device::device_config_complete()
 {
-	m_t0_clk_func.bind_relative_to(*owner());
+	m_t0_clk_func.resolve();
 	if (!m_t0_clk_func.isnull())
 		m_t0_clk_func(clock() / 3);
 }

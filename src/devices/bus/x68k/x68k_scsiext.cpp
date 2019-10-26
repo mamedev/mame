@@ -72,7 +72,7 @@ void x68k_scsiext_device::device_start()
 	uint8_t *ROM = machine().root_device().memregion(subtag("scsiexrom").c_str())->base();
 	machine().root_device().membank("scsi_ext")->set_base(ROM);
 
-m_slot->space().install_readwrite_handler(0xea0000,0xea001f,read8_delegate(FUNC(x68k_scsiext_device::register_r),this),write8_delegate(FUNC(x68k_scsiext_device::register_w),this),0x00ff00ff);
+	m_slot->space().install_readwrite_handler(0xea0000,0xea001f, read8_delegate(*this, FUNC(x68k_scsiext_device::register_r)), write8_delegate(*this, FUNC(x68k_scsiext_device::register_w)), 0x00ff00ff);
 }
 
 void x68k_scsiext_device::device_reset()

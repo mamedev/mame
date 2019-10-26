@@ -36,7 +36,7 @@
 
     P2U
     ===
-    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the the standard 48K memory card.
+    For paging via port 0x78A, a 16K RAM card with RAM at 0x0000 and 0x3fff and the banking logic (see above) is added to the standard 48K memory card.
     P2S, P2U: 2x 320K, double sided, 40 tracks, 16 sectors/track, 256 bytes/sector floppy disk drives
 
     P3, P4

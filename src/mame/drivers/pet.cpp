@@ -1714,7 +1714,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_user->pm_handler().set(m_via, FUNC(via6522_device::write_cb2));
 
 	quickload_image_device &quickload(QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY));
-	quickload.set_load_callback(FUNC(pet_state::quickload_pet), this);
+	quickload.set_load_callback(FUNC(pet_state::quickload_pet));
 	quickload.set_interface("cbm_quik");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("pet_cass");
@@ -1896,8 +1896,8 @@ void pet2001b_state::pet4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -1952,8 +1952,8 @@ void pet_state::cbm4032f(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2018,8 +2018,8 @@ void pet80_state::pet80(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update), this);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row), this);
+	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
+	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2073,7 +2073,7 @@ void cbm8296_state::cbm8296(machine_config &config)
 	m_crtc->set_clock(XTAL(16'000'000)/16);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	subdevice<ieee488_slot_device>("ieee8")->set_default_option("c8250");

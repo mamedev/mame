@@ -267,19 +267,19 @@ void orion_state::orionz80_switch_bank()
 
 	if ((m_orionz80_dispatcher & 0x20) == 0)
 	{
-		space.install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),this));
-		space.install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),this));
-		space.install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orionz80_floppy_rtc_w),this));
-		space.install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),this));
-		space.install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),this));
-		space.install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orionz80_floppy_rtc_r),this));
+		space.install_write_handler(0xf400, 0xf4ff, write8_delegate(*this, FUNC(orion_state::orion128_system_w)));
+		space.install_write_handler(0xf500, 0xf5ff, write8_delegate(*this, FUNC(orion_state::orion128_romdisk_w)));
+		space.install_write_handler(0xf700, 0xf7ff, write8_delegate(*this, FUNC(orion_state::orionz80_floppy_rtc_w)));
+		space.install_read_handler(0xf400, 0xf4ff, read8_delegate(*this, FUNC(orion_state::orion128_system_r)));
+		space.install_read_handler(0xf500, 0xf5ff, read8_delegate(*this, FUNC(orion_state::orion128_romdisk_r)));
+		space.install_read_handler(0xf700, 0xf7ff, read8_delegate(*this, FUNC(orion_state::orionz80_floppy_rtc_r)));
 
-		space.install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),this));
-		space.install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionz80_memory_page_w),this));
-		space.install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),this));
-		space.install_write_handler(0xfb00, 0xfbff, write8_delegate(FUNC(orion_state::orionz80_dispatcher_w),this));
+		space.install_write_handler(0xf800, 0xf8ff, write8_delegate(*this, FUNC(orion_state::orion128_video_mode_w)));
+		space.install_write_handler(0xf900, 0xf9ff, write8_delegate(*this, FUNC(orion_state::orionz80_memory_page_w)));
+		space.install_write_handler(0xfa00, 0xfaff, write8_delegate(*this, FUNC(orion_state::orion128_video_page_w)));
+		space.install_write_handler(0xfb00, 0xfbff, write8_delegate(*this, FUNC(orion_state::orionz80_dispatcher_w)));
 		space.unmap_write(0xfc00, 0xfeff);
-		space.install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),this));
+		space.install_write_handler(0xff00, 0xffff, write8_delegate(*this, FUNC(orion_state::orionz80_sound_w)));
 
 		m_bank3->set_base(m_ram->pointer() + 0xf000);
 		m_bank5->set_base(m_region_maincpu->base() + 0xf800);
@@ -314,19 +314,19 @@ void orion_z80_state::machine_reset()
 	space.install_write_bank(0x4000, 0xefff, "bank2");
 	space.install_write_bank(0xf000, 0xf3ff, "bank3");
 
-	space.install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_z80_state::orion128_system_w),this));
-	space.install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_z80_state::orion128_romdisk_w),this));
-	space.install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_z80_state::orionz80_floppy_rtc_w),this));
-	space.install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_z80_state::orion128_system_r),this));
-	space.install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_z80_state::orion128_romdisk_r),this));
-	space.install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_z80_state::orionz80_floppy_rtc_r),this));
+	space.install_write_handler(0xf400, 0xf4ff, write8_delegate(*this, FUNC(orion_z80_state::orion128_system_w)));
+	space.install_write_handler(0xf500, 0xf5ff, write8_delegate(*this, FUNC(orion_z80_state::orion128_romdisk_w)));
+	space.install_write_handler(0xf700, 0xf7ff, write8_delegate(*this, FUNC(orion_z80_state::orionz80_floppy_rtc_w)));
+	space.install_read_handler(0xf400, 0xf4ff, read8_delegate(*this, FUNC(orion_z80_state::orion128_system_r)));
+	space.install_read_handler(0xf500, 0xf5ff, read8_delegate(*this, FUNC(orion_z80_state::orion128_romdisk_r)));
+	space.install_read_handler(0xf700, 0xf7ff, read8_delegate(*this, FUNC(orion_z80_state::orionz80_floppy_rtc_r)));
 
-	space.install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_z80_state::orion128_video_mode_w),this));
-	space.install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_z80_state::orionz80_memory_page_w),this));
-	space.install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_z80_state::orion128_video_page_w),this));
-	space.install_write_handler(0xfb00, 0xfbff, write8_delegate(FUNC(orion_z80_state::orionz80_dispatcher_w),this));
+	space.install_write_handler(0xf800, 0xf8ff, write8_delegate(*this, FUNC(orion_z80_state::orion128_video_mode_w)));
+	space.install_write_handler(0xf900, 0xf9ff, write8_delegate(*this, FUNC(orion_z80_state::orionz80_memory_page_w)));
+	space.install_write_handler(0xfa00, 0xfaff, write8_delegate(*this, FUNC(orion_z80_state::orion128_video_page_w)));
+	space.install_write_handler(0xfb00, 0xfbff, write8_delegate(*this, FUNC(orion_z80_state::orionz80_dispatcher_w)));
 	space.unmap_write(0xfc00, 0xfeff);
-	space.install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_z80_state::orionz80_sound_w),this));
+	space.install_write_handler(0xff00, 0xffff, write8_delegate(*this, FUNC(orion_z80_state::orionz80_sound_w)));
 
 
 	m_bank1->set_base(m_region_maincpu->base() + 0xf800);
@@ -455,20 +455,20 @@ void orion_state::orionpro_bank_switch()
 	{
 		m_bank6->set_base(ram + 0x10000 * 0 + 0xf000);
 
-		space.install_write_handler(0xf400, 0xf4ff, write8_delegate(FUNC(orion_state::orion128_system_w),this));
-		space.install_write_handler(0xf500, 0xf5ff, write8_delegate(FUNC(orion_state::orion128_romdisk_w),this));
+		space.install_write_handler(0xf400, 0xf4ff, write8_delegate(*this, FUNC(orion_state::orion128_system_w)));
+		space.install_write_handler(0xf500, 0xf5ff, write8_delegate(*this, FUNC(orion_state::orion128_romdisk_w)));
 		space.unmap_write(0xf600, 0xf6ff);
-		space.install_write_handler(0xf700, 0xf7ff, write8_delegate(FUNC(orion_state::orion128_floppy_w),this));
-		space.install_read_handler(0xf400, 0xf4ff, read8_delegate(FUNC(orion_state::orion128_system_r),this));
-		space.install_read_handler(0xf500, 0xf5ff, read8_delegate(FUNC(orion_state::orion128_romdisk_r),this));
+		space.install_write_handler(0xf700, 0xf7ff, write8_delegate(*this, FUNC(orion_state::orion128_floppy_w)));
+		space.install_read_handler(0xf400, 0xf4ff, read8_delegate(*this, FUNC(orion_state::orion128_system_r)));
+		space.install_read_handler(0xf500, 0xf5ff, read8_delegate(*this, FUNC(orion_state::orion128_romdisk_r)));
 		space.unmap_read(0xf600, 0xf6ff);
-		space.install_read_handler(0xf700, 0xf7ff, read8_delegate(FUNC(orion_state::orion128_floppy_r),this));
+		space.install_read_handler(0xf700, 0xf7ff, read8_delegate(*this, FUNC(orion_state::orion128_floppy_r)));
 
-		space.install_write_handler(0xf800, 0xf8ff, write8_delegate(FUNC(orion_state::orion128_video_mode_w),this));
-		space.install_write_handler(0xf900, 0xf9ff, write8_delegate(FUNC(orion_state::orionpro_memory_page_w),this));
-		space.install_write_handler(0xfa00, 0xfaff, write8_delegate(FUNC(orion_state::orion128_video_page_w),this));
+		space.install_write_handler(0xf800, 0xf8ff, write8_delegate(*this, FUNC(orion_state::orion128_video_mode_w)));
+		space.install_write_handler(0xf900, 0xf9ff, write8_delegate(*this, FUNC(orion_state::orionpro_memory_page_w)));
+		space.install_write_handler(0xfa00, 0xfaff, write8_delegate(*this, FUNC(orion_state::orion128_video_page_w)));
 		space.unmap_write(0xfb00, 0xfeff);
-		space.install_write_handler(0xff00, 0xffff, write8_delegate(FUNC(orion_state::orionz80_sound_w),this));
+		space.install_write_handler(0xff00, 0xffff, write8_delegate(*this, FUNC(orion_state::orionz80_sound_w)));
 
 
 		m_bank8->set_base(ram + 0x10000 * 0 + 0xf800);

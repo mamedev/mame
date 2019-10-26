@@ -1056,9 +1056,9 @@ void ngcd_state::neocd(machine_config &config)
 	LC89510_TEMP(config, m_tempcdc, 0); // cd controller
 	m_tempcdc->set_cdrom_tag("cdrom");
 	m_tempcdc->set_is_neoCD(true);
-	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1), this);
-	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2), this);
-	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3), this);
+	m_tempcdc->set_type1_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type1));
+	m_tempcdc->set_type2_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type2));
+	m_tempcdc->set_type3_interrupt_callback(FUNC(ngcd_state::interrupt_callback_type3));
 
 	NVRAM(config, "saveram", nvram_device::DEFAULT_ALL_0);
 

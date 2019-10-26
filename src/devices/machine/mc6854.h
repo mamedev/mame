@@ -28,16 +28,7 @@ public:
 	auto out_rts_cb() { return m_out_rts_cb.bind(); }
 	auto out_dtr_cb() { return m_out_dtr_cb.bind(); }
 
-	template <typename Object> void set_out_frame_callback(Object &&cb) { m_out_frame_cb = std::forward<Object>(cb); }
-	void set_out_frame_callback(out_frame_delegate callback) { m_out_frame_cb = callback; }
-	template <class FunctionClass> void set_out_frame_callback(const char *devname, void (FunctionClass::*callback)(uint8_t *, int), const char *name)
-	{
-		set_out_frame_callback(out_frame_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_out_frame_callback(void (FunctionClass::*callback)(uint8_t *, int), const char *name)
-	{
-		set_out_frame_callback(out_frame_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_out_frame_callback(T &&... args) { m_out_frame_cb.set(std::forward<T>(args)...); }
 
 	/* interface to CPU via address/data bus*/
 	uint8_t read(offs_t offset);
@@ -71,7 +62,7 @@ private:
 	/* low-level, bit-based interface */
 	devcb_write_line  m_out_txd_cb; /* transmit bit */
 
-		/* high-level, frame-based interface */
+	/* high-level, frame-based interface */
 	out_frame_delegate   m_out_frame_cb;
 
 	/* control lines */

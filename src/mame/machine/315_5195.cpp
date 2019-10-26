@@ -42,6 +42,7 @@ sega_315_5195_mapper_device::sega_315_5195_mapper_device(const machine_config &m
 	: device_t(mconfig, SEGA_315_5195_MEM_MAPPER, tag, owner, clock)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 	, m_cpuregion(*this, finder_base::DUMMY_TAG)
+	, m_mapper(*this)
 	, m_pbf_callback(*this)
 	, m_mcu_int_callback(*this)
 	, m_space(nullptr)
@@ -396,7 +397,7 @@ WRITE8_MEMBER(sega_315_5195_mapper_device::pwrite)
 void sega_315_5195_mapper_device::device_start()
 {
 	// bind our handlers
-	m_mapper.bind_relative_to(*owner());
+	m_mapper.resolve();
 	m_pbf_callback.resolve();
 	m_mcu_int_callback.resolve();
 
@@ -482,7 +483,7 @@ void sega_315_5195_mapper_device::update_mapping()
 
 	// first reset everything back to the beginning
 	m_space->unmap_readwrite(0x000000, 0xffffff);
-	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(FUNC(sega_315_5195_mapper_device::read), this), write8_delegate(FUNC(sega_315_5195_mapper_device::write), this), 0x00ff);
+	m_space->install_readwrite_handler(0x000000, 0xffffff, read8_delegate(*this, FUNC(sega_315_5195_mapper_device::read)), write8_delegate(*this, FUNC(sega_315_5195_mapper_device::write)), 0x00ff);
 
 	// loop over the regions
 	for (int index = 7; index >= 0; index--)

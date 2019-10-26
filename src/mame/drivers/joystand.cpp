@@ -308,8 +308,8 @@ WRITE16_MEMBER(joystand_state::bg15_1_w)
 
 void joystand_state::video_start()
 {
-	m_bg1_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(joystand_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
-	m_bg2_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(joystand_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x40);
+	m_bg1_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(joystand_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x20);
+	m_bg2_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(joystand_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 0x40, 0x40);
 
 	m_bg1_tmap->set_transparent_pen(0xf);
 	m_bg2_tmap->set_transparent_pen(0xf);

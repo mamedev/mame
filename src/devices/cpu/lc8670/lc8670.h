@@ -80,18 +80,7 @@ public:
 
 	auto bank_cb() { return m_bankswitch_func.bind(); }
 
-	template <typename Object> void set_lcd_update_cb(Object &&cb) { m_lcd_update_func = std::forward<Object>(cb); }
-	void set_lcd_update_cb(lcd_update_delegate callback) { m_lcd_update_func = callback; }
-	template <class FunctionClass> void set_lcd_update_cb(const char *devname,
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t*, bool, uint8_t), const char *name)
-	{
-		set_lcd_update_cb(lcd_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_lcd_update_cb(
-		uint32_t (FunctionClass::*callback)(bitmap_ind16 &, const rectangle &, uint8_t*, bool, uint8_t), const char *name)
-	{
-		set_lcd_update_cb(lcd_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_lcd_update_cb(T &&... args) { m_lcd_update_func.set(std::forward<T>(args)...); }
 
 	void lc8670_internal_map(address_map &map);
 protected:

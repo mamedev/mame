@@ -60,9 +60,9 @@ void aquarium_state::bak_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void aquarium_state::video_start()
 {
-	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarium_state::get_txt_tile_info),this), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
-	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarium_state::get_mid_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_bak_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(aquarium_state::get_bak_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarium_state::get_txt_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_mid_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarium_state::get_mid_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bak_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(aquarium_state::get_bak_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_txt_tilemap->set_transparent_pen(0);
 	m_mid_tilemap->set_transparent_pen(0);

@@ -985,7 +985,7 @@ void myb3k_state::myb3k(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(myb3k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(myb3k_state::crtc_update_row));
 
 	/* ISA8+ Expansion bus */
 	ISA8(config, m_isabus, 0);

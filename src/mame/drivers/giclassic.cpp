@@ -315,7 +315,7 @@ void giclassic_state::giclassic(machine_config &config)
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(giclassic_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 1, 0);
 	m_k056832->set_palette(m_palette);
 }
@@ -339,12 +339,12 @@ void giclassicsvr_state::giclassvr(machine_config &config)
 	m_palette->enable_shadows();
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(giclassicsvr_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(giclassicsvr_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_4PIRATESH, 0, 0);
 	m_k056832->set_palette(m_palette);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(giclassicsvr_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_PS, -60, 24);
 	m_k055673->set_palette(m_palette);
 

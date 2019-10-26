@@ -1175,7 +1175,7 @@ void meritm_state::crt250_crt252_crt258(machine_config &config)
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
 }
 
 void meritm_state::crt260(machine_config &config)
@@ -1194,7 +1194,7 @@ void meritm_state::crt260(machine_config &config)
 	m_uart->out_tx_callback().set(m_microtouch, FUNC(microtouch_device::rx));
 
 	MICROTOUCH(config, m_microtouch, 9600).stx().set(m_uart, FUNC(ins8250_uart_device::rx_w));
-	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform), this);
+	m_microtouch->set_touch_callback(FUNC(meritm_state::touch_coord_transform));
 }
 
 
@@ -2386,7 +2386,7 @@ ROM_END
 
 void meritm_state::init_megat3te()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::ds1644_r), this), write8_delegate(FUNC(meritm_state::ds1644_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(*this, FUNC(meritm_state::ds1644_r)), write8_delegate(*this, FUNC(meritm_state::ds1644_w)));
 }
 
 /* CRT-250 */

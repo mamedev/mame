@@ -1026,40 +1026,40 @@ void fm7_state::fm7_update_bank(address_space & space, int bank, uint8_t physica
         switch(physical)
         {
             case 0x10:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram0_r),this),write8_delegate(FUNC(fm7_state::fm7_vram0_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram0_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram0_w)));
                 break;
             case 0x11:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram1_r),this),write8_delegate(FUNC(fm7_state::fm7_vram1_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram1_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram1_w)));
                 break;
             case 0x12:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram2_r),this),write8_delegate(FUNC(fm7_state::fm7_vram2_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram2_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram2_w)));
                 break;
             case 0x13:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram3_r),this),write8_delegate(FUNC(fm7_state::fm7_vram3_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram3_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram3_w)));
                 break;
             case 0x14:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram4_r),this),write8_delegate(FUNC(fm7_state::fm7_vram4_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram4_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram4_w)));
                 break;
             case 0x15:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram5_r),this),write8_delegate(FUNC(fm7_state::fm7_vram5_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram5_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram5_w)));
                 break;
             case 0x16:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram6_r),this),write8_delegate(FUNC(fm7_state::fm7_vram6_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram6_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram6_w)));
                 break;
             case 0x17:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram7_r),this),write8_delegate(FUNC(fm7_state::fm7_vram7_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram7_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram7_w)));
                 break;
             case 0x18:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram8_r),this),write8_delegate(FUNC(fm7_state::fm7_vram8_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram8_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram8_w)));
                 break;
             case 0x19:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vram9_r),this),write8_delegate(FUNC(fm7_state::fm7_vram9_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vram9_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vram9_w)));
                 break;
             case 0x1a:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramA_r),this),write8_delegate(FUNC(fm7_state::fm7_vramA_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vramA_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vramA_w)));
                 break;
             case 0x1b:
-                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_vramB_r),this),write8_delegate(FUNC(fm7_state::fm7_vramB_w),this));
+                space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_vramB_r)),write8_delegate(*this, FUNC(fm7_state::fm7_vramB_w)));
                 break;
         }
 //      membank(bank+1)->set_base(RAM+(physical<<12)-0x10000);
@@ -1067,12 +1067,12 @@ void fm7_state::fm7_update_bank(address_space & space, int bank, uint8_t physica
     }
     if(physical == 0x1c)
     {
-        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_console_ram_banked_r),this),write8_delegate(FUNC(fm7_state::fm7_console_ram_banked_w),this));
+        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_console_ram_banked_r)),write8_delegate(*this, FUNC(fm7_state::fm7_console_ram_banked_w)));
         return;
     }
     if(physical == 0x1d)
     {
-        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_r),this),write8_delegate(FUNC(fm7_state::fm7_sub_ram_ports_banked_w),this));
+        space.install_readwrite_handler(bank*0x1000,(bank*0x1000)+size,read8_delegate(*this, FUNC(fm7_state::fm7_sub_ram_ports_banked_r)),write8_delegate(*this, FUNC(fm7_state::fm7_sub_ram_ports_banked_w)));
         return;
     }
     if(physical == 0x35)
@@ -1145,7 +1145,7 @@ void fm7_state::fm7_mmr_refresh(address_space& space)
 	}
 	else
 	{
-		space.install_readwrite_handler(0x7000,0x7fff,read8sm_delegate(FUNC(address_map_bank_device::read8),(address_map_bank_device*)m_avbank[7]),write8sm_delegate(FUNC(address_map_bank_device::write8),(address_map_bank_device*)m_avbank[7]));
+		space.install_readwrite_handler(0x7000,0x7fff,read8sm_delegate(*m_avbank[7], FUNC(address_map_bank_device::read8)),write8sm_delegate(*m_avbank[7], FUNC(address_map_bank_device::write8)));
 	}
 	if(m_init_rom_en)
 	{

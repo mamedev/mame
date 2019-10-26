@@ -127,8 +127,8 @@ void wswan_state::wswan(machine_config &config)
 	WSWAN_VIDEO(config, m_vdp, 0);
 	m_vdp->set_screen("screen");
 	m_vdp->set_vdp_type(VDP_TYPE_WSWAN);
-	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line), this);
-	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb), this);
+	m_vdp->set_irq_callback(FUNC(wswan_state::set_irq_line));
+	m_vdp->set_dmasnd_callback(FUNC(wswan_state::dma_sound_cb));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 //  screen.set_refresh_rate(75);

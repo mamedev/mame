@@ -351,7 +351,7 @@ Ballonies (198x)
 
 		<part name="cass1" interface="svi318_cass">
 			<dataarea name="cass" size="7170">
-				<rom name="compatability.cas" size="7170" crc="1ebede6d" sha1="81fca66fede44597f842ffeee3dda102c6e1f9c1"/>
+				<rom name="compatibility.cas" size="7170" crc="1ebede6d" sha1="81fca66fede44597f842ffeee3dda102c6e1f9c1"/>
 			</dataarea>
 		</part>
 	</software>

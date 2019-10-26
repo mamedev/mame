@@ -107,12 +107,12 @@ void sgi_gr1_device::map_bank(address_map &map)
 	map(0x8440, 0x845f).rw(m_xmap[2], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
 	map(0x8460, 0x847f).rw(m_xmap[3], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
 	map(0x8480, 0x849f).rw(m_xmap[4], FUNC(sgi_xmap2_device::reg_r), FUNC(sgi_xmap2_device::reg_w)).umask32(0x000000ff);
-	map(0x84a0, 0x84bf).lw8("xmap_broadcast",
-		[this](offs_t offset, u8 data)
-		{
-			for (sgi_xmap2_device *xmap : m_xmap)
-				xmap->reg_w(offset, data);
-		}).umask32(0x000000ff);
+	map(0x84a0, 0x84bf).lw8(
+			[this](offs_t offset, u8 data)
+			{
+				for (sgi_xmap2_device *xmap : m_xmap)
+					xmap->reg_w(offset, data);
+			}, "xmap_broadcast").umask32(0x000000ff);
 
 	map(0x84c0, 0x84c3).rw(FUNC(sgi_gr1_device::dr1_r), FUNC(sgi_gr1_device::dr1_w)).umask32(0xff000000);
 	map(0x84e0, 0x84e3).rw(FUNC(sgi_gr1_device::dr0_r), FUNC(sgi_gr1_device::dr0_w)).umask32(0xff000000);
@@ -134,7 +134,7 @@ void sgi_gr1_device::map_bank(address_map &map)
 	map(0x0800, 0x0bff).r(m_ge, FUNC(sgi_ge5_device::buffer_r)).mirror(0x8000);
 	map(0x0800, 0x0bff).w(FUNC(sgi_gr1_device::fifo_w)).mirror(0x8000);
 	map(0x0c00, 0x0dff).w(m_ge, FUNC(sgi_ge5_device::mar_w)).mirror(0x8000);
-	map(0x0e00, 0x0e07).lw32("mar_msb", [this](offs_t offset, u32 data) { m_bank->set_bank(offset); }).mirror(0x8000);
+	map(0x0e00, 0x0e07).lw32([this](offs_t offset, u32 data) { m_bank->set_bank(offset); }, "mar_msb").mirror(0x8000);
 
 	map(0x1400, 0x17ff).rw(m_ge, FUNC(sgi_ge5_device::data_r), FUNC(sgi_ge5_device::data_w));
 	map(0x2000, 0x2007).rw(m_ge, FUNC(sgi_ge5_device::finish_r), FUNC(sgi_ge5_device::finish_w)).mirror(0x8000);
@@ -222,42 +222,42 @@ void sgi_gr1_device::device_reset()
 u8 sgi_gr1_device::dr0_r()
 {
 	LOG("dr0_r 0x%02x (%s)\n", m_dr0, machine().describe_context());
-	
+
 	return m_dr0;
 }
 
 u8 sgi_gr1_device::dr1_r()
 {
 	LOG("dr1_r 0x%02x (%s)\n", m_dr1, machine().describe_context());
-	
+
 	return m_dr1;
 }
 
 u8 sgi_gr1_device::dr2_r()
 {
 	LOG("dr2_r 0x%02x (%s)\n", m_dr2, machine().describe_context());
-	
+
 	return m_dr2;
 }
 
 u8 sgi_gr1_device::dr3_r()
 {
 	LOG("dr3_r 0x%02x (%s)\n", m_dr3, machine().describe_context());
-	
+
 	return m_dr3;
 }
 
 u8 sgi_gr1_device::dr4_r()
 {
 	LOG("dr4_r 0x%02x (%s)\n", m_dr4, machine().describe_context());
-	
+
 	return (m_dr4 | (m_ge->suspended() ? 0 : DR4_GESTALL)) & DR4_RM;
 }
 
 void sgi_gr1_device::dr0_w(u8 data)
 {
 	LOG("dr0_w 0x%02x (%s)\n", data, machine().describe_context());
-	
+
 	m_dr0 = (m_dr0 & ~DR0_WM) | (data & DR0_WM);
 }
 
@@ -280,7 +280,7 @@ void sgi_gr1_device::dr2_w(u8 data)
 void sgi_gr1_device::dr3_w(u8 data)
 {
 	LOG("dr3_w 0x%02x (%s)\n", data, machine().describe_context());
-	
+
 	m_dr3 = (m_dr3 & ~DR3_WM) | (data & DR3_WM);
 }
 

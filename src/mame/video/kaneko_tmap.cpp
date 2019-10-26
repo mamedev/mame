@@ -116,6 +116,7 @@ kaneko_view2_tilemap_device::kaneko_view2_tilemap_device(const machine_config &m
 	, m_xdim(0)
 	, m_ydim(0)
 	, m_invert_flip(0)
+	, m_view2_cb(*this)
 	, m_regs(nullptr)
 {
 }
@@ -148,19 +149,19 @@ void kaneko_view2_tilemap_device::device_start()
 	};
 	layout.total = m_gfxrom->bytes() / ((16*16*4) / 8);
 
-	m_view2_cb.bind_relative_to(*owner());
+	m_view2_cb.resolve();
 	m_regs = make_unique_clear<u16[]>(0x20/2);
 
 	set_gfx(0, std::make_unique<gfx_element>(&palette(), layout, m_gfxrom->base(), 0, 0x40, m_colbase));
 
 	m_tmap[0] = &machine().tilemap().create(
 			*this,
-			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info<0>),this),
+			tilemap_get_info_delegate(*this, FUNC(kaneko_view2_tilemap_device::get_tile_info<0>)),
 			TILEMAP_SCAN_ROWS,
 			16,16, 0x20,0x20);
 	m_tmap[1] = &machine().tilemap().create(
 			*this,
-			tilemap_get_info_delegate(FUNC(kaneko_view2_tilemap_device::get_tile_info<1>),this),
+			tilemap_get_info_delegate(*this, FUNC(kaneko_view2_tilemap_device::get_tile_info<1>)),
 			TILEMAP_SCAN_ROWS,
 			16,16, 0x20,0x20);
 

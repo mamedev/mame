@@ -73,10 +73,10 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 
 	if (data==2)
 	{
-		space2.install_read_handler (0xf000, 0xf7ff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_r),this));
-		space2.install_write_handler(0xf000, 0xf7ff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_charram_w),this));
-		space2.install_read_handler (0xf800, 0xffff, read8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_r),this));
-		space2.install_write_handler(0xf800, 0xffff, write8_delegate(FUNC(pecom_state::pecom_cdp1869_pageram_w),this));
+		space2.install_read_handler (0xf000, 0xf7ff, read8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_r)));
+		space2.install_write_handler(0xf000, 0xf7ff, write8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_charram_w)));
+		space2.install_read_handler (0xf800, 0xffff, read8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_r)));
+		space2.install_write_handler(0xf800, 0xffff, write8_delegate(*this, FUNC(pecom_state::pecom_cdp1869_pageram_w)));
 	}
 	else
 	{

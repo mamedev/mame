@@ -267,7 +267,7 @@ void midxunit_state::machine_reset()
 	for (int i = 0; i < 16; i++)
 		m_ioshuffle[i] = i % 8;
 
-	m_dcs->set_io_callbacks(write_line_delegate(FUNC(midxunit_state::midxunit_dcs_output_full),this), write_line_delegate());
+	m_dcs->set_io_callbacks(write_line_delegate(*this, FUNC(midxunit_state::midxunit_dcs_output_full)), write_line_delegate(*this));
 }
 
 

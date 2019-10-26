@@ -597,6 +597,8 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_flags(0),
 		m_impulse(0),
 		m_name(name),
+		m_read(port.device()),
+		m_write(port.device()),
 		m_write_param(0),
 		m_digital_value(false),
 		m_min(0),
@@ -608,6 +610,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 		m_crosshair_scale(1.0),
 		m_crosshair_offset(0),
 		m_crosshair_altaxis(0),
+		m_crosshair_mapper(port.device()),
 		m_full_turn_count(0),
 		m_remap_table(nullptr),
 		m_way(0)
@@ -1329,9 +1332,9 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 void ioport_field::init_live_state(analog_field *analog)
 {
 	// resolve callbacks
-	m_read.bind_relative_to(device());
-	m_write.bind_relative_to(device());
-	m_crosshair_mapper.bind_relative_to(device());
+	m_read.resolve();
+	m_write.resolve();
+	m_crosshair_mapper.resolve();
 
 	// allocate live state
 	m_live = std::make_unique<ioport_field_live>(*this, analog);

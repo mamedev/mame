@@ -87,8 +87,8 @@ void einstein_silicon_disc_device::device_reset()
 	// install i/o ports
 	io_space().install_device(0xf0, 0xff, *this, &einstein_silicon_disc_device::map);
 	io_space().install_readwrite_handler(0xfa, 0xfa, 0, 0, 0xff00,
-		read8_delegate(FUNC(einstein_silicon_disc_device::ram_r), this),
-		write8_delegate(FUNC(einstein_silicon_disc_device::ram_w), this));
+			read8_delegate(*this, FUNC(einstein_silicon_disc_device::ram_r)),
+			write8_delegate(*this, FUNC(einstein_silicon_disc_device::ram_w)));
 }
 
 

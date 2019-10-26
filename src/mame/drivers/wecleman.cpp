@@ -1168,12 +1168,12 @@ void wecleman_state::hotchase(machine_config &config)
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(-0xb0 / 2, -16);
 	m_k051316[0]->set_wrap(1);
-	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1), this);
+	m_k051316[0]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_1));
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(-0xb0 / 2, -16);
-	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2), this);
+	m_k051316[1]->set_zoom_callback(FUNC(wecleman_state::hotchase_zoom_callback_2));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

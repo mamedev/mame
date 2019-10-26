@@ -218,7 +218,7 @@ struct render_texinfo
 	u64                 unique_id;          // unique identifier to pass to osd
 	u64                 old_id;             // previously allocated id, if applicable
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
-	u32					palette_length;
+	u32                 palette_length;
 };
 
 

@@ -297,6 +297,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dsoccr94 )
 	PORT_INCLUDE(m107_4player)
 
+	PORT_MODIFY("P3_P4")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START3 ) PORT_CONDITION("DSW", 0x600, NOTEQUALS, 0x000)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START4 ) PORT_CONDITION("DSW", 0x600, NOTEQUALS, 0x000)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW", 0x600, EQUALS, 0x000)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_CONDITION("DSW", 0x600, EQUALS, 0x000)
+
 	PORT_MODIFY("COINS_DSW3")
 	PORT_DIPNAME( 0x0300, 0x0300, "Player Power" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(      0x0000, "500" )
@@ -323,7 +329,7 @@ static INPUT_PORTS_START( dsoccr94 )
 /*
    Match Mode: Winner advances to the next game.  Game Over for the loser
    Power Mode: The Players can play the game until their respective powers run
-               out, reguardless of whether they win or lose the game.
+               out, regardless of whether they win or lose the game.
                Player 2 can join in any time during the game
                Player power (time) can be adjusted by dip switch #3
 */

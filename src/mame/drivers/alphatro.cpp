@@ -769,7 +769,7 @@ void alphatro_state::alphatro(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(alphatro_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(alphatro_state::crtc_update_row));
 
 	I8251(config, m_usart, 16_MHz_XTAL / 4);
 	m_usart->txd_handler().set([this] (bool state) { m_cassbit = state; });
@@ -787,7 +787,7 @@ void alphatro_state::alphatro(machine_config &config)
 	RAM(config, "ram").set_default_size("64K");
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "alphatro_cart", "bin").set_device_load(FUNC(alphatro_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "alphatro_cart", "bin").set_device_load(FUNC(alphatro_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("alphatro_cart");
 
 	/* 0000 banking */

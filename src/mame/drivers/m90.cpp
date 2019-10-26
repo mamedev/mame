@@ -851,7 +851,7 @@ void m90_state::dynablsb(machine_config &config)
 
 	m_soundcpu->set_addrmap(AS_IO, &m90_state::dynablsb_sound_cpu_io_map);
 	m_soundcpu->set_periodic_int(FUNC(m90_state::irq0_line_hold), attotime::from_hz(64*60)); /* half the sample rate of the original */
-	m_soundcpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate());
+	m_soundcpu->remove_irq_acknowledge_callback();
 
 	m_screen->set_size(320, 240);
 	m_screen->set_visarea(0, 319, 0, 239);

@@ -823,12 +823,9 @@ void savquest_state::savquest(machine_config &config)
 	DS12885(config.replace(), "rtc");
 
 	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device_read ( 0, FUNC(savquest_state::intel82439tx_pci_r), this);
-	pcibus.set_device_write( 0, FUNC(savquest_state::intel82439tx_pci_w), this);
-	pcibus.set_device_read ( 7, FUNC(savquest_state::intel82371ab_pci_r), this);
-	pcibus.set_device_write( 7, FUNC(savquest_state::intel82371ab_pci_w), this);
-	pcibus.set_device_read (13, FUNC(savquest_state::pci_3dfx_r), this);
-	pcibus.set_device_write(13, FUNC(savquest_state::pci_3dfx_w), this);
+	pcibus.set_device( 0, FUNC(savquest_state::intel82439tx_pci_r), FUNC(savquest_state::intel82439tx_pci_w));
+	pcibus.set_device( 7, FUNC(savquest_state::intel82371ab_pci_r), FUNC(savquest_state::intel82371ab_pci_w));
+	pcibus.set_device(13, FUNC(savquest_state::pci_3dfx_r), FUNC(savquest_state::pci_3dfx_w));
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));

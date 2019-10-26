@@ -766,11 +766,11 @@ void bml3_state::machine_reset()
 	/* defaults */
 	mem.install_rom(0xa000, 0xfeff,memregion("maincpu")->base() + 0xa000);
 	mem.install_rom(0xfff0, 0xffff,memregion("maincpu")->base() + 0xfff0);
-	mem.install_write_handler(0xa000, 0xbfff, write8_delegate(FUNC(bml3_state::a000_w), this),0);
-	mem.install_write_handler(0xc000, 0xdfff, write8_delegate(FUNC(bml3_state::c000_w), this),0);
-	mem.install_write_handler(0xe000, 0xefff, write8_delegate(FUNC(bml3_state::e000_w), this),0);
-	mem.install_write_handler(0xf000, 0xfeff, write8_delegate(FUNC(bml3_state::f000_w), this),0);
-	mem.install_write_handler(0xfff0, 0xffff, write8_delegate(FUNC(bml3_state::fff0_w), this),0);
+	mem.install_write_handler(0xa000, 0xbfff, write8_delegate(*this, FUNC(bml3_state::a000_w)), 0);
+	mem.install_write_handler(0xc000, 0xdfff, write8_delegate(*this, FUNC(bml3_state::c000_w)), 0);
+	mem.install_write_handler(0xe000, 0xefff, write8_delegate(*this, FUNC(bml3_state::e000_w)), 0);
+	mem.install_write_handler(0xf000, 0xfeff, write8_delegate(*this, FUNC(bml3_state::f000_w)), 0);
+	mem.install_write_handler(0xfff0, 0xffff, write8_delegate(*this, FUNC(bml3_state::fff0_w)), 0);
 
 	m_firq_mask = -1; // disable firq
 }
@@ -798,16 +798,17 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x40)
 		{
 			mem.install_readwrite_handler(0xa000, 0xbfff,
-				read8_delegate(FUNC(bml3_state::a000_r), this),
-				write8_delegate(FUNC(bml3_state::a000_w), this), 0);
+					read8_delegate(*this, FUNC(bml3_state::a000_r)),
+					write8_delegate(*this, FUNC(bml3_state::a000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xa000, 0xbfff,
-				memregion("maincpu")->base() + 0xa000);
+					memregion("maincpu")->base() + 0xa000);
 			mem.install_write_handler(0xa000, 0xbfff,
-				write8_delegate(FUNC(bml3_state::a000_w), this),
-				0);
+					write8_delegate(*this, FUNC(bml3_state::a000_w)),
+					0);
 		}
 	}
 
@@ -816,16 +817,17 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x40)
 		{
 			mem.install_readwrite_handler(0xc000, 0xdfff,
-				read8_delegate(FUNC(bml3_state::c000_r), this),
-				write8_delegate(FUNC(bml3_state::c000_w), this), 0);
+					read8_delegate(*this, FUNC(bml3_state::c000_r)),
+					write8_delegate(*this, FUNC(bml3_state::c000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xc000, 0xdfff,
-				memregion("maincpu")->base() + 0xc000);
+					memregion("maincpu")->base() + 0xc000);
 			mem.install_write_handler(0xc000, 0xdfff,
-				write8_delegate(FUNC(bml3_state::c000_w), this),
-				0);
+					write8_delegate(*this, FUNC(bml3_state::c000_w)),
+					0);
 		}
 	}
 
@@ -834,47 +836,50 @@ WRITE8_MEMBER(bml3_state::piaA_w)
 		if(data & 0x80)
 		{
 			mem.install_readwrite_handler(0xe000, 0xefff,
-				read8_delegate(FUNC(bml3_state::e000_r), this),
-				write8_delegate(FUNC(bml3_state::e000_w), this), 0);
+					read8_delegate(*this, FUNC(bml3_state::e000_r)),
+					write8_delegate(*this, FUNC(bml3_state::e000_w)),
+					0);
 		}
 		else
 		{
 			mem.install_rom(0xe000, 0xefff,
-				memregion("maincpu")->base() + 0xe000);
+					memregion("maincpu")->base() + 0xe000);
 			mem.install_write_handler(0xe000, 0xefff,
-				write8_delegate(FUNC(bml3_state::e000_w), this),
-				0);
+					write8_delegate(*this, FUNC(bml3_state::e000_w)),
+					0);
 		}
 	}
 
 	if(data & 1)
 	{
 		mem.install_readwrite_handler(0xf000, 0xfeff,
-			read8_delegate(FUNC(bml3_state::f000_r), this),
-			write8_delegate(FUNC(bml3_state::f000_w), this), 0);
+				read8_delegate(*this, FUNC(bml3_state::f000_r)),
+				write8_delegate(*this, FUNC(bml3_state::f000_w)),
+				0);
 	}
 	else
 	{
 		mem.install_rom(0xf000, 0xfeff,
-			memregion("maincpu")->base() + 0xf000);
+				memregion("maincpu")->base() + 0xf000);
 		mem.install_write_handler(0xf000, 0xfeff,
-			write8_delegate(FUNC(bml3_state::f000_w), this),
-			0);
+				write8_delegate(*this, FUNC(bml3_state::f000_w)),
+				0);
 	}
 
 	if(data & 2)
 	{
 		mem.install_readwrite_handler(0xfff0, 0xffff,
-			read8_delegate(FUNC(bml3_state::fff0_r), this),
-			write8_delegate(FUNC(bml3_state::fff0_w), this), 0);
+				read8_delegate(*this, FUNC(bml3_state::fff0_r)),
+				write8_delegate(*this, FUNC(bml3_state::fff0_w)),
+				0);
 	}
 	else
 	{
 		mem.install_rom(0xfff0, 0xffff,
-			memregion("maincpu")->base() + 0xfff0);
+				memregion("maincpu")->base() + 0xfff0);
 		mem.install_write_handler(0xfff0, 0xffff,
-			write8_delegate(FUNC(bml3_state::fff0_w), this),
-			0);
+				write8_delegate(*this, FUNC(bml3_state::fff0_w)),
+				0);
 	}
 }
 
@@ -936,7 +941,7 @@ void bml3_state::bml3_common(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(bml3_state::crtc_update_row));
 
 	// fire once per scan of an individual key
 	// According to the service manual (p.65), the keyboard timer is driven by the horizontal video sync clock.

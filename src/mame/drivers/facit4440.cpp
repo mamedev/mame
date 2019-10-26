@@ -264,7 +264,7 @@ void facit4440_state::facit4440(machine_config &config)
 	MC6845(config, m_crtc, FAKE_DOT_CLOCK / CH_WIDTH); // HD46505SP-2
 	m_crtc->set_char_width(CH_WIDTH);
 	m_crtc->set_show_border_area(false);
-	m_crtc->set_update_row_callback(FUNC(facit4440_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(facit4440_state::update_row));
 	m_crtc->out_hsync_callback().set("ctc", FUNC(z80ctc_device::trg3));
 	m_crtc->out_vsync_callback().set(FUNC(facit4440_state::vsync_w));
 }

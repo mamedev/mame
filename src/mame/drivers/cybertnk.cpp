@@ -275,13 +275,13 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tile_info)
 
 void cybertnk_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[0]->set_transparent_pen(0);
 
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cybertnk_state::get_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,8,128,32);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cybertnk_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,8,128,32);
 	m_tilemap[2]->set_transparent_pen(0);
 }
 

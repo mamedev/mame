@@ -11,14 +11,14 @@
 class nmk_16bit_sprite_device : public device_t
 {
 public:
-	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	typedef device_delegate<void (u32 &colour, u32 &pri_mask)> colpri_cb_delegate;
 	typedef device_delegate<void (u16 attr, int &flipx, int &flipy, int &code)> ext_cb_delegate;
 
+	nmk_16bit_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
 	// configuration
-	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb = colpri_cb_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_ext_callback(T &&... args) { m_ext_cb = ext_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_colpri_callback(T &&... args) { m_colpri_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_ext_callback(T &&... args) { m_ext_cb.set(std::forward<T>(args)...); }
 	void set_videoshift(int shift) { m_videoshift = shift; }
 	void set_mask(int xmask, int ymask) { m_xmask = xmask, m_ymask = ymask; }
 	void set_screen_size(int width, int height) { m_screen_width = width, m_screen_height = height; }

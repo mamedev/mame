@@ -123,10 +123,10 @@ TILEMAP_MAPPER_MEMBER(supduck_state::supduk_tilemap_scan)
 
 void supduck_state::video_start()
 {
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fore_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
+	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_fore_tile_info)), tilemap_mapper_delegate(*this, FUNC(supduck_state::supduk_tilemap_scan)), 32, 32, 128,64);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(supduck_state::get_back_tile_info)), tilemap_mapper_delegate(*this, FUNC(supduck_state::supduk_tilemap_scan)), 32, 32, 128,64);
 
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);

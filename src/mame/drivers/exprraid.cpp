@@ -856,13 +856,13 @@ void exprraid_state::init_exprraid()
 
 void exprraid_state::init_wexpressb2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x3800, 0x3800, read8_delegate(*this, FUNC(exprraid_state::vblank_r)));
 	exprraid_gfx_expand();
 }
 
 void exprraid_state::init_wexpressb3()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xffc0, 0xffc0, read8_delegate(*this, FUNC(exprraid_state::vblank_r)));
 	exprraid_gfx_expand();
 }
 

@@ -670,7 +670,7 @@ void microvision_state::microvision(machine_config &config)
 
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "microvision_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(microvision_state::cart_load), this);
+	cartslot.set_device_load(FUNC(microvision_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("microvision");

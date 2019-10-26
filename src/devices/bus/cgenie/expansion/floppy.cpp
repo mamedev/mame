@@ -97,7 +97,7 @@ void cgenie_fdc_device::device_add_mconfig(machine_config &config)
 
 //  SOFTWARE_LIST(config, "floppy_list").set_original("cgenie_flop");
 
-	GENERIC_SOCKET(config, "socket", generic_plain_slot, "cgenie_flop_rom", "bin,rom").set_device_load(FUNC(cgenie_fdc_device::socket_load), this);
+	GENERIC_SOCKET(config, "socket", generic_plain_slot, "cgenie_flop_rom", "bin,rom").set_device_load(FUNC(cgenie_fdc_device::socket_load));
 
 	SOFTWARE_LIST(config, "rom_list").set_original("cgenie_flop_rom");
 }
@@ -147,9 +147,7 @@ void cgenie_fdc_device::device_reset()
 
 	// map extra socket
 	if (m_socket->exists())
-	{
-		m_slot->m_program->install_read_handler(0xe000, 0xefff, read8sm_delegate(FUNC(generic_slot_device::read_rom), (generic_slot_device *) m_socket));
-	}
+		m_slot->m_program->install_read_handler(0xe000, 0xefff, read8sm_delegate(*m_socket, FUNC(generic_slot_device::read_rom)));
 }
 
 

@@ -30,7 +30,7 @@
  * inputs. The arrangement of components in the schematic however indicate that
  * this is not the case and indeed a connection exists. This results in sounds
  * at output XU1.14 to contain more detail.
- * 
+ *
  * You can observe sounds at XU1.14 by doing
  *
  * NL_LOGS=XU1.14 ./mame64 kidniki
@@ -60,7 +60,7 @@
  *
  */
 
-#define J4	(1)
+#define J4  (1)
 
 /* ----------------------------------------------------------------------------
  *  Library section header START

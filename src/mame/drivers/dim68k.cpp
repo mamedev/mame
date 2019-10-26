@@ -339,7 +339,7 @@ void dim68k_state::dim68k(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(dim68k_state::crtc_update_row));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(dim68k_state::kbd_put));

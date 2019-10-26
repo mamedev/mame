@@ -17,6 +17,14 @@ Hardware notes:
 - piezo speaker, LEDs, 8*8 chessboard buttons
 - PCB label 510.1128A01
 
+To play, wait until the motor is finished before making a move. At boot-up, the
+computer will do a self-test.
+After the player captures a piece, select the captured piece from the MAME sensorboard
+spawn block and place it at the designated box at the edge of the chessboard.
+
+TODO:
+- sensorboard undo buffer goes out of control, probably not worth solving this issue
+
 ******************************************************************************/
 
 #include "emu.h"
@@ -44,7 +52,8 @@ public:
 		m_dac(*this, "dac"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
-		m_input(*this, "IN.0")
+		m_input(*this, "IN.0"),
+		m_out_motor(*this, "motor.%u", 0U)
 	{ }
 
 	void fphantom(machine_config &config);
@@ -62,6 +71,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_ioport m_input;
+	output_finder<5> m_out_motor;
 
 	void main_map(address_map &map);
 
@@ -96,6 +106,8 @@ private:
 
 void phantom_state::machine_start()
 {
+	m_out_motor.resolve();
+
 	save_item(NAME(m_mux));
 	save_item(NAME(m_lcd_mask));
 	save_item(NAME(m_lcd_data));
@@ -143,10 +155,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(phantom_state::motors_timer)
 	if (m_motors_ctrl & 0x0c)  m_hmotor_sensor0_ff = true;
 	if (m_motors_ctrl & 0x04)  m_hmotor_sensor1_ff = true;
 
-	if ((m_motors_ctrl & 0x01) && m_vmotor_pos > 0x00)	m_vmotor_pos--;
-	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0xff)	m_vmotor_pos++;
-	if ((m_motors_ctrl & 0x04) && m_hmotor_pos > 0x00)	m_hmotor_pos--;
-	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xff)	m_hmotor_pos++;
+	if ((m_motors_ctrl & 0x01) && m_vmotor_pos > 0x00)  m_vmotor_pos--;
+	if ((m_motors_ctrl & 0x02) && m_vmotor_pos < 0xff)  m_vmotor_pos++;
+	if ((m_motors_ctrl & 0x04) && m_hmotor_pos > 0x00)  m_hmotor_pos--;
+	if ((m_motors_ctrl & 0x08) && m_hmotor_pos < 0xff)  m_hmotor_pos++;
 }
 
 void phantom_state::update_pieces_position(int state)
@@ -195,10 +207,10 @@ void phantom_state::update_pieces_position(int state)
 	m_board->refresh();
 }
 
+
 /******************************************************************************
     I/O
 ******************************************************************************/
-
 
 WRITE8_MEMBER(phantom_state::mux_w)
 {
@@ -232,6 +244,9 @@ WRITE8_MEMBER(phantom_state::motors_w)
 
 	if ((m_motors_ctrl ^ data) & 0x10)
 		update_pieces_position(BIT(data, 4));
+
+	for (int i = 0; i < 5; i++)
+		m_out_motor[i] = BIT(data, i);
 
 	m_dac->write(BIT(data, 5));
 	m_motors_ctrl = data;

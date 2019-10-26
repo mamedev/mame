@@ -48,6 +48,7 @@ DEFINE_DEVICE_TYPE(DECO_MXC06, deco_mxc06_device, "deco_mxc06", "DECO MXC06 Spri
 deco_mxc06_device::deco_mxc06_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_MXC06, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_colpri_cb(*this)
 {
 }
 
@@ -237,7 +238,7 @@ void deco_mxc06_device::draw_sprites_bootleg(screen_device &screen, bitmap_ind16
 
 void deco_mxc06_device::device_start()
 {
-	m_colpri_cb.bind_relative_to(*owner());
+	m_colpri_cb.resolve();
 	m_flip_screen = false;
 	m_spritelist = make_unique_clear<struct sprite_t[]>(0x400);
 

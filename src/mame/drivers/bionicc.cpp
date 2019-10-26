@@ -205,7 +205,7 @@ void bionicc_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0xa000, 0xa000).lrw8("mcu", [this]() { return m_mcu_to_audiocpu; }, [this](u8 data) { m_audiocpu_to_mcu = data; });
+	map(0xa000, 0xa000).lrw8(NAME([this]() { return m_mcu_to_audiocpu; }), NAME([this](u8 data) { m_audiocpu_to_mcu = data; }));
 	map(0xc000, 0xc7ff).ram();
 }
 
@@ -393,9 +393,9 @@ u32 bionicc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void bionicc_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bionicc_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bionicc_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bionicc_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
 
 	m_tx_tilemap->set_transparent_pen(3);
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */

@@ -961,8 +961,8 @@ void i82371sb_ide_device::map_extra(uint64_t memory_window_start, uint64_t memor
 	{
 		offs_t m_base = bmiba & 0xfff0;
 
-		io_space->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide1)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide1)), 0xffffffff);
-		io_space->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide2)), 0xffffffff);
+		io_space->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(*m_ide1, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide1, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		io_space->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
 	}
 }
 

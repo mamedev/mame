@@ -177,8 +177,8 @@ TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 
 void dunhuang_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
-	m_tmap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
+	m_tmap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(dunhuang_state::get_tile_info2)), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
 
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);

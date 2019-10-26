@@ -368,8 +368,8 @@ void beta_state::beta(machine_config &config)
 
 	/* EPROM socket */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, EPROM_TAG, generic_plain_slot, nullptr, "bin,rom"));
-	cartslot.set_device_load(FUNC(beta_state::load_beta_eprom), this);
-	cartslot.set_device_unload(FUNC(beta_state::unload_beta_eprom), this);
+	cartslot.set_device_load(FUNC(beta_state::load_beta_eprom));
+	cartslot.set_device_unload(FUNC(beta_state::unload_beta_eprom));
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("256");

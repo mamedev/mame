@@ -699,7 +699,7 @@ ROM_END
 
 void airbustr_state::init_airbustr()
 {
-	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),this)); // protection device lives here
+	m_master->space(AS_PROGRAM).install_read_handler(0xe000, 0xefff, read8_delegate(*this, FUNC(airbustr_state::devram_r))); // protection device lives here
 }
 
 

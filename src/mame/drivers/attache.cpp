@@ -1094,7 +1094,7 @@ void attache_state::driver_start()
 
 	m_nvram->set_base(m_cmos_ram,64);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff,read8_delegate(FUNC(attache_state::rom_r),this),write8_delegate(FUNC(attache_state::rom_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000,0x0fff, read8_delegate(*this, FUNC(attache_state::rom_r)), write8_delegate(*this, FUNC(attache_state::rom_w)));
 
 	save_pointer(m_char_ram,"Character RAM",128*32);
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);

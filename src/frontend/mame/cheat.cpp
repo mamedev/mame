@@ -153,7 +153,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		if (!itemnode->get_value() || !itemnode->get_value()[0])
 			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 
-		// check for non-existant value
+		// check for non-existent value
 		if (!itemnode->has_attribute("value"))
 			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
 

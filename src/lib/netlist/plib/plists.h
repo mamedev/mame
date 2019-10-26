@@ -391,9 +391,9 @@ namespace plib {
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;
 
-		mutex_type    			m_lock;
+		mutex_type              m_lock;
 		PALIGNAS_CACHELINE()
-		T * 					m_end;
+		T *                     m_end;
 		aligned_vector<T> m_list;
 
 	public:

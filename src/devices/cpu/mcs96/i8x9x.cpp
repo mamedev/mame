@@ -170,7 +170,7 @@ void i8x9x_device::serial_send_done()
 
 void i8x9x_device::internal_regs(address_map &map)
 {
-	map(0x00, 0x01).lr16("r0", []() -> u16 { return 0; }).nopw();
+	map(0x00, 0x01).lr16([] () -> u16 { return 0; }, "r0").nopw();
 	map(0x02, 0x03).r(FUNC(i8x9x_device::ad_result_r)); // 8-bit access
 	map(0x02, 0x02).w(FUNC(i8x9x_device::ad_command_w));
 	map(0x03, 0x03).w(FUNC(i8x9x_device::hsi_mode_w));

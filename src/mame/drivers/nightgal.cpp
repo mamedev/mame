@@ -1325,8 +1325,8 @@ READ8_MEMBER(nightgal_state::ngalsumr_prot_value_r)
 
 void nightgal_state::init_ngalsumr()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(FUNC(nightgal_state::ngalsumr_prot_latch_w), this) );
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(FUNC(nightgal_state::ngalsumr_prot_value_r), this) );
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x6000, 0x6000, write8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_latch_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x6001, 0x6001, read8_delegate(*this, FUNC(nightgal_state::ngalsumr_prot_value_r)));
 	// 0x6003 some kind of f/f state
 }
 

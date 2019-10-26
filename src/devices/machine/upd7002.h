@@ -27,8 +27,8 @@ public:
 
 	upd7002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_get_analogue_callback(T &&... args) { m_get_analogue_cb = get_analogue_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_eoc_callback(T &&... args) { m_eoc_cb = eoc_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_get_analogue_callback(T &&... args) { m_get_analogue_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_eoc_callback(T &&... args) { m_eoc_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_READ_LINE_MEMBER(eoc_r);
 	uint8_t read(offs_t offset);

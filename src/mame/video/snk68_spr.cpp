@@ -2,9 +2,9 @@
 // copyright-holders:Bryan McPhail, Acho A. Tang, Nicola Salmoria
 /*
  * Alpha 68k II/V sprite system
- * tile-based, with 8-bit accesses. 
+ * tile-based, with 8-bit accesses.
  * Two banks, first at 0x0000-0x1000, second at 0x1000 until end of VRAM.
- * First bank is processed by 64 bytes stepping starting from address $8, 
+ * First bank is processed by 64 bytes stepping starting from address $8,
  * then once it reaches end it restarts at $c, finally at $4.
  *
  * 0x0000-0x1000
@@ -35,10 +35,10 @@
  *   - player death animation has first frame with inverted horizontal halves;
  *   - stage 1 priest desyncs with background;
  *   - glitchy first frame on title screen;
- *   Given how this and the actual HW works it is pretty likely this having a consistent delay, 
+ *   Given how this and the actual HW works it is pretty likely this having a consistent delay,
  *   however it isn't known how exactly DMA triggers, and one frame of bufferd spriteram isn't enough.
  * - Why entry 0x7c0 requires a one line and a priority hack for alpha68k.cpp games?
- * - Super Champion Baseball: selecting a 3rd or 5th column team causes a shadow to appear on the drawn 
+ * - Super Champion Baseball: selecting a 3rd or 5th column team causes a shadow to appear on the drawn
  *   object which isn't present on the other columns, verify real HW behaviour;
  * - Sky Adventure: stage 1 priest priority goes above the bonus ship, confirmed to be a btanb;
  *
@@ -51,13 +51,13 @@ DEFINE_DEVICE_TYPE(SNK68_SPR, snk68_spr_device, "snk68_spr", "SNK68 Sprites")
 
 snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SNK68_SPR, tag, owner, clock)
+	, m_newtilecb(*this, FUNC(snk68_spr_device::tile_callback_noindirect))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_spriteram(*this, "^spriteram")
 	, m_screen(*this, "^screen")
 	, m_flipscreen(false)
 	, m_partialupdates(1)
 {
-	m_newtilecb =  snk68_tile_indirection_delegate(FUNC(snk68_spr_device::tile_callback_noindirect), this);
 }
 
 void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int& region)
@@ -67,7 +67,7 @@ void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int
 void snk68_spr_device::device_start()
 {
 	// bind our handler
-	m_newtilecb.bind_relative_to(*owner());
+	m_newtilecb.resolve();
 }
 
 void snk68_spr_device::device_reset()
@@ -121,7 +121,7 @@ void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 
 		mx = ((mx + 16) & 0x1ff) - 16;
 		my = -my;
-		
+
 		// TODO: alpha68k games all wants this hack, why?
 		if (group == 1 && start_offset == 0x7c0)
 			my++;

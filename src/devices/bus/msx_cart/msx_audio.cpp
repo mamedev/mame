@@ -96,8 +96,8 @@ void msx_cart_msx_audio_hxmu900_device::device_add_mconfig(machine_config &confi
 void msx_cart_msx_audio_hxmu900_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
-	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
+	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(*m_y8950, FUNC(y8950_device::write)));
+	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(*m_y8950, FUNC(y8950_device::read)));
 }
 
 
@@ -200,10 +200,10 @@ WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205_device::midi_in)
 void msx_cart_msx_audio_nms1205_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(FUNC(y8950_device::write), m_y8950.target()));
-	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(FUNC(y8950_device::read), m_y8950.target()));
-	io_space().install_write_handler(0x00, 0x01, write8sm_delegate(FUNC(acia6850_device::write), m_acia6850.target()));
-	io_space().install_read_handler(0x04, 0x05, read8sm_delegate(FUNC(acia6850_device::read), m_acia6850.target()));
+	io_space().install_write_handler(0xc0, 0xc1, write8sm_delegate(*m_y8950, FUNC(y8950_device::write)));
+	io_space().install_read_handler(0xc0, 0xc1, read8sm_delegate(*m_y8950, FUNC(y8950_device::read)));
+	io_space().install_write_handler(0x00, 0x01, write8sm_delegate(*m_acia6850, FUNC(acia6850_device::write)));
+	io_space().install_read_handler(0x04, 0x05, read8sm_delegate(*m_acia6850, FUNC(acia6850_device::read)));
 }
 
 
@@ -287,8 +287,8 @@ const tiny_rom_entry *msx_cart_msx_audio_fsca1_device::device_rom_region() const
 void msx_cart_msx_audio_fsca1_device::device_start()
 {
 	// Install IO read/write handlers
-	io_space().install_write_handler(0xc0, 0xc3, write8sm_delegate(FUNC(msx_cart_msx_audio_fsca1_device::write_y8950), this));
-	io_space().install_read_handler(0xc0, 0xc3, read8sm_delegate(FUNC(msx_cart_msx_audio_fsca1_device::read_y8950), this));
+	io_space().install_write_handler(0xc0, 0xc3, write8sm_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::write_y8950)));
+	io_space().install_read_handler(0xc0, 0xc3, read8sm_delegate(*this, FUNC(msx_cart_msx_audio_fsca1_device::read_y8950)));
 }
 
 

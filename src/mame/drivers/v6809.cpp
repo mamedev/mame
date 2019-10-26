@@ -308,8 +308,8 @@ void v6809_state::v6809(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(v6809_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(v6809_state::crtc_update_addr));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
 	keyboard.set_keyboard_callback(FUNC(v6809_state::kbd_put));

@@ -71,8 +71,7 @@ public:
 	DECLARE_READ32_MEMBER(mp_param_r);
 	DECLARE_WRITE32_MEMBER(mp_param_w);
 
-	void set_command_callback(write32_delegate callback);
-
+	template <typename... T> void set_command_callback(T &&... args) { m_cmd_callback.set(std::forward<T>(args)...); }
 
 	void mp_internal_map(address_map &map);
 protected:

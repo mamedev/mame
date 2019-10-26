@@ -134,9 +134,9 @@ void pc9801_amd98_device::device_start()
 
 void pc9801_amd98_device::device_reset()
 {
-	m_bus->install_io(0x00d8, 0x00df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
+	m_bus->install_io(0x00d8, 0x00df, read8_delegate(*this, FUNC(pc9801_amd98_device::read)), write8_delegate(*this, FUNC(pc9801_amd98_device::write)));
 	// Thexder access with following
-	m_bus->install_io(0x38d8, 0x38df, read8_delegate(FUNC(pc9801_amd98_device::read), this), write8_delegate(FUNC(pc9801_amd98_device::write), this) );
+	m_bus->install_io(0x38d8, 0x38df, read8_delegate(*this, FUNC(pc9801_amd98_device::read)), write8_delegate(*this, FUNC(pc9801_amd98_device::write)));
 }
 
 
@@ -154,7 +154,7 @@ READ8_MEMBER(pc9801_amd98_device::read)
 			return m_ay2->data_r();
 	}
 
-	printf("%02x\n",offset);
+	logerror("%02x\n",offset);
 
 	return 0xff;
 }
@@ -176,7 +176,7 @@ WRITE8_MEMBER(pc9801_amd98_device::write)
 			m_ay2->data_w(data);
 			break;
 		default:
-			printf("%02x %02x\n",offset,data);
+			logerror("%02x %02x\n",offset,data);
 	}
 }
 
@@ -191,11 +191,11 @@ WRITE8_MEMBER(pc9801_amd98_device::ay3_data_latch_w)
 	switch(data)
 	{
 		case 0x47:
-			//printf("%02x addr\n",m_ay3_latch);
+			//logerror("%02x addr\n",m_ay3_latch);
 			m_ay3->address_w(m_ay3_latch);
 			break;
 		case 0x43:
-			//printf("%02x data\n",m_ay3_latch);
+			//logerror("%02x data\n",m_ay3_latch);
 			m_ay3->data_w(m_ay3_latch);
 			break;
 	}

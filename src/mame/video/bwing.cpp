@@ -125,9 +125,9 @@ void bwing_state::video_start()
 {
 	int i;
 
-	m_charmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_charinfo),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
-	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_fgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::scan_cols),this), 16, 16, 64, 64);
-	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bwing_state::get_bgtileinfo),this), tilemap_mapper_delegate(FUNC(bwing_state::scan_cols),this), 16, 16, 64, 64);
+	m_charmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bwing_state::get_charinfo)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_fgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bwing_state::get_fgtileinfo)), tilemap_mapper_delegate(*this, FUNC(bwing_state::scan_cols)), 16, 16, 64, 64);
+	m_bgmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bwing_state::get_bgtileinfo)), tilemap_mapper_delegate(*this, FUNC(bwing_state::scan_cols)), 16, 16, 64, 64);
 
 	m_charmap->set_transparent_pen(0);
 	m_fgmap->set_transparent_pen(0);

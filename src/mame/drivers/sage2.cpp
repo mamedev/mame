@@ -387,7 +387,7 @@ void sage2_state::machine_reset()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	program.unmap_readwrite(0x000000, 0x07ffff);
 	program.install_rom(0x000000, 0x001fff, 0x07e000, m_rom->base());
-	program.install_read_handler(0xfe0000, 0xfe3fff, read16_delegate(FUNC(sage2_state::rom_r), this));
+	program.install_read_handler(0xfe0000, 0xfe3fff, read16_delegate(*this, FUNC(sage2_state::rom_r)));
 }
 
 READ16_MEMBER(sage2_state::rom_r)

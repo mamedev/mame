@@ -81,7 +81,7 @@ void splash_state::splash_map(address_map &map)
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
-	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
+	map(0x84000a, 0x84000a).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
@@ -161,7 +161,7 @@ void splash_state::roldfrog_map(address_map &map)
 	map(0x840002, 0x840003).portr("DSW2");
 	map(0x840004, 0x840005).portr("P1");
 	map(0x840006, 0x840007).portr("P2");
-	map(0x84000a, 0x84000a).select(0x000070).lw8("outlatch_w", [this](offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); });
+	map(0x84000a, 0x84000a).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
 	map(0x84000f, 0x84000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x880000, 0x8817ff).ram().w(FUNC(splash_state::vram_w)).share("videoram");   /* Video RAM */
 	map(0x881800, 0x881803).ram().share("vregs");                           /* Scroll registers */
@@ -1436,8 +1436,8 @@ void funystrp_state::init_funystrp()
 
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x1fffff, write16_delegate(FUNC(funystrp_state::protection_w), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16_delegate(FUNC(funystrp_state::protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x100000, 0x1fffff, write16_delegate(*this, FUNC(funystrp_state::protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100000, 0x1fffff, read16_delegate(*this, FUNC(funystrp_state::protection_r)));
 }
 
 GAME( 1992, splash,   0,        splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",  "Splash! (Ver. 1.2 World)", MACHINE_SUPPORTS_SAVE )

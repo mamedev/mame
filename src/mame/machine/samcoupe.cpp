@@ -144,7 +144,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 		if ((m_lmpr & 0x1F) <= page_mask)
 			memory = &m_ram->pointer()[(m_lmpr & page_mask) * 0x4000];
 		else
-			memory = nullptr;  /* Attempt to page in non existant ram region */
+			memory = nullptr;  /* Attempt to page in non existent ram region */
 		is_readonly = false;
 	}
 	else
@@ -159,7 +159,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 	if (((m_lmpr + 1) & 0x1f) <= page_mask)
 		memory = &m_ram->pointer()[((m_lmpr + 1) & page_mask) * 0x4000];
 	else
-		memory = nullptr;  /* Attempt to page in non existant ram region */
+		memory = nullptr;  /* Attempt to page in non existent ram region */
 	samcoupe_update_bank(space, 2, memory, false);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
@@ -173,7 +173,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 		if ((m_hmpr & 0x1F) <= page_mask )
 			memory = &m_ram->pointer()[(m_hmpr & page_mask)*0x4000];
 		else
-			memory = nullptr;  /* Attempt to page in non existant ram region */
+			memory = nullptr;  /* Attempt to page in non existent ram region */
 		samcoupe_update_bank(space, 3, memory, false);
 
 
@@ -188,7 +188,7 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 			if (((m_hmpr + 1) & 0x1f) <= page_mask)
 				memory = &m_ram->pointer()[((m_hmpr + 1) & page_mask) * 0x4000];
 			else
-				memory = nullptr;  /* Attempt to page in non existant ram region */
+				memory = nullptr;  /* Attempt to page in non existent ram region */
 			is_readonly = false;
 		}
 		samcoupe_update_bank(space, 4, memory, false);
@@ -323,7 +323,7 @@ void samcoupe_state::machine_reset()
 	if (m_config->read() & 0x01)
 	{
 		/* install RTC */
-		spaceio.install_readwrite_handler(0xef, 0xef, 0, 0, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));
+		spaceio.install_readwrite_handler(0xef, 0xef, 0, 0, 0xff00, read8_delegate(*this, FUNC(samcoupe_state::samcoupe_rtc_r)), write8_delegate(*this, FUNC(samcoupe_state::samcoupe_rtc_w)));
 	}
 	else
 	{

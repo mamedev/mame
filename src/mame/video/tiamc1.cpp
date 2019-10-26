@@ -166,10 +166,10 @@ void tiamc1_state::video_start()
 
 	save_pointer(NAME(m_videoram), 0x3050);
 
-	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tiamc1_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 
-	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tiamc1_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS,
 			8, 8, 32, 32);
 	m_bg_tilemap1->set_scrolldx(4, 4);
 	m_bg_tilemap2->set_scrolldx(4, 4);
@@ -201,7 +201,7 @@ VIDEO_START_MEMBER(tiamc1_state, kot)
 
 	save_pointer(NAME(m_videoram), 0x450);
 
-	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tiamc1_state::get_bg1_tile_info), this), TILEMAP_SCAN_ROWS,
+	m_bg_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tiamc1_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS,
 		8, 8, 32, 32);
 
 	m_bg_tilemap1->set_scrolldx(4, 4);

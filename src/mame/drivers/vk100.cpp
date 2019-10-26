@@ -1047,7 +1047,7 @@ void vk100_state::vk100(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);
-	m_crtc->set_update_row_callback(FUNC(vk100_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(vk100_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(vk100_state::crtc_vsync));
 
 	/* i8251 uart */

@@ -101,9 +101,9 @@ int hp9845_io_slot_device::get_rw_handlers(read16_delegate& rhandler , write16_d
 {
 	hp9845_io_card_device *card = dynamic_cast<hp9845_io_card_device*>(get_card_device());
 
-	if (card != nullptr) {
-		rhandler = read16_delegate(FUNC(hp9845_io_card_device::reg_r) , card);
-		whandler = write16_delegate(FUNC(hp9845_io_card_device::reg_w) , card);
+	if (card) {
+		rhandler = read16_delegate(*card, FUNC(hp9845_io_card_device::reg_r));
+		whandler = write16_delegate(*card, FUNC(hp9845_io_card_device::reg_w));
 		return card->get_sc();
 	} else {
 		return -1;
@@ -114,7 +114,7 @@ bool hp9845_io_slot_device::has_dual_sc() const
 {
 	hp9845_io_card_device *card = dynamic_cast<hp9845_io_card_device*>(get_card_device());
 
-	if (card != nullptr) {
+	if (card) {
 		return card->has_dual_sc();
 	} else {
 		return false;
@@ -129,7 +129,7 @@ void hp9845_io_card_device::set_slot_device(hp9845_io_slot_device* dev)
 	m_slot_dev = dev;
 }
 
-uint8_t hp9845_io_card_device::get_sc(void)
+uint8_t hp9845_io_card_device::get_sc()
 {
 	return m_select_code_port->read() + HP9845_IO_FIRST_SC;
 }

@@ -423,7 +423,7 @@ void clickstart_state::clickstart(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "clickstart_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_device_load(FUNC(clickstart_state::cart_load), this);
+	m_cart->set_device_load(FUNC(clickstart_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("clickstart_cart");
 }

@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(VSYSTEM_SPR2, vsystem_spr2_device, "vsystem2_spr", "Video Sys
 
 vsystem_spr2_device::vsystem_spr2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VSYSTEM_SPR2, tag, owner, clock)
-	, m_newtilecb(vsystem_tile2_indirection_delegate(FUNC(vsystem_spr2_device::tile_callback_noindirect), this))
+	, m_newtilecb(*this, DEVICE_SELF, FUNC(vsystem_spr2_device::tile_callback_noindirect))
 	, m_pritype(0) // hack until we have better handling
 	, m_gfx_region(0)
 	, m_xoffs(0)
@@ -50,7 +50,7 @@ uint32_t vsystem_spr2_device::tile_callback_noindirect(uint32_t tile)
 void vsystem_spr2_device::device_start()
 {
 	// bind our handler
-	m_newtilecb.bind_relative_to(*owner());
+	m_newtilecb.resolve();
 }
 
 void vsystem_spr2_device::device_reset()

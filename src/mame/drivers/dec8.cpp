@@ -2024,7 +2024,7 @@ void dec8_state::gondo(machine_config &config)
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	DECO_KARNOVSPRITES(config, m_spritegen_krn, 0);
-	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb), this);
+	m_spritegen_krn->set_colpri_callback(FUNC(dec8_state::gondo_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);
@@ -2156,7 +2156,7 @@ void dec8_state::ghostb(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ghostb);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting
 	m_palette->set_prom_region("proms");
-	m_palette->set_init("palette", FUNC(deco_rmc3_device::palette_init_proms));
+	m_palette->set_init(m_palette, FUNC(deco_rmc3_device::palette_init_proms));
 	MCFG_VIDEO_START_OVERRIDE(dec8_state,ghostb)
 
 	/* sound hardware */
@@ -2365,7 +2365,7 @@ void dec8_state::cobracom(machine_config &config)
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	DECO_MXC06(config, m_spritegen_mxc, 0);
-	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb), this);
+	m_spritegen_mxc->set_colpri_callback(FUNC(dec8_state::cobracom_colpri_cb));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 //  m_screen->set_refresh_hz(58);

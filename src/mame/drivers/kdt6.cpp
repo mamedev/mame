@@ -574,8 +574,8 @@ void kdt6_state::machine_start()
 	m_dummy_w = std::make_unique<uint8_t[]>(0x1000);
 
 	// override the region 0x0000 to 0x1fff here to enable prom reading
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(FUNC(kdt6_state::page0_r), this));
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(kdt6_state::page1_r), this));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8_delegate(*this, FUNC(kdt6_state::page0_r)));
+	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8_delegate(*this, FUNC(kdt6_state::page1_r)));
 
 	m_fdc->set_rate(250000);
 
@@ -637,7 +637,7 @@ void kdt6_state::psi98(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(kdt6_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(kdt6_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set("ctc2", FUNC(z80ctc_device::trg2));
 
 	// sound hardware

@@ -55,13 +55,13 @@ class mjsenpu_state : public driver_device
 {
 public:
 	mjsenpu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_oki(*this, "oki"),
-			m_hopper(*this, "hopper"),
-			m_mainram(*this, "mainram"),
-	//      m_vram(*this, "vram"),
-			m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_oki(*this, "oki")
+		, m_hopper(*this, "hopper")
+		, m_mainram(*this, "mainram")
+	//  , m_vram(*this, "vram")
+		, m_palette(*this, "palette")
 	{
 	}
 
@@ -538,7 +538,7 @@ void mjsenpu_state::init_mjsenpu()
    (loops for 744256 instructions)
 */
 	// not especially effective, might be wrong.
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32_delegate(FUNC(mjsenpu_state::mjsenpu_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x23468, 0x2346b, read32_delegate(*this, FUNC(mjsenpu_state::mjsenpu_speedup_r)));
 }
 
 

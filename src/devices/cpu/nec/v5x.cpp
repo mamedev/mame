@@ -257,7 +257,7 @@ void v50_base_device::device_start()
 	nec_common_device::device_start();
 	m_internal_io = &space(AS_INTERNAL_IO);
 
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v5x_icu_device::inta_cb), m_icu.target()));
+	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
 	save_item(NAME(m_OPCN));
 }
@@ -267,8 +267,8 @@ void v40_device::install_peripheral_io()
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
 	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
 	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
-		read8sm_delegate(FUNC(v40_device::temp_io_byte_r), this),
-		write8sm_delegate(FUNC(v40_device::temp_io_byte_w), this));
+		read8sm_delegate(*this, FUNC(v40_device::temp_io_byte_r)),
+		write8sm_delegate(*this, FUNC(v40_device::temp_io_byte_w)));
 
 	if (m_OPSEL & OPSEL_DS)
 	{
@@ -276,8 +276,8 @@ void v40_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x0f, base | 0x0f,
-			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()));
+			read8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::read)),
+			write8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::write)));
 	}
 
 	if (m_OPSEL & OPSEL_IS)
@@ -286,8 +286,8 @@ void v40_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x01, base | 0x01);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x01, base | 0x01,
-			read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()));
+			read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+			write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)));
 	}
 
 	if (m_OPSEL & OPSEL_TS)
@@ -296,8 +296,8 @@ void v40_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
-			read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()));
+			read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+			write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)));
 	}
 
 	if (m_OPSEL & OPSEL_SS)
@@ -306,8 +306,8 @@ void v40_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
-			read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()));
+			read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+			write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)));
 	}
 }
 
@@ -316,8 +316,8 @@ void v50_device::install_peripheral_io()
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
 	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
 	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
-		read8sm_delegate(FUNC(v50_device::temp_io_byte_r), this),
-		write8sm_delegate(FUNC(v50_device::temp_io_byte_w), this));
+		read8sm_delegate(*this, FUNC(v50_device::temp_io_byte_r)),
+		write8sm_delegate(*this, FUNC(v50_device::temp_io_byte_w)));
 
 	if (m_OPSEL & OPSEL_DS)
 	{
@@ -325,8 +325,8 @@ void v50_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x0f, base | 0x0f,
-			read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-			write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+			read8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::read)),
+			write8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::write)), 0xffff);
 	}
 
 	if (m_OPSEL & OPSEL_IS)
@@ -335,8 +335,8 @@ void v50_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
-			read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-			write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), io_mask(base));
+			read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+			write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)), io_mask(base));
 	}
 
 	if (m_OPSEL & OPSEL_TS)
@@ -345,8 +345,8 @@ void v50_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
-			read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-			write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), io_mask(base));
+			read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+			write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)), io_mask(base));
 	}
 
 	if (m_OPSEL & OPSEL_SS)
@@ -355,8 +355,8 @@ void v50_device::install_peripheral_io()
 
 		space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
 		space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
-			read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-			write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), io_mask(base));
+			read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+			write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)), io_mask(base));
 	}
 }
 
@@ -499,7 +499,7 @@ void v53_device::device_start()
 	v33_base_device::device_start();
 	m_internal_io = &space(AS_INTERNAL_IO);
 
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v5x_icu_device::inta_cb), m_icu.target()));
+	set_irq_acknowledge_callback(*m_icu, FUNC(v5x_icu_device::inta_cb));
 
 	save_item(NAME(m_SCTL));
 }
@@ -509,8 +509,8 @@ void v53_device::install_peripheral_io()
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
 	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
 	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
-		read8sm_delegate(FUNC(v53_device::temp_io_byte_r), this),
-		write8sm_delegate(FUNC(v53_device::temp_io_byte_w), this));
+		read8sm_delegate(*this, FUNC(v53_device::temp_io_byte_r), this),
+		write8sm_delegate(*this, FUNC(v53_device::temp_io_byte_w), this));
 
 	// IOAG determines if the handlers used 8-bit or 16-bit access
 	// the hng64.cpp games first set everything up in 8-bit mode, then
@@ -537,8 +537,8 @@ void v53_device::install_peripheral_io()
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x0f, base | 0x0f);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x0f, base | 0x0f,
-				read8sm_delegate(FUNC(v5x_dmau_device::read), m_dmau.target()),
-				write8sm_delegate(FUNC(v5x_dmau_device::write), m_dmau.target()), 0xffff);
+				read8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::read)),
+				write8sm_delegate(*m_dmau, FUNC(v5x_dmau_device::write)), 0xffff);
 		}
 	}
 
@@ -550,15 +550,15 @@ void v53_device::install_peripheral_io()
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x01, base | 0x01);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x01, base | 0x01,
-				read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), 0xffff);
+				read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+				write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)), 0xffff);
 		}
 		else
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
-				read8sm_delegate(FUNC(v5x_icu_device::read), m_icu.target()),
-				write8sm_delegate(FUNC(v5x_icu_device::write), m_icu.target()), io_mask(base));
+				read8sm_delegate(*m_icu, FUNC(v5x_icu_device::read)),
+				write8sm_delegate(*m_icu, FUNC(v5x_icu_device::write)), io_mask(base));
 		}
 	}
 
@@ -570,15 +570,15 @@ void v53_device::install_peripheral_io()
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
-				read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), 0xffff);
+				read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+				write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)), 0xffff);
 		}
 		else
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
-				read8sm_delegate(FUNC(pit8253_device::read), m_tcu.target()),
-				write8sm_delegate(FUNC(pit8253_device::write), m_tcu.target()), io_mask(base));
+				read8sm_delegate(*m_tcu, FUNC(pit8253_device::read)),
+				write8sm_delegate(*m_tcu, FUNC(pit8253_device::write)), io_mask(base));
 		}
 	}
 
@@ -590,15 +590,15 @@ void v53_device::install_peripheral_io()
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x03, base | 0x03);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x03, base | 0x03,
-				read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), 0xffff);
+				read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+				write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)), 0xffff);
 		}
 		else
 		{
 			space(AS_INTERNAL_IO).unmap_readwrite(base & ~0x07, base | 0x07);
 			space(AS_INTERNAL_IO).install_readwrite_handler(base & ~0x07, base | 0x07,
-				read8sm_delegate(FUNC(v5x_scu_device::read), m_scu.target()),
-				write8sm_delegate(FUNC(v5x_scu_device::write), m_scu.target()), io_mask(base));
+				read8sm_delegate(*m_scu, FUNC(v5x_scu_device::read)),
+				write8sm_delegate(*m_scu, FUNC(v5x_scu_device::write)), io_mask(base));
 		}
 	}
 }

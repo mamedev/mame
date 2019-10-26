@@ -49,6 +49,7 @@ using util::BIT;
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16dasm.h"
 #include "cpu/f8/f8dasm.h"
+#include "cpu/fr/frdasm.h"
 #include "cpu/g65816/g65816ds.h"
 #include "cpu/h6280/6280dasm.h"
 #include "cpu/h8/h8d.h"
@@ -359,6 +360,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
+	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
 	{ "h6280",           le,  0, []() -> util::disasm_interface * { return new h6280_disassembler; } },
 	{ "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },

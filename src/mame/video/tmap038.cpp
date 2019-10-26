@@ -70,14 +70,14 @@
                     ---- ---- ---4 ----     Layer Disable
                     ---- ---- ---- 3210     Varies*
 
-		*color bank for mcatadv or Layer-Layer priority for cave
+        *color bank for mcatadv or Layer-Layer priority for cave
 
 There are more!
 
 ***************************************************************************
 
 TODO:
-	de-fragmentation and merge drawing behavior into tmap038.cpp
+    de-fragmentation and merge drawing behavior into tmap038.cpp
 
 ***************************************************************************
 
@@ -137,6 +137,7 @@ tilemap038_device::tilemap038_device(const machine_config &mconfig, const char *
 	, m_tiledim(false)
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 	, m_gfxno(0)
+	, m_038_cb(*this)
 {
 }
 
@@ -178,7 +179,7 @@ TILE_GET_INFO_MEMBER(tilemap038_device::get_tile_info)
 
 void tilemap038_device::device_start()
 {
-	m_038_cb.bind_relative_to(*owner());
+	m_038_cb.resolve();
 	m_vregs = make_unique_clear<u16[]>(0x6/2);
 
 	if (m_vram_16x16 == nullptr && m_vram_8x8 == nullptr)
@@ -191,7 +192,7 @@ void tilemap038_device::device_start()
 
 	m_tmap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(tilemap038_device::get_tile_info),this),
+			tilemap_get_info_delegate(*this, FUNC(tilemap038_device::get_tile_info)),
 			TILEMAP_SCAN_ROWS,
 			8,8, 512 / 8,512 / 8);
 

@@ -46,9 +46,12 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	: device_interface(device, "execute")
 	, m_scheduler(nullptr)
 	, m_disabled(false)
+	, m_vblank_interrupt(device)
 	, m_vblank_interrupt_screen(nullptr)
+	, m_timed_interrupt(device)
 	, m_timed_interrupt_period(attotime::zero)
 	, m_nextexec(nullptr)
+	, m_driver_irq(device)
 	, m_timedint_timer(nullptr)
 	, m_profiler(PROFILER_IDLE)
 	, m_icountptr(nullptr)
@@ -371,9 +374,9 @@ void device_execute_interface::interface_pre_start()
 	m_scheduler = &device().machine().scheduler();
 
 	// bind delegates
-	m_vblank_interrupt.bind_relative_to(*device().owner());
-	m_timed_interrupt.bind_relative_to(*device().owner());
-	m_driver_irq.bind_relative_to(*device().owner());
+	m_vblank_interrupt.resolve();
+	m_timed_interrupt.resolve();
+	m_driver_irq.resolve();
 
 	// fill in the initial states
 	int const index = device_iterator(device().machine().root_device()).indexof(*this);

@@ -510,7 +510,7 @@ void famibox_state::machine_start()
 	m_nt_page[2] = m_nt_ram.get() + 0x800;
 	m_nt_page[3] = m_nt_ram.get() + 0xc00;
 
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(famibox_state::famibox_nt_r)), write8_delegate(*this, FUNC(famibox_state::famibox_nt_w)));
 	m_ppu->space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");
 
 	famicombox_bankswitch(0);

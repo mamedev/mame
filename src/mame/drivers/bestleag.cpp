@@ -127,9 +127,9 @@ TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
 
 void bestleag_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,256, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 256, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(bestleag_state::bsb_bg_scan)), 16, 16, 128, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bestleag_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(bestleag_state::bsb_bg_scan)), 16, 16, 128, 64);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_fg_tilemap->set_transparent_pen(15);

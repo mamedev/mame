@@ -133,10 +133,10 @@ WRITE16_MEMBER(mugsmash_state::mugsmash_reg_w)
 
 void mugsmash_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info1),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mugsmash_state::get_mugsmash_tile_info1)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 	m_tilemap1->set_transparent_pen(0);
 
-	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mugsmash_state::get_mugsmash_tile_info2),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mugsmash_state::get_mugsmash_tile_info2)), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 }
 
 uint32_t mugsmash_state::screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -54,7 +54,7 @@ TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
 
 void markham_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(markham_state::get_bg_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(markham_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
 
 	m_bg_tilemap->set_scroll_rows(32);
 }
@@ -64,7 +64,7 @@ VIDEO_START_MEMBER(markham_state, strnskil)
 	video_start();
 
 	m_bg_tilemap->set_scroll_rows(32);
-	m_irq_scanline_start = 96;
+	m_irq_scanline_start = 109;
 	m_irq_scanline_end = 240;
 
 	save_item(NAME(m_irq_source));
@@ -141,16 +141,18 @@ uint32_t markham_state::screen_update_strnskil(screen_device &screen, bitmap_ind
 
 	for (row = 0; row < 32; row++)
 	{
-		if (m_scroll_ctrl != 0x07)
+		switch (scroll_data[m_scroll_ctrl * 32 + row])
 		{
-			switch (scroll_data[m_scroll_ctrl * 32 + row])
-			{
-				case 2:
-					m_bg_tilemap->set_scrollx(row, -~m_xscroll[1]);
-				case 4:
-					m_bg_tilemap->set_scrollx(row, -~m_xscroll[0]);
+			case 2:
+				m_bg_tilemap->set_scrollx(row, -~m_xscroll[1]);
 				break;
-			}
+			case 4:
+				m_bg_tilemap->set_scrollx(row, -~m_xscroll[0]);
+				break;
+			default:
+				// case 6 and 0
+				m_bg_tilemap->set_scrollx(row, 0);
+				break;
 		}
 	}
 

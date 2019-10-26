@@ -469,6 +469,8 @@ protected:
 	/* PowerPC 4XX-specific serial port state */
 	struct ppc4xx_spu_state
 	{
+		ppc4xx_spu_state(device_t &owner) : tx_cb(owner) { }
+
 		uint8_t           regs[9];
 		uint8_t           txbuf;
 		uint8_t           rxbuf;
@@ -502,8 +504,8 @@ protected:
 
 	write32_delegate m_dcstore_cb;
 
-	read32_delegate m_ext_dma_read_cb[4];
-	write32_delegate m_ext_dma_write_cb[4];
+	read32_delegate::array<4> m_ext_dma_read_cb;
+	write32_delegate::array<4> m_ext_dma_write_cb;
 
 	/* PowerPC function pointers for memory accesses/exceptions */
 #ifdef PPC_H_INCLUDED_FROM_PPC_C

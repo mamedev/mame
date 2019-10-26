@@ -1050,7 +1050,7 @@ void mcpx_ide_device::ide_pri_command(address_map &map)
 void mcpx_ide_device::ide_pri_control(address_map &map)
 {
 	// 3f6
-	map(2, 2).rw(*this, FUNC(mcpx_ide_device::pri_read_cs1_r), FUNC(mcpx_ide_device::pri_write_cs1_w));
+	map(2, 2).rw(FUNC(mcpx_ide_device::pri_read_cs1_r), FUNC(mcpx_ide_device::pri_write_cs1_w));
 }
 
 void mcpx_ide_device::ide_sec_command(address_map &map)
@@ -1061,7 +1061,7 @@ void mcpx_ide_device::ide_sec_command(address_map &map)
 void mcpx_ide_device::ide_sec_control(address_map &map)
 {
 	// 376
-	map(2, 2).rw(*this, FUNC(mcpx_ide_device::sec_read_cs1_r), FUNC(mcpx_ide_device::sec_write_cs1_w));
+	map(2, 2).rw(FUNC(mcpx_ide_device::sec_read_cs1_r), FUNC(mcpx_ide_device::sec_write_cs1_w));
 }
 
 void mcpx_ide_device::ide_io(address_map &map)

@@ -1015,19 +1015,19 @@ ROM_END
 
 void lethalj_state::init_ripribit()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::ripribit_control_w)));
 }
 
 
 void lethalj_state::init_cfarm()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cfarm_control_w)));
 }
 
 
 void lethalj_state::init_cclownz()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04100010, 0x0410001f, write16_delegate(*this, FUNC(lethalj_state::cclownz_control_w)));
 }
 
 

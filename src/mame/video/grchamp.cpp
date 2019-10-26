@@ -101,10 +101,10 @@ void grchamp_state::video_start()
 	m_work_bitmap.allocate(32,32);
 
 	/* allocate tilemaps for each of the three sections */
-	m_left_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_left_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
-	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,32);
-	m_right_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_right_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
-	m_center_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(grchamp_state::get_center_tile_info),this), tilemap_mapper_delegate(FUNC(grchamp_state::get_memory_offset),this),  8,8, 64,32);
+	m_left_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_left_tile_info)), tilemap_mapper_delegate(*this, FUNC(grchamp_state::get_memory_offset)), 8,8, 64,32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_right_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_right_tile_info)), tilemap_mapper_delegate(*this, FUNC(grchamp_state::get_memory_offset)), 8,8, 64,32);
+	m_center_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(grchamp_state::get_center_tile_info)), tilemap_mapper_delegate(*this, FUNC(grchamp_state::get_memory_offset)), 8,8, 64,32);
 }
 
 #if 0

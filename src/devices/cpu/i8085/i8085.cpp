@@ -216,6 +216,7 @@ i8085a_cpu_device::i8085a_cpu_device(const machine_config &mconfig, device_type 
 	, m_out_inte_func(*this)
 	, m_in_sid_func(*this)
 	, m_out_sod_func(*this)
+	, m_clk_out_func(*this)
 	, m_cputype(cputype)
 {
 }
@@ -245,7 +246,7 @@ device_memory_interface::space_config_vector i8085a_cpu_device::memory_space_con
 
 void i8085a_cpu_device::device_config_complete()
 {
-	m_clk_out_func.bind_relative_to(*owner());
+	m_clk_out_func.resolve();
 	if (!m_clk_out_func.isnull())
 		m_clk_out_func(clock() / 2);
 }

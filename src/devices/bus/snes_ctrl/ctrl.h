@@ -37,10 +37,8 @@ protected:
 	snes_control_port_device *m_port;
 };
 
-typedef device_delegate<bool (int16_t x, int16_t y)> snesctrl_onscreen_delegate;
 #define SNESCTRL_ONSCREEN_CB(name)  bool name(int16_t x, int16_t y)
 
-typedef device_delegate<void (int16_t x, int16_t y)> snesctrl_gunlatch_delegate;
 #define SNESCTRL_GUNLATCH_CB(name)  void name(int16_t x, int16_t y)
 
 // ======================> snes_control_port_device
@@ -48,6 +46,9 @@ typedef device_delegate<void (int16_t x, int16_t y)> snesctrl_gunlatch_delegate;
 class snes_control_port_device : public device_t, public device_slot_interface
 {
 public:
+	typedef device_delegate<bool (int16_t x, int16_t y)> onscreen_delegate;
+	typedef device_delegate<void (int16_t x, int16_t y)> gunlatch_delegate;
+
 	// construction/destruction
 	template <typename T>
 	snes_control_port_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
@@ -61,8 +62,8 @@ public:
 	snes_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~snes_control_port_device();
 
-	template <typename... T> void set_onscreen_callback(T &&... args) { m_onscreen_cb = snesctrl_onscreen_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_gunlatch_callback(T &&... args) { m_gunlatch_cb = snesctrl_gunlatch_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_onscreen_callback(T &&... args) { m_onscreen_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_gunlatch_callback(T &&... args) { m_gunlatch_cb.set(std::forward<T>(args)...); }
 
 	uint8_t read_pin4();
 	uint8_t read_pin5();
@@ -77,8 +78,8 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	snesctrl_onscreen_delegate m_onscreen_cb;
-	snesctrl_gunlatch_delegate m_gunlatch_cb;
+	onscreen_delegate m_onscreen_cb;
+	gunlatch_delegate m_gunlatch_cb;
 
 	device_snes_control_port_interface *m_device;
 };

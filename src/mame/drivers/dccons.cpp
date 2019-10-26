@@ -305,14 +305,14 @@ void dc_cons_state::init_dc()
 
 void dc_cons_state::init_dcus()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(FUNC(dc_cons_state::dcus_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2303b0, 0xc2303b7, read64_delegate(*this, FUNC(dc_cons_state::dcus_idle_skip_r)));
 
 	init_dc();
 }
 
 void dc_cons_state::init_dcjp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(FUNC(dc_cons_state::dcjp_idle_skip_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc2302f8, 0xc2302ff, read64_delegate(*this, FUNC(dc_cons_state::dcjp_idle_skip_r)));
 
 	init_dc();
 }

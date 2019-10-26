@@ -243,7 +243,7 @@ void firetrap_state::mcu_p3_w(uint8_t data)
 	if (BIT(m_mcu_p3, 1) == 1 && BIT(data, 1) == 0)
 		m_mcu->set_input_line(MCS51_INT0_LINE, CLEAR_LINE);
 
-//	if (BIT(m_mcu_p3, 4) == 1 && BIT(data, 4) == 0)
+//  if (BIT(m_mcu_p3, 4) == 1 && BIT(data, 4) == 0)
 
 	m_mcu_p3 = data;
 }

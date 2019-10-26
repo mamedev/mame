@@ -1860,7 +1860,7 @@ void dec0_automat_state::automat(machine_config &config)
 	m_tilegen[2]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_MXC06(config, m_spritegen, 0);
-	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_automat_state::robocop_colpri_cb));
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 1024);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_automat);
@@ -1986,7 +1986,7 @@ void dec0_state::hbarrel(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::hbarrel_colpri_cb));
 }
 
 void dec0_state::bandit(machine_config &config)
@@ -2012,7 +2012,7 @@ void dec0_state::bandit(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb));
 }
 
 void dec0_state::baddudes(machine_config &config)
@@ -2080,7 +2080,7 @@ void dec0_state::robocop(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
 void dec0_state::robocopb(machine_config &config)
@@ -2089,7 +2089,7 @@ void dec0_state::robocopb(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::robocop_colpri_cb));
 }
 
 void dec0_state::hippodrm(machine_config &config)
@@ -2171,7 +2171,7 @@ void dec0_state::midres(machine_config &config)
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_midres));
-	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb), this);
+	m_spritegen->set_colpri_callback(FUNC(dec0_state::midres_colpri_cb));
 
 	m_gfxdecode->set_info(gfx_midres);
 }
@@ -4018,10 +4018,10 @@ ROM_END
 
 void dec0_state::init_midresb()
 {
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),this));
-//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),this));
+//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x00180000, 0x0018000f, read16_delegate(*this, FUNC(dec0_state::dec0_controls_r)));
+//  m_maincpu->space(AS_PROGRAM).install_read_handler(0x001a0000, 0x001a000f, read16_delegate(*this, FUNC(dec0_state::dec0_rotary_r)));
 
-//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),this));
+//  m_maincpu->space(AS_PROGRAM).install_write_handler(0x00180014, 0x00180015, write16_delegate(*this, FUNC(dec0_state::midres_sound_w)));
 }
 
 READ16_MEMBER(dec0_state::ffantasybl_242024_r)
@@ -4041,7 +4041,7 @@ void dec0_state::init_ffantasybl()
 {
 	m_maincpu->space(AS_PROGRAM).install_ram(0x24c880, 0x24cbff); // what is this? layer 3-related??
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(FUNC(dec0_state::ffantasybl_242024_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00242024, 0x00242025, read16_delegate(*this, FUNC(dec0_state::ffantasybl_242024_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x00ff87ee, 0x00ff87ef, "VBLANK");
 }
 

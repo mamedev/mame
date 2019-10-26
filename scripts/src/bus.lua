@@ -282,6 +282,38 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/ata/atadev.h,BUSES["ATA"] = true
+--@src/devices/bus/ata/ataintf.h,BUSES["ATA"] = true
+---------------------------------------------------
+
+if (MACHINES["ATAFLASH"]~=null) then
+	BUSES["ATA"] = true
+end
+
+if (BUSES["ATA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/ata/atadev.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atadev.h",
+		MAME_DIR .. "src/devices/bus/ata/atahle.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atahle.h",
+		MAME_DIR .. "src/devices/bus/ata/ataintf.cpp",
+		MAME_DIR .. "src/devices/bus/ata/ataintf.h",
+		MAME_DIR .. "src/devices/bus/ata/atapicdr.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atapicdr.h",
+		MAME_DIR .. "src/devices/bus/ata/atapihle.cpp",
+		MAME_DIR .. "src/devices/bus/ata/atapihle.h",
+		MAME_DIR .. "src/devices/bus/ata/cr589.cpp",
+		MAME_DIR .. "src/devices/bus/ata/cr589.h",
+		MAME_DIR .. "src/devices/bus/ata/idehd.cpp",
+		MAME_DIR .. "src/devices/bus/ata/idehd.h",
+		MAME_DIR .. "src/devices/bus/ata/px320a.cpp",
+		MAME_DIR .. "src/devices/bus/ata/px320a.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/fdc/fdc.h,BUSES["BBC_FDC"] = true
 ---------------------------------------------------
 
@@ -800,6 +832,8 @@ if (BUSES["DMV"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/dmv/dmvbus.cpp",
 		MAME_DIR .. "src/devices/bus/dmv/dmvbus.h",
+		MAME_DIR .. "src/devices/bus/dmv/k012.cpp",
+		MAME_DIR .. "src/devices/bus/dmv/k012.h",
 		MAME_DIR .. "src/devices/bus/dmv/k210.cpp",
 		MAME_DIR .. "src/devices/bus/dmv/k210.h",
 		MAME_DIR .. "src/devices/bus/dmv/k220.cpp",
@@ -3799,6 +3833,18 @@ if (BUSES["HP80_IO"]~=null) then
 		MAME_DIR .. "src/devices/bus/hp80_io/hp80_io.h",
 		MAME_DIR .. "src/devices/bus/hp80_io/82937.cpp",
 		MAME_DIR .. "src/devices/bus/hp80_io/82937.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp_optroms/hp_optrom.h,BUSES["HP_OPTROM"] = true
+---------------------------------------------------
+
+if (BUSES["HP9825_OPTROM"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp9825_optroms/hp9825_optrom.cpp",
+		MAME_DIR .. "src/devices/bus/hp9825_optroms/hp9825_optrom.h",
 	}
 end
 

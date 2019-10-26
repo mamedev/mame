@@ -444,7 +444,7 @@ WRITE32_MEMBER(apollo_state::ram_with_parity_w){
 			// no more than 192 read/write handlers may be used
 			// see table_assign_handler in memory.c
 			if (parity_error_handler_install_counter < 40) {
-				m_maincpu->space(AS_PROGRAM).install_read_handler(ram_base_address+offset*4, ram_base_address+offset*4+3, read32_delegate(FUNC(apollo_state::ram_with_parity_r),this));
+				m_maincpu->space(AS_PROGRAM).install_read_handler(ram_base_address+offset*4, ram_base_address+offset*4+3, read32_delegate(*this, FUNC(apollo_state::ram_with_parity_r)));
 				parity_error_handler_is_installed = 1;
 				parity_error_handler_install_counter++;
 			}
@@ -917,7 +917,7 @@ void apollo_state::machine_reset()
 	}
 
 #if 0
-	m_maincpu->set_instruction_hook(read32_delegate(FUNC(apollo_state::apollo_instruction_hook),this));
+	m_maincpu->set_instruction_hook(read32_delegate(*this, FUNC(apollo_state::apollo_instruction_hook)));
 #endif
 }
 
@@ -955,8 +955,8 @@ void apollo_state::machine_start(){
 	MACHINE_START_CALL_MEMBER(apollo);
 
 	// install nop handlers for unmapped ISA bus addresses
-	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_r), this), write16_delegate(FUNC(apollo_state::apollo_atbus_unmap_io_w), this));
-	m_isa->install_memory(0, ATBUS_MEMORY_END, read8_delegate(FUNC(apollo_state::apollo_atbus_unmap_r), this), write8_delegate(FUNC(apollo_state::apollo_atbus_unmap_w), this));
+	m_isa->install16_device((ATBUS_IO_BASE - 0x40000) >> 7, (ATBUS_IO_END - 0x40000) >> 7, read16_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_io_r)), write16_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_io_w)));
+	m_isa->install_memory(0, ATBUS_MEMORY_END, read8_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_r)), write8_delegate(*this, FUNC(apollo_state::apollo_atbus_unmap_w)));
 }
 
 /***************************************************************************
@@ -968,7 +968,7 @@ void apollo_state::init_dn3500()
 //  MLOG1(("driver_init_dn3500"));
 
 	/* hook the RESET line, which resets a slew of other components */
-	m_maincpu->set_reset_callback(write_line_delegate(FUNC(apollo_state::apollo_reset_instr_callback),this));
+	m_maincpu->set_reset_callback(FUNC(apollo_state::apollo_reset_instr_callback));
 
 	ram_base_address = DN3500_RAM_BASE;
 	ram_end_address = DN3500_RAM_END;

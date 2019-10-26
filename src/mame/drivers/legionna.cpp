@@ -197,9 +197,9 @@ void legionna_state::legionna_map(address_map &map)
 	map(0x100470, 0x100471).nopw(); // toggles 0x2000 / 0x0000, tile bank on some games
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
@@ -227,9 +227,9 @@ void legionna_state::heatbrl_map(address_map &map)
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
 	map(0x10074c, 0x10074d).portr("SYSTEM");
-	map(0x1007c0, 0x1007df).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x1007c0, 0x1007df).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
 	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
 	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");
@@ -247,9 +247,9 @@ void legionna_state::godzilla_map(address_map &map)
 	map(0x100470, 0x100471).w(FUNC(legionna_state::heatbrl_setgfxbank));
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
@@ -302,7 +302,7 @@ void legionna_state::denjinmk_map(address_map &map)
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x10071f).r(FUNC(legionna_state::denjinmk_sound_comms_r))
-		.lw8("seibu_sound_w", [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+			.lw8(NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
@@ -329,9 +329,9 @@ void legionna_state::grainbow_map(address_map &map)
 	map(0x100480, 0x100487).w(FUNC(legionna_state::grainbow_layer_config_w)); // probably a COP feature
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
@@ -356,9 +356,9 @@ void legionna_state::cupsoc_map(address_map &map)
 	map(0x100000, 0x1003ff).ram();
 	map(0x100600, 0x10064f).rw(m_crtc, FUNC(seibu_crtc_device::read), FUNC(seibu_crtc_device::write));
 	map(0x100680, 0x100681).nopw(); // irq ack?
-	map(0x100700, 0x10071f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100700, 0x10071f).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100740, 0x100741).portr("DSW1");
 	map(0x100744, 0x100745).portr("PLAYERS12");
 	map(0x100748, 0x100749).portr("PLAYERS34");
@@ -384,22 +384,22 @@ void legionna_state::cupsocs_map(address_map &map)
 	legionna_cop_map(map);
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x1003ff).ram();
-	map(0x100600, 0x10067f).lrw16("crtc_rw",
-								  [this](address_space &space, offs_t offset, u16 mem_mask) {
+	map(0x100600, 0x10067f).lrw16(
+								  NAME([this](address_space &space, offs_t offset, u16 mem_mask) {
 									  return m_crtc->read(space, offset ^ 0x20, mem_mask);
-								  },
-								  [this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
+								  }),
+								  NAME([this](address_space &space, offs_t offset, u16 data, u16 mem_mask) {
 									  m_crtc->write(space, offset ^ 0x20, data, mem_mask);
-								  });
+								  }));
 	map(0x100680, 0x100681).nopw(); // irq ack?
 	map(0x100700, 0x100701).portr("DSW1");
 	map(0x100704, 0x100705).portr("PLAYERS12");
 	map(0x100708, 0x100709).portr("PLAYERS34");
 	map(0x10070c, 0x10070d).portr("SYSTEM");
 	map(0x10071c, 0x10071d).portr("DSW2");
-	map(0x100740, 0x10075f).lrw8("seibu_sound_rw",
-								 [this](offs_t offset) { return m_seibu_sound->main_r(offset >> 1); },
-								 [this](offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); }).umask16(0x00ff);
+	map(0x100740, 0x10075f).lrw8(
+								 NAME([this] (offs_t offset) { return m_seibu_sound->main_r(offset >> 1); }),
+								 NAME([this] (offs_t offset, u8 data) { m_seibu_sound->main_w(offset >> 1, data); })).umask16(0x00ff);
 	map(0x100800, 0x100fff).ram(); // .w(FUNC(legionna_state::background_w)).share("back_data");
 	map(0x101000, 0x1017ff).ram(); // .w(FUNC(legionna_state::foreground_w).share("fore_data");
 	map(0x101800, 0x101fff).ram(); // .w(FUNC(legionna_state::midground_w).share("mid_data");

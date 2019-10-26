@@ -720,13 +720,13 @@ void nes_vt_state::machine_start()
 	m_chrram = std::make_unique<uint8_t[]>(0x2000);
 	save_pointer(NAME(m_chrram), 0x2000);
 
-	m_ppu->set_scanline_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::scanline_irq),this));
-	m_ppu->set_hblank_callback(ppu2c0x_device::scanline_delegate(FUNC(nes_vt_state::hblank_irq),this));
+	m_ppu->set_scanline_callback(*this, FUNC(nes_vt_state::scanline_irq));
+	m_ppu->set_hblank_callback(*this, FUNC(nes_vt_state::hblank_irq));
 
-// m_ppu->set_hblank_callback(ppu2c0x_device::hblank_delegate(FUNC(device_nes_cart_interface::hblank_irq),m_cartslot->m_cart));
-//  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),m_cartslot->m_cart), write8_delegate(FUNC(device_nes_cart_interface::chr_w),m_cartslot->m_cart));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(nes_vt_state::nt_r),this), write8_delegate(FUNC(nes_vt_state::nt_w),this));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(nes_vt_state::chr_r),this), write8_delegate(FUNC(nes_vt_state::chr_w),this));
+//  m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
+//  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_state::nt_r)), write8_delegate(*this, FUNC(nes_vt_state::nt_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*this, FUNC(nes_vt_state::chr_r)), write8_delegate(*this, FUNC(nes_vt_state::chr_w)));
 
 
 }

@@ -42,7 +42,7 @@ void tanbus_mpvdu_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(12);
 	m_crtc->out_vsync_callback().set(FUNC(tanbus_mpvdu_device::vsync_changed));
-	m_crtc->set_update_row_callback(FUNC(tanbus_mpvdu_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(tanbus_mpvdu_device::crtc_update_row));
 
 	SAA5050(config, m_trom, DERIVED_CLOCK(1, 1));
 	m_trom->d_cb().set(FUNC(tanbus_mpvdu_device::videoram_r));

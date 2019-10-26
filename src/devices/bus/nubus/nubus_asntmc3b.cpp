@@ -111,10 +111,10 @@ void nubus_mac8390_device::device_start()
 
 	// TODO: move 24-bit mirroring down into nubus.c
 	uint32_t ofs_24bit = slotno()<<20;
-	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
-	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
-	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_r), this), write8_delegate(FUNC(nubus_mac8390_device::asntm3b_ram_w), this));
-	nubus().install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32_delegate(FUNC(nubus_mac8390_device::en_r), this), write32_delegate(FUNC(nubus_mac8390_device::en_w), this));
+	nubus().install_device(slotspace+0xd0000, slotspace+0xdffff, read8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
+	nubus().install_device(slotspace+0xe0000, slotspace+0xe003f, read32_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
+	nubus().install_device(slotspace+0xd0000+ofs_24bit, slotspace+0xdffff+ofs_24bit, read8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_r)), write8_delegate(*this, FUNC(nubus_mac8390_device::asntm3b_ram_w)));
+	nubus().install_device(slotspace+0xe0000+ofs_24bit, slotspace+0xe003f+ofs_24bit, read32_delegate(*this, FUNC(nubus_mac8390_device::en_r)), write32_delegate(*this, FUNC(nubus_mac8390_device::en_w)));
 }
 
 //-------------------------------------------------

@@ -111,7 +111,7 @@ void tk02_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen("mono");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(tk02_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(tk02_device::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(tk02_device::de_w));
 
 	TATUNG_PIPE(config, m_pipe, DERIVED_CLOCK(1, 1), tatung_pipe_cards, nullptr);
@@ -160,7 +160,7 @@ void tk02_device::device_start()
 void tk02_device::device_reset()
 {
 	io_space().install_device(0x40, 0x4f, *this, &tk02_device::map);
-	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(FUNC(tk02_device::ram_r), this), write8_delegate(FUNC(tk02_device::ram_w), this));
+	io_space().install_readwrite_handler(0x40, 0x47, 0, 0, 0xff00, read8_delegate(*this, FUNC(tk02_device::ram_r)), write8_delegate(*this, FUNC(tk02_device::ram_w)));
 }
 
 

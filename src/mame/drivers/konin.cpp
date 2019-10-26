@@ -80,14 +80,14 @@ void konin_state::konin_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x24, 0x24).w(FUNC(konin_state::picu_b_w));
-	map(0x80, 0x83).lrw8("ioppi_rw",
-		[this](offs_t offset) { return m_ioppi->read(offset^3); },
-		[this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); });
+	map(0x80, 0x83).lrw8(
+		NAME([this](offs_t offset) { return m_ioppi->read(offset^3); }),
+		NAME([this](offs_t offset, u8 data) { m_ioppi->write(offset^3, data); }));
 	map(0xf6, 0xf6).rw("uart", FUNC(i8251_device::status_r), FUNC(i8251_device::control_w));
 	map(0xf7, 0xf7).rw("uart", FUNC(i8251_device::data_r), FUNC(i8251_device::data_w));
-	map(0xf8, 0xfb).lrw8("iopit_rw",
-		[this](offs_t offset) { return m_iopit->read(offset^3); },
-		[this](offs_t offset, u8 data) { m_iopit->write(offset^3, data); });
+	map(0xf8, 0xfb).lrw8(
+		NAME([this](offs_t offset) { return m_iopit->read(offset^3); }),
+		NAME([this](offs_t offset, u8 data) { m_iopit->write(offset^3, data); }));
 }
 
 /* Input ports */
@@ -106,7 +106,7 @@ void konin_state::konin(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &konin_state::konin_mem);
 	maincpu.set_addrmap(AS_IO, &konin_state::konin_io);
 	maincpu.out_inte_func().set(m_picu, FUNC(i8214_device::inte_w));
-	maincpu.set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i8212_device::inta_cb), "intlatch", (i8212_device*)nullptr));
+	maincpu.set_irq_acknowledge_callback("intlatch", FUNC(i8212_device::inta_cb));
 
 	i8212_device &intlatch(I8212(config, "intlatch", 0));
 	intlatch.md_rd_callback().set_constant(0);

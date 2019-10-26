@@ -648,7 +648,7 @@ void ssem_state::ssem(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "snp,asm").set_load_callback(FUNC(ssem_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "snp,asm").set_load_callback(FUNC(ssem_state::quickload_cb));
 }
 
 

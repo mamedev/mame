@@ -309,7 +309,7 @@ void taitojc_state::video_start()
 
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitojc_state::taitojc_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitojc_state::taitojc_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_tilemap->set_transparent_pen(0);
 

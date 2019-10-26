@@ -22,8 +22,8 @@ public:
 	// configuration
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
 	void set_gfx_region(int gfxregion) { m_gfxregion = gfxregion; }
-	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb = decospr_pri_cb_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_col_callback(T &&... args) { m_col_cb = decospr_col_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
+	template <typename... T> void set_col_callback(T &&... args) { m_col_cb.set(std::forward<T>(args)...); }
 	void set_is_bootleg(bool is_bootleg) { m_is_bootleg = is_bootleg; }
 	void set_bootleg_type(int bootleg_type) { m_bootleg_type = bootleg_type; }
 	void set_flipallx(int flipallx) { m_flipallx = flipallx; }

@@ -322,8 +322,8 @@ void mtx_state::mtx512(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
-	SNAPSHOT(config, "snapshot", "mtx", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::snapshot_cb), this);
-	QUICKLOAD(config, "quickload", "run", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::quickload_cb), this);
+	SNAPSHOT(config, "snapshot", "mtx", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::snapshot_cb));
+	QUICKLOAD(config, "quickload", "run", attotime::from_seconds(1)).set_load_callback(FUNC(mtx_state::quickload_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
@@ -336,7 +336,7 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* rom extension board */
 	GENERIC_SOCKET(config, m_extrom, generic_plain_slot, "mtx_rom", "bin,rom");
-	m_extrom->set_device_load(FUNC(mtx_state::extrom_load), this);
+	m_extrom->set_device_load(FUNC(mtx_state::extrom_load));
 
 	/* rs232 board with disk drive bus */
 	MTX_EXP_SLOT(config, m_exp, mtx_expansion_devices, nullptr);
@@ -348,7 +348,7 @@ void mtx_state::mtx512(machine_config &config)
 
 	/* cartridge slot */
 	GENERIC_CARTSLOT(config, m_rompak, generic_plain_slot, "mtx_cart", "bin,rom");
-	m_rompak->set_device_load(FUNC(mtx_state::rompak_load), this);
+	m_rompak->set_device_load(FUNC(mtx_state::rompak_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("mtx_cass");

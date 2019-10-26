@@ -36,11 +36,11 @@ DEFINE_DEVICE_TYPE(GENERIC_CARTSLOT, generic_cartslot_device, "generic_cartslot"
 //  device_generic_cart_interface - constructor
 //-------------------------------------------------
 
-device_generic_cart_interface::device_generic_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_region(*this, DEVICE_SELF)
+device_generic_cart_interface::device_generic_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_slot_card_interface(mconfig, device),
+	m_rom(nullptr),
+	m_rom_size(0),
+	m_region(*this, DEVICE_SELF)
 {
 }
 
@@ -95,17 +95,19 @@ generic_slot_device::generic_slot_device(const machine_config &mconfig, device_t
 	m_must_be_loaded(false),
 	m_width(GENERIC_ROM8_WIDTH),
 	m_endianness(ENDIANNESS_LITTLE),
-	m_cart(nullptr)
+	m_cart(nullptr),
+	m_device_image_load(*this),
+	m_device_image_unload(*this)
 {
 }
 
-generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: generic_slot_device(mconfig, GENERIC_SOCKET, tag, owner, clock)
+generic_socket_device::generic_socket_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	generic_slot_device(mconfig, GENERIC_SOCKET, tag, owner, clock)
 {
 }
 
-generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: generic_slot_device(mconfig, GENERIC_CARTSLOT, tag, owner, clock)
+generic_cartslot_device::generic_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	generic_slot_device(mconfig, GENERIC_CARTSLOT, tag, owner, clock)
 {
 }
 
@@ -124,6 +126,8 @@ generic_slot_device::~generic_slot_device()
 void generic_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_generic_cart_interface *>(get_card_device());
+	m_device_image_load.resolve();
+	m_device_image_unload.resolve();
 }
 
 

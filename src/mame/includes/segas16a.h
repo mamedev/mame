@@ -46,6 +46,8 @@ public:
 		, m_cxdio(*this, "cxdio")
 		, m_workram(*this, "nvram")
 		, m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes")
+		, m_custom_io_r(*this)
+		, m_custom_io_w(*this)
 		, m_video_control(0)
 		, m_mcu_control(0)
 		, m_n7751_command(0)

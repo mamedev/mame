@@ -166,7 +166,7 @@ void pgm_asic3_state::init_orlegend()
 {
 	pgm_basic_init();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xC04000, 0xC0400f, read16_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_r)), write16_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_w)));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;

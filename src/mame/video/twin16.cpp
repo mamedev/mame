@@ -435,9 +435,9 @@ TILE_GET_INFO_MEMBER(twin16_state::layer1_tile_info)
 
 void twin16_state::video_start()
 {
-	m_fixed_tmap = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(FUNC(twin16_state::fix_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_scroll_tmap[0] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(FUNC(twin16_state::layer0_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_scroll_tmap[1] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(FUNC(twin16_state::layer1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_fixed_tmap = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::fix_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_scroll_tmap[0] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::layer0_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
+	m_scroll_tmap[1] = &machine().tilemap().create(*m_gfxdecode,tilemap_get_info_delegate(*this, FUNC(twin16_state::layer1_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_fixed_tmap->set_transparent_pen(0);
 	m_scroll_tmap[0]->set_transparent_pen(0);

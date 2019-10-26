@@ -67,7 +67,7 @@ ________________________________________________________________________________
 |  NO   | Party Darts| Compumatic   | More info: http://www.recreativas.org/party-darts-4906-compumatic   |
 |  NO   | Diamant    | Unknown      | Newer PCB with Philips REF34VA and additional Compumatic custom ICs |
 |  NO   | Tiger Dart | Unknown      | Standard Microdar SPD with Philips REF34VA                          |
-|_______|____________|______________|_____________________________________________________________________|  
+|_______|____________|______________|_____________________________________________________________________|
 
 There's a later revision of the Compumatic Microdar PCB (V5), smaller, with a standard Atmel AT89S51
 instead of the REF34 CPU.

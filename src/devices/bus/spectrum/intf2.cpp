@@ -58,7 +58,7 @@ void spectrum_intf2_device::device_add_mconfig(machine_config &config)
 {
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "spectrum_cart", "bin,rom");
-	m_cart->set_device_load(FUNC(spectrum_intf2_device::cart_load), this);
+	m_cart->set_device_load(FUNC(spectrum_intf2_device::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("spectrum_cart");
 }

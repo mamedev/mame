@@ -754,7 +754,7 @@ void pgm2_state::pgm2(machine_config &config)
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
 
-	TIMER(config, m_mcu_timer, 0).configure_generic(timer_device::expired_delegate(FUNC(pgm2_state::mcu_interrupt), this));
+	TIMER(config, m_mcu_timer, 0).configure_generic(FUNC(pgm2_state::mcu_interrupt));
 
 	ARM_AIC(config, m_arm_aic, 0).irq_callback().set(FUNC(pgm2_state::irq));
 
@@ -1394,20 +1394,20 @@ void pgm2_state::common_encryption_init()
 void pgm2_state::init_orleg2()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(FUNC(pgm2_state::orleg2_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32_delegate(*this, FUNC(pgm2_state::orleg2_speedup_r)));
 }
 
 void pgm2_state::init_kov2nl()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(FUNC(pgm2_state::kov2nl_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32_delegate(*this, FUNC(pgm2_state::kov2nl_speedup_r)));
 }
 
 void pgm2_state::init_ddpdojt()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup_r), this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(FUNC(pgm2_state::ddpdojt_speedup2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup2_r)));
 }
 
 // currently we don't know how to derive address/data xor values from real keys, so we need both
@@ -1419,7 +1419,7 @@ static const kov3_module_key kov3_100_key = { { 0x40,0xac,0x30,0x00,0x47,0x49,0x
 void pgm2_state::init_kov3()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(FUNC(pgm2_state::kov3_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32_delegate(*this, FUNC(pgm2_state::kov3_speedup_r)));
 }
 
 void pgm2_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
@@ -1464,7 +1464,7 @@ void pgm2_state::init_kov3_100()
 void pgm2_state::init_kof98umh()
 {
 	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(FUNC(pgm2_state::kof98umh_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
 }
 
 

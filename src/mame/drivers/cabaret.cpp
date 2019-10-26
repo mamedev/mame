@@ -132,8 +132,8 @@ WRITE8_MEMBER(cabaret_state::fg_color_w)
 
 void cabaret_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cabaret_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,    8,  32, 64, 8);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(cabaret_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,    8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabaret_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,    8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cabaret_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,    8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(64);
 }

@@ -76,7 +76,7 @@ private:
 	struct riff_chunk_t
 	{
 		std::array<uint8_t, 4> group_id = {{'R','I','F','F'}};
-		uint32_t  			   filelen  = 0;
+		uint32_t               filelen  = 0;
 		std::array<uint8_t, 4> rifftype = {{'W','A','V','E'}};
 	};
 

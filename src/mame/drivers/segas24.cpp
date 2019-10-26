@@ -1937,7 +1937,7 @@ void segas24_state::system24(machine_config &config)
 
 	TIMER(config, "irq_timer").configure_generic(FUNC(segas24_state::irq_timer_cb));
 	TIMER(config, "irq_timer_clear").configure_generic(FUNC(segas24_state::irq_timer_clear_cb));
-	TIMER(config, "frc_timer").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "frc_timer").configure_generic(nullptr);
 	TIMER(config, "irq_frc").configure_periodic(FUNC(segas24_state::irq_frc_cb), attotime::from_hz(FRC_CLOCK_MODE1));
 
 	S24TILE(config, m_vtile, 0, 0xfff).set_palette("palette");

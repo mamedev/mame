@@ -32,6 +32,7 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, m_timer(nullptr)
 	, m_timer_state(0)
 	, m_timer_handler(*this)
+	, m_apan_cb(*this)
 {
 }
 
@@ -503,7 +504,7 @@ void k054539_device::device_start()
 
 	// resolve / bind callbacks
 	m_timer_handler.resolve_safe();
-	m_apan_cb.bind_relative_to(*owner());
+	m_apan_cb.resolve();
 
 	for (auto & elem : gain)
 		elem = 1.0;

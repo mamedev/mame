@@ -602,8 +602,8 @@ void goupil_g2_state::goupil_g2(machine_config &config)
 	mc6845_device &crtc(MC6845(config, "crtc", 14.318181_MHz_XTAL / 8));
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(goupil_g2_state::crtc_update_row), this);
-	crtc.set_on_update_addr_change_callback(FUNC(goupil_g2_state::crtc_update_addr_changed), this);
+	crtc.set_update_row_callback(FUNC(goupil_g2_state::crtc_update_row));
+	crtc.set_on_update_addr_change_callback(FUNC(goupil_g2_state::crtc_update_addr_changed));
 
 	m_via_video->writepa_handler().set_nop();
 	m_via_video->writepb_handler().set_nop();

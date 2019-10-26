@@ -273,10 +273,10 @@ void isa8_cga_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_screen(nullptr);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(isa8_cga_device::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(isa8_cga_device::crtc_update_row));
 	m_crtc->out_hsync_callback().set(FUNC(isa8_cga_device::hsync_changed));
 	m_crtc->out_vsync_callback().set(FUNC(isa8_cga_device::vsync_changed));
-	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_device::reconfigure), this);
+	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_device::reconfigure));
 }
 
 ioport_constructor isa8_cga_device::device_input_ports() const
@@ -331,7 +331,7 @@ void isa8_cga_device::device_start()
 
 	set_isa_device();
 	m_vram.resize(m_vram_size);
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_device::io_read), this ), write8_delegate( FUNC(isa8_cga_device::io_write), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_cga_device::io_read)), write8_delegate(*this, FUNC(isa8_cga_device::io_write)));
 	m_isa->install_bank(0xb8000, 0xb8000 + (std::min<size_t>)(0x8000, m_vram_size) - 1, "bank_cga", &m_vram[0]);
 	if(m_vram_size == 0x4000)
 		m_isa->install_bank(0xbc000, 0xbffff, "bank_cga", &m_vram[0]);
@@ -1346,13 +1346,13 @@ void isa8_cga_pc1512_device::device_start()
 {
 	isa8_cga_device::device_start();
 
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_cga_pc1512_device::io_read), this ), write8_delegate( FUNC(isa8_cga_pc1512_device::io_write), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_cga_pc1512_device::io_read)), write8_delegate(*this, FUNC(isa8_cga_pc1512_device::io_write)));
 	m_isa->install_bank(0xb8000, 0xbbfff, "bank1", &m_vram[0]);
 
 	address_space &space = m_isa->memspace();
 
-	space.install_write_handler( 0xb8000, 0xbbfff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
-	space.install_write_handler( 0xbc000, 0xbffff, write8_delegate( FUNC(isa8_cga_pc1512_device::vram_w), this ) );
+	space.install_write_handler(0xb8000, 0xbbfff, write8_delegate(*this, FUNC(isa8_cga_pc1512_device::vram_w)));
+	space.install_write_handler(0xbc000, 0xbffff, write8_delegate(*this, FUNC(isa8_cga_pc1512_device::vram_w)));
 }
 
 void isa8_cga_pc1512_device::device_reset()
@@ -1485,7 +1485,7 @@ void isa8_wyse700_device::device_start()
 {
 	isa8_cga_device::device_start();
 
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_wyse700_device::io_read), this ), write8_delegate( FUNC(isa8_wyse700_device::io_write), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_wyse700_device::io_read)), write8_delegate(*this, FUNC(isa8_wyse700_device::io_write)));
 	m_isa->install_bank(0xa0000, 0xaffff, "bank_wy1", &m_vram[0x00000]);
 	m_isa->install_bank(0xb0000, 0xbffff, "bank_cga", &m_vram[0x10000]);
 }
@@ -1547,7 +1547,7 @@ void isa8_ec1841_0002_device::device_start()
 {
 	isa8_cga_device::device_start();
 
-	m_isa->install_device(0x3d0, 0x3df, read8_delegate( FUNC(isa8_ec1841_0002_device::io_read), this ), write8_delegate( FUNC(isa8_ec1841_0002_device::io_write), this ) );
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(*this, FUNC(isa8_ec1841_0002_device::io_read)), write8_delegate(*this, FUNC(isa8_ec1841_0002_device::io_write)));
 }
 
 void isa8_ec1841_0002_device::device_reset()
@@ -1580,12 +1580,12 @@ WRITE8_MEMBER( isa8_ec1841_0002_device::io_write )
 		m_p3df = data;
 		if (data & 1) {
 			m_isa->install_memory(0xb8000, 0xb9fff,
-									read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
-									write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+					read8_delegate( *this, FUNC(isa8_ec1841_0002_device::char_ram_read)),
+					write8_delegate(*this, FUNC(isa8_ec1841_0002_device::char_ram_write)));
 			if(m_vram_size == 0x4000)
 				m_isa->install_memory(0xbc000, 0xbdfff,
-										read8_delegate( FUNC(isa8_ec1841_0002_device::char_ram_read), this),
-										write8_delegate(FUNC(isa8_ec1841_0002_device::char_ram_write), this) );
+						read8_delegate( *this, FUNC(isa8_ec1841_0002_device::char_ram_read)),
+						write8_delegate(*this, FUNC(isa8_ec1841_0002_device::char_ram_write)));
 		} else {
 			m_isa->install_bank(0xb8000, 0xb8000 + (std::min<size_t>)(0x8000, m_vram_size) - 1, "bank_cga", &m_vram[0]);
 			if(m_vram_size == 0x4000)
@@ -1699,7 +1699,7 @@ void isa8_cga_m24_device::device_add_mconfig(machine_config &config)
 	isa8_cga_device::device_add_mconfig(config);
 
 	subdevice<screen_device>(CGA_SCREEN_NAME)->set_raw(XTAL(14'318'181), 912, 0, 640, 462, 0, 400);
-	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_m24_device::reconfigure), this);
+	m_crtc->set_reconfigure_callback(FUNC(isa8_cga_m24_device::reconfigure));
 }
 
 isa8_cga_m24_device::isa8_cga_m24_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -1912,8 +1912,8 @@ const tiny_rom_entry *isa8_cga_cportiii_device::device_rom_region() const
 void isa8_cga_cportiii_device::device_reset()
 {
 	isa8_cga_m24_device::device_reset();
-	m_isa->install_device(0x13c6, 0x13c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_13c6_w), this));
-	m_isa->install_device(0x23c6, 0x23c7, read8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_r), this), write8_delegate(FUNC(isa8_cga_cportiii_device::port_23c6_w), this));
+	m_isa->install_device(0x13c6, 0x13c7, read8_delegate(*this, FUNC(isa8_cga_cportiii_device::port_13c6_r)), write8_delegate(*this, FUNC(isa8_cga_cportiii_device::port_13c6_w)));
+	m_isa->install_device(0x23c6, 0x23c7, read8_delegate(*this, FUNC(isa8_cga_cportiii_device::port_23c6_r)), write8_delegate(*this, FUNC(isa8_cga_cportiii_device::port_23c6_w)));
 	m_palette->set_pen_color(0, 100, 25, 0);
 	m_chr_gen_offset[0] = m_chr_gen_offset[2] = 0x0000;
 	m_chr_gen_offset[1] = m_chr_gen_offset[3] = 0x1000;
@@ -1947,7 +1947,7 @@ WRITE8_MEMBER(isa8_cga_cportiii_device::port_23c6_w)
 {
 	m_mode2 = data & 1;
 	if(BIT(data, 3))
-		m_isa->install_memory(0xb8000, 0xb9fff, read8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_read), this), write8_delegate(FUNC(isa8_cga_cportiii_device::char_ram_write), this));
+		m_isa->install_memory(0xb8000, 0xb9fff, read8_delegate(*this, FUNC(isa8_cga_cportiii_device::char_ram_read)), write8_delegate(*this, FUNC(isa8_cga_cportiii_device::char_ram_write)));
 	else
 		m_isa->install_bank(0xb8000, 0xb8000 + 0x8000 - 1, "bank_cga", &m_vram[0]);
 }

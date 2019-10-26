@@ -611,10 +611,10 @@ void x68k_state::video_start()
 	m_gfxdecode->gfx(gfx_index)->set_colors(32);
 
 	/* Tilemaps */
-	m_bg0_8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg0_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg1_8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg1_tile),this),TILEMAP_SCAN_ROWS,8,8,64,64);
-	m_bg0_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg0_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
-	m_bg1_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(x68k_state::get_bg1_tile_16),this),TILEMAP_SCAN_ROWS,16,16,64,64);
+	m_bg0_8 =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg0_tile)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_bg1_8 =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg1_tile)),    TILEMAP_SCAN_ROWS,  8,  8, 64, 64);
+	m_bg0_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg0_tile_16)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg1_16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(x68k_state::get_bg1_tile_16)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
 	m_bg0_8->set_transparent_pen(0);
 	m_bg1_8->set_transparent_pen(0);

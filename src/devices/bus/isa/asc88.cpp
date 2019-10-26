@@ -53,11 +53,11 @@ void asc88_device::device_reset()
 	m_isa->install_rom(this, baseaddr, baseaddr | 0x37ff, "asc88", "bios");
 	m_isa->install_bank(baseaddr | 0x3800, baseaddr | 0x3fef, "ascram", m_ram.get());
 	m_isa->install_memory(baseaddr | 0x3ff0, baseaddr | 0x3ff7,
-		read8sm_delegate(FUNC(ncr5380n_device::read), &*m_scsic),
-		write8sm_delegate(FUNC(ncr5380n_device::write), &*m_scsic));
+			read8sm_delegate(*m_scsic, FUNC(ncr5380n_device::read)),
+			write8sm_delegate(*m_scsic, FUNC(ncr5380n_device::write)));
 	m_isa->install_memory(baseaddr | 0x3ff8, baseaddr | 0x3ff8,
-		read8smo_delegate(FUNC(asc88_device::eeprom_r), this),
-		write8smo_delegate(FUNC(asc88_device::control_w), this));
+			read8smo_delegate(*this, FUNC(asc88_device::eeprom_r)),
+			write8smo_delegate(*this, FUNC(asc88_device::control_w)));
 
 	control_w(0);
 }

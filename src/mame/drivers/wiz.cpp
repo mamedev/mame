@@ -123,7 +123,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
   - Here are some infos about the "Debug Mode" Dip Switch :
 
-      * when it it set to OFF, the value which was previously written
+      * when it is set to OFF, the value which was previously written
         to 0xc500 is NOT erased, but the only value written to it is 0x00.
       * when it is set to ON, 0x00 is ALWAYS written to 0xc500.
         (check code at 0x0ef6)

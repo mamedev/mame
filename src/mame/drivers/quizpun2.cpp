@@ -216,8 +216,8 @@ WRITE8_MEMBER(quizpun2_state::scroll_w)
 
 void quizpun2_state::video_start()
 {
-	m_bg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpun2_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
-	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpun2_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
+	m_bg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
+	m_fg_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(quizpun2_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,16,16,0x20,0x40);
 
 	m_bg_tmap->set_transparent_pen(0);
 	m_fg_tmap->set_transparent_pen(0);

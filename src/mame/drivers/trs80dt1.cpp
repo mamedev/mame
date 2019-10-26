@@ -348,7 +348,7 @@ void trs80dt1_state::trs80dt1(machine_config &config)
 
 	I8276(config, m_crtc, 12480000 / 8);
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(trs80dt1_state::crtc_update_row), this);
+	m_crtc->set_display_callback(FUNC(trs80dt1_state::crtc_update_row));
 	m_crtc->drq_wr_callback().set_inputline(m_maincpu, MCS51_INT0_LINE); // BRDY pin goes through inverter to /INT0, so we don't invert
 	m_crtc->irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)); // INT pin
 	m_crtc->irq_wr_callback().append(m_7474, FUNC(ttl7474_device::d_w));

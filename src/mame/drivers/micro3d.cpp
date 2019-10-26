@@ -294,7 +294,7 @@ void micro3d_state::soundmem_io(address_map &map)
 void micro3d_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff6, 0xfffff7).lr16("duart irq", [this]() -> u16 { return m_duart->get_irq_vector(); });
+	map(0xfffff6, 0xfffff7).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 

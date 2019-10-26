@@ -428,7 +428,7 @@ Notes:
       29F400       - Fujitsu 29F400TA-90PFTN 512k x8 FlashROM (TSOP48)
       Custom ASIC  - CAPCOM DL-3229 SCU (QFP144). Decapping reveals this is a Hitachi HD6417099 SH2 variant
                      with built-in encryption, clocked at 6.250MHz
-      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated)
+      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated on type D boards)
       MACH111      - AMD MACH111 CPLD stamped 'CP3B1A' (PLCC44)
       *            - These components located on the other side of the PCB
 
@@ -2157,10 +2157,10 @@ void cps3_state::cps3_map(address_map &map)
 	map(0x05040000, 0x0504ffff).rw(FUNC(cps3_state::ssram_r), FUNC(cps3_state::ssram_w)).umask32(0x00ff00ff); // 'SS' RAM (Score Screen) (text tilemap + toles)
 	map(0x05050000, 0x0505002b).w(FUNC(cps3_state::ssregs_w)).umask32(0x00ff00ff);
 
-	map(0x05100000, 0x05100003).lw32("irq12_ack", [this](offs_t, u32) { m_maincpu->set_input_line(12, CLEAR_LINE); });
-	map(0x05110000, 0x05110003).lw32("irq10_ack", [this](offs_t, u32) { m_maincpu->set_input_line(10, CLEAR_LINE); });
-	map(0x05120000, 0x05120003).lw32("irq14_ack", [this](offs_t, u32) { m_maincpu->set_input_line(14, CLEAR_LINE); }); // ?? unused
-	map(0x05130000, 0x05130003).lw32("irq6_ack", [this](offs_t, u32) { m_maincpu->set_input_line(6, CLEAR_LINE); }); // ?? unused
+	map(0x05100000, 0x05100003).lw32(NAME([this] (offs_t, u32) { m_maincpu->set_input_line(12, CLEAR_LINE); }));
+	map(0x05110000, 0x05110003).lw32(NAME([this] (offs_t, u32) { m_maincpu->set_input_line(10, CLEAR_LINE); }));
+	map(0x05120000, 0x05120003).lw32(NAME([this] (offs_t, u32) { m_maincpu->set_input_line(14, CLEAR_LINE); })); // ?? unused
+	map(0x05130000, 0x05130003).lw32(NAME([this] (offs_t, u32) { m_maincpu->set_input_line(6, CLEAR_LINE); })); // ?? unused
 	map(0x05140000, 0x05140003).rw("scsi:7:wd33c93", FUNC(wd33c93_device::indir_r), FUNC(wd33c93_device::indir_w)).umask32(0x00ff00ff);
 
 	map(0x06000000, 0x067fffff).rw(FUNC(cps3_state::flash1_r), FUNC(cps3_state::flash1_w)); /* Flash ROMs simm 1 */

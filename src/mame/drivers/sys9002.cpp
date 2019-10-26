@@ -143,7 +143,7 @@ void sys9002_state::sys9002(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(sys9002_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(sys9002_state::crtc_update_row));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 614400));
 	uart_clock.signal_handler().set("uart1", FUNC(i8251_device::write_txc));

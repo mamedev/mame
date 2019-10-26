@@ -1164,8 +1164,8 @@ void rainbow_state::machine_reset()
 
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
-	program.install_read_handler(RTC_BASE, RTC_BASE, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(FUNC(rainbow_state::rtc_w), this));
+	program.install_read_handler(RTC_BASE, RTC_BASE, read8_delegate(*this, FUNC(rainbow_state::rtc_r)));
+	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(*this, FUNC(rainbow_state::rtc_w)));
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
 	#endif
 
@@ -1183,7 +1183,7 @@ void rainbow_state::machine_reset()
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 	// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
-	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));
+	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(*this, FUNC(rainbow_state::rtc_r)));
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 	#endif
 #endif
@@ -1206,8 +1206,8 @@ void rainbow_state::machine_reset()
 	{
 		// Install 8088 read / write handler
 		io.unmap_readwrite(0x60, 0x60);
-		io.install_read_handler(0x60, 0x60, read8_delegate(FUNC(rainbow_state::hd_status_60_r), this));
-		io.install_write_handler(0x60, 0x60, write8_delegate(FUNC(rainbow_state::hd_status_60_w), this));
+		io.install_read_handler(0x60, 0x60, read8_delegate(*this, FUNC(rainbow_state::hd_status_60_r)));
+		io.install_write_handler(0x60, 0x60, write8_delegate(*this, FUNC(rainbow_state::hd_status_60_w)));
 
 		hdc_reset();
 		m_hdc_drive_ready = true;
@@ -2756,7 +2756,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	// Install 8088 read / write handler once loopback test is over
 	if ( !(data & 32) && (m_diagnostic & 32) )
 	{
-			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(FUNC(upd7201_new_device::cd_ba_r), &*m_mpsc), write8sm_delegate(FUNC(upd7201_new_device::cd_ba_w), &*m_mpsc));
+			io.install_readwrite_handler(0x40, 0x43, read8sm_delegate(*m_mpsc, FUNC(upd7201_new_device::cd_ba_r)), write8sm_delegate(*m_mpsc, FUNC(upd7201_new_device::cd_ba_w)));
 			logerror("\n **** COMM HANDLER INSTALLED **** ");
 			//popmessage("Autoboot from drive %c", m_p_nvram[0xab] ? (64 + m_p_nvram[0xab]) : 0x3F );
 	}

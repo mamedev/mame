@@ -961,7 +961,7 @@ void deco_mlc_state::init_avengrgs()
 	dynamic_cast<sh2_device *>(m_maincpu.target())->sh2drc_add_fastram(0x0280000, 0x029ffff, 0, &m_vram[0]);
 
 	m_irqLevel = 1;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(*this, FUNC(deco_mlc_state::avengrgs_speedup_r)));
 	descramble_sound();
 }
 

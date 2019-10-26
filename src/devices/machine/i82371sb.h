@@ -14,7 +14,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 
 #include "sound/spkrdev.h"
 #include "machine/ram.h"

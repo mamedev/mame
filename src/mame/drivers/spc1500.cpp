@@ -900,8 +900,8 @@ void spc1500_state::spc1500(machine_config &config)
 	m_vdg->set_screen("screen");
 	m_vdg->set_show_border_area(false);
 	m_vdg->set_char_width(8);
-	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row), this);
-	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig), this);
+	m_vdg->set_update_row_callback(FUNC(spc1500_state::crtc_update_row));
+	m_vdg->set_reconfigure_callback(FUNC(spc1500_state::crtc_reconfig));
 
 	MCFG_VIDEO_START_OVERRIDE(spc1500_state, spc)
 

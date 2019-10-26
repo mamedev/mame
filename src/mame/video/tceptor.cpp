@@ -377,14 +377,14 @@ void tceptor_state::video_start()
 
 	m_c45_road->set_transparent_color(m_palette->pen_indirect(0xfff));
 
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_tx_tile_info),this), TILEMAP_SCAN_COLS,  8, 8, 34, 28);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tceptor_state::get_tx_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 34, 28);
 
 	m_tx_tilemap->set_scrollx(0, -2*8);
 	m_tx_tilemap->set_scrolly(0, 0);
 	m_tx_tilemap->configure_groups(*m_gfxdecode->gfx(0), 7);
 
-	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg1_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
-	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tceptor_state::get_bg2_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 32);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tceptor_state::get_bg1_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tceptor_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	save_pointer(NAME(m_sprite_ram_buffered), 0x200 / 2);
 	save_item(NAME(m_bg_scroll_x[0]));

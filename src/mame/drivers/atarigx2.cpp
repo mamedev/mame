@@ -2263,8 +2263,8 @@ void atarigx2_state::init_spclords()
 {
 	m_playfield_base = 0x000;
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc80f00, 0xc80fff, read32_delegate(FUNC(atari_136095_0072_device::polylsb_read),(atari_136095_0072_device*)&(*m_xga)), write32_delegate(FUNC(atari_136095_0072_device::polylsb_write),(atari_136095_0072_device*)&(*m_xga)));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc80f00, 0xc80fff, read32_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_read)), write32_delegate(downcast<atari_136095_0072_device &>(*m_xga), FUNC(atari_136095_0072_device::polylsb_write)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(*m_xga, FUNC(atari_xga_device::read)), write32_delegate(*m_xga, FUNC(atari_xga_device::write)));
 }
 
 
@@ -2293,15 +2293,15 @@ XMEM=68.A23*E.A22*!E.A21*68.A20                                 = 1101 xxxx = d0
     +68.A23*E.A22*!E.A21*!68.A20*68.A19                         = 1100 1xxx = c80000-cfffff
     +!68.A23*!E.A22*!E.A21                                      = 000x xxxx = 000000-1fffff
 */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atari_xga_device::read),&(*m_xga)), write32_delegate(FUNC(atari_xga_device::write),&(*m_xga)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(*m_xga, FUNC(atari_xga_device::read)), write32_delegate(*m_xga, FUNC(atari_xga_device::write)));
 }
 
 void atarigx2_state::init_rrreveng()
 {
 	m_playfield_base = 0x000;
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(FUNC(atarigx2_state::atarigx2_protection_r),this), write32_delegate(FUNC(atarigx2_state::atarigx2_protection_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(FUNC(atarigx2_state::rrreveng_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xca0000, 0xca0fff, read32_delegate(*this, FUNC(atarigx2_state::atarigx2_protection_r)), write32_delegate(*this, FUNC(atarigx2_state::atarigx2_protection_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xca0fc0, 0xca0fc3, read32_delegate(*this, FUNC(atarigx2_state::rrreveng_prot_r)));
 }
 
 

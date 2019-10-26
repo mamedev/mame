@@ -75,13 +75,9 @@ void bbcbc_state::mem_map(address_map &map)
 void bbcbc_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x7f).lrw8("z80pio_rw",
-						 [this](offs_t offset) {
-							 return m_z80pio->read(offset >> 5);
-						 },
-						 [this](offs_t offset, u8 data) {
-							 m_z80pio->write(offset >> 5, data);
-						 });
+	map(0x00, 0x7f).lrw8(
+						 NAME([this](offs_t offset) { return m_z80pio->read(offset >> 5); }),
+						 NAME([this](offs_t offset, u8 data) { m_z80pio->write(offset >> 5, data); }));
 	map(0x80, 0x81).rw("tms9129", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 }
 

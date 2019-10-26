@@ -1133,7 +1133,7 @@ void mod4_state::mod4(machine_config &config)
 	cpu.set_ram_status_map(&mod4_state::intellec4_ram_status);
 	cpu.set_ram_ports_map(&mod4_state::intellec4_ram_ports);
 	cpu.set_program_memory_map(&mod4_state::intellec4_program_memory);
-	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle), this);
+	cpu.set_bus_cycle_cb(FUNC(mod4_state::bus_cycle));
 	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 
 	m_bus->test_out_cb().set(FUNC(mod4_state::bus_test));
@@ -1359,7 +1359,7 @@ void mod40_state::mod40(machine_config &config)
 	cpu.set_ram_status_map(&mod40_state::intellec4_ram_status);
 	cpu.set_ram_ports_map(&mod40_state::intellec4_ram_ports);
 	cpu.set_program_memory_map(&mod40_state::intellec4_program_memory);
-	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle), this);
+	cpu.set_bus_cycle_cb(FUNC(mod40_state::bus_cycle));
 	cpu.sync_cb().set(m_bus, FUNC(bus::intellec4::univ_bus_device::sync_in));
 	cpu.stp_ack_cb().set(FUNC(mod40_state::stp_ack));
 

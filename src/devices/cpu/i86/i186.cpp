@@ -125,14 +125,14 @@ i80188_cpu_device::i80188_cpu_device(const machine_config &mconfig, const char *
 	: i80186_cpu_device(mconfig, I80188, tag, owner, clock, 8)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::int_callback));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i80186_cpu_device(mconfig, I80186, tag, owner, clock, 16)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
-	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(i80186_cpu_device::int_callback), this));
+	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::int_callback));
 }
 
 i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int data_bus_size)

@@ -129,7 +129,7 @@ public:
 	segaic16_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
-	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb = segaic16_video_pagelatch_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_pagelatch_cb(T &&... args) { m_pagelatch_cb.set(std::forward<T>(args)...); }
 
 	uint8_t m_display_enable;
 	optional_shared_ptr<uint16_t> m_tileram;

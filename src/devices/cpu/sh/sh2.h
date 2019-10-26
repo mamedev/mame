@@ -60,26 +60,11 @@ public:
 
 	void set_is_slave(int slave) { m_is_slave = slave; }
 
-	template <typename Object> void set_dma_kludge_callback(Object &&cb) { m_dma_kludge_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_kludge_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_kludge_callback(dma_kludge_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dma_kludge_callback(T &&... args) { m_dma_kludge_cb.set(std::forward<T>(args)...); }
 
-	template <typename Object> void set_dma_fifo_data_available_callback(Object &&cb) { m_dma_fifo_data_available_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_dma_fifo_data_available_callback(
-		int (FunctionClass::*callback)(uint32_t, uint32_t, uint32_t, int), const char *name)
-	{
-		set_dma_fifo_data_available_callback(dma_fifo_data_available_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_dma_fifo_data_available_callback(T &&... args) { m_dma_fifo_data_available_cb.set(std::forward<T>(args)...); }
 
-	template <typename Object> void set_ftcsr_read_callback(Object &&cb) { m_ftcsr_read_cb = std::forward<Object>(cb); }
-	template <class FunctionClass> void set_ftcsr_read_callback(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_ftcsr_read_callback(ftcsr_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
+	template <typename... T> void set_ftcsr_read_callback(T &&... args) { m_ftcsr_read_cb.set(std::forward<T>(args)...); }
 
 	DECLARE_READ32_MEMBER(sh2_internal_a5);
 

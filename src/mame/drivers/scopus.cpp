@@ -216,7 +216,7 @@ void sagitta180_state::sagitta180(machine_config &config)
 
 	I8275(config, m_crtc, 12480000 / 8); /* guessed xtal */
 	m_crtc->set_character_width(8);
-	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(sagitta180_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 	m_crtc->irq_wr_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_crtc->set_screen("screen");

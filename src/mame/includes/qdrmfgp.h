@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 #include "machine/timer.h"
 #include "sound/k054539.h"
 #include "machine/k053252.h"

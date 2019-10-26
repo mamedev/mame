@@ -667,7 +667,7 @@ void xerox820_state::xerox820(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820");
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb));
 }
 
 void bigboard_state::bigboard(machine_config &config)
@@ -771,7 +771,7 @@ void xerox820ii_state::xerox820ii(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("xerox820ii");
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(xerox820_state::quickload_cb));
 }
 
 void xerox820ii_state::xerox168(machine_config &config)

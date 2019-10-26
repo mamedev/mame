@@ -113,8 +113,8 @@ void acorn_vib_device::device_reset()
 
 	space.install_device(0x0c00, 0x0c0f, *m_via6522, &via6522_device::map);
 	space.install_device(0x0c10, 0x0c1f, *m_via6522, &via6522_device::map);
-	space.install_readwrite_handler(0x0c20, 0x0c21, 0, 0x1e, 0, read8sm_delegate(FUNC(acia6850_device::read), m_acia.target()), write8sm_delegate(FUNC(acia6850_device::write), m_acia.target()));
-	space.install_readwrite_handler(0x0c40, 0x0c43, 0, 0x1c, 0, read8sm_delegate(FUNC(i8255_device::read), m_ppi8255.target()), write8sm_delegate(FUNC(i8255_device::write), m_ppi8255.target()));
+	space.install_readwrite_handler(0x0c20, 0x0c21, 0, 0x1e, 0, read8sm_delegate(*m_acia, FUNC(acia6850_device::read)), write8sm_delegate(*m_acia, FUNC(acia6850_device::write)));
+	space.install_readwrite_handler(0x0c40, 0x0c43, 0, 0x1c, 0, read8sm_delegate(*m_ppi8255, FUNC(i8255_device::read)), write8sm_delegate(*m_ppi8255, FUNC(i8255_device::write)));
 
 	m_mc14411->timer_disable_all();
 	m_mc14411->timer_enable(mc14411_device::timer_id(m_txc->read()), true);

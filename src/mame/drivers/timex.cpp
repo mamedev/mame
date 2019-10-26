@@ -713,7 +713,7 @@ void timex_state::ts2068(machine_config &config)
 	AY8912(config.replace(), "ay8912", XTAL(14'112'000)/8).add_route(ALL_OUTPUTS, "mono", 0.25);        /* From Schematic; 1.764 MHz */
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "dockslot", generic_plain_slot, "timex_cart", "dck,bin").set_device_load(FUNC(timex_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "dockslot", generic_plain_slot, "timex_cart", "dck,bin").set_device_load(FUNC(timex_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");

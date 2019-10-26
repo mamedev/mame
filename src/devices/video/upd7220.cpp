@@ -615,6 +615,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	device_t(mconfig, UPD7220, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
+	m_display_cb(*this),
+	m_draw_text_cb(*this),
 	m_write_drq(*this),
 	m_write_hsync(*this),
 	m_write_vsync(*this),
@@ -676,8 +678,8 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 void upd7220_device::device_start()
 {
 	// resolve callbacks
-	m_display_cb.bind_relative_to(*owner());
-	m_draw_text_cb.bind_relative_to(*owner());
+	m_display_cb.resolve();
+	m_draw_text_cb.resolve();
 
 	m_write_drq.resolve_safe();
 	m_write_hsync.resolve_safe();
@@ -716,6 +718,23 @@ void upd7220_device::device_start()
 	save_item(NAME(m_gchr));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_pitch));
+	save_item(NAME(m_ra_addr));
+	save_item(NAME(m_cr));
+	save_item(NAME(m_pr));
+	save_item(NAME(m_param_ptr));
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_flag));
+	save_item(NAME(m_fifo_ptr));
+	save_item(NAME(m_fifo_dir));
+	save_item(NAME(m_bitmap_mod));
+	save_item(NAME(m_figs.m_dir));
+	save_item(NAME(m_figs.m_figure_type));
+	save_item(NAME(m_figs.m_dc));
+	save_item(NAME(m_figs.m_gd));
+	save_item(NAME(m_figs.m_d));
+	save_item(NAME(m_figs.m_d1));
+	save_item(NAME(m_figs.m_d2));
+	save_item(NAME(m_figs.m_dm));
 }
 
 

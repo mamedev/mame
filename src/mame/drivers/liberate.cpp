@@ -77,7 +77,7 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 	m_bank = data;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x8000, 0x800f, "bank1");
 }
@@ -180,9 +180,9 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 	m_bank = data & 1;
 
 	if (m_bank)
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::deco16_io_r)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x800f, read8_delegate(*this, FUNC(liberate_state::prosoccr_charram_r)));
 
 }
 

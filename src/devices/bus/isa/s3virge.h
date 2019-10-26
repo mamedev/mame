@@ -46,7 +46,7 @@ public:
 	bool is_linear_address_active() { return s3virge.linear_address_enable; }
 	bool is_new_mmio_active() { return s3.cr53 & 0x08; }
 
-	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existant 8514/A device\n"); return nullptr; }
+	ibm8514a_device* get_8514() { fatalerror("s3virge requested non-existent 8514/A device\n"); return nullptr; }
 
 protected:
 	s3virge_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

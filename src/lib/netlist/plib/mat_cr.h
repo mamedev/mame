@@ -469,7 +469,7 @@ namespace plib
 			for (index_type k = 0; k < base::size(); k++)
 				m_ge_par[levGE[k]].push_back(k);
 			//for (std::size_t k = 0; k < m_ge_par.size(); k++)
-			//	printf("%d %d\n", (int) k, (int) m_ge_par[k].size());
+			//  printf("%d %d\n", (int) k, (int) m_ge_par[k].size());
 		}
 		// contains elimination rows below the diagonal
 		std::vector<std::vector<index_type>> m_ge_par; // parallel execution support for Gauss
@@ -560,7 +560,7 @@ namespace plib
 				const auto p_i_end = base::row_idx[i + 1];
 				// loop over all columns k left of diag in row i
 				//if (row_idx[i] < diag[i])
-				//	printf("occ %d\n", (int)i);
+				//  printf("occ %d\n", (int)i);
 				for (auto i_k = base::row_idx[i]; i_k < base::diag[i]; i_k++)
 				{
 					const auto k(base::col_idx[i_k]);

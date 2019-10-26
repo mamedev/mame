@@ -30,7 +30,7 @@ public:
 
 	cem3394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template <typename... T> void set_ext_input_callback(T &&... args) { m_ext_cb = ext_input_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_ext_input_callback(T &&... args) { m_ext_cb.set(std::forward<T>(args)...); }
 	void set_vco_zero_freq(double freq) { m_vco_zero_freq = freq; }
 	void set_filter_zero_freq(double freq) { m_filter_zero_freq = freq; }
 
