@@ -34,6 +34,7 @@ public:
 		, m_displayram(*this, "displayram")
 		, m_chargen(*this, "chargen")
 		, m_keys(*this, "KA%X", 0U)
+		, m_swmisc(*this, "SWMISC")
 	{
 	}
 
@@ -76,6 +77,7 @@ private:
 	required_shared_ptr<u8> m_displayram;
 	required_region_ptr<u8> m_chargen;
 	required_ioport_array<16> m_keys;
+	required_ioport m_swmisc;
 
 	emu_timer *m_bell_timer;
 
@@ -105,6 +107,14 @@ void teleray10_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(teleray10_state::timer_expired)
 {
+	// arbitrary VBLANK condition
+	if (param >= 240 && param < 290)
+	{
+		int height = BIT(m_swmisc->read(), 2) ? 310 : 372;
+		if (height != m_screen->height())
+			m_screen->configure(1000, height, m_screen->visible_area(), attotime::from_ticks(1000 * height, 18.6_MHz_XTAL).as_attoseconds());
+	}
+
 	if (m_outreg->q7_r())
 	{
 		m_timer_expired = true;
@@ -443,10 +453,10 @@ static INPUT_PORTS_START(teleray10)
 	PORT_DIPNAME(0x01, 0x01, "Display Attributes") PORT_DIPLOCATION("7A:1")
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, "Inverse Display") // internal jumper near 4N
+	PORT_DIPNAME(0x02, 0x02, "Inverse Display") PORT_DIPLOCATION("INVRS:1") // internal jumper near 4M
 	PORT_DIPSETTING(0x02, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x04, "Refresh Rate") // internal jumper near 2K
+	PORT_DIPNAME(0x04, 0x04, "Refresh Rate") PORT_DIPLOCATION("50Hz:1") // internal jumper near 2J
 	PORT_DIPSETTING(0x00, "50 Hz")
 	PORT_DIPSETTING(0x04, "60 Hz")
 	PORT_DIPNAME(0x08, 0x08, "Serial Loop") PORT_DIPLOCATION("7A:8")
