@@ -43,6 +43,7 @@ public:
 		, m_colorram(*this, "colorram")
 		, m_gunx(*this, "GUNX")
 		, m_guny(*this, "GUNY")
+		, m_cane_vco_timer(*this, "cane_vco_timer")
 		, m_timer_state(1)
 	{ }
 
@@ -77,6 +78,8 @@ public:
 	void spacerng(machine_config &config);
 	void steelwkr(machine_config &config);
 	void schaser(machine_config &config);
+	void cane(machine_config &config);
+	void cane_audio(machine_config &config);
 
 	void init_invmulti();
 	void init_spacecom();
@@ -104,6 +107,9 @@ private:
 	/* misc game specific */
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
+
+	optional_device<timer_device> m_cane_vco_timer;
+
 	uint8_t m_color_map;
 	uint8_t m_screen_red;
 	uint8_t m_fleet_step;
@@ -128,6 +134,8 @@ private:
 	uint16_t m_claybust_gun_pos;
 	u8 m_sound_data;
 	bool m_timer_state;
+
+	double m_cane_vco_rc_chargetime;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	DECLARE_READ8_MEMBER(indianbt_r);
@@ -177,6 +185,11 @@ private:
 	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
+	DECLARE_WRITE8_MEMBER(cane_sh_port_1_w);
+	DECLARE_WRITE8_MEMBER(cane_music_w);
+	DECLARE_WRITE8_MEMBER(cane_unknown_port0_w);
+	DECLARE_WRITE8_MEMBER(cane_76477_en_w);
+	DECLARE_WRITE8_MEMBER(cane_76477_dis_w);
 
 	DECLARE_READ8_MEMBER(rollingc_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram_w);
@@ -200,6 +213,9 @@ private:
 	DECLARE_MACHINE_RESET(schaser_sh);
 	DECLARE_MACHINE_START(claybust);
 
+	DECLARE_MACHINE_START(cane);
+	DECLARE_MACHINE_RESET(cane);
+
 	void rollingc_palette(palette_device &palette) const;
 	void sflush_palette(palette_device &palette) const;
 
@@ -219,6 +235,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(polaris_60hz_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
+	TIMER_DEVICE_CALLBACK_MEMBER(cane_vco_voltage_timer);	
 	DECLARE_WRITE8_MEMBER(indianbt_sh_port_3_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_2_w);
@@ -269,6 +286,8 @@ private:
 	void vortex_io_map(address_map &map);
 	void yosakdon_io_map(address_map &map);
 	void yosakdon_map(address_map &map);
+	void cane_io_map(address_map &map);
+	void cane_map(address_map &map);
 };
 
 
@@ -280,5 +299,6 @@ DISCRETE_SOUND_EXTERN( ballbomb_discrete );
 DISCRETE_SOUND_EXTERN( indianbt_discrete );
 DISCRETE_SOUND_EXTERN( polaris_discrete );
 DISCRETE_SOUND_EXTERN( schaser_discrete );
+DISCRETE_SOUND_EXTERN( cane_discrete );
 
 #endif // MAME_INCLUDES_8080BW_H
