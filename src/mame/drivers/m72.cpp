@@ -3007,8 +3007,8 @@ ROM_START( lohtb2 )
 	ROM_LOAD16_BYTE( "loht-a12.bin", 0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
-	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht-a26.bin",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) ) // unprotected?? - same as original lohtj MCU
+	ROM_REGION( 0x10000, "mcu", 0 ) /* MCU running in external mode on daughtercard. Same data as lohtj just padded with 0xff */
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) )
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "loht-a16.bin",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
