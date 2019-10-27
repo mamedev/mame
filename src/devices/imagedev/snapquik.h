@@ -49,7 +49,7 @@ public:
 
 	void set_extensions(const char *ext) { m_file_extensions = ext; }
 	void set_delay(attotime delay) { m_delay = delay; }
-	template <typename... T> void set_load_callback(T &&... args) { m_load = load_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_load_callback(T &&... args) { m_load.set(std::forward<T>(args)...); }
 
 protected:
 	snapshot_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

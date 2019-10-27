@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 void mole_state::video_start()
 {
 	memset(m_tileram, 0, sizeof(m_tileram));
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(mole_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	save_item(NAME(m_tileram));
 }

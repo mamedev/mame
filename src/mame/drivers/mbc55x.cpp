@@ -323,7 +323,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mbc55x_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(mbc55x_state::crtc_update_row));
 	m_crtc->out_vsync_callback().set(FUNC(mbc55x_state::vid_vsync_changed));
 	m_crtc->out_hsync_callback().set(FUNC(mbc55x_state::vid_hsync_changed));
 

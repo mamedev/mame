@@ -3436,7 +3436,7 @@ READ32_MEMBER(coolridr_state::aquastge_hack_r)
 
 void coolridr_state::init_coolridr()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(*this, FUNC(coolridr_state::coolridr_hack2_r)));
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
@@ -3452,7 +3452,7 @@ void coolridr_state::init_coolridr()
 
 void coolridr_state::init_aquastge()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(FUNC(coolridr_state::aquastge_hack_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60c3fd8, 0x60c3fdb, read32_delegate(*this, FUNC(coolridr_state::aquastge_hack_r)));
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 	m_subcpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);

@@ -45,14 +45,15 @@ ft5_v6_c4.u58 /
 class koftball_state : public driver_device
 {
 public:
-	koftball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	koftball_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_main_ram(*this, "main_ram"),
 		m_bmc_1_videoram(*this, "bmc_1_videoram"),
 		m_bmc_2_videoram(*this, "bmc_2_videoram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette")
+	{ }
 
 	void koftball(machine_config &config);
 
@@ -104,8 +105,8 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 
 void koftball_state::video_start()
 {
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_t1_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_t2_tile_info)), TILEMAP_SCAN_ROWS, 8,8,64,32);
 
 	m_tilemap_1->set_transparent_pen(0);
 }

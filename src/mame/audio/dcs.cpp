@@ -717,6 +717,11 @@ dcs_audio_device::dcs_audio_device(const machine_config &mconfig, device_type ty
 	m_last_output_full(0),
 	m_last_input_empty(0),
 	m_progflags(0),
+	m_output_full_cb(*this),
+	m_input_empty_cb(*this),
+	m_fifo_data_r(*this),
+	m_fifo_status_r(*this),
+	m_fifo_reset_w(*this),
 	m_timer_enable(0),
 	m_timer_ignore(false),
 	m_timer_start_cycles(0),
@@ -904,13 +909,13 @@ void dcs_audio_device::install_speedup(void)
 {
 	if (m_polling_offset) {
 		if (m_rev < REV_DSIO) {
-			m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(FUNC(dcs_audio_device::dcs_polling_r), this), write16_delegate(FUNC(dcs_audio_device::dcs_polling_w), this));
+			m_cpu->space(AS_DATA).install_readwrite_handler(m_polling_offset, m_polling_offset, read16_delegate(*this, FUNC(dcs_audio_device::dcs_polling_r)), write16_delegate(*this, FUNC(dcs_audio_device::dcs_polling_w)));
 		}
 		else {
 			// ADSP 2181 (DSIO and DENVER) use program memory
-			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset, m_polling_offset, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
+			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset, m_polling_offset, read32_delegate(*this, FUNC(dcs_audio_device::dcs_polling32_r)), write32_delegate(*this, FUNC(dcs_audio_device::dcs_polling32_w)));
 			// DSIO and DENVER poll in two spots.  This offset covers all three machines (mwskins, sf2049, roadburn).
-			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset + 9, m_polling_offset + 9, read32_delegate(FUNC(dcs_audio_device::dcs_polling32_r), this), write32_delegate(FUNC(dcs_audio_device::dcs_polling32_w), this));
+			m_cpu->space(AS_PROGRAM).install_readwrite_handler(m_polling_offset + 9, m_polling_offset + 9, read32_delegate(*this, FUNC(dcs_audio_device::dcs_polling32_r)), write32_delegate(*this, FUNC(dcs_audio_device::dcs_polling32_w)));
 		}
 	}
 }

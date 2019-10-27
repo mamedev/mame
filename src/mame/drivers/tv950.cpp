@@ -298,8 +298,8 @@ void tv950_state::tv950(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(14);
-	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(tv950_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(tv950_state::crtc_update_addr));
 	m_crtc->out_hsync_callback().set(m_via, FUNC(via6522_device::write_pb6)).invert();
 	m_crtc->out_vsync_callback().set(FUNC(tv950_state::crtc_vs_w));
 	m_crtc->set_screen(nullptr);

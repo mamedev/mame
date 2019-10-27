@@ -66,8 +66,8 @@ void snk68_state::pow_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x080000, 0x080000).lr8("P2_r", [this]() -> u8 { return m_p2_io->read(); });
-	map(0x080001, 0x080001).lr8("P1_r", [this]() -> u8 { return m_p1_io->read(); });
+	map(0x080000, 0x080000).lr8(NAME([this] () -> u8 { return m_p2_io->read(); }));
+	map(0x080001, 0x080001).lr8(NAME([this] () -> u8 { return m_p1_io->read(); }));
 	map(0x080000, 0x080000).w(FUNC(snk68_state::sound_w));
 	map(0x0c0000, 0x0c0001).portr("SYSTEM");
 	map(0x0c0001, 0x0c0001).w(FUNC(snk68_state::flipscreen_w));   // + char bank
@@ -110,12 +110,12 @@ void searchar_state::searchar_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x080001, 0x080001).lr8("P1_invert_r", [this]() -> u8 { return m_p1_io->read() ^ m_invert_controls; });
-	map(0x080003, 0x080003).lr8("P2_invert_r", [this]() -> u8 { return m_p2_io->read() ^ m_invert_controls; });
-	map(0x080005, 0x080005).lr8("SYS_invert_r", [this]() -> u8 { return m_system_io->read() ^ m_invert_controls; });
+	map(0x080001, 0x080001).lr8(NAME([this] () -> u8 { return m_p1_io->read() ^ m_invert_controls; }));
+	map(0x080003, 0x080003).lr8(NAME([this] () -> u8 { return m_p2_io->read() ^ m_invert_controls; }));
+	map(0x080005, 0x080005).lr8(NAME([this] () -> u8 { return m_system_io->read() ^ m_invert_controls; }));
 	map(0x080000, 0x080000).w(FUNC(searchar_state::sound_w));
 	/* top byte unknown, bottom is protection in ikari3 and streetsm */
-	map(0x080007, 0x080007).lw8("invctrl_w", [this](u8 data){ m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00; } );
+	map(0x080007, 0x080007).lw8(NAME([this] (u8 data){ m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00; } ));
 	map(0x0c0001, 0x0c0001).w(FUNC(searchar_state::flipscreen_w));
 	map(0x0c0000, 0x0c0001).r(FUNC(searchar_state::rotary_1_r)); /* Player 1 rotary */
 	map(0x0c8000, 0x0c8001).r(FUNC(searchar_state::rotary_2_r)); /* Player 2 rotary */
@@ -154,7 +154,7 @@ void snk68_state::sound_io_map(address_map &map)
 	map(0x00, 0x00).rw("ymsnd", FUNC(ym3812_device::status_port_r), FUNC(ym3812_device::control_port_w));
 	map(0x20, 0x20).w("ymsnd", FUNC(ym3812_device::write_port_w));
 	map(0x40, 0x40).w(FUNC(snk68_state::D7759_write_port_0_w));
-	map(0x80, 0x80).lw8("upd_reset", [this](u8 data){ m_upd7759->reset_w(BIT(data, 7)); } );
+	map(0x80, 0x80).lw8(NAME([this] (u8 data) { m_upd7759->reset_w(BIT(data, 7)); } ));
 }
 
 /******************************************************************************/
@@ -595,13 +595,13 @@ void snk68_state::pow(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pow);
-	
+
 	ALPHA68K_PALETTE(config, m_palette, 0);
 	m_palette->set_entries(2048);
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
-	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow), this);
+	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow));
 	m_sprites->set_xpos_shift(12);
 	m_sprites->set_color_entry_mask(0x7f);
 
@@ -622,7 +622,7 @@ void snk68_state::pow(machine_config &config)
 void snk68_state::streetsm(machine_config &config)
 {
 	pow(config);
-	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_notpow), this);
+	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_notpow));
 }
 
 void searchar_state::searchar(machine_config &config)

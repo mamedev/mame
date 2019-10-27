@@ -33,8 +33,8 @@ public:
 	harddisk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~harddisk_image_device();
 
-	template <typename... T> void set_device_load(T &&... args) { m_device_image_load = load_delegate(std::forward<T>(args)...); }
-	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload = unload_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_device_load(T &&... args) { m_device_image_load.set(std::forward<T>(args)...); }
+	template <typename... T> void set_device_unload(T &&... args) { m_device_image_unload.set(std::forward<T>(args)...); }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides

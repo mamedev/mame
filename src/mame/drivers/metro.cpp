@@ -3126,7 +3126,7 @@ void metro_state::bangball(machine_config &config)
 {
 	msgogo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::bangball_map);
-	m_maincpu->set_periodic_int(device_interrupt_delegate(), attotime());
+	m_maincpu->remove_periodic_int();
 	TIMER(config, "scantimer").configure_scanline(FUNC(metro_state::bangball_scanline), "screen", 0, 1);
 
 	// doesn't like 58.2 Hz
@@ -3138,7 +3138,7 @@ void metro_state::batlbubl(machine_config &config)
 {
 	msgogo(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &metro_state::batlbubl_map);
-	m_maincpu->set_periodic_int(device_interrupt_delegate(), attotime());
+	m_maincpu->remove_periodic_int();
 	TIMER(config, "scantimer").configure_scanline(FUNC(metro_state::bangball_scanline), "screen", 0, 1);
 
 	// doesn't like 58.2 Hz
@@ -3200,7 +3200,7 @@ void metro_state::puzzli(machine_config &config)
 {
 	daitorid(config);
 
-	m_maincpu->set_periodic_int(device_interrupt_delegate(), attotime());
+	m_maincpu->remove_periodic_int();
 	TIMER(config, "scantimer").configure_scanline(FUNC(metro_state::bangball_scanline), "screen", 0, 1);
 
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

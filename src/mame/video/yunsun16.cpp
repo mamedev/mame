@@ -69,10 +69,10 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info)
 void yunsun16_state::video_start()
 {
 	m_tilemap[0] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info<0>),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yunsun16_state::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(yunsun16_state::tilemap_scan_pages)),
 			16, 16, 0x40, 0x40);
 	m_tilemap[1] = &machine().tilemap().create(
-			*m_gfxdecode, tilemap_get_info_delegate(FUNC(yunsun16_state::get_tile_info<1>),this),tilemap_mapper_delegate(FUNC(yunsun16_state::tilemap_scan_pages),this),
+			*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(yunsun16_state::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(yunsun16_state::tilemap_scan_pages)),
 			16, 16, 0x40, 0x40);
 
 	m_tilemap[0]->set_scrolldx(-0x34, 0);

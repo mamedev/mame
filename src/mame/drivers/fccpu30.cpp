@@ -661,7 +661,7 @@ static void fccpu30_vme_cards(device_slot_interface &device)
 
 void cpu30_state::cpu_space_map(address_map &map)
 {
-	map(0xfffffff2, 0xffffffff).lr16("fga002 irq", [this](offs_t offset) -> u16 { return m_fga002->iack(); });
+	map(0xfffffff2, 0xffffffff).lr16(NAME([this] (offs_t offset) -> u16 { return m_fga002->iack(); }));
 }
 
 void cpu30_state::cpu30(machine_config &config)

@@ -487,7 +487,7 @@ void iqblock_state::init_iqblock()
 		if ((i & 0x0090) == 0x0010) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe26, 0xfe26, write8_delegate(*this, FUNC(iqblock_state::iqblock_prot_w)));
 	m_video_type=1;
 }
 
@@ -502,7 +502,7 @@ void iqblock_state::init_grndtour()
 		if ((i & 0x0060) == 0x0040) rom[i] ^= 0x20;
 	}
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xfe39, 0xfe39, write8_delegate(*this, FUNC(iqblock_state::grndtour_prot_w)));
 	m_video_type=0;
 }
 

@@ -186,10 +186,10 @@ void unichamp_state::machine_start()
 			ptr[i+1] = TEMP;
 		}
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
-					read16s_delegate(FUNC(generic_slot_device::read16_rom),(generic_slot_device*)m_cart));
+					read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
 	} else
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x17ff,
-					read16_delegate(FUNC(unichamp_state::read_ff), this));
+					read16_delegate(*this, FUNC(unichamp_state::read_ff)));
 }
 
 /* Set Reset and INTR/INTRM Vector */

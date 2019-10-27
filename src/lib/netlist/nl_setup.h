@@ -325,7 +325,7 @@ namespace netlist
 
 	private:
 		plib::ppreprocessor::defines_map_type       m_defines;
-		plib::psource_collection_t<>				m_includes;
+		plib::psource_collection_t<>                m_includes;
 
 		setup_t  &m_setup;
 		log_type &m_log;

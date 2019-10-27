@@ -75,8 +75,8 @@ namespace
 		virtual void device_start() override
 		{
 			// install handlers
-			install_write_handler(0xFF7A, 0xFF7A, write8_delegate(FUNC(coco_orch90_device::write_left), this));
-			install_write_handler(0xFF7B, 0xFF7B, write8_delegate(FUNC(coco_orch90_device::write_right), this));
+			install_write_handler(0xFF7A, 0xFF7A, write8_delegate(*this, FUNC(coco_orch90_device::write_left)));
+			install_write_handler(0xFF7B, 0xFF7B, write8_delegate(*this, FUNC(coco_orch90_device::write_right)));
 
 			// Orch-90 ties CART to Q
 			set_line_value(line::CART, line_value::Q);

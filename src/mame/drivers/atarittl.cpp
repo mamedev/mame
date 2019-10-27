@@ -374,7 +374,7 @@ void gtrak10_state::gtrak10(machine_config &config)
 	/* basic machine hardware */
 	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(netlist_gtrak10);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", FUNC(fixedfreq_device::update_composite_monochrome), "fixfreq");
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("VIDEO_OUT", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
 

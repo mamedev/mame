@@ -475,7 +475,7 @@ void altos5_state::altos5(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", altos5_floppies, "525qd", floppy_image_device::default_floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("altos5");
-	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(altos5_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "com,cpm", attotime::from_seconds(3)).set_load_callback(FUNC(altos5_state::quickload_cb));
 }
 
 

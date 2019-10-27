@@ -327,19 +327,19 @@ void isa16_3c505_device::map_io(address_map &map)
 	 * A read or write to I/O location 00H will cause an active transition on
 	 * the CA input.
 	 */
-	map(0x0000, 0x0000).lrw8("ca",
-		[this]()
-		{
-			m_net->ca(1);
-			m_net->ca(0);
+	map(0x0000, 0x0000).lrw8(
+			NAME([this]()
+			{
+				m_net->ca(1);
+				m_net->ca(0);
 
-			return 0;
-		},
-		[this](u8 data)
-		{
-			m_net->ca(1);
-			m_net->ca(0);
-		});
+				return 0;
+			}),
+			NAME([this](u8 data)
+			{
+				m_net->ca(1);
+				m_net->ca(0);
+			}));
 
 	/*
 	 * A read or write to I/O location 80H will produce a CAS before RAS cycle

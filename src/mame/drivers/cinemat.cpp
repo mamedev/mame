@@ -1499,21 +1499,21 @@ ROM_END
 void cinemat_state::init_speedfrk()
 {
 	m_gear = 0xe;
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(cinemat_state::speedfrk_wheel_r),this));
-	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(FUNC(cinemat_state::speedfrk_gear_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(*this, FUNC(cinemat_state::speedfrk_wheel_r)));
+	m_maincpu->space(AS_IO).install_read_handler(0x04, 0x06, read8_delegate(*this, FUNC(cinemat_state::speedfrk_gear_r)));
 	save_item(NAME(m_gear));
 }
 
 
 void cinemat_16level_state::init_sundance()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(FUNC(cinemat_16level_state::sundance_inputs_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x00, 0x0f, read8_delegate(*this, FUNC(cinemat_16level_state::sundance_inputs_r)));
 }
 
 
 void cinemat_color_state::init_boxingb()
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(FUNC(cinemat_color_state::boxingb_dial_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x0c, 0x0f, read8_delegate(*this, FUNC(cinemat_color_state::boxingb_dial_r)));
 }
 
 

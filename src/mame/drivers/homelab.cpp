@@ -779,7 +779,7 @@ void homelab_state::homelab(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
 
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb));
 }
 
 void homelab_state::homelab3(machine_config &config)
@@ -812,7 +812,7 @@ void homelab_state::homelab3(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(2)).set_load_callback(FUNC(homelab_state::quickload_cb));
 }
 
 void homelab_state::brailab4(machine_config &config)
@@ -847,7 +847,7 @@ void homelab_state::brailab4(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.05);
-	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "htp", attotime::from_seconds(18)).set_load_callback(FUNC(homelab_state::quickload_cb));
 }
 
 void homelab_state::init_brailab4()

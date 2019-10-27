@@ -722,9 +722,9 @@ void fdc37c93x_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_IO)
 	{
 		if (sysopt_pin == 0)
-			m_isa->install_device(0x03f0, 0x03f3, read8_delegate(FUNC(fdc37c93x_device::read_fdc37c93x), this), write8_delegate(FUNC(fdc37c93x_device::write_fdc37c93x), this));
+			m_isa->install_device(0x03f0, 0x03f3, read8_delegate(*this, FUNC(fdc37c93x_device::read_fdc37c93x)), write8_delegate(*this, FUNC(fdc37c93x_device::write_fdc37c93x)));
 		else
-			m_isa->install_device(0x0370, 0x0373, read8_delegate(FUNC(fdc37c93x_device::read_fdc37c93x), this), write8_delegate(FUNC(fdc37c93x_device::write_fdc37c93x), this));
+			m_isa->install_device(0x0370, 0x0373, read8_delegate(*this, FUNC(fdc37c93x_device::read_fdc37c93x)), write8_delegate(*this, FUNC(fdc37c93x_device::write_fdc37c93x)));
 		if (enabled_logical[LogicalDevice::FDC] == true)
 			map_fdc_addresses();
 		if (enabled_logical[LogicalDevice::Parallel] == true)

@@ -1341,8 +1341,8 @@ void astrof_state::init_abattle()
 		rom[i] = prom[rom[i]];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 
@@ -1353,8 +1353,8 @@ void astrof_state::init_afire()
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::afire_coin_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::afire_coin_prot_r)));
 }
 
 
@@ -1365,15 +1365,15 @@ void astrof_state::init_sstarbtl()
 		rom[i] = ~rom[i];
 
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 void astrof_state::init_acombat3()
 {
 	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(FUNC(astrof_state::shoot_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(FUNC(astrof_state::abattle_coin_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa003, 0xa003, read8_delegate(*this, FUNC(astrof_state::shoot_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa004, 0xa004, read8_delegate(*this, FUNC(astrof_state::abattle_coin_prot_r)));
 }
 
 

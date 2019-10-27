@@ -225,8 +225,8 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 	m_program = &m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
-	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(FUNC(pentagon_state::pentagon_scr_w), this));
-	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(FUNC(pentagon_state::pentagon_scr2_w), this));
+	m_program->install_write_handler(0x4000, 0x5aff, write8_delegate(*this, FUNC(pentagon_state::pentagon_scr_w)));
+	m_program->install_write_handler(0xc000, 0xdaff, write8_delegate(*this, FUNC(pentagon_state::pentagon_scr2_w)));
 
 	if (m_beta->started())
 	{

@@ -916,7 +916,7 @@ void pc2000_state::pc2000(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, 3250).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "genius_cart").set_device_load(FUNC(pc2000_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "genius_cart").set_device_load(FUNC(pc2000_state::cart_load));
 
 	SOFTWARE_LIST(config, "pc1000_cart").set_compatible("pc1000");
 }

@@ -337,13 +337,13 @@ Notes:
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "bus/ata/idehd.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/mips/mips1.h"
 #include "cpu/jaguar/jaguar.h"
 #include "imagedev/chd_cd.h"
 #include "imagedev/snapquik.h"
 #include "machine/eepromser.h"
-#include "machine/idehd.h"
 #include "machine/watchdog.h"
 #include "machine/vt83c461.h"
 #include "sound/cdda.h"
@@ -1137,7 +1137,7 @@ void jaguar_state::jaguar_map(address_map &map)
 void jaguar_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffffd, 0xfffffd).lr8("level6", []() -> u8 { return 0x40; });
+	map(0xfffffd, 0xfffffd).lr8([] () -> u8 { return 0x40; }, "level6");
 }
 
 /*
@@ -1349,7 +1349,7 @@ void jaguar_state::r3000_map(address_map &map)
 	map(0x04f03000, 0x04f03fff).mirror(0x00008000).ram().share("gpuram");
 	map(0x04f10000, 0x04f103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 	map(0x04f16000, 0x04f1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0x04f17000, 0x04f17003).lr16("4f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
+	map(0x04f17000, 0x04f17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPI03
 	map(0x04f17800, 0x04f17803).w(FUNC(jaguar_state::latch_w));          // GPI04
 	map(0x04f17c00, 0x04f17c03).portr("P1_P2");      // GPI05
 	map(0x04f1a100, 0x04f1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
@@ -1393,7 +1393,7 @@ void jaguar_state::m68020_map(address_map &map)
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");
 	map(0xf10000, 0xf103ff).rw(FUNC(jaguar_state::jerry_regs_r), FUNC(jaguar_state::jerry_regs_w));
 	map(0xf16000, 0xf1600b).r(FUNC(jaguar_state::cojag_gun_input_r)); // GPI02
-	map(0xf17000, 0xf17003).lr16("f17000", [this]() { return uint16_t(m_system->read()); }); // GPI03
+	map(0xf17000, 0xf17003).lr16(NAME([this] () { return uint16_t(m_system->read()); })); // GPI03
 //  map(0xf17800, 0xf17803).w(FUNC(jaguar_state::(latch_w));          // GPI04
 	map(0xf17c00, 0xf17c03).portr("P1_P2");      // GPI05
 	map(0xf1a100, 0xf1a13f).rw(FUNC(jaguar_state::dspctrl_r), FUNC(jaguar_state::dspctrl_w));
@@ -1920,11 +1920,11 @@ void jaguar_state::jaguar(machine_config &config)
 	vref.add_route(0, "rdac", -1.0, DAC_VREF_NEG_INPUT);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "abs,bin,cof,jag,prg").set_load_callback(FUNC(jaguar_state::quickload_cb));
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "jaguar_cart", "j64,rom,bin"));
-	cartslot.set_device_load(FUNC(jaguar_state::cart_load), this);
+	cartslot.set_device_load(FUNC(jaguar_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("jaguar");
@@ -2585,10 +2585,10 @@ void jaguar_state::cojag_common_init(uint16_t gpu_jump_offs, uint16_t spin_pc)
 
 	/* install synchronization hooks for GPU */
 	if (m_is_r3000)
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32_delegate(FUNC(jaguar_state::gpu_jump_w), this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x04f0b000 + gpu_jump_offs, 0x04f0b003 + gpu_jump_offs, write32_delegate(*this, FUNC(jaguar_state::gpu_jump_w)));
 	else
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32_delegate(FUNC(jaguar_state::gpu_jump_w), this));
-	m_gpu->space(AS_PROGRAM).install_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, read32_delegate(FUNC(jaguar_state::gpu_jump_r), this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xf0b000 + gpu_jump_offs, 0xf0b003 + gpu_jump_offs, write32_delegate(*this, FUNC(jaguar_state::gpu_jump_w)));
+	m_gpu->space(AS_PROGRAM).install_read_handler(0xf03000 + gpu_jump_offs, 0xf03003 + gpu_jump_offs, read32_delegate(*this, FUNC(jaguar_state::gpu_jump_r)));
 	m_gpu_jump_address = &m_gpu_ram[gpu_jump_offs/4];
 	m_gpu_spin_pc = 0xf03000 + spin_pc;
 
@@ -2606,7 +2606,7 @@ void jaguar_state::init_area51a()
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(FUNC(jaguar_state::area51_main_speedup_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa02030, 0xa02033, write32_delegate(*this, FUNC(jaguar_state::area51_main_speedup_w)));
 	m_main_speedup = m_mainram + 0x2030/4;
 #endif
 }
@@ -2619,7 +2619,7 @@ void jaguar_state::init_area51()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x100062e8, 0x100062eb, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
 	m_main_speedup = m_mainram + 0x62e8/4;
 #endif
 }
@@ -2635,7 +2635,7 @@ void jaguar_state::init_maxforce()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x1000865c, 0x1000865f, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
 	m_main_speedup = m_mainram + 0x865c/4;
 #endif
 }
@@ -2651,7 +2651,7 @@ void jaguar_state::init_area51mx()
 
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(FUNC(jaguar_state::area51mx_main_speedup_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xa19550, 0xa19557, write32_delegate(*this, FUNC(jaguar_state::area51mx_main_speedup_w)));
 	m_main_speedup = m_mainram + 0x19550/4;
 #endif
 }
@@ -2668,7 +2668,7 @@ void jaguar_state::init_a51mxr3k()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 120;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10006f0c, 0x10006f0f, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
 	m_main_speedup = m_mainram + 0x6f0c/4;
 #endif
 }
@@ -2682,7 +2682,7 @@ void jaguar_state::init_fishfren()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10021b60, 0x10021b63, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
 	m_main_speedup = m_mainram + 0x21b60/4;
 #endif
 }
@@ -2696,10 +2696,10 @@ void jaguar_state::init_freeze_common(offs_t main_speedup_addr)
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 200;
 	if (main_speedup_addr != 0) {
-		m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(main_speedup_addr, main_speedup_addr + 3, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
 		m_main_speedup = m_mainram + (main_speedup_addr - 0x10000000)/4;
 	}
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(FUNC(jaguar_state::main_gpu_wait_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400d900, 0x0400d900 + 3, read32_delegate(*this, FUNC(jaguar_state::main_gpu_wait_r)));
 	m_main_gpu_wait = m_shared_ram + 0xd900/4;
 #endif
 }
@@ -2719,7 +2719,7 @@ void jaguar_state::init_vcircle()
 #if ENABLE_SPEEDUP_HACKS
 	/* install speedup for main CPU */
 	m_main_speedup_max_cycles = 50;
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(FUNC(jaguar_state::cojagr3k_main_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x12005b34, 0x12005b37, read32_delegate(*this, FUNC(jaguar_state::cojagr3k_main_speedup_r)));
 	m_main_speedup = m_mainram + 0x5b34/4;
 	m_main_speedup = m_mainram2 + 0x5b34/4;
 #endif

@@ -211,7 +211,7 @@ WRITE8_MEMBER(asma2k_state::port_a_w)
 		if (data & 0x40)
 			space.install_readwrite_bank(0x0000, 0x7fff, "rambank");
 		else
-			space.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(FUNC(asma2k_state::io_r), this), write8_delegate(FUNC(asma2k_state::io_w), this));
+			space.install_readwrite_handler(0x0000, 0x7fff, read8_delegate(*this, FUNC(asma2k_state::io_r)), write8_delegate(*this, FUNC(asma2k_state::io_w)));
 	}
 
 	m_rambank->set_entry(((data>>4) & 0x03));

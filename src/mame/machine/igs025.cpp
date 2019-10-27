@@ -18,8 +18,8 @@
 
 igs025_device::igs025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS025, tag, owner, clock)
+	, m_execute_external(*this, DEVICE_SELF, FUNC(igs025_device::no_callback_setup))
 {
-	m_execute_external =  igs025_execute_external(FUNC(igs025_device::no_callback_setup), this);
 }
 
 void igs025_device::no_callback_setup()
@@ -40,7 +40,7 @@ void igs025_device::device_start()
 	m_kb_ptr = 0;
 	m_kb_swap = 0;
 
-	m_execute_external.bind_relative_to(*owner());
+	m_execute_external.resolve();
 
 	save_item(NAME(m_kb_prot_hold));
 	save_item(NAME(m_kb_prot_hilo));

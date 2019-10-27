@@ -177,31 +177,33 @@ Rowscroll style:
 DEFINE_DEVICE_TYPE(DECO16IC, deco16ic_device, "deco16ic", "DECO 55 / 56 / 74 / 141 Tilemap Generator")
 
 deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, DECO16IC, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_pf1_data(nullptr),
-		m_pf2_data(nullptr),
-		m_pf12_control(nullptr),
-		m_pf1_rowscroll_ptr(nullptr),
-		m_pf2_rowscroll_ptr(nullptr),
-		m_use_custom_pf1(0),
-		m_use_custom_pf2(0),
-		m_pf1_bank(0),
-		m_pf2_bank(0),
-		m_pf12_last_small(0),
-		m_pf12_last_big(0),
-		m_pf1_8bpp_mode(0),
-		m_pf1_size(0),
-		m_pf2_size(0),
-		m_pf1_trans_mask(0xf),
-		m_pf2_trans_mask(0xf),
-		m_pf1_colour_bank(0),
-		m_pf2_colour_bank(0),
-		m_pf1_colourmask(0xf),
-		m_pf2_colourmask(0xf),
-		m_pf12_8x8_gfx_bank(0),
-		m_pf12_16x16_gfx_bank(0),
-		m_gfxdecode(*this, finder_base::DUMMY_TAG)
+	: device_t(mconfig, DECO16IC, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_pf1_data(nullptr)
+	, m_pf2_data(nullptr)
+	, m_pf12_control(nullptr)
+	, m_pf1_rowscroll_ptr(nullptr)
+	, m_pf2_rowscroll_ptr(nullptr)
+	, m_bank1_cb(*this)
+	, m_bank2_cb(*this)
+	, m_use_custom_pf1(0)
+	, m_use_custom_pf2(0)
+	, m_pf1_bank(0)
+	, m_pf2_bank(0)
+	, m_pf12_last_small(0)
+	, m_pf12_last_big(0)
+	, m_pf1_8bpp_mode(0)
+	, m_pf1_size(0)
+	, m_pf2_size(0)
+	, m_pf1_trans_mask(0xf)
+	, m_pf2_trans_mask(0xf)
+	, m_pf1_colour_bank(0)
+	, m_pf2_colour_bank(0)
+	, m_pf1_colourmask(0xf)
+	, m_pf2_colourmask(0xf)
+	, m_pf12_8x8_gfx_bank(0)
+	, m_pf12_16x16_gfx_bank(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -214,8 +216,8 @@ void deco16ic_device::device_start()
 	if(!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_bank1_cb.bind_relative_to(*owner());
-	m_bank2_cb.bind_relative_to(*owner());
+	m_bank1_cb.resolve();
+	m_bank2_cb.resolve();
 
 	int fullheight1 = 0;
 	int fullwidth1 = 0;
@@ -235,12 +237,12 @@ void deco16ic_device::device_start()
 	if (m_pf2_size&DECO_64x32)
 		fullwidth2 = 1;
 
-	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
-//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
-	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf1_tile_info)), tilemap_mapper_delegate(*this, FUNC(deco16ic_device::deco16_scan_rows)), 16, 16, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf1_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
+	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf1_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, fullwidth1 ? 64 : 32, fullheight1 ? 64 : 32);
 
-	m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
-	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
+	m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf2_tile_info)), tilemap_mapper_delegate(*this, FUNC(deco16ic_device::deco16_scan_rows)), 16, 16, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
+	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(deco16ic_device::get_pf2_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, fullwidth2 ? 64 : 32, fullheight2 ? 64 : 32);
 
 	m_pf1_tilemap_8x8->set_transparent_pen(0);
 	m_pf2_tilemap_8x8->set_transparent_pen(0);

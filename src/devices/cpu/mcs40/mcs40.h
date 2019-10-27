@@ -51,7 +51,7 @@ public:
 	template <typename... T> void set_ram_status_map(T &&... args) { set_addrmap(AS_RAM_STATUS, std::forward<T>(args)...); }
 	template <typename... T> void set_ram_ports_map(T &&... args) { set_addrmap(AS_RAM_PORTS, std::forward<T>(args)...); }
 	template <typename... T> void set_program_memory_map(T &&... args) { set_addrmap(AS_PROGRAM_MEMORY, std::forward<T>(args)...); }
-	template <typename... T> void set_bus_cycle_cb(T &&... args) { m_bus_cycle_cb = bus_cycle_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_bus_cycle_cb(T &&... args) { m_bus_cycle_cb.set(std::forward<T>(args)...); }
 	auto i4289_pm_cb() { return m_4289_pm_cb.bind(); }
 	auto i4289_f_l_cb() { return m_4289_f_l_cb.bind(); }
 

@@ -6,7 +6,6 @@
 #pragma once
 
 
-typedef device_delegate<void (int *code, int *color, int *priority)> k05324x_cb_delegate;
 #define K05324X_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority)
 
 
@@ -18,11 +17,13 @@ class k05324x_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_6bpp);
 
 public:
+	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority)>;
+
 	k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration
 	void set_bpp(int bpp);
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k05324x_cb = k05324x_cb_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k05324x_cb.set(std::forward<T>(args)...); }
 	void set_offsets(int x_offset, int y_offset)
 	{
 		m_dx = x_offset;
@@ -53,9 +54,9 @@ private:
 	required_region_ptr<uint8_t> m_sprite_rom;
 
 	int m_dx, m_dy;
-	k05324x_cb_delegate m_k05324x_cb;
+	sprite_delegate m_k05324x_cb;
 
-	uint8_t    m_regs[0x10];    // 053244
+	uint8_t  m_regs[0x10];    // 053244
 	int      m_rombank;       // 053244
 	int      m_ramsize;
 	int      m_z_rejection;

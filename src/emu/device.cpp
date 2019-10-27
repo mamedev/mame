@@ -852,7 +852,7 @@ device_t *device_t::subdevice_slow(const char *tag) const
 	// we presume the result is a rooted path; also doubled colons mess up our
 	// tree walk, so catch them early
 	assert(fulltag[0] == ':');
-	assert(fulltag.find("::") == -1);
+	assert(fulltag.find("::") == std::string::npos);
 
 	// walk the device list to the final path
 	device_t *curdevice = &mconfig().root_device();

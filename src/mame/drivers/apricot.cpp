@@ -393,7 +393,7 @@ void apricot_state::apricot(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(10);
-	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(apricot_state::crtc_update_row));
 	m_crtc->out_de_callback().set(FUNC(apricot_state::apricot_hd6845_de));
 
 	// sound hardware

@@ -3,14 +3,14 @@
 /***************************************************************************
 
     SNK/Alpha 68000 N based board games
-	
-	derived from alpha68k.cpp
 
-	TODO:
-	- Super Stingray MCU irq controls timer speed. The MCU has been
+    derived from alpha68k.cpp
+
+    TODO:
+    - Super Stingray MCU irq controls timer speed. The MCU has been
           hooked up but the clock is almost certainly wrong.
-	- GFX region can eventually overflow in jongbou, and in general all three 
-	  games can probably be run with the same gfx_layout structs
+    - GFX region can eventually overflow in jongbou, and in general all three
+      games can probably be run with the same gfx_layout structs
 
 ============================================================================
 
@@ -85,7 +85,7 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 		int mx = m_spriteram[offs + c];
 		int my = -(mx >> 8) & 0xff;
 		mx &= 0xff;
-			
+
 		// TODO: not convinced by this
 		if (m_is_super_stingray && mx > 0xf8)
 			mx -= 0x100;
@@ -101,7 +101,7 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 			{
 				u8 color, bank;
 				u16 tile;
-				
+
 				bank = data >> 10 & 3;
 				tile = data & 0x3ff;
 				if (m_is_super_stingray == true)
@@ -112,7 +112,7 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 					bank += ((data >> m_tile_bankshift) & 4);
 					tile += (data >> 3 & 0x400);
 				}
-				
+
 				// can't be 0xff in super stingray
 				if (color != 0xff)
 				{
@@ -310,7 +310,7 @@ void sstingray_state::main_map(address_map &map)
 	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(FUNC(sstingray_state::alpha8511_command_r), FUNC(sstingray_state::alpha8511_command_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c0001).portr("IN0");
-	map(0x0e0000, 0x0e0000).lr8("kyros_dip_r", [this]() -> u8 { return m_in[1]->read(); }).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0e0000, 0x0e0000).lr8(NAME([this] () -> u8 { return m_in[1]->read(); })).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void alpha68k_N_state::main_map(address_map &map)
@@ -321,7 +321,7 @@ void alpha68k_N_state::main_map(address_map &map)
 	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(FUNC(kyros_state::kyros_alpha_trigger_r), FUNC(kyros_state::alpha_microcontroller_w));
 	map(0x0c0000, 0x0c0001).portr("IN0");
-	map(0x0e0000, 0x0e0000).lr8("kyros_dip_r", [this]() -> u8 { return m_in[1]->read(); }).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x0e0000, 0x0e0000).lr8(NAME([this] () -> u8 { return m_in[1]->read(); })).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
 void jongbou_state::main_map(address_map &map)
@@ -670,7 +670,7 @@ void alpha68k_N_state::base_config(machine_config &config)
 {
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_N_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_N_state,common)
-	
+
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	SPEAKER(config, "speaker").front_center();
@@ -683,7 +683,7 @@ void alpha68k_N_state::video_config(machine_config &config, u8 tile_transchar, u
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(alpha68k_N_state::screen_update));
 	m_screen->set_palette(m_palette);
-	
+
 	PALETTE(config, m_palette, FUNC(alpha68k_N_state::palette_init), 256 + 1, 256);
 
 	m_tile_transchar = tile_transchar;
@@ -947,7 +947,7 @@ ROM_START( jongbou )
 	ROM_REGION( 0x200, "clut_proms", 0 )
 	ROM_LOAD( "h.l9",  0x0100, 0x0100, CRC(e6e93b0b) SHA1(f64ff63699451910982a1a44c94ccd2c18fd389e) )
 	ROM_LOAD( "l.l10", 0x0000, 0x0100, CRC(51676dac) SHA1(685d14f448501a63cc9fa063f65842caddad8f39) )
-	
+
 	ROM_REGION( 0x2000, "color_proms", 0 )
 	ROM_LOAD( "p3.i15", 0x0000, 0x2000, CRC(8c09cd2a) SHA1(317764e0f5af29e78fd764bdf28579bf6be5630f) )
 ROM_END

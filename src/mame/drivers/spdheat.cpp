@@ -5,7 +5,7 @@
     Super Dead Heat hardware
 
     driver by Phil Bennett
- 
+
     TODO:
       * Sound filters
 
@@ -58,10 +58,10 @@ void spdheat_state::machine_reset()
 
 void spdheat_state::video_start()
 {
-	m_fg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<0>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<1>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<2>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_fg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(spdheat_state::get_fg_tile_info<3>), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spdheat_state::get_fg_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -98,50 +98,48 @@ TILE_GET_INFO_MEMBER(spdheat_state::get_fg_tile_info)
 void spdheat_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t xo, uint32_t yo)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(1);
-	
+
 	/*
 	 Sprite RAM format:
-	 
+
 	 0:  .... .... .... .... = ?
-	 
+
 	 1:  .... .... xxxx xxxx = Y position
-	 .... ..x. .... .... = Y position
-	 x... .... .... .... = 0 = 16x16, 1 = 16x32
-	 
+	     .... ..x. .... .... = Y position
+	     x... .... .... .... = 0 = 16x16, 1 = 16x32
+
 	 2:  .... ..xx xxxx xxxx = Code
-	 ..xx xx.. .... .... = Color
-	 .x.. .... .... .... = X flip
-	 x... .... .... .... = Y flip
-	 
-	 3:  .... .xxx xxxx xxxx = X position
+	     ..xx xx.. .... .... = Color
+	     .x.. .... .... .... = X flip
+	     x... .... .... .... = Y flip
+
+	 3:  .... ..xx xxxx xxxx = X position
 	 */
-	
+
 	for (int offs = (0x800 / 2) - 4; offs >= 0; offs -= 4)
 	{
 		int code = (m_spriteram[offs + 2] & 0x3ff) ^ 0x200;
 		int color = (m_spriteram[offs + 2] >> 10) & 0x0f;
-		
+
 		int y = 256 - ((m_spriteram[offs + 1] & 0x0ff));
-		int x = (int16_t)(m_spriteram[offs + 3] & 0xffff);
-		
+		int x = (m_spriteram[offs + 3] & 0x3ff);
+
 		int flipx = BIT(m_spriteram[offs + 2], 14);
 		int flipy = BIT(m_spriteram[offs + 2], 15);
-		
-		// TODO: revisit
-		if (xo == 0 && x >= 0)
-			x &= 0x3ff;
-		
+
 		if (xo == 1)
 		{
-			if (x < 384)
-				continue;
-			
-			x -= 512;
+			x -= 0x200;
 		}
-		
+		else
+		{
+			if (x & 0x200)
+				x -= 0x400;
+		}
+
 		if (yo != BIT(m_spriteram[offs + 1], 9))
 			continue;
-		
+
 		if ((m_spriteram[offs + 1] & 0x8000) == 0)
 		{
 			if (flipy)
@@ -355,105 +353,105 @@ WRITE8_MEMBER(spdheat_state::sub_nmi_w)
  *************************************/
 
 /*
- 
-	 YM2203 IC62
- 	 ===========
- 
-	 PORT A
-	 .... xxxx  PGA[3:0]
-	 xxxx ....  PC010SA IC58 'VR'
- 
-	 PORT B
-	 .... xxxx  PC010SA IC58 'BASS'
-	 xxxx ....  PC010SA IC58 TREBL
- 
-	 PSG OUTPUT -> PC010SA IC58   (PSGA)
- 
- 
-	 YM2203 IC61
- 	 ===========
- 
-	 PORT A
-	 .... xxxx  PGB[3:0]
-	 xxxx ....  PC010SA IC59 'VR'
- 
-	 PORT B
-	 .... xxxx  PC010SA IC59 'BASS'
-	 xxxx ....  PC010SA IC59 TREBL
- 
-	 PSG OUTPUT -> PC010SA IC59   (PSGB)
- 
- 
-	 YM2149 IC57
- 	 ===========
- 
-	 PORT A
-	 .... xxxx  PGC[3:0]
-	 xxxx ....  PC010SA IC54 'VR'
- 
-	 PORT B
-	 .... xxxx  PC010SA IC54 'BASS'
-	 xxxx ....  PC010SA IC54 TREBL
- 
-	 PSG OUTPUT -> PC010SA IC54   (PSGC)
- 
- 
- 	 YM2149 IC56
- 	 ===========
- 
-	 PORT A
-	 .... xxxx  PGD[3:0]
-	 xxxx ....  PC010SA IC55 'VR'
- 
-	 PORT B
-	 .... xxxx  PC010SA IC55 'BASS'
-	 xxxx ....  PC010SA IC55 TREBL
- 
-	 PSG OUTPUT -> PC010SA IC55   (PSGD)
- 
- 
- 	PGC[3:0], PGD[3:0] = FMB BAL1
- 	PGA[3:0], PGB[3:0] = FMB VR1
+
+     YM2203 IC62
+     ===========
+
+     PORT A
+     .... xxxx  PGA[3:0]
+     xxxx ....  PC010SA IC58 'VR'
+
+     PORT B
+     .... xxxx  PC010SA IC58 'BASS'
+     xxxx ....  PC010SA IC58 TREBL
+
+     PSG OUTPUT -> PC010SA IC58   (PSGA)
+
+
+     YM2203 IC61
+     ===========
+
+     PORT A
+     .... xxxx  PGB[3:0]
+     xxxx ....  PC010SA IC59 'VR'
+
+     PORT B
+     .... xxxx  PC010SA IC59 'BASS'
+     xxxx ....  PC010SA IC59 TREBL
+
+     PSG OUTPUT -> PC010SA IC59   (PSGB)
+
+
+     YM2149 IC57
+     ===========
+
+     PORT A
+     .... xxxx  PGC[3:0]
+     xxxx ....  PC010SA IC54 'VR'
+
+     PORT B
+     .... xxxx  PC010SA IC54 'BASS'
+     xxxx ....  PC010SA IC54 TREBL
+
+     PSG OUTPUT -> PC010SA IC54   (PSGC)
+
+
+     YM2149 IC56
+     ===========
+
+     PORT A
+     .... xxxx  PGD[3:0]
+     xxxx ....  PC010SA IC55 'VR'
+
+     PORT B
+     .... xxxx  PC010SA IC55 'BASS'
+     xxxx ....  PC010SA IC55 TREBL
+
+     PSG OUTPUT -> PC010SA IC55   (PSGD)
+
+
+    PGC[3:0], PGD[3:0] = FMB BAL1
+    PGA[3:0], PGB[3:0] = FMB VR1
  */
 
 WRITE8_MEMBER(spdheat_state::ym1_port_a_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym1_port_b_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym2_port_a_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym2_port_b_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym3_port_a_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym3_port_b_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym4_port_a_w)
 {
-	
+
 }
 
 WRITE8_MEMBER(spdheat_state::ym4_port_b_w)
 {
-	
+
 }
 
 
@@ -496,9 +494,9 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPNAME( 0x0040, 0x0040, "Round Skip (With Select Buttons)" ) PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Functions of CPU-Controlled Cars" ) PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(      0x0080, "Continuous" )
-	PORT_DIPSETTING(      0x0000, "Not Continuous" )
+	PORT_DIPNAME( 0x0080, 0x0080, "CPU Keeps Collected Upgrades Between Races" ) PORT_DIPLOCATION("DSWA:8") // "Functions of CPU-Controlled Cars"
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) ) // "Not Continuous"
+	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) ) // "Continuous"
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x000F, 0x0000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSWB:1,2,3,4")
@@ -537,21 +535,21 @@ static INPUT_PORTS_START( spdheat )
 	PORT_DIPSETTING(      0x0002, "2nd Race" )
 	PORT_DIPSETTING(      0x0001, "3rd Race" )
 	PORT_DIPSETTING(      0x0000, "4th Race" )
-	PORT_DIPNAME( 0x000C, 0x0004, "Timer Setting" ) PORT_DIPLOCATION("DSWC:3,4")
-	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x000C, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0010, 0x0000, "Coin Display" ) PORT_DIPLOCATION("DSWC:5")
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000C, 0x0008, "Timer Setting" ) PORT_DIPLOCATION("DSWC:3,4")
+	PORT_DIPSETTING(      0x000C, DEF_STR( Easy ) ) // 210 on initial race
+	PORT_DIPSETTING(      0x0008, DEF_STR( Normal ) ) // 200
+	PORT_DIPSETTING(      0x0004, DEF_STR( Hard ) ) // 190
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) ) // 180
+	PORT_DIPNAME( 0x0010, 0x0010, "Display Coins per Credit" ) PORT_DIPLOCATION("DSWC:5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Language ) ) PORT_DIPLOCATION("DSWC:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Japanese ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSWC:7")
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Coin System" ) PORT_DIPLOCATION("DSWC:8")
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin System" ) PORT_DIPLOCATION("DSWC:8") // what does this do?
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
@@ -595,7 +593,7 @@ static INPUT_PORTS_START( spdheat )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P3 Shift") PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED ) // see above
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_NAME("Reserved 3")
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_TOGGLE PORT_NAME("P4 Shift") PORT_PLAYER(4)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED ) // see above
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE4 )
@@ -686,7 +684,7 @@ void spdheat_state::spdheat(machine_config &config)
 
 	Z80(config, m_audiocpu, SOUND_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spdheat_state::sound_map);
-	
+
 	Z80(config, m_subcpu, SOUND_CLOCK);
 	m_subcpu->set_addrmap(AS_PROGRAM, &spdheat_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &spdheat_state::sub_io_map);
@@ -736,9 +734,9 @@ void spdheat_state::spdheat(machine_config &config)
 	/* sound hardware */
 	// TODO: there are multiple speakers
 	SPEAKER(config, "mono").front_center();
-	
+
 	INPUT_MERGER_ANY_HIGH(config, m_audio_irq).output_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
-	
+
 	ym2203_device &ym1(YM2203(config, "ym1", FM_CLOCK));
 	ym1.irq_handler().set(m_audio_irq, FUNC(input_merger_any_high_device::in_w<0>));
 	ym1.port_a_write_callback().set(FUNC(spdheat_state::ym1_port_a_w));
@@ -747,7 +745,7 @@ void spdheat_state::spdheat(machine_config &config)
 	ym1.add_route(1, "mono", 0.3);
 	ym1.add_route(2, "mono", 0.3);
 	ym1.add_route(3, "mono", 0.3);
-	
+
 	ym2203_device &ym2(YM2203(config, "ym2", FM_CLOCK));
 	ym2.irq_handler().set(m_audio_irq, FUNC(input_merger_any_high_device::in_w<1>));
 	ym2.port_a_write_callback().set(FUNC(spdheat_state::ym2_port_a_w));
@@ -756,7 +754,7 @@ void spdheat_state::spdheat(machine_config &config)
 	ym2.add_route(1, "mono", 0.3);
 	ym2.add_route(2, "mono", 0.3);
 	ym2.add_route(3, "mono", 0.3);
-	
+
 	ym2149_device &ym3(YM2149(config, "ym3", SOUND_CLOCK));
 	ym3.port_a_write_callback().set(FUNC(spdheat_state::ym3_port_a_w));
 	ym3.port_b_write_callback().set(FUNC(spdheat_state::ym3_port_b_w));
@@ -766,7 +764,7 @@ void spdheat_state::spdheat(machine_config &config)
 	ym4.port_a_write_callback().set(FUNC(spdheat_state::ym4_port_a_w));
 	ym4.port_b_write_callback().set(FUNC(spdheat_state::ym4_port_b_w));
 	ym4.add_route(ALL_OUTPUTS, "mono", 0.3);
-	
+
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.3);
 	voltage_regulator_device &vref(VOLTAGE_REGULATOR(config, "vref"));
 	vref.add_route(0, "dac", 1.0, DAC_VREF_POS_INPUT);

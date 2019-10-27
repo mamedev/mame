@@ -103,7 +103,6 @@ private:
 	uint32_t m_bios_bank_addr;
 
 	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_ctrl[6];
 	uint8_t m_bios_6600;
 	uint8_t m_bios_6403;
 	uint8_t m_bios_6404;
@@ -472,7 +471,7 @@ READ8_MEMBER(mplay_state::bank_r)
 		}
 		else
 		{
-			return memregion("maincpu")->base()[fulladdress ^ 1];
+			return memregion("maincpu")->as_u8(BYTE_XOR_BE(fulladdress));
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO access
@@ -928,17 +927,17 @@ void mplay_state::init_megaplay()
 	m_ic37_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	init_megadrij();
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 
 	// for now ...
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(FUNC(mplay_state::mp_io_read),this), write16_delegate(FUNC(mplay_state::mp_io_write),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa10000, 0xa1001f, read16_delegate(*this, FUNC(mplay_state::mp_io_read)), write16_delegate(*this, FUNC(mplay_state::mp_io_write)));
 
 	// megaplay has ram shared with the bios cpu here
 	m_z80snd->space(AS_PROGRAM).install_ram(0x2000, 0x3fff, &m_ic36_ram[0]);
 
 	// instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(FUNC(mplay_state::extra_ram_r),this), write16_delegate(FUNC(mplay_state::extra_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xa02000, 0xa03fff, read16_delegate(*this, FUNC(mplay_state::extra_ram_r)), write16_delegate(*this, FUNC(mplay_state::extra_ram_w)));
 }
 
 /*
@@ -986,11 +985,3 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-
-/* Not confirmed to exist:
-
-system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
-the numbering prior to 'Streets of Rage 2'
-
-*/

@@ -137,15 +137,8 @@ public:
 	void program_11bit(address_map &map);
 	void program_12bit(address_map &map);
 
-	void set_t0_clk_cb(clock_update_delegate callback) { m_t0_clk_func = callback; }
-	template <class FunctionClass> void set_t0_clk_cb(const char *devname, void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_t0_clk_cb(clock_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_t0_clk_cb(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_t0_clk_cb(clock_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_t0_clk_cb(T &&... args) { m_t0_clk_func.set(std::forward<T>(args)...); }
+
 protected:
 	typedef int (mcs48_cpu_device::*mcs48_ophandler)();
 

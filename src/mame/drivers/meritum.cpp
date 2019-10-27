@@ -440,7 +440,7 @@ void meritum_state::meritum(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb));
 }
 
 /***************************************************************************

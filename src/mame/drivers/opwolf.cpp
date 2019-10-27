@@ -930,7 +930,7 @@ void opwolf_state::opwolf(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -1004,7 +1004,7 @@ void opwolf_state::opwolfb(machine_config &config) /* OSC clocks unknown for the
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::opwolf_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();

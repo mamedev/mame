@@ -844,7 +844,7 @@ void vic20_state::vic20(machine_config &config, const char* softlist_filter)
 	m_user->pl_handler().set(m_via1, FUNC(via6522_device::write_pb7));
 	m_user->pm_handler().set(m_via1, FUNC(via6522_device::write_cb2));
 
-	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(vic20_state::quickload_vc20), this);
+	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(vic20_state::quickload_vc20));
 
 	SOFTWARE_LIST(config, "cart_list").set_type("vic1001_cart", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);
 	SOFTWARE_LIST(config, "cass_list").set_type("vic1001_cass", SOFTWARE_LIST_ORIGINAL_SYSTEM).set_filter(softlist_filter);

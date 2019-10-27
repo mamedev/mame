@@ -2833,7 +2833,7 @@ void mcr_state::mcr_init(int cpuboard, int vidboard, int ssioboard)
 
 	if (m_ssio.found())
 	{
-		m_ssio->set_custom_output(0, 0xff, write8_delegate(FUNC(mcr_state::mcr_control_port_w), this));
+		m_ssio->set_custom_output(0, 0xff, *this, FUNC(mcr_state::mcr_control_port_w));
 	}
 }
 
@@ -2843,8 +2843,8 @@ void mcr_state::init_solarfox()
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs = 16;
 
-	m_ssio->set_custom_input(0, 0x1c, read8_delegate(FUNC(mcr_state::solarfox_ip0_r), this));
-	m_ssio->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::solarfox_ip1_r), this));
+	m_ssio->set_custom_input(0, 0x1c, *this, FUNC(mcr_state::solarfox_ip0_r));
+	m_ssio->set_custom_input(1, 0xff, *this, FUNC(mcr_state::solarfox_ip1_r));
 }
 
 
@@ -2853,7 +2853,7 @@ void mcr_state::init_kick()
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
 
-	m_ssio->set_custom_input(1, 0xf0, read8_delegate(FUNC(mcr_state::kick_ip1_r), this));
+	m_ssio->set_custom_input(1, 0xf0, *this, FUNC(mcr_state::kick_ip1_r));
 }
 
 
@@ -2862,7 +2862,7 @@ void mcr_dpoker_state::init_dpoker()
 	mcr_init(90009, 91399, 90908);
 	m_mcr12_sprite_xoffs_flip = 16;
 
-	m_ssio->set_custom_input(0, 0x8e, read8_delegate(FUNC(mcr_dpoker_state::ip0_r),this));
+	m_ssio->set_custom_input(0, 0x8e, *this, FUNC(mcr_dpoker_state::ip0_r));
 
 	// meter ram, is it battery backed?
 	m_maincpu->space(AS_PROGRAM).install_ram(0x8000, 0x81ff);
@@ -2872,10 +2872,10 @@ void mcr_dpoker_state::init_dpoker()
 	m_maincpu->space(AS_IO).install_read_port(0x28, 0x28, "P28");
 	m_maincpu->space(AS_IO).install_read_port(0x2c, 0x2c, "P2C");
 
-	m_maincpu->space(AS_IO).install_write_handler(0x2c, 0x2c, write8_delegate(FUNC(mcr_dpoker_state::lamps1_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x30, 0x30, write8_delegate(FUNC(mcr_dpoker_state::lamps2_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x34, 0x34, write8_delegate(FUNC(mcr_dpoker_state::output_w),this));
-	m_maincpu->space(AS_IO).install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(mcr_dpoker_state::meters_w),this));
+	m_maincpu->space(AS_IO).install_write_handler(0x2c, 0x2c, write8_delegate(*this, FUNC(mcr_dpoker_state::lamps1_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x30, 0x30, write8_delegate(*this, FUNC(mcr_dpoker_state::lamps2_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x34, 0x34, write8_delegate(*this, FUNC(mcr_dpoker_state::output_w)));
+	m_maincpu->space(AS_IO).install_write_handler(0x3f, 0x3f, write8_delegate(*this, FUNC(mcr_dpoker_state::meters_w)));
 
 	m_coin_status = 0;
 	m_output = 0;
@@ -2895,9 +2895,9 @@ void mcr_state::init_wacko()
 {
 	mcr_init(90010, 91399, 90913);
 
-	m_ssio->set_custom_input(1, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip1_r),this));
-	m_ssio->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr_state::wacko_ip2_r),this));
-	m_ssio->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::wacko_op4_w),this));
+	m_ssio->set_custom_input(1, 0xff, *this, FUNC(mcr_state::wacko_ip1_r));
+	m_ssio->set_custom_input(2, 0xff, *this, FUNC(mcr_state::wacko_ip2_r));
+	m_ssio->set_custom_output(4, 0x01, *this, FUNC(mcr_state::wacko_op4_w));
 }
 
 
@@ -2905,8 +2905,8 @@ void mcr_state::init_twotiger()
 {
 	mcr_init(90010, 91399, 90913);
 
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::twotiger_op4_w),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, 0, read8_delegate(FUNC(mcr_state::twotiger_videoram_r),this), write8_delegate(FUNC(mcr_state::twotiger_videoram_w),this));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr_state::twotiger_op4_w));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xe800, 0xefff, 0, 0x1000, 0, read8_delegate(*this, FUNC(mcr_state::twotiger_videoram_r)), write8_delegate(*this, FUNC(mcr_state::twotiger_videoram_w)));
 }
 
 
@@ -2914,8 +2914,8 @@ void mcr_state::init_kroozr()
 {
 	mcr_init(90010, 91399, 91483);
 
-	m_ssio->set_custom_input(1, 0x47, read8_delegate(FUNC(mcr_state::kroozr_ip1_r),this));
-	m_ssio->set_custom_output(4, 0x34, write8_delegate(FUNC(mcr_state::kroozr_op4_w),this));
+	m_ssio->set_custom_input(1, 0x47, *this, FUNC(mcr_state::kroozr_ip1_r));
+	m_ssio->set_custom_output(4, 0x34, *this, FUNC(mcr_state::kroozr_op4_w));
 }
 
 
@@ -2923,7 +2923,7 @@ void mcr_state::init_journey()
 {
 	mcr_init(91475, 91464, 90913);
 
-	m_ssio->set_custom_output(4, 0x01, write8_delegate(FUNC(mcr_state::journey_op4_w),this));
+	m_ssio->set_custom_output(4, 0x01, *this, FUNC(mcr_state::journey_op4_w));
 }
 
 
@@ -2937,7 +2937,7 @@ void mcr_state::init_dotrone()
 {
 	mcr_init(91490, 91464, 91657);
 
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::dotron_op4_w),this));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr_state::dotron_op4_w));
 }
 
 
@@ -2945,8 +2945,8 @@ void mcr_nflfoot_state::init_nflfoot()
 {
 	mcr_init(91490, 91464, 91657);
 
-	m_ssio->set_custom_input(2, 0x80, read8_delegate(FUNC(mcr_nflfoot_state::ip2_r),this));
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_nflfoot_state::op4_w),this));
+	m_ssio->set_custom_input(2, 0x80, *this, FUNC(mcr_nflfoot_state::ip2_r));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr_nflfoot_state::op4_w));
 
 	save_item(NAME(m_ipu_sio_txda));
 	save_item(NAME(m_ipu_sio_txdb));
@@ -2957,11 +2957,11 @@ void mcr_state::init_demoderb()
 {
 	mcr_init(91490, 91464, 90913);
 
-	m_ssio->set_custom_input(1, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip1_r),this));
-	m_ssio->set_custom_input(2, 0xfc, read8_delegate(FUNC(mcr_state::demoderb_ip2_r),this));
-	m_ssio->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr_state::demoderb_op4_w),this));
+	m_ssio->set_custom_input(1, 0xfc, *this, FUNC(mcr_state::demoderb_ip1_r));
+	m_ssio->set_custom_input(2, 0xfc, *this, FUNC(mcr_state::demoderb_ip2_r));
+	m_ssio->set_custom_output(4, 0xff, *this, FUNC(mcr_state::demoderb_op4_w));
 
-	/* the SSIO Z80 doesn't have any program to execute */
+	// the SSIO Z80 doesn't have any program to execute
 	m_ssio->suspend_cpu();
 }
 

@@ -224,7 +224,7 @@ void hp9k3xx_state::machine_reset()
 {
 	auto *dio = subdevice<bus::hp_dio::dio16_device>("diobus");
 	if (dio)
-		m_maincpu->set_reset_callback(write_line_delegate(FUNC(bus::hp_dio::dio16_device::reset_in), dio));
+		m_maincpu->set_reset_callback(*dio, FUNC(bus::hp_dio::dio16_device::reset_in));
 }
 
 void hp9k3xx_state::machine_start()

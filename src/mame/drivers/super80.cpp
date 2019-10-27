@@ -750,7 +750,7 @@ void super80_state::super80(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);
@@ -833,7 +833,7 @@ void super80_state::super80v(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(SUPER80V_DOTS);
-	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(super80_state::crtc_update_row));
 
 	config.set_default_layout(layout_super80);
 
@@ -855,7 +855,7 @@ void super80_state::super80v(machine_config &config)
 	INPUT_BUFFER(config, "cent_status_in", 0);
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(super80_state::quickload_cb));
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

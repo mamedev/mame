@@ -390,7 +390,7 @@ void tavernie_state::ivg09(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(tavernie_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(tavernie_state::crtc_update_row));
 
 	PIA6821(config, m_pia1, 0);
 	m_pia1->readpb_handler().set(FUNC(tavernie_state::pb_ivg_r));

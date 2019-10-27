@@ -45,6 +45,7 @@ void sega_315_5881_crypt_device::iomap_le(address_map &map)
 
 sega_315_5881_crypt_device::sega_315_5881_crypt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA315_5881_CRYPT, tag, owner, clock)
+	, m_read(*this)
 {
 }
 
@@ -56,7 +57,7 @@ void sega_315_5881_crypt_device::device_start()
 	line_buffer = std::make_unique<uint8_t[]>(LINE_SIZE);
 	line_buffer_prev = std::make_unique<uint8_t[]>(LINE_SIZE);
 
-	m_read.bind_relative_to(*owner());
+	m_read.resolve();
 
 	save_pointer(NAME(buffer), BUFFER_SIZE);
 	save_pointer(NAME(line_buffer), LINE_SIZE);

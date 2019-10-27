@@ -373,7 +373,7 @@ READ32_MEMBER(gunbustr_state::main_cycle_r)
 void gunbustr_state::init_gunbustr()
 {
 	/* Speedup handler */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x203acc, 0x203acf, read32_delegate(*this, FUNC(gunbustr_state::main_cycle_r)));
 
 	m_interrupt5_timer = timer_alloc(TIMER_GUNBUSTR_INTERRUPT5);
 }

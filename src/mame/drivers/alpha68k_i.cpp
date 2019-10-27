@@ -3,13 +3,13 @@
 /***************************************************************************
 
     SNK/Alpha 68000 I board based games
-	
-	derived from alpha68k.cpp
 
-	TODO:
-	- Both POST screens are X offset by a large margin, 
-	  i.e. Paddle Mania draws a middle line there, which isn't shown on real HW. 
-	- Paddle Mania: ranking screen is unreadable, maybe 
+    derived from alpha68k.cpp
+
+    TODO:
+    - Both POST screens are X offset by a large margin,
+      i.e. Paddle Mania draws a middle line there, which isn't shown on real HW.
+    - Paddle Mania: ranking screen is unreadable, maybe
 
 ***************************************************************************/
 
@@ -91,7 +91,7 @@ u16 thenextspace_state::sound_cpu_r(){ return 1; }
  * Address Maps
  *
  */
- 
+
 void paddlemania_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                         // main program
@@ -344,12 +344,12 @@ void alpha68k_I_state::base_config(machine_config &config)
 {
 	MCFG_MACHINE_START_OVERRIDE(alpha68k_I_state,common)
 	MCFG_MACHINE_RESET_OVERRIDE(alpha68k_I_state,common)
-	
+
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	
+
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", 4000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -435,7 +435,7 @@ ROM_START( paddlema )
 	ROM_LOAD( "padlem.a",        0x0000,  0x0100,  CRC(cae6bcd6) SHA1(da3b3bdcdc7fefae80b0ef8365565bbe5ff0d5d2) ) /* R */
 	ROM_LOAD( "padlem.b",        0x0100,  0x0100,  CRC(b6df8dcb) SHA1(318ca20fab6608aa2956ec3bb82e8ae77c250d51) ) /* G */
 	ROM_LOAD( "padlem.c",        0x0200,  0x0100,  CRC(39ca9b86) SHA1(8b8d7aae85830e69366e86f8b6cccfb8140cd526) ) /* B */
-	
+
 	ROM_REGION( 0x800, "clut_proms", 0 )
 	ROM_LOAD( "padlem.17j",      0x0000,  0x0400,  CRC(86170069) SHA1(8e2ad7afa50453e9a2dc89386ce02d10e7c89fbc) ) /* Clut low nibble */
 	ROM_LOAD( "padlem.16j",      0x0400,  0x0400,  CRC(8da58e2c) SHA1(6012715a2d3ba4cf8bc5a8250e7f28cb59913092) ) /* Clut high nibble */

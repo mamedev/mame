@@ -435,6 +435,7 @@ lg-dvd.cpp
 lilith.cpp
 lisa.cpp
 llc.cpp
+lms46.cpp
 lola8a.cpp
 lviv.cpp
 lwriter.cpp
@@ -814,6 +815,7 @@ tek405x.cpp
 tek410x.cpp
 tek440x.cpp
 tekxp33x.cpp
+teleray10.cpp
 telex1192.cpp
 telex274.cpp
 telex277d.cpp

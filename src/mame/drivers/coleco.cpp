@@ -342,7 +342,7 @@ void coleco_state::machine_start()
 	}
 
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(FUNC(coleco_state::cart_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8_delegate(*this, FUNC(coleco_state::cart_r)));
 
 	save_item(NAME(m_joy_mode));
 	save_item(NAME(m_last_nmi_state));

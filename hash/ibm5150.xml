@@ -6917,7 +6917,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="actnserv35" cloneof="actnserv">
 		<description>Action Service (Smash16 release) (3.5")</description>
 		<year>1990</year>
@@ -8829,7 +8829,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="italy90">
 		<description>Italy '90 Soccer</description>
 		<year>1989</year>
@@ -8854,7 +8854,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="joeblade">
 		<description>Joe Blade (Smash16 release)</description>
 		<year>1992</year>
@@ -10154,7 +10154,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="outruna" cloneof="outrun">
 		<description>Out Run (Kixx release)</description>
 		<year>1989</year>
@@ -11288,7 +11288,7 @@ has been replaced with an all-zero block. -->
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="starflg2">
 		<description>Starflight 2: Trade Routes of the Cloud Nebula (5.25")</description>
 		<year>1989</year>

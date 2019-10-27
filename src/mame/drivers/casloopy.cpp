@@ -544,7 +544,7 @@ void casloopy_state::casloopy(machine_config &config)
 	cartslot.set_width(GENERIC_ROM32_WIDTH);
 	cartslot.set_endian(ENDIANNESS_LITTLE);
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(casloopy_state::cart_load), this);
+	cartslot.set_device_load(FUNC(casloopy_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("casloopy");

@@ -10,6 +10,8 @@
 class tilemap038_device : public device_t
 {
 public:
+	typedef device_delegate<void (bool tiledim, u32 &color, u32 &pri, u32 &code)> tmap038_cb_delegate;
+
 	tilemap038_device(const machine_config &mconfig, const char *tag, device_t *owner)
 		: tilemap038_device(mconfig, tag, owner, (u32)0)
 	{
@@ -19,8 +21,7 @@ public:
 
 	// configurations
 	template <typename T> void set_gfxdecode_tag(T &&tag) { m_gfxdecode.set_tag(std::forward<T>(tag)); }
-	typedef device_delegate<void (bool tiledim, u32 &color, u32 &pri, u32 &code)> tmap038_cb_delegate;
-	void set_tile_callback(tmap038_cb_delegate cb) { m_038_cb = cb; }
+	template <typename... T> void set_tile_callback(T &&... args) { m_038_cb.set(std::forward<T>(args)...); }
 	void set_gfx(u16 no) { m_gfxno = no; }
 
 	// call to do the rendering etc.
@@ -47,10 +48,10 @@ public:
 
 	u16 lineram_r(offs_t offset) { return m_lineram[offset]; }
 	void lineram_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_lineram[offset]); }
- 
+
 	u16 vregs_r(offs_t offset) { return m_vregs[offset]; }
 	void vregs_w(offs_t offset, u16 data, u16 mem_mask = ~0) { COMBINE_DATA(&m_vregs[offset]); }
- 
+
 	void mark_all_dirty() { m_tmap->mark_all_dirty(); };
 	void set_flip(u32 attributes) { m_tmap->set_flip(attributes); }
 	void set_palette_offset(u32 offset) { m_tmap->set_palette_offset(offset); }

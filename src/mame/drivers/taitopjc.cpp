@@ -244,8 +244,8 @@ void taitopjc_state::video_start()
 	m_screen_ram = std::make_unique<uint32_t[]>(0x40000);
 	m_pal_ram = std::make_unique<uint32_t[]>(0x8000);
 
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer0),this), 16, 16, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitopjc_state::tile_get_info),this), tilemap_mapper_delegate(FUNC(taitopjc_state::tile_scan_layer1),this), 16, 16, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer0)), 16, 16, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer1)), 16, 16, 32, 32);
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(1);
 

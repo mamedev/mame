@@ -281,7 +281,7 @@
 		NET_REGISTER_DEV(TTL_74279_DIP, name)
 
 #define DM9312(name, cA, cB, cC, cSTROBE, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7)     \
-		NET_REGISTER_DEV(DM9312, name)	                                       \
+		NET_REGISTER_DEV(DM9312, name)                                         \
 		NET_CONNECT(name, VCC, VCC)                                            \
 		NET_CONNECT(name, GND, GND)                                            \
 		NET_CONNECT(name, A,  cA)                                              \

@@ -30,12 +30,12 @@
 ***********************************************************************************************************/
 
 #include "emu.h"
+#include "bus/ata/atadev.h"
 #include "cpu/h8/h83002.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "machine/tmp68301.h"
 #include "machine/idectrl.h"
-#include "machine/idehd.h"
 #include "machine/timer.h"
 #include "video/v9938.h"
 #include "audio/nichisnd.h"
@@ -46,8 +46,8 @@
 class csplayh5_state : public driver_device
 {
 public:
-	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	csplayh5_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_nichisnd(*this, "nichisnd"),
 		m_key(*this, "KEY.%u", 0),
@@ -361,7 +361,7 @@ void csplayh5_state::csplayh5(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &csplayh5_state::csplayh5_map);
 	m_maincpu->out_parallel_callback().set(FUNC(csplayh5_state::tmp68301_parallel_port_w));
 
-	TIMER(config, "scantimer", 0).configure_scanline(timer_device::expired_delegate(FUNC(csplayh5_state::csplayh5_irq), this), "screen", 0, 1);
+	TIMER(config, "scantimer", 0).configure_scanline(FUNC(csplayh5_state::csplayh5_irq), "screen", 0, 1);
 
 #if USE_H8
 	h830002_device &subcpu(H83002(config, "subcpu", DVD_CLOCK/2));    /* unknown divider */

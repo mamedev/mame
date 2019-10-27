@@ -237,10 +237,10 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 
 void panicr_state::video_start()
 {
-	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
-	m_infotilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_infotile_info_2),this),TILEMAP_SCAN_ROWS,16,16,1024,16 );
+	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(panicr_state::get_bgtile_info)), TILEMAP_SCAN_ROWS, 16,16, 1024,16);
+	m_infotilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(panicr_state::get_infotile_info_2)), TILEMAP_SCAN_ROWS, 16,16, 1024,16);
 
-	m_txttilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(panicr_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_txttilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(panicr_state::get_txttile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 	m_txttilemap->configure_groups(*m_gfxdecode->gfx(0), 0);
 
 	save_item(NAME(m_scrollx));

@@ -197,7 +197,7 @@ void galaxy_state::galaxy(machine_config &config)
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -236,7 +236,7 @@ void galaxy_state::galaxyp(machine_config &config)
 
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "gal").set_load_callback(FUNC(galaxy_state::snapshot_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

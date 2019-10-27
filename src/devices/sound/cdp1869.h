@@ -141,6 +141,10 @@ public:
 
 	static constexpr unsigned PALETTE_LENGTH  = 8+64;
 
+	typedef device_delegate<uint8_t (uint16_t pma, uint8_t cma, uint8_t pmd)> char_ram_read_delegate;
+	typedef device_delegate<void (uint16_t pma, uint8_t cma, uint8_t pmd, uint8_t data)> char_ram_write_delegate;
+	typedef device_delegate<int (uint16_t pma, uint8_t cma, uint8_t pmd)> pcb_read_delegate;
+
 	// construction/destruction
 	template <typename T>
 	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&addrmap)
@@ -156,44 +160,9 @@ public:
 	void set_color_clock(const XTAL &xtal) { xtal.validate("selecting cdp1869 clock"); set_color_clock(xtal.value()); }
 
 	// delegate setters
-	typedef device_delegate<uint8_t (uint16_t pma, uint8_t cma, uint8_t pmd)> char_ram_read_delegate;
-	void set_char_ram_read_callback(char_ram_read_delegate callback) { m_in_char_ram_func = callback; }
-	template <class FunctionClass> void set_char_ram_read_callback(const char *devname,
-		uint8_t (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_read_callback(char_ram_read_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_char_ram_read_callback(
-		uint8_t (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_read_callback(char_ram_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
-	typedef device_delegate<void (uint16_t pma, uint8_t cma, uint8_t pmd, uint8_t data)> char_ram_write_delegate;
-	void set_char_ram_write_callback(char_ram_write_delegate callback) { m_out_char_ram_func = callback; }
-	template <class FunctionClass> void set_char_ram_write_callback(const char *devname,
-		void (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_write_callback(char_ram_write_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_char_ram_write_callback(
-		void (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t, uint8_t), const char *name)
-	{
-		set_char_ram_write_callback(char_ram_write_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
-
-	typedef device_delegate<int (uint16_t pma, uint8_t cma, uint8_t pmd)> pcb_read_delegate;
-	void set_pcb_read_callback(pcb_read_delegate callback) { m_in_pcb_func = callback; }
-	template <class FunctionClass> void set_pcb_read_callback(const char *devname,
-		int (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_pcb_read_callback(pcb_read_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_pcb_read_callback(
-		int (FunctionClass::*callback)(uint16_t, uint8_t, uint8_t), const char *name)
-	{
-		set_pcb_read_callback(pcb_read_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_char_ram_read_callback(T &&... args) { m_in_char_ram_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_char_ram_write_callback(T &&... args) { m_out_char_ram_func.set(std::forward<T>(args)...); }
+	template <typename... T> void set_pcb_read_callback(T &&... args) { m_in_pcb_func.set(std::forward<T>(args)...); }
 
 	// helper functions
 	template <typename T, typename U> screen_device& add_pal_screen(machine_config &config, T &&screen_tag, U &&clock)

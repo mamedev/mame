@@ -401,8 +401,8 @@ void darkhors_state::video_start()
 {
 	common_state::video_start();
 
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
+	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darkhors_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
 

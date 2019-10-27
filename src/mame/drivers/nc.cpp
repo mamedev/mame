@@ -1411,8 +1411,8 @@ void nc_state::nc_base(machine_config &config)
 
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cardslot", generic_plain_slot, nullptr));
-	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card), this);
-	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card), this);
+	cartslot.set_device_load(FUNC(nc_state::load_pcmcia_card));
+	cartslot.set_device_unload(FUNC(nc_state::unload_pcmcia_card));
 
 	/* internal ram */
 	RAM(config, m_ram).set_default_size("64K");

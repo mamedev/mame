@@ -507,10 +507,10 @@ READ8_MEMBER( popper_state::watchdog_clear_r )
 void popper_state::machine_start()
 {
 	// create tilemaps
-	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer0_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popper_state::layer0_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
 	m_layer0_tilemap->set_transparent_pen(1);
 
-	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(popper_state::layer1_tile_info), this), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
+	m_layer1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(popper_state::layer1_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 48, 32);
 	m_layer1_tilemap->set_transparent_pen(0);
 
 	// allocate and start scanline timer

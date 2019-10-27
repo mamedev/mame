@@ -568,6 +568,23 @@ if (CPUS["F8"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- Fujitsu FR
+--@src/devices/cpu/fr/fr.h,CPUS["FR"] = true
+--------------------------------------------------
+
+if (CPUS["FR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/fr/fr.cpp",
+		MAME_DIR .. "src/devices/cpu/fr/fr.h",
+	}
+end
+
+if (CPUS["FR"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/fr/frdasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/fr/frdasm.h")
+end
+
+--------------------------------------------------
 -- G65816
 --@src/devices/cpu/g65816/g65816.h,CPUS["G65816"] = true
 --------------------------------------------------
@@ -2014,8 +2031,8 @@ if (CPUS["SATURN"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.cpp",
 		MAME_DIR .. "src/devices/cpu/saturn/saturn.h",
-		MAME_DIR .. "src/devices/cpu/saturn/satops.hxx",
-		MAME_DIR .. "src/devices/cpu/saturn/sattable.hxx",
+		MAME_DIR .. "src/devices/cpu/saturn/satops.ipp",
+		MAME_DIR .. "src/devices/cpu/saturn/sattable.ipp",
 	}
 end
 

@@ -268,13 +268,13 @@ WRITE16_MEMBER(ngen_state::cpu_peripheral_cb)
 		addr = (m_peripheral & 0xffc0) << 4;
 		if(m_middle & 0x0040)
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
+			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(*this, FUNC(ngen_state::peripheral_r)), write16_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to memory 0x%08x\n",addr);
 		}
 		else
 		{
 			addr &= 0xffff;
-			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(FUNC(ngen_state::peripheral_r), this), write16_delegate(FUNC(ngen_state::peripheral_w), this));
+			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16_delegate(*this, FUNC(ngen_state::peripheral_r)), write16_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to I/O 0x%04x\n",addr);
 		}
 		break;
@@ -450,7 +450,7 @@ WRITE16_MEMBER(ngen_state::xbus_w)
 	switch(m_xbus_current)
 	{
 		case 0x00:  // Floppy/Hard disk module
-			io.install_readwrite_handler(addr,addr+0xff,read16_delegate(FUNC(ngen_state::hfd_r),this),write16_delegate(FUNC(ngen_state::hfd_w),this),0xffffffff);
+			io.install_readwrite_handler(addr,addr+0xff, read16_delegate(*this, FUNC(ngen_state::hfd_r)), write16_delegate(*this, FUNC(ngen_state::hfd_w)), 0xffffffff);
 			break;
 		default:
 			cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
@@ -999,7 +999,7 @@ void ngen_state::ngen(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(ngen_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(ngen_state::crtc_update_row));
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz
@@ -1112,7 +1112,7 @@ void ngen386_state::ngen386(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(ngen386_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(ngen386_state::crtc_update_row));
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart, 0);  // main clock unknown, Rx/Tx clocks are 19.53kHz

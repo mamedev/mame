@@ -243,17 +243,17 @@ TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info_sidampkr)
 
 void wallc_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(wallc_state, unkitpkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_unkitpkr), this), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info_unkitpkr)), TILEMAP_SCAN_COLS_FLIP_Y, 8, 8, 32, 32);
 }
 
 VIDEO_START_MEMBER(wallc_state, sidampkr)
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wallc_state::get_bg_tile_info_sidampkr), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wallc_state::get_bg_tile_info_sidampkr)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 uint32_t wallc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

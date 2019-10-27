@@ -163,8 +163,8 @@ void i82371sb_device::map_busmaster_dma()
 {
 	if (m_base != 0)
 	{
-		spaceio->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide)), 0xffffffff);
-		spaceio->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(FUNC(bus_master_ide_controller_device::bmdma_r), &(*m_ide2)), write32_delegate(FUNC(bus_master_ide_controller_device::bmdma_w), &(*m_ide2)), 0xffffffff);
+		spaceio->install_readwrite_handler(m_base, m_base + 0x7, read32_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
+		spaceio->install_readwrite_handler(m_base + 0x8, m_base + 0xf, read32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_r)), write32_delegate(*m_ide2, FUNC(bus_master_ide_controller_device::bmdma_w)), 0xffffffff);
 	}
 }
 
@@ -253,7 +253,7 @@ void i82371sb_device::device_start()
 
 	southbridge_device::device_start();
 	m_ide_io_ports_enabled = false;
-	spaceio.install_readwrite_handler(0x00b0, 0x00b3, read8_delegate(FUNC(i82371sb_device::read_apmcapms), this), write8_delegate(FUNC(i82371sb_device::write_apmcapms), this), 0xffff0000);
+	spaceio.install_readwrite_handler(0x00b0, 0x00b3, read8_delegate(*this, FUNC(i82371sb_device::read_apmcapms)), write8_delegate(*this, FUNC(i82371sb_device::write_apmcapms)), 0xffff0000);
 	m_smi_callback.resolve_safe();
 	m_boot_state_hook.resolve_safe();
 	// setup save states

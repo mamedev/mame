@@ -846,7 +846,7 @@ void sapi_state::sapi3b(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(6);
-	crtc.set_update_row_callback(FUNC(sapi_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(sapi_state::crtc_update_row));
 
 	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	subdevice<screen_device>("screen")->set_no_palette();

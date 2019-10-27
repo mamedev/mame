@@ -48,72 +48,74 @@ jazz_mct_adr_device::jazz_mct_adr_device(const machine_config &mconfig, const ch
 
 void jazz_mct_adr_device::map(address_map &map)
 {
-	map(0x000, 0x007).lrw32("configuration", [this](){ return m_config; }, [this](u32 data) { m_config = data; });
-	map(0x008, 0x00f).lr32("revision_level", [](){ return 1; });
-	map(0x010, 0x017).lr32("dma_invalid_address", [this]() { m_dma_interrupt_source &= ~DMA_ADDRESS_ERROR; return m_dma_invalid_address; });
-	map(0x018, 0x01f).lrw32("translation_base", [this]() { return m_trans_tbl_base; }, [this](u32 data) { LOG("tbl base 0x%08x\n", data); m_trans_tbl_base = data; });
-	map(0x020, 0x027).lrw32("translation_limit", [this]() { return m_trans_tbl_limit; }, [this](u32 data) { LOG("tbl limit 0x%08x\n", data); m_trans_tbl_limit = data; });
-	map(0x028, 0x02f).lrw32("translation_invalidate", []() { return 0; }, [](u32 data) { });
-	map(0x030, 0x037).lw32("cache_maintenance", [this](u32 data) { m_ioc_maint = data; });
-	map(0x038, 0x03f).lr32("remote_failed_address", []() { return 0; });
-	map(0x040, 0x047).lr32("dma_memory_failed_address", [this]() { m_dma_interrupt_source &= ~DMA_PARITY_ERROR; return m_dma_memory_failed_address; });
-	map(0x048, 0x04f).lw32("io_cache_physical_tag", [this](u32 data) { m_ioc_physical_tag = data; });
-	map(0x050, 0x057).lw32("io_cache_logical_tag", [this](u32 data) { m_ioc_logical_tag = data; });
-	map(0x058, 0x05f).lrw32("io_cache_byte_mask",
-		// FIXME: hack to pass diagnostics
-		[this]()
-		{
-			u32 const data = m_ioc_byte_mask;
+	map(0x000, 0x007).lrw32(NAME([this] () { return m_config; }), NAME([this] (u32 data) { m_config = data; }));
+	map(0x008, 0x00f).lr32([] () { return 1; }, "revision_level");
+	map(0x010, 0x017).lr32(NAME([this] () { m_dma_interrupt_source &= ~DMA_ADDRESS_ERROR; return m_dma_invalid_address; }));
+	map(0x018, 0x01f).lrw32(NAME([this] () { return m_trans_tbl_base; }), NAME([this] (u32 data) { LOG("tbl base 0x%08x\n", data); m_trans_tbl_base = data; }));
+	map(0x020, 0x027).lrw32(NAME([this] () { return m_trans_tbl_limit; }), NAME([this] (u32 data) { LOG("tbl limit 0x%08x\n", data); m_trans_tbl_limit = data; }));
+	map(0x028, 0x02f).lrw32([] () { return 0; }, "translation_invalidate_r", [] (u32 data) { }, "translation_invalidate_w");
+	map(0x030, 0x037).lw32(NAME([this] (u32 data) { m_ioc_maint = data; }));
+	map(0x038, 0x03f).lr32([] () { return 0; }, "remote_failed_address");
+	map(0x040, 0x047).lr32(NAME([this] () { m_dma_interrupt_source &= ~DMA_PARITY_ERROR; return m_dma_memory_failed_address; }));
+	map(0x048, 0x04f).lw32(NAME([this] (u32 data) { m_ioc_physical_tag = data; }));
+	map(0x050, 0x057).lw32(NAME([this] (u32 data) { m_ioc_logical_tag = data; }));
+	map(0x058, 0x05f).lrw32(
+			// FIXME: hack to pass diagnostics
+			[this] ()
+			{
+				u32 const data = m_ioc_byte_mask;
 
-			if (data == 0xffffffff)
-				m_ioc_byte_mask = 0;
-			return data;
-		},
-		[this](u32 data) { m_ioc_byte_mask |= data; });
-	map(0x060, 0x067).lw32("io_cache_buffer_window_lo", [this](u32 data)
-	{
-		// FIXME: hack to pass diagnostics
-		if (m_ioc_logical_tag == 0x80000001 && m_ioc_byte_mask == 0x0f0f0f0f)
-		{
-			u32 const address = (m_ioc_physical_tag & ~0x1) + ((m_ioc_maint & 0x3) << 3);
+				if (data == 0xffffffff)
+					m_ioc_byte_mask = 0;
+				return data;
+			}, "io_cache_byte_mask_r",
+			NAME([this] (u32 data) { m_ioc_byte_mask |= data; }));
+	map(0x060, 0x067).lw32(
+			[this] (u32 data)
+			{
+				// FIXME: hack to pass diagnostics
+				if (m_ioc_logical_tag == 0x80000001 && m_ioc_byte_mask == 0x0f0f0f0f)
+				{
+					u32 const address = (m_ioc_physical_tag & ~0x1) + ((m_ioc_maint & 0x3) << 3);
 
-			m_bus->write_dword(address, data);
-		}
-	});
+					m_bus->write_dword(address, data);
+				}
+			}, "io_cache_buffer_window_lo");
 	// io_cache_buffer_window_hi
-	map(0x070, 0x0ef).lrw32("remote_speed",
-		[this](offs_t offset) { return m_remote_speed[offset  >> 1]; },
-		[this](offs_t offset, u32 data) { m_remote_speed[offset >> 1] = data; });
+	map(0x070, 0x0ef).lrw32(
+			NAME([this] (offs_t offset) { return m_remote_speed[offset  >> 1]; }),
+			NAME([this] (offs_t offset, u32 data) { m_remote_speed[offset >> 1] = data; }));
 	// parity_diagnostic_lo
 	// parity_diagnostic_hi
-	map(0x100, 0x1ff).lrw32("dma_reg",
-		[this](offs_t offset) { return m_dma_reg[offset >> 1]; },
-		[this](offs_t offset, u32 data)
-		{
-			unsigned const reg = offset >> 1;
+	map(0x100, 0x1ff).lrw32(
+			NAME([this] (offs_t offset) { return m_dma_reg[offset >> 1]; }),
+			[this] (offs_t offset, u32 data)
+			{
+				unsigned const reg = offset >> 1;
 
-			LOG("dma_reg %d data 0x%08x (%s)\n", offset, data, machine().describe_context());
+				LOG("dma_reg %d data 0x%08x (%s)\n", offset, data, machine().describe_context());
 
-			m_dma_reg[reg] = data;
+				m_dma_reg[reg] = data;
 
-			if ((reg == REG_ENABLE) && (data & DMA_ENABLE))
-				LOG("dma started address 0x%08x count %d\n", translate_address(m_dma_reg[(0 << 2) + REG_ADDRESS]), m_dma_reg[(0 << 2) + REG_COUNT]);
-		});
-	map(0x200, 0x207).lr32("interrupt_source", [this]() { return m_dma_interrupt_source; });
-	map(0x208, 0x20f).lr32("error_type", []() { return 0; });
-	map(0x210, 0x217).lrw32("refresh_rate", [this]() { return m_memory_refresh_rate; }, [this](u32 data) { m_memory_refresh_rate = data; });
+				if ((reg == REG_ENABLE) && (data & DMA_ENABLE))
+					LOG("dma started address 0x%08x count %d\n", translate_address(m_dma_reg[(0 << 2) + REG_ADDRESS]), m_dma_reg[(0 << 2) + REG_COUNT]);
+			}, "dma_reg_w");
+	map(0x200, 0x207).lr32(NAME([this] () { return m_dma_interrupt_source; }));
+	map(0x208, 0x20f).lr32([] () { return 0; }, "error_type");
+	map(0x210, 0x217).lrw32(NAME([this] () { return m_memory_refresh_rate; }), NAME([this] (u32 data) { m_memory_refresh_rate = data; }));
 	// refresh_counter
-	map(0x220, 0x227).lrw32("system_security", [this]() { return m_nvram_protect; }, [this](u32 data) { LOG("nvram_protect 0x%08x (%s)\n", data, machine().describe_context()); m_nvram_protect = data; });
-	map(0x228, 0x22f).lw32("interrupt_interval", [this](u32 data)
-	{
-		LOG("timer_w 0x%08x\n", data);
+	map(0x220, 0x227).lrw32(NAME([this] () { return m_nvram_protect; }), NAME([this] (u32 data) { LOG("nvram_protect 0x%08x (%s)\n", data, machine().describe_context()); m_nvram_protect = data; }));
+	map(0x228, 0x22f).lw32(
+			[this] (u32 data)
+			{
+				LOG("timer_w 0x%08x\n", data);
 
-		attotime interval = attotime::from_ticks((data + 1) & 0x1ff, 1000);
+				attotime interval = attotime::from_ticks((data + 1) & 0x1ff, 1000);
 
-		m_interval_timer->adjust(interval, 0, interval);
-	});
-	map(0x230, 0x237).lr32("interval_timer", [this]() { if (m_out_int_timer_asserted) { m_out_int_timer_asserted = false; m_out_int_timer(0); } return m_interval_timer->remaining().as_ticks(1000); });
-	map(0x238, 0x23b).lr32("interrupt_acknowledge", [this]() { return m_eisa_iack(); });
+				m_interval_timer->adjust(interval, 0, interval);
+			}, "interrupt_interval");
+	map(0x230, 0x237).lr32([this] () { if (m_out_int_timer_asserted) { m_out_int_timer_asserted = false; m_out_int_timer(0); } return m_interval_timer->remaining().as_ticks(1000); }, "interval_timer");
+	map(0x238, 0x23b).lr32(NAME([this] () { return m_eisa_iack(); }));
 }
 
 void jazz_mct_adr_device::device_start()

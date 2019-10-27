@@ -169,8 +169,8 @@ TILEMAP_MAPPER_MEMBER(silvmil_state::scan_rows)
 
 void silvmil_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::scan_rows),this), 16, 16, 64, 32);
-	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::scan_rows),this), 16, 16, 64, 32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(silvmil_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(silvmil_state::scan_rows)), 16, 16, 64, 32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(silvmil_state::get_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(silvmil_state::scan_rows)), 16, 16, 64, 32);
 
 	m_fg_layer->set_transparent_pen(0);
 }

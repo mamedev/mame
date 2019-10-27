@@ -422,7 +422,7 @@ void duet16_state::duet16(machine_config &config)
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", 2000000)); // "46505S" on schematics
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(duet16_state::crtc_update_row));
 
 	PALETTE(config, m_pal).set_entries(8);
 	PALETTE(config, m_chrpal, palette_device::BRG_3BIT);

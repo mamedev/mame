@@ -1209,8 +1209,8 @@ project "bimg"
 
 	configuration { }
 
-	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" then
-		if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["targetos"]=="macosx" or _OPTIONS["targetos"]=="linux" or _OPTIONS["targetos"]=="windows" or _OPTIONS["targetos"]=="asmjs" then
+		if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
 			buildoptions_cpp {
 				"-Wno-unused-const-variable",
 			}
@@ -1399,6 +1399,7 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/dxgi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_egl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_glx.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/glcontext_html5.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/nvapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",

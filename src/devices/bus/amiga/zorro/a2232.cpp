@@ -191,24 +191,24 @@ void a2232_device::autoconfig_base_address(offs_t address)
 	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	m_slot->space().install_readwrite_handler(address, address + 0x3fff,
-		read16_delegate(FUNC(a2232_device::shared_ram_r), this),
-		write16_delegate(FUNC(a2232_device::shared_ram_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::shared_ram_r)),
+			write16_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
-		read16_delegate(FUNC(a2232_device::irq_ack_r), this),
-		write16_delegate(FUNC(a2232_device::irq_ack_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::irq_ack_r)),
+			write16_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
-		read16_delegate(FUNC(a2232_device::reset_low_r), this),
-		write16_delegate(FUNC(a2232_device::reset_low_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::reset_low_r)),
+			write16_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
-		read16_delegate(FUNC(a2232_device::irq_r), this),
-		write16_delegate(FUNC(a2232_device::irq_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::irq_r)),
+			write16_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
 
 	m_slot->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
-		read16_delegate(FUNC(a2232_device::reset_high_r), this),
-		write16_delegate(FUNC(a2232_device::reset_high_w), this), 0xffff);
+			read16_delegate(*this, FUNC(a2232_device::reset_high_r)),
+			write16_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
 
 	// we're done
 	m_slot->cfgout_w(0);
@@ -237,8 +237,8 @@ WRITE_LINE_MEMBER( a2232_device::cfgin_w )
 
 		// install autoconfig handler
 		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-			read16_delegate(FUNC(amiga_autoconfig::autoconfig_read), static_cast<amiga_autoconfig *>(this)),
-			write16_delegate(FUNC(amiga_autoconfig::autoconfig_write), static_cast<amiga_autoconfig *>(this)), 0xffff);
+				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

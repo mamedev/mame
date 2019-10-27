@@ -812,7 +812,7 @@ void avigo_state::avigo(machine_config &config)
 	TIMER(config, "1hz_timer").configure_periodic(FUNC(avigo_state::avigo_1hz_timer), attotime::from_hz(1));
 
 	/* quickload */
-	QUICKLOAD(config, "quickload", "app").set_load_callback(FUNC(avigo_state::quickload_cb), this);
+	QUICKLOAD(config, "quickload", "app").set_load_callback(FUNC(avigo_state::quickload_cb));
 }
 
 

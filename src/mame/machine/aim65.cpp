@@ -113,21 +113,21 @@ void aim65_state::machine_start()
 
 	// Init ROM sockets
 	if (m_z24->exists())
-		space.install_read_handler(0xd000, 0xdfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z24));
+		space.install_read_handler(0xd000, 0xdfff, read8sm_delegate(*m_z24, FUNC(generic_slot_device::read_rom)));
 	if (m_z25->exists())
-		space.install_read_handler(0xc000, 0xcfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z25));
+		space.install_read_handler(0xc000, 0xcfff, read8sm_delegate(*m_z25, FUNC(generic_slot_device::read_rom)));
 	if (m_z26->exists())
-		space.install_read_handler(0xb000, 0xbfff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z26));
+		space.install_read_handler(0xb000, 0xbfff, read8sm_delegate(*m_z26, FUNC(generic_slot_device::read_rom)));
 
 	// Init PROM/ROM module sockets
 	if (m_z12->exists())
-		space.install_read_handler(0x4000, 0x4fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z12));
+		space.install_read_handler(0x4000, 0x4fff, read8sm_delegate(*m_z12, FUNC(generic_slot_device::read_rom)));
 	if (m_z13->exists())
-		space.install_read_handler(0x5000, 0x5fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z13));
+		space.install_read_handler(0x5000, 0x5fff, read8sm_delegate(*m_z13, FUNC(generic_slot_device::read_rom)));
 	if (m_z14->exists())
-		space.install_read_handler(0x6000, 0x6fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z14));
+		space.install_read_handler(0x6000, 0x6fff, read8sm_delegate(*m_z14, FUNC(generic_slot_device::read_rom)));
 	if (m_z15->exists())
-		space.install_read_handler(0x7000, 0x7fff, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_z15));
+		space.install_read_handler(0x7000, 0x7fff, read8sm_delegate(*m_z15, FUNC(generic_slot_device::read_rom)));
 
 	// Init RAM
 	space.install_ram(0x0000, m_ram->size() - 1, m_ram->pointer());

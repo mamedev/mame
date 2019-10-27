@@ -138,10 +138,10 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
 #include "emu.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/atapicdr.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/atapicdr.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/midikbd.h"
@@ -1468,9 +1468,9 @@ WRITE8_MEMBER(firebeat_state::security_w)
 
 void firebeat_state::init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3)
 {
-	if(out1.isnull()) out1 = write32_delegate(FUNC(firebeat_state::lamp_output_w),this);
-	if(out2.isnull()) out2 = write32_delegate(FUNC(firebeat_state::lamp_output2_w),this);
-	if(out3.isnull()) out3 = write32_delegate(FUNC(firebeat_state::lamp_output3_w),this);
+	if(out1.isnull()) out1 = write32_delegate(*this, FUNC(firebeat_state::lamp_output_w));
+	if(out2.isnull()) out2 = write32_delegate(*this, FUNC(firebeat_state::lamp_output2_w));
+	if(out3.isnull()) out3 = write32_delegate(*this, FUNC(firebeat_state::lamp_output3_w));
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000804, 0x7d000807, out1);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x7d000320, 0x7d000323, out2);
@@ -1489,23 +1489,23 @@ void firebeat_state::init_firebeat()
 
 	m_cur_cab_data = cab_data;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(FUNC(firebeat_state::security_w), this));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(firebeat_state::security_w)));
 
 	set_ibutton(rom);
 
-	init_lights(write32_delegate(), write32_delegate(), write32_delegate());
+	init_lights(write32_delegate(*this), write32_delegate(*this), write32_delegate(*this));
 }
 
 void firebeat_state::init_ppp()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
+	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 }
 
 void firebeat_state::init_ppd()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output2_ppp_w),this), write32_delegate(FUNC(firebeat_state::lamp_output3_ppp_w),this));
+	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output2_ppp_w)), write32_delegate(*this, FUNC(firebeat_state::lamp_output3_ppp_w)));
 
 	m_cur_cab_data = ppd_cab_data;
 }
@@ -1520,7 +1520,7 @@ void firebeat_state::init_keyboard()
 void firebeat_state::init_kbm()
 {
 	init_firebeat();
-	init_lights(write32_delegate(FUNC(firebeat_state::lamp_output_kbm_w),this), write32_delegate(), write32_delegate());
+	init_lights(write32_delegate(*this, FUNC(firebeat_state::lamp_output_kbm_w)), write32_delegate(*this), write32_delegate(*this));
 
 	init_keyboard();
 

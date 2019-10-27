@@ -530,9 +530,9 @@ void studio2_state::machine_start()
 	if (m_cart->exists())
 	{
 		// these have to be installed only if a cart is present, because they partially overlap the built-in game
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(FUNC(studio2_state::cart_400), this));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0a00, 0x0bff, read8_delegate(FUNC(studio2_state::cart_a00), this));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e00, 0x0fff, read8_delegate(FUNC(studio2_state::cart_e00), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0a00, 0x0bff, read8_delegate(*this, FUNC(studio2_state::cart_a00)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_e00)));
 	}
 
 	// register for state saving
@@ -544,8 +544,8 @@ void mpt02_state::machine_start()
 	if (m_cart->exists())
 	{
 		// these have to be installed only if a cart is present, because they partially overlap the built-in game
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(FUNC(studio2_state::cart_400), this));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(FUNC(mpt02_state::cart_c00), this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(*this, FUNC(mpt02_state::cart_c00)));
 	}
 
 	// register for state saving
@@ -647,7 +647,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 
 void studio2_state::studio2_cartslot(machine_config &config)
 {
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "studio2_cart", "st2,bin,rom").set_device_load(FUNC(studio2_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "studio2_cart", "st2,bin,rom").set_device_load(FUNC(studio2_state::cart_load));
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("studio2");

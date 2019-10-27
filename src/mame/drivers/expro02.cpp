@@ -923,7 +923,7 @@ void expro02_state::expro02(machine_config &config)
 	m_view2->set_colbase(0x400);
 	m_view2->set_offset(0x5b, 0x8, 256, 224);
 	m_view2->set_palette(m_palette);
-	m_view2->set_tile_callback(kaneko_view2_tilemap_device::view2_cb_delegate(FUNC(expro02_state::tile_callback), this));
+	m_view2->set_tile_callback(FUNC(expro02_state::tile_callback));
 
 	KANEKO_VU002_SPRITE(config, m_kaneko_spr);
 	m_kaneko_spr->set_priorities(8,8,8,8); // above all (not verified)

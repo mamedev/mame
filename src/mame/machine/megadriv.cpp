@@ -1019,10 +1019,10 @@ void md_base_state::megadriv_init_common()
 		save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 	}
 
-	m_maincpu->set_tas_write_callback(write8_delegate(FUNC(md_base_state::megadriv_tas_callback),this));
+	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
 
-	m_megadrive_io_read_data_port_ptr = read8_delegate(FUNC(md_base_state::megadrive_io_read_data_port_3button),this);
-	m_megadrive_io_write_data_port_ptr = write16_delegate(FUNC(md_base_state::megadrive_io_write_data_port_3button),this);
+	m_megadrive_io_read_data_port_ptr = read8_delegate(*this, FUNC(md_base_state::megadrive_io_read_data_port_3button));
+	m_megadrive_io_write_data_port_ptr = write16_delegate(*this, FUNC(md_base_state::megadrive_io_write_data_port_3button));
 }
 
 void md_base_state::init_megadriv_c2()

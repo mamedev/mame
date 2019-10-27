@@ -815,7 +815,7 @@ void midnrun_state::midnrun(machine_config &config)
 	m_screen->set_screen_update(FUNC(midnrun_state::screen_update));
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(midnrun_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8, 1, 0);
 	m_k056832->set_palette(m_palette);
 }

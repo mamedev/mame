@@ -63,6 +63,7 @@ dooyong_rom_tilemap_device::dooyong_rom_tilemap_device(
 	: dooyong_tilemap_device_base(mconfig, type, tag, owner, clock)
 	, m_rows(8)
 	, m_tilerom(*this, finder_base::DUMMY_TAG)
+	, m_tmap_cb(*this)
 	, m_tilerom_offset(0)
 	, m_tilerom_length(~0U)
 	, m_transparent_pen(~0U)
@@ -108,11 +109,11 @@ void dooyong_rom_tilemap_device::device_start()
 	if (!m_gfxdecode->started())
 		throw device_missing_dependencies();
 
-	m_tmap_cb.bind_relative_to(*owner());
+	m_tmap_cb.resolve();
 
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(dooyong_rom_tilemap_device::tile_info), this),
+			tilemap_get_info_delegate(*this, FUNC(dooyong_rom_tilemap_device::tile_info)),
 			TILEMAP_SCAN_COLS,
 			gfx().width(),
 			gfx().height(),
@@ -236,7 +237,7 @@ void dooyong_ram_tilemap_device::device_start()
 
 	m_tilemap = &machine().tilemap().create(
 			*m_gfxdecode,
-			tilemap_get_info_delegate(FUNC(dooyong_ram_tilemap_device::tile_info), this),
+			tilemap_get_info_delegate(*this, FUNC(dooyong_ram_tilemap_device::tile_info)),
 			TILEMAP_SCAN_COLS,
 			8,
 			8,

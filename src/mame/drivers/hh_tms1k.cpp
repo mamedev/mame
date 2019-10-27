@@ -2274,7 +2274,7 @@ void quizwizc_state::quizwizc(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "quizwiz_cart"));
 	cartslot.set_must_be_loaded(true);
-	cartslot.set_device_load(FUNC(quizwizc_state::cart_load), this);
+	cartslot.set_device_load(FUNC(quizwizc_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("quizwiz");
 }
 
@@ -2462,7 +2462,7 @@ void tc4_state::tc4(machine_config &config)
 	/* cartridge */
 	generic_cartslot_device &cartslot(GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "tc4_cart"));
 	cartslot.set_must_be_loaded(true); // system won't power on without cartridge
-	cartslot.set_device_load(FUNC(tc4_state::cart_load), this);
+	cartslot.set_device_load(FUNC(tc4_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tc4");
 }

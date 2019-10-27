@@ -165,14 +165,14 @@ TILE_GET_INFO_MEMBER(jackie_state::get_reel_tile_info)
 
 void jackie_state::video_start()
 {
-	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel_tile_info<0>),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel_tile_info<1>),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel_tile_info<2>),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	for (int i = 0; i < 3; i++)
 		m_reel_tilemap[i]->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(jackie_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 

@@ -43,15 +43,7 @@ public:
 	i8085a_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// CLK rate callback (8085A only)
-	void set_clk_out(clock_update_delegate callback) { m_clk_out_func = callback; }
-	template <class FunctionClass> void set_clk_out(const char *devname, void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_clk_out(clock_update_delegate(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_clk_out(void (FunctionClass::*callback)(uint32_t), const char *name)
-	{
-		set_clk_out(clock_update_delegate(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_clk_out(T &&... args) { m_clk_out_func.set(std::forward<T>(args)...); }
 
 	// STATUS changed callback
 	auto out_status_func() { return m_out_status_func.bind(); }

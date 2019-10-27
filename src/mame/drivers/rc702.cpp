@@ -121,7 +121,7 @@ void rc702_state::rc702_io(address_map &map)
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).lw8("banking",[this](u8 data){membank("bankr0")->set_entry(1);}); // replace roms with ram
+	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { membank("bankr0")->set_entry(1); })); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
@@ -387,7 +387,7 @@ void rc702_state::rc702(machine_config &config)
 
 	i8275_device &crtc(I8275(config, "crtc", 11640000/7));
 	crtc.set_character_width(7);
-	crtc.set_display_callback(FUNC(rc702_state::display_pixels), this);
+	crtc.set_display_callback(FUNC(rc702_state::display_pixels));
 	crtc.irq_wr_callback().set(m_7474, FUNC(ttl7474_device::clear_w)).invert();
 	crtc.irq_wr_callback().append(m_ctc1, FUNC(z80ctc_device::trg2));
 	crtc.drq_wr_callback().set(FUNC(rc702_state::crtc_drq_w));

@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
 
 void ddealer_state::video_start()
 {
-	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ddealer_state::get_back_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(ddealer_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 64, 32);
 }
 
 void ddealer_state::draw_video_layer(uint16_t* vreg_base, uint16_t* top, uint16_t* bottom, bitmap_ind16 &bitmap, const rectangle &cliprect, int flipy)
@@ -681,7 +681,7 @@ READ16_MEMBER(ddealer_state::mcu_r)
 
 void ddealer_state::init_ddealer()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(FUNC(ddealer_state::mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe01c, 0xfe01d, read16_delegate(*this, FUNC(ddealer_state::mcu_r)));
 }
 
 ROM_START( ddealer )

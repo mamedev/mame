@@ -180,10 +180,10 @@ Notes:
 #include "emu.h"
 #include "audio/dcs.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "emupal.h"
 #include "screen.h"
 

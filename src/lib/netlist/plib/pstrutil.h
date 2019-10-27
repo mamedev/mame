@@ -17,7 +17,7 @@
 #include <string>
 #include <type_traits>
 
-namespace plib 
+namespace plib
 {
 	template<class T>
 	struct string_info

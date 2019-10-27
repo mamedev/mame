@@ -302,10 +302,10 @@ void urashima_state::video_start()
 {
 	jalmah_state::video_start();
 
-	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<0>),this),tilemap_mapper_delegate(FUNC(urashima_state::range0_16x16),this),16,16,256,32);
+	m_layer[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(urashima_state::get_tile_info_urashima<0>)), tilemap_mapper_delegate(*this, FUNC(urashima_state::range0_16x16)), 16,16,256,32);
 	// range confirmed with title screen transition in attract mode
 	// also it's confirmed to be 64 x 64 with 2nd tier girls stripping
-	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(urashima_state::get_tile_info_urashima<1>),this),tilemap_mapper_delegate(FUNC(urashima_state::range3_8x8),this),8,8,64,64);
+	m_layer[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(urashima_state::get_tile_info_urashima<1>)), tilemap_mapper_delegate(*this, FUNC(urashima_state::range3_8x8)), 8,8,64,64);
 
 	for(int i=0;i<2;i++)
 		m_layer[i]->set_transparent_pen(15);
@@ -1701,53 +1701,53 @@ READ16_MEMBER(jalmah_state::suchiesp_mcu_r)
 
 void jalmah_state::init_urashima()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::urashima_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::urashima_mcu_w)));
 
 	m_mcu_prg = URASHIMA_MCU;
 }
 
 void jalmah_state::init_daireika()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::daireika_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::daireika_mcu_w)));
 
 	m_mcu_prg = DAIREIKA_MCU;
 }
 
 void jalmah_state::init_mjzoomin()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x80012, 0x80013, write16_delegate(*this, FUNC(jalmah_state::mjzoomin_mcu_w)));
 
 	m_mcu_prg = MJZOOMIN_MCU;
 }
 
 void jalmah_state::init_kakumei()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI_MCU;
 }
 
 void jalmah_state::init_kakumei2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::kakumei_mcu_r)));
 
 	m_mcu_prg = KAKUMEI2_MCU;
 }
 
 void jalmah_state::init_suchiesp()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchiesp_mcu_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x80004, 0x80005, read16_delegate(*this, FUNC(jalmah_state::suchiesp_mcu_r)));
 
 	m_mcu_prg = SUCHIESP_MCU;
 }
 
 /*First version of the MCU*/
 GAME( 1989, urashima, 0, urashima,  urashima, urashima_state, init_urashima, ROT0, "UPL",          "Otogizoushi Urashima Mahjong (Japan)",         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, daireika, 0, jalmahv1,    daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1990, mjzoomin, 0, jalmahv1,    mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1989, daireika, 0, jalmahv1,  daireika, jalmah_state,   init_daireika, ROT0, "Jaleco / NMK", "Mahjong Daireikai (Japan)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1990, mjzoomin, 0, jalmahv1,  mjzoomin, jalmah_state,   init_mjzoomin, ROT0, "Jaleco",       "Mahjong Channel Zoom In (Japan)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 /*Second version of the MCU*/
 GAME( 1990, kakumei,  0, jalmah,    kakumei,  jalmah_state,   init_kakumei,  ROT0, "Jaleco",       "Mahjong Kakumei (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1992, kakumei2, 0, jalmah,    kakumei2, jalmah_state,   init_kakumei2, ROT0, "Jaleco",       "Mahjong Kakumei 2 - Princess League (Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION )

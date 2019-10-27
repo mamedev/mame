@@ -142,7 +142,7 @@ class towns_state : public driver_device
 	void townssj(machine_config &config);
 
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
-	
+
 protected:
 	uint16_t m_towns_machine_id;  // default is 0x0101
 
@@ -159,7 +159,7 @@ protected:
 
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
-	
+
 	required_device_array<upd71071_device, 2> m_dma;
 	optional_device<fmscsi_device> m_scsi;
 	required_device_array<floppy_connector, 2> m_flop;

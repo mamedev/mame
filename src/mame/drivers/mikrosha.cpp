@@ -44,7 +44,7 @@ private:
 void mikrosha_state::machine_reset()
 {
 	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000+m_cart->get_rom_size()-1, read8sm_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0x8000 + m_cart->get_rom_size() - 1, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 	radio86_state::machine_reset();
 }
 
@@ -220,7 +220,7 @@ void mikrosha_state::mikrosha(machine_config &config)
 
 	i8275_device &i8275(I8275(config, "i8275", XTAL(16'000'000) / 12));
 	i8275.set_character_width(6);
-	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels), this);
+	i8275.set_display_callback(FUNC(mikrosha_state::display_pixels));
 	i8275.drq_wr_callback().set(m_dma8257, FUNC(i8257_device::dreq2_w));
 
 	pit8253_device &pit8253(PIT8253(config, "pit8253", 0));

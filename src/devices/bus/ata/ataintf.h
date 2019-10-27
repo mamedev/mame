@@ -8,41 +8,12 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATAINTF_H
-#define MAME_MACHINE_ATAINTF_H
+#ifndef MAME_BUS_ATA_ATAINTF_H
+#define MAME_BUS_ATA_ATAINTF_H
 
 #pragma once
 
 #include "atadev.h"
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-// ======================> ata_slot_device
-
-class ata_slot_device : public device_t,
-						public device_slot_interface
-{
-public:
-	// construction/destruction
-	ata_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	device_ata_interface *dev() { return m_dev; }
-
-protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_config_complete() override;
-
-private:
-	device_ata_interface *m_dev;
-};
-
-// device type definition
-DECLARE_DEVICE_TYPE(ATA_SLOT, ata_slot_device)
-
-void ata_devices(device_slot_interface &device);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -85,7 +56,6 @@ public:
 	}
 
 	ata_slot_device &slot(int index);
-	virtual void set_default_ata_devices(const char* _master, const char* _slave);
 
 	uint16_t read_dma();
 	void write_dma(uint16_t data);
@@ -176,4 +146,4 @@ public:
 
 DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)
 
-#endif // MAME_MACHINE_ATAINTF_H
+#endif // MAME_BUS_ATA_ATAINTF_H

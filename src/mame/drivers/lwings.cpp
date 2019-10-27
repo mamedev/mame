@@ -1777,8 +1777,8 @@ ROM_END
 
 void lwings_state::init_avengersb()
 {
-	/* set up protection handlers */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(FUNC(generic_latch_8_device::write), (generic_latch_8_device*)m_soundlatch));
+	// set up protection handlers
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xf80c, 0xf80c, write8smo_delegate(*m_soundlatch, FUNC(generic_latch_8_device::write)));
 }
 
 

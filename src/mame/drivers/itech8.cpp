@@ -961,7 +961,7 @@ void itech8_state::ninclown_map(address_map &map)
 	map(0x100080, 0x100080).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100100, 0x100100).w(FUNC(itech8_state::grom_bank_w));
 	map(0x100100, 0x100101).portr("40");
-	map(0x100180, 0x100180).lw8("page_inv_w", [this](u8 data){ page_w(~data); } );
+	map(0x100180, 0x100180).lw8(NAME([this](u8 data){ page_w(~data); }));
 	map(0x100180, 0x100181).portr("60");
 	map(0x100240, 0x100240).w(m_tms34061, FUNC(tms34061_device::latch_w));
 	map(0x100280, 0x100281).portr("80").nopw();

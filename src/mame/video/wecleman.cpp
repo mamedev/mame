@@ -910,19 +910,19 @@ VIDEO_START_MEMBER(wecleman_state,wecleman)
 
 	m_sprite_list = std::make_unique<sprite_t []>(NUM_SPRITES);
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_bg_tile_info),this),
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wecleman_state::wecleman_get_bg_tile_info)),
 								TILEMAP_SCAN_ROWS,
 									/* We draw part of the road below */
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2 );
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_fg_tile_info),this),
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wecleman_state::wecleman_get_fg_tile_info)),
 								TILEMAP_SCAN_ROWS,
 
 								8,8,
 								PAGE_NX * 2, PAGE_NY * 2);
 
-	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(wecleman_state::wecleman_get_txt_tile_info),this),
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wecleman_state::wecleman_get_txt_tile_info)),
 									TILEMAP_SCAN_ROWS,
 
 									8,8,

@@ -287,8 +287,8 @@ void calcune_state::calcune(machine_config &config)
 	m_vdp[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
 	m_vdp[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
 
-	TIMER(config, "scantimer").configure_scanline("gen_vdp1", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
-	TIMER(config, "scantimer2").configure_scanline("gen_vdp2", FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(m_vdp[0], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
+	TIMER(config, "scantimer2").configure_scanline(m_vdp[1], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

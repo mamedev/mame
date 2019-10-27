@@ -230,7 +230,7 @@ uint32_t tattack_state::screen_update_tattack(screen_device &screen, bitmap_ind1
 
 void tattack_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(tattack_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(tattack_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }
 
 WRITE8_MEMBER(tattack_state::paddle_w)

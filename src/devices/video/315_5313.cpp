@@ -169,6 +169,9 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_sndirqline_callback(*this)
 	, m_lv6irqline_callback(*this)
 	, m_lv4irqline_callback(*this)
+	, m_32x_scanline_func(*this)
+	, m_32x_interrupt_func(*this)
+	, m_32x_scanline_helper_func(*this)
 	, m_command_pending(0)
 	, m_command_part1(0)
 	, m_command_part2(0)
@@ -283,9 +286,9 @@ void sega315_5313_device::device_start()
 	m_lv6irqline_callback.resolve_safe();
 	m_lv4irqline_callback.resolve_safe();
 
-	m_32x_scanline_func.bind_relative_to(*owner());
-	m_32x_interrupt_func.bind_relative_to(*owner());
-	m_32x_scanline_helper_func.bind_relative_to(*owner());
+	m_32x_scanline_func.resolve();
+	m_32x_interrupt_func.resolve();
+	m_32x_scanline_helper_func.resolve();
 
 	m_vram  = std::make_unique<u16[]>(0x10000 / 2);
 	m_cram  = std::make_unique<u16[]>(0x80 / 2);

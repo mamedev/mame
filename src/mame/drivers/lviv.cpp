@@ -460,7 +460,7 @@ void lviv_state::lviv(machine_config &config)
 	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.50);
 
 	/* snapshot */
-	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "sav").set_load_callback(FUNC(lviv_state::snapshot_cb));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(lviv_lvt_format);

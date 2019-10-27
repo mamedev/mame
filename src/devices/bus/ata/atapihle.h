@@ -8,13 +8,13 @@
 
 ***************************************************************************/
 
-#ifndef MAME_MACHINE_ATAPIHLE_H
-#define MAME_MACHINE_ATAPIHLE_H
+#ifndef MAME_BUS_ATA_ATAPIHLE_H
+#define MAME_BUS_ATA_ATAPIHLE_H
 
 #pragma once
 
 #include "atahle.h"
-#include "t10spc.h"
+#include "machine/t10spc.h"
 
 class atapi_hle_device : public ata_hle_device, public virtual t10spc
 {
@@ -74,4 +74,4 @@ private:
 	static constexpr int ATAPI_BUFFER_LENGTH = 0xf800;
 };
 
-#endif // MAME_MACHINE_ATAPIHLE_H
+#endif // MAME_BUS_ATA_ATAPIHLE_H

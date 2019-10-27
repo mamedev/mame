@@ -675,7 +675,7 @@ void kongambl_state::kongambl(machine_config &config)
 	K055555(config, m_k055555, 0);
 
 	K055673(config, m_k055673, 0);
-	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback), this);
+	m_k055673->set_sprite_callback(FUNC(kongambl_state::sprite_callback));
 	m_k055673->set_config(K055673_LAYOUT_LE2, -48+1, -23);
 	m_k055673->set_palette(m_palette);
 
@@ -684,7 +684,7 @@ void kongambl_state::kongambl(machine_config &config)
 #endif
 
 	K056832(config, m_k056832, 0);
-	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback), this);
+	m_k056832->set_tile_callback(FUNC(kongambl_state::tile_callback));
 	m_k056832->set_config(K056832_BPP_8TASMAN, 0, 0);
 	m_k056832->set_palette(m_palette);
 

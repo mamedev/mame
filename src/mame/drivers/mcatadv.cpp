@@ -448,12 +448,12 @@ void mcatadv_state::mcatadv(machine_config &config)
 	TMAP038(config, m_tilemap[0]);
 	m_tilemap[0]->set_gfxdecode_tag(m_gfxdecode);
 	m_tilemap[0]->set_gfx(0);
-	m_tilemap[0]->set_tile_callback(tilemap038_device::tmap038_cb_delegate(FUNC(mcatadv_state::get_banked_color<0>), this));
+	m_tilemap[0]->set_tile_callback(FUNC(mcatadv_state::get_banked_color<0>));
 
 	TMAP038(config, m_tilemap[1]);
 	m_tilemap[1]->set_gfxdecode_tag(m_gfxdecode);
 	m_tilemap[1]->set_gfx(1);
-	m_tilemap[1]->set_tile_callback(tilemap038_device::tmap038_cb_delegate(FUNC(mcatadv_state::get_banked_color<1>), this));
+	m_tilemap[1]->set_tile_callback(FUNC(mcatadv_state::get_banked_color<1>));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(3));  /* a guess, and certainly wrong */
 

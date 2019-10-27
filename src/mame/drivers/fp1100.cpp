@@ -302,7 +302,7 @@ void fp1100_state::sub_map(address_map &map)
 	map(0xe001, 0xe001).mirror(0x3fe).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0xe400, 0xe7ff).portr("DSW").w(FUNC(fp1100_state::kbd_row_w));
 	map(0xe800, 0xebff).rw(FUNC(fp1100_state::main_to_sub_r), FUNC(fp1100_state::sub_to_main_w));
-	map(0xec00, 0xefff).lw8("reset0", [this] (u8 data) { m_subcpu->set_input_line(UPD7810_INTF0, CLEAR_LINE); });
+	map(0xec00, 0xefff).lw8(NAME([this] (u8 data) { m_subcpu->set_input_line(UPD7810_INTF0, CLEAR_LINE); }));
 	map(0xf000, 0xf3ff).w(FUNC(fp1100_state::colour_control_w));
 	map(0xf400, 0xff7f).rom().region("sub_ipl", 0x2400);
 }
@@ -378,15 +378,15 @@ void fp1100_state::handle_int_to_main()
 		{
 			m_maincpu->set_input_line(0, HOLD_LINE);
 			LOG("%s: Main IRQ asserted\n",machine().describe_context());
-//			m_main_irq_status = true;
+//          m_main_irq_status = true;
 		}
 	}
 	else
 	{
 		if (m_main_irq_status)
 		{
-//			m_maincpu->set_input_line(0, CLEAR_LINE);
-//			LOG("%s: Main IRQ cleared\n",machine().describe_context());
+//          m_maincpu->set_input_line(0, CLEAR_LINE);
+//          LOG("%s: Main IRQ cleared\n",machine().describe_context());
 			m_main_irq_status = false;
 		}
 	}
@@ -711,7 +711,7 @@ void fp1100_state::fp1100(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(fp1100_state::crtc_update_row));
 
 	/* Printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");

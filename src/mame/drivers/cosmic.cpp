@@ -1575,16 +1575,16 @@ void cosmic_state::init_cosmica()
 
 void cosmic_state::init_devzone()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807,write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
 }
 
 
 void cosmic_state::init_nomnlnd()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5000, 0x5001, read8_delegate(*this, FUNC(cosmic_state::nomnlnd_port_0_1_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x4800, 0x4800);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(FUNC(cosmic_state::cosmic_background_enable_w),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(FUNC(cosmic_state::dac_w), this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x4807, 0x4807, write8_delegate(*this, FUNC(cosmic_state::cosmic_background_enable_w)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x480a, 0x480a, write8_delegate(*this, FUNC(cosmic_state::dac_w)));
 }
 
 void cosmic_state::init_panic()

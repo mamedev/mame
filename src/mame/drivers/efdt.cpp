@@ -221,8 +221,8 @@ TILE_GET_INFO_MEMBER(efdt_state::get_tile_info_1)
 
 void efdt_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_0), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(efdt_state::get_tile_info_1), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(efdt_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(efdt_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);

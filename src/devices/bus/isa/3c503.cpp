@@ -32,8 +32,8 @@ void el2_3c503_device::device_start() {
 	memset(m_rom, 0, 8*1024); // empty
 	m_dp8390->set_mac(mac);
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x030f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_loport_w), this));
-	m_isa->install_device(0x0700, 0x070f, read8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_r), this), write8_delegate(FUNC(el2_3c503_device::el2_3c503_hiport_w), this));
+	m_isa->install_device(0x0300, 0x030f, read8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_r)), write8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_loport_w)));
+	m_isa->install_device(0x0700, 0x070f, read8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_r)), write8_delegate(*this, FUNC(el2_3c503_device::el2_3c503_hiport_w)));
 
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime

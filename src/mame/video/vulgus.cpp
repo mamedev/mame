@@ -109,8 +109,8 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_bg_tile_info)
 
 void vulgus_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(vulgus_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(vulgus_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vulgus_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(vulgus_state::get_bg_tile_info)), TILEMAP_SCAN_COLS, 16,16, 32,32);
 
 	m_fg_tilemap->configure_groups(*m_gfxdecode->gfx(0), 47);
 

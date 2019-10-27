@@ -4300,7 +4300,7 @@ void apple2e_state::apple2e(machine_config &config)
 
 	/* repeat timer.  15 Hz from page 7-15 of "Understanding the Apple IIe" */
 	timer_device &timer(TIMER(config, "repttmr", 0));
-	timer.configure_periodic(timer_device::expired_delegate(FUNC(apple2e_state::ay3600_repeat), this), attotime::from_hz(15));
+	timer.configure_periodic(FUNC(apple2e_state::ay3600_repeat), attotime::from_hz(15));
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);

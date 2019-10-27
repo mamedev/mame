@@ -327,8 +327,8 @@ void ppreprocessor::error(const pstring &err)
 #define CHECKTOK2(p_op, p_prio) \
 	else if (tok == # p_op)                         \
 	{                                               \
-		if (!has_val)								\
-			{ error("parsing error!"); return 1;}	\
+		if (!has_val)                               \
+			{ error("parsing error!"); return 1;}   \
 		if (prio < (p_prio))                        \
 			return val;                             \
 		start++;                                    \

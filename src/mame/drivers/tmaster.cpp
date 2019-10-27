@@ -212,7 +212,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 void tmaster_state::cpu_space_map(address_map &map)
 {
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
-	map(0xfffff8, 0xfffff9).lr16("irq 2", [this]() -> u16 { return m_duart->get_irq_vector(); });
+	map(0xfffff8, 0xfffff9).lr16(NAME([this] () -> u16 { return m_duart->get_irq_vector(); }));
 }
 
 WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)

@@ -435,8 +435,8 @@ void stv_state::init_stv()
 	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	m_slave->sh2drc_set_options(SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
-	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::stv_ioga_r32)), write32_delegate(*this, FUNC(stv_state::stv_ioga_w32)));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::stv_ioga_r32)), write32_delegate(*this, FUNC(stv_state::stv_ioga_w32)));
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x0007ffff, 1, &m_rom[0]);
 	m_maincpu->sh2drc_add_fastram(0x00200000, 0x002fffff, 0, &m_workram_l[0]);
@@ -451,8 +451,8 @@ void stv_state::init_stv()
 void stv_state::init_critcrsh()
 {
 	init_stv();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
-	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::critcrsh_ioga_r32),this), write32_delegate(FUNC(stv_state::stv_ioga_w32),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::critcrsh_ioga_r32)), write32_delegate(*this, FUNC(stv_state::stv_ioga_w32)));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::critcrsh_ioga_r32)), write32_delegate(*this, FUNC(stv_state::stv_ioga_w32)));
 }
 
 /*
@@ -487,11 +487,11 @@ void stv_state::init_magzun()
 
 	init_stv();
 
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
-	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::magzun_ioga_r32),this), write32_delegate(FUNC(stv_state::magzun_ioga_w32),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::magzun_ioga_r32)), write32_delegate(*this, FUNC(stv_state::magzun_ioga_w32)));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::magzun_ioga_r32)), write32_delegate(*this, FUNC(stv_state::magzun_ioga_w32)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x608e830, 0x608e833, read32_delegate(FUNC(stv_state::magzun_hef_hack_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60ff3b4, 0x60ff3b7, read32_delegate(FUNC(stv_state::magzun_rx_hack_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x608e830, 0x608e833, read32_delegate(*this, FUNC(stv_state::magzun_hef_hack_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x60ff3b4, 0x60ff3b7, read32_delegate(*this, FUNC(stv_state::magzun_rx_hack_r)));
 
 	/* Program ROM patches, don't understand how to avoid these two checks ... */
 	{
@@ -507,8 +507,8 @@ void stv_state::init_magzun()
 void stv_state::init_stvmp()
 {
 	init_stv();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
-	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stvmp_ioga_r32),this), write32_delegate(FUNC(stv_state::stvmp_ioga_w32),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::stvmp_ioga_r32)), write32_delegate(*this, FUNC(stv_state::stvmp_ioga_w32)));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::stvmp_ioga_r32)), write32_delegate(*this, FUNC(stv_state::stvmp_ioga_w32)));
 }
 
 
@@ -761,8 +761,8 @@ void stv_state::init_batmanfr()
 
 	init_stv();
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
-	m_slave->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(FUNC(stv_state::batmanfr_sound_comms_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(*this, FUNC(stv_state::batmanfr_sound_comms_w)));
+	m_slave->space(AS_PROGRAM).install_write_handler(0x04800000, 0x04800003, write32_delegate(*this, FUNC(stv_state::batmanfr_sound_comms_w)));
 
 	m_minit_boost = m_sinit_boost = 0;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(50);
@@ -992,12 +992,12 @@ WRITE32_MEMBER(stv_state::decathlt_prot_srcaddr_w)
 
 void stv_state::init_decathlt()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(FUNC(stv_state::decathlt_prot_srcaddr_w), this)); // set compressed data source address, write data
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2000000, 0x37fffff, write32_delegate(*this, FUNC(stv_state::decathlt_prot_srcaddr_w))); // set compressed data source address, write data
 
 	// really needs installing over the whole range, with fallbacks to read rom if device is disabled or isn't accessed on given address
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); // read decompressed data
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37ffff8, 0x37ffffb, read32_delegate(FUNC(stv_state::decathlt_prot_r), this)); //  ^
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x27ffff8, 0x27ffffb, read32_delegate(*this, FUNC(stv_state::decathlt_prot_r))); // read decompressed data
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2fffff8, 0x2fffffb, read32_delegate(*this, FUNC(stv_state::decathlt_prot_r))); //  ^
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x37ffff8, 0x37ffffb, read32_delegate(*this, FUNC(stv_state::decathlt_prot_r))); //  ^
 
 	m_protbank->configure_entry(0, memregion("cart")->base() + 0x0000000);
 	m_protbank->configure_entry(1, memregion("cart")->base() + 0x0800000);
@@ -1028,8 +1028,8 @@ void stv_state::init_nameclv3()
 void stv_state::init_hopper()
 {
 	init_stv();
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
-	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(FUNC(stv_state::stv_ioga_r32),this), write32_delegate(FUNC(stv_state::hop_ioga_w32),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::stv_ioga_r32)), write32_delegate(*this, FUNC(stv_state::hop_ioga_w32)));
+	m_slave->space(AS_PROGRAM).install_readwrite_handler(0x00400000, 0x0040003f, read32_delegate(*this, FUNC(stv_state::stv_ioga_r32)), write32_delegate(*this, FUNC(stv_state::hop_ioga_w32)));
 }
 
 void stv_state::stv_mem(address_map &map)
@@ -1255,7 +1255,7 @@ void stv_state::shienryu(machine_config &config)
 }
 
 #define STV_CARTSLOT_ADD(_tag, _load) \
-	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "stv_cart").set_device_load(FUNC(stv_state::_load), this);
+	GENERIC_CARTSLOT(config, _tag, generic_plain_slot, "stv_cart").set_device_load(FUNC(stv_state::_load));
 
 void stv_state::stv_cartslot(machine_config &config)
 {
@@ -1365,7 +1365,7 @@ MACHINE_START_MEMBER(stv_state, stv)
 
 	stv_register_protection_savestates(); // machine/stvprot.c
 
-	m_audiocpu->set_reset_callback(write_line_delegate(FUNC(stv_state::m68k_reset_callback),this));
+	m_audiocpu->set_reset_callback(*this, FUNC(stv_state::m68k_reset_callback));
 }
 
 

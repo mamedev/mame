@@ -204,17 +204,17 @@ void legionna_state::common_video_start(bool split, bool has_extended_banking, b
 {
 	common_video_allocate_ptr();
 
-	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_back_tile_info),this),                TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_back_tile_info)),                TILEMAP_SCAN_ROWS,16,16,32,32);
 	if (split)
 	{
-		m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_split),this),       TILEMAP_SCAN_ROWS,16,16,32,32);
+		m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_mid_tile_info_split)),       TILEMAP_SCAN_ROWS,16,16,32,32);
 	}
 	else
 	{
-		m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_mid_tile_info_share_bgrom),this), TILEMAP_SCAN_ROWS,16,16,32,32);
+		m_midground_layer =  &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_mid_tile_info_share_bgrom)), TILEMAP_SCAN_ROWS,16,16,32,32);
 	}
-	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_fore_tile_info),this),                TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(legionna_state::get_text_tile_info),this),                TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_fore_tile_info)),                TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_text_layer =       &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(legionna_state::get_text_tile_info)),                TILEMAP_SCAN_ROWS, 8, 8,64,32);
 
 	m_has_extended_banking = has_extended_banking;
 	m_has_extended_priority = has_extended_priority;

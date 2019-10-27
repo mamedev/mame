@@ -1173,7 +1173,7 @@ void asteroid_state::init_asteroidb()
 
 void asteroid_state::init_asterock()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(FUNC(asteroid_state::asterock_IN0_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2000, 0x2007, read8_delegate(*this, FUNC(asteroid_state::asterock_IN0_r)));
 }
 
 

@@ -807,10 +807,10 @@ void nascom_state::nascom(machine_config &config)
 
 	// devices
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "nas", attotime::from_msec(500)));
-	snapshot.set_load_callback(FUNC(nascom_state::snapshot_cb<0>), this);
+	snapshot.set_load_callback(FUNC(nascom_state::snapshot_cb<0>));
 	snapshot.set_interface("nascom_snap");
 	snapshot_image_device &snapchar(SNAPSHOT(config, "snapchar", "chr", attotime::from_msec(500)));
-	snapchar.set_load_callback(FUNC(nascom_state::snapshot_cb<1>), this);
+	snapchar.set_load_callback(FUNC(nascom_state::snapshot_cb<1>));
 	snapchar.set_interface("nascom_char");
 }
 
@@ -850,9 +850,9 @@ void nascom2_state::nascom2(machine_config &config)
 
 	// generic sockets for ram/rom (todo: support ram here)
 	GENERIC_SOCKET(config, m_socket1, generic_plain_slot, "nascom_socket", "bin,rom");
-	m_socket1->set_device_load(FUNC(nascom2_state::socket1_load), this);
+	m_socket1->set_device_load(FUNC(nascom2_state::socket1_load));
 	GENERIC_SOCKET(config, m_socket2, generic_plain_slot, "nascom_socket", "bin,rom");
-	m_socket2->set_device_load(FUNC(nascom2_state::socket2_load), this);
+	m_socket2->set_device_load(FUNC(nascom2_state::socket2_load));
 
 	// nasbus expansion bus
 	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));

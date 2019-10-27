@@ -177,7 +177,7 @@ void tim100_state::tim100(machine_config &config)
 
 	I8276(config, m_crtc, XTAL(4'915'200));
 	m_crtc->set_character_width(12);
-	m_crtc->set_display_callback(FUNC(tim100_state::crtc_display_pixels), this);
+	m_crtc->set_display_callback(FUNC(tim100_state::crtc_display_pixels));
 	m_crtc->drq_wr_callback().set(FUNC(tim100_state::drq_w));
 	m_crtc->irq_wr_callback().set(FUNC(tim100_state::irq_w));
 	m_crtc->set_screen("screen");

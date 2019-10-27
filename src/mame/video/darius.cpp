@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
 void darius_state::video_start()
 {
 	m_gfxdecode->gfx(2)->set_granularity(16);
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darius_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,128,64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(darius_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }

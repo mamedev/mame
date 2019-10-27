@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(shangkid_state,shangkid)
 {
-	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shangkid_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_background = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(shangkid_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 }
 
 WRITE8_MEMBER(shangkid_state::videoram_w)

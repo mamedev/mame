@@ -92,7 +92,7 @@ uint32_t taotaido_state::tile_callback( uint32_t code )
 
 void taotaido_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taotaido_state::bg_tile_info),this),tilemap_mapper_delegate(FUNC(taotaido_state::tilemap_scan_rows),this),16,16,128,64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taotaido_state::bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(taotaido_state::tilemap_scan_rows)), 16,16, 128,64);
 
 	m_spriteram_old = std::make_unique<uint16_t[]>(0x2000/2);
 	m_spriteram_older = std::make_unique<uint16_t[]>(0x2000/2);

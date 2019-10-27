@@ -446,7 +446,7 @@ void pg685_state::pg675(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row));
 
 	// sound hardware
 
@@ -494,7 +494,7 @@ void pg685_state::pg685(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row), this);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row));
 
 	// sound hardware
 
@@ -546,7 +546,7 @@ void pg685_state::pg685oua12(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row_oua12), this);
+	crtc.set_update_row_callback(FUNC(pg685_state::crtc_update_row_oua12));
 
 	// sound hardware
 

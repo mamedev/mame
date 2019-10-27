@@ -977,7 +977,7 @@ void mekd3_state::mekd3(machine_config &config)
 	m_mc6845->set_screen("screen");
 	m_mc6845->set_show_border_area(false);
 	m_mc6845->set_char_width(8);
-	m_mc6845->set_update_row_callback(FUNC(mekd3_state::update_row), this);
+	m_mc6845->set_update_row_callback(FUNC(mekd3_state::update_row));
 	m_mc6845->out_hsync_callback().set(FUNC(mekd3_state::r2_hsync_changed));
 	m_mc6845->out_vsync_callback().set(FUNC(mekd3_state::r2_vsync_changed));
 

@@ -173,7 +173,7 @@ void multi16_state::multi16(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(multi16_state::crtc_update_row), this);
+	m_crtc->set_update_row_callback(FUNC(multi16_state::crtc_update_row));
 
 	// floppy
 	MB8866(config, m_fdc, 2000000);

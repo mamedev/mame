@@ -131,7 +131,7 @@ void system1_state::video_start_common(int pagecount)
 	/* create the tilemap pages */
 	for (pagenum = 0; pagenum < pagecount; pagenum++)
 	{
-		m_tilemap_page[pagenum] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(system1_state::tile_get_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+		m_tilemap_page[pagenum] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(system1_state::tile_get_info)), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 		m_tilemap_page[pagenum]->set_transparent_pen(0);
 		m_tilemap_page[pagenum]->set_user_data(m_videoram.get() + 0x800 * pagenum);
 	}

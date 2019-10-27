@@ -278,10 +278,12 @@
 #include "emu.h"
 #include "audio/dcs.h"
 
+#include "bus/ata/idehd.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
 #include "machine/idectrl.h"
-#include "machine/idehd.h"
+#include "machine/ins8250.h"
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
 #include "machine/timekpr.h"
@@ -290,8 +292,6 @@
 #include "machine/pci-ide.h"
 #include "video/voodoo_pci.h"
 #include "screen.h"
-#include "machine/ins8250.h"
-#include "bus/rs232/rs232.h"
 
 #include "sf2049.lh"
 

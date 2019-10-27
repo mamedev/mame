@@ -384,7 +384,7 @@ device_image_interface *software_list_device::find_mountable_image(const machine
 	// When softlists were refactored in MAME 0.183, this was changed to build a "plan" for what needs to be loaded, so
 	// it was incorrect to check the image slot.  This is why an overload for find_mountable_image() was created that
 	// takes an std::function.  This overload is being preserved for compatibility with existing code, but I regard the
-	// continued existance of this overload is a red flag.
+	// continued existence of this overload as a red flag.
 	return find_mountable_image(
 		mconfig,
 		part,

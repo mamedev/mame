@@ -4,7 +4,7 @@
  *
  *   Ericsson Information Systems PC "compatibles"
  *
- * The Ericsson PC was the the first original Ericsson design for the office PC market replacing the
+ * The Ericsson PC was the first original Ericsson design for the office PC market replacing the
  * Step/One which was an OEM:ed clone of the Matsushita Mybrain 3000 (see myb3k.cpp driver).
  *
  **************************************************************
@@ -21,22 +21,22 @@
  * On board ports: Beeper,
  * Ports: serial, parallel
  * Internal Options: Up to 640K RAM through add-on RAM card
- * Misc: The hardware was not 100% PC compatible so non BIOS based software would not run. 50.000+ units sold
+ * Misc: The hardware was not 100% PC compatible so non BIOS based software would not always run. 50.000+ units sold
  *
- * TODO:
- * - Add keyboard, first HLE as in pc.cpp and then LLE when the keyboard controller is dumped
- * - Add the on-board FDC and boot DOS 1.xx
- * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes inclusing 640x400 (aka HR)
+ * TODO
+ * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
+ * - Implement the descrete baudrate generator
+ * - Implement logic around enabling/resetting NMI and ISA bus I/O CHK
  *
- * Credits: The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
+ * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
  *          A dead pcb was donated by rfka01 and rom dumps by ZnaxQue@sweclockers.com
  *
  ************************************************************************************************************/
 /*
- Links:
- ------
+ Links
+ -----
 
  */
 
@@ -175,8 +175,8 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(int_w);
 	uint8_t m_nmi_enabled;
 	uint8_t m_8087_int = 0;
-	const uint8_t m_parer_int = 0;
-	const uint8_t m_iochck_int = 0;
+	uint8_t m_parer_int = 0;
+	uint8_t m_iochck_int = 0;
 	void update_nmi();
 
 	// Timer
@@ -185,6 +185,8 @@ private:
 	// Speaker
 	DECLARE_WRITE_LINE_MEMBER(speaker_ck_w);
 	required_device<speaker_sound_device> m_speaker;
+	bool m_pc4;
+	bool m_pc5;
 
 	void epc_map(address_map &map);
 	void epc_io(address_map &map);
@@ -242,145 +244,164 @@ void epc_state::epc_map(address_map &map)
 
 void epc_state::epc_io(address_map &map)
 {
-	map(0x0000, 0x000f).mirror(0x10).lrw8("dma8237_rw",
+	map(0x0000, 0x000f).mirror(0x10).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_dma8237a->read(offset);
 			LOGDMA("dma8237_r %04x\n", offset);
 			return data;
 		},
+		"dma8237_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGDMA("dma8237_w %04x: %02x\n", offset, data);
 			m_dma8237a->write(offset, data);
-		}
+		},
+		"dma8237_w"
 	);
 
-	map(0x0020, 0x0021).mirror(0x1e).lrw8("pic8259_rw",
+	map(0x0020, 0x0021).mirror(0x1e).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_pic8259->read(offset);
 			LOGPIC("pic8259_r %04x: %02x\n", offset, data);
 			return data;
 		},
+		"pic8259_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPIC("pic8259_w %04x: %02x\n", offset, data);
 			m_pic8259->write(offset, data);
-		}
+		},
+		"pic8259_w"
 	);
 
-	map(0x0040, 0x0043).mirror(0x1c).lrw8("pit8253_rw",
+	map(0x0040, 0x0043).mirror(0x1c).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_pit8253->read(offset);
 			LOGPIT("pit8253_r %04x\n", offset);
 			return data;
 		},
+		"pit8253_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPIT("pit8253_w %04x: %02x\n", offset, data);
 			m_pit8253->write(offset, data);
-		}
+		},
+		"pit8253_w"
 	);
 
-	map(0x0060, 0x0060).mirror(0x1c).lrw8("kbd_8251_data_rw",
+	map(0x0060, 0x0060).mirror(0x1c).lrw8(
 		[this]() -> uint8_t
 		{
 			uint8_t data = m_kbd8251->data_r();
 			LOGKBD("kbd8251_r %02x\n", data);
 			return data;
 		},
+		"kbd_8251_data_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_w 0x60 %02x\n", data);
 			m_kbd8251->data_w(data);
-		}
+		},
+		"kbd_8251_data_w"
 	);
 									// NOTE: PPI Port A is not mapped
-	map(0x0061, 0x0061).mirror(0x1c).lrw8("ppi8255_rw", // PPI Port B
+	map(0x0061, 0x0061).mirror(0x1c).lrw8(              // PPI Port B
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(1);
 			LOGPPI("ppi8255_r Port B: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Port B: %02x\n", data);
 			m_ppi8255->write(1, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0062, 0x0062).mirror(0x1c).lrw8("ppi8255_rw", // PPI Port C
+	map(0x0062, 0x0062).mirror(0x1c).lrw8(              // PPI Port C
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(2);
 			LOGPPI("ppi8255_r Port C: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Port C: %02x\n", data);
 			m_ppi8255->write(2, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0063, 0x0063).lrw8("ppi8255_rw",  // PPI Control register
+	map(0x0063, 0x0063).lrw8(               // PPI Control register
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t data = m_ppi8255->read(3);
 			LOGPPI("ppi8255_r Control: %02x\n", data);
 			return data;
 		},
+		"ppi8255_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGPPI("ppi8255_w Control: %02x\n", data);
 			m_ppi8255->write(3, data);
-		}
+		},
+		"ppi8255_w"
 	);
 
-	map(0x0070, 0x0070).mirror(0x0e).lw8("i8251_data_w",
+	map(0x0070, 0x0070).mirror(0x0e).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_w 0x70: %02x\n", data);
 			m_kbd8251->data_w(data);
-		}
+		},
+		"i8251_data_w"
 	);
 
-	map(0x0071, 0x0071).mirror(0x0e).lrw8("kbd_8251_stat_ctrl_rw",
+	map(0x0071, 0x0071).mirror(0x0e).lrw8(
 		[this](offs_t offset) -> uint8_t
 		{
 			uint8_t stat = m_kbd8251->status_r();
 			//LOGKBD("kbd8251_status_r %02x\n", stat);
 			return stat;
 		},
+		"kbd_8251_stat_ctrl_r",
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGKBD("kbd8251_control_w 0x71: %02x\n", data);
 			m_kbd8251->control_w(data);
-		}
+		},
+		"kbd_8251_stat_ctrl_w"
 	);
 
-	map(0x0080, 0x0083).mirror(0xc).lw8("dma_segement_w",
+	map(0x0080, 0x0083).mirror(0xc).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGDMA("dma_segment_w %04x: %02x\n", offset, data);
 			m_dma_segment[offset] = data & 0x0f;
-		}
+		},
+		"dma_segement_w"
 	);
 
-	map(0x00a0, 0x00a1).mirror(0xe).lw8("nmi_enable_w",
+	map(0x00a0, 0x00a1).mirror(0xe).lw8(
 		[this](offs_t offset, uint8_t data)
 		{
 			LOGNMI("nmi_enable_w %04x: %02x\n", offset, data);
 			m_nmi_enabled = BIT(data,7);
 			update_nmi();
-		}
+		},
+		"nmi_enable_w"
 	);
 
 	// FDC Output Control Register (same as PC XT DOR)
-	map(0x03f2, 0x03f3).lw8("ocr_w",        // B0-B1 Drive select 0-3
+	map(0x03f2, 0x03f3).lw8(                // B0-B1 Drive select 0-3
 		[this](offs_t offset, uint8_t data) // B2 FDC Reset line
 		{                   // B3 Enable FDC DMA/IRQ
 			LOGFDC("FDC OCR: %02x\n", data);// B4-B7 Motor on for selected drive
@@ -402,23 +423,26 @@ void epc_state::epc_io(address_map &map)
 				m_fdc->reset();
 			check_fdc_irq();
 			check_fdc_drq();
-		}
+		},
+		"ocr_w"
 	);
 
 	map(0x03f4, 0x03f5).m(m_fdc, FUNC(i8272a_device::map));
 
-	map(0x03bc, 0x03be).lrw8("lpt_rw",
+	map(0x03bc, 0x03be).lrw8(
 		[this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t data = m_lpt->read(space, offset);
 			LOGLPT("LPT read offset %02x: %02x\n", offset, data);
 			return data;
 		},
+		"lpt_r",
 		[this](address_space &space, offs_t offset, uint8_t data)
 		{
 			LOGLPT("LPT write offset %02x: %02x\n", offset, data);
 			m_lpt->write(space, offset, data);
-		}
+		},
+		"lpt_w"
 	);
 
 	map(0x03f8, 0x03ff).rw(m_uart, FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -429,33 +453,53 @@ void epc_state::machine_start()
 	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 
 	std::fill_n(&m_dma_segment[0], 4, 0);
-	m_dma_active = 0;
-	m_tc = false;
-	m_int = 1;
-	m_txd = false;
-	m_rxrdy = false;
-	m_dreq0_ck = true;
-	m_rxtx_clk_state = 0;
 
 	save_item(NAME(m_dma_segment));
 	save_item(NAME(m_dma_active));
 	save_item(NAME(m_tc));
-	save_item(NAME(m_int));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_rxrdy));
-	save_item(NAME(m_ocr));
-	m_ocr = 0x00;
-	save_item(NAME(m_ppi_portb));
+	save_item(NAME(m_int));
 	save_item(NAME(m_dreq0_ck));
+	save_item(NAME(m_ppi_portb));
 	save_item(NAME(m_rxtx_clk_state));
+	save_item(NAME(m_nmi_enabled));
+	save_item(NAME(m_8087_int));
+	save_item(NAME(m_parer_int));
+	save_item(NAME(m_iochck_int));
+	save_item(NAME(m_pc4));
+	save_item(NAME(m_pc5));
+	save_item(NAME(m_ocr));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_drq));
 }
 
 void epc_state::machine_reset()
 {
+	m_dma_active = 0;
+	m_tc = false;
+	m_txd = false;
+	m_rxrdy = false;
+	m_int = 1;
+	m_dreq0_ck = true;
 	m_ppi_portb = 0;
-	m_keyboard->rst_line_w(ASSERT_LINE);
+	m_rxtx_clk_state = 0;
 	m_nmi_enabled = 0;
-	m_kbd8251->write_cts(0); // Held low always
+	m_8087_int = 0;
+	m_parer_int = 0;
+	m_iochck_int = 0;
+	m_pc4 = 0;
+	m_pc5 = 0;
+	m_ocr = 0;
+	m_irq = 0;
+	m_drq = 0;
+	m_fdc_irq = 0;
+	m_fdc_drq = 0;
+
+	m_keyboard->rst_line_w(ASSERT_LINE);
+	m_kbd8251->write_cts(0); // Tied to GND
 }
 
 void epc_state::init_epc()
@@ -550,7 +594,9 @@ WRITE_LINE_MEMBER(epc_state::dreq0_ck_w)
 
 WRITE_LINE_MEMBER(epc_state::speaker_ck_w)
 {
-	m_speaker->level_w((m_ppi_portb & 0x02) && state ? 1 : 0);
+	m_pc5 = state;
+	m_pc4 = (m_ppi_portb & 0x02) && state ? 1 : 0;
+	m_speaker->level_w(m_pc4);
 }
 
 /**********************************************************
@@ -614,7 +660,8 @@ READ8_MEMBER( epc_state::ppi_portc_r )
 	// Read 4 configurations dip switches depending on PB3
 	data = (m_io_dsw->read() >> ((m_ppi_portb & 0x08) ? 4 : 0) & 0x0f);
 
-	// TODO: verify what PC4-PC7 is used for, if anything
+	data |= (m_pc4 ? 1U << 4 : 0); // Feedback from gated speaker beep
+	data |= (m_pc5 ? 1U << 5 : 0); // Feedback from timer source for speaker beep
 
 	LOGPPI("PPI Port C read: %02x\n", data);
 
@@ -785,7 +832,7 @@ void epc_state::epc(machine_config &config)
 	ISA8(config, m_isabus,  XTAL(14'318'181) / 3.0); // TEW crystal marked X1 verified
 	m_isabus->set_memspace(m_maincpu, AS_PROGRAM);
 	m_isabus->set_iospace(m_maincpu, AS_IO);
-	//m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w)); // Reserved in service manual
+	m_isabus->irq2_callback().set(m_pic8259, FUNC(pic8259_device::ir2_w)); // Reserved in service manual
 	m_isabus->irq3_callback().set(m_pic8259, FUNC(pic8259_device::ir3_w));
 	m_isabus->irq4_callback().set(m_pic8259, FUNC(pic8259_device::ir4_w));
 	m_isabus->irq5_callback().set(m_pic8259, FUNC(pic8259_device::ir5_w));
@@ -794,7 +841,6 @@ void epc_state::epc(machine_config &config)
 	m_isabus->drq1_callback().set(m_dma8237a, FUNC(am9517a_device::dreq1_w));
 	m_isabus->drq2_callback().set(m_dma8237a, FUNC(am9517a_device::dreq2_w));
 	m_isabus->drq3_callback().set(m_dma8237a, FUNC(am9517a_device::dreq3_w));
-	//m_isabus->iochck_callback().set(FUNC(epc_state::chck_w)); // TODO: Check schematics
 	m_isabus->iochck_callback().set([this] (int state)
 	{
 		if (m_nmi_enabled && !state && 0)
@@ -814,8 +860,10 @@ void epc_state::epc(machine_config &config)
 	// System board has 128kB memory with parity, expansion can be achieved through the
 	// 128kB Memory Expansion Board 1090 and/or the 128kB Multifunction Board MB1080-001
 	// and/or the 384kB MB1080-002. The MB1080 DRAM might need to be dynamically added as
-	// base address and also a video memory hole is configuarable.
-	RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
+	// base address and also a video memory hole is configurable.
+	// Some RAM sizes are disabled because they trigger issue #5776, just until that is sorted out
+	//RAM(config, m_ram).set_default_size("128K").set_extra_options("256K, 384K, 512K, 640K");
+	RAM(config, m_ram).set_default_size("128K").set_extra_options("384K");
 
 	// FDC
 	I8272A(config, m_fdc, XTAL(16'000'000) / 2, false); // TEW crystal marked X3 verified
@@ -853,7 +901,7 @@ void epc_state::update_nmi()
 		 (m_parer_int != 0) || // Parity error is always false as it is an emulator, at least for now
 		 (m_iochck_int != 0))) // Same goes for ISA board errors
 	{
-		LOGNMI(" NMI asserted\n");
+		LOGNMI(" NMI Asserted\n");
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	else

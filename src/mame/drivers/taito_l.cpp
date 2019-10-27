@@ -584,10 +584,10 @@ void horshoes_state::horshoes_map(address_map &map)
 	common_banks_map(map);
 	map(0x8000, 0x9fff).ram();
 	map(0xa000, 0xa003).r(FUNC(horshoes_state::extport_select_and_ym2203_r)).w(m_ymsnd, FUNC(ym2203_device::write));
-	map(0xa800, 0xa800).select(0x000c).lr8("upd4701_r",
+	map(0xa800, 0xa800).select(0x000c).lr8(NAME(
 										   [this](address_space &space, offs_t offset, u8 mem_mask) {
 											   return m_upd4701->read_xy(space, offset >> 2, mem_mask);
-										   });
+										   }));
 	map(0xa802, 0xa802).r(m_upd4701, FUNC(upd4701_device::reset_x_r));
 	map(0xa803, 0xa803).r(m_upd4701, FUNC(upd4701_device::reset_y_r));
 	map(0xb801, 0xb801).nopr(); // Watchdog or interrupt ack

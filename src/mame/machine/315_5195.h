@@ -40,7 +40,7 @@ public:
 	sega_315_5195_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration helpers
-	template <typename... T> void set_mapper(T &&... args) { m_mapper = mapper_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_mapper(T &&... args) { m_mapper.set(std::forward<T>(args)...); }
 
 	auto pbf() { return m_pbf_callback.bind(); }
 	auto mcu_int() { return m_mcu_int_callback.bind(); }

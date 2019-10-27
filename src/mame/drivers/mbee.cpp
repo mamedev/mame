@@ -682,12 +682,12 @@ void mbee_state::mbee(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bee), this);
-	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bin), this);
+	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bee));
+	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(3)).set_load_callback(FUNC(mbee_state::quickload_bin));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));
@@ -741,12 +741,12 @@ void mbee_state::mbeeic(machine_config &config)
 	m_crtc->set_screen(m_screen);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row), this);
-	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr), this);
+	m_crtc->set_update_row_callback(FUNC(mbee_state::crtc_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(mbee_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(FUNC(mbee_state::crtc_vs));
 
-	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bee), this);
-	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bin), this);
+	QUICKLOAD(config, "quickload", "mwb,com,bee", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bee));
+	QUICKLOAD(config, "quickload2", "bin", attotime::from_seconds(2)).set_load_callback(FUNC(mbee_state::quickload_bin));
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_a));

@@ -41,14 +41,14 @@ public:
 	m_palette3(*this, "palette3"),
 	m_dac(*this, "dac")
 	{ }
-	
+
 	void spdheat(machine_config &config);
-	
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -57,24 +57,24 @@ private:
 	required_shared_ptr_array<uint16_t, 4> m_fg_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
 	tilemap_t *m_fg_tilemap[4];
-	
+
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette0;
 	required_device<palette_device> m_palette1;
 	required_device<palette_device> m_palette2;
 	required_device<palette_device> m_palette3;
 	required_device<dac_byte_interface> m_dac;
-	
+
 	uint32_t m_sound_data[4];
 	uint32_t m_sound_status;
 	uint32_t m_sub_data;
 	uint32_t m_sub_status;
-	
+
 	void main_map(address_map &map);
 	void sub_map(address_map &map);
 	void sub_io_map(address_map &map);
 	void sound_map(address_map &map);
-	
+
 	DECLARE_READ8_MEMBER(sub_r);
 	DECLARE_WRITE8_MEMBER(sub_dac_w);
 	DECLARE_WRITE8_MEMBER(sub_nmi_w);
@@ -94,7 +94,7 @@ private:
 	DECLARE_WRITE8_MEMBER(ym3_port_b_w);
 	DECLARE_WRITE8_MEMBER(ym4_port_a_w);
 	DECLARE_WRITE8_MEMBER(ym4_port_b_w);
-	
+
 	template<int screen> DECLARE_WRITE16_MEMBER(text_w);
 	template<int screen> TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t xo, uint32_t yo);

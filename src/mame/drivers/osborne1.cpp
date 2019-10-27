@@ -356,8 +356,8 @@ void osborne1nv_state::osborne1nv(machine_config &config)
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_update_row_callback(FUNC(osborne1nv_state::crtc_update_row), this);
-	crtc.set_on_update_addr_change_callback(FUNC(osborne1nv_state::crtc_update_addr_changed), this);
+	crtc.set_update_row_callback(FUNC(osborne1nv_state::crtc_update_row));
+	crtc.set_on_update_addr_change_callback(FUNC(osborne1nv_state::crtc_update_addr_changed));
 }
 
 

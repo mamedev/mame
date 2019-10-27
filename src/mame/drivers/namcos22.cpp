@@ -5640,21 +5640,21 @@ READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 void namcos22_state::install_c74_speedup()
 {
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),this), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x80, 0x81, read16_delegate(*this, FUNC(namcos22_state::mcuc74_speedup_r)), write16_delegate(*this, FUNC(namcos22_state::mcu_speedup_w)));
 }
 
 void namcos22s_state::install_130_speedup()
 {
 	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu130_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu130_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
 }
 
 void namcos22s_state::install_141_speedup()
 {
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22s_state::mcu141_speedup_r),this), write16_delegate(FUNC(namcos22s_state::mcu_speedup_w),this));
+		m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(*this, FUNC(namcos22s_state::mcu141_speedup_r)), write16_delegate(*this, FUNC(namcos22s_state::mcu_speedup_w)));
 }
 
 

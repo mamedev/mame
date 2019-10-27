@@ -433,7 +433,7 @@ void pwrview_state::pwrview(machine_config &config)
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(64'000'000)/64)); // clock unknown
 	crtc.set_char_width(32);   /* ? */
-	crtc.set_update_row_callback(FUNC(pwrview_state::update_row), this);
+	crtc.set_update_row_callback(FUNC(pwrview_state::update_row));
 
 	ADDRESS_MAP_BANK(config, "bios_bank").set_map(&pwrview_state::bios_bank).set_options(ENDIANNESS_LITTLE, 16, 17, 0x8000);
 }

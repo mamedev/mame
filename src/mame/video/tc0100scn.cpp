@@ -156,6 +156,7 @@ tc0100scn_base_device::tc0100scn_base_device(const machine_config &mconfig, devi
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_gfxlayout(TC0100SCN_LAYOUT_DEFAULT)
+	, m_tc0100scn_cb(*this)
 	, m_ram(nullptr)
 	, m_bgscroll_ram(nullptr)
 	, m_fgscroll_ram(nullptr)
@@ -227,7 +228,7 @@ GFXDECODE_END
 void tc0100scn_base_device::device_start()
 {
 	// bind callbacks
-	m_tc0100scn_cb.bind_relative_to(*owner());
+	m_tc0100scn_cb.resolve();
 
 	static const gfx_layout charlayout =
 	{
@@ -248,14 +249,14 @@ void tc0100scn_base_device::device_start()
 	   we're safe as it uses single width tilemaps. */
 
 	/* Single width versions */
-	m_tilemap[0][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>, "bg0_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[1][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>, "bg1_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	m_tilemap[2][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_tx_tile_info<0x02000, 1>, "txt_std", this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[0][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[1][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_tilemap[2][0] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_tx_tile_info<0x02000, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	/* Double width versions */
-	m_tilemap[0][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>, "bg0_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[1][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>, "bg1_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
-	m_tilemap[2][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(&tc0100scn_base_device::get_tx_tile_info<0x09000, 2>, "txt_wide", this), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_tilemap[0][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x00000, 0>))), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[1][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_bg_tile_info<0x04000, 1>))), TILEMAP_SCAN_ROWS, 8, 8, 128, 64);
+	m_tilemap[2][1] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, NAME((&tc0100scn_base_device::get_tx_tile_info<0x09000, 2>))), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
 
 	m_tilemap[0][0]->set_transparent_pen(0);
 	m_tilemap[1][0]->set_transparent_pen(0);

@@ -9,18 +9,19 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-typedef device_delegate<u16 (u16)> igs017_igs031_palette_scramble_delegate;
-
-class igs017_igs031_device : public device_t,
-							public device_gfx_interface,
-							public device_video_interface,
-							public device_memory_interface
+class igs017_igs031_device :
+		public device_t,
+		public device_gfx_interface,
+		public device_video_interface,
+		public device_memory_interface
 {
 public:
+	typedef device_delegate<u16 (u16)> palette_scramble_delegate;
+
 	igs017_igs031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	template <typename T> void set_i8255_tag(T &&tag) { m_i8255.set_tag(std::forward<T>(tag)); }
-	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb = igs017_igs031_palette_scramble_delegate(std::forward<T>(args)...); }
+	template <typename... T> void set_palette_scramble_cb(T &&... args) { m_palette_scramble_cb.set(std::forward<T>(args)...); }
 
 	void set_text_reverse_bits()
 	{
@@ -28,8 +29,6 @@ public:
 	}
 
 	u16 palette_callback_straight(u16 bgr) const;
-
-	igs017_igs031_palette_scramble_delegate m_palette_scramble_cb;
 
 	void map(address_map &map);
 
@@ -69,6 +68,8 @@ protected:
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 private:
+	palette_scramble_delegate m_palette_scramble_cb;
+
 	address_space_config        m_space_config;
 
 	required_shared_ptr<u8> m_spriteram;

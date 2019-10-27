@@ -179,7 +179,7 @@ void aa310_state::init_aa310()
 	uint32_t ram_size = m_ram->size();
 
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x02000000, 0x02ffffff);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(aa310_state::aa310_psy_wram_r), this), write32_delegate(FUNC(aa310_state::aa310_psy_wram_w), this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(*this, FUNC(aa310_state::aa310_psy_wram_r)), write32_delegate(*this, FUNC(aa310_state::aa310_psy_wram_w)));
 
 	archimedes_driver_init();
 }

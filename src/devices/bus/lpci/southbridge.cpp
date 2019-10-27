@@ -219,18 +219,18 @@ void southbridge_device::device_start()
 {
 	spaceio = &m_maincpu->space(AS_IO);
 
-	spaceio->install_readwrite_handler(0x0000, 0x001f, read8sm_delegate(FUNC(am9517a_device::read), &(*m_dma8237_1)), write8sm_delegate(FUNC(am9517a_device::write), &(*m_dma8237_1)), 0xffffffff);
-	spaceio->install_readwrite_handler(0x0020, 0x003f, read8sm_delegate(FUNC(pic8259_device::read), &(*m_pic8259_master)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_pic8259_master)), 0xffffffff);
-	spaceio->install_readwrite_handler(0x0040, 0x005f, read8sm_delegate(FUNC(pit8254_device::read), &(*m_pit8254)), write8sm_delegate(FUNC(pit8254_device::write), &(*m_pit8254)), 0xffffffff);
-	spaceio->install_readwrite_handler(0x0060, 0x0063, read8_delegate(FUNC(southbridge_device::at_portb_r), this), write8_delegate(FUNC(southbridge_device::at_portb_w), this), 0x0000ff00);
-	spaceio->install_readwrite_handler(0x0080, 0x009f, read8_delegate(FUNC(southbridge_device::at_page8_r), this), write8_delegate(FUNC(southbridge_device::at_page8_w), this), 0xffffffff);
-	spaceio->install_readwrite_handler(0x00a0, 0x00bf, read8sm_delegate(FUNC(pic8259_device::read), &(*m_pic8259_slave)), write8sm_delegate(FUNC(pic8259_device::write), &(*m_pic8259_slave)), 0xffffffff);
-	spaceio->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(FUNC(southbridge_device::at_dma8237_2_r), this), write8_delegate(FUNC(southbridge_device::at_dma8237_2_w), this), 0xffffffff);
-	spaceio->install_readwrite_handler(0x0170, 0x0177, read32_delegate(FUNC(southbridge_device::ide2_read32_cs0_r), this), write32_delegate(FUNC(southbridge_device::ide2_write32_cs0_w), this), 0xffffffff);
-	spaceio->install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(FUNC(southbridge_device::ide1_read32_cs0_r), this), write32_delegate(FUNC(southbridge_device::ide1_write32_cs0_w), this), 0xffffffff);
-	spaceio->install_readwrite_handler(0x0374, 0x0377, read8_delegate(FUNC(southbridge_device::ide2_read_cs1_r), this), write8_delegate(FUNC(southbridge_device::ide2_write_cs1_w), this), 0xff0000);
-	spaceio->install_readwrite_handler(0x03f4, 0x03f7, read8_delegate(FUNC(southbridge_device::ide1_read_cs1_r), this), write8_delegate(FUNC(southbridge_device::ide1_write_cs1_w), this), 0xff0000);
-	spaceio->install_readwrite_handler(0x04d0, 0x04d3, read8_delegate(FUNC(southbridge_device::eisa_irq_read), this), write8_delegate(FUNC(southbridge_device::eisa_irq_write), this), 0x0000ffff);
+	spaceio->install_readwrite_handler(0x0000, 0x001f, read8sm_delegate(*m_dma8237_1, FUNC(am9517a_device::read)), write8sm_delegate(*m_dma8237_1, FUNC(am9517a_device::write)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0020, 0x003f, read8sm_delegate(*m_pic8259_master, FUNC(pic8259_device::read)), write8sm_delegate(*m_pic8259_master, FUNC(pic8259_device::write)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0040, 0x005f, read8sm_delegate(*m_pit8254, FUNC(pit8254_device::read)), write8sm_delegate(*m_pit8254, FUNC(pit8254_device::write)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0060, 0x0063, read8_delegate(*this, FUNC(southbridge_device::at_portb_r)), write8_delegate(*this, FUNC(southbridge_device::at_portb_w)), 0x0000ff00);
+	spaceio->install_readwrite_handler(0x0080, 0x009f, read8_delegate(*this, FUNC(southbridge_device::at_page8_r)), write8_delegate(*this, FUNC(southbridge_device::at_page8_w)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x00a0, 0x00bf, read8sm_delegate(*m_pic8259_slave, FUNC(pic8259_device::read)), write8sm_delegate(*m_pic8259_slave, FUNC(pic8259_device::write)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x00c0, 0x00df, read8_delegate(*this, FUNC(southbridge_device::at_dma8237_2_r)), write8_delegate(*this, FUNC(southbridge_device::at_dma8237_2_w)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0170, 0x0177, read32_delegate(*this, FUNC(southbridge_device::ide2_read32_cs0_r)), write32_delegate(*this, FUNC(southbridge_device::ide2_write32_cs0_w)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x01f0, 0x01f7, read32_delegate(*this, FUNC(southbridge_device::ide1_read32_cs0_r)), write32_delegate(*this, FUNC(southbridge_device::ide1_write32_cs0_w)), 0xffffffff);
+	spaceio->install_readwrite_handler(0x0374, 0x0377, read8_delegate(*this, FUNC(southbridge_device::ide2_read_cs1_r)), write8_delegate(*this, FUNC(southbridge_device::ide2_write_cs1_w)), 0xff0000);
+	spaceio->install_readwrite_handler(0x03f4, 0x03f7, read8_delegate(*this, FUNC(southbridge_device::ide1_read_cs1_r)), write8_delegate(*this, FUNC(southbridge_device::ide1_write_cs1_w)), 0xff0000);
+	spaceio->install_readwrite_handler(0x04d0, 0x04d3, read8_delegate(*this, FUNC(southbridge_device::eisa_irq_read)), write8_delegate(*this, FUNC(southbridge_device::eisa_irq_write)), 0x0000ffff);
 	spaceio->nop_readwrite(0x00e0, 0x00ef);
 }
 
@@ -560,9 +560,9 @@ void southbridge_extended_device::device_start()
 
 	southbridge_device::device_start();
 
-	spaceio.install_readwrite_handler(0x0060, 0x0063, read8smo_delegate(FUNC(at_keyboard_controller_device::data_r), &(*m_keybc)), write8smo_delegate(FUNC(at_keyboard_controller_device::data_w), &(*m_keybc)), 0x000000ff);
-	spaceio.install_readwrite_handler(0x0064, 0x0067, read8smo_delegate(FUNC(at_keyboard_controller_device::status_r), &(*m_keybc)), write8smo_delegate(FUNC(at_keyboard_controller_device::command_w), &(*m_keybc)), 0xffffffff);
-	spaceio.install_readwrite_handler(0x0070, 0x007f, read8sm_delegate(FUNC(ds12885_device::read), &(*m_ds12885)), write8sm_delegate(FUNC(ds12885_device::write), &(*m_ds12885)), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0060, 0x0063, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::data_w)), 0x000000ff);
+	spaceio.install_readwrite_handler(0x0064, 0x0067, read8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::status_r)), write8smo_delegate(*m_keybc, FUNC(at_keyboard_controller_device::command_w)), 0xffffffff);
+	spaceio.install_readwrite_handler(0x0070, 0x007f, read8sm_delegate(*m_ds12885, FUNC(ds12885_device::read)), write8sm_delegate(*m_ds12885, FUNC(ds12885_device::write)), 0xffffffff);
 }
 
 //-------------------------------------------------

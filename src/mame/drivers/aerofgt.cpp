@@ -1489,7 +1489,7 @@ void aerofgt_state::pspikes(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1616,7 +1616,7 @@ void aerofgt_state::kickball(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 2048);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1664,7 +1664,7 @@ void aerofgt_state::pspikesc(machine_config &config)
 	//VSYSTEM_GGA(config, "gga", 0);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1706,12 +1706,12 @@ void aerofgt_state::karatblz(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1760,12 +1760,12 @@ void aerofgt_state::karatblzbl(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1822,7 +1822,7 @@ void aerofgt_state::spinlbrk(machine_config &config)
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback), this); // rom lookup
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::spinbrk_tile_callback)); // rom lookup
 	m_spr_old[1]->set_pritype(1);
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
@@ -1874,12 +1874,12 @@ void aerofgt_state::turbofrc(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1930,12 +1930,12 @@ void aerofgt_state::aerofgtb(machine_config &config)
 	VSYSTEM_GGA(config, "gga", XTAL(14'318'181) / 2); // divider not verified
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(2);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 
 	VSYSTEM_SPR2(config, m_spr_old[1], 0);
-	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback), this);
+	m_spr_old[1]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_ol2_tile_callback));
 	m_spr_old[1]->set_gfx_region(3);
 	m_spr_old[1]->set_gfxdecode_tag(m_gfxdecode);
 
@@ -1996,7 +1996,7 @@ void aerofgt_state::aerofgt(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 1024);
 
 	VSYSTEM_SPR(config, m_spr, 0);
-	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback), this);
+	m_spr->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_tile_callback));
 	m_spr->set_gfx_region(2);
 	m_spr->set_gfxdecode_tag(m_gfxdecode);
 
@@ -2117,7 +2117,7 @@ void aerofgt_state::wbbc97(machine_config &config)
 	//VSYSTEM_GGA(config, "gga", 0);
 
 	VSYSTEM_SPR2(config, m_spr_old[0], 0);
-	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback), this);
+	m_spr_old[0]->set_tile_indirect_cb(FUNC(aerofgt_state::aerofgt_old_tile_callback));
 	m_spr_old[0]->set_gfx_region(1);
 	m_spr_old[0]->set_gfxdecode_tag(m_gfxdecode);
 

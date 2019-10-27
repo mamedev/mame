@@ -370,7 +370,7 @@ void rastan_state::rastan(machine_config &config)
 
 	PC090OJ(config, m_pc090oj, 0);
 	m_pc090oj->set_palette("palette");
-	m_pc090oj->set_colpri_callback(FUNC(rastan_state::rastan_colpri_cb), this);
+	m_pc090oj->set_colpri_callback(FUNC(rastan_state::rastan_colpri_cb));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

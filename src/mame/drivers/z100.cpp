@@ -799,7 +799,7 @@ void z100_state::z100(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_char_width(8);
-	m_crtc->set_update_row_callback(FUNC(z100_state::update_row), this);
+	m_crtc->set_update_row_callback(FUNC(z100_state::update_row));
 	m_crtc->out_vsync_callback().set(FUNC(z100_state::vidint_w));
 
 	PIC8259(config, m_picm);

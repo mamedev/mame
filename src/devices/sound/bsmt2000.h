@@ -34,15 +34,7 @@ public:
 	bsmt2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	void set_ready_callback(ready_callback callback) { m_ready_callback = callback; }
-	template <class FunctionClass> void set_ready_callback(const char *devname, void (FunctionClass::*callback)(), const char *name)
-	{
-		set_ready_callback(ready_callback(callback, name, devname, static_cast<FunctionClass *>(nullptr)));
-	}
-	template <class FunctionClass> void set_ready_callback(void (FunctionClass::*callback)(), const char *name)
-	{
-		set_ready_callback(ready_callback(callback, name, nullptr, static_cast<FunctionClass *>(nullptr)));
-	}
+	template <typename... T> void set_ready_callback(T &&... args) { m_ready_callback.set(std::forward<T>(args)...); }
 
 	// public interface
 	uint16_t read_status();

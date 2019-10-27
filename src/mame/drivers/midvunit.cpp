@@ -650,10 +650,10 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x980080, 0x980080).noprw();
 	map(0x980082, 0x980083).r(FUNC(midvunit_state::midvunit_dma_trigger_r));
 	map(0x990000, 0x990000).r(FUNC(midvunit_state::midvunit_intcs_r));
-	map(0x991030, 0x991030).lr16("991030", [this]() { return uint16_t(m_in1->read()); });
+	map(0x991030, 0x991030).lr16(NAME([this] () { return uint16_t(m_in1->read()); }));
 //  map(0x991050, 0x991050).readonly(); // seems to be another port
 	map(0x991060, 0x991060).r(FUNC(midvunit_state::port0_r));
-	map(0x992000, 0x992000).lr16("992000", [this]() { return uint16_t(m_dsw->read()); });
+	map(0x992000, 0x992000).lr16(NAME([this] () { return uint16_t(m_dsw->read()); }));
 	map(0x993000, 0x993000).rw(FUNC(midvunit_state::adc_r), FUNC(midvunit_state::adc_w));
 	map(0x994000, 0x994000).w(FUNC(midvunit_state::midvunit_control_w));
 	map(0x995000, 0x995000).rw(FUNC(midvunit_state::midvunit_wheel_board_r), FUNC(midvunit_state::midvunit_wheel_board_w));
@@ -1113,8 +1113,8 @@ void midvunit_state::midvcommon(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "timer0").configure_generic(timer_device::expired_delegate());
-	TIMER(config, "timer1").configure_generic(timer_device::expired_delegate());
+	TIMER(config, "timer0").configure_generic(nullptr);
+	TIMER(config, "timer1").configure_generic(nullptr);
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -1866,7 +1866,7 @@ void midvunit_state::init_crusnusa_common(offs_t speedup)
 	m_adc_shift = 24;
 
 	/* speedups */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(*this, FUNC(midvunit_state::generic_speedup_r)));
 	m_generic_speedup = m_ram_base + speedup;
 }
 void midvunit_state::init_crusnusa()  { init_crusnusa_common(0xc93e); }
@@ -1879,19 +1879,19 @@ void midvunit_state::init_crusnwld_common(offs_t speedup)
 	m_adc_shift = 16;
 
 	/* control register is different */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32_delegate(FUNC(midvunit_state::crusnwld_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32_delegate(*this, FUNC(midvunit_state::crusnwld_control_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::crusnwld_serial_status_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::crusnwld_serial_data_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x996000, 0x996000, write32_delegate(FUNC(midvunit_state::crusnwld_serial_data_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(*this, FUNC(midvunit_state::crusnwld_serial_status_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x996000, 0x996000, read32_delegate(*this, FUNC(midvunit_state::crusnwld_serial_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x996000, 0x996000, write32_delegate(*this, FUNC(midvunit_state::crusnwld_serial_data_w)));
 
 	/* install strange protection device */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9d0000, 0x9d1fff, read32_delegate(FUNC(midvunit_state::bit_data_r),this));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9d0000, 0x9d0000, write32_delegate(FUNC(midvunit_state::bit_reset_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x9d0000, 0x9d1fff, read32_delegate(*this, FUNC(midvunit_state::bit_data_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x9d0000, 0x9d0000, write32_delegate(*this, FUNC(midvunit_state::bit_reset_w)));
 
 	/* speedups */
 	if (speedup) {
-		m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(speedup, speedup + 1, read32_delegate(*this, FUNC(midvunit_state::generic_speedup_r)));
 		m_generic_speedup = m_ram_base + speedup;
 	}
 }
@@ -1906,13 +1906,13 @@ void midvunit_state::init_offroadc()
 	m_adc_shift = 16;
 
 	/* control register is different */
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32_delegate(FUNC(midvunit_state::crusnwld_control_w),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x994000, 0x994000, write32_delegate(*this, FUNC(midvunit_state::crusnwld_control_w)));
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(FUNC(midvunit_state::offroadc_serial_status_r),this));
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32_delegate(FUNC(midvunit_state::offroadc_serial_data_r),this), write32_delegate(FUNC(midvunit_state::offroadc_serial_data_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x991030, 0x991030, read32_delegate(*this, FUNC(midvunit_state::offroadc_serial_status_r)));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x996000, 0x996000, read32_delegate(*this, FUNC(midvunit_state::offroadc_serial_data_r)), write32_delegate(*this, FUNC(midvunit_state::offroadc_serial_data_w)));
 
 	/* speedups */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x195aa, 0x195aa, read32_delegate(*this, FUNC(midvunit_state::generic_speedup_r)));
 	m_generic_speedup = m_ram_base + 0x195aa;
 }
 
@@ -1933,7 +1933,7 @@ void midvunit_state::init_wargods()
 	m_midway_ioasic->set_default_nvram(default_nvram);
 
 	/* speedups */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(FUNC(midvunit_state::generic_speedup_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f4c, 0x2f4c, read32_delegate(*this, FUNC(midvunit_state::generic_speedup_r)));
 	m_generic_speedup = m_ram_base + 0x2f4c;
 }
 

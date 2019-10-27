@@ -23,6 +23,7 @@ DEFINE_DEVICE_TYPE(CRTC_EGA, crtc_ega_device, "crtc_ega", "IBM EGA CRT Controlle
 crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CRTC_EGA, tag, owner, clock), device_video_interface(mconfig, *this, false)
 	, m_res_out_de_cb(*this), m_res_out_hsync_cb(*this), m_res_out_vsync_cb(*this), m_res_out_vblank_cb(*this)
+	, m_begin_update_cb(*this), m_row_update_cb(*this), m_end_update_cb(*this)
 	, m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0)
 	, m_ena_vert_access(0), m_de_skew(0)
 	, m_horiz_retr_start(0), m_horiz_retr_end(0), m_horiz_retr_skew(0)
@@ -599,9 +600,9 @@ void crtc_ega_device::device_start()
 	m_res_out_vblank_cb.resolve();
 
 	/* bind delegates */
-	m_begin_update_cb.bind_relative_to(*owner());
-	m_row_update_cb.bind_relative_to(*owner());
-	m_end_update_cb.bind_relative_to(*owner());
+	m_begin_update_cb.resolve();
+	m_row_update_cb.resolve();
+	m_end_update_cb.resolve();
 
 	/* create the timers */
 	m_line_timer = timer_alloc(TIMER_LINE);

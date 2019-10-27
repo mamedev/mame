@@ -159,10 +159,10 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
 
 void umipoker_state::video_start()
 {
-	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_0),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_1),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_2),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(umipoker_state::get_tile_info_3),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_0 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_0)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_1)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_2)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
+	m_tilemap_3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(umipoker_state::get_tile_info_3)), TILEMAP_SCAN_ROWS, 8,8, 64,32);
 
 	m_tilemap_0->set_transparent_pen(0);
 	m_tilemap_1->set_transparent_pen(0);

@@ -168,18 +168,18 @@ void channelf_state::machine_start()
 		switch (m_cart->get_type())
 		{
 			case CF_MAZE:
-				m_maincpu->space(AS_IO).install_readwrite_handler(0x24, 0x25, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_IO).install_readwrite_handler(0x24, 0x25, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
 				break;
 			case CF_HANGMAN:
-				m_maincpu->space(AS_IO).install_readwrite_handler(0x20, 0x21, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_IO).install_readwrite_handler(0x20, 0x21, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
 				break;
 			case CF_CHESS:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
 				break;
 			case CF_MULTI:
 			case CF_MULTI_OLD:
-				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(FUNC(channelf_cart_slot_device::read_ram),(channelf_cart_slot_device*)m_cart), write8_delegate(FUNC(channelf_cart_slot_device::write_ram),(channelf_cart_slot_device*)m_cart));
-				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8_delegate(FUNC(channelf_cart_slot_device::write_bank),(channelf_cart_slot_device*)m_cart));
+				m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2800, 0x2fff, read8_delegate(*m_cart, FUNC(channelf_cart_slot_device::read_ram)), write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_ram)));
+				m_maincpu->space(AS_PROGRAM).install_write_handler(0x3000, 0x3fff, write8_delegate(*m_cart, FUNC(channelf_cart_slot_device::write_bank)));
 				break;
 		}
 

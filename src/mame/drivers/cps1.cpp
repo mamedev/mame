@@ -353,11 +353,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
 void cps_state::cpu_space_map(address_map &map)
 {
 	// Eventually add the sync to E due to vpa
-	map(0xfffff2, 0xffffff).lr16("autovectors", [this](offs_t offset) -> u16 {
-									 // clear the IPL1 and IPL2 flip-flops
-									 m_maincpu->set_input_line(2, CLEAR_LINE);
-									 m_maincpu->set_input_line(4, CLEAR_LINE);
-									 return m68000_device::autovector(offset+1); });
+	map(0xfffff2, 0xffffff).lr16(
+			[this] (offs_t offset) -> u16
+			{
+				// clear the IPL1 and IPL2 flip-flops
+				m_maincpu->set_input_line(2, CLEAR_LINE);
+				m_maincpu->set_input_line(4, CLEAR_LINE);
+				return m68000_device::autovector(offset + 1);
+			},
+			"autovectors");
 }
 
 
@@ -13026,7 +13030,7 @@ READ16_MEMBER(cps_state::sf2rb_prot_r)
 
 void cps_state::init_sf2rb()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(FUNC(cps_state::sf2rb_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(*this, FUNC(cps_state::sf2rb_prot_r)));
 
 	init_cps1();
 }
@@ -13047,7 +13051,7 @@ READ16_MEMBER(cps_state::sf2rb2_prot_r)
 
 void cps_state::init_sf2rb2()
 {
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(FUNC(cps_state::sf2rb2_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x2fffff, read16_delegate(*this, FUNC(cps_state::sf2rb2_prot_r)));
 
 	init_cps1();
 }
@@ -13057,7 +13061,7 @@ void cps_state::init_sf2ee()
 	/* This specific revision of SF2 has the CPS-B custom mapped at a different address. */
 	/* The mapping is handled by the PAL IOB2 on the B-board */
 	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x800140, 0x80017f);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(*this, FUNC(cps_state::cps1_cps_b_r)), write16_delegate(*this, FUNC(cps_state::cps1_cps_b_w)));
 
 	init_cps1();
 }
@@ -13065,7 +13069,7 @@ void cps_state::init_sf2ee()
 void cps_state::init_sf2thndr()
 {
 	/* This particular hack uses a modified B-board PAL which mirrors the CPS-B registers at an alternate address */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(FUNC(cps_state::cps1_cps_b_r),this), write16_delegate(FUNC(cps_state::cps1_cps_b_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8001c0, 0x8001ff, read16_delegate(*this, FUNC(cps_state::cps1_cps_b_r)), write16_delegate(*this, FUNC(cps_state::cps1_cps_b_w)));
 
 	init_cps1();
 }
@@ -13073,7 +13077,7 @@ void cps_state::init_sf2thndr()
 void cps_state::init_sf2hack()
 {
 	/* some SF2 hacks have some inputs wired to the LSB instead of MSB */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(FUNC(cps_state::cps1_hack_dsw_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x800018, 0x80001f, read16_delegate(*this, FUNC(cps_state::cps1_hack_dsw_r)));
 
 	init_cps1();
 }
@@ -13115,7 +13119,7 @@ READ16_MEMBER(cps_state::sf2dongb_prot_r)
 void cps_state::init_sf2dongb()
 {
 	// There is a hacked up Altera EP910PC-30 DIP in the 5f socket instead of a 4th EPROM
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180000, 0x1fffff, read16_delegate(FUNC(cps_state::sf2dongb_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180000, 0x1fffff, read16_delegate(*this, FUNC(cps_state::sf2dongb_prot_r)));
 
 	init_cps1();
 }
@@ -13137,8 +13141,8 @@ WRITE16_MEMBER(cps_state::sf2ceblp_prot_w)
 
 void cps_state::init_sf2ceblp()
 {
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16_delegate(FUNC(cps_state::sf2ceblp_prot_w),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x57A2b0, 0x57A2b1, read16_delegate(FUNC(cps_state::sf2ceblp_prot_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x5762b0, 0x5762b1, write16_delegate(*this, FUNC(cps_state::sf2ceblp_prot_w)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x57A2b0, 0x57A2b1, read16_delegate(*this, FUNC(cps_state::sf2ceblp_prot_r)));
 
 	init_cps1();
 }
@@ -13255,7 +13259,7 @@ void cps_state::init_ganbare()
 	init_cps1();
 
 	/* ram is shared between the CPS work ram and the timekeeper ram */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(FUNC(cps_state::ganbare_ram_r),this), write16_delegate(FUNC(cps_state::ganbare_ram_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff0000, 0xffffff, read16_delegate(*this, FUNC(cps_state::ganbare_ram_r)), write16_delegate(*this, FUNC(cps_state::ganbare_ram_w)));
 }
 
 READ16_MEMBER(cps_state::dinohunt_sound_r)
@@ -13269,7 +13273,7 @@ READ16_MEMBER(cps_state::dinohunt_sound_r)
 void cps_state::init_dinohunt()
 {
 	// is this shared with the new sound hw?
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16_delegate(FUNC(cps_state::dinohunt_sound_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xf18000, 0xf19fff, read16_delegate(*this, FUNC(cps_state::dinohunt_sound_r)));
 	m_maincpu->space(AS_PROGRAM).install_read_port(0xfc0000, 0xfc0001, "IN2"); ;
 	// the ym2151 doesn't seem to be used. Is it actually on the PCB?
 

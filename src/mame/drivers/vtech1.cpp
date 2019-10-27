@@ -459,7 +459,7 @@ void vtech1_state::laser110(machine_config &config)
 	// snapshot
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "vz"));
 	snapshot.set_delay(attotime::from_double(2.0));
-	snapshot.set_load_callback(FUNC(vtech1_state::snapshot_cb), this);
+	snapshot.set_load_callback(FUNC(vtech1_state::snapshot_cb));
 	snapshot.set_interface("vzsnap");
 
 	CASSETTE(config, m_cassette);

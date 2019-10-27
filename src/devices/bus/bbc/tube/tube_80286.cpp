@@ -62,7 +62,7 @@ void bbc_tube_80286_device::device_add_mconfig(machine_config &config)
 	I80286(config, m_i80286, 12_MHz_XTAL / 2);
 	m_i80286->set_addrmap(AS_PROGRAM, &bbc_tube_80286_device::tube_80286_mem);
 	m_i80286->set_addrmap(AS_IO, &bbc_tube_80286_device::tube_80286_io);
-	m_i80286->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bbc_tube_80286_device::irq_callback), this));
+	m_i80286->set_irq_acknowledge_callback(FUNC(bbc_tube_80286_device::irq_callback));
 
 	TUBE(config, m_ula);
 	m_ula->pnmi_handler().set_inputline(m_i80286, INPUT_LINE_NMI);

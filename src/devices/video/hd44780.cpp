@@ -55,6 +55,7 @@ hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, d
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
+	, m_pixel_update_cb(*this)
 	, m_cgrom(nullptr)
 	, m_cgrom_region(*this, DEVICE_SELF)
 	, m_rs_input(0)
@@ -94,7 +95,7 @@ void hd44780_device::device_start()
 {
 	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
-	m_pixel_update_cb.bind_relative_to(*owner());
+	m_pixel_update_cb.resolve();
 
 	m_busy_timer = timer_alloc(TIMER_BUSY);
 	m_blink_timer = timer_alloc(TIMER_BLINKING);

@@ -1434,8 +1434,8 @@ void merit_state::pitboss(machine_config &config)
 	crtc.set_screen(m_screen);
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
-	crtc.set_begin_update_callback(FUNC(merit_state::crtc_begin_update), this);
-	crtc.set_update_row_callback(FUNC(merit_state::crtc_update_row), this);
+	crtc.set_begin_update_callback(FUNC(merit_state::crtc_begin_update));
+	crtc.set_update_row_callback(FUNC(merit_state::crtc_update_row));
 	crtc.out_hsync_callback().set(FUNC(merit_state::hsync_changed));
 	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 

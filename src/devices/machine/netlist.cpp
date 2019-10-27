@@ -184,7 +184,7 @@ public:
 
 	ATTR_COLD void register_callback(netlist_mame_analog_output_device::output_delegate &&callback)
 	{
-		m_callback = std::move(callback);
+		m_callback.reset(new netlist_mame_analog_output_device::output_delegate(std::move(callback)));
 	}
 
 	NETLIB_UPDATEI()
@@ -196,7 +196,7 @@ public:
 		if (std::fabs(cur - m_last) > 1e-6)
 		{
 			m_cpu_device->update_icount(exec().time());
-			m_callback(cur, m_cpu_device->local_time());
+			(*m_callback)(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
 		}
@@ -204,7 +204,7 @@ public:
 
 private:
 	netlist::analog_input_t m_in;
-	netlist_mame_analog_output_device::output_delegate m_callback;
+	std::unique_ptr<netlist_mame_analog_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
 	netlist::state_var<nl_double> m_last;
 };
@@ -234,7 +234,7 @@ public:
 
 	ATTR_COLD void register_callback(netlist_mame_logic_output_device::output_delegate &&callback)
 	{
-		m_callback = std::move(callback);
+		m_callback.reset(new netlist_mame_logic_output_device::output_delegate(std::move(callback)));
 	}
 
 	NETLIB_UPDATEI()
@@ -246,7 +246,7 @@ public:
 		if (cur != m_last)
 		{
 			m_cpu_device->update_icount(exec().time());
-			m_callback(cur, m_cpu_device->local_time());
+			(*m_callback)(cur, m_cpu_device->local_time());
 			m_cpu_device->check_mame_abort_slice();
 			m_last = cur;
 		}
@@ -254,7 +254,7 @@ public:
 
 private:
 	netlist::logic_input_t m_in;
-	netlist_mame_logic_output_device::output_delegate m_callback;
+	std::unique_ptr<netlist_mame_logic_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
 	netlist::state_var<netlist::netlist_sig_t> m_last;
 };
@@ -719,6 +719,7 @@ netlist_mame_analog_output_device::netlist_mame_analog_output_device(const machi
 	: device_t(mconfig, NETLIST_ANALOG_OUTPUT, tag, owner, clock)
 	, netlist_mame_sub_interface(*owner)
 	, m_in("")
+	, m_delegate(*this)
 {
 }
 
@@ -730,7 +731,7 @@ void netlist_mame_analog_output_device::custom_netlist_additions(netlist::netlis
 
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
-		m_delegate.bind_relative_to(owner()->machine().root_device());
+		m_delegate.resolve();
 
 	auto dev = netlist::pool().make_unique<NETLIB_NAME(analog_callback)>(nlstate, dfqn);
 	//static_cast<NETLIB_NAME(analog_callback) *>(dev.get())->register_callback(std::move(m_delegate));
@@ -753,13 +754,8 @@ netlist_mame_logic_output_device::netlist_mame_logic_output_device(const machine
 	: device_t(mconfig, NETLIST_LOGIC_OUTPUT, tag, owner, clock)
 	, netlist_mame_sub_interface(*owner)
 	, m_in("")
+	, m_delegate(*this)
 {
-}
-
-void netlist_mame_logic_output_device::set_params(const char *in_name, output_delegate &&adelegate)
-{
-	m_in = in_name;
-	m_delegate = std::move(adelegate);
 }
 
 void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist_state_t &nlstate)
@@ -770,7 +766,7 @@ void netlist_mame_logic_output_device::custom_netlist_additions(netlist::netlist
 
 	/* ignore if no running machine -> called within device_validity_check context */
 	if (owner()->has_running_machine())
-		m_delegate.bind_relative_to(owner()->machine().root_device());
+		m_delegate.resolve();
 
 	auto dev = netlist::pool().make_unique<NETLIB_NAME(logic_callback)>(nlstate, dfqn);
 	dev->register_callback(std::move(m_delegate));

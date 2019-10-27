@@ -407,8 +407,8 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[0]->set_pf2_col_bank(0x40);
 	m_deco_tilegen[0]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[0]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[0]->set_bank1_callback(FUNC(backfire_state::bank_callback), this);
-	m_deco_tilegen[0]->set_bank2_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[0]->set_bank1_callback(FUNC(backfire_state::bank_callback));
+	m_deco_tilegen[0]->set_bank2_callback(FUNC(backfire_state::bank_callback));
 	m_deco_tilegen[0]->set_pf12_8x8_bank(0);
 	m_deco_tilegen[0]->set_pf12_16x16_bank(1);
 	m_deco_tilegen[0]->set_gfxdecode_tag("gfxdecode");
@@ -423,8 +423,8 @@ void backfire_state::backfire(machine_config &config)
 	m_deco_tilegen[1]->set_pf2_col_bank(0x50);
 	m_deco_tilegen[1]->set_pf1_col_mask(0x0f);
 	m_deco_tilegen[1]->set_pf2_col_mask(0x0f);
-	m_deco_tilegen[1]->set_bank1_callback(FUNC(backfire_state::bank_callback), this);
-	m_deco_tilegen[1]->set_bank2_callback(FUNC(backfire_state::bank_callback), this);
+	m_deco_tilegen[1]->set_bank1_callback(FUNC(backfire_state::bank_callback));
+	m_deco_tilegen[1]->set_bank2_callback(FUNC(backfire_state::bank_callback));
 	m_deco_tilegen[1]->set_pf12_8x8_bank(2);
 	m_deco_tilegen[1]->set_pf12_16x16_bank(3);
 	m_deco_tilegen[1]->set_gfxdecode_tag("gfxdecode");
@@ -432,13 +432,13 @@ void backfire_state::backfire(machine_config &config)
 	DECO_SPRITE(config, m_sprgen[0], 0);
 	m_sprgen[0]->set_screen(m_lscreen);
 	m_sprgen[0]->set_gfx_region(4);
-	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback), this);
+	m_sprgen[0]->set_pri_callback(FUNC(backfire_state::pri_callback));
 	m_sprgen[0]->set_gfxdecode_tag("gfxdecode");
 
 	DECO_SPRITE(config, m_sprgen[1], 0);
 	m_sprgen[1]->set_screen("rscreen");
 	m_sprgen[1]->set_gfx_region(5);
-	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback), this);
+	m_sprgen[1]->set_pri_callback(FUNC(backfire_state::pri_callback));
 	m_sprgen[1]->set_gfxdecode_tag("gfxdecode");
 
 	/* sound hardware */
@@ -615,7 +615,7 @@ void backfire_state::init_backfire()
 	deco156_decrypt(machine());
 	m_maincpu->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(*this, FUNC(backfire_state::backfire_speedup_r)));
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 1)", MACHINE_SUPPORTS_SAVE )

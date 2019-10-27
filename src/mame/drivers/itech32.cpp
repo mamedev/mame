@@ -4447,8 +4447,8 @@ void drivedge_state::driver_init()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms1_speedup_r),this));
-	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(drivedge_state::tms2_speedup_r),this));
+	m_dsp[0]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(*this, FUNC(drivedge_state::tms1_speedup_r)));
+	m_dsp[1]->space(AS_PROGRAM).install_read_handler(0x8382, 0x8382, read32_delegate(*this, FUNC(drivedge_state::tms2_speedup_r)));
 }
 
 
@@ -4464,10 +4464,10 @@ void itech32_state::init_wcbowl()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(FUNC(itech32_state::trackball_r),this), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(*this, FUNC(itech32_state::trackball_r)), 0x00ff);
 
 	m_maincpu->space(AS_PROGRAM).nop_read(0x578000, 0x57ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(*this, FUNC(itech32_state::wcbowl_prot_result_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x680080, 0x680081);
 }
 
@@ -4484,11 +4484,11 @@ void itech32_state::init_wcbowlj()
 	m_vram_height = 1024;
 	m_planes = 1;
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(FUNC(itech32_state::trackball_r),this), 0x00ff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680040, 0x680041, read8smo_delegate(FUNC(itech32_state::trackball_p2_r),this), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680001, read8smo_delegate(*this, FUNC(itech32_state::trackball_r)), 0x00ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680040, 0x680041, read8smo_delegate(*this, FUNC(itech32_state::trackball_p2_r)), 0x00ff);
 
 	m_maincpu->space(AS_PROGRAM).nop_read(0x578000, 0x57ffff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(FUNC(itech32_state::wcbowl_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680080, 0x680081, read16smo_delegate(*this, FUNC(itech32_state::wcbowl_prot_result_r)));
 	m_maincpu->space(AS_PROGRAM).nop_write(0x680080, 0x680081);
 }
 
@@ -4501,8 +4501,8 @@ void itech32_state::init_sftm_common(int prot_addr)
 
 	m_itech020_prot_address = prot_addr;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(FUNC(itech32_state::color_w<0>),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(FUNC(itech32_state::color_w<1>),this), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(*this, FUNC(itech32_state::color_w<0>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(*this, FUNC(itech32_state::color_w<1>)), 0x000000ff);
 }
 
 
@@ -4531,10 +4531,10 @@ void itech32_state::init_shuffle_bowl_common(int prot_addr)
 
 	m_itech020_prot_address = prot_addr;
 
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(FUNC(itech32_state::color_w<0>),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(FUNC(itech32_state::color_w<1>),this), 0x000000ff);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write8smo_delegate(*this, FUNC(itech32_state::color_w<0>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write8smo_delegate(*this, FUNC(itech32_state::color_w<1>)), 0x000000ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p2_r)));
 }
 
 
@@ -4552,7 +4552,7 @@ void itech32_state::init_wcbowln()
 
 void itech32_state::install_timekeeper()
 {
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8sm_delegate(FUNC(timekeeper_device::read), &(*m_timekeeper)), write8sm_delegate(FUNC(timekeeper_device::write), &(*m_timekeeper)), 0xffffffff);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x681000, 0x6817ff, read8sm_delegate(*m_timekeeper, FUNC(timekeeper_device::read)), write8sm_delegate(*m_timekeeper, FUNC(timekeeper_device::write)), 0xffffffff);
 }
 
 void itech32_state::init_wcbowlt()
@@ -4582,7 +4582,7 @@ void itech32_state::init_gt3d()
 	    Hacked versions of this PCB have been found with GT97
 	    through GTClassic. This is _NOT_ a factory modification
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read16smo_delegate(FUNC(itech32_state::trackball_8bit_r),this), 0x0000ffff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read16smo_delegate(*this, FUNC(itech32_state::trackball_8bit_r)), 0x0000ffff);
 	init_gt_common();
 }
 
@@ -4595,8 +4595,8 @@ void itech32_state::init_aama()
 	    board share the same sound CPU code and sample ROMs.
 	    This board has all versions of GT for it, GT3D through GTClassic
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p2_r)));
 	init_gt_common();
 }
 
@@ -4620,7 +4620,7 @@ void itech32_state::init_s_ver()
 	    board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
 	    Trackball info is read through 200202 (actually 200203).
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_p1_r)));
 	init_gt_common();
 }
 
@@ -4634,7 +4634,7 @@ void itech32_state::init_gt3dl()
 	    Player 1 trackball read through 200003
 	    Player 2 trackball read through 200002
 	*/
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32smo_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32smo_delegate(*this, FUNC(itech32_state::trackball32_4bit_combined_r)));
 	init_gt_common();
 }
 
@@ -4642,7 +4642,7 @@ void itech32_state::init_gt3dl()
 void itech32_state::init_gt2kp()
 {
 	/* a little extra protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(FUNC(itech32_state::gt2kp_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(*this, FUNC(itech32_state::gt2kp_prot_result_r)));
 	init_aama();
 
 	/* The protection code is:
@@ -4663,7 +4663,7 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 void itech32_state::init_gtclasscp()
 {
 	/* a little extra protection */
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(FUNC(itech32_state::gtclass_prot_result_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x680000, 0x680003, read32smo_delegate(*this, FUNC(itech32_state::gtclass_prot_result_r)));
 	init_aama();
 
 	/* The protection code is:

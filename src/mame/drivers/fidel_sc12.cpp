@@ -254,7 +254,7 @@ void sc12_state::sc12(machine_config &config)
 
 	/* cartridge */
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "fidel_scc", "bin,dat");
-	m_cart->set_device_load(FUNC(sc12_state::cart_load), this);
+	m_cart->set_device_load(FUNC(sc12_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("fidel_scc");
 }

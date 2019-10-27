@@ -2630,6 +2630,13 @@ ms4125                          // MSI MS-4125 motherboard (486)
 pkm0038s                        // DTK PKM-0038S aka Gemlight GMB-486SG motherboard (486)
 fic4386vcv                      // FIC 4386-VC-V motherboard (486)
 v4p895p3                        // QDI V4P895P3/SMT V5.0 motherboard (486)
+op82c392                        // 486 motherboards using the OPTi OPTi 82C392, 82C493, 82C206 chipset
+ls486e                          // LuckyStar LS-486E Rev:C motherboard (486)
+pm486pu                         // PROTECH PM486PU-S7 motherboard (486)
+ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
+ms4144                          // MSI MS-4144 motherboard (486)
+pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
+ochipdca2                       // Octek Hippo DCA2 motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -10643,7 +10650,8 @@ wonder3                         // 20/05/1991 (c) 1991 (Japan)
 1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
 1944d                           //
 1944j                           // 20/06/2000 (c) 2000 Eighting/Raizing (Japan)
-19xx                            // 07/12/1995 (c) 1996 (USA)
+19xx                            // 04/01/1996 (c) 1996 (Euro)
+19xxu                           // 07/12/1995 (c) 1996 (USA)
 19xxa                           // 04/01/1996 (c) 1996 (Asia)
 19xxar1                         // 07/12/1995 (c) 1996 (Asia)
 19xxb                           // 18/12/1995 (c) 1996 (Brazil)
@@ -18839,6 +18847,9 @@ lkageoo                         // A54 (c) 1984 Taito Corporation
 llc1                            //
 llc2                            //
 
+@source:lms46.cpp
+lms46                           //
+
 @source:lockon.cpp
 lockon                          // (c) 1986 Tatsumi
 lockonc                         // (c) 1986 Tatsumi
@@ -21663,6 +21674,7 @@ bup                             // Mephisto B&P
 mm4tk                           // Mephisto MM IV (Turbo Kit)
 mm4                             // Mephisto MM IV
 mm5                             // Mephisto MM V
+mm5p
 rebel5                          // Mephisto Rebell 5.0
 
 @source:mephisto_modena.cpp
@@ -38060,6 +38072,9 @@ tek4404                         // (c) 1984 Tektronix
 @source:tekxp33x.cpp
 tekxp330                        //
 
+@source:teleray10.cpp
+teleray10                       //
+
 @source:telex1192.cpp
 telex1192                       //
 
@@ -39430,6 +39445,7 @@ vigilanto                       // (c) 1988 (US)
 @source:spg110.cpp
 jak_capb                        //
 jak_spdmo                       //
+conyteni                        //
 
 @source:vii.cpp
 jak_batm                        // The Batman, 2004
@@ -39469,6 +39485,8 @@ dreamlif                        //
 icanguit                        //
 icanpian                        //
 tvgogo                          //
+pvmil                           //
+taikeegr                        //
 
 @source:vsmile.cpp
 vsmile                          //
@@ -40480,6 +40498,7 @@ corv_px4                        //
 dh_lf2                          //
 dh_lx2                          //
 fs_lx2                          //
+fs_lx3                          //
 fs_lx4                          //
 fs_lx5                          //
 fs_sp2                          //

@@ -33,7 +33,7 @@ DEFINE_DEVICE_TYPE(SED1520, sed1520_device, "sed1520", "Epson SED1520")
 sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SED1520, tag, owner, clock), m_lcd_on(0), m_busy(0), m_page(0), m_column(0), m_old_column(0), m_start_line(0),
 	m_adc(0), m_static_drive(0), m_modify_write(false),
-	m_screen_update_cb()
+	m_screen_update_cb(*this)
 {
 }
 
@@ -44,7 +44,7 @@ sed1520_device::sed1520_device(const machine_config &mconfig, const char *tag, d
 
 void sed1520_device::device_start()
 {
-	m_screen_update_cb.bind_relative_to(*owner());
+	m_screen_update_cb.resolve();
 
 	// state saving
 	save_item(NAME(m_lcd_on));

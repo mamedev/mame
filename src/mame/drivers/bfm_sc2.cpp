@@ -3741,8 +3741,8 @@ void bfm_sc2_dmd_state::machine_start()
 {
 	bfm_sc2_state::machine_start();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_write_handler(0x2800, 0x2800, write8_delegate(FUNC(bfm_sc2_dmd_state::vfd1_dmd_w),this));
-	space.install_write_handler(0x2900, 0x2900, write8_delegate(FUNC(bfm_sc2_dmd_state::dmd_reset_w),this));
+	space.install_write_handler(0x2800, 0x2800, write8_delegate(*this, FUNC(bfm_sc2_dmd_state::vfd1_dmd_w)));
+	space.install_write_handler(0x2900, 0x2900, write8_delegate(*this, FUNC(bfm_sc2_dmd_state::dmd_reset_w)));
 }
 
 /* machine driver for scorpion2 board */

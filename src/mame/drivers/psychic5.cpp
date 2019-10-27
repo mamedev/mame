@@ -748,7 +748,6 @@ void psychic5_state::psychic5(machine_config &config)
 	JALECO_BLEND(config, m_blend, 0);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,psychic5)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -795,7 +794,6 @@ void psychic5_state::bombsa(machine_config &config)
 	PALETTE(config, m_palette).set_entries(768);
 
 	MCFG_VIDEO_START_OVERRIDE(psychic5_state,bombsa)
-	MCFG_VIDEO_RESET_OVERRIDE(psychic5_state,psychic5)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

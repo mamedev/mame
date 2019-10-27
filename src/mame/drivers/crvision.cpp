@@ -694,8 +694,8 @@ void crvision_state::machine_start()
 
 	if (m_cart->exists())
 	{
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom40),(crvision_cart_slot_device*)m_cart));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(FUNC(crvision_cart_slot_device::read_rom80),(crvision_cart_slot_device*)m_cart));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(*m_cart, FUNC(crvision_cart_slot_device::read_rom40)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xbfff, read8_delegate(*m_cart, FUNC(crvision_cart_slot_device::read_rom80)));
 	}
 }
 

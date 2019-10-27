@@ -116,7 +116,8 @@ offs_t unsp_disassembler::disassemble_remaining(std::ostream& stream, offs_t pc,
 
 			// alu, 16-bit immediate
 		case 1:
-			if ((op0 == 4 || op0 == 12 || op0 == 6 || op0 == 9) && opA != opB)
+			// TaiKee Guitar has this with op0 == 9
+			if ((op0 == 4 || op0 == 12 || op0 == 6 /*|| op0 == 9*/) && opA != opB)
 			{
 				util::stream_format(stream, "<BAD>");
 				return UNSP_DASM_OK;
@@ -131,7 +132,8 @@ offs_t unsp_disassembler::disassemble_remaining(std::ostream& stream, offs_t pc,
 
 			// alu, direct memory
 		case 2:
-			if ((op0 == 4 || op0 == 12 || op0 == 6 || op0 == 9) && opA != opB)
+			// TaiKee Guitar has this with op0 == 9
+			if ((op0 == 4 || op0 == 12 || op0 == 6 /*|| op0 == 9*/) && opA != opB)
 			{
 				util::stream_format(stream, "<BAD>");
 				return UNSP_DASM_OK;

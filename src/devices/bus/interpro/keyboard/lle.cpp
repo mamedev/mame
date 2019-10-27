@@ -480,11 +480,11 @@ void lle_device_base::ext_map(address_map &map)
 	// not clear what these addresses correspond to, possibly
 	// used in manufacturer testing?
 	if (VERBOSE & LOG_GENERAL)
-		map(0x7fe, 0x7ff).lw8("write",
-			[this](address_space &space, offs_t offset, u8 data, u8 mem_mask)
-			{
-				LOG("write offset 0x%03f data 0x%02x (%s)\n", offset, data, machine().describe_context());
-			});
+		map(0x7fe, 0x7ff).lw8(
+				[this] (offs_t offset, u8 data, u8 mem_mask)
+				{
+					LOG("write offset 0x%03f data 0x%02x (%s)\n", offset, data, machine().describe_context());
+				}, "write");
 }
 
 READ_LINE_MEMBER(lle_device_base::t0_r)

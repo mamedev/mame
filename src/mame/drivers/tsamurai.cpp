@@ -1395,7 +1395,7 @@ ROM_END
 void tsamurai_state::init_the26thz()
 {
 	m_maincpu->space(AS_PROGRAM).unmap_read(0xd803, 0xd803);
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd803, 0xd803, read8_delegate(FUNC(tsamurai_state::tsamurai_unknown_d803_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd803, 0xd803, read8_delegate(*this, FUNC(tsamurai_state::tsamurai_unknown_d803_r)));
 }
 
 GAME( 1984, vsgongf,   0,        vsgongf,  vsgongf,   tsamurai_state, empty_init,    ROT90, "Kaneko", "VS Gong Fight", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )

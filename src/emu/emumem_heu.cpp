@@ -62,6 +62,8 @@ template<int Width, int AddrShift, int Endian> void handler_entry_read_units<Wid
 
 template<int Width, int AddrShift, int Endian> typename emu::detail::handler_entry_size<Width>::uX handler_entry_read_units<Width, AddrShift, Endian>::read(offs_t offset, uX mem_mask)
 {
+	this->ref();
+
 	uX result = m_unmap;
 	for (int index = 0; index < m_subunits; index++) {
 		const subunit_info &si = m_subunit_infos[index];
@@ -91,6 +93,8 @@ template<int Width, int AddrShift, int Endian> typename emu::detail::handler_ent
 			}
 		}
 	}
+
+	this->unref();
 	return result;
 }
 
@@ -173,6 +177,8 @@ template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Wi
 
 template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Width, AddrShift, Endian>::write(offs_t offset, uX data, uX mem_mask)
 {
+	this->ref();
+
 	for (int index = 0; index < m_subunits; index++) {
 		const subunit_info &si = m_subunit_infos[index];
 		if (mem_mask & si.m_amask) {
@@ -201,6 +207,8 @@ template<int Width, int AddrShift, int Endian> void handler_entry_write_units<Wi
 			}
 		}
 	}
+
+	this->unref();
 }
 
 

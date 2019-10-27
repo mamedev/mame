@@ -243,8 +243,8 @@ WRITE8_MEMBER(igspoker_state::fg_color_w)
 
 void igspoker_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS,   8,  32, 64, 8);
 
 	m_fg_tilemap->set_transparent_pen(0);
 }
@@ -263,7 +263,7 @@ uint32_t igspoker_state::screen_update_igs_video(screen_device &screen, bitmap_i
 
 VIDEO_START_MEMBER(igspoker_state,cpokerpk)
 {
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igspoker_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(igspoker_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,   8,  8,  64, 32);
 }
 
 uint32_t igspoker_state::screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

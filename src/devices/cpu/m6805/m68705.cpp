@@ -836,8 +836,8 @@ void m6805_hmos_device::internal_map(address_map &map)
 	map(0x0005, 0x0005).w(FUNC(m6805_hmos_device::port_ddr_w<1>));
 	map(0x0006, 0x0006).w(FUNC(m6805_hmos_device::port_ddr_w<2>));
 
-	map(0x0008, 0x0008).lrw8("tdr", [this]() { return m_timer.tdr_r(); }, [this](u8 data) { m_timer.tdr_w(data); });
-	map(0x0009, 0x0009).lrw8("tcr", [this]() { return m_timer.tcr_r(); }, [this](u8 data) { m_timer.tcr_w(data); });
+	map(0x0008, 0x0008).lrw8(NAME([this]() { return m_timer.tdr_r(); }), NAME([this](u8 data) { m_timer.tdr_w(data); }));
+	map(0x0009, 0x0009).lrw8(NAME([this]() { return m_timer.tcr_r(); }), NAME([this](u8 data) { m_timer.tcr_w(data); }));
 
 	// M68?05Px devices don't have Port D or the Miscellaneous register
 	if (m_port_mask[3] != 0xff)
@@ -865,7 +865,7 @@ void m6805_mrom_device::internal_map(address_map &map)
 	 *   6805S3  0000-007f  0080-00ff  0100-0eff  0f00-0ff7   0ff8-0fff
 	 *   6805U2  0000-007f  0080-00ff  07c0-0f37  0f38-0ff7   0ff8-0fff
 	 *   6805U3  0000-007f             0080-0f37  0f38-0ff7   0ff8-0fff
-         *   6805U1  0000-007f  0080-00ff  0800-0f7f  0f80-0ff7   0ff8-0fff
+	 *   6805U1  0000-007f  0080-00ff  0800-0f7f  0f80-0ff7   0ff8-0fff
 	 *
 	 * This code assumes that dumps are captured contiguously from address 0 to
 	 * the end of the address range, and are not split by range. Register, RAM

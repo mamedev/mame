@@ -401,7 +401,7 @@ void z1013_state::z1013(machine_config &config)
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb), this);
+	SNAPSHOT(config, "snapshot", "z80").set_load_callback(FUNC(z1013_state::snapshot_cb));
 }
 
 void z1013_state::z1013k76(machine_config &config)

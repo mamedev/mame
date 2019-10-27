@@ -537,11 +537,11 @@ segaic16_video_device::segaic16_video_device(const machine_config &mconfig, cons
 	, m_tileram(*this, "^tileram")
 	, m_textram(*this, "^textram")
 	, m_rotateram(*this, "^rotateram")
+	, m_pagelatch_cb(*this, DEVICE_SELF, FUNC(segaic16_video_device::tilemap_16b_fill_latch))
 	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	memset(m_rotate, 0, sizeof(m_rotate));
 	memset(m_bg_tilemap, 0, sizeof(m_bg_tilemap));
-	m_pagelatch_cb =  segaic16_video_pagelatch_delegate(FUNC(segaic16_video_device::tilemap_16b_fill_latch), this);
 }
 
 void segaic16_video_device::device_start()
@@ -551,7 +551,7 @@ void segaic16_video_device::device_start()
 
 	save_item(NAME(m_display_enable));
 
-	m_pagelatch_cb.bind_relative_to(*owner());
+	m_pagelatch_cb.resolve();
 }
 
 void segaic16_video_device::device_reset()
@@ -1205,8 +1205,8 @@ static void tilemap_16b_reset(screen_device &screen, segaic16_video_device::tile
 void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks)
 {
 	struct tilemap_info *info = &m_bg_tilemap[which];
-	tilemap_get_info_delegate get_text_info;
-	tilemap_get_info_delegate get_tile_info;
+	tilemap_get_info_delegate get_text_info(*this);
+	tilemap_get_info_delegate get_tile_info(*this);
 	int pagenum;
 	int i;
 
@@ -1235,8 +1235,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 	switch (type)
 	{
 		case TILEMAP_HANGON:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_tile_info));
 			info->numpages = 4;
 			info->draw_layer = tilemap_16a_draw_layer;
 			info->reset = nullptr;
@@ -1244,8 +1244,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			break;
 
 		case TILEMAP_16A:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16a_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16a_tile_info));
 			info->numpages = 8;
 			info->draw_layer = tilemap_16a_draw_layer;
 			info->reset = nullptr;
@@ -1253,8 +1253,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			break;
 
 		case TILEMAP_16B:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_tile_info));
 			info->numpages = 16;
 			info->draw_layer = tilemap_16b_draw_layer;
 			info->reset = tilemap_16b_reset;
@@ -1262,8 +1262,8 @@ void segaic16_video_device::tilemap_init(int which, int type, int colorbase, int
 			break;
 
 		case TILEMAP_16B_ALT:
-			get_text_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_alt_text_info),this);
-			get_tile_info = tilemap_get_info_delegate(FUNC(segaic16_video_device::tilemap_16b_alt_tile_info),this);
+			get_text_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_alt_text_info));
+			get_tile_info = tilemap_get_info_delegate(*this, FUNC(segaic16_video_device::tilemap_16b_alt_tile_info));
 			info->numpages = 16;
 			info->draw_layer = tilemap_16b_draw_layer;
 			info->reset = tilemap_16b_reset;

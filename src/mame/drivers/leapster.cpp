@@ -324,7 +324,7 @@ void leapster_state::leapster(machine_config &config)
 	screen.set_screen_update(FUNC(leapster_state::screen_update_leapster));
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load), this);
+	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "leapster_cart", "bin").set_device_load(FUNC(leapster_state::cart_load));
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("leapster");

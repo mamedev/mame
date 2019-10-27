@@ -44,16 +44,8 @@ typedef device_delegate<void (int)> write_line_delegate;
 
 namespace emu { namespace detail {
 
-template <typename T, typename Enable = void> struct read_line_device_class { };
-template <typename T, typename Enable = void> struct write_line_device_class { };
-
-template <typename T>
-inline read_line_delegate make_delegate(T &&func, char const *name, char const *tag, rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > *obj)
-{ return read_line_delegate(func, name, tag, obj); }
-
-template <typename T>
-inline write_line_delegate make_delegate(T &&func, char const *name, char const *tag, rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > *obj)
-{ return write_line_delegate(func, name, tag, obj); }
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
+template <typename T> struct rw_delegate_type<T, void_t<rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = rw_device_class_t<type, std::remove_reference_t<T> >; };
 
 } } // namespace emu::detail
 
@@ -115,43 +107,8 @@ protected:
 	template <typename Input, typename Result, typename Func> using transform_result_t = typename transform_result<Input, Result, Func>::type;
 
 	// Mapping method types to delegate types
-	template <typename T, typename Enable = void> struct delegate_type;
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8_delegate, std::remove_reference_t<T> > > > { using type = read8_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16_delegate, std::remove_reference_t<T> > > > { using type = read16_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32_delegate, std::remove_reference_t<T> > > > { using type = read32_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64_delegate, std::remove_reference_t<T> > > > { using type = read64_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8s_delegate, std::remove_reference_t<T> > > > { using type = read8s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16s_delegate, std::remove_reference_t<T> > > > { using type = read16s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32s_delegate, std::remove_reference_t<T> > > > { using type = read32s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64s_delegate, std::remove_reference_t<T> > > > { using type = read64s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8sm_delegate, std::remove_reference_t<T> > > > { using type = read8sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16sm_delegate, std::remove_reference_t<T> > > > { using type = read16sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32sm_delegate, std::remove_reference_t<T> > > > { using type = read32sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64sm_delegate, std::remove_reference_t<T> > > > { using type = read64sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read8smo_delegate, std::remove_reference_t<T> > > > { using type = read8smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read16smo_delegate, std::remove_reference_t<T> > > > { using type = read16smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read32smo_delegate, std::remove_reference_t<T> > > > { using type = read32smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read64smo_delegate, std::remove_reference_t<T> > > > { using type = read64smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<read_line_delegate, std::remove_reference_t<T> > > > { using type = read_line_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8_delegate, std::remove_reference_t<T> > > > { using type = write8_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16_delegate, std::remove_reference_t<T> > > > { using type = write16_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32_delegate, std::remove_reference_t<T> > > > { using type = write32_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64_delegate, std::remove_reference_t<T> > > > { using type = write64_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8s_delegate, std::remove_reference_t<T> > > > { using type = write8s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16s_delegate, std::remove_reference_t<T> > > > { using type = write16s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32s_delegate, std::remove_reference_t<T> > > > { using type = write32s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64s_delegate, std::remove_reference_t<T> > > > { using type = write64s_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8sm_delegate, std::remove_reference_t<T> > > > { using type = write8sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16sm_delegate, std::remove_reference_t<T> > > > { using type = write16sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32sm_delegate, std::remove_reference_t<T> > > > { using type = write32sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64sm_delegate, std::remove_reference_t<T> > > > { using type = write64sm_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write8smo_delegate, std::remove_reference_t<T> > > > { using type = write8smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write16smo_delegate, std::remove_reference_t<T> > > > { using type = write16smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write32smo_delegate, std::remove_reference_t<T> > > > { using type = write32smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write64smo_delegate, std::remove_reference_t<T> > > > { using type = write64smo_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> struct delegate_type<T, void_t<emu::detail::rw_device_class_t<write_line_delegate, std::remove_reference_t<T> > > > { using type = write_line_delegate; using device_class = emu::detail::rw_device_class_t<type, std::remove_reference_t<T> >; };
-	template <typename T> using delegate_type_t = typename delegate_type<T>::type;
-	template <typename T> using delegate_device_class_t = typename delegate_type<T>::device_class;
+	template <typename T> using delegate_type_t = emu::detail::rw_delegate_type_t<T>;
+	template <typename T> using delegate_device_class_t = emu::detail::rw_delegate_device_class_t<T>;
 
 	// Invoking transform callbacks
 	template <typename Input, typename Result, typename T> static std::enable_if_t<is_transform_form1<Input, Result, T>::value, mask_t<transform_result_t<Input, Result, T>, Result> > invoke_transform(T const &cb, address_space &space, offs_t &offset, Input data, std::make_unsigned_t<Input> &mem_mask) { return std::make_unsigned_t<transform_result_t<Input, Result, T> >(cb(space, offset, data, mem_mask)); }
@@ -638,20 +595,17 @@ private:
 		delegate_builder(devcb_read &target, bool append, device_t &devbase, char const *tag, T &&func, char const *name)
 			: builder_base(target, append)
 			, transform_base<output_t, delegate_builder>(DefaultMask & delegate_traits<Delegate>::default_mask)
-			, m_devbase(devbase)
-			, m_delegate(std::forward<T>(func), name, tag, std::add_pointer_t<devcb_read::delegate_device_class_t<T> >(nullptr))
+			, m_delegate(devbase, tag, std::forward<T>(func), name)
 		{ }
 		template <typename T>
 		delegate_builder(devcb_read &target, bool append, device_t &devbase, devcb_read::delegate_device_class_t<T> &obj, T &&func, char const *name)
 			: builder_base(target, append)
 			, transform_base<output_t, delegate_builder>(DefaultMask & delegate_traits<Delegate>::default_mask)
-			, m_devbase(devbase)
-			, m_delegate(std::forward<T>(func), name, devcb_read::get_tag(obj), &obj)
+			, m_delegate(obj, std::forward<T>(func), name)
 		{ }
 		delegate_builder(delegate_builder &&that)
 			: builder_base(std::move(that))
 			, transform_base<output_t, delegate_builder>(std::move(that))
-			, m_devbase(that.m_devbase)
 			, m_delegate(std::move(that.m_delegate))
 		{
 			that.consume();
@@ -670,8 +624,9 @@ private:
 
 		void validity_check(validity_checker &valid) const
 		{
-			if (!m_devbase.subdevice(m_delegate.device_name()))
-				osd_printf_error("Read callback bound to non-existent object tag %s (%s)\n", m_delegate.device_name(), m_delegate.name());
+			auto const target(m_delegate.finder_target());
+			if (target.second && !target.first.subdevice(target.second))
+				osd_printf_error("Read callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second).c_str(), m_delegate.name());
 		}
 
 		template <typename T>
@@ -679,7 +634,7 @@ private:
 		{
 			assert(this->m_consumed);
 			this->built();
-			m_delegate.bind_relative_to(m_devbase);
+			m_delegate.resolve();
 			chain(
 					[cb = std::move(this->m_delegate), exor = this->exor(), mask = this->mask()] (address_space &space, offs_t offset, input_mask_t mem_mask)
 					{ return (devcb_read::invoke_read<Result>(cb, space, offset, mem_mask & mask) ^ exor) & mask; });
@@ -690,7 +645,6 @@ private:
 		delegate_builder &operator=(delegate_builder const &) = delete;
 		delegate_builder &operator=(delegate_builder &&that) = delete;
 
-		device_t &m_devbase;
 		Delegate m_delegate;
 	};
 
@@ -1328,7 +1282,6 @@ private:
 
 			wrapped_builder(delegate_builder &&that)
 				: builder_base(std::move(that))
-				, m_devbase(that.m_devbase)
 				, m_delegate(std::move(that.m_delegate))
 			{
 				that.consume();
@@ -1336,7 +1289,6 @@ private:
 			}
 			wrapped_builder(wrapped_builder &&that)
 				: builder_base(std::move(that))
-				, m_devbase(that.m_devbase)
 				, m_delegate(std::move(that.m_delegate))
 			{
 				that.consume();
@@ -1345,15 +1297,16 @@ private:
 
 			void validity_check(validity_checker &valid) const
 			{
-				if (!m_devbase.subdevice(m_delegate.device_name()))
-					osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", m_delegate.device_name(), m_delegate.name());
+				auto const target(m_delegate.finder_target());
+				if (target.second && !target.first.subdevice(target.second))
+					osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second).c_str(), m_delegate.name());
 			}
 
 			auto build()
 			{
 				assert(this->m_consumed);
 				this->built();
-				m_delegate.bind_relative_to(m_devbase);
+				m_delegate.resolve();
 				return
 						[cb = std::move(this->m_delegate)] (address_space &space, offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 						{ devcb_write::invoke_write<Input>(cb, space, offset, data, mem_mask); };
@@ -1364,7 +1317,6 @@ private:
 			wrapped_builder operator=(wrapped_builder const &) = delete;
 			wrapped_builder operator=(wrapped_builder &&that) = delete;
 
-			device_t &m_devbase;
 			Delegate m_delegate;
 		};
 
@@ -1374,7 +1326,6 @@ private:
 		delegate_builder &operator=(delegate_builder const &) = delete;
 		delegate_builder &operator=(delegate_builder &&that) = delete;
 
-		device_t &m_devbase;
 		Delegate m_delegate;
 
 	public:
@@ -1384,20 +1335,17 @@ private:
 		delegate_builder(devcb_write &target, bool append, device_t &devbase, char const *tag, T &&func, char const *name)
 			: builder_base(target, append)
 			, transform_base<mask_t<Input, typename delegate_traits<Delegate>::input_t>, delegate_builder>(DefaultMask & delegate_traits<Delegate>::default_mask)
-			, m_devbase(devbase)
-			, m_delegate(std::forward<T>(func), name, tag, std::add_pointer_t<devcb_write::delegate_device_class_t<T> >(nullptr))
+			, m_delegate(devbase, tag, std::forward<T>(func), name)
 		{ }
 		template <typename T>
 		delegate_builder(devcb_write &target, bool append, device_t &devbase, devcb_write::delegate_device_class_t<T> &obj, T &&func, char const *name)
 			: builder_base(target, append)
 			, transform_base<mask_t<Input, typename delegate_traits<Delegate>::input_t>, delegate_builder>(DefaultMask & delegate_traits<Delegate>::default_mask)
-			, m_devbase(devbase)
-			, m_delegate(std::forward<T>(func), name, devcb_write::get_tag(obj), &obj)
+			, m_delegate(obj, std::forward<T>(func), name)
 		{ }
 		delegate_builder(delegate_builder &&that)
 			: builder_base(std::move(that))
 			, transform_base<mask_t<Input, typename delegate_traits<Delegate>::input_t>, delegate_builder>(std::move(that))
-			, m_devbase(that.m_devbase)
 			, m_delegate(std::move(that.m_delegate))
 		{
 			that.consume();
@@ -1415,15 +1363,16 @@ private:
 
 		void validity_check(validity_checker &valid) const
 		{
-			if (!m_devbase.subdevice(m_delegate.device_name()))
-				osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", m_delegate.device_name(), m_delegate.name());
+			auto const target(m_delegate.finder_target());
+			if (target.second && !target.first.subdevice(target.second))
+				osd_printf_error("Write callback bound to non-existent object tag %s (%s)\n", target.first.subtag(target.second).c_str(), m_delegate.name());
 		}
 
 		auto build()
 		{
 			assert(this->m_consumed);
 			this->built();
-			m_delegate.bind_relative_to(m_devbase);
+			m_delegate.resolve();
 			return
 					[cb = std::move(this->m_delegate), exor = this->exor(), mask = this->mask()] (address_space &space, offs_t offset, input_t data, std::make_unsigned_t<input_t> mem_mask)
 					{ devcb_write::invoke_write<Input>(cb, space, offset, (data ^ exor) & mask, mem_mask & mask); };

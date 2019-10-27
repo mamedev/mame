@@ -417,12 +417,12 @@ void leland_80186_sound_device::peripheral_ctrl(offs_t offset, u16 data)
 			u32 temp = (m_peripheral & 0xffc0) << 4;
 			if (data & 0x0040)
 			{
-				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16s_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_PROGRAM).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_r)), write16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_w)));
 			}
 			else
 			{
 				temp &= 0xffff;
-				m_audiocpu->space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(FUNC(leland_80186_sound_device::peripheral_r), this), write16s_delegate(FUNC(leland_80186_sound_device::peripheral_w), this));
+				m_audiocpu->space(AS_IO).install_readwrite_handler(temp, temp + 0x2ff, read16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_r)), write16s_delegate(*this, FUNC(leland_80186_sound_device::peripheral_w)));
 			}
 			break;
 		}

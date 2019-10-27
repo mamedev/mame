@@ -36,19 +36,19 @@ void coco12_state::configure_sam()
 	m_sam->configure_bank(2, &rom[0x2000], 0x2000, true);           // $A000-$BFFF
 
 	// $C000-$FEFF
-	m_sam->configure_bank(3, read8_delegate(FUNC(cococart_slot_device::cts_read), m_cococart.target()), write8_delegate(FUNC(cococart_slot_device::cts_write), m_cococart.target()));
+	m_sam->configure_bank(3, read8_delegate(*m_cococart, FUNC(cococart_slot_device::cts_read)), write8_delegate(*m_cococart, FUNC(cococart_slot_device::cts_write)));
 
 	// $FF00-$FF1F
-	m_sam->configure_bank(4, read8_delegate(FUNC(coco12_state::ff00_read), this), write8_delegate(FUNC(coco12_state::ff00_write), this));
+	m_sam->configure_bank(4, read8_delegate(*this, FUNC(coco12_state::ff00_read)), write8_delegate(*this, FUNC(coco12_state::ff00_write)));
 
 	// $FF20-$FF3F
-	m_sam->configure_bank(5, read8_delegate(FUNC(coco12_state::ff20_read), this), write8_delegate(FUNC(coco12_state::ff20_write), this));
+	m_sam->configure_bank(5, read8_delegate(*this, FUNC(coco12_state::ff20_read)), write8_delegate(*this, FUNC(coco12_state::ff20_write)));
 
 	// $FF40-$FF5F
-	m_sam->configure_bank(6, read8_delegate(FUNC(coco12_state::ff40_read), this), write8_delegate(FUNC(coco12_state::ff40_write), this));
+	m_sam->configure_bank(6, read8_delegate(*this, FUNC(coco12_state::ff40_read)), write8_delegate(*this, FUNC(coco12_state::ff40_write)));
 
 	// $FF60-$FFBF
-	m_sam->configure_bank(7, read8_delegate(FUNC(coco12_state::ff60_read), this), write8_delegate(FUNC(coco12_state::ff60_write), this));
+	m_sam->configure_bank(7, read8_delegate(*this, FUNC(coco12_state::ff60_read)), write8_delegate(*this, FUNC(coco12_state::ff60_write)));
 }
 
 
