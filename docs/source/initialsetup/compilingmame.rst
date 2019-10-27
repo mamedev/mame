@@ -444,7 +444,7 @@ Known Issues
 Issues with specific compiler versions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* MinGW GCC 7 for Windows i386 produces spurious out-of-bounds access warnings.
+* GCC 7 for 32-bit x86 targets produces spurious out-of-bounds access warnings.
   Adding **NOWERROR=1** to your build options works around this by not treating
   warnings as errors.
 * Initial versions of GNU libstdc++ 6 have a broken ``std::unique_ptr``

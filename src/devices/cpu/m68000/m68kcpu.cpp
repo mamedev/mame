@@ -2584,6 +2584,7 @@ m68000_device::m68000_device(const machine_config &mconfig, const device_type ty
 
 void m68000_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68000();
 }
 
@@ -2607,6 +2608,7 @@ m68008_device::m68008_device(const machine_config &mconfig, const char *tag, dev
 
 void m68008_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68008();
 }
 
@@ -2618,6 +2620,7 @@ m68008fn_device::m68008fn_device(const machine_config &mconfig, const char *tag,
 
 void m68008fn_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68008();
 }
 
@@ -2630,6 +2633,7 @@ m68010_device::m68010_device(const machine_config &mconfig, const char *tag, dev
 
 void m68010_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68010();
 }
 
@@ -2642,6 +2646,7 @@ m68020_device::m68020_device(const machine_config &mconfig, const char *tag, dev
 
 void m68020_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020();
 }
 
@@ -2653,6 +2658,7 @@ m68020fpu_device::m68020fpu_device(const machine_config &mconfig, const char *ta
 
 void m68020fpu_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020fpu();
 }
 
@@ -2664,6 +2670,7 @@ m68020pmmu_device::m68020pmmu_device(const machine_config &mconfig, const char *
 
 void m68020pmmu_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020pmmu();
 }
 
@@ -2689,6 +2696,7 @@ m68020hmmu_device::m68020hmmu_device(const machine_config &mconfig, const char *
 
 void m68020hmmu_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68020hmmu();
 }
 
@@ -2700,6 +2708,7 @@ m68ec020_device::m68ec020_device(const machine_config &mconfig, const char *tag,
 
 void m68ec020_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68ec020();
 }
 
@@ -2710,6 +2719,7 @@ m68030_device::m68030_device(const machine_config &mconfig, const char *tag, dev
 
 void m68030_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68030();
 }
 
@@ -2720,6 +2730,7 @@ m68ec030_device::m68ec030_device(const machine_config &mconfig, const char *tag,
 
 void m68ec030_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68ec030();
 }
 
@@ -2731,6 +2742,7 @@ m68040_device::m68040_device(const machine_config &mconfig, const char *tag, dev
 
 void m68040_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68040();
 }
 
@@ -2743,6 +2755,7 @@ m68ec040_device::m68ec040_device(const machine_config &mconfig, const char *tag,
 
 void m68ec040_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68ec040();
 }
 
@@ -2755,6 +2768,7 @@ m68lc040_device::m68lc040_device(const machine_config &mconfig, const char *tag,
 
 void m68lc040_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_m68lc040();
 }
 
@@ -2767,6 +2781,7 @@ scc68070_base_device::scc68070_base_device(const machine_config &mconfig, const 
 
 void scc68070_base_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_scc68070();
 }
 
@@ -2785,6 +2800,7 @@ fscpu32_device::fscpu32_device(const machine_config &mconfig, const char *tag, d
 
 void fscpu32_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_fscpu32();
 }
 
@@ -2797,6 +2813,7 @@ mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag,
 
 void mcf5206e_device::device_start()
 {
+	m68000_base_device::device_start();
 	init_cpu_coldfire();
 }
 
