@@ -3008,7 +3008,7 @@ ROM_START( lohtb2 )
 	ROM_RELOAD(                      0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )
-	ROM_LOAD( "loht-a26.bin",  0x00000, 0x02000, CRC(ac901e17) SHA1(70a73288d594c78ad2aca78ce55a699cb040bede) ) // unprotected??
+	ROM_LOAD( "loht-a26.bin",  0x00000, 0x01000, CRC(9fa9b496) SHA1(b529bcd7bf123894e11f2a8df8826932122e375a) ) // unprotected?? - same as original lohtj MCU
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "loht-a16.bin",  0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
@@ -3043,16 +3043,16 @@ ROM_START( lohtb3 ) // extremely similar to the original. Copyright changed to 1
 	ROM_LOAD16_BYTE( "1.1", 0x00000, 0x20000, CRC(b9384e93) SHA1(5b882ecd68fdf7a6307af0e1aca2ab1782911227) )
 
 	ROM_LOAD16_BYTE( "i-10.10",  0x40001, 0x10000, CRC(79e007ec) SHA1(b2e4cc4a47f5f127ba9a1a00eaaf067464314ea0) )
-	ROM_RELOAD(                      0xc0001, 0x10000 )
+	ROM_RELOAD(                  0xc0001, 0x10000 )
 	ROM_LOAD16_BYTE( "i-11.11",  0x60001, 0x10000, CRC(254ea4d5) SHA1(07277bbe2ea6678f0de1f28e40be794880b3faff) )
-	ROM_RELOAD(                      0xe0001, 0x10000 )
+	ROM_RELOAD(                  0xe0001, 0x10000 )
 	ROM_LOAD16_BYTE( "i-2.2",    0x40000, 0x10000, CRC(b951346e) SHA1(82fa3c4a09a86b74b98c31aaea5c0629ddff83a0) )
-	ROM_RELOAD(                      0xc0000, 0x10000 )
+	ROM_RELOAD(                  0xc0000, 0x10000 )
 	ROM_LOAD16_BYTE( "i-3.3",    0x60000, 0x10000, CRC(cfb0390d) SHA1(4acc61a51a7ae681bd8d835e2644b44c4d6d7bcb) )
-	ROM_RELOAD(                      0xe0000, 0x10000 )
+	ROM_RELOAD(                  0xe0000, 0x10000 )
 
 	ROM_REGION( 0x10000, "mcu", 0 )  /* i8751 microcontroller */
-	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) )
+	ROM_LOAD( "c8751h.bin",  0x00000, 0x01000, CRC(9c9545f1) SHA1(ca800ce7467efb877d0fff4c47d72478a991e2a9) ) // unprotected?? - works for original loht (World) set
 
 	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD( "i-8.8",   0x00000, 0x10000, CRC(df5ac5ee) SHA1(5b45417ada402047d97dfb6cee6545686ad26e37) )
