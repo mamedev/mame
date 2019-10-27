@@ -140,9 +140,8 @@ private:
 	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(scrollx_w);
 	DECLARE_WRITE8_MEMBER(scrolly_w);
-	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(slave_ack_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
-	DECLARE_READ8_MEMBER(mermaid_p0_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p0_w);
 	DECLARE_READ8_MEMBER(mermaid_p1_r);
 	DECLARE_WRITE8_MEMBER(mermaid_p1_w);
@@ -182,6 +181,7 @@ void hvyunit_state::machine_start()
 	m_slavebank->configure_entries(0, 4, memregion("slave")->base(), 0x4000);
 	m_soundbank->configure_entries(0, 4, memregion("soundcpu")->base(), 0x4000);
 
+	std::fill_n(&m_mermaid_p[0], 4, 0xff);
 	save_item(NAME(m_mermaid_p));
 }
 
@@ -294,10 +294,9 @@ WRITE8_MEMBER(hvyunit_state::scrolly_w)
 	m_scrolly = data;
 }
 
-WRITE8_MEMBER(hvyunit_state::coin_count_w)
+WRITE8_MEMBER(hvyunit_state::slave_ack_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	m_slavecpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 
@@ -319,12 +318,6 @@ WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
  *
  *************************************/
 
-READ8_MEMBER(hvyunit_state::mermaid_p0_r)
-{
-	// ?
-	return 0;
-}
-
 WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
 	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
@@ -332,6 +325,14 @@ WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 
 	if (BIT(data, 0) == 0)
 		m_mermaid_p[1] = m_mermaidlatch->read();
+
+	if (!BIT(m_mermaid_p[0], 4) && BIT(data, 4))
+	{
+		machine().bookkeeping().coin_counter_w(0, BIT(m_mermaid_p[2], 0));
+		machine().bookkeeping().coin_counter_w(1, BIT(m_mermaid_p[2], 1));
+		machine().bookkeeping().coin_lockout_w(0, !BIT(m_mermaid_p[2], 2));
+		machine().bookkeeping().coin_lockout_w(1, !BIT(m_mermaid_p[2], 3));
+	}
 
 	m_mermaid_p[0] = data;
 }
@@ -433,7 +434,7 @@ void hvyunit_state::slave_io(address_map &map)
 	map(0x06, 0x06).w(FUNC(hvyunit_state::scrolly_w));
 	map(0x08, 0x08).w(FUNC(hvyunit_state::scrollx_w));
 	map(0x0c, 0x0c).r(FUNC(hvyunit_state::mermaid_status_r));
-	map(0x0e, 0x0e).w(FUNC(hvyunit_state::coin_count_w));
+	map(0x0e, 0x0e).w(FUNC(hvyunit_state::slave_ack_w));
 
 //  map(0x22, 0x22).r(FUNC(hvyunit_state::hu_scrolly_hi_reset)); //22/a2 taken from ram $f065
 //  map(0xa2, 0xa2).r(FUNC(hvyunit_state::hu_scrolly_hi_set));
@@ -613,14 +614,13 @@ void hvyunit_state::hvyunit(machine_config &config)
 	Z80(config, m_slavecpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_slavecpu->set_addrmap(AS_PROGRAM, &hvyunit_state::slave_memory);
 	m_slavecpu->set_addrmap(AS_IO, &hvyunit_state::slave_io);
-	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_hold));
+	m_slavecpu->set_vblank_int("screen", FUNC(hvyunit_state::irq0_line_assert));
 
 	Z80(config, m_soundcpu, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &hvyunit_state::sound_memory);
 	m_soundcpu->set_addrmap(AS_IO, &hvyunit_state::sound_io);
 
 	I80C51(config, m_mermaid, XTAL(12'000'000)/2); /* 6MHz verified on PCB */
-	m_mermaid->port_in_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_r));
 	m_mermaid->port_out_cb<0>().set(FUNC(hvyunit_state::mermaid_p0_w));
 	m_mermaid->port_in_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_r));
 	m_mermaid->port_out_cb<1>().set(FUNC(hvyunit_state::mermaid_p1_w));
