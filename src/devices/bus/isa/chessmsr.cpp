@@ -46,6 +46,10 @@ void isa8_chessmsr_device::device_start()
 {
 	set_isa_device();
 	m_installed = false;
+
+	save_item(NAME(m_installed));
+	save_item(NAME(m_suspended));
+	save_item(NAME(m_ram_offset));
 }
 
 
