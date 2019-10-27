@@ -2438,6 +2438,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/qvt102.h,MACHINES["QVT102"] = true
+---------------------------------------------------
+
+if (MACHINES["QVT102"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/qvt102.cpp",
+		MAME_DIR .. "src/devices/machine/qvt102.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/r10696.h,MACHINES["R10696"] = true
 ---------------------------------------------------
 

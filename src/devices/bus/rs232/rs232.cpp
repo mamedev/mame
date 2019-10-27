@@ -167,6 +167,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "null_modem.h"
 #include "printer.h"
 #include "pty.h"
+#include "qvt102.h"
 #include "sun_kbd.h"
 #include "swtpc8212.h"
 #include "terminal.h"
@@ -183,5 +184,6 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("pty", PSEUDO_TERMINAL);
 	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
 	device.option_add("ie15", SERIAL_TERMINAL_IE15);
+	device.option_add("qvt102", SERIAL_TERMINAL_QVT102);
 	device.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 }

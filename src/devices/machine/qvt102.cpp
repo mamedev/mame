@@ -29,17 +29,8 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "cpu/mcs48/mcs48.h"
-#include "machine/input_merger.h"
-#include "machine/6850acia.h"
+#include "machine/qvt102.h"
 #include "machine/nvram.h"
-#include "machine/z80ctc.h"
-#include "video/mc6845.h"
-#include "sound/spkrdev.h"
-#include "bus/rs232/rs232.h"
-#include "emupal.h"
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -47,106 +38,53 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class qvt102_state : public driver_device
+qvt102_device::qvt102_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_maincpu(*this, "maincpu")
+	, m_irqs(*this, "irqs")
+	, m_kbdmcu(*this, "kbdmcu")
+	, m_keys_p1(*this, "P1_%u", 0U)
+	, m_keys_p2(*this, "P2_%u", 0U)
+	, m_keys_special(*this, "SPECIAL")
+	, m_jumper(*this, "JUMPER")
+	, m_acia(*this, "acia")
+	, m_aux(*this, "aux")
+	, m_ctc(*this, "ctc")
+	, m_crtc(*this, "crtc")
+	, m_screen(*this, "screen")
+	, m_palette(*this, "palette")
+	, m_speaker(*this, "speaker")
+	, m_vram(*this, "videoram")
+	, m_char_rom(*this, "chargen")
+	, m_latch(0)
+	, m_kbd_data(0)
+	, m_kbd_bus(0xff), m_kbd_p1(0xff), m_kbd_p2(0xff)
+	, m_rs232_conn_txd_handler(*this)
+	, m_rs232_conn_dtr_handler(*this)
+	, m_rs232_conn_rts_handler(*this)
 {
-public:
-	qvt102_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_irqs(*this, "irqs")
-		, m_kbdmcu(*this, "kbdmcu")
-		, m_keys_p1(*this, "P1_%u", 0U)
-		, m_keys_p2(*this, "P2_%u", 0U)
-		, m_keys_special(*this, "SPECIAL")
-		, m_jumper(*this, "JUMPER")
-		, m_acia(*this, "acia")
-		, m_host(*this, "host")
-		, m_aux(*this, "aux")
-		, m_ctc(*this, "ctc")
-		, m_crtc(*this, "crtc")
-		, m_screen(*this, "screen")
-		, m_palette(*this, "palette")
-		, m_speaker(*this, "speaker")
-		, m_vram(*this, "videoram")
-		, m_char_rom(*this, "chargen")
-		, m_latch(0)
-		, m_kbd_data(0)
-		, m_kbd_bus(0xff), m_kbd_p1(0xff), m_kbd_p2(0xff)
-	{ }
+}
 
-	void qvt102(machine_config &config);
-
-protected:
-	void machine_start() override;
-	void machine_reset() override;
-
-private:
-	required_device<m6800_cpu_device> m_maincpu;
-	required_device<input_merger_device> m_irqs;
-	required_device<i8748_device> m_kbdmcu;
-	required_ioport_array<8> m_keys_p1;
-	required_ioport_array<8> m_keys_p2;
-	required_ioport m_keys_special;
-	required_ioport m_jumper;
-	required_device<acia6850_device> m_acia;
-	required_device<rs232_port_device> m_host;
-	required_device<rs232_port_device> m_aux;
-	required_device<z80ctc_device> m_ctc;
-	required_device<hd6845s_device> m_crtc;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<uint8_t> m_vram;
-	required_region_ptr<u8> m_char_rom;
-
-	void mem_map(address_map &map);
-
-	MC6845_UPDATE_ROW(crtc_update_row);
-
-	DECLARE_READ8_MEMBER(vsync_ack_r);
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_READ8_MEMBER(kbd_r);
-	DECLARE_WRITE8_MEMBER(latch_w);
-
-	DECLARE_READ8_MEMBER(ctc_r);
-	DECLARE_WRITE8_MEMBER(ctc_w);
-
-	DECLARE_WRITE_LINE_MEMBER(acia_txd_w);
-	DECLARE_WRITE_LINE_MEMBER(acia_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(dsr_w);
-	DECLARE_WRITE_LINE_MEMBER(host_rxd_w);
-	DECLARE_WRITE_LINE_MEMBER(host_dcd_w);
-
-	uint8_t m_latch;
-	int m_kbd_data;
-
-	// keyboard mcu
-	DECLARE_READ8_MEMBER(mcu_bus_r);
-	DECLARE_WRITE8_MEMBER(mcu_bus_w);
-	DECLARE_READ_LINE_MEMBER(mcu_t0_r);
-	DECLARE_READ_LINE_MEMBER(mcu_t1_r);
-	DECLARE_WRITE8_MEMBER(mcu_p1_w);
-	DECLARE_WRITE8_MEMBER(mcu_p2_w);
-
-	uint8_t m_kbd_bus, m_kbd_p1, m_kbd_p2;
-};
-
+qvt102_device::qvt102_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: qvt102_device(mconfig, QVT102, tag, owner, clock)
+{
+}
 
 //**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
-void qvt102_state::mem_map(address_map &map)
+void qvt102_device::mem_map(address_map &map)
 {
 	map(0x0000, 0x03ff).ram().share("nvram");
-	map(0x2800, 0x2800).rw(FUNC(qvt102_state::ctc_r), FUNC(qvt102_state::ctc_w));
-	map(0x3000, 0x3000).r(FUNC(qvt102_state::vsync_ack_r));
-	map(0x3800, 0x3800).w(FUNC(qvt102_state::latch_w));
+	map(0x2800, 0x2800).rw(FUNC(qvt102_device::ctc_r), FUNC(qvt102_device::ctc_w));
+	map(0x3000, 0x3000).r(FUNC(qvt102_device::vsync_ack_r));
+	map(0x3800, 0x3800).w(FUNC(qvt102_device::latch_w));
 	map(0x4000, 0x47ff).ram().share("videoram").mirror(0x3800);
 	map(0x8000, 0x8000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x8001, 0x8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x9800, 0x9801).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	map(0xa000, 0xa000).r(FUNC(qvt102_state::kbd_r));
+	map(0xa000, 0xa000).r(FUNC(qvt102_device::kbd_r));
 	map(0xe000, 0xffff).rom().region("maincpu", 0);
 }
 
@@ -155,7 +93,7 @@ void qvt102_state::mem_map(address_map &map)
 //  INPUT PORT DEFINITIONS
 //**************************************************************************
 
-static INPUT_PORTS_START( qvt102 )
+INPUT_PORTS_START( qvt102 )
 	PORT_START("P1_0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)      PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -354,18 +292,18 @@ INPUT_PORTS_END
 // -----21- unused
 // -------0 speaker
 
-READ8_MEMBER(qvt102_state::mcu_bus_r)
+READ8_MEMBER(qvt102_device::mcu_bus_r)
 {
 	return m_kbd_bus;
 }
 
-WRITE8_MEMBER(qvt102_state::mcu_bus_w)
+WRITE8_MEMBER(qvt102_device::mcu_bus_w)
 {
 	m_speaker->level_w(BIT(data, 0));
 	m_kbd_bus = data;
 }
 
-READ_LINE_MEMBER(qvt102_state::mcu_t0_r)
+READ_LINE_MEMBER(qvt102_device::mcu_t0_r)
 {
 	int state = 1;
 
@@ -381,7 +319,7 @@ READ_LINE_MEMBER(qvt102_state::mcu_t0_r)
 	return state;
 }
 
-READ_LINE_MEMBER(qvt102_state::mcu_t1_r)
+READ_LINE_MEMBER(qvt102_device::mcu_t1_r)
 {
 	int state = 1;
 
@@ -396,12 +334,12 @@ READ_LINE_MEMBER(qvt102_state::mcu_t1_r)
 	return state;
 }
 
-WRITE8_MEMBER(qvt102_state::mcu_p1_w)
+WRITE8_MEMBER(qvt102_device::mcu_p1_w)
 {
 	m_kbd_p1 = data;
 }
 
-WRITE8_MEMBER(qvt102_state::mcu_p2_w)
+WRITE8_MEMBER(qvt102_device::mcu_p2_w)
 {
 	m_kbd_p2 = data;
 
@@ -431,19 +369,19 @@ WRITE8_MEMBER(qvt102_state::mcu_p2_w)
 //  VIDEO EMULATION
 //**************************************************************************
 
-READ8_MEMBER(qvt102_state::vsync_ack_r)
+READ8_MEMBER(qvt102_device::vsync_ack_r)
 {
 	m_irqs->in_w<0>(CLEAR_LINE);
 	return 0;
 }
 
-WRITE_LINE_MEMBER(qvt102_state::vsync_w)
+WRITE_LINE_MEMBER(qvt102_device::vsync_w)
 {
 	if (state)
 		m_irqs->in_w<0>(ASSERT_LINE);
 }
 
-MC6845_UPDATE_ROW( qvt102_state::crtc_update_row )
+MC6845_UPDATE_ROW( qvt102_device::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
@@ -517,7 +455,7 @@ GFXDECODE_END
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE8_MEMBER(qvt102_state::latch_w)
+WRITE8_MEMBER(qvt102_device::latch_w)
 {
 	// 7------- host to keyboard
 	// -6------ aux print
@@ -532,13 +470,15 @@ WRITE8_MEMBER(qvt102_state::latch_w)
 
 	// jumper w3 enables this connection
 	if (machine().phase() != machine_phase::INIT)
+	{
 		if (BIT(m_jumper->read(), 2))
-			m_host->write_dtr(BIT(data, 4));
+			m_rs232_conn_dtr_handler(BIT(data, 4));
+	}
 
 	m_kbdmcu->set_input_line(MCS48_INPUT_IRQ, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ8_MEMBER(qvt102_state::kbd_r)
+READ8_MEMBER(qvt102_device::kbd_r)
 {
 	// 7------- keyboard to host
 	// -6------ dtr2
@@ -551,17 +491,17 @@ READ8_MEMBER(qvt102_state::kbd_r)
 	return data;
 }
 
-READ8_MEMBER(qvt102_state::ctc_r)
+READ8_MEMBER(qvt102_device::ctc_r)
 {
 	return m_ctc->read(BIT(m_latch, 5));
 }
 
-WRITE8_MEMBER(qvt102_state::ctc_w)
+WRITE8_MEMBER(qvt102_device::ctc_w)
 {
 	m_ctc->write(BIT(m_latch, 5), data);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::acia_txd_w)
+WRITE_LINE_MEMBER(qvt102_device::acia_txd_w)
 {
 	if (BIT(m_latch, 6) == 0)
 	{
@@ -574,28 +514,46 @@ WRITE_LINE_MEMBER(qvt102_state::acia_txd_w)
 		if (BIT(m_latch, 0) == 0)
 			m_aux->write_txd(state);
 
-		m_host->write_txd(state);
+		m_rs232_conn_txd_handler(state);
 	}
 }
 
-WRITE_LINE_MEMBER(qvt102_state::acia_rts_w)
+WRITE_LINE_MEMBER(qvt102_device::acia_rts_w)
 {
-	m_host->write_rts(state);
+	m_rs232_conn_rts_handler(state);
 
 	// jumper w4 enables rts output to dtr
 	if (machine().phase() != machine_phase::INIT)
+	{
 		if (BIT(m_jumper->read(), 3))
-			m_host->write_dtr(state);
+			m_rs232_conn_dtr_handler(state);
+	}
 }
 
-WRITE_LINE_MEMBER(qvt102_state::dsr_w)
+WRITE_LINE_MEMBER(qvt102_device::rs232_conn_dcd_w)
+{
+	if (machine().phase() != machine_phase::INIT)
+		if (BIT(m_jumper->read(), 1))
+			m_acia->write_dcd(state);
+}
+
+WRITE_LINE_MEMBER(qvt102_device::rs232_conn_dsr_w)
 {
 	if (machine().phase() != machine_phase::INIT)
 		if (BIT(m_jumper->read(), 0))
 			m_acia->write_dcd(state);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::host_rxd_w)
+WRITE_LINE_MEMBER(qvt102_device::rs232_conn_ri_w)
+{
+}
+
+WRITE_LINE_MEMBER(qvt102_device::rs232_conn_cts_w)
+{
+	m_acia->write_cts(state);
+}
+
+WRITE_LINE_MEMBER(qvt102_device::rs232_conn_rxd_w)
 {
 	m_acia->write_rxd(state);
 
@@ -604,14 +562,14 @@ WRITE_LINE_MEMBER(qvt102_state::host_rxd_w)
 		m_aux->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(qvt102_state::host_dcd_w)
+void qvt102_device::device_resolve_objects()
 {
-	if (machine().phase() != machine_phase::INIT)
-		if (BIT(m_jumper->read(), 1))
-			m_acia->write_dcd(state);
+	m_rs232_conn_dtr_handler.resolve_safe();
+	m_rs232_conn_rts_handler.resolve_safe();
+	m_rs232_conn_txd_handler.resolve_safe();
 }
 
-void qvt102_state::machine_start()
+void qvt102_device::device_start()
 {
 	m_kbd_data = 0;
 	m_kbd_bus = m_kbd_p1 = m_kbd_p2 = 0xff;
@@ -624,73 +582,9 @@ void qvt102_state::machine_start()
 	save_item(NAME(m_kbd_p2));
 }
 
-void qvt102_state::machine_reset()
+void qvt102_device::device_reset()
 {
 	m_latch = 0;
-}
-
-
-//**************************************************************************
-//  MACHINE DEFINTIONS
-//**************************************************************************
-
-void qvt102_state::qvt102(machine_config &config)
-{
-	M6800(config, m_maincpu, 16.6698_MHz_XTAL / 18);
-	m_maincpu->set_addrmap(AS_PROGRAM, &qvt102_state::mem_map);
-
-	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
-
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x TC5514-APL + 3V battery
-
-	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_color(rgb_t::green());
-	m_screen->set_raw(16.6698_MHz_XTAL, 882, 9, 729, 315, 0, 300); // 80x24+1
-	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
-
-	GFXDECODE(config, "gfxdecode", m_palette, chars);
-
-	HD6845S(config, m_crtc, 16.6698_MHz_XTAL / 9);
-	m_crtc->set_screen("screen");
-	m_crtc->set_show_border_area(false);
-	m_crtc->set_char_width(9);
-	m_crtc->set_update_row_callback(FUNC(qvt102_state::crtc_update_row));
-	m_crtc->out_vsync_callback().set(FUNC(qvt102_state::vsync_w));
-
-	ACIA6850(config, m_acia, 0);
-	m_acia->txd_handler().set(FUNC(qvt102_state::acia_txd_w));
-	m_acia->rts_handler().set(FUNC(qvt102_state::acia_rts_w));
-	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
-
-	RS232_PORT(config, m_host, default_rs232_devices, nullptr);
-	m_host->rxd_handler().set(FUNC(qvt102_state::host_rxd_w));
-	m_host->cts_handler().set(m_acia, FUNC(acia6850_device::write_cts));
-	m_host->dsr_handler().set(FUNC(qvt102_state::dsr_w));
-	m_host->dcd_handler().set(FUNC(qvt102_state::host_dcd_w));
-
-	RS232_PORT(config, m_aux, default_rs232_devices, nullptr);
-	m_aux->dsr_handler().set(FUNC(qvt102_state::dsr_w));
-
-	Z80CTC(config, m_ctc, 16.6698_MHz_XTAL / 9);
-	m_ctc->set_clk<0>(16.6698_MHz_XTAL / 18);
-	m_ctc->set_clk<1>(16.6698_MHz_XTAL / 18);
-	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_txc));
-	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_rxc));
-
-	I8748(config, m_kbdmcu, 6_MHz_XTAL);
-	m_kbdmcu->bus_in_cb().set(FUNC(qvt102_state::mcu_bus_r));
-	m_kbdmcu->bus_out_cb().set(FUNC(qvt102_state::mcu_bus_w));
-	m_kbdmcu->t0_in_cb().set(FUNC(qvt102_state::mcu_t0_r));
-	m_kbdmcu->t1_in_cb().set(FUNC(qvt102_state::mcu_t1_r));
-	m_kbdmcu->p1_out_cb().set(FUNC(qvt102_state::mcu_p1_w));
-	m_kbdmcu->p2_out_cb().set(FUNC(qvt102_state::mcu_p2_w));
-
-	// sound hardware (on keyboard)
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -720,11 +614,90 @@ ROM_START( qvt102a )
 	ROM_LOAD("k301.u302", 0x000, 0x400, CRC(67564b20) SHA1(5897ff920f8fae4aa498d3a4dfd45b58183c041d))
 ROM_END
 
-
 //**************************************************************************
-//  SYSTEM DRIVERS
+//  MACHINE DEFINTIONS
 //**************************************************************************
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY  FULLNAME    FLAGS
-COMP( 1983, qvt102,  0,      0,      qvt102,  qvt102,  qvt102_state, empty_init, "Qume",  "QVT-102",  MACHINE_SUPPORTS_SAVE )
-COMP( 1983, qvt102a, qvt102, 0,      qvt102,  qvt102,  qvt102_state, empty_init, "Qume",  "QVT-102A", MACHINE_SUPPORTS_SAVE )
+void qvt102_device::device_add_mconfig(machine_config &config)
+{
+	M6800(config, m_maincpu, 16.6698_MHz_XTAL / 18);
+	m_maincpu->set_addrmap(AS_PROGRAM, &qvt102_device::mem_map);
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x TC5514-APL + 3V battery
+
+	// video hardware
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_raw(16.6698_MHz_XTAL, 882, 9, 729, 315, 0, 300); // 80x24+1
+	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	PALETTE(config, m_palette, palette_device::MONOCHROME_HIGHLIGHT);
+
+	GFXDECODE(config, "gfxdecode", m_palette, chars);
+
+	HD6845S(config, m_crtc, 16.6698_MHz_XTAL / 9);
+	m_crtc->set_screen("screen");
+	m_crtc->set_show_border_area(false);
+	m_crtc->set_char_width(9);
+	m_crtc->set_update_row_callback(FUNC(qvt102_device::crtc_update_row));
+	m_crtc->out_vsync_callback().set(FUNC(qvt102_device::vsync_w));
+
+	ACIA6850(config, m_acia, 0);
+	m_acia->txd_handler().set(FUNC(qvt102_device::acia_txd_w));
+	m_acia->rts_handler().set(FUNC(qvt102_device::acia_rts_w));
+	m_acia->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<1>));
+
+	RS232_PORT(config, m_aux, default_rs232_devices, nullptr);
+	// TODO is this correct, routing both DSR inputs together?
+	m_aux->dsr_handler().set(FUNC(qvt102_device::rs232_conn_dsr_w));
+
+	Z80CTC(config, m_ctc, 16.6698_MHz_XTAL / 9);
+	m_ctc->set_clk<0>(16.6698_MHz_XTAL / 18);
+	m_ctc->set_clk<1>(16.6698_MHz_XTAL / 18);
+	m_ctc->zc_callback<0>().set(m_acia, FUNC(acia6850_device::write_txc));
+	m_ctc->zc_callback<1>().set(m_acia, FUNC(acia6850_device::write_rxc));
+
+	I8748(config, m_kbdmcu, 6_MHz_XTAL);
+	m_kbdmcu->bus_in_cb().set(FUNC(qvt102_device::mcu_bus_r));
+	m_kbdmcu->bus_out_cb().set(FUNC(qvt102_device::mcu_bus_w));
+	m_kbdmcu->t0_in_cb().set(FUNC(qvt102_device::mcu_t0_r));
+	m_kbdmcu->t1_in_cb().set(FUNC(qvt102_device::mcu_t1_r));
+	m_kbdmcu->p1_out_cb().set(FUNC(qvt102_device::mcu_p1_w));
+	m_kbdmcu->p2_out_cb().set(FUNC(qvt102_device::mcu_p2_w));
+
+	// sound hardware (on keyboard)
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+ioport_constructor qvt102_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(qvt102);
+}
+
+const tiny_rom_entry *qvt102_device::device_rom_region() const
+{
+	return ROM_NAME(qvt102);
+}
+
+DEFINE_DEVICE_TYPE(QVT102, qvt102_device, "qvt102_device", "QVT102")
+
+
+qvt102a_device::qvt102a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: qvt102_device(mconfig, type, tag, owner, clock)
+{
+}
+
+qvt102a_device::qvt102a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: qvt102a_device(mconfig, QVT102A, tag, owner, clock)
+{
+}
+
+const tiny_rom_entry *qvt102a_device::device_rom_region() const
+{
+	return ROM_NAME(qvt102a);
+}
+
+DEFINE_DEVICE_TYPE(QVT102A, qvt102a_device, "qvt102a_device", "QVT102A")
