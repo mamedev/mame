@@ -892,11 +892,11 @@ void sn76477_device::log_complete_state()
 
 void sn76477_device::open_wav_file()
 {
-	char wav_file_name[30];
-
 	std::string s = tag();
-	std::replace(s.begin(), s.end(), ':', '_');	
-	sprintf(wav_file_name, LOG_WAV_FILE_NAME, s.c_str());
+	std::replace(s.begin(), s.end(), ':', '_');
+
+	char const* wav_file_name = util::string_format(LOG_WAV_FILE_NAME, s).c_str();
+
 	m_file = wav_open(wav_file_name, m_our_sample_rate, 2);
 
 	LOG(1, "SN76477:         Logging output: %s\n", wav_file_name);
@@ -1998,7 +1998,7 @@ void sn76477_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		 */
 		*buffer++ = (((voltage_out - OUT_LOW_CLIP_THRESHOLD) / (OUT_CENTER_LEVEL_VOLTAGE - OUT_LOW_CLIP_THRESHOLD)) - 1) * 32767;
 
-		if (LOG_WAV && (!LOG_WAV_ENABLED_ONLY || (LOG_WAV_ENABLED_ONLY && !m_enable)))
+		if (LOG_WAV && (!m_enable || !LOG_WAV_ENABLED_ONLY))
 		{
 			int16_t log_data_l;
 			int16_t log_data_r;
