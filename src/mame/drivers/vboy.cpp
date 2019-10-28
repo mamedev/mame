@@ -223,8 +223,8 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 
 			if (dat)
 			{
-				uint8_t const res_x = x + xi;
-				uint8_t const res_y = y + yi;
+				uint16_t const res_x = x + xi;
+				uint16_t const res_y = y + yi;
 
 				if (cliprect.contains(res_x, res_y))
 				{
