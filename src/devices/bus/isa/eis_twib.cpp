@@ -249,8 +249,8 @@ void isa8_eistwib_device::device_reset()
 		LOG("Installing twib device at %04x\n", base); 
 		m_isa->install_device(
 				base, base + 0x0f,
-				read8_delegate(FUNC( isa8_eistwib_device::twib_r ), this),
-				write8_delegate(FUNC( isa8_eistwib_device::twib_w ), this));
+				read8_delegate(*this, FUNC( isa8_eistwib_device::twib_r )),
+				write8_delegate(*this, FUNC( isa8_eistwib_device::twib_w )));
 		m_installed = true;
 	}
 	// CD and CTS input are tied to ground
