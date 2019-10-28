@@ -716,21 +716,43 @@ ROM_START( hvyunitj )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) )
-	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) )
-	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* the data in first half of this actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
-	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_05.1h, despite the different label */
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) /* == b73_22.2c, despite the different label */
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) /* == b73_21.2b, despite the different label */
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* == b73_15.0b, despite the different label */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_16.0c, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
 ROM_END
 
-/*
+ROM_START( hvyunitja )
+	ROM_REGION( 0x20000, "master", 0 )
+	ROM_LOAD( "b73_24.5c",  0x00000, 0x20000, CRC(60122f5a) SHA1(f9abccc8c4f65c613f901c7baebe02881ea8bf60) )
 
-There is known to exist a currently undumped Japanese version with graphic ROMs numbered B73_15 through B73_23, while
-using B73_12 sound CPU code & B73_14 slave CPU code. The label for the program was missing, presumed to B73_24
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "b73_14.5p",  0x00000, 0x10000, CRC(0dfb51d4) SHA1(0e6f3b3d4558f12fe1b1620f57a0f4ac2065fd1a) )
 
-*/
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "b73_12.7e",  0x000000, 0x010000, CRC(d1d24fab) SHA1(ed0312535d0b136d79aa885b9e6eea19ebde6409) )
+
+	ROM_REGION( 0x1000, "mermaid", 0 )
+	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 ) /* The data in first half of b73_15.0b actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
+	ROM_LOAD( "b73_22.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) // == b73_28.2c, despite the different label - M5M27C101P mask ROM
+	ROM_LOAD( "b73_21.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) // == b73_27.2b, despite the different label - M5M27C101P mask ROM
+	ROM_LOAD( "b73_15.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) // == b73_25.0b, despite the different label - M5M27C101P mask ROM
+	ROM_LOAD( "b73_16.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) // == b73_26.0c, despite the different label - HN27512P mask ROM
+	/* The data below is moved from 0x000000-0x080000 to 0x180000-0x200000 compared to other sets */
+	ROM_LOAD( "b73_17.0d",  0x180000, 0x020000, CRC(a8ec5309) SHA1(55418711fd9ca38f1c41c8c7dd7984920702c5e9) ) // == 1/4 b73_08.2f - M5M27C101P mask ROM
+	ROM_LOAD( "b73_18.0f",  0x1a0000, 0x020000, CRC(dc955a69) SHA1(f476f449c1a6b1d0212e16827c121713451c1918) ) // == 2/4 b73_08.2f - M5M27C101P mask ROM
+	ROM_LOAD( "b73_19.0h",  0x1c0000, 0x020000, CRC(2fb1b3e3) SHA1(f25e8a432721a772b62eff52a0b97e89f56d79af) ) // == 3/4 b73_08.2f - M5M27C101P mask ROM
+	ROM_LOAD( "b73_20.0k",  0x1e0000, 0x020000, CRC(0662d0dd) SHA1(323b3f1d8fc034e22e8ac8dcc17b080ecaeaf3ed) ) // == 4/4 b73_08.2f - M5M27C101P mask ROM
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD( "b73_23.2p",  0x000000, 0x080000, NO_DUMP )
+	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
+ROM_END
 
 ROM_START( hvyunitjo )
 	ROM_REGION( 0x20000, "master", 0 )
@@ -776,10 +798,10 @@ ROM_START( hvyunitu )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
-	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) )
-	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) )
-	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* the data in first half of this actually differs slightly to the other sets, a 0x22 fill is replaced by 0xff on empty tiles */
-	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_05.1h, despite the different label */
+	ROM_LOAD( "b73_28.2c",  0x100000, 0x020000, CRC(a02e08d6) SHA1(72764d4e8474aaac0674fd1c20278a706da7ade2) ) /* == b73_22.2c, despite the different label */
+	ROM_LOAD( "b73_27.2b",  0x120000, 0x020000, CRC(8708f97c) SHA1(ccddc7f2fa53c5e35345c2db0520f515c512b723) ) /* == b73_21.2b, despite the different label */
+	ROM_LOAD( "b73_25.0b",  0x140000, 0x020000, CRC(2f13f81e) SHA1(9d9c1869bf582a0bc0581cdf5b65237124b9e456) ) /* == b73_15.0b, despite the different label */
+	ROM_LOAD( "b73_26.0c",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) ) /* == b73_16.0c, despite the different label */
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
@@ -794,5 +816,6 @@ ROM_END
 
 GAME( 1988, hvyunit,   0,       hvyunit, hvyunit,  hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (World)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hvyunitj,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hvyunitja, hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Alternate ROM format)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hvyunitjo, hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, hvyunitu,  hvyunit, hvyunit, hvyunitj, hvyunit_state, empty_init, ROT0, "Kaneko / Taito", "Heavy Unit -U.S.A. Version- (US)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
