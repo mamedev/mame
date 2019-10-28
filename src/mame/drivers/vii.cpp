@@ -110,7 +110,7 @@
             Some corrupt sound effects and a few corrupt ground tiles a few minutes in. (checksum is good, and a video recorded
              from one of these doesn't exhibit these problems, so either emulation issue or alt revision?)
         pvmil:
-            Question order is always the same from power-on / reset, it isn't on the real unit, what determines this?
+            Question order depends on SoC RNG, only reads when it wants a new value, so unless RNG runs on a timer question order ends up the same
 
         vii:
             When loading a cart from file manager, sometimes MAME will crash.
