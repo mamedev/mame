@@ -113,6 +113,9 @@ void spg2xx_io_device::device_start()
 	m_timer_src_c = timer_alloc(TIMER_SRC_C);
 	m_timer_src_c->adjust(attotime::never);
 
+	m_rng_timer = timer_alloc(TIMER_RNG);
+	m_rng_timer->adjust(attotime::never);
+
 	save_item(NAME(m_timer_a_preload));
 	save_item(NAME(m_timer_b_preload));
 	save_item(NAME(m_timer_b_divisor));
@@ -155,6 +158,9 @@ void spg2xx_io_device::device_reset()
 
 	m_4khz_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
 
+	m_rng_timer->adjust(attotime::from_hz(1234), 0, attotime::from_hz(1234)); // timer value is arbitrary, maybe should match system clock, but that would result in heavy switching
+
+
 	m_2khz_divider = 0;
 	m_1khz_divider = 0;
 	m_4hz_divider = 0;
@@ -176,6 +182,15 @@ void spg2xx_io_device::uart_rx(uint8_t data)
 			m_uart_rx_timer->adjust(attotime::from_ticks(BIT(m_io_regs[0x30], 5) ? 11 : 10, m_uart_baud_rate));
 	}
 }
+
+uint16_t spg2xx_io_device::clock_rng(int which)
+{
+	const uint16_t value = m_io_regs[0x2c + which];
+	m_io_regs[0x2c + which] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
+	return value;
+}
+
+
 
 READ16_MEMBER(spg2xx_io_device::io_r)
 {
@@ -256,16 +271,12 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 
 	case 0x2c: // PRNG 0
 	{
-		const uint16_t value = m_io_regs[0x2c];
-		m_io_regs[0x2c] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
-		return value;
+		return clock_rng(0);
 	}
 
 	case 0x2d: // PRNG 1
 	{
-		const uint16_t value = m_io_regs[0x2d];
-		m_io_regs[0x2d] = ((value << 1) | (BIT(value, 14) ^ BIT(value, 13))) & 0x7fff;
-		return value;
+		return clock_rng(1);
 	}
 
 	case 0x2e: // FIQ Source Select
@@ -1098,6 +1109,11 @@ void spg2xx_io_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 		case TIMER_SRC_C:
 			update_timer_c_src();
+			break;
+
+		case TIMER_RNG:
+			clock_rng(0);
+			clock_rng(1);
 			break;
 	}
 }
