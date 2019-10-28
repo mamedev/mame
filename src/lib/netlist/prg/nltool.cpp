@@ -36,6 +36,7 @@ public:
 		opt_rfolders(*this, "r", "rom",                     "where to look for data files"),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
+		opt_prepro(*this,   "",  "prepro",                  "output preprocessor output to stderr"),
 		opt_version(*this,  "",  "version",                 "display version and exit"),
 		opt_help(*this,     "h", "help",                    "display help and exit"),
 
@@ -82,6 +83,7 @@ public:
 	plib::option_vec    opt_rfolders;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
+	plib::option_bool   opt_prepro;
 	plib::option_bool   opt_version;
 	plib::option_bool   opt_help;
 	plib::option_group  opt_grp2;
@@ -126,7 +128,7 @@ private:
 
 	void listdevices();
 
-	std::vector<pstring> m_options;
+	std::vector<pstring> m_defines;
 
 };
 
@@ -385,7 +387,7 @@ void tool_app_t::run()
 
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
-				m_options, opt_rfolders(), opt_includes());
+				m_defines, opt_rfolders(), opt_includes());
 
 		nt.reset();
 
@@ -481,7 +483,7 @@ void tool_app_t::validate()
 
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
-				m_options, opt_rfolders(), opt_includes());
+				m_defines, opt_rfolders(), opt_includes());
 	}
 	catch (netlist::nl_exception &e)
 	{
@@ -515,7 +517,7 @@ void tool_app_t::static_compile()
 
 	nt.read_netlist(opt_file(), opt_name(),
 			opt_logs(),
-			m_options, opt_rfolders(), opt_includes());
+			m_defines, opt_rfolders(), opt_includes());
 
 	// need to reset ...
 
@@ -857,8 +859,10 @@ int tool_app_t::execute()
 		return 0;
 	}
 
-	m_options = opt_defines();
-	m_options.emplace_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
+	m_defines = opt_defines();
+	m_defines.emplace_back("NLTOOL_VERSION=" PSTRINGIFY(NLTOOL_VERSION));
+	if (opt_prepro())
+		m_defines.emplace_back("__PREPROCESSOR_DEBUG__=1");
 
 	try
 	{

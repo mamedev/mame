@@ -477,9 +477,9 @@ nl_convert_eagle_t::tokenizer::tokenizer(nl_convert_eagle_t &convert, plib::putf
 	register_token("(");
 }
 
-void nl_convert_eagle_t::tokenizer::verror(const pstring &msg, int line_num, const pstring &line)
+void nl_convert_eagle_t::tokenizer::verror(const pstring &msg)
 {
-	m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
+	m_convert.out("{}\n", msg);
 }
 
 //FIXME: should accept a stream as well
@@ -616,9 +616,9 @@ nl_convert_rinf_t::tokenizer::tokenizer(nl_convert_rinf_t &convert, plib::putf8_
 	m_tok_END = register_token(".END");
 }
 
-void nl_convert_rinf_t::tokenizer::verror(const pstring &msg, int line_num, const pstring &line)
+void nl_convert_rinf_t::tokenizer::verror(const pstring &msg)
 {
-	m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
+	m_convert.out("{}\n", msg);
 }
 
 /*      token_id_t m_tok_HFA;

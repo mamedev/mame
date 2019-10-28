@@ -9,7 +9,6 @@
 #include "palloc.h"
 #include "putil.h"
 
-//#include <cstdarg>
 
 namespace plib {
 // ----------------------------------------------------------------------------------------
@@ -20,7 +19,6 @@ pstring ptokenizer::currentline_str()
 {
 	return m_cur_line;
 }
-
 
 void ptokenizer::skipeol()
 {
@@ -38,7 +36,6 @@ void ptokenizer::skipeol()
 	}
 }
 
-
 pstring::value_type ptokenizer::getc()
 {
 	if (m_unget != 0)
@@ -49,7 +46,7 @@ pstring::value_type ptokenizer::getc()
 	}
 	if (m_px == m_cur_line.end())
 	{
-		m_lineno++;
+		++m_source_location.back();
 		if (m_strm.readline(m_cur_line))
 			m_px = m_cur_line.begin();
 		else
@@ -143,45 +140,54 @@ long ptokenizer::get_number_long()
 
 ptokenizer::token_t ptokenizer::get_token()
 {
+	token_t ret = get_token_internal();
 	while (true)
 	{
-		token_t ret = get_token_internal();
 		if (ret.is_type(ENDOFFILE))
 			return ret;
-
-		if (m_support_line_markers && ret.is_type(LINEMARKER))
+		else if (m_support_line_markers && ret.is_type(LINEMARKER))
 		{
-			// FIXME: do something with information gathered
+			bool benter(false);
+			bool bexit(false);
+			pstring file;
+			unsigned lineno;
+
 			ret = get_token_internal();
 			if (!ret.is_type(NUMBER))
 				error(pfmt("Expected line number after line marker but got <{1}>")(ret.str()) );
+			lineno = pstonum<unsigned>(ret.str());
 			ret = get_token_internal();
 			if (!ret.is_type(STRING))
 				error(pfmt("Expected file name after line marker but got <{1}>")(ret.str()) );
+			file = ret.str();
 			ret = get_token_internal();
 			while (ret.is_type(NUMBER))
 			{
+				if (ret.str() == "1")
+					benter = true;
+				if (ret.str() == "2")
+					bexit = false;
 				// FIXME: process flags; actually only 1 (file enter) and 2 (after file exit)
 				ret = get_token_internal();
 			}
+			if (bexit) // pop the last location
+				m_source_location.pop_back();
+			if (!benter) // new location!
+				m_source_location.pop_back();
+			m_source_location.emplace_back(plib::source_location(file, lineno));
 		}
-
-		if (ret.is(m_tok_comment_start))
+		else if (ret.is(m_tok_comment_start))
 		{
 			do {
 				ret = get_token_internal();
 			} while (ret.is_not(m_tok_comment_end));
+			ret = get_token_internal();
 		}
 		else if (ret.is(m_tok_line_comment))
 		{
 			skipeol();
+			ret = get_token_internal();
 		}
-#if 0
-		else if (ret.str() == "#")
-		{
-			skipeol();
-		}
-#endif
 		else
 		{
 			return ret;
@@ -202,7 +208,7 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 		}
 	}
 	if (m_support_line_markers && c == '#')
-		return token_t(LINEMARKER);
+		return token_t(LINEMARKER, "#");
 	else if (m_number_chars_start.find(c) != pstring::npos)
 	{
 		/* read number while we receive number or identifier chars
@@ -274,6 +280,25 @@ ptokenizer::token_t ptokenizer::get_token_internal()
 	}
 }
 
+void ptokenizer::error(const pstring &errs)
+{
+	pstring s("");
+	pstring trail      ("                 from ");
+	pstring trail_first("In file included from ");
+	pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
+			(m_source_location.back().file_name(), m_source_location.back().line(), errs);
+	m_source_location.pop_back();
+	while (m_source_location.size() > 0)
+	{
+		if (m_source_location.size() == 1)
+			trail = trail_first;
+		s = trail + plib::pfmt("{1}:{2}:0\n")(m_source_location.back().file_name(), m_source_location.back().line()) + s;
+		m_source_location.pop_back();
+	}
+	verror("\n" + s + e + " " + currentline_str() + "\n");
+}
+
+
 // ----------------------------------------------------------------------------------------
 // A simple preprocessor
 // ----------------------------------------------------------------------------------------
@@ -298,12 +323,20 @@ ppreprocessor::ppreprocessor(psource_collection_t<> &sources, defines_map_type *
 	m_expr_sep.emplace_back("||");
 	m_expr_sep.emplace_back("==");
 	m_expr_sep.emplace_back(",");
+	m_expr_sep.emplace_back(";");
+	m_expr_sep.emplace_back(".");
+	m_expr_sep.emplace_back("##");
+	m_expr_sep.emplace_back("#");
 	m_expr_sep.emplace_back(" ");
 	m_expr_sep.emplace_back("\t");
+	m_expr_sep.emplace_back("\"");
 
 	if (defines != nullptr)
 		m_defines = *defines;
 	m_defines.insert({"__PLIB_PREPROCESSOR__", define_t("__PLIB_PREPROCESSOR__", "1")});
+	auto idx = m_defines.find("__PREPROCESSOR_DEBUG__");
+	m_debug_out = idx != m_defines.end();
+
 }
 
 void ppreprocessor::error(const pstring &err)
@@ -311,58 +344,127 @@ void ppreprocessor::error(const pstring &err)
 	pstring s("");
 	pstring trail      ("                 from ");
 	pstring trail_first("In file included from ");
-	pstring e = plib::pfmt("PREPRO ERROR: {1}:{2}:0: error: {3}\n")
-			(m_stack.top().m_name, m_stack.top().m_lineno, err);
-	m_stack.pop();
+	pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
+			(m_stack.back().m_name, m_stack.back().m_lineno, err);
+	m_stack.pop_back();
 	while (m_stack.size() > 0)
 	{
 		if (m_stack.size() == 1)
 			trail = trail_first;
-		s = trail + plib::pfmt("{1}:{2}:0\n")(m_stack.top().m_name, m_stack.top().m_lineno) + s;
-		m_stack.pop();
+		s = trail + plib::pfmt("{1}:{2}:0\n")(m_stack.back().m_name, m_stack.back().m_lineno) + s;
+		m_stack.pop_back();
 	}
-	throw pexception("\n" + s + e);
+	throw pexception("\n" + s + e + " " + m_line + "\n");
 }
+
+
+
+template <typename PP, typename L = ppreprocessor::string_list>
+struct simple_iter
+{
+	simple_iter(PP *parent, const L &tokens)
+	: m_tokens(tokens), m_parent(parent), m_pos(0)
+	{}
+
+	/**! skip white space in token list
+	 *
+	 */
+	void skip_ws()
+	{
+		while (m_pos < m_tokens.size() && (m_tokens[m_pos] == " " || m_tokens[m_pos] == "\t"))
+			m_pos++;
+	}
+
+	/**! return next token skipping white space
+	 *
+	 * @return next token
+	 */
+	pstring next()
+	{
+		skip_ws();
+		if (m_pos >= m_tokens.size())
+			error("unexpected end of line");
+		return m_tokens[m_pos++];
+	}
+
+	/**! return next token including white space
+	 *
+	 * @return next token
+	 */
+	pstring next_ws()
+	{
+		if (m_pos >= m_tokens.size())
+			error("unexpected end of line");
+		return m_tokens[m_pos++];
+	}
+
+	pstring peek_ws()
+	{
+		if (m_pos >= m_tokens.size())
+			error("unexpected end of line");
+		return m_tokens[m_pos];
+	}
+
+	pstring last()
+	{
+		if (m_pos == 0)
+			error("no last token at beginning of line");
+		if (m_pos > m_tokens.size())
+			error("unexpected end of line");
+		return m_tokens[m_pos-1];
+	}
+
+	bool eod()
+	{
+		return (m_pos >= m_tokens.size());
+	}
+
+	void error(pstring err)
+	{
+		m_parent->error(err);
+	}
+private:
+	L m_tokens;
+	PP *m_parent;
+	std::size_t m_pos;
+};
 
 #define CHECKTOK2(p_op, p_prio) \
 	else if (tok == # p_op)                         \
 	{                                               \
-		if (!has_val)                               \
-			{ error("parsing error!"); return 1;}   \
+		if (!has_val)								\
+			{ sexpr.error("parsing error!"); return 1;}	\
 		if (prio < (p_prio))                        \
 			return val;                             \
-		start++;                                    \
-		const auto v2 = expr(sexpr, start, (p_prio)); \
+		sexpr.next();                                    \
+		const auto v2 = prepro_expr(sexpr, (p_prio)); \
 		val = (val p_op v2);                        \
 	}                                               \
 
 // Operator precedence see https://en.cppreference.com/w/cpp/language/operator_precedence
 
-int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio)
+template <typename PP>
+static int prepro_expr(simple_iter<PP> &sexpr, int prio)
 {
 	int val(0);
 	bool has_val(false);
 
-	pstring tok=sexpr[start];
+	pstring tok=sexpr.peek_ws();
 	if (tok == "(")
 	{
-		start++;
-		val = expr(sexpr, start, /*prio*/ 255);
-		if (sexpr[start] != ")")
-			error("parsing error!");
+		sexpr.next();
+		val = prepro_expr(sexpr, 255);
+		if (sexpr.next() != ")")
+			sexpr.error("expected ')'");
 		has_val = true;
-		start++;
 	}
-	while (start < sexpr.size())
+	while (!sexpr.eod())
 	{
-		tok=sexpr[start];
+		tok = sexpr.peek_ws();
 		if (tok == ")")
 		{
 			if (!has_val)
-			{
-				error("parsing error!");
-				return 1; // tease compiler
-			}
+				sexpr.error("Found ')' but have no value computed");
 			else
 				return val;
 		}
@@ -371,15 +473,12 @@ int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, i
 			if (prio < 3)
 			{
 				if (!has_val)
-				{
-					error("parsing error!");
-					return 1; // tease compiler
-				}
+					sexpr.error("parsing error!");
 				else
 					return val;
 			}
-			start++;
-			val = !expr(sexpr, start, 3);
+			sexpr.next();
+			val = !prepro_expr(sexpr, 3);
 			has_val = true;
 		}
 		CHECKTOK2(*,  5)
@@ -393,16 +492,12 @@ int ppreprocessor::expr(const std::vector<pstring> &sexpr, std::size_t &start, i
 		{
 			val = plib::pstonum<decltype(val)>(tok);
 			has_val = true;
-			start++;
+			sexpr.next();
 		}
 	}
 	if (!has_val)
-	{
-		error("parsing error!");
-		return 1; // tease compiler
-	}
-	else
-		return val;
+		sexpr.error("No value computed. Empty expression ?");
+	return val;
 }
 
 ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
@@ -411,16 +506,158 @@ ppreprocessor::define_t *ppreprocessor::get_define(const pstring &name)
 	return (idx != m_defines.end()) ? &idx->second : nullptr;
 }
 
+ppreprocessor::string_list ppreprocessor::tokenize(const pstring &str,
+		const string_list &sep, bool remove_ws, bool concat)
+{
+	const pstring STR = "\"";
+	string_list tmpret;
+	string_list tmp(psplit(str, sep));
+	std::size_t pi(0);
+
+	while (pi < tmp.size())
+	{
+		if (tmp[pi] == STR)
+		{
+			pstring s(STR);
+			pi++;
+			// FIXME : \"
+			while (pi < tmp.size() && tmp[pi] != STR)
+			{
+				s += tmp[pi];
+				pi++;
+			}
+			s += STR;
+			tmpret.push_back(s);
+		}
+		else
+			if (!remove_ws || (tmp[pi] != " " && tmp[pi] != "\t"))
+				tmpret.push_back(tmp[pi]);
+		pi++;
+	}
+	if (!concat)
+		return tmpret;
+	else
+	{
+		// FIXME: error if concat at beginning or end
+		string_list ret;
+		pi = 0;
+		while (pi<tmpret.size())
+		{
+			if (tmpret[pi] == "##")
+			{
+				while (ret.back() == " " || ret.back() == "\t")
+					ret.pop_back();
+				pstring cc = ret.back();
+				ret.pop_back();
+				pi++;
+				while (pi < tmpret.size() && (tmpret[pi] == " " || tmpret[pi] == "\t"))
+					pi++;
+				if (pi == tmpret.size())
+					error("## found at end of sequence");
+				ret.push_back(cc + tmpret[pi]);
+			}
+			else
+				ret.push_back(tmpret[pi]);
+			pi++;
+		}
+		return ret;
+	}
+}
+
+bool ppreprocessor::is_valid_token(const pstring &str)
+{
+	if (str.length() == 0)
+		return false;
+	char c = str.at(0);
+	return ((c>='a' && c<='z') || (c>='A' && c<='Z') || c == '_');
+}
+
 pstring ppreprocessor::replace_macros(const pstring &line)
 {
-	std::vector<pstring> elems(psplit(line, m_expr_sep));
-	pstring ret("");
-	for (auto & elem : elems)
+	//std::vector<pstring> elems(psplit(line, m_expr_sep));
+	bool repeat(false);
+	pstring tmpret(line);
+	do
 	{
-		define_t *def = get_define(elem);
-		ret += (def != nullptr) ? def->m_replace : elem;
-	}
-	return ret;
+		repeat = false;
+		auto elems(simple_iter<ppreprocessor>(this, tokenize(tmpret, m_expr_sep, false, true)));
+		tmpret = "";
+		while (!elems.eod())
+		{
+			auto token(elems.next_ws());
+			define_t *def = get_define(token);
+			if (def == nullptr)
+				tmpret += token;
+			else if (!def->m_has_params)
+			{
+				tmpret += def->m_replace;
+				repeat = true;
+			}
+			else
+			{
+				token = elems.next();
+				if (token != "(")
+					error("expected '(' in macro expansion of " + def->m_name);
+				string_list rep;
+				token = elems.next();
+				while (token != ")")
+				{
+					pstring par("");
+					int pcnt(1);
+					while (true)
+					{
+						if (pcnt==1 && token == ",")
+						{
+							token = elems.next();
+							break;
+						}
+						if (token == "(")
+							pcnt++;
+						if (token == ")")
+							if (--pcnt == 0)
+								break;
+						par += token;
+						token = elems.next();
+					}
+					rep.push_back(par);
+				}
+				repeat = true;
+				if (def->m_params.size() != rep.size())
+					error(pfmt("Expected {1} parameters, got {2}")(def->m_params.size(), rep.size()));
+				auto r(simple_iter<ppreprocessor>(this, tokenize(def->m_replace, m_expr_sep, false, false)));
+				bool stringify_next = false;
+				while (!r.eod())
+				{
+					pstring token(r.next());
+					if (token == "#")
+						stringify_next = true;
+					else if (token != " " && token != "\t")
+					{
+						for (std::size_t i=0; i<def->m_params.size(); i++)
+							if (def->m_params[i] == token)
+							{
+								if (stringify_next)
+								{
+									stringify_next = false;
+									token = "\"" + rep[i] + "\"";
+								}
+								else
+									token = rep[i];
+								break;
+							}
+						if (stringify_next)
+							error("'#' is not followed by a macro parameter");
+						tmpret += token;
+						tmpret += " "; // make sure this is not concatenated with next token
+					}
+					else
+						tmpret += token;
+				}
+			}
+		}
+	} while (repeat);
+
+	return tmpret;
 }
 
 static pstring catremainder(const std::vector<pstring> &elems, std::size_t start, const pstring &sep)
@@ -476,7 +713,7 @@ pstring ppreprocessor::process_comments(pstring line)
 	return ret;
 }
 
-pstring ppreprocessor::process_line(pstring line)
+std::pair<pstring,bool> ppreprocessor::process_line(pstring line)
 {
 	bool line_cont = plib::right(line, 1) == "\\";
 	if (line_cont)
@@ -490,7 +727,7 @@ pstring ppreprocessor::process_line(pstring line)
 	if (line_cont)
 	{
 		m_state = LINE_CONTINUATION;
-		return "";
+		return {"", false};
 	}
 	else
 		m_state = PROCESS;
@@ -498,18 +735,20 @@ pstring ppreprocessor::process_line(pstring line)
 	line = process_comments(m_line);
 
 	pstring lt = plib::trim(plib::replace_all(line, "\t", " "));
-	pstring ret;
 	// FIXME ... revise and extend macro handling
 	if (plib::startsWith(lt, "#"))
 	{
-		std::vector<pstring> lti(psplit(lt, " ", true));
+		string_list lti(psplit(lt, " ", true));
 		if (lti[0] == "#if")
 		{
 			m_if_level++;
-			std::size_t start = 0;
 			lt = replace_macros(lt);
-			std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
-			auto val = static_cast<int>(expr(t, start, 255));
+			//std::vector<pstring> t(psplit(replace_all(lt.substr(3), " ", ""), m_expr_sep));
+			auto t(simple_iter<ppreprocessor>(this, tokenize(lt.substr(3), m_expr_sep, true, true)));
+			auto val = static_cast<int>(prepro_expr(t, 255));
+			t.skip_ws();
+			if (!t.eod())
+				error("found unprocessed content at end of line");
 			if (val == 0)
 				m_if_flag |= (1 << m_if_level);
 		}
@@ -548,18 +787,18 @@ pstring ppreprocessor::process_line(pstring line)
 				{
 					arg = arg.substr(1, arg.length() - 2);
 					/* first try local context */
-					auto l(plib::util::buildpath({m_stack.top().m_local_path, arg}));
+					auto l(plib::util::buildpath({m_stack.back().m_local_path, arg}));
 					auto lstrm(m_sources.get_stream<>(l));
 					if (lstrm)
 					{
-						m_stack.emplace(input_context(std::move(lstrm), plib::util::path(l), l));
+						m_stack.emplace_back(input_context(std::move(lstrm), plib::util::path(l), l));
 					}
 					else
 					{
 						auto strm(m_sources.get_stream<>(arg));
 						if (strm)
 						{
-							m_stack.emplace(input_context(std::move(strm), plib::util::path(arg), arg));
+							m_stack.emplace_back(input_context(std::move(strm), plib::util::path(arg), arg));
 						}
 						else
 							error("include not found:" + arg);
@@ -567,6 +806,8 @@ pstring ppreprocessor::process_line(pstring line)
 				}
 				else
 					error("include misspelled:" + arg);
+				pstring linemarker = pfmt("# {1} \"{2}\" 1\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+				push_out(linemarker);
 			}
 		}
 		else if (lti[0] == "#pragma")
@@ -582,52 +823,93 @@ pstring ppreprocessor::process_line(pstring line)
 			if (m_if_flag == 0)
 			{
 				if (lti.size() < 2)
-					error("define needs at least one argument: " + line);
-				else if (lti.size() == 2)
-					m_defines.insert({lti[1], define_t(lti[1], "")});
+					error("define needs at least one argument");
+				auto args(simple_iter<ppreprocessor>(this, tokenize(lt.substr(8), m_expr_sep, false, false)));
+				pstring n = args.next();
+				if (!is_valid_token(n))
+					error("define expected identifier");
+				if (args.next_ws() == "(")
+				{
+					define_t def(n);
+					def.m_has_params = true;
+					auto token(args.next());
+					while (true)
+					{
+						if (token == ")")
+							break;
+						def.m_params.push_back(token);
+						token = args.next();
+						if (token != "," && token != ")")
+							error(pfmt("expected , or ), found <{1}>")(token));
+						if (token == ",")
+							token = args.next();
+					}
+					pstring r;
+					while (!args.eod())
+						r += args.next_ws();
+					def.m_replace = r;
+					m_defines.insert({n, def});
+				}
 				else
 				{
-					pstring arg("");
-					for (std::size_t i=2; i<lti.size() - 1; i++)
-						arg += lti[i] + " ";
-					arg += lti[lti.size()-1];
-					m_defines.insert({lti[1], define_t(lti[1], arg)});
+					pstring r;
+					while (!args.eod())
+						r += args.next_ws();
+					m_defines.insert({n, define_t(n, r)});
 				}
 			}
 		}
 		else
 		{
 			if (m_if_flag == 0)
-				error(pfmt("unknown directive on line {1}: {2}")(m_stack.top().m_lineno)(replace_macros(line)));
+				error("unknown directive");
 		}
+		return { "", false };
 	}
 	else
 	{
-		lt = replace_macros(lt);
 		if (m_if_flag == 0)
-			ret += lt;
+			return { replace_macros(lt), true };
+		else
+			return { "", false };
 	}
-	return ret;
 }
+
+void ppreprocessor::push_out(pstring s)
+{
+	m_outbuf += decltype(m_outbuf)(s.c_str());
+	if (m_debug_out)
+		std::cerr << s;
+}
+
 
 void ppreprocessor::process_stack()
 {
 	while (m_stack.size() > 0)
 	{
 		pstring line;
-		pstring linemarker = pfmt("# {1} \"{2}\" 1\n")(m_stack.top().m_lineno, m_stack.top().m_name);
-		m_outbuf += decltype(m_outbuf)(linemarker.c_str());
-		while (m_stack.top().m_reader.readline(line))
+		pstring linemarker = pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+		push_out(linemarker);
+		bool last_skipped=false;
+		while (m_stack.back().m_reader.readline(line))
 		{
-			m_stack.top().m_lineno++;
-			line = process_line(line);
-			m_outbuf += decltype(m_outbuf)(line.c_str()) + static_cast<char>(10);
+			m_stack.back().m_lineno++;
+			auto r(process_line(line));
+			if (r.second)
+			{
+				if (last_skipped)
+					push_out(pfmt("# {1} \"{2}\"\n")(m_stack.back().m_lineno, m_stack.back().m_name));
+				push_out(r.first + "\n");
+				last_skipped = false;
+			}
+			else
+				last_skipped = true;
 		}
-		m_stack.pop();
+		m_stack.pop_back();
 		if (m_stack.size() > 0)
 		{
-			linemarker = pfmt("# {1} \"{2}\" 2\n")(m_stack.top().m_lineno, m_stack.top().m_name);
-			m_outbuf += decltype(m_outbuf)(linemarker.c_str());
+			linemarker = pfmt("# {1} \"{2}\" 2\n")(m_stack.back().m_lineno, m_stack.back().m_name);
+			push_out(linemarker);
 		}
 	}
 }

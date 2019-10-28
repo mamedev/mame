@@ -3,3 +3,5 @@ build/obj/*
 buildVS/Release/*
 buildVS/x64/*
 buildVS/.vs/*
+nltool
+nlwav

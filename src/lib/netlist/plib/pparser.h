@@ -16,7 +16,7 @@
 
 //#include <cstdint>
 #include <unordered_map>
-#include <stack>
+#include <vector>
 
 namespace plib {
 class ptokenizer
@@ -25,13 +25,14 @@ public:
 	template <typename T>
 	ptokenizer(T &&strm) // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
 	: m_strm(std::forward<T>(strm))
-	, m_lineno(0)
 	, m_cur_line("")
 	, m_px(m_cur_line.begin())
 	, m_unget(0)
 	, m_string('"')
 	, m_support_line_markers(true) // FIXME
 	{
+		// add a first entry to the stack
+		m_source_location.emplace_back(plib::source_location("Unknown", 0));
 	}
 
 	COPYASSIGNMOVE(ptokenizer, delete)
@@ -91,8 +92,6 @@ public:
 		pstring m_token;
 	};
 
-
-	int currentline_no() { return m_lineno; }
 	pstring currentline_str();
 
 	/* tokenizer stuff follows ... */
@@ -127,11 +126,11 @@ public:
 	}
 
 	token_t get_token_internal();
-	void error(const pstring &errs) { verror(errs, currentline_no(), currentline_str()); }
+	void error(const pstring &errs);
 
 	putf8_reader &stream() { return m_strm; }
 protected:
-	virtual void verror(const pstring &msg, int line_num, const pstring &line) = 0;
+	virtual void verror(const pstring &msg) = 0;
 
 private:
 	void skipeol();
@@ -143,7 +142,6 @@ private:
 
 	putf8_reader m_strm;
 
-	int m_lineno;
 	pstring m_cur_line;
 	pstring::const_iterator m_px;
 	pstring::value_type m_unget;
@@ -160,7 +158,10 @@ private:
 	token_id_t m_tok_comment_start;
 	token_id_t m_tok_comment_end;
 	token_id_t m_tok_line_comment;
+
+	/* source locations, vector used as stack because we need to loop through stack */
 	bool m_support_line_markers;
+	std::vector<plib::source_location> m_source_location;
 };
 
 
@@ -168,13 +169,20 @@ class ppreprocessor : public std::istream
 {
 public:
 
+	using string_list = std::vector<pstring>;
+
 	struct define_t
 	{
 		define_t(const pstring &name, const pstring &replace)
-		: m_name(name), m_replace(replace)
+		: m_name(name), m_replace(replace), m_has_params(false)
+		{}
+		define_t(const pstring &name)
+		: m_name(name), m_replace(""), m_has_params(false)
 		{}
 		pstring m_name;
 		pstring m_replace;
+		bool m_has_params;
+		string_list m_params;
 	};
 
 	using defines_map_type = std::unordered_map<pstring, define_t>;
@@ -195,6 +203,7 @@ public:
 	, m_pos(s.m_pos)
 	, m_state(s.m_state)
 	, m_comment(s.m_comment)
+	, m_debug_out(s.m_debug_out)
 	{
 	}
 
@@ -206,10 +215,12 @@ public:
 	template <typename T>
 	ppreprocessor & process(T &&istrm)
 	{
-		m_stack.emplace(input_context(std::forward<T>(istrm),"","<stream>"));
+		m_stack.emplace_back(input_context(std::forward<T>(istrm),"","<stream>"));
 		process_stack();
 		return *this;
 	}
+
+	void error(const pstring &err);
 
 protected:
 
@@ -237,6 +248,7 @@ protected:
 
 				m_strm->m_pos += static_cast</*pos_type*/long>(bytes);
 			}
+
 			return this->gptr() == this->egptr()
 				 ? std::char_traits<char>::eof()
 				 : std::char_traits<char>::to_int_type(*this->gptr());
@@ -246,12 +258,8 @@ protected:
 		ppreprocessor *m_strm;
 		std::array<char_type, 1024> m_buf;
 	};
-	//friend class st;
-
-	int expr(const std::vector<pstring> &sexpr, std::size_t &start, int prio);
 	define_t *get_define(const pstring &name);
 	pstring replace_macros(const pstring &line);
-	virtual void error(const pstring &err);
 
 private:
 
@@ -261,14 +269,19 @@ private:
 		LINE_CONTINUATION
 	};
 
+	void push_out(pstring s);
+
 	void process_stack();
 
-	pstring process_line(pstring line);
+	string_list tokenize(const pstring &str, const string_list &sep, bool remove_ws, bool concat);
+	bool is_valid_token(const pstring &str);
+
+	std::pair<pstring,bool> process_line(pstring line);
 	pstring process_comments(pstring line);
 
 	defines_map_type m_defines;
 	psource_collection_t<> &m_sources;
-	std::vector<pstring> m_expr_sep;
+	string_list m_expr_sep;
 
 	std::uint_least64_t m_if_flag; // 31 if levels
 	int m_if_level;
@@ -289,12 +302,14 @@ private:
 		pstring m_name;
 	};
 
-	std::stack<input_context> m_stack;
+	/* vector used as stack because we need to loop through stack */
+	std::vector<input_context> m_stack;
 	pstring_t<pu8_traits> m_outbuf;
 	std::istream::pos_type m_pos;
 	state_e m_state;
 	pstring m_line;
 	bool m_comment;
+	bool m_debug_out;
 
 };
 
