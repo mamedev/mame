@@ -2,7 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!-- The majority of this list was sourced from The Ultimate Tape Archive V1.0 released 11th December 2018. -->
-<!-- Others based on c64tapes.org dumps -->
+<!-- Some others are based on c64tapes.org dumps -->
+<!-- Some are based on the C64 Tape Archive at https://archive.org/download/c64tapes/index.htm -->
 
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
 
@@ -74,6 +75,46 @@
 		</part>
 	</software>
 
+	<software name="3dpinbl">
+		<description>3D Pinball</description>
+		<year>1989</year>
+		<publisher>Mastertronic Plus</publisher>
+
+		<part name="3dpinbla" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="192466">
+				<rom name="3dpinbla.tap" size="192466" crc="fa7d00d8" sha1="9e547ac4ee11b6b6f034f4cac5c31079c23373b3"/>
+			</dataarea>
+		</part>
+
+		<part name="3dpinblb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="192466">
+				<rom name="3dpinblb.tap" size="192466" crc="f91f841d" sha1="2ed915985ef8192df097b420b17dfbe87ed358bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="a3dpool">
+		<description>American 3D Pool</description>
+		<year>1991</year>
+		<publisher>Zeppelin Games</publisher>
+
+		<part name="a3dpoola" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="861564">
+				<rom name="a3dpoola.tap" size="861564" crc="3381e127" sha1="a3cca3ad5638f9e2e08b223cfd2526f72fdeb063"/>
+			</dataarea>
+		</part>
+
+		<part name="a3dpoolb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="867657">
+				<rom name="a3dpoolb.tap" size="867657" crc="acc6f5fe" sha1="f21761d9d86e1bc98ea081a7405193e1eae6e30e"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="4meghero">
 		<description>4 Most Megaheroes</description>
 		<year>1991</year>
@@ -97,7 +138,7 @@
 	<software name="5thgear">
 		<description>5th Gear</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="556826">
@@ -299,7 +340,7 @@
 	<software name="anarchy">
 		<description>Anarchy</description>
 		<year>1987</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="386234">
@@ -334,6 +375,26 @@
 		<part name="cass2" interface="cbm_cass">
 			<dataarea name="cass" size="607163">
 				<rom name="Andy_Capp_a1.tap" size="607163" crc="6b702918" sha1="b709ac615c53ff6a7359bd89e3da8c8e8d9758a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anglebl">
+		<description>Angle Ball</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="anglebla" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="267415">
+				<rom name="anglebla.tap" size="267415" crc="8a71c7cf" sha1="f60d649fd0087ae4692947750c56733159bffd2a"/>
+			</dataarea>
+		</part>
+
+		<part name="angleblb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="267414">
+				<rom name="angleblb.tap" size="267414" crc="8c58c3c3" sha1="f4db67b46dec798230fea7291445c1cbddf74c0d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -544,6 +605,26 @@
 		</part>
 	</software>
 
+	<software name="ballcrz">
+		<description>Ball Crazy</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="ballcrza" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="531341">
+				<rom name="ballcrza.tap" size="531341" crc="e0b0dfce" sha1="d97966c12248724d0334c8ccfb03bfb877d92d03"/>
+			</dataarea>
+		</part>
+
+		<part name="ballcrzb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="528497">
+				<rom name="ballcrzb.tap" size="528497" crc="ddb141fb" sha1="d8e3ebaee70fcaa1b81d2ab02111bb7d0e033a4d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="barb2">
 		<description>Barbarian II</description>
 		<year>1988</year>
@@ -567,7 +648,7 @@
 	<software name="batman">
 		<description>Batman</description>
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -637,7 +718,7 @@
 	<software name="bvalley">
 		<description>Battle Valley</description>
 		<year>1987</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="446958">
@@ -1069,7 +1150,7 @@
 	<software name="bublbobl">
 		<description>Bubble Bobble</description>
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="763836">
@@ -1497,6 +1578,26 @@
 		</part>
 	</software>
 
+	<software name="circus">
+		<description>Continental Circus</description>
+		<year>1991</year>
+		<publisher>Mastertronic Plus</publisher>
+
+		<part name="circusa" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="569886">
+				<rom name="circusa.tap" size="569886" crc="d0f36a0b" sha1="bd09c14234c8c89fc391631f0fc949a7fd8a7922"/>
+			</dataarea>
+		</part>
+
+		<part name="circusb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="569886">
+				<rom name="circusb.tap" size="569886" crc="df7f4101" sha1="b07a48a3283936058f6e3147d41f34f3001ba650"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="corp">
 		<description>Corporation</description>
 		<year>1990</year>
@@ -1554,7 +1655,7 @@
 	<software name="crazycar">
 		<description>Crazy Cars</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="813145">
@@ -1710,7 +1811,7 @@
 	<software name="daleydech" cloneof="daleydec">
 		<description>Daley Thompson's Decathlon (Hit Squad)</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="582574">
@@ -1920,7 +2021,7 @@
 	<software name="enduro">
 		<description>Enduro Racer</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="495807">
@@ -2021,6 +2122,26 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="741073">
 				<rom name="Fast_Food.tap" size="741073" crc="6e0f6d68" sha1="a7e41c82248d1276abc1db92acc1e690e2ab68a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="feud">
+		<description>Feud</description>
+		<year>1987</year>
+		<publisher>Bulldog Software</publisher>
+
+		<part name="feuda" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="611910">
+				<rom name="feuda.tap" size="611910" crc="9ac57691" sha1="ff53d728123469ce40c8c1553cb03912aa897e60"/>
+			</dataarea>
+		</part>
+
+		<part name="feudb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="611910">
+				<rom name="feudb.tap" size="611910" crc="0cbe87c1" sha1="b06e65952e8d2c8ee0b8cb227134136ba53b62b3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2319,7 +2440,7 @@
 	<software name="fs2_6to8">
 		<description>Fun School 2 for 6-8 Year Olds</description>
 		<year>1992</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A: Train / Maze / Shopping / Treasure"/>
@@ -2594,7 +2715,7 @@
 	<software name="golfmstr">
 		<description>Golf Master</description>
 		<year>19??</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="395010">
@@ -2698,7 +2819,7 @@
 	<software name="gryzor">
 		<description>Gryzor</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="738562">
@@ -3168,7 +3289,7 @@
 	<software name="lic2kill">
 		<description>James Bond 007: Licence To Kill</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="514499">
@@ -3690,7 +3811,7 @@
 	<software name="lotus">
 		<description>Lotus Esprit Turbo Challenge</description>
 		<year>19??</year>
-		<publisher>Gremlin Graphics (GBH)</publisher>
+		<publisher>GBH</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -3854,7 +3975,7 @@
 	<software name="missomega">
 		<description>Mission Omega</description>
 		<year>1989</year>
-		<publisher>Grandslam (Bug Byte)</publisher>
+		<publisher>Bug Byte</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="520994">
@@ -4095,7 +4216,7 @@
 	<software name="tnzs">
 		<description>The Newzealand Story</description>
 		<year>1991</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4222,10 +4343,30 @@
 		</part>
 	</software>
 
+	<software name="omahd">
+		<description>One Man and His Droid</description>
+		<year>1985</year>
+		<publisher>199 Range</publisher>
+
+		<part name="omahda" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="611660">
+				<rom name="omahda.tap" size="611660" crc="6da4096b" sha1="263e452ba8e5f69411a873ba8ce1907f2610d24f"/>
+			</dataarea>
+		</part>
+
+		<part name="omahdb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="598097">
+				<rom name="omahdb.tap" size="598097" crc="30661926" sha1="60d822dc311a72b197483b79b29ea9daab4366de"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="opthunder">
 		<description>Operation Thunderbolt</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4245,7 +4386,7 @@
 	<software name="opwolf">
 		<description>Operation Wolf</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="720182">
@@ -4402,7 +4543,7 @@
 	<software name="parallax">
 		<description>Parallax</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="702891">
@@ -4516,7 +4657,7 @@
 	<software name="platoon">
 		<description>Platoon</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side A"/>
@@ -4937,7 +5078,7 @@
 	<software name="rbisland">
 		<description>Rainbow Islands</description>
 		<year>1992</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4969,7 +5110,7 @@
 	<software name="rambo3">
 		<description>Rambo III</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -4989,7 +5130,7 @@
 	<software name="rambo2">
 		<description>Rambo: First Blood Part II</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="642762">
@@ -5021,7 +5162,7 @@
 	<software name="redheat">
 		<description>Red Heat</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="726358">
@@ -5045,7 +5186,7 @@
 	<software name="renegade">
 		<description>Renegade</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="500294">
@@ -5216,6 +5357,26 @@
 		</part>
 	</software>
 
+	<software name="robocop">
+		<description>Robocop</description>
+		<year>1988</year>
+		<publisher>The Hit Squad</publisher>
+
+		<part name="robocopa" interface="cbm_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass" size="1510854">
+				<rom name="robocopa.tap" size="1510854" crc="66624f2c" sha1="e8d137e6a345c0e3cafd1bf56eb7215a7a6dc597"/>
+			</dataarea>
+		</part>
+
+		<part name="robocopb" interface="cbm_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass" size="1510854">
+				<rom name="robocopb.tap" size="1510854" crc="a018d08f" sha1="b4730e17a2566994c017dcfe893968375c30d3ec"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="rockstar">
 		<description>Rock Star Ate My Hamster</description>
 		<year>19??</year>
@@ -5256,6 +5417,26 @@
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="593226">
 				<rom name="Rock'n_Wrestle_a1.tap" size="593226" crc="61948e29" sha1="6da8449359722db7204fa28450f1ce49dd7ac303"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockfrd">
+		<description>Rockford / Back to Reality</description>
+		<year>1987</year>
+		<publisher>Mastertronic Added Dimension</publisher>
+
+		<part name="breality" interface="cbm_cass">
+			<feature name="part_id" value="Back to Reality"/>
+			<dataarea name="cass" size="570317">
+				<rom name="breality.tap" size="570317" crc="2f561e28" sha1="ed091ed18ac721772d567d2a6e24cef44a3a3b7a"/>
+			</dataarea>
+		</part>
+
+		<part name="rockford" interface="cbm_cass">
+			<feature name="part_id" value="Rockford"/>
+			<dataarea name="cass" size="333295">
+				<rom name="rockford.tap" size="333295" crc="ec352a42" sha1="b74140b6c605c914f5d983eabff74b38167c1777"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5359,7 +5540,7 @@
 	<software name="scorpion">
 		<description>Scorpion</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="581494">
@@ -5491,7 +5672,7 @@
 	<software name="slayer">
 		<description>Slayer</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="558266">
@@ -5810,7 +5991,7 @@
 	<software name="cobra">
 		<description>Stallone: Cobra</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="524590">
@@ -5822,7 +6003,7 @@
 	<software name="rotj">
 		<description>Star Wars: Return of the Jedi</description>
 		<year>19??</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="622110">
@@ -5876,7 +6057,7 @@
 	<software name="steel">
 		<description>Steel</description>
 		<year>1988</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="420211">
@@ -6072,7 +6253,7 @@
 	<software name="spokerc" cloneof="spoker">
 		<description>Strip Poker (CDS)</description>
 		<year>19??</year>
-		<publisher>CDS Software (Blue Ribbon)</publisher>
+		<publisher>Blue Ribbon</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Suzi"/>
@@ -6256,7 +6437,7 @@
 	<software name="shangon">
 		<description>Super Hang On</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<feature name="part_id" value="Side 1: Africa and Asia"/>
@@ -6482,7 +6663,7 @@
 	<software name="thndforc">
 		<description>Thunderforce</description>
 		<year>1987</year>
-		<publisher>Hewson (Rack IT)</publisher>
+		<publisher>Rack It</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="591004">
@@ -6760,7 +6941,7 @@
 	<software name="thevindc">
 		<description>The Vindicator</description>
 		<year>1990</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="1508734">
@@ -6922,7 +7103,7 @@
 	<software name="wizball">
 		<description>Wizball</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="567846">
@@ -6966,7 +7147,7 @@
 	<software name="wsb">
 		<description>World Series Baseball</description>
 		<year>1989</year>
-		<publisher>Hit Squad</publisher>
+		<publisher>The Hit Squad</publisher>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="402702">
