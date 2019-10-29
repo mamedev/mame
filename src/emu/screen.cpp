@@ -1039,11 +1039,6 @@ void screen_device::update_scan_bitmap_size(int y)
 	// determine effective size to allocate
 	s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
 
-	if (machine().input().code_pressed(KEYCODE_Q))
-	{
-		printf("Updating scan bitmap %d to %d (%d vs. %d)\n", y, effwidth, m_max_width, m_visarea.right() + 1);
-	}
-
 	if (m_scan_widths[y] == effwidth)
 		return;
 
