@@ -8,7 +8,7 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include "plib/pparser.h"
+#include "plib/ppreprocessor.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
 #include "plib/putil.h"
@@ -181,7 +181,7 @@ namespace netlist
 		{}
 
 		COPYASSIGNMOVE(source_netlist_t, delete)
-		virtual ~source_netlist_t() noexcept = default;
+		~source_netlist_t() noexcept override = default;
 
 		virtual bool parse(nlparse_t &setup, const pstring &name);
 	};
@@ -197,7 +197,7 @@ namespace netlist
 		{}
 
 		COPYASSIGNMOVE(source_data_t, delete)
-		virtual ~source_data_t() noexcept = default;
+		~source_data_t() noexcept override = default;
 	};
 
 	// ----------------------------------------------------------------------------------------

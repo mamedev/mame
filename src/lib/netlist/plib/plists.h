@@ -35,8 +35,17 @@ namespace plib {
 	{
 	public:
 
-		using iterator = C *;
-		using const_iterator = const C *;
+		typedef C 	    			      value_type;
+		typedef value_type*			      pointer;
+		typedef const value_type*         const_pointer;
+		typedef value_type&       	      reference;
+		typedef const value_type&  	      const_reference;
+		typedef value_type*      	      iterator;
+		typedef const value_type*	      const_iterator;
+		typedef std::size_t        	      size_type;
+		typedef std::ptrdiff_t     	      difference_type;
+		typedef std::reverse_iterator<iterator>	      reverse_iterator;
+		typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
 
 		//uninitialised_array_t() noexcept = default;
 		uninitialised_array_t() noexcept
@@ -48,24 +57,24 @@ namespace plib {
 		~uninitialised_array_t() noexcept
 		{
 			if (m_initialized>=N)
-				for (std::size_t i=0; i<N; i++)
+				for (size_type i=0; i<N; i++)
 					(*this)[i].~C();
 		}
 
-		size_t size() const { return N; }
+		size_t size() const noexcept { return N; }
 
-		C& operator[](const std::size_t &index) noexcept
+		reference operator[](size_type index) noexcept
 		{
-			return *reinterpret_cast<C *>(&m_buf[index]);
+			return *reinterpret_cast<pointer>(&m_buf[index]);
 		}
 
-		const C& operator[](const std::size_t &index) const noexcept
+		const_reference operator[](size_type index) const noexcept
 		{
-			return *reinterpret_cast<const C *>(&m_buf[index]);
+			return *reinterpret_cast<const_pointer>(&m_buf[index]);
 		}
 
 		template<typename... Args>
-		void emplace(const std::size_t index, Args&&... args)
+		void emplace(size_type index, Args&&... args)
 		{
 			m_initialized++;
 			// allocate on buffer
@@ -125,7 +134,14 @@ namespace plib {
 			explicit constexpr iter_t(LC* x) noexcept : p(x) { }
 			constexpr iter_t(iter_t &rhs) noexcept : p(rhs.p) { }
 			iter_t(iter_t &&rhs) noexcept { std::swap(*this, rhs);  }
-			iter_t& operator=(const iter_t &rhs) noexcept { if (this != &rhs) p = rhs.p; return *this; }
+
+			iter_t& operator=(const iter_t &rhs) noexcept
+			{
+				if (this != &rhs)
+					p = rhs.p;
+				return *this;
+			}
+
 			iter_t& operator=(iter_t &&rhs) noexcept { std::swap(*this, rhs); return *this; }
 			~iter_t() = default;
 
@@ -386,7 +402,7 @@ namespace plib {
 
 		const T *listptr() const noexcept { return &m_list[1]; }
 		std::size_t size() const noexcept { return static_cast<std::size_t>(m_end - &m_list[1]); }
-		const T & operator[](const std::size_t index) const noexcept { return m_list[ 1 + index]; }
+		const T & operator[](std::size_t index) const noexcept { return m_list[ 1 + index]; }
 	private:
 		using mutex_type = pspin_mutex<TS>;
 		using lock_guard_type = std::lock_guard<mutex_type>;

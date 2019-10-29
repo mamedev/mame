@@ -38,15 +38,18 @@ namespace devices
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 		unsigned solve_non_dynamic(const bool newton_raphson);
 
-		constexpr std::size_t size() const { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
+		constexpr std::size_t size() const noexcept { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
 
 		void LE_solve();
 
 		template <typename T>
 		void LE_back_subst(T & x);
 
-		FT &A(std::size_t r, std::size_t c) { return m_A[r * m_pitch + c]; }
-		FT &RHS(std::size_t r) { return m_A[r * m_pitch + size()]; }
+		const FT &A(std::size_t r, std::size_t c) const noexcept { return m_A[r][c]; }
+		FT &A(std::size_t r, std::size_t c) noexcept { return m_A[r][c]; }
+
+		const FT &RHS(std::size_t r) const noexcept { return m_A[r][size()]; }
+		FT &RHS(std::size_t r) noexcept { return m_A[r][size()]; }
 		plib::parray<FT, SIZE>  m_new_V;
 
 	private:
@@ -55,8 +58,7 @@ namespace devices
 
 		const std::size_t m_dim;
 		const std::size_t m_pitch;
-		plib::parray<FT, SIZE * int(m_pitch_ABS)> m_A;
-
+		plib::parray2D<FT, SIZE, m_pitch_ABS> m_A;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -95,10 +97,10 @@ namespace devices
 				const auto &nzrd = m_terms[i]->m_nzrd;
 				const auto &nzbd = m_terms[i]->m_nzbd;
 
-				for (const std::size_t j : nzbd)
+				for (auto j : nzbd)
 				{
 					const FT f1 = -f * A(j, i);
-					for (const std::size_t k : nzrd)
+					for (auto k : nzrd)
 						A(j, k) += A(i, k) * f1;
 					//RHS(j) += RHS(i) * f1;
 				}
@@ -213,7 +215,7 @@ namespace devices
 	, m_new_V(size)
 	, m_dim(size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 1) + 7) / 8) * 8)
-	, m_A(size * m_pitch)
+	, m_A(size, m_pitch)
 	{
 	}
 

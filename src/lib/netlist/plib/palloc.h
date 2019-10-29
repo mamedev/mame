@@ -36,29 +36,31 @@ namespace plib {
 		using arena_storage_type = typename std::conditional<P::is_stateless, P, P *>::type;
 
 		template <typename X, typename Y = void>
-		typename std::enable_if<!X::is_stateless, X&>::type getref(X *x) { return *x;}
+		typename std::enable_if<!X::is_stateless, X&>::type getref(X *x) const noexcept
+		{ return *x;}
 
 		template <typename X, typename Y = void *>
 		typename std::enable_if<std::remove_pointer<X>::type::is_stateless, X&>::type
-		getref(X &x, Y y = nullptr)
+		getref(X &x, Y y = nullptr) const noexcept
 		{
 			unused_var(y);
 			return x;
 		}
 
-		constexpr arena_deleter(arena_storage_type a = arena_storage_type())
+		constexpr arena_deleter(arena_storage_type a = arena_storage_type()) noexcept
 		: m_a(a) { }
 
 #if 1
 		template<typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
-		arena_deleter(const arena_deleter<P, U> &rhs) : m_a(rhs.m_a) { }
+		arena_deleter(const arena_deleter<P, U> &rhs) noexcept
+		: m_a(rhs.m_a) { }
 #else
 		template<typename PU, typename U, typename = typename
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
 		arena_deleter(const arena_deleter<PU, U> &rhs) : m_a(rhs.m_a) { }
 #endif
-		void operator()(T *p) //const
+		void operator()(T *p) noexcept //const
 		{
 			/* call destructor */
 			p->~T();
@@ -202,19 +204,20 @@ namespace plib {
 		: m_a(arena_type::instance())
 		{ }
 
-		~arena_allocator() noexcept = default;
+		//~arena_allocator() noexcept = default;
 
 		arena_allocator(arena_type & a) noexcept : m_a(a)
 		{
 		}
 
 		template <class U>
-		arena_allocator(const arena_allocator<ARENA, U, ALIGN>& rhs)
+		arena_allocator(const arena_allocator<ARENA, U, ALIGN>& rhs) noexcept
 		: m_a(rhs.m_a)
 		{
 		}
 
-		template <class U> struct rebind
+		template <class U>
+		struct rebind
 		{
 			using other = arena_allocator<ARENA, U, ALIGN>;
 		};
@@ -224,7 +227,7 @@ namespace plib {
 			return reinterpret_cast<T *>(m_a.allocate(ALIGN, sizeof(T) * n));
 		}
 
-		void deallocate(T* p, std::size_t n)
+		void deallocate(T* p, std::size_t n) noexcept
 		{
 			unused_var(n);
 			m_a.deallocate(p);
@@ -234,7 +237,9 @@ namespace plib {
 		friend bool operator==(const arena_allocator<AR1, T1, A1>& lhs,
 			const arena_allocator<AR2, T2, A2>& rhs) noexcept;
 
-		template <class AU, class U, std::size_t A> friend class arena_allocator;
+		template <class AU, class U, std::size_t A>
+		friend class arena_allocator;
+
 	private:
 		arena_type &m_a;
 	};
@@ -268,7 +273,7 @@ namespace plib {
 		template <typename T>
 		using owned_pool_ptr = plib::owned_ptr<T, arena_deleter<aligned_arena, T>>;
 
-		static inline aligned_arena &instance()
+		static inline aligned_arena &instance() noexcept
 		{
 			static aligned_arena s_arena;
 			return s_arena;
@@ -294,7 +299,7 @@ namespace plib {
 			#endif
 		}
 
-		static inline void deallocate( void *ptr )
+		static inline void deallocate( void *ptr ) noexcept
 		{
 			#if (PUSE_ALIGNED_ALLOCATION)
 				// NOLINTNEXTLINE(cppcoreguidelines-no-malloc)
@@ -336,7 +341,7 @@ namespace plib {
 			}
 		}
 
-		bool operator ==(const aligned_arena &rhs) const
+		bool operator ==(const aligned_arena &rhs) const noexcept
 		{
 			plib::unused_var(rhs);
 			return true;
@@ -380,7 +385,7 @@ namespace plib {
 	}
 
 	template<typename T>
-	inline void pdelete(T *ptr)
+	inline void pdelete(T *ptr) noexcept
 	{
 		ptr->~T();
 		aligned_arena::deallocate(ptr);

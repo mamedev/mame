@@ -431,6 +431,7 @@ namespace analog
 
 	NETLIB_UPDATE(MOSFET)
 	{
+		// FIXME: This should never be called
 		if (!m_SG.m_P.net().isRailNet())
 			m_SG.m_P.solve_now();   // Basis
 		else if (!m_SG.m_N.net().isRailNet())

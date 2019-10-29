@@ -9,7 +9,7 @@
 #define NL_PARSER_H_
 
 #include "nl_setup.h"
-#include "plib/pparser.h"
+#include "plib/ptokenizer.h"
 
 namespace netlist
 {

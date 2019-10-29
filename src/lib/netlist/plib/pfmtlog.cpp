@@ -108,14 +108,14 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 		auto pdot(fmt.find('.'));
 
 		if (pdot==0)
-			strm << std::setprecision(pstonum<int>(fmt.substr(1)));
+			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(1), 6));
 		else if (pdot != pstring::npos)
 		{
-			strm << std::setprecision(pstonum<int>(fmt.substr(pdot + 1)));
-			r.width = pstonum<int>(left(fmt,pdot));
+			strm << std::setprecision(pstonum_ne_def<int>(fmt.substr(pdot + 1), 6));
+			r.width = pstonum_ne_def<int>(left(fmt,pdot), 0);
 		}
 		else if (fmt != "")
-			r.width = pstonum<int>(fmt);
+			r.width = pstonum_ne_def<int>(fmt, 0);
 
 		switch (r.pend)
 		{

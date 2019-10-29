@@ -281,7 +281,7 @@ namespace devices
 					break;
 	#endif
 	#if 1
-				case 86:
+				case 87:
 					ms = create_solver<double,86>(86, sname);
 					break;
 	#endif

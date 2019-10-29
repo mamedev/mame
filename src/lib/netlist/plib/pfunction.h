@@ -91,14 +91,14 @@ namespace plib {
 		 * @param values for input variables, e.g. {1.1, 2.2}
 		 * @return value of expression
 		 */
-		double evaluate(const std::vector<double> &values);
+		double evaluate(const std::vector<double> &values) noexcept;
 
 	private:
 
 		void compile_postfix(const std::vector<pstring> &inputs,
 				const std::vector<pstring> &cmds, const pstring &expr);
 
-		double lfsr_random()
+		double lfsr_random() noexcept
 		{
 			std::uint16_t lsb = m_lfsr & 1;
 			m_lfsr >>= 1;

@@ -304,6 +304,7 @@ namespace analog
 
 	NETLIB_UPDATE(QBJT_switch)
 	{
+		// FIXME: this should never be called
 		if (!m_RB.m_P.net().isRailNet())
 			m_RB.m_P.solve_now();   // Basis
 		else if (!m_RB.m_N.net().isRailNet())
@@ -367,6 +368,7 @@ namespace analog
 
 	NETLIB_UPDATE(QBJT_EB)
 	{
+		// FIXME: this should never be called
 		if (!m_D_EB.m_P.net().isRailNet())
 			m_D_EB.m_P.solve_now();   // Basis
 		else if (!m_D_EB.m_N.net().isRailNet())

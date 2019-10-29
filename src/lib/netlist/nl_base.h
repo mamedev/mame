@@ -666,7 +666,7 @@ namespace netlist
 			void rebuild_list();     /* rebuild m_list after a load */
 			void move_connections(net_t &dest_net);
 
-			std::vector<core_terminal_t *> &core_terms() { return m_core_terms; }
+			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 			void update_inputs() noexcept
 			{
@@ -731,7 +731,7 @@ namespace netlist
 			std::vector<core_terminal_t *> m_core_terms; // save post-start m_list ...
 
 			template <bool KEEP_STATS, typename T>
-			void process(const T mask, netlist_sig_t sig);
+			void process(const T mask, netlist_sig_t sig) noexcept;
 		};
 	} // namespace detail
 
@@ -1686,7 +1686,7 @@ namespace netlist
 		if (found)
 		{
 			bool err = false;
-			auto vald = plib::pstonum_ne<T, true>(p, err);
+			auto vald = plib::pstonum_ne<T>(p, err);
 			if (err)
 				device.state().log().fatal(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
 			m_param = vald;
@@ -1925,7 +1925,7 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	template <bool KEEP_STATS, typename T>
-	inline void detail::net_t::process(const T mask, netlist_sig_t sig)
+	inline void detail::net_t::process(const T mask, netlist_sig_t sig) noexcept
 	{
 		m_cur_Q = sig;
 
