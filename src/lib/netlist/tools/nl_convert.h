@@ -185,7 +185,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg) override;
 
 	private:
 		nl_convert_eagle_t &m_convert;
@@ -223,7 +223,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line) override;
+		void verror(const pstring &msg) override;
 
 	private:
 		nl_convert_rinf_t &m_convert;

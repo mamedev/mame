@@ -14,6 +14,21 @@
  *    USB controller
  *    and more.
  *
+ * TODO:
+ * - device-ify s3c240x;
+ * - console screen is horizontal, but here screen is setted up with 
+ *   Height < Width and ROT270, in a double negation fashion. Simplify and 
+ *   eventually update video fns;
+ * - Normalize palette to actual TFT color space;
+ * - Several games have dubious sound clipping and mixing;
+ * - RF and internet comms & netplay (rallypop has both);
+ * - Games from SW list doesn't reload after save, is it even supported?
+ * - Add slot for USB PC-Link application, add a host machine connection
+ *   somehow;
+ * - Verify MP3 support, which in turn needs checking out how the filesystem 
+ *   works here (and eventually a tool for direct injecting);
+ * - Verify gp32linux distro;
+ *
  **************************************************************************/
 
 #include "emu.h"
@@ -1683,6 +1698,8 @@ void gp32_state::gp32(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	// TODO: bad setup that theoretically should fail a validation check plus console doesn't have vertical screen anyway
+	// TODO: retrieve actual defaults from BIOS
 	m_screen->set_size(240, 320);
 	m_screen->set_visarea(0, 239, 0, 319);
 	m_screen->set_screen_update(FUNC(gp32_state::screen_update_gp32));
@@ -1714,13 +1731,9 @@ ROM_START( gp32 )
 	ROMX_LOAD( "gp32166m.bin", 0x000000, 0x080000, CRC(4548a840) SHA1(1ad0cab0af28fb45c182e5e8c87ead2aaa4fffe1), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "mfv2", "Mr. Spiv Multi Firmware V2" )
 	ROMX_LOAD( "gp32mfv2.bin", 0x000000, 0x080000, CRC(7ddaaaeb) SHA1(5a85278f721beb3b00125db5c912d1dc552c5897), ROM_BIOS(4) )
-#if 0
-	ROM_SYSTEM_BIOS( 5, "test", "test" )
-	ROMX_LOAD( "test.bin", 0x000000, 0x080000, CRC(00000000) SHA1(0000000000000000000000000000000000000000), ROM_BIOS(5) )
-#endif
 
 	ROM_REGION( 0x4000, "plds", ROMREGION_ERASEFF )
 	ROM_LOAD( "x2c32.jed", 0, 0x3bbb, CRC(eeec10d8) SHA1(34c4b1b865511517a5de1fa352228d95cda387c5) ) // JEDEC format for the time being. X2C32: 32 Macrocell CoolRunner-II CPLD
 ROM_END
 
-CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, empty_init, "Game Park Holdings", "GP32", ROT270|MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+CONS(2001, gp32, 0, 0, gp32, gp32, gp32_state, empty_init, "Game Park Holdings", "GP32", ROT270 | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )

@@ -39,6 +39,8 @@ Notes
   by the D-Board; the SOU1 PAL is missing as well, while PRG1 is replaced by
   PRG2. The other PALs are the same.
 
+- The BPRG1 PAL found on later B-boards allows the use of a larger program ROM space.
+  
 - The B-board usually has two PALs (later revisions have three). The first PAL
   is used to map tile codes to the graphics ROMs, and changes from game to game.
   The other doesn't change from game to game and there are only two versions,
@@ -5684,7 +5686,7 @@ ROM_START( mercs )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "c628",         0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "c628",         0x0000, 0x0117, CRC(662e090f) SHA1(3e3cb3b2ddfaac4772f38b859946ced717b84698) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -5730,7 +5732,7 @@ ROM_START( mercsu )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "c628",         0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "c628",         0x0000, 0x0117, CRC(662e090f) SHA1(3e3cb3b2ddfaac4772f38b859946ced717b84698) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -5776,7 +5778,7 @@ ROM_START( mercsur1 )
 	ROM_LOAD( "iob1.11e",     0x0000, 0x0117, CRC(3abc0700) SHA1(973043aa46ec6d5d1db20dc9d5937005a0f9f6ae) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "c628",         0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "c628",         0x0000, 0x0117, CRC(662e090f) SHA1(3e3cb3b2ddfaac4772f38b859946ced717b84698) )
 ROM_END
 
 /* B-Board 89625B-1 */
@@ -5837,7 +5839,7 @@ ROM_START( mercsj )
 	ROM_LOAD( "lwio.12e",     0x0000, 0x0117, CRC(ad52b90c) SHA1(f0fd6aeea515ee449320fe15684e6b3ab7f97bf4) )    // pal verification required
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "c628",         0x0000, 0x0117, NO_DUMP )
+	ROM_LOAD( "c628",         0x0000, 0x0117, CRC(662e090f) SHA1(3e3cb3b2ddfaac4772f38b859946ced717b84698) )
 ROM_END
 
 /* B-Board 89624B-3 */
@@ -6649,7 +6651,7 @@ ROM_START( sf2ee )
 	ROM_LOAD( "iob2.11d",     0x0000, 0x0117, CRC(d26f0a27) SHA1(22bb5647ff98df22fd19ae079ff98b9d100855f9) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "c632b.ic1",    0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )    // == c632.ic1
+	ROM_LOAD( "c632b.ic1",    0x0000, 0x0117, CRC(5c3cbb67) SHA1(e947078640e0b1a6cc51958cbf84b7e407213452) )
 ROM_END
 
 /* B-Board 90629B-2 */
@@ -7006,7 +7008,7 @@ ROM_START( sf2ue )
 	ROM_LOAD( "iob2.11d",     0x0000, 0x0117, CRC(d26f0a27) SHA1(22bb5647ff98df22fd19ae079ff98b9d100855f9) )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
-	ROM_LOAD( "c632b.ic1",    0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )    // == c632.ic1
+	ROM_LOAD( "c632b.ic1",    0x0000, 0x0117, CRC(5c3cbb67) SHA1(e947078640e0b1a6cc51958cbf84b7e407213452) )
 ROM_END
 
 /* B-Board 90629B-3 */
@@ -8661,7 +8663,7 @@ ROM_START( captcomm )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
-	ROM_LOAD( "c632b.ic1",    0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 91635B-2 */
@@ -8704,7 +8706,7 @@ ROM_START( captcommr1 )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
-	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )    // == c632b.ic1
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 91635B-2 */
@@ -8747,7 +8749,7 @@ ROM_START( captcommu )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
-	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )    // == c632b.ic1
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 91634B-2 */
@@ -8790,7 +8792,7 @@ ROM_START( captcommj )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
-	ROM_LOAD( "c632b.ic1",    0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )    /* seen the same pcb with C632.IC1 */
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* B-Board 91634B-2 */
@@ -8833,7 +8835,7 @@ ROM_START( captcommjr1 )
 
 	ROM_REGION( 0x0200, "cboardplds", 0 )
 	ROM_LOAD( "ioc1.ic7",     0x0000, 0x0104, CRC(a399772d) SHA1(55471189db573dd61e3087d12c55564291672c77) )
-	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )    // == c632b.ic1
+	ROM_LOAD( "c632.ic1",     0x0000, 0x0117, CRC(0fbd9270) SHA1(d7e737b20c44d41e29ca94be56114b31934dde81) )
 ROM_END
 
 /* Captain Commando bootleg

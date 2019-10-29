@@ -68,8 +68,9 @@
 #define LOG_DCD     (1U <<  8)
 #define LOG_SYNC    (1U <<  9)
 #define LOG_BIT     (1U <<  10)
+#define LOG_RTS     (1U <<  11)
 
-//#define VERBOSE  (LOG_INT | LOG_READ | LOG_SETUP | LOG_TX | LOG_CMD | LOG_CTS)
+//#define VERBOSE  (LOG_CMD | LOG_SETUP | LOG_SYNC | LOG_BIT | LOG_TX )
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -81,6 +82,7 @@
 #define LOGTX(...)    LOGMASKED(LOG_TX,      __VA_ARGS__)
 #define LOGRCV(...)   LOGMASKED(LOG_RCV,     __VA_ARGS__)
 #define LOGCTS(...)   LOGMASKED(LOG_CTS,     __VA_ARGS__)
+#define LOGRTS(...)   LOGMASKED(LOG_RTS,     __VA_ARGS__)
 #define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
 #define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
 #define LOGBIT(...)   LOGMASKED(LOG_BIT,     __VA_ARGS__)
@@ -297,7 +299,7 @@ inline void z80sio_channel::set_rts(int state)
 {
 	if (bool(m_rts) != bool(state))
 	{
-		LOG("%s(%d) \"%s\" Channel %c \n", FUNCNAME, state, owner()->tag(), 'A' + m_index);
+		LOGRTS("%s(%d) \"%s\" Channel %c \n", FUNCNAME, state, owner()->tag(), 'A' + m_index);
 		out_rts_cb(m_rts = state);
 	}
 }
@@ -341,7 +343,9 @@ inline void z80sio_channel::tx_setup_idle()
 		break;
 	case WR4_SYNC_MODE_SDLC:
 		// SDLC transmit examples don't show flag being loaded, implying it's hard-coded on the transmit side
-		tx_setup(0x7e, 8, true, false, false);
+		//tx_setup(0x7e, 8, true, false, false);
+		// Verified on a 8274, the 0x7e SYNC byte is required in CR7 to start transmitting, other values fails
+		tx_setup(m_wr7, 8, true, false, false);
 		break;
 	}
 	m_tx_in_pkt = false;
@@ -1073,6 +1077,8 @@ bool z80sio_channel::is_tx_idle() const
 //-------------------------------------------------
 void z80sio_channel::transmit_enable()
 {
+	LOGTX("%s\n", FUNCNAME);
+
 	if (transmit_allowed())
 	{
 		if (is_tx_idle())
@@ -1113,7 +1119,7 @@ void z80sio_channel::transmit_enable()
 //-------------------------------------------------
 void z80sio_channel::transmit_complete()
 {
-	LOG("%s %s\n",FUNCNAME, tag());
+	if (!m_rts) LOGTX("%s %s\n",FUNCNAME, tag());
 
 	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
 		sync_tx_sr_empty();
@@ -1131,7 +1137,7 @@ void z80sio_channel::sync_tx_sr_empty()
 {
 	if (!transmit_allowed())
 	{
-		LOGTX("%s() Channel %c Transmitter Disabled m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
+		if (!m_rts) LOGTX("%s() Channel %c Transmitter Disabled m_wr5:%02x\n", FUNCNAME, 'A' + m_index, m_wr5);
 		m_tx_flags = 0;
 	}
 	else if (m_tx_forced_sync ||
@@ -1420,10 +1426,10 @@ int z80sio_channel::get_tx_word_length() const
  * Break/Abort latch. */
 uint8_t z80sio_channel::do_sioreg_rr0()
 {
-	LOGR("%s\n", FUNCNAME);
 	uint8_t tmp = m_rr0 & ~RR0_TX_BUFFER_EMPTY;
 	if (get_tx_empty())
 		tmp |= RR0_TX_BUFFER_EMPTY;
+	LOGR("%s: %02x\n", FUNCNAME, tmp);
 	return tmp;
 }
 
@@ -1507,7 +1513,7 @@ void z80sio_channel::do_sioreg_wr0_resets(uint8_t data)
 		LOGCMD("Z80SIO Channel %c : CRC_RESET_NULL\n", 'A' + m_index);
 		break;
 	case WR0_CRC_RESET_RX: /* In Synchronous mode: all Os (zeros) (CCITT-O CRC-16) */
-		LOGCMD("Z80SIO Channel %c : CRC_RESET_RX - not implemented\n", 'A' + m_index);
+		LOGCMD("Z80SIO Channel %c : CRC_RESET_RX\n", 'A' + m_index);
 		m_rx_crc = ((m_wr4 & WR4_SYNC_MODE_MASK) == WR4_SYNC_MODE_SDLC) ? ~uint16_t(0U) : uint16_t(0U);
 		m_rx_crc_en = false;
 		break;
@@ -1520,6 +1526,8 @@ void z80sio_channel::do_sioreg_wr0_resets(uint8_t data)
 		// Command is accepted in active part of packet only
 		if (m_tx_in_pkt)
 			m_rr0 &= ~RR0_TX_UNDERRUN;
+		else
+			LOGCMD(" - not accepted as not in active part of packet\n");
 		break;
 	default: /* Will not happen unless someone messes with the mask */
 		logerror("Z80SIO Channel %c : %s Wrong CRC reset/init command:%02x\n", 'A' + m_index, FUNCNAME, data & WR0_CRC_RESET_CODE_MASK);
@@ -1531,7 +1539,7 @@ void z80sio_channel::do_sioreg_wr0(uint8_t data)
 	m_wr0 = data;
 
 	if ((data & WR0_COMMAND_MASK) != WR0_NULL)
-		LOGSETUP(" * %s %c Reg %02x <- %02x \n", owner()->tag(), 'A' + m_index, 0, data);
+		LOGSETUP("\n * %s %c Reg %02x <- %02x \n", owner()->tag(), 'A' + m_index, 0, data);
 	switch (data & WR0_COMMAND_MASK)
 	{
 	case WR0_NULL:
@@ -1601,31 +1609,15 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 {
 /* TODO: implement vector modifications when WR1 bit D2 is changed */
 	m_wr1 = data;
-	LOG("Z80SIO \"%s\" Channel %c : External Interrupt Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Transmit Interrupt Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_TX_INT_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Status Affects Vector %u\n", owner()->tag(), 'A' + m_index, (data & WR1_STATUS_VECTOR) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Wait/Ready Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Wait/Ready Function %s\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
-	LOG("Z80SIO \"%s\" Channel %c : Wait/Ready on %s\n", owner()->tag(), 'A' + m_index, (data & WR1_WRDY_ON_RX_TX) ? "Receive" : "Transmit");
-
-	switch (data & WR1_RX_INT_MODE_MASK)
-	{
-	case WR1_RX_INT_DISABLE:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt Disabled\n", owner()->tag(), 'A' + m_index);
-		break;
-
-	case WR1_RX_INT_FIRST:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on First Character\n", owner()->tag(), 'A' + m_index);
-		break;
-
-	case WR1_RX_INT_ALL_PARITY:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on All Characters, Parity Affects Vector\n", owner()->tag(), 'A' + m_index);
-		break;
-
-	case WR1_RX_INT_ALL:
-		LOG("Z80SIO \"%s\" Channel %c : Receiver Interrupt on All Characters\n", owner()->tag(), 'A' + m_index);
-		break;
-	}
+	LOGSETUP("Z80SIO \"%s\" Channel %c :\n", owner()->tag(), 'A' + m_index);
+	LOGSETUP(" - External Interrupt Enable %u\n", (data & WR1_EXT_INT_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Transmit Interrupt Enable %u\n", (data & WR1_TX_INT_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Status Affects Vector %u\n", (data & WR1_STATUS_VECTOR) ? 1 : 0);
+	LOGSETUP(" - Wait/Ready Enable %u\n",     (data & WR1_WRDY_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Wait/Ready Function %s\n",   (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait");
+	LOGSETUP(" - Wait/Ready on %s\n",         (data & WR1_WRDY_ON_RX_TX) ? "Rx" : "Tx");
+	LOGSETUP(" - Receiver Interrupt %s\n",  std::array<char const *, 4>
+		 {{"Disabled", "on First Character", "on All Characters, Parity Affects Vector", "on All Characters"}}[(m_wr2 >> 3) & 0x03]);
 
 	if (!(data & WR1_WRDY_ENABLE))
 		set_ready(false);
@@ -1638,7 +1630,19 @@ void z80sio_channel::do_sioreg_wr1(uint8_t data)
 void z80sio_channel::do_sioreg_wr2(uint8_t data)
 {
 	m_wr2 = data;
-	LOG("Z80SIO \"%s\" Channel %c : Interrupt Vector %02x\n", owner()->tag(), 'A' + m_index, data);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : ", owner()->tag(), 'A' + m_index);
+	if (m_index == 0)
+	{
+		LOGSETUP(" - INT/DMA priority and mode: %02x\n", m_wr2 & 0x07);
+		LOGSETUP(" - Interrupt mode: %s\n", std::array<char const *, 4> {{"85-1", "85-2", "85-3", "86"}}[(m_wr2 >> 3) & 0x03]);
+		LOGSETUP(" - Vector mode: %s\n", (m_wr2 & 0x20) ? "Vectored" : "Non-vectored");
+		LOGSETUP(" - Rx INT mask: %d\n", (m_wr2 >> 6) & 0x01 );
+		LOGSETUP(" - Pin 10: %s\n",  (m_wr2 & 0x80) ? "SYNCB" : "RTSB");
+	}
+	else
+	{
+		LOGSETUP("Interrupt Vector %02x\n", m_wr2);
+	}
 }
 
 void z80sio_channel::do_sioreg_wr3(uint8_t data)
@@ -1647,12 +1651,13 @@ void z80sio_channel::do_sioreg_wr3(uint8_t data)
 	LOGSETUP("Z80SIO Channel %c : Sync Character Load Inhibit %u\n", 'A' + m_index, (data & WR3_SYNC_CHAR_LOAD_INHIBIT) ? 1 : 0);
 	LOGSETUP("Z80SIO Channel %c : Receive CRC Enable %u\n", 'A' + m_index, (data & WR3_RX_CRC_ENABLE) ? 1 : 0);
 	LOGSETUP("Z80SIO Channel %c : Auto Enables %u\n", 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0);
-	LOGSETUP("Z80SIO Channel %c : Receiver Bits/Character %u\n", 'A' + m_index, get_rx_word_length());
-	if (data & WR3_ENTER_HUNT_PHASE)
-		LOGCMD("Z80SIO Channel %c : Enter Hunt Phase\n", 'A' + m_index);
+	LOGSETUP("Z80SIO Channel %c : Enter Hunt Phase %u\n", 'A' + m_index, (data & WR3_ENTER_HUNT_PHASE) ? 1 : 0);
+		 //if (data & WR3_ENTER_HUNT_PHASE)
+		 //LOGCMD("Z80SIO Channel %c : Enter Hunt Phase\n", 'A' + m_index);
 
 	bool const was_allowed(receive_allowed());
 	m_wr3 = data;
+	LOG("Z80SIO Channel %c : Receiver Bits/Character %u\n", 'A' + m_index, get_rx_word_length()); // depends on m_wr3 being updated
 
 	if (!was_allowed && receive_allowed())
 	{
@@ -1668,25 +1673,27 @@ void z80sio_channel::do_sioreg_wr3(uint8_t data)
 void z80sio_channel::do_sioreg_wr4(uint8_t data)
 {
 	m_wr4 = data;
-	LOG("Z80SIO \"%s\" Channel %c : Parity Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0);
-	LOG("Z80SIO \"%s\" Channel %c : Parity %s\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd");
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Parity Enable %u\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_ENABLE) ? 1 : 0);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Parity %s\n", owner()->tag(), 'A' + m_index, (data & WR4_PARITY_EVEN) ? "Even" : "Odd");
 	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
-		LOG("Z80SIO \"%s\" Channel %c : Synchronous Mode\n", owner()->tag(), 'A' + m_index);
+		LOGSETUP("Z80SIO \"%s\" Channel %c : Synchronous Mode %s\n", owner()->tag(), 'A' + m_index,
+			std::array<char const *, 4> {{"Monosync", "Bisync", "HDLC/SDLC", "External"}}[(m_wr4 >> 4) & 0x03]);
 	else
-		LOG("Z80SIO \"%s\" Channel %c : Stop Bits %g\n", owner()->tag(), 'A' + m_index, (((m_wr4 & WR4_STOP_BITS_MASK) >> 2) + 1) / 2.);
-	LOG("Z80SIO \"%s\" Channel %c : Clock Mode %uX\n", owner()->tag(), 'A' + m_index, get_clock_mode());
+		LOGSETUP("Z80SIO \"%s\" Channel %c : Stop Bits %g\n", owner()->tag(), 'A' + m_index, (((m_wr4 & WR4_STOP_BITS_MASK) >> 2) + 1) / 2.);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Clock Mode %uX\n", owner()->tag(), 'A' + m_index, get_clock_mode());
 }
 
 void z80sio_channel::do_sioreg_wr5(uint8_t data)
 {
 	m_wr5 = data;
-	LOG("Z80SIO Channel %c : Transmitter Enable %u\n", 'A' + m_index, (data & WR5_TX_ENABLE) ? 1 : 0);
-	LOG("Z80SIO Channel %c : Transmitter Bits/Character %u\n", 'A' + m_index, get_tx_word_length());
-	LOG("Z80SIO Channel %c : Transmit CRC Enable %u\n", 'A' + m_index, (data & WR5_TX_CRC_ENABLE) ? 1 : 0);
-	LOG("Z80SIO Channel %c : %s Frame Check Polynomial\n", 'A' + m_index, (data & WR5_CRC16) ? "CRC-16" : "SDLC");
-	LOG("Z80SIO Channel %c : Send Break %u\n", 'A' + m_index, (data & WR5_SEND_BREAK) ? 1 : 0);
-	LOG("Z80SIO Channel %c : Request to Send %u\n", 'A' + m_index, (data & WR5_RTS) ? 1 : 0);
-	LOG("Z80SIO Channel %c : Data Terminal Ready %u\n", 'A' + m_index, (data & WR5_DTR) ? 1 : 0);
+	LOGSETUP("Z80SIO Channel %c\n", 'A' + m_index);
+	LOGSETUP(" - Transmitter Enable %u\n",         (data & WR5_TX_ENABLE) ? 1 : 0);
+	LOGSETUP(" - Transmitter Bits/Character %u\n", get_tx_word_length());
+	LOGSETUP(" - Transmit CRC Enable %u\n",        (data & WR5_TX_CRC_ENABLE) ? 1 : 0);
+	LOGSETUP(" - %s Frame Check Polynomial\n",     (data & WR5_CRC16) ? "CRC-16" : "SDLC");
+	LOGSETUP(" - Send Break %u\n",                 (data & WR5_SEND_BREAK) ? 1 : 0);
+	LOGSETUP(" - Request to Send %u\n",            (data & WR5_RTS) ? 1 : 0);
+	LOGSETUP(" - Data Terminal Ready %u\n",        (data & WR5_DTR) ? 1 : 0);
 
 	if (~data & WR5_TX_ENABLE)
 		m_uart->clear_interrupt(m_index, INT_TRANSMIT);
@@ -1694,13 +1701,13 @@ void z80sio_channel::do_sioreg_wr5(uint8_t data)
 
 void z80sio_channel::do_sioreg_wr6(uint8_t data)
 {
-	LOG("Z80SIO \"%s\" Channel %c : Transmit Sync/Sync 1/SDLC Address %02x\n", owner()->tag(), 'A' + m_index, data);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Transmit Sync/Sync 1/SDLC Address %02x\n", owner()->tag(), 'A' + m_index, data);
 	m_wr6 = data;
 }
 
 void z80sio_channel::do_sioreg_wr7(uint8_t data)
 {
-	LOG("Z80SIO \"%s\" Channel %c : Receive Sync/Sync 2/SDLC Flag %02x\n", owner()->tag(), 'A' + m_index, data);
+	LOGSETUP("Z80SIO \"%s\" Channel %c : Receive Sync/Sync 2/SDLC Flag %02x\n", owner()->tag(), 'A' + m_index, data);
 	m_wr7 = data;
 }
 
@@ -1714,7 +1721,7 @@ void z80sio_channel::control_write(uint8_t data)
 	if (reg != 0)
 	{
 		LOGSETUP(" * %s %c Reg %02x <- %02x - %s\n", tag(), 'A' + m_index, reg, data, std::array<char const *, 8>
-			 {{"WR0", "WR1", "WR2", "WR3 - Async Rx setup", "WR4 - Async Clock, Parity and stop bits", "WR5 - Async Tx setup", "WR6", "WR7"}}[reg]);
+			 {{"WR0", "WR1", "WR2", "WR3", "WR4", "WR5", "WR6", "WR7"}}[reg]);
 		// mask out register index
 		m_wr0 &= ~WR0_REGISTER_MASK;
 	}
@@ -1771,10 +1778,14 @@ void z80sio_channel::data_write(uint8_t data)
 	m_tx_data = data;
 	set_tx_empty(get_tx_empty() , false);
 	if ((m_wr4 & WR4_STOP_BITS_MASK) == WR4_STOP_BITS_SYNC)
+	{
+		LOGTX("Z80SIO: WR4_STOP_BITS_SYNC detected\n");
 		m_tx_in_pkt = true;
+	}
 	else
 	{
 		// ALL_SENT is only meaningful in async mode, in sync mode it's always 1
+		LOGTX("Z80SIO: WR4_STOP_BITS_SYNC *not* detected\n");
 		m_rr1 &= ~RR1_ALL_SENT;
 		m_all_sent_delay = 0;
 	}
@@ -2208,7 +2219,7 @@ WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 {
 	if (bool(m_dcd) != bool(state))
 	{
-		LOG("Z80SIO Channel %c : DCD %u\n", 'A' + m_index, state);
+		LOGDCD("Z80SIO Channel %c : DCD %u\n", 'A' + m_index, state);
 
 		bool const was_allowed(receive_allowed());
 		m_dcd = state;
@@ -2228,7 +2239,7 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 {
 	if (bool(m_sync) != bool(state))
 	{
-		LOG("Z80SIO Channel %c : Sync %u\n", 'A' + m_index, state);
+		LOGSYNC("Z80SIO Channel %c : Sync %u\n", 'A' + m_index, state);
 
 		m_sync = state;
 
@@ -2389,9 +2400,9 @@ WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 			m_tx_count = get_clock_mode() / 2;
 			// Send out a delayed half bit
 			bool new_txd = BIT(m_tx_delay , 3);
+			LOGBIT("%.6f TX %d DLY %x\n" , machine().time().as_double() , new_txd , m_tx_delay & 0xf);
 			if (new_txd != m_txd && !(m_wr5 & WR5_SEND_BREAK))
 			{
-				LOGBIT("%.6f TX %d DLY %x\n" , machine().time().as_double() , new_txd , m_tx_delay & 0xf);
 				out_txd_cb(new_txd);
 			}
 			m_txd = new_txd;

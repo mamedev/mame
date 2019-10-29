@@ -37,17 +37,18 @@ public:
 	void sport2k(machine_config &config);
 
 private:
-	DECLARE_WRITE8_MEMBER(shift_load_w);
-	DECLARE_READ8_MEMBER(ay8910_read);
-	DECLARE_WRITE8_MEMBER(ay8910_write);
-	DECLARE_WRITE8_MEMBER(t0_t1_w);
-	DECLARE_WRITE8_MEMBER(ay8910_columns_w);
-	DECLARE_READ8_MEMBER(ay8910_inputs_r);
-	DECLARE_WRITE8_MEMBER(sound_rombank_w);
+	void shift_load_w(u8 data);
+	u8 ay8910_read();
+	void ay8910_write(u8 data);
+	void t0_t1_w(u8 data);
+	void ay8910_columns_w(u8 data);
+	u8 ay8910_inputs_r();
+	void sound_rombank_w(u8 data);
 
 	void mephisto_8051_io(address_map &map);
 	void mephisto_8051_map(address_map &map);
 	void mephisto_map(address_map &map);
+	void sport2k_map(address_map &map);
 	void sport2k_8051_io(address_map &map);
 
 	u8 m_ay8910_data;
@@ -62,22 +63,22 @@ private:
 };
 
 
-WRITE8_MEMBER(mephisto_pinball_state::shift_load_w)
+void mephisto_pinball_state::shift_load_w(u8 data)
 {
 }
 
-READ8_MEMBER(mephisto_pinball_state::ay8910_read)
+u8 mephisto_pinball_state::ay8910_read()
 {
 	return m_ay8910_data;
 }
 
-WRITE8_MEMBER(mephisto_pinball_state::ay8910_write)
+void mephisto_pinball_state::ay8910_write(u8 data)
 {
 	m_ay8910_data = data;
 	ay8910_update();
 }
 
-WRITE8_MEMBER(mephisto_pinball_state::t0_t1_w)
+void mephisto_pinball_state::t0_t1_w(u8 data)
 {
 	m_ay8910_bdir = BIT(data, 4); // T0
 	m_ay8910_bc1 = BIT(data, 5); // T1
@@ -92,23 +93,23 @@ void mephisto_pinball_state::ay8910_update()
 		m_ay8910_data = m_aysnd->data_r();
 }
 
-WRITE8_MEMBER(mephisto_pinball_state::ay8910_columns_w)
+void mephisto_pinball_state::ay8910_columns_w(u8 data)
 {
 }
 
-READ8_MEMBER(mephisto_pinball_state::ay8910_inputs_r)
+u8 mephisto_pinball_state::ay8910_inputs_r()
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(mephisto_pinball_state::sound_rombank_w)
+void mephisto_pinball_state::sound_rombank_w(u8 data)
 {
 	m_soundbank->set_entry(data & 0xf);
 }
 
 void mephisto_pinball_state::mephisto_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
+	map(0x00000, 0x07fff).rom().region("maincpu", 0).mirror(0x8000);
 	map(0x10000, 0x107ff).ram().share("nvram");
 	map(0x12000, 0x1201f).noprw(); //.rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x13000, 0x130ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -117,6 +118,20 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 	map(0x14800, 0x14807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x16000, 0x16000).w(FUNC(mephisto_pinball_state::shift_load_w));
 	map(0x17000, 0x17001).nopw(); //???
+	map(0xf0000, 0xf7fff).rom().region("maincpu", 0).mirror(0x8000);
+}
+
+void mephisto_pinball_state::sport2k_map(address_map &map)
+{
+	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
+	map(0x20000, 0x21fff).ram().share("nvram");
+	map(0x2a000, 0x2a01f).noprw(); //.rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x2b000, 0x2b0ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x2b800, 0x2b807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x2c000, 0x2c0ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
+	map(0x2c800, 0x2c807).rw("ic9", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
+	map(0x2e000, 0x2e000).w(FUNC(mephisto_pinball_state::shift_load_w));
+	map(0x2f000, 0x2f001).nopw(); //???
 	map(0xf0000, 0xfffff).rom().region("maincpu", 0);
 }
 
@@ -206,6 +221,7 @@ void mephisto_pinball_state::mephisto(machine_config &config)
 void mephisto_pinball_state::sport2k(machine_config &config)
 {
 	mephisto(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_pinball_state::sport2k_map);
 	subdevice<i8051_device>("soundcpu")->set_addrmap(AS_IO, &mephisto_pinball_state::sport2k_8051_io);
 
 	YM3812(config, "ymsnd", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -215,9 +231,8 @@ void mephisto_pinball_state::sport2k(machine_config &config)
 / Mephisto
 /-------------------------------------------------------------------*/
 ROM_START(mephistp)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("cpu_ver1.2", 0x00000, 0x8000, CRC(845c8eb4) SHA1(2a705629990950d4e2d3a66a95e9516cf112cc88))
-	ROM_RELOAD(0x08000, 0x8000)
 
 	ROM_REGION(0x08000, "soundcpu", 0)
 	ROM_LOAD("ic15_02", 0x00000, 0x8000, CRC(2accd446) SHA1(7297e4825c33e7cf23f86fe39a0242e74874b1e2))
@@ -234,9 +249,8 @@ ROM_START(mephistp)
 ROM_END
 
 ROM_START(mephistp1)
-	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD("cpu_ver1.1", 0x00000, 0x8000, CRC(ce584902) SHA1(dd05d008bbd9b6588cb204e8d901537ffe7ddd43))
-	ROM_RELOAD(0x08000, 0x8000)
 
 	ROM_REGION(0x08000, "soundcpu", 0)
 	ROM_LOAD("ic15_02", 0x00000, 0x8000, CRC(2accd446) SHA1(7297e4825c33e7cf23f86fe39a0242e74874b1e2))

@@ -204,6 +204,7 @@ sega315_5124_device::sega315_5124_device(const machine_config &mconfig, device_t
 	, device_memory_interface(mconfig, *this)
 	, device_video_interface(mconfig, *this)
 	, device_mixer_interface(mconfig, *this, 2)
+	, m_hcounter_divide(1)
 	, m_cram_size(cram_size)
 	, m_line_timing(line_timing)
 	, m_palette_offset(palette_offset)
@@ -361,7 +362,7 @@ u8 sega315_5124_device::vcount_read()
 	const int active_scr_start = m_frame_timing[VERTICAL_SYNC] + m_frame_timing[TOP_BLANKING] + m_frame_timing[TOP_BORDER];
 	int vpos = screen().vpos();
 
-	if (screen().hpos() < m_line_timing[VCOUNT_CHANGE_HPOS])
+	if (screen_hpos() < m_line_timing[VCOUNT_CHANGE_HPOS])
 	{
 		vpos--;
 		if (vpos < 0)
@@ -382,7 +383,7 @@ u8 sega315_5124_device::hcount_read()
 void sega315_5124_device::hcount_latch()
 {
 	/* The hcount value returned by the VDP seems to be based on the previous hpos */
-	int hclock = screen().hpos() - 1;
+	int hclock = screen_hpos() - 1;
 	if (hclock < 0)
 		hclock += WIDTH;
 
@@ -677,7 +678,7 @@ void sega315_5124_device::check_pending_flags()
 	   return some position in the beginning of next line. To ensure the instruction
 	   will get updated status, here a maximum hpos is set if the timer reports no
 	   remaining time, what could also occur due to the ahead time of the timeslice. */
-	int const hpos = (m_pending_flags_timer->remaining() == attotime::zero) ? (WIDTH - 1) : screen().hpos();
+	int const hpos = (m_pending_flags_timer->remaining() == attotime::zero) ? (WIDTH - 1) : screen_hpos();
 
 	if ((m_pending_hint) && hpos >= m_line_timing[HINT_HPOS])
 	{
@@ -853,11 +854,11 @@ void sega315_5124_device::control_write(u8 data)
 				break;
 			case 1:
 				set_display_settings();
-				if (screen().hpos() <= DISPLAY_DISABLED_HPOS)
+				if (screen_hpos() <= DISPLAY_DISABLED_HPOS)
 					m_display_disabled = !BIT(m_reg[0x01], 6);
 				break;
 			case 8:
-				if (screen().hpos() <= m_line_timing[XSCROLL_HPOS])
+				if (screen_hpos() <= m_line_timing[XSCROLL_HPOS])
 					m_reg8copy = m_reg[0x08];
 			}
 
@@ -1303,7 +1304,7 @@ void sega315_5313_mode4_device::sprite_collision(int line, int sprite_col_x)
 		// This function is been used to check for sprite collision of
 		// the 315-5313 VDP, that occurs before the active screen is
 		// drawn, so it must not flag a collision again when drawing.
-		if (screen().hpos() < m_draw_time)
+		if (screen_hpos() < m_draw_time)
 		{
 			m_pending_status |= STATUS_SPRCOL;
 			m_pending_sprcol_x = m_line_timing[SPRCOL_BASEHPOS];

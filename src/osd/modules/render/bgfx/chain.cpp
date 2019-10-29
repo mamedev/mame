@@ -168,5 +168,6 @@ void bgfx_chain::prepend_converter(bgfx_effect *effect, chain_manager &chains)
 
 	const uint32_t screen_width = chains.targets().width(TARGET_STYLE_GUEST, m_screen_index);
 	const uint32_t screen_height = chains.targets().height(TARGET_STYLE_GUEST, m_screen_index);
+	m_targets.destroy_target("screen", m_screen_index);
 	m_targets.create_target("screen", bgfx::TextureFormat::RGBA8, screen_width, screen_height, TARGET_STYLE_GUEST, true, false, 1, m_screen_index);
 }

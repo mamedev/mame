@@ -84,6 +84,8 @@ public:
 		if (m_strm->eof())
 			return false;
 		m_strm->read(&b, 1);
+		if (m_strm->eof())
+			return false;
 		return true;
 	}
 
@@ -93,12 +95,14 @@ public:
 		if (m_strm->eof())
 			return false;
 		m_strm->read(&b[0], 1);
+		if (m_strm->eof())
+			return false;
 		const std::size_t l = putf8string::traits_type::codelen(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		for (std::size_t i = 1; i < l; i++)
 		{
+			m_strm->read(&b[i], 1);
 			if (m_strm->eof())
 				return false;
-			m_strm->read(&b[i], 1);
 		}
 		c = putf8string::traits_type::code(reinterpret_cast<putf8string::traits_type::mem_t *>(&b));
 		return true;

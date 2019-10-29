@@ -632,20 +632,24 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
+	const u32 width = sega315_5124_device::WIDTH - (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 	for (int y = 0; y < 224; y++)
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
-		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT);
+		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 
-		for (int x = 0; x < sega315_5124_device::WIDTH; x++)
+		for (int srcx = 0, xx = 0, dstx = 0; srcx < width; dstx++)
 		{
-			uint32_t src = srcptr[x] & 0xffffff;
+			uint32_t src = srcptr[srcx] & 0xffffff;
 
 			if (src)
 			{
-				if (x>=16)
-					lineptr[x-16] = src;
-
+				lineptr[dstx] = src;
+			}
+			if (++xx >= 5)
+			{
+				srcx++;
+				xx = 0;
 			}
 		}
 	}
@@ -690,15 +694,18 @@ void mplay_state::megaplay(machine_config &config)
 	io2.in_porte_cb().set(FUNC(mplay_state::bios_6404_r));
 	io2.out_porte_cb().set(FUNC(mplay_state::bios_6404_w));
 
+	m_vdp->set_lcm_scaling(true);
+
 	/* New update functions to handle the extra layer */
-	subdevice<screen_device>("megadriv")->set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	subdevice<screen_device>("megadriv")->set_raw((XTAL(10'738'635) * 5)/2, \
+			sega315_5124_device::WIDTH * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH) * 5, (sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256) * 5, \
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	subdevice<screen_device>("megadriv")->set_screen_update(FUNC(mplay_state::screen_update_megplay));
 
 	// Megaplay has an additional SMS VDP as an overlay
 	SEGA315_5246(config, m_vdp1, MASTER_CLOCK / 5); /* ?? */
 	m_vdp1->set_screen("megadriv");
+	m_vdp1->set_hcounter_divide(5);
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
 	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);

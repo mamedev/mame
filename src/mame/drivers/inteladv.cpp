@@ -108,5 +108,12 @@ ROM_START( inteladv )
 	ROM_LOAD( "vtechinteladv.bin", 0x000000, 0x800000, CRC(e24dbbcb) SHA1(7cb7f25f5eb123ae4c46cd4529aafd95508b2210) )
 ROM_END
 
+ROM_START( cars2lap )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	// Flash dump contains some 65C02 code starting at $000D6A, but mostly appears to be custom bytecode or non-executable data banked in 32K blocks
+	ROM_LOAD("n25s16.u6", 0x00000, 0x200000, CRC(ec1ba96e) SHA1(51b8844ae77adf20f74f268d380d268c9ce19785))
+ROM_END
+
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                                 FLAGS
 COMP( 1995, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )
+COMP( 2012, cars2lap, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",               MACHINE_IS_SKELETON ) // might not belong here

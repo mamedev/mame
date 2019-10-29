@@ -22,14 +22,59 @@
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
 
+// FIXME:: __FUNCTION__ may be not be supported by all compilers.
+
+#define PSOURCELOC() plib::source_location(__FILE__, __LINE__)
 
 namespace plib
 {
 
-	// ----------------------------------------------------------------------------------------
-	// A Generic netlist sources implementation
-	// ----------------------------------------------------------------------------------------
+	/**! Source code locations
+	 *
+	 * The c++20 draft for source locations is based on const char * strings.
+	 * It is thus only suitable for c++ source code and not for programmatic
+	 * parsing of files. This class is a replacement dynamic use cases.
+	 *
+	 */
+	struct source_location
+	{
+		source_location() noexcept
+		: m_file("unknown"), m_func(m_file), m_line(0), m_col(0)
+		{ }
 
+		source_location(pstring file, unsigned line) noexcept
+		: m_file(file), m_func("unknown"), m_line(line), m_col(0)
+		{ }
+
+		source_location(pstring file, pstring func, unsigned line) noexcept
+		: m_file(file), m_func(func), m_line(line), m_col(0)
+		{ }
+
+		unsigned line() const noexcept { return m_line; }
+		unsigned column() const noexcept { return m_col; }
+		pstring file_name() const noexcept { return m_file; }
+		pstring function_name() const noexcept { return m_func; }
+
+		source_location &operator ++()
+		{
+			++m_line;
+			return *this;
+		}
+
+	private:
+		pstring m_file;
+		pstring m_func;
+		unsigned m_line;
+		unsigned m_col;
+	};
+
+	/**! Base source class
+	 *
+	 * Pure virtual class all other source implementations are based on.
+	 * Sources provide an abstraction to read input from a variety of
+	 * sources, e.g. files, memory, remote locations.
+	 *
+	 */
 	class psource_t
 	{
 	public:
