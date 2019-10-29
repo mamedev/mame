@@ -108,37 +108,43 @@ static constexpr unsigned FILTER_SHIFT    = FINE_FILTER_BIT - FILTER_BIT;
 static constexpr unsigned MAX_SAMPLE_CHUNK    = 10000;
 static constexpr unsigned ULAW_MAXBITS        = 8;
 
-static constexpr unsigned CONTROL_BS1         = 0x8000;
-static constexpr unsigned CONTROL_BS0         = 0x4000;
-static constexpr unsigned CONTROL_CMPD        = 0x2000;
-static constexpr unsigned CONTROL_CA2         = 0x1000;
-static constexpr unsigned CONTROL_CA1         = 0x0800;
-static constexpr unsigned CONTROL_CA0         = 0x0400;
-static constexpr unsigned CONTROL_LP4         = 0x0200;
-static constexpr unsigned CONTROL_LP3         = 0x0100;
-static constexpr unsigned CONTROL_IRQ         = 0x0080;
-static constexpr unsigned CONTROL_DIR         = 0x0040;
-static constexpr unsigned CONTROL_IRQE        = 0x0020;
-static constexpr unsigned CONTROL_BLE         = 0x0010;
-static constexpr unsigned CONTROL_LPE         = 0x0008;
-static constexpr unsigned CONTROL_LEI         = 0x0004;
-static constexpr unsigned CONTROL_STOP1       = 0x0002;
-static constexpr unsigned CONTROL_STOP0       = 0x0001;
+namespace {
 
-static constexpr unsigned CONTROL_BSMASK      = (CONTROL_BS1 | CONTROL_BS0);
-static constexpr unsigned CONTROL_CAMASK      = (CONTROL_CA2 | CONTROL_CA1 | CONTROL_CA0);
-static constexpr unsigned CONTROL_LPMASK      = (CONTROL_LP4 | CONTROL_LP3);
-static constexpr unsigned CONTROL_LOOPMASK    = (CONTROL_BLE | CONTROL_LPE);
-static constexpr unsigned CONTROL_STOPMASK    = (CONTROL_STOP1 | CONTROL_STOP0);
+enum : u16 {
+	CONTROL_BS1         = 0x8000,
+	CONTROL_BS0         = 0x4000,
+	CONTROL_CMPD        = 0x2000,
+	CONTROL_CA2         = 0x1000,
+	CONTROL_CA1         = 0x0800,
+	CONTROL_CA0         = 0x0400,
+	CONTROL_LP4         = 0x0200,
+	CONTROL_LP3         = 0x0100,
+	CONTROL_IRQ         = 0x0080,
+	CONTROL_DIR         = 0x0040,
+	CONTROL_IRQE        = 0x0020,
+	CONTROL_BLE         = 0x0010,
+	CONTROL_LPE         = 0x0008,
+	CONTROL_LEI         = 0x0004,
+	CONTROL_STOP1       = 0x0002,
+	CONTROL_STOP0       = 0x0001,
 
-// ES5505 has sightly different control bit
-static constexpr unsigned CONTROL_5505_LP4    = 0x0800;
-static constexpr unsigned CONTROL_5505_LP3    = 0x0400;
-static constexpr unsigned CONTROL_5505_CA1    = 0x0200;
-static constexpr unsigned CONTROL_5505_CA0    = 0x0100;
+	CONTROL_BSMASK      = (CONTROL_BS1 | CONTROL_BS0),
+	CONTROL_CAMASK      = (CONTROL_CA2 | CONTROL_CA1 | CONTROL_CA0),
+	CONTROL_LPMASK      = (CONTROL_LP4 | CONTROL_LP3),
+	CONTROL_LOOPMASK    = (CONTROL_BLE | CONTROL_LPE),
+	CONTROL_STOPMASK    = (CONTROL_STOP1 | CONTROL_STOP0),
 
-static constexpr unsigned CONTROL_5505_LPMASK = (CONTROL_5505_LP4 | CONTROL_5505_LP3);
-static constexpr unsigned CONTROL_5505_CAMASK = (CONTROL_5505_CA1 | CONTROL_5505_CA0);
+	// ES5505 has sightly different control bit
+	CONTROL_5505_LP4    = 0x0800,
+	CONTROL_5505_LP3    = 0x0400,
+	CONTROL_5505_CA1    = 0x0200,
+	CONTROL_5505_CA0    = 0x0100,
+
+	CONTROL_5505_LPMASK = (CONTROL_5505_LP4 | CONTROL_5505_LP3),
+	CONTROL_5505_CAMASK = (CONTROL_5505_CA1 | CONTROL_5505_CA0)
+};
+
+}
 
 es550x_device::es550x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
