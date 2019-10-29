@@ -72,8 +72,8 @@ namespace devices
 		for (std::size_t k=0; k<iN; k++)
 		{
 			fill[k].resize(iN, decltype(m_ops.m_mat)::FILL_INFINITY);
-			terms_for_net_t * row = this->m_terms[k].get();
-			for (const auto &nz_j : row->m_nz)
+			terms_for_net_t & row = this->m_terms[k];
+			for (const auto &nz_j : row.m_nz)
 			{
 				fill[k][static_cast<mattype>(nz_j)] = 0;
 			}
@@ -87,18 +87,18 @@ namespace devices
 		for (std::size_t k=0; k<iN; k++)
 		{
 			std::size_t cnt = 0;
-			for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
+			for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
 			{
 				for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
-					if (this->m_terms[k]->m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
+					if (this->m_terms[k].m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
 					{
 						this->m_mat_ptr[k][j] = &m_ops.m_mat.A[i];
 						cnt++;
 						break;
 					}
 			}
-			nl_assert(cnt == this->m_terms[k]->m_railstart);
-			this->m_mat_ptr[k][this->m_terms[k]->m_railstart] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
+			nl_assert(cnt == this->m_terms[k].railstart());
+			this->m_mat_ptr[k][this->m_terms[k].railstart()] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
 		}
 	}
 
@@ -116,7 +116,7 @@ namespace devices
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_new_V[k] = this->m_terms[k]->getV();
+			this->m_new_V[k] = this->m_terms[k].getV();
 		}
 
 		const float_type accuracy = this->m_params.m_accuracy;

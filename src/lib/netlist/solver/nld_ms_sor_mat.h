@@ -166,7 +166,7 @@ namespace devices
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_terms[k]->getV();
+			this->m_new_V[k] = this->m_terms[k].getV();
 
 		do {
 			resched = false;
@@ -176,8 +176,8 @@ namespace devices
 			{
 				float_type Idrive = 0;
 
-				const auto *p = this->m_terms[k]->m_nz.data();
-				const std::size_t e = this->m_terms[k]->m_nz.size();
+				const auto *p = this->m_terms[k].m_nz.data();
+				const std::size_t e = this->m_terms[k].m_nz.size();
 
 				for (std::size_t i = 0; i < e; i++)
 					Idrive = Idrive + this->A(k,p[i]) * this->m_new_V[p[i]];

@@ -156,13 +156,13 @@ void matrix_solver_w_t<FT, SIZE>::LE_invert()
 	{
 		/* FIXME: Singular matrix? */
 		const float_type f = 1.0 / W(i,i);
-		const auto * const p = m_terms[i]->m_nzrd.data();
-		const size_t e = m_terms[i]->m_nzrd.size();
+		const auto * const p = m_terms[i].m_nzrd.data();
+		const size_t e = m_terms[i].m_nzrd.size();
 
 		/* Eliminate column i from row j */
 
-		const auto * const pb = m_terms[i]->m_nzbd.data();
-		const size_t eb = m_terms[i]->m_nzbd.size();
+		const auto * const pb = m_terms[i].m_nzbd.data();
+		const size_t eb = m_terms[i].m_nzbd.size();
 		for (std::size_t jb = 0; jb < eb; jb++)
 		{
 			const auto j = pb[jb];
@@ -250,7 +250,7 @@ unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphso
 		for (unsigned row = 0; row < iN; row ++)
 		{
 			unsigned cc=0;
-			auto &nz = m_terms[row]->m_nz;
+			auto &nz = m_terms[row].m_nz;
 			for (auto & col : nz)
 			{
 				if (A(row,col) != lA(row,col))

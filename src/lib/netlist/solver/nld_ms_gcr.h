@@ -90,7 +90,7 @@ namespace devices
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			fill[k].resize(iN, decltype(mat)::FILL_INFINITY);
-			for (auto &j : this->m_terms[k]->m_nz)
+			for (auto &j : this->m_terms[k].m_nz)
 			{
 				fill[k][j] = 0;
 				raw_elements++;
@@ -108,9 +108,9 @@ namespace devices
 		{
 			std::size_t cnt(0);
 			/* build pointers into the compressed row format matrix for each terminal */
-			for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
+			for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
 			{
-				int other = this->m_terms[k]->m_connected_net_idx[j];
+				int other = this->m_terms[k].m_connected_net_idx[j];
 				for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
 					if (other == static_cast<int>(mat.col_idx[i]))
 					{
@@ -119,8 +119,8 @@ namespace devices
 						break;
 					}
 			}
-			nl_assert(cnt == this->m_terms[k]->m_railstart);
-			m_mat_ptr[k][this->m_terms[k]->m_railstart] = &mat.A[mat.diag[k]];
+			nl_assert(cnt == this->m_terms[k].railstart());
+			m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
 		}
 
 		this->log().verbose("maximum fill: {1}", gr.first);
@@ -156,7 +156,7 @@ namespace devices
 
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
-			const auto &nzbd = this->m_terms[i]->m_nzbd;
+			const auto &nzbd = this->m_terms[i].m_nzbd;
 
 			if (nzbd.size() > 0)
 			{

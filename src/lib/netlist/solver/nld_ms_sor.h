@@ -84,13 +84,13 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		float_type gabs_t = 0.0;
 		float_type RHS_t = 0.0;
 
-		const std::size_t term_count = this->m_terms[k]->count();
+		const std::size_t term_count = this->m_terms[k].count();
 		const float_type * const gt = this->m_gtn[k];
 		const float_type * const go = this->m_gonn[k];
 		const float_type * const Idr = this->m_Idrn[k];
 		auto other_cur_analog = this->m_connected_net_Vn[k];
 
-		this->m_new_V[k] = this->m_terms[k]->getV();
+		this->m_new_V[k] = this->m_terms[k].getV();
 
 		for (std::size_t i = 0; i < term_count; i++)
 		{
@@ -98,7 +98,7 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 			RHS_t = RHS_t + Idr[i];
 		}
 
-		for (std::size_t i = this->m_terms[k]->m_railstart; i < term_count; i++)
+		for (std::size_t i = this->m_terms[k].railstart(); i < term_count; i++)
 			RHS_t = RHS_t  - go[i] * *other_cur_analog[i];
 
 		RHS[k] = RHS_t;
@@ -134,8 +134,8 @@ unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_rap
 		float_type err = 0;
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			const int * net_other = this->m_terms[k]->m_connected_net_idx.data();
-			const std::size_t railstart = this->m_terms[k]->m_railstart;
+			const int * net_other = this->m_terms[k].m_connected_net_idx.data();
+			const std::size_t railstart = this->m_terms[k].railstart();
 			const float_type * go = this->m_gonn[k];
 
 			float_type Idrive = 0.0;

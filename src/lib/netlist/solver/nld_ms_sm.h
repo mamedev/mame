@@ -141,13 +141,13 @@ namespace devices
 		{
 			/* FIXME: Singular matrix? */
 			const float_type f = 1.0 / W(i,i);
-			const auto * const p = m_terms[i]->m_nzrd.data();
-			const std::size_t e = m_terms[i]->m_nzrd.size();
+			const auto * const p = m_terms[i].m_nzrd.data();
+			const std::size_t e = m_terms[i].m_nzrd.size();
 
 			/* Eliminate column i from row j */
 
-			const auto * const pb = m_terms[i]->m_nzbd.data();
-			const std::size_t eb = m_terms[i]->m_nzbd.size();
+			const auto * const pb = m_terms[i].m_nzbd.data();
+			const std::size_t eb = m_terms[i].m_nzbd.size();
 			for (std::size_t jb = 0; jb < eb; jb++)
 			{
 				const unsigned j = pb[jb];
@@ -236,7 +236,7 @@ namespace devices
 			{
 				std::size_t colcount = 0;
 
-				auto &nz = m_terms[row]->m_nz;
+				auto &nz = m_terms[row].m_nz;
 				for (unsigned & col : nz)
 				{
 					v[col] = A(row,col) - lA(row,col);

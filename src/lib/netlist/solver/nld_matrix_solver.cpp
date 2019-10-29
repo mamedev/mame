@@ -16,11 +16,11 @@ namespace devices
 {
 
 	terms_for_net_t::terms_for_net_t(analog_net_t * net)
-		: m_railstart(0)
-		, m_last_V(0.0)
+		: m_last_V(0.0)
 		, m_DD_n_m_1(0.0)
 		, m_h_n_m_1(1e-12)
 		, m_net(net)
+		, m_railstart(0)
 	{
 	}
 
@@ -70,8 +70,8 @@ namespace devices
 
 		for (auto & net : nets)
 		{
-			m_terms.push_back(plib::make_unique<terms_for_net_t>(net));
-			m_rails_temp.push_back(plib::make_unique<terms_for_net_t>());
+			m_terms.emplace_back(net);
+			m_rails_temp.emplace_back();
 		}
 
 		for (std::size_t k = 0; k < nets.size(); k++)
@@ -121,7 +121,7 @@ namespace devices
 							net_proxy_output->net().add_terminal(*p);
 							// FIXME: repeated calling - kind of brute force
 							net_proxy_output->net().rebuild_list();
-							log().debug("Added input\n");
+							log().debug("Added input {1}", net_proxy_output->name());
 						}
 						break;
 					case detail::terminal_type::OUTPUT:
@@ -204,7 +204,7 @@ namespace devices
 					for (std::size_t k = 0; k < iN - 1; k++)
 						for (std::size_t i = k+1; i < iN; i++)
 						{
-							if ((static_cast<int>(m_terms[k]->m_railstart) - static_cast<int>(m_terms[i]->m_railstart)) * sort_order < 0)
+							if ((static_cast<int>(m_terms[k].railstart()) - static_cast<int>(m_terms[i].railstart())) * sort_order < 0)
 							{
 								std::swap(m_terms[i], m_terms[k]);
 							}
@@ -217,11 +217,11 @@ namespace devices
 		/* rebuild */
 		for (auto &term : m_terms)
 		{
-			int *other = term->m_connected_net_idx.data();
-			for (std::size_t i = 0; i < term->count(); i++)
+			int *other = term.m_connected_net_idx.data();
+			for (std::size_t i = 0; i < term.count(); i++)
 				//FIXME: this is weird
 				if (other[i] != -1)
-					other[i] = get_net_idx(&term->terms()[i]->connected_terminal()->net());
+					other[i] = get_net_idx(&term.terms()[i]->connected_terminal()->net());
 		}
 	}
 
@@ -231,9 +231,9 @@ namespace devices
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			m_terms[k]->m_railstart = m_terms[k]->count();
-			for (std::size_t i = 0; i < m_rails_temp[k]->count(); i++)
-				this->m_terms[k]->add_terminal(m_rails_temp[k]->terms()[i], m_rails_temp[k]->m_connected_net_idx.data()[i], false);
+			m_terms[k].set_railstart(m_terms[k].count());
+			for (std::size_t i = 0; i < m_rails_temp[k].count(); i++)
+				this->m_terms[k].add_terminal(m_rails_temp[k].terms()[i], m_rails_temp[k].m_connected_net_idx.data()[i], false);
 		}
 
 		// free all - no longer needed
@@ -246,20 +246,20 @@ namespace devices
 		/* create a list of non zero elements. */
 		for (unsigned k = 0; k < iN; k++)
 		{
-			terms_for_net_t * t = m_terms[k].get();
+			terms_for_net_t & t = m_terms[k];
 			/* pretty brutal */
-			int *other = t->m_connected_net_idx.data();
+			int *other = t.m_connected_net_idx.data();
 
-			t->m_nz.clear();
+			t.m_nz.clear();
 
-			for (std::size_t i = 0; i < t->m_railstart; i++)
-				if (!plib::container::contains(t->m_nz, static_cast<unsigned>(other[i])))
-					t->m_nz.push_back(static_cast<unsigned>(other[i]));
+			for (std::size_t i = 0; i < t.railstart(); i++)
+				if (!plib::container::contains(t.m_nz, static_cast<unsigned>(other[i])))
+					t.m_nz.push_back(static_cast<unsigned>(other[i]));
 
-			t->m_nz.push_back(k);     // add diagonal
+			t.m_nz.push_back(k);     // add diagonal
 
 			/* and sort */
-			std::sort(t->m_nz.begin(), t->m_nz.end());
+			std::sort(t.m_nz.begin(), t.m_nz.end());
 		}
 
 		/* create a list of non zero elements right of the diagonal
@@ -268,30 +268,30 @@ namespace devices
 		 */
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			terms_for_net_t * t = m_terms[k].get();
+			terms_for_net_t & t = m_terms[k];
 			/* pretty brutal */
-			int *other = t->m_connected_net_idx.data();
+			int *other = t.m_connected_net_idx.data();
 
 			if (k==0)
-				t->m_nzrd.clear();
+				t.m_nzrd.clear();
 			else
 			{
-				t->m_nzrd = m_terms[k-1]->m_nzrd;
-				for (auto j = t->m_nzrd.begin(); j != t->m_nzrd.end(); )
+				t.m_nzrd = m_terms[k-1].m_nzrd;
+				for (auto j = t.m_nzrd.begin(); j != t.m_nzrd.end(); )
 				{
 					if (*j < k + 1)
-						j = t->m_nzrd.erase(j);
+						j = t.m_nzrd.erase(j);
 					else
 						++j;
 				}
 			}
 
-			for (std::size_t i = 0; i < t->m_railstart; i++)
-				if (!plib::container::contains(t->m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
-					t->m_nzrd.push_back(static_cast<unsigned>(other[i]));
+			for (std::size_t i = 0; i < t.railstart(); i++)
+				if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
+					t.m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
 			/* and sort */
-			std::sort(t->m_nzrd.begin(), t->m_nzrd.end());
+			std::sort(t.m_nzrd.begin(), t.m_nzrd.end());
 		}
 
 		/* create a list of non zero elements below diagonal k
@@ -304,8 +304,8 @@ namespace devices
 		{
 			for (std::size_t j = 0; j < iN; j++)
 				touched[k][j] = false;
-			for (std::size_t j = 0; j < m_terms[k]->m_nz.size(); j++)
-				touched[k][m_terms[k]->m_nz[j]] = true;
+			for (std::size_t j = 0; j < m_terms[k].m_nz.size(); j++)
+				touched[k][m_terms[k].m_nz[j]] = true;
 		}
 
 		m_ops = 0;
@@ -317,8 +317,8 @@ namespace devices
 				if (touched[row][k])
 				{
 					m_ops++;
-					if (!plib::container::contains(m_terms[k]->m_nzbd, row))
-						m_terms[k]->m_nzbd.push_back(row);
+					if (!plib::container::contains(m_terms[k].m_nzbd, row))
+						m_terms[k].m_nzbd.push_back(row);
 					for (std::size_t col = k + 1; col < iN; col++)
 						if (touched[k][col])
 						{
@@ -334,7 +334,7 @@ namespace devices
 			for (std::size_t k = 0; k < iN; k++)
 			{
 				pstring line = plib::pfmt("{1:3}")(k);
-				for (const auto & nzrd : m_terms[k]->m_nzrd)
+				for (const auto & nzrd : m_terms[k].m_nzrd)
 					line += plib::pfmt(" {1:3}")(nzrd);
 				log().verbose("{1}", line);
 			}
@@ -346,14 +346,14 @@ namespace devices
 		{
 			pstring num = plib::pfmt("{1}")(k);
 
-			state().save(*this, m_terms[k]->m_last_V, this->name(), "lastV." + num);
-			state().save(*this, m_terms[k]->m_DD_n_m_1, this->name(), "m_DD_n_m_1." + num);
-			state().save(*this, m_terms[k]->m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
+			state().save(*this, m_terms[k].m_last_V, this->name(), "lastV." + num);
+			state().save(*this, m_terms[k].m_DD_n_m_1, this->name(), "m_DD_n_m_1." + num);
+			state().save(*this, m_terms[k].m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
 
 			// FIXME: This shouldn't be necessary, recalculate on each entry ...
-			state().save(*this, m_gonn[k],"GO" + num, this->name(), m_terms[k]->count());
-			state().save(*this, m_gtn[k],"GT" + num, this->name(), m_terms[k]->count());
-			state().save(*this, m_Idrn[k],"IDR" + num, this->name(), m_terms[k]->count());
+			state().save(*this, m_gonn[k],"GO" + num, this->name(), m_terms[k].count());
+			state().save(*this, m_gtn[k],"GT" + num, this->name(), m_terms[k].count());
+			state().save(*this, m_Idrn[k],"IDR" + num, this->name(), m_terms[k].count());
 		}
 	}
 
@@ -460,10 +460,10 @@ namespace devices
 		return next_time_step;
 	}
 
-	int matrix_solver_t::get_net_idx(const analog_net_t *net) const
+	int matrix_solver_t::get_net_idx(const analog_net_t *net) const noexcept
 	{
 		for (std::size_t k = 0; k < m_terms.size(); k++)
-			if (m_terms[k]->isNet(net))
+			if (m_terms[k].isNet(net))
 				return static_cast<int>(k);
 		return -1;
 	}
@@ -483,9 +483,9 @@ namespace devices
 
 		auto &term = m_terms[irow];
 
-		for (std::size_t i = 0; i < term->count(); i++)
+		for (std::size_t i = 0; i < term.count(); i++)
 		{
-			auto col = get_net_idx(&term->terms()[i]->connected_terminal()->net());
+			auto col = get_net_idx(&term.terms()[i]->connected_terminal()->net());
 			if (col != -1)
 			{
 				if (col==row) col = diag;
@@ -511,9 +511,9 @@ namespace devices
 
 			double weight = 0.0;
 			auto &term = m_terms[row];
-			for (std::size_t i = 0; i < term->count(); i++)
+			for (std::size_t i = 0; i < term.count(); i++)
 			{
-				auto col = get_net_idx(&term->terms()[i]->connected_terminal()->net());
+				auto col = get_net_idx(&term.terms()[i]->connected_terminal()->net());
 				if (col >= 0)
 				{
 					auto colu = static_cast<std::size_t>(col);
@@ -527,7 +527,7 @@ namespace devices
 					}
 				}
 			}
-			return weight; // / static_cast<double>(term->m_railstart);
+			return weight; // / static_cast<double>(term.railstart());
 		}
 	}
 
@@ -535,19 +535,19 @@ namespace devices
 	{
 		if (term->connected_terminal()->net().isRailNet())
 		{
-			m_rails_temp[k]->add_terminal(term, -1, false);
+			m_rails_temp[k].add_terminal(term, -1, false);
 		}
 		else
 		{
 			int ot = get_net_idx(&term->connected_terminal()->net());
 			if (ot>=0)
 			{
-				m_terms[k]->add_terminal(term, ot, true);
+				m_terms[k].add_terminal(term, ot, true);
 			}
 			/* Should this be allowed ? */
 			else // if (ot<0)
 			{
-				m_rails_temp[k]->add_terminal(term, ot, true);
+				m_rails_temp[k].add_terminal(term, ot, true);
 				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
@@ -563,15 +563,15 @@ namespace devices
 			{
 				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
-				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t->getV() - t->m_last_V)));
+				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t.getV() - t.m_last_V)));
 				const nl_double hn = cur_ts;
 
-				//printf("%g %g %g %g\n", DD_n, hn, t->m_DD_n_m_1, t->m_h_n_m_1);
-				nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
+				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
+				nl_double DD2 = (DD_n / hn - t.m_DD_n_m_1 / t.m_h_n_m_1) / (hn + t.m_h_n_m_1);
 				nl_double new_net_timestep(0);
 
-				t->m_h_n_m_1 = hn;
-				t->m_DD_n_m_1 = DD_n;
+				t.m_h_n_m_1 = hn;
+				t.m_DD_n_m_1 = DD_n;
 				if (std::fabs(DD2) > plib::constants<nl_double>::cast(1e-60)) // avoid div-by-zero
 					new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_double>::cast(0.5)*DD2));
 				else
@@ -580,7 +580,7 @@ namespace devices
 				if (new_net_timestep < new_solver_timestep)
 					new_solver_timestep = new_net_timestep;
 
-				t->m_last_V = t->getV();
+				t.m_last_V = t.getV();
 			}
 			if (new_solver_timestep < m_params.m_min_timestep)
 			{

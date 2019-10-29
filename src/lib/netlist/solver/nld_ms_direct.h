@@ -73,10 +73,10 @@ namespace devices
 		/* add RHS element */
 		for (std::size_t k = 0; k < size(); k++)
 		{
-			terms_for_net_t * t = m_terms[k].get();
+			terms_for_net_t & t = m_terms[k];
 
-			if (!plib::container::contains(t->m_nzrd, static_cast<unsigned>(size())))
-				t->m_nzrd.push_back(static_cast<unsigned>(size()));
+			if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(size())))
+				t.m_nzrd.push_back(static_cast<unsigned>(size()));
 		}
 
 		// FIXME: This shouldn't be necessary ...
@@ -94,8 +94,8 @@ namespace devices
 			{
 				/* FIXME: Singular matrix? */
 				const FT f = 1.0 / A(i,i);
-				const auto &nzrd = m_terms[i]->m_nzrd;
-				const auto &nzbd = m_terms[i]->m_nzbd;
+				const auto &nzrd = m_terms[i].m_nzrd;
+				const auto &nzbd = m_terms[i].m_nzbd;
 
 				for (auto j : nzbd)
 				{
@@ -178,7 +178,7 @@ namespace devices
 			for (std::size_t j = kN; j-- > 0; )
 			{
 				FT tmp = 0;
-				const auto &nzrd = m_terms[j]->m_nzrd;
+				const auto &nzrd = m_terms[j].m_nzrd;
 				const auto e = nzrd.size() - 1; /* exclude RHS element */
 				for ( std::size_t k = 0; k < e; k++)
 					tmp += A(j, nzrd[k]) * x[nzrd[k]];
