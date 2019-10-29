@@ -102,8 +102,8 @@ void msbc1_state::msbc1(machine_config &config)
 	M68000(config, m_maincpu, 12.5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::msbc1_mem);
 
-	MK68564(config, "sio1", 3.6864_MHz_XTAL);
-	MK68564(config, "sio2", 3.6864_MHz_XTAL);
+	MK68564(config, "sio1", 8_MHz_XTAL / 2).set_xtal(3.6864_MHz_XTAL);
+	MK68564(config, "sio2", 8_MHz_XTAL / 2).set_xtal(3.6864_MHz_XTAL);
 }
 
 /* ROM definition */

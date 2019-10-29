@@ -55,9 +55,9 @@
                            D5  3|             |46 D4
                            D7  4|             |45 D6
                         _INTR  5|             |44 R/_W
-                          IEO  6|             |43 _IACK
-                          IEI  7|             |42 _DTACK
-                          _M1  8|             |41 _CS
+                          CLK  6|             |43 _IACK
+                        XTAL1  7|             |42 _DTACK
+                        XTAL2  8|             |41 _CS
                        _RESET  9|             |40 _RxRDYB
                       _RxRDYA 10|             |39 _TxRDYB
                       _TxRDYA 11|  DIP48      |38 GND
@@ -365,9 +365,14 @@ private:
 	uint8_t brgctl_r();
 	void brgctl_w(uint8_t data);
 
+	void brg_update();
+	TIMER_CALLBACK_MEMBER(brg_timeout);
+
 	bool m_tx_auto_enable;
 	uint8_t m_brg_tc;
 	uint8_t m_brg_control;
+	bool m_brg_state;
+	emu_timer *m_brg_timer;
 };
 
 
@@ -514,6 +519,9 @@ class mk68564_device : public i8274_new_device
 {
 public:
 	mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_xtal(uint32_t clock);
+	void set_xtal(const XTAL &clock) { set_xtal(clock.value()); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

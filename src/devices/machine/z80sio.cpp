@@ -78,6 +78,7 @@
 #define LOG_SYNC    (1U <<  9)
 #define LOG_BIT     (1U <<  10)
 #define LOG_RTS     (1U <<  11)
+#define LOG_BRG     (1U <<  12)
 
 //#define VERBOSE  (LOG_CMD | LOG_SETUP | LOG_SYNC | LOG_BIT | LOG_TX )
 //#define LOG_OUTPUT_STREAM std::cout
@@ -95,6 +96,7 @@
 #define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
 #define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
 #define LOGBIT(...)   LOGMASKED(LOG_BIT,     __VA_ARGS__)
+#define LOGBRG(...)   LOGMASKED(LOG_BRG,     __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -979,6 +981,8 @@ mk68564_channel::mk68564_channel(const machine_config &mconfig, const char *tag,
 	, m_tx_auto_enable(false)
 	, m_brg_tc(0)
 	, m_brg_control(0)
+	, m_brg_state(false)
+	, m_brg_timer(nullptr)
 {
 }
 
@@ -1055,9 +1059,12 @@ void mk68564_channel::device_start()
 {
 	z80sio_channel::device_start();
 
+	m_brg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mk68564_channel::brg_timeout), this));
+
 	save_item(NAME(m_tx_auto_enable));
 	save_item(NAME(m_brg_tc));
 	save_item(NAME(m_brg_control));
+	save_item(NAME(m_brg_state));
 }
 
 
@@ -1117,6 +1124,8 @@ void mk68564_channel::device_reset()
 	m_tx_auto_enable = false;
 	m_brg_tc = 0;
 	m_brg_control = 0;
+	m_brg_state = false;
+	m_brg_timer->adjust(attotime::never);
 }
 
 bool z80sio_channel::is_tx_idle() const
@@ -2758,7 +2767,6 @@ uint8_t mk68564_channel::tcreg_r()
 //-------------------------------------------------
 void mk68564_channel::tcreg_w(uint8_t data)
 {
-	logerror("Time constant = %d\n", data);
 	m_brg_tc = data;
 }
 
@@ -2769,7 +2777,8 @@ void mk68564_channel::tcreg_w(uint8_t data)
 //-------------------------------------------------
 uint8_t mk68564_channel::brgctl_r()
 {
-	return m_brg_control;
+	// unused bits are all zero
+	return m_brg_control & 0x0f;
 }
 
 
@@ -2779,15 +2788,20 @@ uint8_t mk68564_channel::brgctl_r()
 //-------------------------------------------------
 void mk68564_channel::brgctl_w(uint8_t data)
 {
-	// TODO: actually emulate this
-	logerror("BRG %sabled, divide by %d, RxC %sternal, TxC %sternal\n",
-		BIT(data, 0) ? "en" : "dis",
-		BIT(data, 1) ? 64 : 4,
-		BIT(data, 2) ? "in" : "ex",
-		BIT(data, 3) ? "in" : "ex");
+	if (BIT(data, 0))
+		LOGBRG("%s: BRG enabled, divide by %d, RxC %sternal, TxC %sternal (TC = %d, %.1f Hz)\n",
+			machine().describe_context(),
+			BIT(data, 1) ? 64 : 4,
+			BIT(data, 2) ? "in" : "ex",
+			BIT(data, 3) ? "in" : "ex",
+			m_brg_tc,
+			clocks_to_attotime((m_brg_tc ? m_brg_tc : 256) * (BIT(data, 1) ? 64 : 4)).as_hz());
+	else
+		LOGBRG("%s: BRG disabled\n", machine().describe_context());
 
-	// unused bits are always zero
 	m_brg_control = data & 0x0f;
+	m_brg_state = false;
+	brg_update();
 }
 
 
@@ -2909,7 +2923,37 @@ void mk68564_device::write(offs_t offset, uint8_t data)
 		break;
 
 	default:
-		LOG("Write %02X to unused/read-only register %02X\n", data, offset & 0x1f);
+		logerror("Write %02X to unused/read-only register %02X\n", data, offset & 0x1f);
 		break;
 	}
+}
+
+//**************************************************************************
+//  MK68564 BAUD RATE GENERATOR
+//**************************************************************************
+
+void mk68564_device::set_xtal(uint32_t clock)
+{
+	assert(!configured());
+	subdevice<mk68564_channel>(CHANA_TAG)->set_clock(clock);
+	subdevice<mk68564_channel>(CHANB_TAG)->set_clock(clock);
+}
+
+void mk68564_channel::brg_update()
+{
+	if (BIT(m_brg_control, 2))
+		rxc_w(m_brg_state);
+	if (BIT(m_brg_control, 3))
+		txc_w(m_brg_state);
+
+	if (BIT(m_brg_control, 0))
+		m_brg_timer->adjust(clocks_to_attotime((m_brg_tc ? m_brg_tc : 256) * (BIT(m_brg_control, 1) ? 32 : 2)));
+	else
+		m_brg_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(mk68564_channel::brg_timeout)
+{
+	m_brg_state = !m_brg_state;
+	brg_update();
 }
