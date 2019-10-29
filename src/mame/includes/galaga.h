@@ -13,6 +13,49 @@
 #include "screen.h"
 #include "tilemap.h"
 
+
+#define LFSR_CYCLES_PER_LINE 		256
+#define VISIBLE_LINES			224
+#define STARFIELD_X_OFFSET_GALAGA	16
+#define STARFIELD_Y_OFFSET_BOSCO	16
+#define STARFIELD_PIXEL_WIDTH		256
+
+#define LFSR_HIT_MASK		0xFA14
+#define LFSR_HIT_VALUE		0x7800
+#define LFSR_SEED		0x7FFF
+
+
+static const int speed_X_cycle_count_offset[] =
+{
+	0,  1,  2,  3, -4, -3, -2, -1 
+};
+
+static const int pre_vis_cycle_count_values[] = 
+{
+	22 * LFSR_CYCLES_PER_LINE, 
+	23 * LFSR_CYCLES_PER_LINE, 
+	22 * LFSR_CYCLES_PER_LINE, 
+	23 * LFSR_CYCLES_PER_LINE, 
+	19 * LFSR_CYCLES_PER_LINE, 
+	20 * LFSR_CYCLES_PER_LINE, 
+	20 * LFSR_CYCLES_PER_LINE, 
+	22 * LFSR_CYCLES_PER_LINE
+};
+
+static const int post_vis_cycle_count_values[] = 
+{
+	10 * LFSR_CYCLES_PER_LINE, 
+	10 * LFSR_CYCLES_PER_LINE, 
+	12 * LFSR_CYCLES_PER_LINE, 
+	12 * LFSR_CYCLES_PER_LINE, 
+	9  * LFSR_CYCLES_PER_LINE, 
+	9  * LFSR_CYCLES_PER_LINE, 
+	10 * LFSR_CYCLES_PER_LINE, 
+	9  * LFSR_CYCLES_PER_LINE
+};
+
+
+
 class galaga_state : public driver_device
 {
 public:
@@ -55,6 +98,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	uint16_t get_next_lfsr_state(uint16_t lfsr);
 	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void galaga(machine_config &config);
 	void gatsbee(machine_config &config);
@@ -63,8 +107,6 @@ public:
 	void galaga_map(address_map &map);
 	void galaga_mem4(address_map &map);
 	void gatsbee_main_map(address_map &map);
-
-	void starfield_init();
 
 protected:
 	virtual void machine_start() override;
@@ -86,11 +128,16 @@ protected:
 	output_finder<2> m_leds;
 	emu_timer *m_cpu3_interrupt_timer;
 
-	/* machine state */
-	uint32_t m_stars_scrollx;
-	uint32_t m_stars_scrolly;
+	// Current LFSR state
+	uint16_t m_lfsr;
+
+	// Current scroll indexes
+	uint8_t m_stars_scroll_index_x;
+	uint8_t m_stars_scroll_index_y;
 
 	uint32_t m_galaga_gfxbank; // used by catsbee
+
+	uint8_t m_bosco_starclr; // used by bosco
 
 	/* devices */
 
@@ -103,15 +150,6 @@ protected:
 	uint8_t m_main_irq_mask;
 	uint8_t m_sub_irq_mask;
 	uint8_t m_sub2_nmi_mask;
-
-	struct star
-	{
-		uint16_t x,y;
-		uint8_t col,set;
-	};
-
-	static star const s_star_seed_tab[];
-
 };
 
 DISCRETE_SOUND_EXTERN( galaga_discrete );

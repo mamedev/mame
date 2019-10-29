@@ -13,9 +13,11 @@
 #include "includes/bosco.h"
 
 
-#define MAX_STARS 252
 #define STARS_COLOR_BASE (64*4+64*4+4)
 #define VIDEO_RAM_SIZE 0x400
+
+#define LFSR_SEED 0x7FFF
+
 
 void bosco_state::bosco_palette(palette_device &palette) const
 {
@@ -132,8 +134,16 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 	m_bosco_radarx = m_videoram + 0x03f0;
 	m_bosco_radary = m_bosco_radarx + 0x0800;
 
-	save_item(NAME(m_stars_scrollx));
-	save_item(NAME(m_stars_scrolly));
+	m_lfsr = LFSR_SEED;
+	m_stars_scroll_index_x = 0;
+	m_stars_scroll_index_y = 0;
+	m_bosco_starclr = 1;
+
+	save_item(NAME(m_lfsr));
+	save_item(NAME(m_stars_scroll_index_x));
+	save_item(NAME(m_stars_scroll_index_y));
+	save_item(NAME(m_bosco_starclr));
+
 }
 
 
@@ -165,6 +175,7 @@ WRITE8_MEMBER( bosco_state::bosco_scrolly_w )
 
 WRITE8_MEMBER( bosco_state::bosco_starclr_w )
 {
+	m_bosco_starclr = data;
 }
 
 
@@ -227,34 +238,73 @@ void bosco_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
-	if (1)
+	int set_a,set_b;  // star sets
+
+	uint32_t pre_vis_cycle_count = pre_vis_cycle_count_values[m_stars_scroll_index_y];
+	uint32_t post_vis_cycle_count = post_vis_cycle_count_values[m_stars_scroll_index_y];
+
+	// X scrolling adjustment occurs during pre-visible portion
+	pre_vis_cycle_count += speed_X_cycle_count_offset[m_stars_scroll_index_x];
+
+	/* two sets of stars controlled by these bits */
+	set_a = m_videolatch->q4_r();
+	set_b = m_videolatch->q5_r() | 2;
+
+	/* $9840 controls the stars ON/OFF */
+	if (!m_bosco_starclr)
 	{
-		int star_cntr;
-		int set_a, set_b;
+		int x,y;
 
-		/* two sets of stars controlled by these bits */
-		set_a = m_videolatch->q4_r();
-		set_b = m_videolatch->q5_r() | 2;
+		// Advance the LFSR during the pre-visible portion of the frame
+		do { m_lfsr = get_next_lfsr_state(m_lfsr); } while (--pre_vis_cycle_count);
 
-		for (star_cntr = 0;star_cntr < MAX_STARS;star_cntr++)
+		// Now we are in visible portion of the frame - Output all LFSR hits here
+		for (y=STARFIELD_Y_OFFSET_BOSCO;y<VISIBLE_LINES+STARFIELD_Y_OFFSET_BOSCO;y++)
 		{
-			int x,y;
-
-			if ((set_a == s_star_seed_tab[star_cntr].set) || (set_b == s_star_seed_tab[star_cntr].set))
+			// The starfield sits between X pos 0...255
+			for (x=0;x<STARFIELD_PIXEL_WIDTH;x++)
 			{
-				x = (s_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
-				y = (s_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
-
-				/* don't draw the stars that are off the screen */
-				if (x < 224)
+				// Check lfsr for hit
+				if ((m_lfsr&LFSR_HIT_MASK) == LFSR_HIT_VALUE)
 				{
-					if (flip) x += 64;
+					int star_set = ((m_lfsr>>9)&0x2) | ((m_lfsr>>8)&0x1);
 
-					if (cliprect.contains(x, y))
-						bitmap.pix16(y, x) = STARS_COLOR_BASE + s_star_seed_tab[star_cntr].col;
+					if ((set_a == star_set) || (set_b == star_set))
+					{
+						// don't draw the stars that are off the screen
+						if (x < 224)
+						{
+							int dx = x;
+
+							if (flip) dx += 64;
+
+							if (cliprect.contains(dx, y))
+							{
+								uint8_t color;
+
+								color  = (m_lfsr>>5)&0x7;
+								color |= (m_lfsr<<3)&0x18;
+								color |= (m_lfsr<<2)&0x20;
+								color = (~color)&0x3F;
+
+								bitmap.pix16(y, dx) = STARS_COLOR_BASE + color;
+							}
+						}
+					}
 				}
+
+				// Advance LFSR
+				m_lfsr = get_next_lfsr_state(m_lfsr);
 			}
 		}
+
+		// Advance the LFSR during the post-visible portion of the frame
+		do { m_lfsr = get_next_lfsr_state(m_lfsr); } while (--post_vis_cycle_count);
+	}
+	else
+	{
+		// _STARCLR is high - reset the lfsr
+		m_lfsr = LFSR_SEED;
 	}
 }
 
@@ -300,10 +350,7 @@ WRITE_LINE_MEMBER(bosco_state::screen_vblank_bosco)
 	// falling edge
 	if (!state)
 	{
-		static const int speedsx[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
-		static const int speedsy[8] = { 0, -1, -2, -3, 0, 3, 2, 1 };
-
-		m_stars_scrollx += speedsx[m_bosco_starcontrol[0] & 0x07];
-		m_stars_scrolly += speedsy[(m_bosco_starcontrol[0] & 0x38) >> 3];
+		m_stars_scroll_index_x = m_bosco_starcontrol[0] & 0x07;
+		m_stars_scroll_index_y = (m_bosco_starcontrol[0] & 0x38) >> 3;
 	}
 }

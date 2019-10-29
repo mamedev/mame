@@ -8,6 +8,8 @@
 
 ***************************************************************************/
 
+#include <stdlib.h>
+
 #include "emu.h"
 #include "includes/galaga.h"
 
@@ -18,292 +20,7 @@
 
 #include "logmacro.h"
 
-#define MAX_STARS 252
 #define STARS_COLOR_BASE (64*4+64*4)
-
-/*
-Galaga star line and pixel locations pulled directly from
-a clocked stepping of the 05 starfield. The chip was clocked
-on a test rig with hblank and vblank simulated, each X & Y
-location of a star being recorded along with it's color value.
-
-Because the starfield begins generating stars at the point
-in time it's enabled the exact horiz location of the stars
-on Galaga depends on the length of time of the POST for the
-original board.
-
-Two control bits determine which of two sets are displayed
-set 0 or 1 and simultaneously 2 or 3.
-
-There are 63 stars in each set, 126 displayed at any one time
-
-*/
-
-galaga_state::star const galaga_state::s_star_seed_tab[252]=
-{
-	// also shared by Bosconian
-
-	// star set 0
-	{0x0085, 0x0006, 0x35, 0x00},
-	{0x008f, 0x0008, 0x30, 0x00},
-	{0x00e5, 0x001b, 0x07, 0x00},
-	{0x0022, 0x001c, 0x31, 0x00},
-	{0x00e5, 0x0025, 0x1d, 0x00},
-	{0x0015, 0x0026, 0x29, 0x00},
-	{0x0080, 0x002d, 0x3b, 0x00},
-	{0x0097, 0x002e, 0x1c, 0x00},
-	{0x00ba, 0x003b, 0x05, 0x00},
-	{0x0036, 0x003d, 0x36, 0x00},
-	{0x0057, 0x0044, 0x09, 0x00},
-	{0x00cf, 0x0044, 0x3d, 0x00},
-	{0x0061, 0x004e, 0x27, 0x00},
-	{0x0087, 0x0064, 0x1a, 0x00},
-	{0x00d6, 0x0064, 0x17, 0x00},
-	{0x000b, 0x006c, 0x3c, 0x00},
-	{0x0006, 0x006d, 0x24, 0x00},
-	{0x0018, 0x006e, 0x3a, 0x00},
-	{0x00a9, 0x0079, 0x23, 0x00},
-	{0x008a, 0x007b, 0x11, 0x00},
-	{0x00d6, 0x0080, 0x0c, 0x00},
-	{0x0067, 0x0082, 0x3f, 0x00},
-	{0x0039, 0x0083, 0x38, 0x00},
-	{0x0072, 0x0083, 0x14, 0x00},
-	{0x00ec, 0x0084, 0x16, 0x00},
-	{0x008e, 0x0085, 0x10, 0x00},
-	{0x0020, 0x0088, 0x25, 0x00},
-	{0x0095, 0x008a, 0x0f, 0x00},
-	{0x000e, 0x008d, 0x00, 0x00},
-	{0x0006, 0x0091, 0x2e, 0x00},
-	{0x0007, 0x0094, 0x0d, 0x00},
-	{0x00ae, 0x0097, 0x0b, 0x00},
-	{0x0000, 0x0098, 0x2d, 0x00},
-	{0x0086, 0x009b, 0x01, 0x00},
-	{0x0058, 0x00a1, 0x34, 0x00},
-	{0x00fe, 0x00a1, 0x3e, 0x00},
-	{0x00a2, 0x00a8, 0x1f, 0x00},
-	{0x0041, 0x00aa, 0x0a, 0x00},
-	{0x003f, 0x00ac, 0x32, 0x00},
-	{0x00de, 0x00ac, 0x03, 0x00},
-	{0x00d4, 0x00b9, 0x26, 0x00},
-	{0x006d, 0x00bb, 0x1b, 0x00},
-	{0x0062, 0x00bd, 0x39, 0x00},
-	{0x00c9, 0x00be, 0x18, 0x00},
-	{0x006c, 0x00c1, 0x04, 0x00},
-	{0x0059, 0x00c3, 0x21, 0x00},
-	{0x0060, 0x00cc, 0x0e, 0x00},
-	{0x0091, 0x00cc, 0x12, 0x00},
-	{0x003f, 0x00cf, 0x06, 0x00},
-	{0x00f7, 0x00cf, 0x22, 0x00},
-	{0x0044, 0x00d0, 0x33, 0x00},
-	{0x0034, 0x00d2, 0x08, 0x00},
-	{0x00d3, 0x00d9, 0x20, 0x00},
-	{0x0071, 0x00dd, 0x37, 0x00},
-	{0x0073, 0x00e1, 0x2c, 0x00},
-	{0x00b9, 0x00e3, 0x2f, 0x00},
-	{0x00a9, 0x00e4, 0x13, 0x00},
-	{0x00d3, 0x00e7, 0x19, 0x00},
-	{0x0037, 0x00ed, 0x02, 0x00},
-	{0x00bd, 0x00f4, 0x15, 0x00},
-	{0x000f, 0x00f6, 0x28, 0x00},
-	{0x004f, 0x00f7, 0x2b, 0x00},
-	{0x00fb, 0x00ff, 0x2a, 0x00},
-
-	// star set 1
-	{0x00fe, 0x0004, 0x3d, 0x01},
-	{0x00c4, 0x0006, 0x10, 0x01},
-	{0x001e, 0x0007, 0x2d, 0x01},
-	{0x0083, 0x000b, 0x1f, 0x01},
-	{0x002e, 0x000d, 0x3c, 0x01},
-	{0x001f, 0x000e, 0x00, 0x01},
-	{0x00d8, 0x000e, 0x2c, 0x01},
-	{0x0003, 0x000f, 0x17, 0x01},
-	{0x0095, 0x0011, 0x3f, 0x01},
-	{0x006a, 0x0017, 0x35, 0x01},
-	{0x00cc, 0x0017, 0x02, 0x01},
-	{0x0000, 0x0018, 0x32, 0x01},
-	{0x0092, 0x001d, 0x36, 0x01},
-	{0x00e3, 0x0021, 0x04, 0x01},
-	{0x002f, 0x002d, 0x37, 0x01},
-	{0x00f0, 0x002f, 0x0c, 0x01},
-	{0x009b, 0x003e, 0x06, 0x01},
-	{0x00a4, 0x004c, 0x07, 0x01},
-	{0x00ea, 0x004d, 0x13, 0x01},
-	{0x0084, 0x004e, 0x21, 0x01},
-	{0x0033, 0x0052, 0x0f, 0x01},
-	{0x0070, 0x0053, 0x0e, 0x01},
-	{0x0006, 0x0059, 0x08, 0x01},
-	{0x0081, 0x0060, 0x28, 0x01},
-	{0x0037, 0x0061, 0x29, 0x01},
-	{0x008f, 0x0067, 0x2f, 0x01},
-	{0x001b, 0x006a, 0x1d, 0x01},
-	{0x00bf, 0x007c, 0x12, 0x01},
-	{0x0051, 0x007f, 0x31, 0x01},
-	{0x0061, 0x0086, 0x25, 0x01},
-	{0x006a, 0x008f, 0x0d, 0x01},
-	{0x006a, 0x0091, 0x19, 0x01},
-	{0x0090, 0x0092, 0x05, 0x01},
-	{0x003b, 0x0096, 0x24, 0x01},
-	{0x008c, 0x0097, 0x0a, 0x01},
-	{0x0006, 0x0099, 0x03, 0x01},
-	{0x0038, 0x0099, 0x38, 0x01},
-	{0x00a8, 0x0099, 0x18, 0x01},
-	{0x0076, 0x00a6, 0x20, 0x01},
-	{0x00ad, 0x00a6, 0x1c, 0x01},
-	{0x00ec, 0x00a6, 0x1e, 0x01},
-	{0x0086, 0x00ac, 0x15, 0x01},
-	{0x0078, 0x00af, 0x3e, 0x01},
-	{0x007b, 0x00b3, 0x09, 0x01},
-	{0x0027, 0x00b8, 0x39, 0x01},
-	{0x0088, 0x00c2, 0x23, 0x01},
-	{0x0044, 0x00c3, 0x3a, 0x01},
-	{0x00cf, 0x00c5, 0x34, 0x01},
-	{0x0035, 0x00c9, 0x30, 0x01},
-	{0x006e, 0x00d1, 0x3b, 0x01},
-	{0x00d6, 0x00d7, 0x16, 0x01},
-	{0x003a, 0x00d9, 0x2b, 0x01},
-	{0x00ab, 0x00e0, 0x11, 0x01},
-	{0x00e0, 0x00e2, 0x1b, 0x01},
-	{0x006f, 0x00e6, 0x0b, 0x01},
-	{0x00b8, 0x00e8, 0x14, 0x01},
-	{0x00d9, 0x00e8, 0x1a, 0x01},
-	{0x00f9, 0x00e8, 0x22, 0x01},
-	{0x0004, 0x00f1, 0x2e, 0x01},
-	{0x0049, 0x00f8, 0x26, 0x01},
-	{0x0010, 0x00f9, 0x01, 0x01},
-	{0x0039, 0x00fb, 0x33, 0x01},
-	{0x0028, 0x00fc, 0x27, 0x01},
-
-	// star set 2
-	{0x00fa, 0x0006, 0x19, 0x02},
-	{0x00e4, 0x0007, 0x2d, 0x02},
-	{0x0072, 0x000a, 0x03, 0x02},
-	{0x0084, 0x001b, 0x00, 0x02},
-	{0x00ba, 0x001d, 0x29, 0x02},
-	{0x00e3, 0x0022, 0x04, 0x02},
-	{0x00d1, 0x0026, 0x2a, 0x02},
-	{0x0089, 0x0032, 0x30, 0x02},
-	{0x005b, 0x0036, 0x27, 0x02},
-	{0x0084, 0x003a, 0x36, 0x02},
-	{0x0053, 0x003f, 0x0d, 0x02},
-	{0x0008, 0x0040, 0x1d, 0x02},
-	{0x0055, 0x0040, 0x1a, 0x02},
-	{0x00aa, 0x0041, 0x31, 0x02},
-	{0x00fb, 0x0041, 0x2b, 0x02},
-	{0x00bc, 0x0046, 0x16, 0x02},
-	{0x0093, 0x0052, 0x39, 0x02},
-	{0x00b9, 0x0057, 0x10, 0x02},
-	{0x0054, 0x0059, 0x28, 0x02},
-	{0x00e6, 0x005a, 0x01, 0x02},
-	{0x00a7, 0x005d, 0x1b, 0x02},
-	{0x002d, 0x005e, 0x35, 0x02},
-	{0x0014, 0x0062, 0x21, 0x02},
-	{0x0069, 0x006d, 0x1f, 0x02},
-	{0x00ce, 0x006f, 0x0b, 0x02},
-	{0x00df, 0x0075, 0x2f, 0x02},
-	{0x00cb, 0x0077, 0x12, 0x02},
-	{0x004e, 0x007c, 0x23, 0x02},
-	{0x004a, 0x0084, 0x0f, 0x02},
-	{0x0012, 0x0086, 0x25, 0x02},
-	{0x0068, 0x008c, 0x32, 0x02},
-	{0x0003, 0x0095, 0x20, 0x02},
-	{0x000a, 0x009c, 0x17, 0x02},
-	{0x005b, 0x00a3, 0x08, 0x02},
-	{0x005f, 0x00a4, 0x3e, 0x02},
-	{0x0072, 0x00a4, 0x2e, 0x02},
-	{0x00cc, 0x00a6, 0x06, 0x02},
-	{0x008a, 0x00ab, 0x0c, 0x02},
-	{0x00e0, 0x00ad, 0x26, 0x02},
-	{0x00f3, 0x00af, 0x0a, 0x02},
-	{0x0075, 0x00b4, 0x13, 0x02},
-	{0x0068, 0x00b7, 0x11, 0x02},
-	{0x006d, 0x00c2, 0x2c, 0x02},
-	{0x0076, 0x00c3, 0x14, 0x02},
-	{0x00cf, 0x00c4, 0x1e, 0x02},
-	{0x0004, 0x00c5, 0x1c, 0x02},
-	{0x0013, 0x00c6, 0x3f, 0x02},
-	{0x00b9, 0x00c7, 0x3c, 0x02},
-	{0x0005, 0x00d7, 0x34, 0x02},
-	{0x0095, 0x00d7, 0x3a, 0x02},
-	{0x00fc, 0x00d8, 0x02, 0x02},
-	{0x00e7, 0x00dc, 0x09, 0x02},
-	{0x001d, 0x00e1, 0x05, 0x02},
-	{0x0005, 0x00e6, 0x33, 0x02},
-	{0x001c, 0x00e9, 0x3b, 0x02},
-	{0x00a2, 0x00ed, 0x37, 0x02},
-	{0x0028, 0x00ee, 0x07, 0x02},
-	{0x00dd, 0x00ef, 0x18, 0x02},
-	{0x006d, 0x00f0, 0x38, 0x02},
-	{0x00a1, 0x00f2, 0x0e, 0x02},
-	{0x0074, 0x00f7, 0x3d, 0x02},
-	{0x0069, 0x00f9, 0x22, 0x02},
-	{0x003f, 0x00ff, 0x24, 0x02},
-
-	// star set 3
-	{0x0071, 0x0010, 0x34, 0x03},
-	{0x00af, 0x0011, 0x23, 0x03},
-	{0x00a0, 0x0014, 0x26, 0x03},
-	{0x0002, 0x0017, 0x02, 0x03},
-	{0x004b, 0x0019, 0x31, 0x03},
-	{0x0093, 0x001c, 0x0e, 0x03},
-	{0x001b, 0x001e, 0x25, 0x03},
-	{0x0032, 0x0020, 0x2e, 0x03},
-	{0x00ee, 0x0020, 0x3a, 0x03},
-	{0x0079, 0x0022, 0x2f, 0x03},
-	{0x006c, 0x0023, 0x17, 0x03},
-	{0x00bc, 0x0025, 0x11, 0x03},
-	{0x0041, 0x0029, 0x30, 0x03},
-	{0x001c, 0x002e, 0x32, 0x03},
-	{0x00b9, 0x0031, 0x01, 0x03},
-	{0x0083, 0x0032, 0x05, 0x03},
-	{0x0095, 0x003a, 0x12, 0x03},
-	{0x000d, 0x003f, 0x07, 0x03},
-	{0x0020, 0x0041, 0x33, 0x03},
-	{0x0092, 0x0045, 0x2c, 0x03},
-	{0x00d4, 0x0047, 0x08, 0x03},
-	{0x00a1, 0x004b, 0x2d, 0x03},
-	{0x00d2, 0x004b, 0x3b, 0x03},
-	{0x00d6, 0x0052, 0x24, 0x03},
-	{0x009a, 0x005f, 0x1c, 0x03},
-	{0x0016, 0x0060, 0x3d, 0x03},
-	{0x001a, 0x0063, 0x1f, 0x03},
-	{0x00cd, 0x0066, 0x28, 0x03},
-	{0x00ff, 0x0067, 0x10, 0x03},
-	{0x0035, 0x0069, 0x20, 0x03},
-	{0x008f, 0x006c, 0x04, 0x03},
-	{0x00ca, 0x006c, 0x2a, 0x03},
-	{0x005a, 0x0074, 0x09, 0x03},
-	{0x0060, 0x0078, 0x38, 0x03},
-	{0x0072, 0x0079, 0x1e, 0x03},
-	{0x0037, 0x007f, 0x29, 0x03},
-	{0x0012, 0x0080, 0x14, 0x03},
-	{0x0029, 0x0082, 0x2b, 0x03},
-	{0x0084, 0x0098, 0x36, 0x03},
-	{0x0032, 0x0099, 0x37, 0x03},
-	{0x00bb, 0x00a0, 0x19, 0x03},
-	{0x003e, 0x00a3, 0x3e, 0x03},
-	{0x004a, 0x00a6, 0x1a, 0x03},
-	{0x0029, 0x00a7, 0x21, 0x03},
-	{0x009d, 0x00b7, 0x22, 0x03},
-	{0x006c, 0x00b9, 0x15, 0x03},
-	{0x000c, 0x00c0, 0x0a, 0x03},
-	{0x00c2, 0x00c3, 0x0f, 0x03},
-	{0x002f, 0x00c9, 0x0d, 0x03},
-	{0x00d2, 0x00ce, 0x16, 0x03},
-	{0x00f3, 0x00ce, 0x0b, 0x03},
-	{0x0075, 0x00cf, 0x27, 0x03},
-	{0x001a, 0x00d5, 0x35, 0x03},
-	{0x0026, 0x00d6, 0x39, 0x03},
-	{0x0080, 0x00da, 0x3c, 0x03},
-	{0x00a9, 0x00dd, 0x00, 0x03},
-	{0x00bc, 0x00eb, 0x03, 0x03},
-	{0x0032, 0x00ef, 0x1b, 0x03},
-	{0x0067, 0x00f0, 0x3f, 0x03},
-	{0x00ef, 0x00f1, 0x18, 0x03},
-	{0x00a8, 0x00f3, 0x0c, 0x03},
-	{0x00de, 0x00f9, 0x1d, 0x03},
-	{0x002c, 0x00fa, 0x13, 0x03}
-};
-
 
 
 
@@ -380,100 +97,6 @@ void galaga_state::galaga_palette(palette_device &palette) const
 
 /***************************************************************************
 
-    Star field documentation
-
-    Couriersud, May 2019:
-
-    The code below was manually applied based on a pull request from
-    Jindřich Makovička. He based his work on information published by
-    Wolfgang Scherr about the 05XX on pin4.at.
-
-    Wolfgang shared is VHDL implementation with the MAME team. I have
-    created a spreadsheet implementation for his decode logic.
-
-    Both implementations use the same Galois type LFSR( tap 15,12,10,5).
-    Using the same seed value, the following holds true:
-
-    Decode_W(lfsr[t-4]) = Decode_J(lfsr[t])
-
-    The two decoding algorithm (Wolfgang, Jindřich) thus deliver the same
-    results but with a 4 clock difference.
-
-    Jindřich's code filters out stars with y<4. This matches the starfield
-    measurements documented above. Wolfgang states that his code matches his
-    measurements and there are stars with y<4.
-    We need to have a closer look at this.
-
-    Both implementations are complex compared to other star field gnerators
-    used in the industry. We thus now have two decoding solutions matching
-    the output. I wonder if there is a simpler one.
-
-***************************************************************************/
-
-void galaga_state::starfield_init()
-{
-	const uint16_t feed = 0x9420;
-
-	int idx = 0;
-	for (uint16_t sf = 0; sf < 4; ++sf)
-	{
-		// starfield select flags
-		uint16_t sf1 = (sf >> 1) & 1;
-		uint16_t sf2 = sf & 1;
-
-		uint16_t i = 0x70cc;
-		for (int cnt = 0; cnt < 65535; ++cnt)
-		{
-			// output enable lookup
-			uint16_t xor1 = i ^ (i >> 3);
-			uint16_t xor2 = xor1 ^ (i >> 2);
-			uint16_t oe = (sf1 ? 0 : 0x4000) | ((sf1 ^ sf2) ? 0 : 0x1000);
-			if ((i & 0x8007) == 0x8007
-				&& (~i & 0x2008) == 0x2008
-				&& (xor1 & 0x0100) == (sf1 ? 0 : 0x0100)
-				&& (xor2 & 0x0040) == (sf2 ? 0 : 0x0040)
-				&& (i & 0x5000) == oe
-				&& cnt >= 256 * 4)
-			{
-				// color lookup
-				uint16_t xor3 = (i >> 1) ^ (i >> 6);
-				uint16_t clr =
-					(((i >> 9) & 0x07)
-					 | ((xor3 ^ (i >> 4) ^ (i >> 7)) & 0x08)
-					 | (~xor3 & 0x10)
-					 | (((i >> 2) ^ (i >> 5)) & 0x20))
-					^ ((i & 0x4000) ? 0 : 0x24)
-					^ ((((i >> 2) ^ i) & 0x1000) ? 0x21 : 0);
-#if 0
-				m_star_seed_tab[idx].x = cnt % 256;
-				m_star_seed_tab[idx].y = cnt / 256;
-				m_star_seed_tab[idx].col = clr;
-				m_star_seed_tab[idx].set = sf;
-#else
-				int x = cnt % 256;
-				int y = cnt / 256;
-				int col = clr;
-				int set = sf;
-
-				if ((x != s_star_seed_tab[idx].x) || (y != s_star_seed_tab[idx].y)
-					|| (col != s_star_seed_tab[idx].col) || (s_star_seed_tab[idx].set != set))
-					LOGMASKED(LOG_DEBUG, "Mismatch: %d %d %d %d %d %d %d %d\n", x, y, col, set, s_star_seed_tab[idx].x,
-						s_star_seed_tab[idx].y, s_star_seed_tab[idx].col, s_star_seed_tab[idx].set);
-#endif
-				++idx;
-			}
-
-			// update the LFSR
-			if (i & 1)
-				i = (i >> 1) ^ feed;
-			else
-				i = (i >> 1);
-		}
-	}
-}
-
-/***************************************************************************
-
   Callbacks for the TileMap code
 
 ***************************************************************************/
@@ -524,11 +147,15 @@ VIDEO_START_MEMBER(galaga_state,galaga)
 
 	m_galaga_gfxbank = 0;
 
-	save_item(NAME(m_stars_scrollx));
-	save_item(NAME(m_stars_scrolly));
+	m_lfsr = LFSR_SEED;
+	m_stars_scroll_index_x = 0;
+	m_stars_scroll_index_y = 0;
+
 	save_item(NAME(m_galaga_gfxbank));
 
-	starfield_init();
+	save_item(NAME(m_lfsr));
+	save_item(NAME(m_stars_scroll_index_x));
+	save_item(NAME(m_stars_scroll_index_y));
 }
 
 
@@ -610,37 +237,526 @@ void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect 
 }
 
 
+
+/***************************************************************************
+
+  Starfield generator documentation
+  
+     R. Hildinger, based on RE effort Aug. 2019
+     
+  -----
+  
+  * These notes are based on what is presumably an original Namco 05xx starfield 
+  generator from an original 1981 Namco/Midway Galaga board. This particular 
+  chip is marked only with the text "0521" on the chip package. The ROMS on 
+  this board are all marked "0508-00803 Galaga (c) Midway 1981"
+  
+  INTRO:
+  ------
+  
+  The starfields for Galaga and Bosconian are driven by a custom Namco 05XX chip that
+  is contains an internal 16-bit Linear Feedback Shift Register (LFSR) and all the
+  necessary support logic for generating a 6-bit RGB signal. The chip is fed all the 
+  required signals from the video system to allow it to output a colored "star" at
+  pseudo-random intervals and to scroll these stars in both horizontal and vertical
+  directions.
+  
+  The chip can generate a total of 256 stars in 4 banks of 64 for each vertical
+  frame. Two of these banks of stars will be active at any one time, controlled
+  by two starfield selector pins. Some stars will be hidden by the vertical and 
+  horizontal blanking, so there will always be less than 128 stars on screen at one
+  time. 
+  
+  The 05xx is a typical seventies-era 5v logic chip in a 24 pin, .6" width package:
+
+  Pin arrangement:
+
+
+                |--------------------------|
+          CLK  <| 1  ++            /-\  24 |>  Gnd
+                |    ++            \-/     |
+       _HSYNC  <| 2                     23 |>  SF1
+                |                          |
+     LFSR_RUN  <| 3                0    22 |>  SF0
+                |                  5       |
+       _VSYNC  <| 4                2    21 |>  LFSR_OUT
+                |                  1       |
+          _OE  <| 5                     20 |>  OE_CHAIN
+                |                          |
+      BLUE_HI  <| 6                     19 |>  _STARCLR
+                |                          |
+      BLUE_LO  <| 7                     18 |>  SCROLL_Y2
+                |                          |
+     GREEN_HI  <| 8                     17 |>  SCROLL_Y1
+                |                          |
+     GEEEN_LO  <| 9                     16 |>  SCROLL_Y0
+                |                          |
+       RED_HI  <| 10                    15 |>  SCROLL_X2
+                |                          |
+       RED_LO  <| 11                    14 |>  SCROLL_X1
+                |                          |
+    Vcc (+5v)  <| 12                    13 |>  SCROLL_X0
+                |--------------------------|
+
+
+  NOTE: Pin names are not official - just my best approximation of their function.
+
+
+  INPUTS:
+  -------
+
+  Pin 1 (CLK): This signal drives the internal linear feedback shift register (LFSR), 
+               as well as some internal state logic.
+   
+  Pin 2 (_HSYNC): Video system horizontal sync signal (pulse low). Rising edge marks 
+                  the start of each horizontal line in monitor's natural orientation.
+           
+  Pin 3 (LFSR_RUN): Enable the internal LFSR to update with every CLK cycle. This 
+                    signal is gated internally with the SCROLL and _STARCLR signals 
+                    to implement horizontal and vertical starfield scrolling, and 
+                    to clear the starfield altogether.
+
+  Pin 4 (_VSYNC): Video system vertical sync signal (pulse low). Rising edge marks 
+                  the start of each video frame.
+
+  Pin 5 (_OE): Output Enable (Active low): When low, the RGB outputs are active. When 
+              high, the RGB outputs are placed in a high impedance state to prevent 
+              interference with sprite and tile map generators. This line is used to 
+              effectively place stars in the background and prevent them from 
+              overwriting sprites and tiles.
+
+  Pins 13-15 (SCROLL_X): These 3 lines control the horizontal speed and direction of 
+                         the starfield scrolling. SCROLL_X2, SCROLL_X1, and 
+                         SCROLL_X0 map to scroll speed as follows:
+
+	SCROLL_X2	SCROLL_X1	SCROLL_X0	speed and direction
+	---------	---------	---------	-------------------
+	low		low		low		1 pixels per frame reverse (-X)
+	low		low		high		2 pixels per frame reverse (-X)
+	low		high		low		3 pixels per frame reverse (-X)
+	low		high		high		4 pixels per frame reverse (-X)
+		
+	high		low		low		3 pixels per frame forward (+X)
+	high		low		high		2 pixels per frame forward (+X)
+	high		high		low		1 pixels per frame forward (+X)
+	high		high		high		0 pixels per frame stationary
+
+  Pins 16-18 (SCROLL_Y): These 3 lines control the vertical speed and direction of the 
+                         starfield scrolling. SCROLL_Y2, SCROLL_Y1, and SCROLL_Y0 map to 
+                         scroll speed as follows:
+
+	SCROLL_Y2	SCROLL_Y1	SCROLL_Y0	speed
+	---------	---------	---------	-----
+	low		low		low		0 lines per frame stationary
+	low		low		high		1 lines per frame reverse (-Y)
+	low		high		low		2 lines per frame reverse (-Y)
+	low		high		high		3 lines per frame reverse (-Y)
+
+	high		low		low		4 lines per frame forward (+Y)
+	high		low		high		3 lines per frame forward (+Y)
+	high		high		low		2 lines per frame forward (+Y)
+	high		high		high		1 lines per frame forward (+Y)
+
+  Pin 19 (_STARCLR): Gates the LFSR_RUN signal when active, stopping the LFSR from 
+                     running which effectively stops the starfield from being drawn. 
+                     It also resets the LFSR seed back to boot value.
+
+  Pins 22-23 (SF): These two lines control which of the 4 star sets are currently being
+                   displayed on screen. SF1 and SF0 map to the star sets as follows:
+
+	SF1		SF0		Star sets
+	---		---		---------
+	low		low		0 and 2
+	low		high		1 and 2
+	high		high		1 and 3
+	High		low		0 and 3
+
+
+
+  OUTPUTS:
+  --------
+
+  Pins 6-11 (RGB Output): These are the red, green, and blue outputs designed to be 
+                          fed in to a digital to analog converter and sent to the picture 
+                          tube. These outputs are active every time the LFSR has a "hit"
+                          that indicates a star should be generated at this point. 
+                          Together they form a 6-bit RGB color value as follows:
+
+	Bit5        Bit4        Bit3        Bit2        Bit1        Bit0
+	----        ----        ----        ----        ----        ----
+	BLUE_HI     BLUE_LO     GREEN_HI    GREEN_LO    RED_HI      RED_LO
+		
+  Pin 20 (OE_CHAIN): This signal (chained output enable) is high for 1 CLK cycle every 
+                     time the LFSR has a "hit" that indicates a star should be generated
+                     at this point. It is active at the same time as the RGB outputs.
+ 
+  Pin 21 (LFSR_OUT): This is the output bit of the internal 16-bit LFSR.
+
+
+  MACHINE NOTES:
+  --------------
+  ( G = Galaga, B = Bosconian, GB = both)
+  
+  GB: CLK: - driven at 1/3 of the Master clock signal ( 18.432 Mhz / 3 = 6.144 MHz ).
+  
+  GB: _HSYNC: - driven at 1/384 of the CLK signal ( 6.144 Mhz / 384 = 16 KHz )
+              - pulse width = 32 CLK cycles low, 352 CLK cycles high (total = 384)
+              - High pulse width limits horizontal resolution to maximum of 352 pixels.
+              - 256 pulses per vertical frame during _VSYNC high
+              
+  GB: _VSYNC: - driven at 1/264 of the _HSYNC signal ( 16 KHz / 264 =  60.60606 Hz)
+              - pulse width = 8 _HSYNC pulses low, 256 _HSYNC pulses high (total = 264)
+              - High pulse width limits vertical resolution to maximum of 256 lines.
+
+  GB: LFSR_RUN: - driven at 1/384 of the CLK signal ( 6.144 Mhz / 384 = 16 KHz )
+                - pulse width = 128 CLK cycles low, 256 CLK cycles high (total = 384)
+                - 256 pulses per vertical frame during _VSYNC high
+                - High pulse position sits inside _HSYNC high between CLK 
+                  cycles 56 and 311, which effectively limits starfield width 
+                  to 256 horizontal pixels 
+
+  GB: _OE: - Semi-periodic signal driven at 1/384 of the CLK signal ( 16 KHz )
+           - Low portion of signal is driven high at any point where a tile or
+             sprite is generated
+           - Low pulse width = 288 CLK cycles, High pulse width = 96 CLK cycles
+           - Low pulse position inside _HSYNC high between CLK cycles 40 and 327
+           - Low pulse width further limits horizontal resolution to 288 pixels
+           - Signal is only actively generated by video system hardware between _HSYNC 
+             pulses 25 and 248 for a total of 224 pulses, which further limits vertical
+              esolution to 224 lines.
+
+  G: SCROLL_Y: - All SCROLL_Y signals are tied to ground
+  
+  GB: RGB OUTPUT: These outputs are sent to the simple resistance ladders that form the 
+                  8-bit RGB DAC within the video system:
+           
+                  BLUE_HI ----> 220 ohm resistor --------> Blue video signal
+                  BLUE_LO ----> 470 ohm resistor ----^
+           
+                  GREEN_HI ---> 220 ohm resistor --------> Green video signal
+                  GREEN_LO ---> 470 ohm resistor ----^
+               ......--------->  1K ohm resistor ----^
+     
+                  RED_HI -----> 220 ohm resistor --------> Red video signal
+                  RED_LO -----> 470 ohm resistor ----^
+               ......--------->  1K ohm resistor ----^
+
+  GB: OE_CHAIN: - This signal is sent to the color LUT PROM that handles the output 
+                  from the tile and sprite generators. It forces the PROM outputs to 
+                  go high impedance when the signal is high.
+                  
+
+  THEORY OF OPERATION:
+  --------------------
+  
+  The operation of the 05xx starfield generator is fairly simple, but subject to a
+  fairly complex clocking scheme when scrolling is taken into account. 
+  
+  The 05xx is designed as a beam-following color generator much like other starfield
+  generators in games like Galaxian, etc. It uses an internal LFSR to function 
+  a pseudo-random number generator, and it runs one step for every pixel clock except 
+  when gated by the LFSR_RUN, SCROLL and _STARCLR input signals. 
+  
+  The LFSR is a 16-bit fibonacci-style shift register with taps at 16,13, 11, and 6; 
+  producing a maximal sequence of 65,535 steps before starting over. It is run 
+  over a 256x256 pixel portion of the video frame, and does not reset with each new
+  frame. Since the sequence period is 65,535 steps, and the pixel field is 65,536 steps,
+  the generated starfield will scroll in the -X direction 1 pixel per frame. To make the
+  starfield stationary, the LFSR must skip 1 pixel clock per frame. In fact all 
+  scrolling is achieved by either running the LFSR extra steps during the blanking 
+  interval, or skipping pixel clocks.
+  
+  The individual stars are generated by a logic function that looks at the state of the
+  LFSR and triggers based on the value of certain bits within the state. When the bits 
+  match pre-determined values (a "hit"), a logic function is applied to the remaining 
+  bits to generate both a starfield set value and a color value. If the starfield value 
+  matches an active set, the color value is applied the RGB outputs for the duration of 
+  the pixel clock, and the OE_CHAIN signal is raised to block the output from the sprite 
+  and tilemap video sections.
+  
+  An LFSR hit is detected when the following is true: 
+  
+    bits 14, 13, 12, and 11 = 1
+    bits 15,  9,  4, and  2 = 0
+
+        LFSR state:     Bf Be Bd Bc - Bb Ba B9 B8 - B7 B6 B5 B4 - B3 B2 B1 B0
+                        |  |  |  |    |  |  |  |    |  |  |  |    |  |  |  | 
+        and'ed with:    1  1  1  1    1  0  1  0    0  0  0  1    0  1  0  0  (FA14)
+                        |  |  |  |    |  |  |  |    |  |  |  |    |  |  |  | 
+        equals:         0  1  1  1    1  0  0  0    0  0  0  0    0  0  0  0  (7800)
+
+    Therefore an LFSR hit looks like this:
+                            
+                        0  1  1  1  - 1  Ba 0  B8 - B7 B6 B5 0  - B4 0  B1 B0
+       
+  By limiting LFSR hits to only those values where 8 of the 16 bits match a specific 
+  value, only 256 hits will be detected per LFSR period, and thus 256 possible stars.
+  Because the hit detection values contain at least one positive bit, it avoids the
+  issue where an LFSR never reaches the all-zeroes state.
+  
+  Once a hit is detected, set and color values are extracted from the remaining 8 
+  bits as follows:
+  
+       star set value = (Ba B8)b                            [0..3]
+       
+       color value (BBGGRR) = (!B4 !B1 !B0 !B7 !B6 !B5)b    [0..63]
+
+
+  NUMBER OF STARS ON SCREEN:
+  --------------------------
+  
+  As stated before, during any frame only 2 of the 4 banks of 64 stars will be displayed,
+  for a maximum of 128 stars. This maximum is reduced to 126 by the fact that 1 star in
+  every bank has the color 0x00, or completely black and therefore invisible on screen.
+  Additionally, some stars are generated outside the vertical boundaries of the 
+  visible portion of the screen and are also invisible on screen, making the total
+  number of stars on screen at any one time less than 126.
+  
+  The durations of the horizontal and vertical sync pulses for Galaga and Bosconian allow
+  for a frame size of 352 x 256. The LFSR_RUN signal pulse sits inside _HSYNC signal pulse
+  between pixel clock cycles 56 and 311, thus limiting the size of the frame where stars 
+  are generated to 256 x 256:
+  
+            0         56                                              311    351
+          0 +---------+===============================================+------+
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |   Starfield generation area:                  |      |
+            |         |   (56,0) -> (311,255)  [256x256]              |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+            |         |                                               |      |
+        255 +---------+===============================================+------+
+        
+  The _OE signal restricts the visible area of the video frame. The _OE signal pulse sits
+  between pixel clock cycles 40 and 327, limiting the visible horizontal dimension to
+  288 pixels. Also, the _OE signal is only generated between lines 24 and 247, limiting 
+  the vertical dimension to 224 lines, hence the final output resolution of 288 x 224:
+  
+            0         56                                              311    351
+          0 +---------+===============================================+------+
+            |         |                                               |      |
+            |      40 |                                               |  327 |
+            |   24 +--+-----------------------------------------------+--+   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |   Starfield visible area:                     |  |   |
+            |      |  |   (56,24) -> (311,247)  [256x224]             |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |      |  |                                               |  |   |
+            |  247 +--+-----------------------------------------------+--+   |
+            |         |                                               |      |
+        255 +---------+===============================================+------+
+
+  In this manner, all stars generated in the starfield generation area that fall outside
+  the starfield visible area are not shown on screen.
+
+
+  HORIZONTAL SCROLLING:
+  ---------------------
+  
+  Horizontal and vertical scrolling of the starfield is accomplished by either advancing 
+  the LFSR or delaying the advance for some number of pixel clocks per frame
+  
+  For horizontal scrolling, advancing the LFSR an additional Z number of clocks results 
+  in a starfield shift in the negative X direction of Z+1 pixels, while delaying the LFSR
+  advance results in shift in the positive X direction of Z-1 pixels. The scrolling
+  amount and direction is controlled by the SCROLL_X input signals as follows:
+  
+    SCROLL_X     LFSR ACTION / FRAME     NUM LFSR ADVs / FRAME   X SHIFT RESULT
+    --------------------------------------------------------------------------------
+    000          nothing                 256*256 + 0 = 65536     -1 pixels 
+    001          Advance 1 extra         256*256 + 1 = 65537     -2 pixels 
+    010          Advance 2 extra         256*256 + 2 = 65538     -3 pixels 
+    011          Advance 3 extra         256*256 + 3 = 65539     -4 pixels 
+    100          Delay 4 clock           256*256 - 4 = 65532     +3 pixels
+    101          Delay 3 clocks          256*256 - 3 = 65533     +2 pixels
+    110          Delay 2 clocks          256*256 - 2 = 65534     +1 pixels
+    111          Delay 1 clocks          256*256 - 1 = 65535     No X Shift
+  
+      NOTE: The advance or delay of the LFSR occurs at pixel clock 0x500 (1280) after
+      the start of each frame. This is during the non-visible portion of starfield 
+      generation.
+
+
+  VERTICAL SCROLLING:
+  -------------------
+  
+  For vertical scrolling, advancing the LFSR an additional (Z * the horizontal frame
+  size) number of clocks results in a starfield shift in the negative Y direction of Z+1 
+  lines, while delaying the LFSR advance results in shift in the positive Y direction of 
+  Z-1 pixels. The scrolling amount and direction is controlled by the SCROLL_Y input 
+  signals as follows:
+  
+    SCROLL_Y     LFSR ACTION / FRAME     NUM LFSR ADVs / FRAME    Y SHIFT RESULT
+    --------------------------------------------------------------------------------
+    000          nothing                 256*256 + 0 = 65536      No Y Shift
+    001          Advance 1*256 extra     256*256 + 256 = 65792    -1 lines 
+    010          Advance 2*256 extra     256*256 + 512 = 66048    -2 lines 
+    011          Advance 3*256 extra     256*256 + 768 = 66304    -3 lines 
+    100          Delay 4*256 clock       256*256 - 1024 = 64512   +4 lines
+    101          Delay 3*256 clocks      256*256 - 768 = 64768    +3 lines
+    110          Delay 2*256 clocks      256*256 - 512 = 65024    +2 lines
+    111          Delay 1*256 clocks      256*256 - 256 = 65280    +1 lines
+  
+  Vertical scrolling is accomplished in much the same way as horizontal scrolling in that
+  the primary difference between the two is that for vertical scrolling we have to 
+  advance or delay the LFSR in multiples of the horizontal starfield frame size to 
+  effectively  scroll a single vertical line. Also, the points at which these delays 
+  or advances occur are not at the same point in every case. 
+  
+  For example, the default SCROLL_Y value of 000 equates to no Y scrolling. In this case 
+  the LFSR is run for 256 pixel clocks per line starting at line 2 within the frame and 
+  ending at line 257, for a total of 256*256 = 65,526 pixel clocks. The start and end 
+  lines for other SCROLL_Y values are different. The following table lists the lines over
+  which the LFSR is run (keeping in mind that running the LFSR over a line means 256 LFSR
+  advances):
+  
+    SCROLL_Y   SKIP   PRE_VIS         VISIBLE            POST_VIS             TOTAL_LINES
+    -------------------------------------------------------------------------------------
+    000        2      [2..23] (22)    [24..247] (224)    [248..257] (10)      (256)
+    001        1      [1..23] (23)    [24..247] (224)    [248..257] (10)      (257)
+    010        2      [2..23] (22)    [24..247] (224)    [248..259] (12)      (258)
+    011        1      [1..23] (23)    [24..247] (224)    [248..259] (12)      (259)
+    100        5      [5..23] (19)    [24..247] (224)    [248..256] (9)       (252)
+    101        4      [4..23] (20)    [24..247] (224)    [248..256] (9)       (253)
+    110        4      [4..23] (20)    [24..247] (224)    [248..257] (10)      (254)
+    111        2      [2..23] (22)    [24..247] (224)    [248..256] (9)       (255)
+
+    NOTE: SKIP = number of lines that are skipped at the start of the frame before
+                 running the LFSR
+          PRE_VIS, VISIBLE, POST_VIS = line range of LFSR runs during pre-visible,
+                 visible, and post-visible potions of frame
+          TOTAL_LINES = Total number of lines over which the LFSR is run
+                
+    NOTE2: Lines are indexed from 0
+           Lines > 255 are inside the vertical blanking interval
+    
+
+
+  _STARCLR AND THE LFSR SEED:
+  ----------------------------------------
+  
+  The _STARCLR input signal is used to stop the LFSR from running (and therefore 
+  generating any stars), and to reset its internal state. At no other time is the 
+  internal state of the LFSR reset. When the _STARCLR signal is held low, the 
+  LFSR_RUN signal is blocked, and the internal state of the LFSR is loaded with 
+  it's seed value, which is 0x7FFF. 
+
+  NOTE: Testing with a Galaga machine reveals that during normal operation, the
+        _STARCLR signal is held low at power on and then raised when the initial
+        attract screen displays. The low-to-high transition arrives approximately
+        14,191 starfield pixel clocks in to the first frame of attract screen animation, 
+        resulting in a starfield that is half-filled. There is no real way to simulate
+        this in the MAME galaga video driver as it fills the starfield between frames
+        rather than mid-frame.
+  
+***************************************************************************/
+
+
+uint16_t galaga_state::get_next_lfsr_state(uint16_t lfsr)
+{
+    uint16_t bit;
+
+    // 16-bit FIBONACCI-style LFSR with taps at 16,13,11, and 6
+    // These taps produce a maximal sequence of 65,535 steps.
+
+    bit = ((lfsr >> 0) ^ (lfsr >> 3) ^ (lfsr >> 5) ^ (lfsr >> 10));
+    lfsr = (lfsr >> 1) | (bit << 15);
+
+    return lfsr;
+}
+
+
 void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	/* draw the stars */
+	int set_a,set_b;  // star sets
+
+	uint32_t pre_vis_cycle_count = pre_vis_cycle_count_values[m_stars_scroll_index_y];
+	uint32_t post_vis_cycle_count = post_vis_cycle_count_values[m_stars_scroll_index_y];
+
+	// X scrolling adjustment occurs during pre-visible portion
+	pre_vis_cycle_count += speed_X_cycle_count_offset[m_stars_scroll_index_x];
+
+	/* two sets of stars controlled by these bits */
+	set_a = m_videolatch->q3_r();
+	set_b = m_videolatch->q4_r() | 2;
 
 	/* $a005 controls the stars ON/OFF */
 	if ( m_videolatch->q5_r() == 1 )
 	{
-		int star_cntr;
-		int set_a, set_b;
+		int x,y;
 
-		/* two sets of stars controlled by these bits */
-		set_a = m_videolatch->q3_r();
-		set_b = m_videolatch->q4_r() | 2;
+		// Advance the LFSR during the pre-visible portion of the frame
+		do { m_lfsr = get_next_lfsr_state(m_lfsr); } while (--pre_vis_cycle_count);
 
-		for (star_cntr = 0;star_cntr < MAX_STARS ;star_cntr++)
+		// Now we are in visible portion of the frame - Output all LFSR hits here
+		for (y=0;y<VISIBLE_LINES;y++)
 		{
-			int x,y;
-
-			if ((set_a == s_star_seed_tab[star_cntr].set) || (set_b == s_star_seed_tab[star_cntr].set))
+			// The starfield sits between X pos 16...271
+			for (x=STARFIELD_X_OFFSET_GALAGA;x<STARFIELD_PIXEL_WIDTH+STARFIELD_X_OFFSET_GALAGA;x++)
 			{
-				x = (s_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + 16;
-				y = (112 + s_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
-				/* 112 is a tweak to get alignment about perfect */
+				// Check lfsr for hit
+				if ((m_lfsr&LFSR_HIT_MASK) == LFSR_HIT_VALUE)
+				{
+					int star_set = ((m_lfsr>>9)&0x2) | ((m_lfsr>>8)&0x1);
 
-				if (cliprect.contains(x, y))
-					bitmap.pix16(y, x) = STARS_COLOR_BASE + s_star_seed_tab[ star_cntr ].col;
+					if ((set_a == star_set) || (set_b == star_set))
+					{
+						if (cliprect.contains(x, y))
+						{
+							uint8_t color;
+
+							color  = (m_lfsr>>5)&0x7;
+							color |= (m_lfsr<<3)&0x18;
+							color |= (m_lfsr<<2)&0x20;
+							color = (~color)&0x3F;
+
+							bitmap.pix16(y, x) = STARS_COLOR_BASE + color;
+						}
+					}
+				}
+
+				// Advance LFSR
+				m_lfsr = get_next_lfsr_state(m_lfsr);
 			}
-
 		}
+
+		// Advance the LFSR during the post-visible portion of the frame
+		do { m_lfsr = get_next_lfsr_state(m_lfsr); } while (--post_vis_cycle_count);
+	}
+	else
+	{
+		// _STARCLR is high - reset the lfsr
+		m_lfsr = LFSR_SEED;
 	}
 }
+
 
 uint32_t galaga_state::screen_update_galaga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -660,12 +776,15 @@ WRITE_LINE_MEMBER(galaga_state::screen_vblank_galaga)
 	{
 		/* this function is called by galaga_interrupt_1() */
 		int s0,s1,s2;
-		static const int speeds[8] = { -1, -2, -3, 0, 3, 2, 1, 0 };
 
 		s0 = m_videolatch->q0_r();
 		s1 = m_videolatch->q1_r();
 		s2 = m_videolatch->q2_r();
 
-		m_stars_scrollx += speeds[s0 + s1*2 + s2*4];
+		// Galaga only scrolls in X direction - the SCROLL_Y pins
+		// of the 05XX chip are tied to ground.
+
+		m_stars_scroll_index_x = (s2<<2) | (s1<<1) | (s0<<0);
+		m_stars_scroll_index_y = 0;
 	}
 }
