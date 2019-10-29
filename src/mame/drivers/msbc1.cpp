@@ -52,6 +52,8 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/z80sio.h"
+
 #define MC68000R12_TAG  "u50"
 #define MK68564_0_TAG   "u14"
 #define MK68564_1_TAG   "u15"
@@ -78,6 +80,8 @@ void msbc1_state::msbc1_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram();
 	map(0xf80000, 0xf87fff).rom().region(MC68000R12_TAG, 0);
+	map(0xfffa00, 0xfffa3f).rw("sio1", FUNC(mk68564_device::read), FUNC(mk68564_device::write)).umask16(0x00ff);
+	map(0xfffc00, 0xfffc3f).rw("sio2", FUNC(mk68564_device::read), FUNC(mk68564_device::write)).umask16(0x00ff);
 }
 
 /* Input ports */
@@ -95,8 +99,11 @@ void msbc1_state::machine_reset()
 void msbc1_state::msbc1(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(12'500'000));
+	M68000(config, m_maincpu, 12.5_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &msbc1_state::msbc1_mem);
+
+	MK68564(config, "sio1", 3.6864_MHz_XTAL);
+	MK68564(config, "sio2", 3.6864_MHz_XTAL);
 }
 
 /* ROM definition */
