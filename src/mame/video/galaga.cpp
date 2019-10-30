@@ -8,8 +8,6 @@
 
 ***************************************************************************/
 
-#include <stdlib.h>
-
 #include "emu.h"
 #include "includes/galaga.h"
 
