@@ -1782,9 +1782,9 @@ void m68000_base_device::init_cpu_m68000(void)
 	m_cyc_dbcc_f_noexp = -2;
 	m_cyc_dbcc_f_exp   = 2;
 	m_cyc_scc_r_true   = 2;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 8;
+	m_cyc_shift        = 2;
 	m_cyc_reset        = 132;
 	m_has_pmmu         = 0;
 	m_has_hmmu         = 0;
@@ -1811,9 +1811,9 @@ void m68000_base_device::init_cpu_m68008(void)
 	m_cyc_dbcc_f_noexp = -2;
 	m_cyc_dbcc_f_exp   = 2;
 	m_cyc_scc_r_true   = 2;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 8;
+	m_cyc_shift        = 2;
 	m_cyc_reset        = 132;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -1838,9 +1838,9 @@ void m68000_base_device::init_cpu_m68010(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 6;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 8;
+	m_cyc_shift        = 2;
 	m_cyc_reset        = 130;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -1864,9 +1864,9 @@ void m68000_base_device::init_cpu_m68020(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -1920,9 +1920,9 @@ void m68000_base_device::init_cpu_m68ec020(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -1948,9 +1948,9 @@ void m68000_base_device::init_cpu_m68030(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 1;
@@ -1977,9 +1977,9 @@ void m68000_base_device::init_cpu_m68ec030(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;     /* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
 	m_has_fpu          = 1;
@@ -2006,9 +2006,9 @@ void m68000_base_device::init_cpu_m68040(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 1;
@@ -2034,9 +2034,9 @@ void m68000_base_device::init_cpu_m68ec040(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
@@ -2062,9 +2062,9 @@ void m68000_base_device::init_cpu_m68lc040(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 	m_has_pmmu         = 1;
 	m_has_fpu          = 0;
@@ -2078,21 +2078,20 @@ void m68000_base_device::init_cpu_scc68070(void)
 	init_cpu_common();
 	m_cpu_type         = CPU_TYPE_SCC070;
 
-	// TODO: most of this is subtly different
 	init16(*m_program, *m_oprogram);
 	m_sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m_state_table      = m68ki_instruction_state_table[1];
 	m_cyc_instruction  = m68ki_cycles[1];
 	m_cyc_exception    = m68ki_exception_cycle_table[1];
-	m_cyc_bcc_notake_b = -4;
+	m_cyc_bcc_notake_b = 0;
 	m_cyc_bcc_notake_w = 0;
-	m_cyc_dbcc_f_noexp = 0;
-	m_cyc_dbcc_f_exp   = 6;
+	m_cyc_dbcc_f_noexp = 3;
+	m_cyc_dbcc_f_exp   = 3;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 3;
-	m_cyc_shift        = 1;
-	m_cyc_reset        = 130;
+	m_cyc_movem_w      = 7;
+	m_cyc_movem_l      = 11;
+	m_cyc_shift        = 3;
+	m_cyc_reset        = 154;
 	m_has_pmmu         = 0;
 	m_has_fpu          = 0;
 
@@ -2117,9 +2116,9 @@ void m68000_base_device::init_cpu_fscpu32(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -2144,9 +2143,9 @@ void m68000_base_device::init_cpu_coldfire(void)
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp   = 4;
 	m_cyc_scc_r_true   = 0;
-	m_cyc_movem_w      = 2;
-	m_cyc_movem_l      = 2;
-	m_cyc_shift        = 0;
+	m_cyc_movem_w      = 4;
+	m_cyc_movem_l      = 4;
+	m_cyc_shift        = 1;
 	m_cyc_reset        = 518;
 
 	define_state();
@@ -2398,9 +2397,9 @@ void m68000_base_device::clear_all()
 	m_cyc_dbcc_f_noexp = 0;
 	m_cyc_dbcc_f_exp = 0;
 	m_cyc_scc_r_true = 0;
-	m_cyc_movem_w = 0;
-	m_cyc_movem_l = 0;
-	m_cyc_shift = 0;
+	m_cyc_movem_w = 1;
+	m_cyc_movem_l = 1;
+	m_cyc_shift = 1;
 	m_cyc_reset = 0;
 
 	m_initial_cycles = 0;
