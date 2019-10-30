@@ -83,7 +83,7 @@ public:
 
 	state_manager_t() = default;
 
-	template<typename C>
+	template<typename C> //, typename std::enable_if<std::is_integral<C>::value || std::is_floating_point<C>::value>::type>
 	void save_item(const void *owner, C &state, const pstring &stname)
 	{
 		save_state_ptr( owner, stname, dtype<C>(), 1, &state);
@@ -101,8 +101,8 @@ public:
 		save_state_ptr(owner, stname, dtype<C>(), count, state);
 	}
 
-	template<typename C>
-	void save_item(const void *owner, std::vector<C> &v, const pstring &stname)
+	template<typename C, typename A>
+	void save_item(const void *owner, std::vector<C, A> &v, const pstring &stname)
 	{
 		save_state_ptr(owner, stname, dtype<C>(), v.size(), v.data());
 	}

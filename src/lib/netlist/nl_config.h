@@ -94,14 +94,7 @@
 // Use nano-second resolution - Sufficient for now
 
 static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
-//static constexpr const auto NETLIST_INTERNAL_RES = 1000000000000;
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
-
-//#define NETLIST_INTERNAL_RES        (UINT64_C(1000000000))
-//#define NETLIST_CLOCK               (NETLIST_INTERNAL_RES)
-//#define NETLIST_INTERNAL_RES      (UINT64_C(1000000000000))
-//#define NETLIST_CLOCK               (UINT64_C(1000000000))
-
 
 //#define nl_double float
 using nl_double = double;

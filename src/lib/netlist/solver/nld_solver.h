@@ -24,10 +24,6 @@ namespace netlist
 {
 namespace devices
 {
-	class NETLIB_NAME(solver);
-
-	class matrix_solver_t;
-
 	NETLIB_OBJECT(solver)
 	{
 		NETLIB_CONSTRUCTOR(solver)

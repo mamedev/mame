@@ -41,7 +41,7 @@ namespace netlist
 
 		logic_output_t m_DO;
 
-		state_array<uint8_t, 128> m_ram; // 1024x1 bits
+		state_container<std::array<uint8_t, 128>> m_ram; // 1024x1 bits
 		param_ptr_t m_RAM;
 		nld_power_pins m_power_pins;
 	};

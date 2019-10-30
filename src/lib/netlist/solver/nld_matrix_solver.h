@@ -136,11 +136,6 @@ namespace devices
 		plib::aligned_vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
 		plib::aligned_vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
 
-		/* state */
-		nl_double m_last_V;
-		nl_double m_DD_n_m_1;
-		nl_double m_h_n_m_1;
-
 		plib::aligned_vector<int> m_connected_net_idx;
 	private:
 		analog_net_t * m_net;
@@ -375,6 +370,17 @@ namespace devices
 		plib::aligned_vector<terms_for_net_t> m_terms;
 		plib::aligned_vector<terms_for_net_t> m_rails_temp;
 
+		/* state - variable time_stepping */
+		plib::aligned_vector<nl_double> m_last_V;
+		plib::aligned_vector<nl_double> m_DD_n_m_1;
+		plib::aligned_vector<nl_double> m_h_n_m_1;
+
+		// FIXME: it should be like this, however dimensions are determined
+		//        in vsetup.
+		//state_container<std::vector<nl_double>> m_last_V;
+		//state_container<std::vector<nl_double>> m_DD_n_m_1;
+		//state_container<std::vector<nl_double>> m_h_n_m_1;
+
 		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
 
 		const solver_parameters_t &m_params;
@@ -384,6 +390,9 @@ namespace devices
 		state_var<int> m_stat_vsolver_calls;
 		state_var<int> m_iterative_fail;
 		state_var<int> m_iterative_total;
+
+
+
 
 	private:
 

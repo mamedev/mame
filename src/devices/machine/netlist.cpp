@@ -522,7 +522,7 @@ public:
 				if (i != m_num_channels)
 					state().log().fatal("sound input numbering has to be sequential!");
 				m_num_channels++;
-				m_channels[i].m_param = dynamic_cast<netlist::param_double_t *>(setup().find_param((*m_channels[i].m_param_name)(), true));
+				m_channels[i].m_param = dynamic_cast<netlist::param_double_t *>(state().setup().find_param((*m_channels[i].m_param_name)(), true));
 			}
 		}
 	}

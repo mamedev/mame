@@ -92,9 +92,9 @@ namespace netlist
 		for (auto & pwr_sym : power_syms)
 		{
 			pstring devname = out_proxied->device().name();
-			auto tp_t = setup().find_terminal(devname + "." + pwr_sym.first,
+			auto tp_t = state().setup().find_terminal(devname + "." + pwr_sym.first,
 					/*detail::terminal_type::INPUT,*/ false);
-			auto tn_t = setup().find_terminal(devname + "." + pwr_sym.second,
+			auto tn_t = state().setup().find_terminal(devname + "." + pwr_sym.second,
 					/*detail::terminal_type::INPUT,*/ false);
 			if (f && (tp_t != nullptr && tn_t != nullptr))
 				log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(out_proxied->device().name(),
@@ -113,9 +113,9 @@ namespace netlist
 		if (!f)
 		{
 			if (logic_family()->fixed_V() == 0.0)
-				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_1(setup().de_alias(out_proxied->device().name())));
+				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_1(state().setup().de_alias(out_proxied->device().name())));
 			else
-				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(setup().de_alias(out_proxied->device().name())));
+				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(state().setup().de_alias(out_proxied->device().name())));
 			m_GNDHack = plib::make_unique<analog_output_t>(*this, "_QGND");
 			m_VCCHack = plib::make_unique<analog_output_t>(*this, "_QVCC");
 
@@ -126,7 +126,7 @@ namespace netlist
 		else
 		{
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-			if (setup().is_extended_validation())
+			if (state().setup().is_extended_validation())
 			{
 				// During validation, don't connect to terminals found
 				// This will cause terminals not connected to a rail net to

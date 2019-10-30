@@ -16,10 +16,7 @@ namespace devices
 {
 
 	terms_for_net_t::terms_for_net_t(analog_net_t * net)
-		: m_last_V(0.0)
-		, m_DD_n_m_1(0.0)
-		, m_h_n_m_1(1e-12)
-		, m_net(net)
+		: m_net(net)
 		, m_railstart(0)
 	{
 	}
@@ -342,13 +339,18 @@ namespace devices
 		/*
 		 * save states
 		 */
+
+		m_last_V.resize(iN, plib::constants<nl_double>::zero());
+		m_DD_n_m_1.resize(iN, plib::constants<nl_double>::zero());
+		m_h_n_m_1.resize(iN, plib::constants<nl_double>::zero());
+
+		state().save(*this, m_last_V.as_base(), this->name(), "m_last_V");
+		state().save(*this, m_DD_n_m_1.as_base(), this->name(), "m_DD_n_m_1");
+		state().save(*this, m_h_n_m_1.as_base(), this->name(), "m_h_n_m_1");
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			pstring num = plib::pfmt("{1}")(k);
-
-			state().save(*this, m_terms[k].m_last_V, this->name(), "lastV." + num);
-			state().save(*this, m_terms[k].m_DD_n_m_1, this->name(), "m_DD_n_m_1." + num);
-			state().save(*this, m_terms[k].m_h_n_m_1, this->name(), "m_h_n_m_1." + num);
 
 			// FIXME: This shouldn't be necessary, recalculate on each entry ...
 			state().save(*this, m_gonn[k],"GO" + num, this->name(), m_terms[k].count());
@@ -559,19 +561,21 @@ namespace devices
 
 		if (m_params.m_dynamic_ts)
 		{
-			for (auto &t : m_terms)
+			for (std::size_t k = 0; k < m_terms.size(); k++)
 			{
+				auto &t = m_terms[k];
 				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
-				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t.getV() - t.m_last_V)));
+
+				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t.getV() - m_last_V[k])));
 				const nl_double hn = cur_ts;
 
 				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
-				nl_double DD2 = (DD_n / hn - t.m_DD_n_m_1 / t.m_h_n_m_1) / (hn + t.m_h_n_m_1);
+				nl_double DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
 				nl_double new_net_timestep(0);
 
-				t.m_h_n_m_1 = hn;
-				t.m_DD_n_m_1 = DD_n;
+				m_h_n_m_1[k] = hn;
+				m_DD_n_m_1[k] = DD_n;
 				if (std::fabs(DD2) > plib::constants<nl_double>::cast(1e-60)) // avoid div-by-zero
 					new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_double>::cast(0.5)*DD2));
 				else
@@ -580,7 +584,7 @@ namespace devices
 				if (new_net_timestep < new_solver_timestep)
 					new_solver_timestep = new_net_timestep;
 
-				t.m_last_V = t.getV();
+				m_last_V[k] = t.getV();
 			}
 			if (new_solver_timestep < m_params.m_min_timestep)
 			{
