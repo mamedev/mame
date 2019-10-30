@@ -182,6 +182,7 @@ void sega315_5246_device::sega315_5246_palette(palette_device &palette) const
 
 void sega315_5377_device::sega315_5377_palette(palette_device &palette) const
 {
+	// TODO : linear?
 	for (int i = 0; i < 4096; i++)
 	{
 		const u8 r = i & 0x000f;
