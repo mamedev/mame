@@ -296,8 +296,7 @@ void es5506_device::device_start()
 
 	/* init the voices */
 	// 21 bit integer and 11 bit fraction
-	m_accum_shift = ADDRESS_FRAC_BIT - ADDRESS_FRAC_BIT_ES5506;
-	m_accum_mask = (((((1 << 21) - 1) << ADDRESS_FRAC_BIT_ES5506) | ((1 << ADDRESS_FRAC_BIT_ES5506) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+	get_accum_mask(ADDRESS_INTEGER_BIT_ES5506, ADDRESS_FRAC_BIT_ES5506);
 	for (int j = 0; j < 32; j++)
 	{
 		m_voice[j].index = j;
@@ -409,8 +408,7 @@ void es5505_device::device_start()
 
 	/* init the voices */
 	// 20 bit integer and 9 bit fraction
-	m_accum_shift = ADDRESS_FRAC_BIT - ADDRESS_FRAC_BIT_ES5505;
-	m_accum_mask = (((((1 << 20) - 1) << ADDRESS_FRAC_BIT_ES5505) | ((1 << ADDRESS_FRAC_BIT_ES5505) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+	get_accum_mask(ADDRESS_INTEGER_BIT_ES5505, ADDRESS_FRAC_BIT_ES5505);
 	for (int j = 0; j < 32; j++)
 	{
 		m_voice[j].index = j;
@@ -487,18 +485,29 @@ void es550x_device::compute_tables()
 	m_volume_lookup = make_unique_clear<u32[]>(volume_len);
 
 	/* generate volume lookup table */
-	const u8 exponent_bit = (VOLUME_INTEGER_BIT - 4);
-	const u32 mantissa_len = (1 << exponent_bit);
+	const u8 exponent_mask = (1 << VOLUME_EXPONENT_BIT) - 1;
+	const u32 mantissa_len = (1 << VOLUME_MANTISSA_BIT);
 	const u32 mantissa_mask = (mantissa_len - 1);
 	for (int i = 0; i < volume_len; i++)
 	{
-		u8 exponent = i >> exponent_bit;
+		u8 exponent = (i >> VOLUME_MANTISSA_BIT) & exponent_mask;
 		u32 mantissa = (i & mantissa_mask) | mantissa_len;
 
-		m_volume_lookup[i] = (mantissa << 11) >> (20 - exponent);
+		m_volume_lookup[i] = (mantissa << VOLUME_MANTISSA_ACC_SHIFT) >> (VOLUME_EXPONENT_ACC_SHIFT - exponent);
 	}
 }
 
+/**********************************************************************************************
+
+     get_accum_mask -- get address accumulator mask
+
+***********************************************************************************************/
+
+void es550x_device::get_accum_mask(unsigned address_integer, unsigned address_frac)
+{
+	m_accum_shift = ADDRESS_FRAC_BIT - address_frac;
+	m_accum_mask = (((((1 << address_integer) - 1) << address_frac) | ((1 << address_frac) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+}
 
 
 /**********************************************************************************************

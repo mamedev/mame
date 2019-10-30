@@ -34,10 +34,23 @@ protected:
 		LP_MASK = LP3 | LP4
 	};
 
+	// constants for volumes
+	const unsigned VOLUME_EXPONENT_BIT = 4;
+	const unsigned VOLUME_EXPONENT_ACC_BIT = 16;
+	const unsigned VOLUME_EXPONENT_ACC_SHIFT = VOLUME_EXPONENT_ACC_BIT + VOLUME_EXPONENT_BIT;
+
+	const unsigned VOLUME_MANTISSA_BIT = 8;
+	const unsigned VOLUME_MANTISSA_ACC_BIT = 27;
+	const unsigned VOLUME_MANTISSA_ACC_SHIFT = VOLUME_MANTISSA_ACC_BIT - (VOLUME_MANTISSA_BIT << 1);
+
 	const unsigned FINE_VOLUME_BIT = 16;
-	const unsigned VOLUME_INTEGER_BIT = 12;
+	const unsigned VOLUME_INTEGER_BIT = VOLUME_EXPONENT_BIT + VOLUME_MANTISSA_BIT;
 	const unsigned VOLUME_INTEGER_SHIFT = FINE_VOLUME_BIT - VOLUME_INTEGER_BIT;
-	const unsigned VOLUME_ACC_SHIFT = 23 - VOLUME_INTEGER_BIT;
+
+	const unsigned VOLUME_ACC_BIT = 23;
+	const unsigned VOLUME_ACC_SHIFT = VOLUME_ACC_BIT - VOLUME_INTEGER_BIT;
+
+	// constants for address
 	const unsigned ADDRESS_FRAC_BIT = 11;
 
 	// struct describing a single playing voice
@@ -87,6 +100,7 @@ protected:
 	void update_irq_state();
 	void update_internal_irq_state();
 	void compute_tables();
+	void get_accum_mask(unsigned address_integer, unsigned address_frac);
 
 	virtual inline u32 get_bank(u32 control) { return 0; }
 	virtual inline u32 get_ca(u32 control) { return 0; }
@@ -160,7 +174,8 @@ protected:
 
 	const unsigned VOLUME_BIT_ES5506 = 16;
 	const unsigned VOLUME_SHIFT_ES5506 = FINE_VOLUME_BIT - VOLUME_BIT_ES5506;
-	const unsigned ADDRESS_FRAC_BIT_ES5506 = ADDRESS_FRAC_BIT;
+	const unsigned ADDRESS_INTEGER_BIT_ES5506 = 21;
+	const unsigned ADDRESS_FRAC_BIT_ES5506 = 11;
 
 	virtual inline u32 get_bank(u32 control) override { return (control >> 14) & 3; }
 	virtual inline u32 get_ca(u32 control) override { return (control >> 10) & 7; }
@@ -205,6 +220,7 @@ protected:
 
 	const unsigned VOLUME_BIT_ES5505 = 8;
 	const unsigned VOLUME_SHIFT_ES5505 = FINE_VOLUME_BIT - VOLUME_BIT_ES5505;
+	const unsigned ADDRESS_INTEGER_BIT_ES5505 = 20;
 	const unsigned ADDRESS_FRAC_BIT_ES5505 = 9;
 
 	virtual inline u32 get_lp(u32 control) override { return (control >> 10) & LP_MASK; }
