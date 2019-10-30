@@ -40,7 +40,7 @@ Notes
   PRG2. The other PALs are the same.
 
 - The BPRG1 PAL found on later B-boards allows the use of a larger program ROM space.
-  
+
 - The B-board usually has two PALs (later revisions have three). The first PAL
   is used to map tile codes to the graphics ROMs, and changes from game to game.
   The other doesn't change from game to game and there are only two versions,
@@ -10792,6 +10792,59 @@ ROM_START( sf2cems6c )  /* 920322 USA */
 	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
 ROM_END
 
+ROM_START( sf2ceds6 ) // 10/17/92 DSTREET-6 on PCB, labels similar to the ones used by Subsino
+	ROM_REGION( 0x40000, "patch", 0 )
+	ROM_LOAD16_BYTE( "n.010.u12", 0x00000, 0x20000, CRC(275b67ac) SHA1(b3189713de8aed61c12d6f2469dbe9386cc30983) )
+	ROM_LOAD16_BYTE( "i.010.u11", 0x00001, 0x20000, CRC(ca403ac1) SHA1(0748a8b88029cbbb8cae40a4ba93843aeed261ae) )
+
+	ROM_REGION( 0x0200, "patchpld", 0 )
+	ROM_LOAD( "palce20v8h.u28", 0x0000, 0x0117, NO_DUMP )
+
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "6st-u196.2m1", 0x000000, 0x100000, CRC(596609d4) SHA1(4d876e6e44554eccbd0c5ea2d2d09e5024af0f9f) )
+	ROM_LOAD16_WORD_SWAP( "6st-u210.2m1", 0x100000,  0x80000, CRC(ed4186bd) SHA1(f3dfe91d8f4384275190b0d86488843c1161d86f) )
+
+	// TODO: the following patches weren't verified via pal analysis
+	ROM_COPY( "patch", 0x00000, 0x000000, 0x18000 )
+	ROM_COPY( "patch", 0x18000, 0x030000, 0x18000 )
+	ROM_COPY( "patch", 0x30000, 0x0e0000, 0x08000 )
+	ROM_COPY( "patch", 0x38000, 0x108000, 0x08000 )
+	//ROM_COPY( "patch", 0x38000, 0x148000, 0x08000 ) // is this needed? if bugs (random resets) are reported try to enable this
+
+	ROM_REGION( 0x600000, "gfx", 0 )
+	ROM_LOAD64_WORD( "6st.u70", 0x000000, 0x80000, CRC(baa0f81f) SHA1(5e55a5c4ad64be17089670a3d73c1c0d9082351b) )
+	ROM_CONTINUE(               0x000004, 0x80000 )
+	ROM_LOAD64_WORD( "6st.u68", 0x000002, 0x80000, CRC(8edff95a) SHA1(8db35c5940dcc1f09f11be26051b2f98445d10e7) )
+	ROM_CONTINUE(               0x000006, 0x80000 )
+	ROM_LOAD64_WORD( "6st.u69", 0x200000, 0x80000, CRC(468962b1) SHA1(fdfd2a7cbbcafaa37e972da425446d471e1e1dae) )
+	ROM_CONTINUE(               0x200004, 0x80000 )
+	ROM_LOAD64_WORD( "6st.u64", 0x200002, 0x80000, CRC(8165f536) SHA1(8178fe2240c73c7283592aa31dd24aec5bf9429b) )
+	ROM_CONTINUE(               0x200006, 0x80000 )
+	ROM_LOAD64_WORD( "6st.u19", 0x400000, 0x80000, CRC(39d763d3) SHA1(a2a0bddecaca6046785ccddfd20b8356a6ec36f0) )
+	ROM_CONTINUE(               0x400004, 0x80000 )
+	ROM_LOAD64_WORD( "6st.u18", 0x400002, 0x80000, CRC(2ddfe46e) SHA1(517a76166d387375a75a36b2785de86898bdc777) )
+	ROM_CONTINUE(               0x400006, 0x80000 )
+	// extra gfx data, purpose unknown
+	// mapping over 0x400000, not sure if correct
+	ROM_LOAD64_WORD( "6st.u31", 0x400000, 0x20000, CRC(35486f2d) SHA1(abdcfc73d2d42a7f3523e1a383c1ce5563c4fbd7) )
+	ROM_CONTINUE(               0x400004, 0x20000 )
+	ROM_LOAD64_WORD( "6st.u29", 0x400002, 0x20000, CRC(e4eca601) SHA1(acee4988f12a037a3b50f3923892fdac65f35805) )
+	ROM_CONTINUE(               0x400006, 0x20000 )
+
+	ROM_REGION( 0x18000, "audiocpu", 0 )
+	ROM_LOAD( "o.u191", 0x00000, 0x08000, CRC(08f6b60e) SHA1(8258fcaca4ac419312531eec67079b97f471179c) )
+	ROM_CONTINUE(         0x10000, 0x08000 )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "fun-s3-j1.u210", 0x00000, 0x40000, CRC(6cfffb11) SHA1(995526183ffd35f92e9096500a3fe6237faaa2dd) )
+
+	ROM_REGION( 0x10000, "user1", 0 ) // unknown, priority?
+	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal20v8a.u104", 0x0000, 0x0157, NO_DUMP )
+ROM_END
+
 /* B-Board 89625B-1 */
 ROM_START( cworld2j )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
@@ -13452,6 +13505,7 @@ GAME( 1992, sf2ceupl,    sf2ce,    sf2m10,     sf2hack,  cps_state, init_cps1,  
 GAME( 1992, sf2cems6a,   sf2ce,    sf2cems6,   sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 1)", MACHINE_SUPPORTS_SAVE ) // 920313 USA
 GAME( 1992, sf2cems6b,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
 GAME( 1992, sf2cems6c,   sf2ce,    sf2cems6,   sf2bhh,   cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Mstreet-6, bootleg, set 3)", MACHINE_SUPPORTS_SAVE ) // 920322 USA
+GAME( 1992, sf2ceds6,    sf2ce,    sf2cems6,   sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Dstreet-6, bootleg)", MACHINE_SUPPORTS_SAVE ) // 920313 USA
 GAME( 1992, sf2re,       sf2,      sf2m3,      sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (RE, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )    // 920313 - based on USA version, glitch on title screen confirmed not to happen on PCB so MIG
 GAME( 1992, cworld2j,    0,        cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, cworld2ja,   cworld2j, cps1_12MHz, cworld2j, cps_state, init_cps1,     ROT0,   "Capcom", "Adventure Quiz Capcom World 2 (Japan 920611, B-Board 90629B-3, no battery)", MACHINE_SUPPORTS_SAVE )
