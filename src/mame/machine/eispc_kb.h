@@ -16,8 +16,6 @@ public:
 
 	eispc_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 0);
 
-	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
-
 	DECLARE_INPUT_CHANGED_MEMBER(key);
 	DECLARE_WRITE_LINE_MEMBER(rxd_w);
 	DECLARE_WRITE_LINE_MEMBER(hold_w);
