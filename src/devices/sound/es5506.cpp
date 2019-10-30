@@ -297,7 +297,7 @@ void es5506_device::device_start()
 	/* init the voices */
 	// 21 bit integer and 11 bit fraction
 	m_accum_shift = ADDRESS_FRAC_BIT - ADDRESS_FRAC_BIT_ES5506;
-	m_accum_mask = ((((1 << 21) - 1) << ADDRESS_FRAC_BIT_ES5506) | ((1 << ADDRESS_FRAC_BIT_ES5506) - 1)) << m_accum_shift;
+	m_accum_mask = (((((1 << 21) - 1) << ADDRESS_FRAC_BIT_ES5506) | ((1 << ADDRESS_FRAC_BIT_ES5506) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
 	for (int j = 0; j < 32; j++)
 	{
 		m_voice[j].index = j;
@@ -410,7 +410,7 @@ void es5505_device::device_start()
 	/* init the voices */
 	// 20 bit integer and 9 bit fraction
 	m_accum_shift = ADDRESS_FRAC_BIT - ADDRESS_FRAC_BIT_ES5505;
-	m_accum_mask = ((((1 << 20) - 1) << ADDRESS_FRAC_BIT_ES5505) | ((1 << ADDRESS_FRAC_BIT_ES5505) - 1)) << m_accum_shift;
+	m_accum_mask = (((((1 << 20) - 1) << ADDRESS_FRAC_BIT_ES5505) | ((1 << ADDRESS_FRAC_BIT_ES5505) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
 	for (int j = 0; j < 32; j++)
 	{
 		m_voice[j].index = j;
