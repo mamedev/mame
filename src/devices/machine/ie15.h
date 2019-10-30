@@ -139,6 +139,15 @@ private:
 	required_device<ie15_keyboard_device> m_keyboard;
 	required_ioport m_io_keyboard;
 
+	output_finder<> m_lat_led;
+	output_finder<> m_nr_led;
+	output_finder<> m_pch_led;
+	output_finder<> m_dup_led;
+	output_finder<> m_lin_led;
+	output_finder<> m_red_led;
+	output_finder<> m_sdv_led;
+	output_finder<> m_prd_led;
+
 	devcb_write_line m_rs232_conn_txd_handler;
 	devcb_write_line m_rs232_conn_dtr_handler;
 	devcb_write_line m_rs232_conn_rts_handler;

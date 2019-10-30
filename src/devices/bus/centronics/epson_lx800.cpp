@@ -92,7 +92,7 @@ void epson_lx800_device::device_add_mconfig(machine_config &config)
 
 	/* gate array */
 	e05a03_device &ic3b(E05A03(config, "ic3b", 0));
-	ic3b.pe_lp_wr_callback().set(FUNC(epson_lx800_device::paperempty_led_w));
+	ic3b.pe_lp_wr_callback().set_output("paperout_led");
 	ic3b.reso_wr_callback().set(FUNC(epson_lx800_device::reset_w));
 	ic3b.pe_wr_callback().set(FUNC(epson_lx800_device::centronics_pe_w));
 	ic3b.data_rd_callback().set(FUNC(epson_lx800_device::centronics_data_r));
@@ -193,7 +193,8 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 	device_t(mconfig, type, tag, owner, clock),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_beep(*this, "beeper")
+	m_beep(*this, "beeper"),
+	m_online_led(*this, "online_led")
 {
 }
 
@@ -204,6 +205,7 @@ epson_lx800_device::epson_lx800_device(const machine_config &mconfig, device_typ
 
 void epson_lx800_device::device_start()
 {
+	m_online_led.resolve();
 }
 
 
@@ -276,7 +278,7 @@ WRITE8_MEMBER( epson_lx800_device::portc_w )
 	logerror("%s: lx800_portc_w(%02x): %02x\n", machine().describe_context(), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
-	machine().output().set_value("online_led", !BIT(data, 2));
+	m_online_led = !BIT(data, 2);
 	m_beep->set_state(!BIT(data, 7));
 }
 
@@ -324,12 +326,6 @@ READ8_MEMBER( epson_lx800_device::centronics_data_r )
 WRITE_LINE_MEMBER( epson_lx800_device::centronics_pe_w )
 {
 	logerror("centronics: pe = %d\n", state);
-}
-
-WRITE_LINE_MEMBER( epson_lx800_device::paperempty_led_w )
-{
-	logerror("setting paperout led: %d\n", state);
-	machine().output().set_value("paperout_led", state);
 }
 
 WRITE_LINE_MEMBER( epson_lx800_device::reset_w )
