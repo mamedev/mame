@@ -696,6 +696,7 @@ rambo.cpp
 ravens.cpp
 rc702.cpp
 rc759.cpp
+rcm32p.cpp
 rd100.cpp
 rd110.cpp
 replicator.cpp
