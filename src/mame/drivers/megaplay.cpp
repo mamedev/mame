@@ -637,12 +637,13 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	{
 		uint32_t* lineptr = &bitmap.pix32(y);
 		uint32_t* srcptr =  &m_vdp1->get_bitmap().pix32(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
+		uint8_t* y1ptr = &m_vdp1->get_y1_bitmap().pix8(y + sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH);
 
 		for (int srcx = 0, xx = 0, dstx = 0; srcx < width; dstx++)
 		{
 			uint32_t src = srcptr[srcx] & 0xffffff;
 
-			if (src)
+			if (y1ptr[srcx])
 			{
 				lineptr[dstx] = src;
 			}
