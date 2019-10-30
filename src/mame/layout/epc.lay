@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Joakim Larsson Edstrom
+LEDs for the Ericsson PC keyboard
+-->
+<mamelayout version="2">
+	<element name="text_caps"><text string="Caps Lock"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_num"><text string="Num Lock"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_scroll"><text string="Scroll Lock"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="led" defstate="0"><disk><color red="0.85" green="0.18" blue="0.16" /></disk></element>
+	
+	<group name="caps">
+		<bezel element="led" name="kbled0"><bounds x="0" y="0" width="100" height="100" /></bezel>
+		<bezel element="text_caps"><bounds x="120" y="0" width="900" height="100" /></bezel>
+	</group>
+
+	<group name="num">
+		<bezel element="led" name="kbled1"><bounds x="0" y="0" width="100" height="100" /></bezel>
+		<bezel element="text_num"><bounds x="120" y="0" width="800" height="100" /></bezel>
+	</group>
+
+	<group name="scroll">
+		<bezel element="led" name="kbled2"><bounds x="0" y="0" width="100" height="100" /></bezel>
+		<bezel element="text_scroll"><bounds x="120" y="0" width="1000" height="100" /></bezel>
+	</group>
+
+	<view name="Default Layout">
+		<screen index="0"><bounds left="0" top="150" right="1000" bottom="900" /></screen>
+		<group ref="caps">  <bounds x="0"    y="0" width="90"  height="10" /></group>
+		<group ref="num">   <bounds x="110" y="0" width="80"  height="10" /></group>
+		<group ref="scroll"><bounds x="210" y="0" width="100" height="10" /></group>
+	</view>
+</mamelayout>
