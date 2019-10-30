@@ -42,6 +42,14 @@ ie15_device::ie15_device(const machine_config &mconfig, device_type type, const 
 	, m_screen(*this, "screen")
 	, m_keyboard(*this, "keyboard")
 	, m_io_keyboard(*this, "io_keyboard")
+	, m_lat_led(*this, "lat_led")
+	, m_nr_led(*this, "nr_led")
+	, m_pch_led(*this, "pch_led")
+	, m_dup_led(*this, "dup_led")
+	, m_lin_led(*this, "lin_led")
+	, m_red_led(*this, "red_led")
+	, m_sdv_led(*this, "sdv_led")
+	, m_prd_led(*this, "prd_led")
 	, m_rs232_conn_txd_handler(*this)
 	, m_rs232_conn_dtr_handler(*this)
 	, m_rs232_conn_rts_handler(*this)
@@ -465,6 +473,15 @@ void ie15_device::device_resolve_objects()
 
 void ie15_device::device_start()
 {
+	m_lat_led.resolve();
+	m_nr_led.resolve();
+	m_pch_led.resolve();
+	m_dup_led.resolve();
+	m_lin_led.resolve();
+	m_red_led.resolve();
+	m_sdv_led.resolve();
+	m_prd_led.resolve();
+
 	m_hblank_timer = timer_alloc(TIMER_HBLANK);
 	m_hblank_timer->adjust(attotime::never);
 
@@ -574,14 +591,14 @@ void ie15_device::update_leds()
 {
 	uint8_t data = m_io_keyboard->read();
 
-	machine().output().set_value("lat_led", m_kb_ruslat ^ 1);
-	machine().output().set_value("nr_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1);
-	machine().output().set_value("pch_led", BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1);
-	machine().output().set_value("dup_led", BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1);
-	machine().output().set_value("lin_led", BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1);
-	machine().output().set_value("red_led", BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1);
-	machine().output().set_value("sdv_led", BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1);
-	machine().output().set_value("prd_led", 1); // XXX
+	m_lat_led = m_kb_ruslat ^ 1;
+	m_nr_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_NR_BIT) ^ 1;
+	m_pch_led = BIT(data, ie15_keyboard_device::IE_KB_PCH_BIT) ^ 1;
+	m_dup_led = BIT(data, ie15_keyboard_device::IE_KB_DUP_BIT) ^ 1;
+	m_lin_led = BIT(data, ie15_keyboard_device::IE_KB_LIN_BIT) ^ 1;
+	m_red_led = BIT(data, ie15_keyboard_device::IE_KB_RED_BIT) ^ 1;
+	m_sdv_led = BIT(m_kb_control, ie15_keyboard_device::IE_KB_SDV_BIT) ^ 1;
+	m_prd_led = 1; // XXX
 }
 
 /*

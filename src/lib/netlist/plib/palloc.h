@@ -441,7 +441,7 @@ namespace plib {
 	//============================================================
 
 	// FIXME: needs a separate file
-	template <class T, std::size_t ALIGN = alignof(T)>
+	template <class T, std::size_t ALIGN = PALIGN_VECTOROPT>
 	class aligned_vector : public std::vector<T, aligned_allocator<T, ALIGN>>
 	{
 	public:
@@ -454,6 +454,9 @@ namespace plib {
 		using size_type = typename base::size_type;
 
 		using base::base;
+
+		base & as_base() noexcept { return *this; }
+		const base & as_base() const noexcept { return *this; }
 
 		C14CONSTEXPR reference operator[](size_type i) noexcept
 		{

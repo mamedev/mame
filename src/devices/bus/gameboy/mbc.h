@@ -122,8 +122,10 @@ protected:
 	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
-	virtual void device_start() override { shared_start(); }
+	virtual void device_start() override { shared_start(); m_rumble.resolve(); }
 	virtual void device_reset() override { shared_reset(); }
+
+	output_finder<> m_rumble;
 };
 
 // ======================> gb_rom_mbc6_device
