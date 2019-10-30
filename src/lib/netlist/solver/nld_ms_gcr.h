@@ -35,19 +35,84 @@ namespace devices
 		static constexpr const std::size_t storage_N = 100;
 
 		matrix_solver_GCR_t(netlist_state_t &anetlist, const pstring &name,
-				const solver_parameters_t *params, const std::size_t size)
-			: matrix_solver_t(anetlist, name, params)
-			, m_dim(size)
-			, RHS(size)
-			, new_V(size)
-			, mat(static_cast<typename mat_type::index_type>(size))
-			, m_proc()
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params, const std::size_t size)
+		: matrix_solver_t(anetlist, name, nets, params)
+		, m_dim(size)
+		, RHS(size)
+		, new_V(size)
+		, mat(static_cast<typename mat_type::index_type>(size))
+		, m_proc()
+		{
+			const std::size_t iN = this->N();
+
+			/* build the final matrix */
+
+			std::vector<std::vector<unsigned>> fill(iN);
+
+			std::size_t raw_elements = 0;
+
+			for (std::size_t k = 0; k < iN; k++)
 			{
+				fill[k].resize(iN, decltype(mat)::FILL_INFINITY);
+				for (auto &j : this->m_terms[k].m_nz)
+				{
+					fill[k][j] = 0;
+					raw_elements++;
+				}
+
 			}
+
+			auto gr = mat.gaussian_extend_fill_mat(fill);
+
+			log_fill(fill, mat);
+
+			mat.build_from_fill_mat(fill);
+
+			for (mat_index_type k=0; k<iN; k++)
+			{
+				std::size_t cnt(0);
+				/* build pointers into the compressed row format matrix for each terminal */
+				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				{
+					int other = this->m_terms[k].m_connected_net_idx[j];
+					for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
+						if (other == static_cast<int>(mat.col_idx[i]))
+						{
+							m_mat_ptr[k][j] = &mat.A[i];
+							cnt++;
+							break;
+						}
+				}
+				nl_assert(cnt == this->m_terms[k].railstart());
+				m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
+			}
+
+			this->log().verbose("maximum fill: {1}", gr.first);
+			this->log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
+					static_cast<double>(mat.nz_num) / static_cast<double>(iN * iN));
+			this->log().verbose(" Pre elimination occupancy ratio: {2}",
+					static_cast<double>(raw_elements) / static_cast<double>(iN * iN));
+
+			// FIXME: Move me
+
+			if (state().lib().isLoaded())
+			{
+				pstring symname = static_compile_name();
+				m_proc.load(this->state().lib(), symname);
+				if (m_proc.resolved())
+				{
+					this->log().info("External static solver {1} found ...", symname);
+				}
+				else
+				{
+					this->log().warning("External static solver {1} not found ...", symname);
+				}
+			}
+		}
 
 		constexpr std::size_t N() const { return m_dim; }
 
-		void vsetup(analog_net_t::list_t &nets) override;
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 		std::pair<pstring, pstring> create_solver_code() override;
@@ -73,78 +138,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver - GCR
 	// ----------------------------------------------------------------------------------------
-
-	template <typename FT, int SIZE>
-	void matrix_solver_GCR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-	{
-		setup_base(nets);
-
-		const std::size_t iN = this->N();
-
-		/* build the final matrix */
-
-		std::vector<std::vector<unsigned>> fill(iN);
-
-		std::size_t raw_elements = 0;
-
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			fill[k].resize(iN, decltype(mat)::FILL_INFINITY);
-			for (auto &j : this->m_terms[k].m_nz)
-			{
-				fill[k][j] = 0;
-				raw_elements++;
-			}
-
-		}
-
-		auto gr = mat.gaussian_extend_fill_mat(fill);
-
-		log_fill(fill, mat);
-
-		mat.build_from_fill_mat(fill);
-
-		for (mat_index_type k=0; k<iN; k++)
-		{
-			std::size_t cnt(0);
-			/* build pointers into the compressed row format matrix for each terminal */
-			for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
-			{
-				int other = this->m_terms[k].m_connected_net_idx[j];
-				for (auto i = mat.row_idx[k]; i <  mat.row_idx[k+1]; i++)
-					if (other == static_cast<int>(mat.col_idx[i]))
-					{
-						m_mat_ptr[k][j] = &mat.A[i];
-						cnt++;
-						break;
-					}
-			}
-			nl_assert(cnt == this->m_terms[k].railstart());
-			m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
-		}
-
-		this->log().verbose("maximum fill: {1}", gr.first);
-		this->log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
-				static_cast<double>(mat.nz_num) / static_cast<double>(iN * iN));
-		this->log().verbose(" Pre elimination occupancy ratio: {2}",
-				static_cast<double>(raw_elements) / static_cast<double>(iN * iN));
-
-		// FIXME: Move me
-
-		if (state().lib().isLoaded())
-		{
-			pstring symname = static_compile_name();
-			m_proc.load(this->state().lib(), symname);
-			if (m_proc.resolved())
-			{
-				this->log().info("External static solver {1} found ...", symname);
-			}
-			else
-			{
-				this->log().warning("External static solver {1} not found ...", symname);
-			}
-		}
-	}
 
 	template <typename FT, int SIZE>
 	void matrix_solver_GCR_t<FT, SIZE>::generate_code(plib::putf8_fmt_writer &strm)

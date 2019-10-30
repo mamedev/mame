@@ -42,7 +42,8 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 
 	matrix_solver_t::matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
-			const solver_parameters_t *params)
+		const analog_net_t::list_t &nets,
+		const solver_parameters_t *params)
 		: device_t(anetlist, name)
 		, m_params(*params)
 		, m_stat_calculations(*this, "m_stat_calculations", 0)
@@ -56,9 +57,10 @@ namespace devices
 		, m_ops(0)
 	{
 		connect_post_start(m_fb_sync, m_Q_sync);
+		setup_base(nets);
 	}
 
-	void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
+	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
 	{
 
 		log().debug("New solver setup\n");

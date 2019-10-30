@@ -29,8 +29,10 @@ public:
 
 	using float_type = FT;
 
-	matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
+	matrix_solver_SOR_t(netlist_state_t &anetlist, const pstring &name,
+		analog_net_t::list_t &nets,
+		const solver_parameters_t *params, const std::size_t size)
+		: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
 		, m_lp_fact(*this, "m_lp_fact", 0)
 		, w(size, 0.0)
 		, one_m_w(size, 0.0)
@@ -39,7 +41,6 @@ public:
 		{
 		}
 
-	void vsetup(analog_net_t::list_t &nets) override;
 	unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 private:
@@ -53,13 +54,6 @@ private:
 // ----------------------------------------------------------------------------------------
 // matrix_solver - Gauss - Seidel
 // ----------------------------------------------------------------------------------------
-
-
-template <typename FT, int SIZE>
-void matrix_solver_SOR_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-{
-	matrix_solver_direct_t<FT, SIZE>::vsetup(nets);
-}
 
 template <typename FT, int SIZE>
 unsigned matrix_solver_SOR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)

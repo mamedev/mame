@@ -29,9 +29,10 @@ namespace devices
 
 		using float_type = FT;
 
-		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size);
+		matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params, const std::size_t size);
 
-		void vsetup(analog_net_t::list_t &nets) override;
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
@@ -64,25 +65,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver_direct
 	// ----------------------------------------------------------------------------------------
-
-	template <typename FT, int SIZE>
-	void matrix_solver_direct_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-	{
-		matrix_solver_t::setup_base(nets);
-
-		/* add RHS element */
-		for (std::size_t k = 0; k < size(); k++)
-		{
-			terms_for_net_t & t = m_terms[k];
-
-			if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(size())))
-				t.m_nzrd.push_back(static_cast<unsigned>(size()));
-		}
-
-		// FIXME: This shouldn't be necessary ...
-		for (std::size_t k = 0; k < size(); k++)
-			state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
-	}
 
 	template <typename FT, int SIZE>
 	void matrix_solver_direct_t<FT, SIZE>::LE_solve()
@@ -210,13 +192,27 @@ namespace devices
 
 	template <typename FT, int SIZE>
 	matrix_solver_direct_t<FT, SIZE>::matrix_solver_direct_t(netlist_state_t &anetlist, const pstring &name,
-			const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, params)
+		const analog_net_t::list_t &nets,
+		const solver_parameters_t *params,
+		const std::size_t size)
+	: matrix_solver_t(anetlist, name, nets, params)
 	, m_new_V(size)
 	, m_dim(size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 1) + 7) / 8) * 8)
 	, m_A(size, m_pitch)
 	{
+		/* add RHS element */
+		for (std::size_t k = 0; k < this->size(); k++)
+		{
+			terms_for_net_t & t = m_terms[k];
+
+			if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(this->size())))
+				t.m_nzrd.push_back(static_cast<unsigned>(this->size()));
+		}
+
+		// FIXME: This shouldn't be necessary ...
+		for (std::size_t k = 0; k < this->size(); k++)
+			state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
 	}
 
 } // namespace devices

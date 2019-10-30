@@ -27,9 +27,11 @@ namespace devices
 
 		using float_type = FT;
 
-		matrix_solver_direct2_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params)
-			: matrix_solver_direct_t<double, 2>(anetlist, name, params, 2)
-			{}
+		matrix_solver_direct2_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params)
+		: matrix_solver_direct_t<FT, 2>(anetlist, name, nets, params, 2)
+		{}
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override
 		{
 			this->build_LE_A(*this);

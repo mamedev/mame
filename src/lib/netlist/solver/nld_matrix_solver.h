@@ -162,11 +162,6 @@ namespace devices
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
 
-		void setup(analog_net_t::list_t &nets)
-		{
-			vsetup(nets);
-		}
-
 		void solve_base();
 
 		/* after every call to solve, update inputs must be called.
@@ -206,14 +201,13 @@ namespace devices
 	protected:
 
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
 		void sort_terms(matrix_sort_type_e sort);
 
-		void setup_base(analog_net_t::list_t &nets);
 		void update_dynamic();
 
-		virtual void vsetup(analog_net_t::list_t &nets) = 0;
 		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 
 		netlist_time compute_next_timestep(const double cur_ts);
@@ -391,9 +385,6 @@ namespace devices
 		state_var<int> m_iterative_fail;
 		state_var<int> m_iterative_total;
 
-
-
-
 	private:
 
 		state_var<netlist_time> m_last_step;
@@ -402,6 +393,9 @@ namespace devices
 
 		logic_input_t m_fb_sync;
 		logic_output_t m_Q_sync;
+
+		/* base setup - called from constructor */
+		void setup_base(const analog_net_t::list_t &nets);
 
 		/* calculate matrix */
 		void setup_matrix();

@@ -57,9 +57,17 @@ namespace devices
 		static constexpr const std::size_t storage_N = 100;
 
 		matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
-				const solver_parameters_t *params, const std::size_t size);
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params, const std::size_t size)
+		: matrix_solver_t(anetlist, name, nets, params)
+		, m_dim(size)
+		, m_cnt(0)
+		{
+			/* FIXME: Shouldn't be necessary */
+			for (std::size_t k = 0; k < this->size(); k++)
+				state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
+		}
 
-		void vsetup(analog_net_t::list_t &nets) override;
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
@@ -111,16 +119,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver_direct
 	// ----------------------------------------------------------------------------------------
-
-	template <typename FT, int SIZE>
-	void matrix_solver_sm_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-	{
-		matrix_solver_t::setup_base(nets);
-
-		/* FIXME: Shouldn't be necessary */
-		for (std::size_t k = 0; k < size(); k++)
-			state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
-	}
 
 	template <typename FT, int SIZE>
 	void matrix_solver_sm_t<FT, SIZE>::LE_invert()
@@ -298,14 +296,6 @@ namespace devices
 		return this->solve_non_dynamic(newton_raphson);
 	}
 
-	template <typename FT, int SIZE>
-	matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
-			const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, params)
-	, m_dim(size)
-	, m_cnt(0)
-	{
-	}
 
 } // namespace devices
 } // namespace netlist
