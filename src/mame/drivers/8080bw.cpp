@@ -3568,18 +3568,18 @@ void _8080bw_state::init_invmulti()
 /***********************************************************************************************************************************
 	This game was never released by Model Racing to the public.
 
-	The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer
+	The assembler source files for this game were extracted from the original floppy disks used by the former Model Racing developer
 	Adolfo Melilli (adolfo@melilli.com).
-	Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
+	Those disks were retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
 	dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
 	Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
-	romset and wrote a mame driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
+	romset and wrote a MAME driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
 
 	The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
-	code and comments written into the source files of the game. Several of those hypothesis came following the directions of
-	previous yet contemporary Model Racing works (Eg: Claybuster) and where confirmed by Melilli himself.
+	code and comments written into the source files of the game. Several of those hypotheses came following the directions of
+	previous yet contemporary Model Racing works (Eg: Claybuster) and were confirmed by Melilli himself.
 
-	Being unreleased this games has not an official name, thus the name used in the source files was used instead.
+	Being unreleased this game lacks an official name, thus the name used in the source files was used instead.
 
 ***********************************************************************************************************************************/
 void cane_state::cane_map(address_map &map)
@@ -3612,7 +3612,7 @@ void cane_state::cane_io_map(address_map &map)
 =================================================================================================================
 ------------
 -- OUT 0 --
-Source file: CANE1.ED - Referred only once in code, in the "rifle routine" (ROUTINE FUCILE)
+Source file: CANE1.ED - Referenced only once in code, in the "rifle routine" (ROUTINE FUCILE)
 
 	> ;ROUTINE FUCILE
 	>   CALL  SPARO
@@ -3626,7 +3626,7 @@ Source files: CANE2.ED, MIRINO.ED
 
 	> PRMTR EQU 1
 
-	and referred multiple times in CANE2.ED and MIRINO.ED. Eg:
+	and referenced multiple times in CANE2.ED and MIRINO.ED. Eg:
 
 	> ;PER RISPETTARE POS ORIZZONT. UCCELLO
 	>   LXI D,TPADEL
@@ -3641,7 +3641,7 @@ Source files: CANE1.ED, CANE2.ED, MIRINO.ED
 
 	> DATO  EQU 2
 
-	and referred multiple times in CANE1.ED and MIRINO.ED. Eg:
+	and referenced multiple times in CANE1.ED and MIRINO.ED. Eg:
 
 	> ZANZ: XRA A
 	>   OUT DATO
@@ -3661,7 +3661,7 @@ Source file: CANE2.ED
 	> RESP3:
 	> ;IL CONTRARIO DI SETP3
 
-	and referred multiple times in CANE2.ED. Eg:
+	and referenced multiple times in CANE2.ED. Eg:
 
 	> ;SPENGO IL VOLO UCCELLI
 	> MVI A,0FEH
@@ -3690,16 +3690,16 @@ Source file: CANE1.ED, CANE2.ED
 Source file: CANE2.ED, TOS.ED
 
 TOS sound
-D0-D7 is pushed into a LS273 (Octal D-type Flip-Flop) and it's value is used to preload the starting value of
+D0-D7 is pushed into a LS273 (Octal D-type Flip-Flop) and its value is used to preload the starting value of
 two, cascaded, LS161 (Synchronous 4-Bit Counters).
-The counters drive a J-K Flip-Flop generating a square wave signal drived in frequency by the preloaded value.
+The counters drive a J-K Flip-Flop generating a square wave signal driven in frequency by the preloaded value.
 
 	> CANONE:
 	> ;AZZITTO IL TOS:
 	>   MVI A,255   ; A = 255       ; TIMER spento
 	>   OUT 5       ; OUT 5
 
-The musical note is defined in a library source file TOS.ED and referred later by the source files, eg. in CANE2.ED:
+The musical notes are defined in a library source file TOS.ED and referenced later by the source files, eg. in CANE2.ED:
 	> CARICA: DB  RE,FA,FA,FA,FA,PAU
 	>   DB  RE,FA,FA,FA,FA,PAU
 	>   DB  RE,FA,PAU,RE,FA,PAU
@@ -3711,7 +3711,7 @@ The musical note is defined in a library source file TOS.ED and referred later b
 
 	> CIPCIP: DB  220,215,210,205,200,FINALE
 
-	The notes are defined in TOS.ed:
+	The notes are defined in TOS.ED:
 	> ; SI PARTE DA UNA FREQUENZA DI CLOCK DI 1 MHZ CIRCA,QUESTA FREQUENZA DIVISA)
 	> ; PER UNA SERIE DI PARAMETRI ATTRAVERSO DEI DIVISORI PROGRAMMABILI FORNISCE
 	> ; ALL'USCITA DI QUESTI I DODICI SEMITONI DELLA SCALA CROMATICA
@@ -3763,7 +3763,7 @@ Source file: CANE1.ED, CANE2.ED
 
 	> PRONTO  EQU 3
 
-	and referred in CANE1.ED
+	and referenced in CANE1.ED
 
 	> OUT LOW DATO
 	> IN  LOW PRONTO
@@ -3827,7 +3827,7 @@ static INPUT_PORTS_START( cane )
 	> SAR9A:  IN  1
 	>   ANI 4
 
-	Start game: (Verificare con debug $3C2)
+	Start game: (Verified by debugging $3C2)
 	CANE1.ED
 	> IN  1
 	> ANI 8
@@ -3879,18 +3879,18 @@ void cane_state::cane_unknown_port0_w(u8 data)
 	This game was never completed and released by Model Racing to the public.
 	It's in a nearly incomplete form (eg: doesn't have any sound or score routine in the code) and it's barely playable.
 
-	The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer
+	The assembler source files for this game were extracted from the original floppy disks used by the former Model Racing developer
 	Adolfo Melilli (adolfo@melilli.com).
-	Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
+	Those disks were retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
 	dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
 	Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
-	romset and wrote a mame driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
+	ROMset and wrote a MAME driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
 
 	The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
-	code and comments written into the source files of the game. Several of those hypothesis came following the directions of
-	previous yet contemporary Model Racing works (Eg: Claybuster) and where confirmed by Melilli himself.
+	code and comments written into the source files of the game. Several of those hypotheses came following the directions of
+	previous yet contemporary Model Racing works (Eg: Claybuster) and were confirmed by Melilli himself.
 
-	Being unreleased this games has not an official name, thus the name used in the source files was used instead.
+	Being unreleased this game lacks an official name, thus the name used in the source files was used instead.
 
 ***********************************************************************************************************************************/
 
@@ -3920,7 +3920,7 @@ void orbite_state::orbite_io_map(address_map &map)
 {
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 
-	// Ports verified on sources
+	// Ports verified from source code
 	map(0x08, 0x08).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 	map(0x20, 0x20).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x40, 0x40).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
