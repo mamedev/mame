@@ -10,6 +10,8 @@
 #include "sound/discrete.h"
 #include "speaker.h"
 
+#include <cmath>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -1462,15 +1464,12 @@ cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *
 	m_vco_timer(*this, "vco_timer"),
 	m_sn(*this, "snsnd"),
 	m_discrete(*this, "discrete"),
-	m_vco_rc_chargetime(INT_MAX)
+	m_vco_rc_chargetime(attotime::never)
 {
 }
 
 void cane_audio_device::device_add_mconfig(machine_config &config)
 {
-	// provare a commentare
-	m_vco_rc_chargetime = INT_MAX;
-
 	TIMER(config, m_vco_timer).configure_periodic(FUNC(cane_audio_device::vco_voltage_timer), attotime::from_hz(1000));
 
 	SPEAKER(config, "mono").front_center();
@@ -1504,6 +1503,10 @@ ioport_constructor cane_audio_device::device_input_ports() const
 
 void cane_audio_device::device_start()
 {
+	// provare a commentare
+	m_vco_rc_chargetime = attotime::never;
+
+	save_item(NAME(m_vco_rc_chargetime));
 }
 
 void cane_audio_device::sh_port_1_w(u8 data)
@@ -1524,7 +1527,7 @@ void cane_audio_device::sh_port_1_w(u8 data)
 	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
 
 	m_vco_timer->adjust(attotime::zero, m_vco_timer->param(), attotime::from_hz(1000));
-	m_vco_rc_chargetime = m_vco_timer->start_time().as_double();
+	m_vco_rc_chargetime = m_vco_timer->start_time();
 
 	// Little hack...
 	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
@@ -1672,10 +1675,10 @@ DISCRETE_SOUND_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::vco_voltage_timer)
 {
-	double voltage;
-	voltage = 5 * (1 - exp(- (m_vco_timer->fire_time().as_double() - m_vco_rc_chargetime) / 47));
+	const double delta = (m_vco_timer->fire_time() - m_vco_rc_chargetime).as_double();
+	const double voltage = 5 * (1 - std::exp(-delta / 47));
 
-	LOG("t = %d\n", m_vco_timer->fire_time().as_double() - m_vco_rc_chargetime);
+	LOG("t = %d\n", delta);
 	LOG("vco_voltage = %d\n", voltage);
 
 	m_sn->vco_voltage_w(voltage);

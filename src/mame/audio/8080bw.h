@@ -37,7 +37,7 @@ private:
 	required_device<sn76477_device> m_sn;
 	required_device<discrete_sound_device> m_discrete;
 
-	double m_vco_rc_chargetime;
+	attotime m_vco_rc_chargetime;
 };
 
 DECLARE_DEVICE_TYPE(CANE_AUDIO, cane_audio_device)
