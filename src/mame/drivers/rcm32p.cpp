@@ -9,8 +9,19 @@
     Thanks to KitsuWhooa for the PCB layout diagram and part list.
 
 
-Note: The firmware gets stuck in the loop at 0xBB06, waiting for Interrupt #5 (calls 0x4014/0x4030) to fire.
-It gets there by calling function 0xBBBB, which writes text (address w@0x40, num characters b@0x43) to the LCD screen.
+Notes:
+- When booting, it does a basic check by writing values 0..0xFF to 0x108A.
+  It then expects (value & 0x03) to be read back from 0x1080 and (value) to be read back from 0x1081/0x1082.
+  If there is any unexpected results, it goes into Test Mode. (jump to 0x46D4)
+  Booting normally means it finally ends up at 0x4801.
+  The routine for doing the check begins at 0x4686.
+- When in test mode, the firmware gets stuck in the loop at 0xBB06, waiting for Interrupt #5 (calls 0x4014/0x4030) to fire.
+  It gets there by calling function 0xBBBB, which writes text (address w@0x40, num characters b@0x43) to the LCD screen.
+  This can be worked around by setting b@BB2D = 03.
+
+  It then gets stuck at 0x6718, trying to read a "mode" value (0 to 7) from 0x1300.
+  The byte at 0x1300 contains the bit mask of the pressed test switches. (see service notes, page 10/11)
+  Modes are selected by checking the first unset bit in order 0..7.
 
 
 PCB Layout
@@ -113,6 +124,17 @@ Parts:
 static INPUT_PORTS_START( cm32p )
 	PORT_START("A7")
 	PORT_BIT(0x03ff, 0x0000, IPT_DIAL) PORT_NAME("Knob") PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
+
+	PORT_START("SW")	// test switches
+	//PORT_BIT(0x00, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Check/Tune") PORT_CODE(KEYCODE_0)	// default after booting test mode
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("MSB Adj.") PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("THD Check") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: String 1") PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: Sax 1") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Long Reverb") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Short Reverb") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Down Check") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Up Check") PORT_CODE(KEYCODE_F)
 INPUT_PORTS_END
 
 class cm32p_state : public driver_device
@@ -128,8 +150,9 @@ protected:
 
 private:
 	required_device<i8x9x_device> cpu;
-	optional_device<msm6222b_device> lcd;
+	required_device<msm6222b_device> lcd;
 	required_device<timer_device> midi_timer;
+	required_ioport test_sw;
 
 	void mt32_palette(palette_device &palette) const;
 
@@ -144,25 +167,27 @@ private:
 	DECLARE_READ8_MEMBER(pcmrom_r);
 	DECLARE_READ8_MEMBER(snd_io_r);
 	DECLARE_WRITE8_MEMBER(snd_io_w);
+	DECLARE_READ8_MEMBER(test_sw_r);
 	
 	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
 
 	void cm32p_map(address_map &map);
 
-	uint8_t lcd_data_buffer[256];
-	int lcd_data_buffer_pos;
+	//uint8_t lcd_data_buffer[256];
+	//int lcd_data_buffer_pos;
 	uint8_t midi;
 	int midi_pos;
 	uint8_t port0;
 	uint8_t sound_io_buffer[256];
 };
 
-cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const char *tag) :
-	driver_device(mconfig, type, tag),
-	cpu(*this, "maincpu"),
-	lcd(*this, "lcd"),
-	midi_timer(*this, "midi_timer")
+cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, cpu(*this, "maincpu")
+	, lcd(*this, "lcd")
+	, midi_timer(*this, "midi_timer")
+	, test_sw(*this, "SW")
 {
 }
 
@@ -201,7 +226,9 @@ uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void cm32p_state::machine_start()
 {
-	lcd_data_buffer_pos = 0;
+	//lcd_data_buffer_pos = 0;
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0xBB2D] = 0x03;	// hack to make test mode work (TODO: remove)
 }
 
 void cm32p_state::machine_reset()
@@ -214,9 +241,9 @@ void cm32p_state::machine_reset()
 WRITE8_MEMBER(cm32p_state::lcd_ctrl_w)
 {
 	lcd->control_w(data);
-	for(int i=0; i != lcd_data_buffer_pos; i++)
-		lcd->data_w(lcd_data_buffer[i]);
-	lcd_data_buffer_pos = 0;
+	//for(int i=0; i != lcd_data_buffer_pos; i++)
+	//	lcd->data_w(lcd_data_buffer[i]);
+	//lcd_data_buffer_pos = 0;
 }
 
 READ8_MEMBER(cm32p_state::lcd_ctrl_r)
@@ -228,7 +255,8 @@ READ8_MEMBER(cm32p_state::lcd_ctrl_r)
 
 WRITE8_MEMBER(cm32p_state::lcd_data_w)
 {
-	lcd_data_buffer[lcd_data_buffer_pos++] = data;
+	//lcd_data_buffer[lcd_data_buffer_pos++] = data;
+	lcd->data_w(data);
 }
 
 WRITE16_MEMBER(cm32p_state::midi_w)
@@ -285,6 +313,11 @@ WRITE8_MEMBER(cm32p_state::snd_io_w)
 	sound_io_buffer[offset] = data;
 }
 
+READ8_MEMBER(cm32p_state::test_sw_r)
+{
+	return test_sw->read();
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::samples_timer_cb)
 {
 	port0 ^= 0x10;
@@ -301,7 +334,8 @@ void cm32p_state::cm32p_map(address_map &map)
 	map(0x1000, 0x10ff).ram();	// I/O ?? (writes to 1080..82/86/8C/8D)
 	map(0x1100, 0x1100).rw(FUNC(cm32p_state::lcd_ctrl_r), FUNC(cm32p_state::lcd_ctrl_w));
 	map(0x1102, 0x1102).w(FUNC(cm32p_state::lcd_data_w));
-	map(0x1200, 0x13ff).ram();	// I/O ?? (reads 1300)
+	//map(0x1200, 0x13ff).ram();	// I/O ?? (reads 1300)
+	map(0x1300, 0x1300).r(FUNC(cm32p_state::test_sw_r));
 	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));	// sound chip area? (writes to 1400..1F, reads 1401)
 	map(0x2000, 0x20ff).rom().region("maincpu", 0x2000);	// init vector @ 2080
 	map(0x2100, 0x3fff).ram();	// the program clears region 2100..3EFF at init and sets SP=3FFE
