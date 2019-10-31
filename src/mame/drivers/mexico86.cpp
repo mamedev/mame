@@ -445,7 +445,7 @@ void mexico86_state::mexico86(machine_config &config)
 	m_subcpu->set_vblank_int("screen", FUNC(mexico86_state::irq0_line_hold));
 
 	/* 100 CPU slices per frame - high value to ensure proper synchronization of the CPUs */
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

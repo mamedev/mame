@@ -43,13 +43,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-#define VIDEOBRAIN_EXPANSION_SLOT_TAG       "exp"
-
-
-//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -57,7 +50,7 @@ class videobrain_expansion_slot_device;
 
 // ======================> device_videobrain_expansion_card_interface
 
-class device_videobrain_expansion_card_interface : public device_slot_card_interface
+class device_videobrain_expansion_card_interface : public device_interface
 {
 	friend class videobrain_expansion_slot_device;
 
@@ -90,7 +83,7 @@ protected:
 // ======================> videobrain_expansion_slot_device
 
 class videobrain_expansion_slot_device : public device_t,
-											public device_slot_interface,
+											public device_single_card_slot_interface<device_videobrain_expansion_card_interface>,
 											public device_image_interface
 {
 public:
@@ -109,8 +102,8 @@ public:
 	auto extres_wr_callback() { return m_write_extres.bind(); }
 
 	// computer interface
-	uint8_t bo_r(offs_t offset, int cs1, int cs2);
-	void bo_w(offs_t offset, uint8_t data, int cs1, int cs2);
+	uint8_t bo_r(offs_t offset, int cs1, int cs2) { return m_cart ? m_cart->videobrain_bo_r(offset, cs1, cs2) : 0; }
+	void bo_w(offs_t offset, uint8_t data, int cs1, int cs2) { if (m_cart) m_cart->videobrain_bo_w(offset, data, cs1, cs2); }
 
 	uint8_t cs1_r(offs_t offset) { return bo_r(offset + 0x1000, 0, 1); }
 	void cs1_w(offs_t offset, uint8_t data) { bo_w(offset + 0x1000, data, 0, 1); }

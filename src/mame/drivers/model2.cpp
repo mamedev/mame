@@ -2809,7 +2809,7 @@ void model2b_state::model2b(machine_config &config)
 	//m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
 	//m_dsp2->set_addrmap(AS_DATA, &model2b_state::geo_sharc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(18000);
+	config.set_maximum_quantum(attotime::from_hz(18000));
 
 	GENERIC_FIFO_U32(config, m_copro_fifo_in, 0);
 	GENERIC_FIFO_U32(config, m_copro_fifo_out, 0);

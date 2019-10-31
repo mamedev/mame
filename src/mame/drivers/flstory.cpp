@@ -744,7 +744,7 @@ void flstory_state::common(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(flstory_state::irq0_line_hold), attotime::from_hz(2*60));
 
 	/* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

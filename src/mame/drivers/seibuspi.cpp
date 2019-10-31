@@ -1790,7 +1790,7 @@ void seibuspi_state::spi(machine_config &config)
 	Z80(config, m_audiocpu, 28.636363_MHz_XTAL / 4); // Z84C0008PEC, 7.159MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &seibuspi_state::spi_soundmap);
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(seibuspi_state, spi)
 

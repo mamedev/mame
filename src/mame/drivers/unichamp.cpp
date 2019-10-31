@@ -255,7 +255,7 @@ void unichamp_state::unichamp(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &unichamp_state::unichamp_mem);
 	m_maincpu->bext().set(FUNC(unichamp_state::bext_r));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

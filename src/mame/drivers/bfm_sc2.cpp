@@ -2282,7 +2282,7 @@ void bfm_sc2_vid_state::scorpion2_vid(machine_config &config)
 	MC6809(config, m_maincpu, MASTER_CLOCK); // MC68B09P (2 MHz bus)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc2_vid_state::memmap_vid);                       // setup scorpion2 board memorymap
 	m_maincpu->set_periodic_int(FUNC(bfm_sc2_vid_state::timer_irq), attotime::from_hz(1000)); // generate 1000 IRQ's per second
-	config.m_minimum_quantum = attotime::from_hz(960);                                        // needed for serial communication !!
+	config.set_maximum_quantum(attotime::from_hz(960));                                        // needed for serial communication !!
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9));
 
@@ -3808,7 +3808,7 @@ void bfm_sc2_awp_state::scorpion3(machine_config &config)
 /* machine driver for scorpion2 board + matrix board */
 void bfm_sc2_dmd_state::scorpion2_dm01(machine_config &config)
 {
-	config.m_minimum_quantum = attotime::from_hz(960);                                   // needed for serial communication !!
+	config.set_maximum_quantum(attotime::from_hz(960));                                   // needed for serial communication !!
 	MC6809(config, m_maincpu, MASTER_CLOCK); // MC68B09P (2 MHz bus)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bfm_sc2_dmd_state::memmap_no_vid);
 	m_maincpu->set_periodic_int(FUNC(bfm_sc2_dmd_state::timer_irq), attotime::from_hz(1000));

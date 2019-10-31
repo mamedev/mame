@@ -544,7 +544,7 @@ void europc_fdc_device::device_add_mconfig(machine_config &config)
 	fdc.drq_wr_callback().set(FUNC(isa8_fdc_device::drq_w));
 	// single built-in 3.5" 720K drive, connector for optional external 3.5" or 5.25" drive
 	FLOPPY_CONNECTOR(config, "fdc:0", pc_dd_floppies, "35dd", isa8_fdc_device::floppy_formats).set_fixed(true);
-	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, "", isa8_fdc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", pc_dd_floppies, nullptr, isa8_fdc_device::floppy_formats);
 }
 
 static void europc_fdc(device_slot_interface &device)

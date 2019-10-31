@@ -26,8 +26,8 @@ DEFINE_DEVICE_TYPE(BBC_1MHZBUS_SLOT, bbc_1mhzbus_slot_device, "bbc_1mhzbus_slot"
 //  device_bbc_1mhzbus_interface - constructor
 //-------------------------------------------------
 
-device_bbc_1mhzbus_interface::device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_bbc_1mhzbus_interface::device_bbc_1mhzbus_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "bbc1mhzbus")
 {
 	m_slot = dynamic_cast<bbc_1mhzbus_slot_device *>(device.owner());
 }
@@ -43,23 +43,11 @@ device_bbc_1mhzbus_interface::device_bbc_1mhzbus_interface(const machine_config 
 
 bbc_1mhzbus_slot_device::bbc_1mhzbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_1MHZBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_bbc_1mhzbus_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_validity_check -
-//-------------------------------------------------
-
-void bbc_1mhzbus_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const carddev = get_card_device();
-	if (carddev && !dynamic_cast<device_bbc_1mhzbus_interface *>(carddev))
-		osd_printf_error("Card device %s (%s) does not implement device_bbc_1mhzbus_interface\n", carddev->tag(), carddev->name());
 }
 
 
@@ -69,24 +57,13 @@ void bbc_1mhzbus_slot_device::device_validity_check(validity_checker &valid) con
 
 void bbc_1mhzbus_slot_device::device_start()
 {
-	device_t *const carddev = get_card_device();
-	m_card = dynamic_cast<device_bbc_1mhzbus_interface *>(carddev);
-	if (carddev && !m_card)
-		fatalerror("Card device %s (%s) does not implement device_bbc_1mhzbus_interface\n", carddev->tag(), carddev->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_1mhzbus_slot_device::device_reset()
-{
-}
 
 //-------------------------------------------------
 //  read

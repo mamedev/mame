@@ -395,7 +395,7 @@ void megaphx_state::megaphx(machine_config &config)
 	pic.read_b().set(FUNC(megaphx_state::pic_portb_r));
 	pic.write_b().set(FUNC(megaphx_state::pic_portb_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	TTL166(config, m_dsw_shifter[0]);
 	m_dsw_shifter[0]->data_callback().set_ioport("DSW1");

@@ -893,22 +893,22 @@ WRITE8_MEMBER(neogeo_base_state::audio_cpu_enable_nmi_w)
 
 READ16_MEMBER(ngarcade_base_state::in0_edge_r)
 {
-	return (m_edge->in0_r(space, offset) << 8) | m_dsw->read();
+	return (m_edge->in0_r() << 8) | m_dsw->read();
 }
 
 READ16_MEMBER(ngarcade_base_state::in0_edge_joy_r)
 {
-	return ((m_edge->in0_r(space, offset) & m_ctrl1->ctrl_r(space, offset)) << 8) | m_dsw->read();
+	return ((m_edge->in0_r() & m_ctrl1->read_ctrl()) << 8) | m_dsw->read();
 }
 
 READ16_MEMBER(ngarcade_base_state::in1_edge_r)
 {
-	return (m_edge->in1_r(space, offset) << 8) | 0xff;
+	return (m_edge->in1_r() << 8) | 0xff;
 }
 
 READ16_MEMBER(ngarcade_base_state::in1_edge_joy_r)
 {
-	return ((m_edge->in1_r(space, offset) & m_ctrl2->ctrl_r(space, offset)) << 8) | 0xff;
+	return ((m_edge->in1_r() & m_ctrl2->read_ctrl()) << 8) | 0xff;
 }
 
 CUSTOM_INPUT_MEMBER(ngarcade_base_state::startsel_edge_joy_r)
@@ -1737,9 +1737,9 @@ void aes_base_state::aes_base_main_map(address_map &map)
 {
 	base_main_map(map);
 
-	map(0x300000, 0x300000).mirror(0x01fffe).r(m_ctrl1, FUNC(neogeo_control_port_device::ctrl_r));
+	map(0x300000, 0x300000).mirror(0x01fffe).r(m_ctrl1, FUNC(neogeo_control_port_device::read_ctrl));
 	map(0x320000, 0x320001).mirror(0x01fffe).portr("AUDIO");
-	map(0x340000, 0x340000).mirror(0x01fffe).r(m_ctrl2, FUNC(neogeo_control_port_device::ctrl_r));
+	map(0x340000, 0x340000).mirror(0x01fffe).r(m_ctrl2, FUNC(neogeo_control_port_device::read_ctrl));
 	map(0x380000, 0x380001).mirror(0x01fffe).r(FUNC(aes_base_state::aes_in2_r));
 }
 
@@ -2004,8 +2004,8 @@ void mvs_led_state::mv1(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, nullptr, false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, nullptr, false);
 
 	cartslot_config(config, 1);
 
@@ -2019,8 +2019,8 @@ void mvs_led_state::mv1f(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, nullptr, false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, nullptr, false);
 
 	cartslot_config(config, 1);
 
@@ -2048,8 +2048,8 @@ void mvs_led_el_state::mv2f(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, nullptr, false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, nullptr, false);
 
 	cartslot_config(config, 2);
 
@@ -2065,8 +2065,8 @@ void mvs_led_el_state::mv4f(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, nullptr, false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, nullptr, false);
 
 	cartslot_config(config, 4);
 
@@ -2082,8 +2082,8 @@ void mvs_led_el_state::mv6f(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", false);
 
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", false);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, nullptr, false);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, nullptr, false);
 
 	cartslot_config(config, 6);
 
@@ -2099,8 +2099,8 @@ void mvs_led_state::mv1_fixed(machine_config &config)
 
 	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge, "joy", true);
 
-	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, "", true);
-	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, "", true);
+	NEOGEO_CONTROL_PORT(config, m_ctrl1, neogeo_arc_pin15, nullptr, true);
+	NEOGEO_CONTROL_PORT(config, m_ctrl2, neogeo_arc_pin15, nullptr, true);
 }
 
 
@@ -2736,7 +2736,7 @@ void mvs_led_state::neogeo_mj(machine_config &config)
 	set_default_bios_tag("japan");
 
 	// no joystick panel
-	m_edge->set_default_option("");
+	m_edge->set_default_option(nullptr);
 	m_edge->set_fixed(false);
 
 	// P1 mahjong controller
@@ -2778,9 +2778,10 @@ void mvs_led_state::pnyaa(machine_config &config)
 
 void mvs_led_state::popbounc(machine_config &config)
 {
-	mv1_fixed(config);
+	neogeo_arcade(config);
+	neogeo_mono(config);
 
-	NEOGEO_CTRL_EDGE_CONNECTOR(config.replace(), m_edge, neogeo_arc_edge_fixed, "dial", true);
+	NEOGEO_CTRL_EDGE_CONNECTOR(config, m_edge, neogeo_arc_edge_fixed, "dial", true);
 
 	cartslot_fixed(config, "rom");
 }

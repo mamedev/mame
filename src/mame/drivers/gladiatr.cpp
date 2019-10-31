@@ -954,7 +954,7 @@ void ppking_state::ppking(machine_config &config)
 	MC6809(config, m_audiocpu, 12_MHz_XTAL/4);  /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ppking_state::ppking_cpu3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(ppking_state, ppking)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1056,7 +1056,7 @@ void gladiatr_state::gladiatr(machine_config &config)
 	m_csnd->t1_in_cb().set(FUNC(gladiatr_state::csnd_t1_r));
 
 	/* lazy way to make polled serial between MCUs work */
-	config.m_perfect_cpu_quantum = subtag("ucpu");
+	config.set_perfect_quantum(m_ucpu);
 
 	CLOCK(config, "tclk", 12_MHz_XTAL/8/128/2) /* verified on pcb */
 		.signal_handler().set(FUNC(gladiatr_state::tclk_w));

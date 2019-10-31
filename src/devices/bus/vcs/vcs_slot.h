@@ -47,7 +47,7 @@ enum
 
 // ======================> device_vcs_cart_interface
 
-class device_vcs_cart_interface : public device_slot_card_interface
+class device_vcs_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -85,7 +85,7 @@ protected:
 
 class vcs_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_vcs_cart_interface>
 {
 public:
 	// construction/destruction

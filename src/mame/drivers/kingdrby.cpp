@@ -982,7 +982,7 @@ void kingdrby_state::kingdrby(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &kingdrby_state::sound_io_map);
 	m_soundcpu->set_periodic_int(FUNC(kingdrby_state::irq0_line_hold), attotime::from_hz(1000)); /* guess, controls ay8910 tempo.*/
 
-	config.m_perfect_cpu_quantum = subtag("master");
+	config.set_perfect_quantum("master");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

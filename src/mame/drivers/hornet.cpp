@@ -1150,7 +1150,7 @@ void hornet_state::hornet(machine_config &config)
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &hornet_state::sharc0_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

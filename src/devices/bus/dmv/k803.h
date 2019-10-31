@@ -42,7 +42,6 @@ private:
 
 	required_device<mm58167_device> m_rtc;
 	required_ioport m_dsw;
-	dmvcart_slot_device * m_bus;
 	uint8_t   m_latch;
 	int     m_rtc_int;
 };

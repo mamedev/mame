@@ -20,11 +20,9 @@ class snes_control_port_device;
 
 // ======================> device_snes_control_port_interface
 
-class device_snes_control_port_interface : public device_slot_card_interface
+class device_snes_control_port_interface : public device_interface
 {
 public:
-	// construction/destruction
-	device_snes_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_snes_control_port_interface();
 
 	virtual uint8_t read_pin4() { return 0; }
@@ -34,6 +32,8 @@ public:
 	virtual void port_poll() { }
 
 protected:
+	device_snes_control_port_interface(const machine_config &mconfig, device_t &device);
+
 	snes_control_port_device *m_port;
 };
 
@@ -43,7 +43,7 @@ protected:
 
 // ======================> snes_control_port_device
 
-class snes_control_port_device : public device_t, public device_slot_interface
+class snes_control_port_device : public device_t, public device_single_card_slot_interface<device_snes_control_port_interface>
 {
 public:
 	typedef device_delegate<bool (int16_t x, int16_t y)> onscreen_delegate;

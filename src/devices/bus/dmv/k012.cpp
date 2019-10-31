@@ -49,7 +49,6 @@ dmv_k012_device::dmv_k012_device(const machine_config &mconfig, device_type type
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_dmvslot_interface( mconfig, *this )
 	, m_hdc(*this, "hdc")
-	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_jumpers(*this, "JUMPERS")
 {
 }
@@ -95,7 +94,7 @@ ioport_constructor dmv_k012_device::device_input_ports() const
 void dmv_k012_device::device_add_mconfig(machine_config &config)
 {
 	WD1000(config, m_hdc, 20_MHz_XTAL / 4);         // WD1010
-	m_hdc->intrq_wr_callback().set(FUNC(dmv_k012_device::hdc_intrq_w));
+	m_hdc->intrq_wr_callback().set(FUNC(dmv_k012_device::out_int));
 
 	// default drive is 10MB (306,4,17)
 	HARDDISK(config, "hdc:0", 0);
@@ -114,9 +113,4 @@ void dmv_k012_device::io_write(int ifsel, offs_t offset, uint8_t data)
 {
 	if ((1 << ifsel) == m_jumpers->read() && !(offset & 0x08))
 		m_hdc->write(machine().dummy_space(), offset, data);
-}
-
-WRITE_LINE_MEMBER(dmv_k012_device::hdc_intrq_w)
-{
-	m_bus->m_out_irq_cb(state);
 }

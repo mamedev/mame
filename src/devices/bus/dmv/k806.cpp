@@ -71,7 +71,6 @@ dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag,
 	, m_mouse_buttons(*this, "MOUSE")
 	, m_mouse_x(*this, "MOUSEX")
 	, m_mouse_y(*this, "MOUSEY")
-	, m_bus(nullptr)
 {
 }
 
@@ -81,8 +80,6 @@ dmv_k806_device::dmv_k806_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k806_device::device_start()
 {
-	m_bus = static_cast<dmvcart_slot_device*>(owner());
-
 	// register for state saving
 	save_item(NAME(m_mouse.phase));
 	save_item(NAME(m_mouse.x));
@@ -153,7 +150,7 @@ void dmv_k806_device::io_write(int ifsel, offs_t offset, uint8_t data)
 	if (BIT(jumpers, ifsel) && ((!BIT(offset, 3) && BIT(jumpers, 5)) || (BIT(offset, 3) && BIT(jumpers, 6))))
 	{
 		m_mcu->upi41_master_w(machine().dummy_space(), offset & 1, data);
-		m_bus->m_out_int_cb(CLEAR_LINE);
+		out_int(CLEAR_LINE);
 	}
 }
 
@@ -185,7 +182,7 @@ READ_LINE_MEMBER( dmv_k806_device::portt1_r )
 
 WRITE8_MEMBER( dmv_k806_device::port2_w )
 {
-	m_bus->m_out_int_cb((data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	out_int((data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------------------------

@@ -853,7 +853,7 @@ void bnstars_state::bnstars(machine_config &config)
 	Z80(config, m_audiocpu, 4000000); // Unverified; it's possibly higher than 4MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bnstars_state::bnstars_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bnstars);
 

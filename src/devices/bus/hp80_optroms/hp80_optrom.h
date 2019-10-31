@@ -20,8 +20,13 @@ static constexpr offs_t HP80_OPTROM_SIZE = 0x2000;
 
 void hp80_optrom_slot_devices(device_slot_interface &device);
 
-class hp80_optrom_cart_device : public device_t,
-								public device_slot_card_interface
+class device_hp80_optrom_interface : public device_interface
+{
+protected:
+	device_hp80_optrom_interface(const machine_config &mconfig, device_t &device);
+};
+
+class hp80_optrom_cart_device : public device_t, public device_hp80_optrom_interface
 {
 public:
 	// construction/destruction
@@ -36,7 +41,7 @@ protected:
 
 class hp80_optrom_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_hp80_optrom_interface>
 {
 public:
 	// construction/destruction
@@ -75,7 +80,7 @@ protected:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	hp80_optrom_cart_device *m_cart;
+	device_hp80_optrom_interface *m_cart;
 	uint8_t m_select_code;
 };
 

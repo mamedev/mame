@@ -1746,7 +1746,7 @@ void ms32_state::ms32(machine_config &config)
 	Z80(config, m_audiocpu, 8000000); // Z0840008PSC, Clock from notes
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ms32_state::ms32_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 
 	/* video hardware */

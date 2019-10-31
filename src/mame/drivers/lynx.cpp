@@ -79,7 +79,7 @@ void lynx_state::lynx(machine_config &config)
 	/* basic machine hardware */
 	M65SC02(config, m_maincpu, 4000000);        /* vti core, integrated in vlsi, stz, but not bbr bbs */
 	m_maincpu->set_addrmap(AS_PROGRAM, &lynx_state::lynx_mem);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "bank_fc00").set_map(&lynx_state::lynx_fc00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);
 	ADDRESS_MAP_BANK(config, "bank_fd00").set_map(&lynx_state::lynx_fd00_mem).set_options(ENDIANNESS_LITTLE, 8, 9, 0x100);

@@ -758,7 +758,7 @@ void ps2sony_state::ps2sony(machine_config &config)
 	SONYPS2_IOP(config, m_iop, XTAL(67'737'600)/2);
 	m_iop->set_addrmap(AS_PROGRAM, &ps2sony_state::iop_map);
 
-	config.m_perfect_cpu_quantum = subtag("iop");
+	config.set_perfect_quantum(m_iop);
 
 	SONYPS2_PAD(config, m_pad[0]);
 	SONYPS2_PAD(config, m_pad[1]);

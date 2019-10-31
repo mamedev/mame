@@ -68,7 +68,7 @@
 
 class portfolio_memory_card_slot_device;
 
-class device_portfolio_memory_card_slot_interface : public device_slot_card_interface
+class device_portfolio_memory_card_slot_interface : public device_interface
 {
 	friend class portfolio_memory_card_slot_device;
 
@@ -92,7 +92,7 @@ protected:
 // ======================> portfolio_memory_card_slot_device
 
 class portfolio_memory_card_slot_device : public device_t,
-									 public device_slot_interface,
+									 public device_single_card_slot_interface<device_portfolio_memory_card_slot_interface>,
 									 public device_image_interface
 {
 public:

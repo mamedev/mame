@@ -25,8 +25,8 @@ DEFINE_DEVICE_TYPE(SPECTRUM_EXPANSION_SLOT, spectrum_expansion_slot_device, "spe
 //  device_spectrum_expansion_interface - constructor
 //-------------------------------------------------
 
-device_spectrum_expansion_interface::device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_spectrum_expansion_interface::device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "spectrumexp")
 {
 	m_slot = dynamic_cast<spectrum_expansion_slot_device *>(device.owner());
 }
@@ -42,7 +42,7 @@ device_spectrum_expansion_interface::device_spectrum_expansion_interface(const m
 
 spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SPECTRUM_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_spectrum_expansion_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
@@ -51,38 +51,16 @@ spectrum_expansion_slot_device::spectrum_expansion_slot_device(const machine_con
 
 
 //-------------------------------------------------
-//  device_validity_check - device-specific checks
-//-------------------------------------------------
-
-void spectrum_expansion_slot_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-	if (card && !dynamic_cast<device_spectrum_expansion_interface *>(card))
-		osd_printf_error("Card device %s (%s) does not implement device_spectrum_expansion_interface\n", card->tag(), card->name());
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void spectrum_expansion_slot_device::device_start()
 {
-	device_t *const card_device(get_card_device());
-	m_card = dynamic_cast<device_spectrum_expansion_interface *>(card_device);
-	if (card_device && !m_card)
-		throw emu_fatalerror("spectrum_expansion_slot_device: card device %s (%s) does not implement device_spectrum_expansion_interface\n", card_device->tag(), card_device->name());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();
 	m_nmi_handler.resolve_safe();
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void spectrum_expansion_slot_device::device_reset()
-{
 }
 
 //-------------------------------------------------

@@ -565,7 +565,7 @@ void card_state::brc_base(machine_config &config)
 	Z80(config, m_maincpu, 5_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &card_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &card_state::main_io);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	I8041A(config, m_mcu, 5_MHz_XTAL);
 	m_mcu->p1_out_cb().set(FUNC(card_state::mcu_p1_w));

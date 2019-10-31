@@ -157,7 +157,7 @@ protected:
 
 // ======================> device_cbm_iec_interface
 
-class device_cbm_iec_interface : public device_slot_card_interface
+class device_cbm_iec_interface : public device_interface
 {
 	friend class cbm_iec_device;
 

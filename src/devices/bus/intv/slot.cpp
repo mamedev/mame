@@ -96,10 +96,10 @@ DEFINE_DEVICE_TYPE(INTV_CART_SLOT, intv_cart_slot_device, "intv_cart_slot", "Int
 //  device_intv_cart_interface - constructor
 //-------------------------------------------------
 
-device_intv_cart_interface::device_intv_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_intv_cart_interface::device_intv_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "intvcart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -147,7 +147,7 @@ void device_intv_cart_interface::ram_alloc(uint32_t size)
 intv_cart_slot_device::intv_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, INTV_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_intv_cart_interface>(mconfig, *this),
 	m_type(INTV_STD),
 	m_cart(nullptr)
 {
@@ -168,7 +168,7 @@ intv_cart_slot_device::~intv_cart_slot_device()
 
 void intv_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_intv_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 

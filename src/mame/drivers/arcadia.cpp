@@ -479,7 +479,7 @@ void arcadia_state::arcadia(machine_config &config)
 	m_maincpu->sense_handler().set(FUNC(arcadia_state::vsync_r));
 	m_maincpu->set_periodic_int(FUNC(arcadia_state::video_line), attotime::from_hz(262*60));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

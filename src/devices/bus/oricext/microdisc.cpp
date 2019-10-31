@@ -4,14 +4,14 @@
 #include "microdisc.h"
 #include "formats/oric_dsk.h"
 
-DEFINE_DEVICE_TYPE(MICRODISC, microdisc_device, "microdisc", "Microdisc floppy drive interface")
+DEFINE_DEVICE_TYPE(ORIC_MICRODISC, oric_microdisc_device, "oric_microdisc", "Microdisc floppy drive interface")
 
 ROM_START( microdisc )
 	ROM_REGION( 0x2000, "microdisc", 0 )
 	ROM_LOAD ("microdis.rom", 0, 0x02000, CRC(a9664a9c) SHA1(0d2ef6e67322f48f4b7e08d8bbe68827e2074561) )
 ROM_END
 
-FLOPPY_FORMATS_MEMBER( microdisc_device::floppy_formats )
+FLOPPY_FORMATS_MEMBER( oric_microdisc_device::floppy_formats )
 	FLOPPY_ORIC_DSK_FORMAT
 FLOPPY_FORMATS_END
 
@@ -20,28 +20,28 @@ static void microdisc_floppies(device_slot_interface &device)
 	device.option_add("3dsdd", FLOPPY_3_DSDD);
 }
 
-void microdisc_device::map(address_map &map)
+void oric_microdisc_device::map(address_map &map)
 {
 	map(0x310, 0x313).rw("fdc", FUNC(fd1793_device::read), FUNC(fd1793_device::write));
-	map(0x314, 0x314).rw(FUNC(microdisc_device::port_314_r), FUNC(microdisc_device::port_314_w));
-	map(0x318, 0x318).r(FUNC(microdisc_device::port_318_r));
+	map(0x314, 0x314).rw(FUNC(oric_microdisc_device::port_314_r), FUNC(oric_microdisc_device::port_314_w));
+	map(0x318, 0x318).r(FUNC(oric_microdisc_device::port_318_r));
 }
 
-microdisc_device::microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	oricext_device(mconfig, MICRODISC, tag, owner, clock),
+oric_microdisc_device::oric_microdisc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ORIC_MICRODISC, tag, owner, clock),
+	device_oricext_interface(mconfig, *this),
 	fdc(*this, "fdc"), microdisc_rom(nullptr), port_314(0), intrq_state(false), drq_state(false), hld_state(false)
 {
 }
 
-microdisc_device::~microdisc_device()
+oric_microdisc_device::~oric_microdisc_device()
 {
 }
 
-void microdisc_device::device_start()
+void oric_microdisc_device::device_start()
 {
-	oricext_device::device_start();
 	microdisc_rom = device().machine().root_device().memregion(this->subtag("microdisc").c_str())->base();
-	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &microdisc_device::map);
+	cpu->space(AS_PROGRAM).install_device(0x0000, 0xffff, *this, &oric_microdisc_device::map);
 
 	for(int i=0; i<4; i++) {
 		char name[32];
@@ -51,7 +51,7 @@ void microdisc_device::device_start()
 	intrq_state = drq_state = hld_state = false;
 }
 
-void microdisc_device::device_reset()
+void oric_microdisc_device::device_reset()
 {
 	port_314 = 0x00;
 	irq_w(false);
@@ -63,26 +63,26 @@ void microdisc_device::device_reset()
 	ram[0xe000] = 0x42;
 }
 
-const tiny_rom_entry *microdisc_device::device_rom_region() const
+const tiny_rom_entry *oric_microdisc_device::device_rom_region() const
 {
 	return ROM_NAME( microdisc );
 }
 
-void microdisc_device::device_add_mconfig(machine_config &config)
+void oric_microdisc_device::device_add_mconfig(machine_config &config)
 {
 	FD1793(config, fdc, 8_MHz_XTAL / 8);
-	fdc->intrq_wr_callback().set(FUNC(microdisc_device::fdc_irq_w));
-	fdc->drq_wr_callback().set(FUNC(microdisc_device::fdc_drq_w));
-	fdc->hld_wr_callback().set(FUNC(microdisc_device::fdc_hld_w));
+	fdc->intrq_wr_callback().set(FUNC(oric_microdisc_device::fdc_irq_w));
+	fdc->drq_wr_callback().set(FUNC(oric_microdisc_device::fdc_drq_w));
+	fdc->hld_wr_callback().set(FUNC(oric_microdisc_device::fdc_hld_w));
 	fdc->set_force_ready(true);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", microdisc_floppies, "3dsdd", microdisc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", microdisc_floppies, nullptr, microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", microdisc_floppies, "3dsdd", oric_microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", microdisc_floppies, nullptr, oric_microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", microdisc_floppies, nullptr, oric_microdisc_device::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", microdisc_floppies, nullptr, oric_microdisc_device::floppy_formats);
 }
 
-void microdisc_device::remap()
+void oric_microdisc_device::remap()
 {
 	if(port_314 & P_ROMDIS) {
 		bank_c000_r->set_base(rom+0x0000);
@@ -108,7 +108,7 @@ void microdisc_device::remap()
 	}
 }
 
-WRITE8_MEMBER(microdisc_device::port_314_w)
+WRITE8_MEMBER(oric_microdisc_device::port_314_w)
 {
 	port_314 = data;
 	remap();
@@ -122,28 +122,28 @@ WRITE8_MEMBER(microdisc_device::port_314_w)
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-READ8_MEMBER(microdisc_device::port_314_r)
+READ8_MEMBER(oric_microdisc_device::port_314_r)
 {
 	return (intrq_state && (port_314 & P_IRQEN)) ? 0x7f : 0xff;
 }
 
-READ8_MEMBER(microdisc_device::port_318_r)
+READ8_MEMBER(oric_microdisc_device::port_318_r)
 {
 	return drq_state ? 0x7f : 0xff;
 }
 
-WRITE_LINE_MEMBER(microdisc_device::fdc_irq_w)
+WRITE_LINE_MEMBER(oric_microdisc_device::fdc_irq_w)
 {
 	intrq_state = state;
 	irq_w(intrq_state && (port_314 & P_IRQEN));
 }
 
-WRITE_LINE_MEMBER(microdisc_device::fdc_drq_w)
+WRITE_LINE_MEMBER(oric_microdisc_device::fdc_drq_w)
 {
 	drq_state = state;
 }
 
-WRITE_LINE_MEMBER(microdisc_device::fdc_hld_w)
+WRITE_LINE_MEMBER(oric_microdisc_device::fdc_hld_w)
 {
 	logerror("hld %d\n", state);
 	hld_state = state;

@@ -677,7 +677,7 @@ void mplay_state::megaplay(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mplay_state::megaplay_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mplay_state::megaplay_bios_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");

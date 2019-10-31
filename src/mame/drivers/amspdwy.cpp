@@ -258,7 +258,7 @@ void amspdwy_state::amspdwy(machine_config &config)
 	Z80(config, m_audiocpu, 3000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &amspdwy_state::amspdwy_sound_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

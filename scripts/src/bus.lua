@@ -3842,7 +3842,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/hp_optroms/hp_optrom.h,BUSES["HP_OPTROM"] = true
+--@src/devices/bus/hp9825_optroms/hp9825_optrom.h,BUSES["HP9825_OPTROM"] = true
 ---------------------------------------------------
 
 if (BUSES["HP9825_OPTROM"]~=null) then

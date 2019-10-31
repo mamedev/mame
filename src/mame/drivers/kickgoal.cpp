@@ -399,7 +399,7 @@ void kickgoal_state::kickgoal(machine_config &config)
 	m_audiocpu->read_c().set(FUNC(kickgoal_state::soundio_port_c_r));
 	m_audiocpu->write_c().set(FUNC(kickgoal_state::soundio_port_c_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	EEPROM_93C46_16BIT(config, "eeprom").default_data(kickgoal_default_eeprom_type1, 128);
 

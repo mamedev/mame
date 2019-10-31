@@ -813,7 +813,7 @@ void cedar_magnet_state::cedar_magnet(machine_config &config)
 
 	CEDAR_MAGNET_FLOP(config, "flop", 0);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 

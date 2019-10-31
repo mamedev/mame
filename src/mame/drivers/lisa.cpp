@@ -117,7 +117,7 @@ void lisa_state::lisa(machine_config &config)
 	M6504(config, m_fdc_cpu, 2000000);        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	m_fdc_cpu->set_addrmap(AS_PROGRAM, &lisa_state::lisa_fdc_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	LS259(config, m_latch); // U4E (CPU board)
 	m_latch->q_out_cb<0>().set(FUNC(lisa_state::diag1_w));

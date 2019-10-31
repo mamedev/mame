@@ -1102,7 +1102,7 @@ plib::unique_ptr<netlist::netlist_t> netlist_mame_device::base_validity_check(va
 	}
 	catch (emu_fatalerror &err)
 	{
-		osd_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.what());
 	}
 	catch (std::exception &err)
 	{

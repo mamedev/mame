@@ -487,7 +487,7 @@ void argus_state::argus(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &argus_state::sound_map_a);
 	m_audiocpu->set_addrmap(AS_IO, &argus_state::sound_portmap_1);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -526,7 +526,7 @@ void valtric_state::valtric(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &valtric_state::sound_map_a);
 	m_audiocpu->set_addrmap(AS_IO, &valtric_state::sound_portmap_2);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -571,7 +571,7 @@ void butasan_state::butasan(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &butasan_state::sound_map_b);
 	m_audiocpu->set_addrmap(AS_IO, &butasan_state::sound_portmap_2);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

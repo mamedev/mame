@@ -12,11 +12,16 @@
 
 #pragma once
 
-#include "softlist_dev.h"
 #include "machine/bankdev.h"
+#include "softlist_dev.h"
 
-class hp9825_optrom_cart_device : public device_t,
-								  public device_slot_card_interface
+class device_hp9825_optrom_interface : public device_interface
+{
+public:
+	device_hp9825_optrom_interface(const machine_config &mconfig, device_t &device);
+};
+
+class hp9825_optrom_cart_device : public device_t, public device_hp9825_optrom_interface
 {
 public:
 	// construction/destruction
@@ -31,7 +36,7 @@ protected:
 
 class hp9825_optrom_slot_device : public device_t,
 								  public device_image_interface,
-								  public device_slot_interface
+								  public device_single_card_slot_interface<device_hp9825_optrom_interface>
 {
 public:
 	// construction/destruction
@@ -65,7 +70,7 @@ protected:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	hp9825_optrom_cart_device *m_cart;
+	device_hp9825_optrom_interface *m_cart;
 	offs_t m_rom_limit;
 	unsigned m_loaded_regions;
 	address_space *m_space_r;

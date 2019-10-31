@@ -38,7 +38,7 @@ INPUT_PORTS_END
 
 interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_MOUSE_PORT, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_interpro_mouse_port_interface>(mconfig, *this)
 	, m_state_func(*this)
 	, m_device(nullptr)
 {
@@ -46,15 +46,7 @@ interpro_mouse_port_device::interpro_mouse_port_device(machine_config const &mco
 
 void interpro_mouse_port_device::device_config_complete()
 {
-	m_device = dynamic_cast<device_interpro_mouse_port_interface *>(get_card_device());
-}
-
-void interpro_mouse_port_device::device_validity_check(validity_checker &valid) const
-{
-	device_t *const card(get_card_device());
-
-	if (card && !dynamic_cast<device_interpro_mouse_port_interface *>(card))
-		osd_printf_error("Device %s (%s) does not implement device_interpro_mouse_port_interface\n", card->tag(), card->name());
+	m_device = get_card_device();
 }
 
 void interpro_mouse_port_device::device_start()
@@ -63,7 +55,7 @@ void interpro_mouse_port_device::device_start()
 }
 
 device_interpro_mouse_port_interface::device_interpro_mouse_port_interface(machine_config const &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "interpromouse")
 	, m_port(dynamic_cast<interpro_mouse_port_device *>(device.owner()))
 {
 }

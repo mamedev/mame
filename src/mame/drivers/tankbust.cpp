@@ -341,7 +341,7 @@ void tankbust_state::tankbust(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &tankbust_state::map_cpu2);
 	m_subcpu->set_addrmap(AS_IO, &tankbust_state::port_map_cpu2);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 
 	/* video hardware */

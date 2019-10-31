@@ -39,7 +39,7 @@ DEFINE_DEVICE_TYPE(UTS_KEYBOARD, uts_keyboard_port_device, "uts_kbd", "UTS Keybo
 
 uts_keyboard_port_device::uts_keyboard_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, UTS_KEYBOARD, tag, owner, clock)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_uts_keyboard_interface>(mconfig, *this)
 	, m_rxd_callback(*this)
 	, m_kbd(nullptr)
 {
@@ -47,7 +47,7 @@ uts_keyboard_port_device::uts_keyboard_port_device(const machine_config &mconfig
 
 void uts_keyboard_port_device::device_config_complete()
 {
-	m_kbd = dynamic_cast<device_uts_keyboard_interface *>(get_card_device());
+	m_kbd = get_card_device();
 }
 
 void uts_keyboard_port_device::device_resolve_objects()
@@ -64,7 +64,7 @@ void uts_keyboard_port_device::device_start()
 //**************************************************************************
 
 device_uts_keyboard_interface::device_uts_keyboard_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "utskbd")
 	, m_port(device, DEVICE_SELF_OWNER)
 {
 }

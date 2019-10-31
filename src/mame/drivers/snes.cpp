@@ -1345,8 +1345,8 @@ void snes_console_state::snes(machine_config &config)
 	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &snes_console_state::spc_map);
 
-	//config.m_minimum_quantum = attotime::from_hz(48000);
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	//config.set_maximum_quantum(attotime::from_hz(48000));
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

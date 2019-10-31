@@ -426,7 +426,7 @@ void speglsht_state::speglsht(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &speglsht_state::speglsht_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(speglsht_state::irq4_line_assert));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 	MCFG_MACHINE_RESET_OVERRIDE(speglsht_state,speglsht)
 
 	/* video hardware */

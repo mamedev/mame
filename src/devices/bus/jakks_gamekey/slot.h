@@ -21,7 +21,7 @@ enum
 
 // ======================> device_jakks_gamekey_interface
 
-class device_jakks_gamekey_interface : public device_slot_card_interface
+class device_jakks_gamekey_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -50,7 +50,7 @@ protected:
 
 class jakks_gamekey_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_jakks_gamekey_interface>
 {
 public:
 	// construction/destruction

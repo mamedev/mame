@@ -50,7 +50,7 @@
 class device_c64_expansion_card_interface;
 
 class c64_expansion_slot_device : public device_t,
-									public device_slot_interface,
+									public device_single_card_slot_interface<device_c64_expansion_card_interface>,
 									public device_image_interface
 {
 public:
@@ -96,7 +96,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -133,7 +132,7 @@ protected:
 
 // ======================> device_c64_expansion_card_interface
 
-class device_c64_expansion_card_interface : public device_slot_card_interface
+class device_c64_expansion_card_interface : public device_interface
 {
 	friend class c64_expansion_slot_device;
 

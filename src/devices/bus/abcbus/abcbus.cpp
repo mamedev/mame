@@ -28,7 +28,7 @@ DEFINE_DEVICE_TYPE(ABCBUS_SLOT, abcbus_slot_device, "abcbus_slot", "ABCBUS slot"
 //-------------------------------------------------
 
 device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device)
+	device_interface(device, "abcbus")
 {
 	m_slot = dynamic_cast<abcbus_slot_device *>(device.owner());
 }
@@ -40,7 +40,7 @@ device_abcbus_card_interface::device_abcbus_card_interface(const machine_config 
 
 abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABCBUS_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_abcbus_card_interface>(mconfig, *this),
 	m_write_irq(*this),
 	m_write_nmi(*this),
 	m_write_rdy(*this),
@@ -62,7 +62,7 @@ abcbus_slot_device::abcbus_slot_device(const machine_config &mconfig, const char
 
 void abcbus_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_abcbus_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

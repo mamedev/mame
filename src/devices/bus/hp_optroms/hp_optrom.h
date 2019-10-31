@@ -16,8 +16,13 @@
 #include "softlist_dev.h"
 
 
-class hp_optrom_cart_device : public device_t,
-								public device_slot_card_interface
+class device_hp_optrom_interface : public device_interface
+{
+protected:
+	device_hp_optrom_interface(const machine_config &mconfig, device_t &device);
+};
+
+class hp_optrom_cart_device : public device_t, public device_hp_optrom_interface
 {
 public:
 	// construction/destruction
@@ -32,7 +37,7 @@ protected:
 
 class hp_optrom_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_hp_optrom_interface>
 {
 public:
 		// construction/destruction
@@ -60,7 +65,7 @@ protected:
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
-	hp_optrom_cart_device *m_cart;
+	device_hp_optrom_interface *m_cart;
 	std::vector<uint8_t> m_content;
 	offs_t m_base_addr;
 	offs_t m_end_addr;

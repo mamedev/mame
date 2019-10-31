@@ -184,7 +184,7 @@ void astrocde_home_state::astrocde(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &astrocde_home_state::astrocade_mem);
 	m_maincpu->set_addrmap(AS_IO, &astrocde_home_state::astrocade_io);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	MCFG_MACHINE_START_OVERRIDE(astrocde_home_state, astrocde)
 

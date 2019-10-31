@@ -273,7 +273,7 @@ void zorro2_device::fc_w(int code)
 //-------------------------------------------------
 
 device_zorro_card_interface::device_zorro_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "zorro"),
 	m_zorro(nullptr)
 {
 }

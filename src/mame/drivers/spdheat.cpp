@@ -689,7 +689,7 @@ void spdheat_state::spdheat(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &spdheat_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &spdheat_state::sub_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette0, gfx_spdheat); // TODO?

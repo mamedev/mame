@@ -19,12 +19,20 @@
 DEFINE_DEVICE_TYPE(HP80_OPTROM_CART, hp80_optrom_cart_device, "hp80_optrom_cart", "HP80 optional ROM cartridge")
 DEFINE_DEVICE_TYPE(HP80_OPTROM_SLOT, hp80_optrom_slot_device, "hp80_optrom_slot", "HP80 optional ROM slot")
 
+// +----------------------------+
+// |device_hp80_optrom_interface|
+// +----------------------------+
+device_hp80_optrom_interface::device_hp80_optrom_interface(const machine_config &config, device_t &device) :
+	device_interface(device, "hp80optrom")
+{
+}
+
 // +-----------------------+
 // |hp80_optrom_cart_device|
 // +-----------------------+
 hp80_optrom_cart_device::hp80_optrom_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	device_slot_card_interface(mconfig, *this)
+	device_hp80_optrom_interface(mconfig, *this)
 {
 }
 
@@ -39,7 +47,7 @@ hp80_optrom_cart_device::hp80_optrom_cart_device(const machine_config &mconfig, 
 hp80_optrom_slot_device::hp80_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, HP80_OPTROM_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_hp80_optrom_interface>(mconfig, *this),
 	m_cart(nullptr),
 	m_select_code(0)
 {
@@ -59,7 +67,7 @@ void hp80_optrom_slot_device::install_read_handler(address_space& space)
 
 void hp80_optrom_slot_device::device_start()
 {
-	m_cart = dynamic_cast<hp80_optrom_cart_device *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 image_init_result hp80_optrom_slot_device::call_load()

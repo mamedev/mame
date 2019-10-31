@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(COMX_EXPANSION_SLOT, comx_expansion_slot_device, "comx_expans
 //-------------------------------------------------
 
 device_comx_expansion_card_interface::device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device) :
-	device_slot_card_interface(mconfig, device),
+	device_interface(device, "comxexp"),
 	m_ds(1)
 {
 	m_slot = dynamic_cast<comx_expansion_slot_device *>(device.owner());
@@ -45,7 +45,7 @@ device_comx_expansion_card_interface::device_comx_expansion_card_interface(const
 
 comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_comx_expansion_card_interface>(mconfig, *this),
 	m_write_irq(*this), m_card(nullptr)
 {
 }
@@ -57,7 +57,7 @@ comx_expansion_slot_device::comx_expansion_slot_device(const machine_config &mco
 
 void comx_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_comx_expansion_card_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_write_irq.resolve_safe();

@@ -1063,7 +1063,7 @@ void wecleman_state::wecleman(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::wecleman_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, wecleman)
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, wecleman)
@@ -1142,7 +1142,7 @@ void wecleman_state::hotchase(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wecleman_state::hotchase_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(wecleman_state::hotchase_sound_timer), attotime::from_hz(496));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(wecleman_state, hotchase)
 	MCFG_MACHINE_START_OVERRIDE(wecleman_state, hotchase)

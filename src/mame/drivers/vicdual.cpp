@@ -2233,7 +2233,7 @@ void carnival_state::carnival(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_IO, &carnival_state::carnival_io_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* audio hardware */
 	SPEAKER(config, "mono").front_center();

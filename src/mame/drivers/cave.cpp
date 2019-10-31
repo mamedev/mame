@@ -2491,7 +2491,7 @@ void cave_state::sailormn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cave_state::sailormn_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &cave_state::sailormn_sound_portmap);
 
-//  config.m_minimum_quantum = attotime::from_hz(600);
+//  config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	EEPROM_93C46_16BIT(config, m_eeprom);

@@ -932,7 +932,7 @@ void mystwarr_state::mystwarr(machine_config &config)
 	Z80(config, m_soundcpu, 8000000);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mystwarr_state::mystwarr_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(1920);
+	config.set_maximum_quantum(attotime::from_hz(1920));
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 

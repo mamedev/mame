@@ -353,7 +353,7 @@ void tispellb_state::rev1(machine_config &config)
 	m_subcpu->o().set(FUNC(tispellb_state::sub_write_o));
 	m_subcpu->r().set(FUNC(tispellb_state::sub_write_r));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	PWM_DISPLAY(config, m_display).set_size(16, 16);

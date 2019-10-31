@@ -500,7 +500,7 @@ void exelv_state::exl100(machine_config &config)
 	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
 	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	TMS3556(config, m_tms3556);
 
@@ -554,7 +554,7 @@ void exelv_state::exeltel(machine_config &config)
 	subcpu.in_portd().set(FUNC(exelv_state::tms7041_portd_r));
 	subcpu.out_portd().set(FUNC(exelv_state::tms7041_portd_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	TMS3556(config, m_tms3556);
 

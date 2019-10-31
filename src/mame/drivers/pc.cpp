@@ -185,14 +185,14 @@ void pc_state::cfg_single_360K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 void pc_state::cfg_single_720K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35dd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_fixed(true);
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 void pc_state::pccga(machine_config &config)
@@ -797,7 +797,7 @@ void pc_state::olytext30(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("mb:pic8259", FUNC(pic8259_device::inta_cb));
 
 	subdevice<isa8_slot_device>("isa2")->set_option_machine_config("fdc_xt", cfg_single_720K);
-	subdevice<isa8_slot_device>("isa3")->set_default_option("");
+	subdevice<isa8_slot_device>("isa3")->set_default_option(nullptr);
 	subdevice<isa8_slot_device>("isa5")->set_default_option("hdc");
 	subdevice<ram_device>(RAM_TAG)->set_default_size("768K");
 }

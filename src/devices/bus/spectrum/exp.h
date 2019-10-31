@@ -53,7 +53,7 @@
 
 class device_spectrum_expansion_interface;
 
-class spectrum_expansion_slot_device : public device_t, public device_slot_interface
+class spectrum_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_spectrum_expansion_interface>
 {
 public:
 	// construction/destruction
@@ -89,9 +89,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	device_spectrum_expansion_interface *m_card;
 
@@ -103,12 +101,9 @@ private:
 
 // ======================> device_spectrum_expansion_interface
 
-class device_spectrum_expansion_interface : public device_slot_card_interface
+class device_spectrum_expansion_interface : public device_interface
 {
 public:
-	// construction/destruction
-	device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device);
-
 	// reading and writing
 	virtual void pre_opcode_fetch(offs_t offset) { };
 	virtual void post_opcode_fetch(offs_t offset) { };
@@ -121,6 +116,9 @@ public:
 	virtual DECLARE_READ_LINE_MEMBER(romcs) { return 0; }
 
 protected:
+	// construction/destruction
+	device_spectrum_expansion_interface(const machine_config &mconfig, device_t &device);
+
 	spectrum_expansion_slot_device *m_slot;
 };
 

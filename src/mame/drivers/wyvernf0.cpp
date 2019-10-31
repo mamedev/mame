@@ -643,7 +643,7 @@ void wyvernf0_state::wyvernf0(machine_config &config)
 	TAITO68705_MCU(config, m_bmcu, 48_MHz_XTAL/16); // 3MHz - Clock verified
 
 	/* 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs */
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -1128,7 +1128,7 @@ void attache_state::attache(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &attache_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
@@ -1205,12 +1205,12 @@ void attache816_state::attache816(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &attache816_state::attache_io);
 	m_maincpu->set_daisy_config(attache_daisy_chain);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I8086(config, m_extcpu, 24_MHz_XTAL / 3);
 	m_extcpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_x86_map);
 	m_extcpu->set_addrmap(AS_IO, &attache816_state::attache_x86_io);
-	config.m_perfect_cpu_quantum = subtag("extcpu");
+	config.set_perfect_quantum(m_extcpu);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);

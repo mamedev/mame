@@ -28,7 +28,7 @@ namespace bus { namespace ti99 { namespace colorbus {
 
 v9938_colorbus_device::v9938_colorbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, V9938_COLORBUS, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
+		device_single_card_slot_interface<device_v9938_colorbus_interface>(mconfig, *this),
 		m_v9938(*owner, TI_VDP_TAG),
 		m_extra_button(*this)
 {
@@ -56,6 +56,12 @@ void v9938_colorbus_device::device_start()
 }
 
 /*****************************************************************************/
+
+device_v9938_colorbus_interface::device_v9938_colorbus_interface(const machine_config &mconfig, device_t &device)
+	:	device_interface(device, "v9938colorbus"),
+		m_colorbus(nullptr)
+{
+}
 
 void device_v9938_colorbus_interface::interface_config_complete()
 {

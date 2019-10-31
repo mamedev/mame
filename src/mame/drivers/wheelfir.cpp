@@ -740,7 +740,7 @@ void wheelfir_state::wheelfir(machine_config &config)
 	M68000(config, m_subcpu, 32000000/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &wheelfir_state::wheelfir_sub);
 
-	//config.m_minimum_quantum = attotime::from_hz(12000);
+	//config.set_maximum_quantum(attotime::from_hz(12000));
 
 	adc0808_device &adc(ADC0808(config, "adc", 500000)); // unknown clock
 	adc.eoc_ff_callback().set(FUNC(wheelfir_state::adc_eoc_w));

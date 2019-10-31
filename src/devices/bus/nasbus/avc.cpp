@@ -131,13 +131,13 @@ WRITE8_MEMBER( nascom_avc_device::control_w )
 	// page video ram in?
 	if (((m_control & 0x07) == 0) && (data & 0x07))
 	{
-		m_nasbus->ram_disable_w(0);
+		ram_disable_w(0);
 		program_space().install_readwrite_handler(0x8000, 0xbfff, read8_delegate(*this, FUNC(nascom_avc_device::vram_r)), write8_delegate(*this, FUNC(nascom_avc_device::vram_w)));
 	}
 	else if ((data & 0x07) == 0)
 	{
 		program_space().unmap_readwrite(0x8000, 0xbfff);
-		m_nasbus->ram_disable_w(1);
+		ram_disable_w(1);
 	}
 
 	m_control = data;

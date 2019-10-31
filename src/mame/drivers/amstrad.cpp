@@ -914,7 +914,7 @@ void amstrad_state::amstrad_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, amstrad )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, amstrad )
@@ -1040,7 +1040,7 @@ void amstrad_state::cpcplus(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, plus )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, plus )
@@ -1119,7 +1119,7 @@ void amstrad_state::gx4000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amstrad_state::amstrad_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(amstrad_state::amstrad_cpu_acknowledge_int));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_START_OVERRIDE(amstrad_state, gx4000 )
 	MCFG_MACHINE_RESET_OVERRIDE(amstrad_state, gx4000 )

@@ -797,7 +797,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	MN1020012A(config, m_soundcpu, 10000000); /* MN1020819DA sound CPU - NOTE: May have 64kB internal ROM */
 	m_soundcpu->set_addrmap(AS_PROGRAM, &taitopjc_state::mn10200_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

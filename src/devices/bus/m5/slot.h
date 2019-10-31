@@ -28,7 +28,7 @@ enum
 
 // ======================> device_m5_cart_interface
 
-class device_m5_cart_interface : public device_slot_card_interface
+class device_m5_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -62,7 +62,7 @@ protected:
 
 class m5_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_m5_cart_interface>
 {
 public:
 	// construction/destruction
@@ -78,9 +78,6 @@ public:
 
 	m5_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~m5_cart_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -109,6 +106,8 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_m5_cart_interface*       m_cart;

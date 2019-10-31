@@ -36,7 +36,7 @@ enum
 
 // ======================> device_gba_cart_interface
 
-class device_gba_cart_interface : public device_slot_card_interface
+class device_gba_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -97,9 +97,6 @@ public:
 	gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 	virtual ~gba_cart_slot_device();
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
@@ -133,8 +130,9 @@ public:
 	virtual DECLARE_WRITE32_MEMBER(write_tilt) { if (m_cart) m_cart->write_tilt(space, offset, data, mem_mask); }
 	virtual DECLARE_WRITE32_MEMBER(write_mapper) { if (m_cart) m_cart->write_mapper(space, offset, data, mem_mask); }
 
-
 protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_gba_cart_interface* m_cart;

@@ -1100,7 +1100,7 @@ void taitojc_state::taitojc(machine_config &config)
 	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

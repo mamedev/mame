@@ -1350,7 +1350,7 @@ void arkanoid_state::arkanoid(machine_config &config)
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set(FUNC(arkanoid_state::input_mux_r));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
+	config.set_maximum_quantum(attotime::from_hz(6000));                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

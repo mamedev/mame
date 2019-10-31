@@ -704,7 +704,7 @@ void segahang_state::shared_base(machine_config &config)
 	M68000(config, m_subcpu, MASTER_CLOCK_25MHz/4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segahang_state::sub_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	I8255(config, m_i8255_1);
 	m_i8255_1->out_pa_callback().set("soundlatch", FUNC(generic_latch_8_device::write));

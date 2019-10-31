@@ -2176,7 +2176,7 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* to improve main<->audio comms */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* to improve main<->audio comms */
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2332,7 +2332,7 @@ void nslasher_state::nslasher(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* to improve main<->audio comms */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* to improve main<->audio comms */
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 

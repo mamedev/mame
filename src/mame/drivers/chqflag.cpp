@@ -327,7 +327,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_bank1000).set_map(&chqflag_state::bank1000_map).set_options(ENDIANNESS_BIG, 8, 13, 0x1000);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 

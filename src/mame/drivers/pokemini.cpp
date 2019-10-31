@@ -1768,7 +1768,7 @@ void pokemini_state::pokemini(machine_config &config)
 	MINX(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pokemini_state::pokemini_mem_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	I2CMEM(config, m_i2cmem, 0).set_data_size(0x2000);
 

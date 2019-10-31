@@ -1381,7 +1381,7 @@ void nc_state::nc_base(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, /*6000000*/ 4606000);        /* Russell Marks says this is more accurate */
 	m_maincpu->set_addrmap(AS_PROGRAM, &nc_state::nc_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));

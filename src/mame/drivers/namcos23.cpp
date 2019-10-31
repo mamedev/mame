@@ -3618,7 +3618,7 @@ void namcos23_state::gorgon(machine_config &config)
 	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3683,7 +3683,7 @@ void namcos23_state::s23(machine_config &config)
 	m_iocpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("subcpu:sci0", FUNC(h8_sci_device::rx_w));
 	m_subcpu->subdevice<h8_sci_device>("sci0")->tx_handler().set("iocpu:sci0", FUNC(h8_sci_device::rx_w));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 
@@ -3762,7 +3762,7 @@ void namcos23_state::ss23(machine_config &config)
 	// Timer at 115200*16 for the jvs serial clock
 	m_subcpu->subdevice<h8_sci_device>("sci0")->set_external_clock_period(attotime::from_hz(JVSCLOCK/8));
 
-	config.m_minimum_quantum = attotime::from_hz(2*115200);
+	config.set_maximum_quantum(attotime::from_hz(2*115200));
 
 	NAMCO_SETTINGS(config, m_settings, 0);
 

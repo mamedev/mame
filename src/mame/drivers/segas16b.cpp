@@ -3992,7 +3992,7 @@ void segas16b_state::system16b_i8751(machine_config &config)
 	m_mcu->port_in_cb<1>().set_ioport("SERVICE");
 	m_mcu->port_out_cb<1>().set(FUNC(segas16b_state::spin_68k_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	m_screen->screen_vblank().set_inputline(m_mcu, INPUT_LINE_IRQ0);
 }

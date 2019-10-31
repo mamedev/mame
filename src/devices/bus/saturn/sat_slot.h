@@ -13,7 +13,7 @@
 
 // ======================> device_sat_cart_interface
 
-class device_sat_cart_interface : public device_slot_card_interface
+class device_sat_cart_interface : public device_interface
 {
 public:
 	virtual ~device_sat_cart_interface();
@@ -63,7 +63,7 @@ protected:
 
 class sat_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_sat_cart_interface>
 {
 public:
 	// construction/destruction

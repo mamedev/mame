@@ -18,12 +18,10 @@
 
 class ata_interface_device;
 
-class device_ata_interface : public device_slot_card_interface
+class device_ata_interface : public device_interface
 {
 	friend class abstract_ata_interface_device;
 public:
-	device_ata_interface(const machine_config &mconfig, device_t &device);
-
 	virtual uint16_t read_dma() = 0;
 	virtual uint16_t read_cs0(offs_t offset, uint16_t mem_mask = 0xffff) = 0;
 	virtual uint16_t read_cs1(offs_t offset, uint16_t mem_mask = 0xffff) = 0;
@@ -38,6 +36,8 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) = 0;
 
 protected:
+	device_ata_interface(const machine_config &mconfig, device_t &device);
+
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dmarq_handler;
 	devcb_write_line m_dasp_handler;
@@ -47,7 +47,7 @@ protected:
 // ======================> ata_slot_device
 
 class ata_slot_device : public device_t,
-						public device_slot_interface
+						public device_single_card_slot_interface<device_ata_interface>
 {
 public:
 	// construction/destruction

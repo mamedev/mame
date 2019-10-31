@@ -29,7 +29,8 @@
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
 hp98034_io_card_device::hp98034_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp9845_io_card_device(mconfig , HP98034_IO_CARD , tag , owner , clock),
+	: device_t(mconfig , HP98034_IO_CARD , tag , owner , clock),
+	  device_hp9845_io_interface(mconfig, *this),
 	  m_cpu(*this , "np"),
 	  m_sw1(*this , "sw1"),
 	  m_ieee488(*this , IEEE488_TAG)
@@ -102,8 +103,6 @@ void hp98034_io_card_device::device_start()
 
 void hp98034_io_card_device::device_reset()
 {
-	hp9845_io_card_device::device_reset();
-
 	m_idr = 0;
 	m_odr = 0;
 	m_force_flg = false;

@@ -1680,7 +1680,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	NVRAM(config, "backup1", nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, "backup2", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MB3773(config, "watchdog");
 

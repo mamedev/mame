@@ -43,8 +43,8 @@
 class qvt102_state : public driver_device
 {
 public:
-	qvt102_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	qvt102_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_irqs(*this, "irqs"),
 		m_kbdmcu(*this, "kbdmcu"),
@@ -610,7 +610,7 @@ void qvt102_state::qvt102(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &qvt102_state::mem_map);
 
 	// needs a tight sync with the keyboard cpu
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 

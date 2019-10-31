@@ -56,7 +56,7 @@
 
 // ======================> device_iq151cart_interface
 
-class device_iq151cart_interface : public device_slot_card_interface
+class device_iq151cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -68,7 +68,7 @@ public:
 	virtual void io_read(offs_t offset, uint8_t &data) { }
 	virtual void io_write(offs_t offset, uint8_t data) { }
 	virtual uint8_t* get_cart_base() { return nullptr; }
-	virtual void set_screen_device(screen_device *screen) { m_screen = screen; }
+	virtual void set_screen_device(screen_device &screen) { m_screen = &screen; }
 
 	// video update
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect) { }
@@ -82,7 +82,7 @@ protected:
 // ======================> iq151cart_slot_device
 
 class iq151cart_slot_device : public device_t,
-								public device_slot_interface,
+								public device_single_card_slot_interface<device_iq151cart_interface>,
 								public device_image_interface
 {
 public:
@@ -108,9 +108,6 @@ public:
 	auto out_irq4_callback() { return m_out_irq4_cb.bind(); }
 	auto out_drq_callback() { return m_out_drq_cb.bind(); }
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
@@ -133,6 +130,10 @@ public:
 	virtual void io_read(offs_t offset, uint8_t &data);
 	virtual void io_write(offs_t offset, uint8_t data);
 	virtual void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
 
 	devcb_write_line                m_out_irq0_cb;
 	devcb_write_line                m_out_irq1_cb;

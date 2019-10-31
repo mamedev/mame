@@ -714,7 +714,7 @@ void ninjaw_state::ninjaw(machine_config &config)
 	// TODO: if CPUs are unsynched then seldomly stages loads up with no enemies
 	//       Let's use a better timer (was 6000 before) based off actual CPU timing.
 	//       Might as well bump the divider in case the bug still occurs before resorting to perfect CPU.
-	config.m_minimum_quantum = attotime::from_hz(16000000/1024);  /* CPU slices */
+	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));
@@ -820,7 +820,7 @@ void ninjaw_state::darius2(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &ninjaw_state::darius2_slave_map);
 	m_subcpu->set_vblank_int("lscreen", FUNC(ninjaw_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(16000000/1024);  /* CPU slices */
+	config.set_maximum_quantum(attotime::from_hz(16000000/1024));  /* CPU slices */
 	//config.m_perfect_cpu_quantum = subtag("maincpu");
 
 	tc0040ioc_device &tc0040ioc(TC0040IOC(config, "tc0040ioc", 0));

@@ -25,10 +25,10 @@ DEFINE_DEVICE_TYPE(VECTREX_CART_SLOT, vectrex_cart_slot_device, "vectrex_cart_sl
 //  device_vectrex_cart_interface - constructor
 //-------------------------------------------------
 
-device_vectrex_cart_interface::device_vectrex_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0)
+device_vectrex_cart_interface::device_vectrex_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "vectrexcart"),
+	m_rom(nullptr),
+	m_rom_size(0)
 {
 }
 
@@ -65,7 +65,7 @@ void device_vectrex_cart_interface::rom_alloc(uint32_t size, const char *tag)
 vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VECTREX_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vectrex_cart_interface>(mconfig, *this),
 	m_type(VECTREX_STD),
 	m_vec3d(VEC3D_NONE),
 	m_cart(nullptr)
@@ -87,7 +87,7 @@ vectrex_cart_slot_device::~vectrex_cart_slot_device()
 
 void vectrex_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_vectrex_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 
@@ -124,7 +124,7 @@ static int vectrex_get_pcb_id(const char *slot)
 
 static const char *vectrex_get_slot(int type)
 {
-	for (auto & elem : slot_list)
+	for (auto &elem : slot_list)
 	{
 		if (elem.pcb_id == type)
 			return elem.slot_option;

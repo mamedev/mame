@@ -829,7 +829,7 @@ void bbc_state::bbca(machine_config &config)
 	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_state::bbca_mem);
 	m_maincpu->set_periodic_int(FUNC(bbc_state::bbcb_keyscan), attotime::from_hz(1000)); /* scan keyboard */
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
@@ -1081,7 +1081,7 @@ void bbc_state::torchh10(machine_config &config)
 {
 	torchf(config);
 	/* fdc */
-	m_i8271->subdevice<floppy_connector>("1")->set_default_option("");
+	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 10MB HDD */
 
@@ -1092,7 +1092,7 @@ void bbc_state::torchh21(machine_config &config)
 {
 	torchf(config);
 	/* fdc */
-	m_i8271->subdevice<floppy_connector>("1")->set_default_option("");
+	m_i8271->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 21MB HDD */
 
@@ -1162,7 +1162,7 @@ void bbcbp_state::abc110(machine_config &config)
 {
 	bbcbp(config);
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option("");
+	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* Acorn Z80 co-processor */
 	m_tube->set_default_option("z80");
@@ -1184,7 +1184,7 @@ void bbcbp_state::acw443(machine_config &config)
 {
 	bbcbp(config);
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option("");
+	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* 32016 co-processor */
 	//m_tube->set_default_option("32016");
@@ -1211,7 +1211,7 @@ void bbcbp_state::abc310(machine_config &config)
 {
 	bbcbp(config);
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option("");
+	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* Acorn 80286 co-processor */
 	m_tube->set_default_option("80286");
@@ -1317,7 +1317,7 @@ void bbcm_state::bbcm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbcm_state::bbcm_mem);
 	m_maincpu->set_addrmap(AS_OPCODES, &bbcm_state::bbcm_fetch);
 	m_maincpu->set_periodic_int(FUNC(bbc_state::bbcb_keyscan), attotime::from_hz(1000)); /* scan keyboard */
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&bbcm_state::bbcm_bankdev).set_options(ENDIANNESS_LITTLE, 8, 16, 0x0400);
 
@@ -1608,8 +1608,8 @@ void bbcm_state::cfa3000(machine_config &config)
 	bbcm(config);
 
 	/* fdc */
-	m_wd1770->subdevice<floppy_connector>("0")->set_default_option("");
-	m_wd1770->subdevice<floppy_connector>("1")->set_default_option("");
+	m_wd1770->subdevice<floppy_connector>("0")->set_default_option(nullptr);
+	m_wd1770->subdevice<floppy_connector>("1")->set_default_option(nullptr);
 
 	/* keyboard */
 	m_userport->set_default_option("cfa3000kbd");

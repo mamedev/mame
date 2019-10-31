@@ -26,7 +26,7 @@ class device_bbc_rom_interface;
 
 class bbc_romslot_device : public device_t,
 							public device_image_interface,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_bbc_rom_interface>
 {
 public:
 		// image-level overrides
@@ -109,7 +109,7 @@ public:
 
 // ======================> device_bbc_rom_interface
 
-class device_bbc_rom_interface : public device_slot_card_interface
+class device_bbc_rom_interface : public device_interface
 {
 public:
 	// construction/destruction

@@ -749,6 +749,8 @@ void md_cons_state::genesis_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("segacd");
@@ -767,6 +769,8 @@ void md_cons_state::md_scd(machine_config &config)
 	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -787,6 +791,8 @@ void md_cons_state::mdj_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacdj");
@@ -802,6 +808,8 @@ void md_cons_state::genesis_32x_scd(machine_config &config)
 	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
@@ -823,6 +831,8 @@ void md_cons_state::md_32x_scd(machine_config &config)
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
 
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
+
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 
 	MCFG_MACHINE_START_OVERRIDE(md_cons_state, ms_megacd)
@@ -842,6 +852,8 @@ void md_cons_state::mdj_32x_scd(machine_config &config)
 	m_segacd->set_palette("gen_vdp:gfx_palette");
 	m_segacd->set_hostcpu(m_maincpu);
 	m_segacd->set_screen("megadriv");
+
+	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
 	CDROM(config, "cdrom").set_interface("scd_cdrom");
 

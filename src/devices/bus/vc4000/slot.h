@@ -20,7 +20,7 @@ enum
 
 // ======================> device_vc4000_cart_interface
 
-class device_vc4000_cart_interface : public device_slot_card_interface
+class device_vc4000_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -30,7 +30,7 @@ public:
 	virtual uint8_t read_rom(offs_t offset) { return 0xff; }
 	virtual uint8_t extra_rom(offs_t offset) { return 0xff; }
 	virtual uint8_t read_ram(offs_t offset) { return 0xff; }
-	virtual void write_ram(offs_t offset, uint8_t data) {}
+	virtual void write_ram(offs_t offset, uint8_t data) { }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);
@@ -55,7 +55,7 @@ protected:
 
 class vc4000_cart_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_vc4000_cart_interface>
 {
 public:
 	// construction/destruction

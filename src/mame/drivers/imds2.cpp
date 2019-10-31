@@ -253,7 +253,7 @@ void imds2_state::imds2(machine_config &config)
 	m_ipccpu->set_addrmap(AS_PROGRAM, &imds2_state::ipc_mem_map);
 	m_ipccpu->set_addrmap(AS_IO, &imds2_state::ipc_io_map);
 	m_ipccpu->set_irq_acknowledge_callback("ipcsyspic", FUNC(pic8259_device::inta_cb));
-	//config.m_minimum_quantum = attotime::from_hz(100);
+	//config.set_maximum_quantum(attotime::from_hz(100));
 
 	PIC8259(config, m_ipcsyspic, 0);
 	m_ipcsyspic->out_int_callback().set(FUNC(imds2_state::ipc_intr_w));

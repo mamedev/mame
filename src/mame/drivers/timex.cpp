@@ -694,7 +694,7 @@ void timex_state::ts2068(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &timex_state::ts2068_mem);
 	m_maincpu->set_addrmap(AS_IO, &timex_state::ts2068_io);
 	m_maincpu->set_vblank_int("screen", FUNC(timex_state::spec_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_RESET_OVERRIDE(timex_state, ts2068 )
 

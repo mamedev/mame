@@ -60,7 +60,7 @@ DEFINE_DEVICE_TYPE(SG1000_CARD_SLOT,    sg1000_card_slot_device,    "sg1000_card
 //-------------------------------------------------
 
 device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "sega8cart")
 	, m_rom(nullptr)
 	, m_rom_size(0)
 	, m_rom_page_count(0)
@@ -120,7 +120,7 @@ void device_sega8_cart_interface::ram_alloc(uint32_t size)
 sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_card)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_sega8_cart_interface>(mconfig, *this)
 	, m_type(SEGA8_BASE_ROM)
 	, m_is_card(is_card)
 	, m_cart(nullptr)
@@ -198,7 +198,7 @@ sega8_cart_slot_device::~sega8_cart_slot_device()
 
 void sega8_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_sega8_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 //-------------------------------------------------

@@ -971,7 +971,7 @@ void mlanding_state::mlanding(machine_config &config)
 	ciu.set_master_tag(m_maincpu);
 	ciu.set_slave_tag(m_audiocpu);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TAITOIO_YOKE(config, m_yoke, 0);
 
