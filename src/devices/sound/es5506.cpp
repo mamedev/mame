@@ -499,7 +499,7 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 		const u8 exponent = (i >> mantissa_bit) & exponent_mask;
 		const u32 mantissa = (i & mantissa_mask) | mantissa_len;
 
-		m_volume_lookup[i] = (mantissa << mantissa_shift) >> (((mantissa_shift - mantissa_bit) + 1 + (1 << exponent_bit)) - exponent);
+		m_volume_lookup[i] = (mantissa << mantissa_shift) >> ((mantissa_shift + mantissa_bit + 1) - exponent);
 	}
 }
 
