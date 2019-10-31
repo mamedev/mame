@@ -11,6 +11,7 @@
 #include "mps2.h"
 
 #include "bus/rs232/rs232.h"
+#include "bus/rs232/swtpc8212.h"
 #include "machine/6850acia.h"
 #include "machine/input_merger.h"
 
@@ -141,6 +142,7 @@ void ss50_mps2_device::device_add_mconfig(machine_config &config)
 	rs232_upper.rxd_handler().set(m_acia_upper, FUNC(acia6850_device::write_rxd));
 	rs232_upper.cts_handler().set(m_acia_upper, FUNC(acia6850_device::write_cts));
 	rs232_upper.dcd_handler().set(m_acia_upper, FUNC(acia6850_device::write_dcd));
+	rs232_upper.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 	rs232_upper.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_upper));
 
 	ACIA6850(config, m_acia_lower, 0);
@@ -152,6 +154,7 @@ void ss50_mps2_device::device_add_mconfig(machine_config &config)
 	rs232_lower.rxd_handler().set(m_acia_lower, FUNC(acia6850_device::write_rxd));
 	rs232_lower.cts_handler().set(m_acia_lower, FUNC(acia6850_device::write_cts));
 	rs232_lower.dcd_handler().set(m_acia_lower, FUNC(acia6850_device::write_dcd));
+	rs232_lower.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 	rs232_lower.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal_lower));
 
 	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set(FUNC(ss50_mps2_device::write_irq));

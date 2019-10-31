@@ -354,7 +354,7 @@ void micro3d_state::micro3d(machine_config &config)
 	mfp.out_tco_cb().set("mfp", FUNC(mc68901_device::tbi_w));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	config.m_minimum_quantum = attotime::from_hz(3000);
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	PALETTE(config, m_palette).set_format(palette_device::BRGx_555, 4096);
 

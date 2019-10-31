@@ -246,7 +246,7 @@ void kim1_state::kim1(machine_config &config)
 	// basic machine hardware
 	M6502(config, m_maincpu, 1000000);        /* 1 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &kim1_state::kim1_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
 	config.set_default_layout(layout_kim1);

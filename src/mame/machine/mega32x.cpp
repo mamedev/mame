@@ -1683,7 +1683,7 @@ const rom_entry *sega_32x_device::device_rom_region() const
 // some games appear to dislike 'perfect' levels of interleave, probably due to
 // non-emulated cache, ram waitstates and other issues?
 #define _32X_INTERLEAVE_LEVEL \
-	config.m_minimum_quantum = attotime::from_hz(1800000);
+	config.set_maximum_quantum(attotime::from_hz(1800000));
 
 void sega_32x_device::device_add_mconfig(machine_config &config)
 {

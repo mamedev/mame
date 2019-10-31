@@ -76,7 +76,7 @@ namespace netlist
 		if (state != m_last_state)
 		{
 			m_last_state = state;
-			const nl_double R = state ? m_RON() : m_ROFF();
+			const nl_fptype R = state ? m_RON() : m_ROFF();
 
 			// FIXME: We only need to update the net first if this is a time stepping net
 			m_R.update();

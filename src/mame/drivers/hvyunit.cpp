@@ -634,7 +634,7 @@ void hvyunit_state::hvyunit(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_slavelatch);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(58);

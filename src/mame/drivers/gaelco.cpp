@@ -646,7 +646,7 @@ void gaelco_state::bigkarnk(machine_config &config)
 	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  /* 68B09EP, 2 MHz? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_snd_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch);
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
@@ -715,7 +715,7 @@ void gaelco_state::squash(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::squash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
@@ -753,7 +753,7 @@ void gaelco_state::thoop(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::thoop_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch); // B8
 	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted

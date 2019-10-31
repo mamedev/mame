@@ -85,8 +85,9 @@
 #define LOG_RESET   (1U <<  2)
 #define LOG_BITS    (1U <<  3)
 #define LOG_UI      (1U <<  4)
+#define LOG_LEDS    (1U <<  5)
 
-//#define VERBOSE (LOG_UI)
+//#define VERBOSE (LOG_LEDS)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -95,6 +96,7 @@
 #define LOGRST(...)   LOGMASKED(LOG_RESET, __VA_ARGS__)
 #define LOGBITS(...)  LOGMASKED(LOG_BITS,  __VA_ARGS__)
 #define LOGUI(...)    LOGMASKED(LOG_UI,    __VA_ARGS__)
+#define LOGLEDS(...)  LOGMASKED(LOG_LEDS,  __VA_ARGS__)
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -249,6 +251,9 @@ eispc_keyboard_device::eispc_keyboard_device(
 	, m_mcu(*this, M6801_TAG)
 	, m_rows(*this, "P1%u", 0)
 	, m_txd_cb(*this)
+	, m_led_caps_cb(*this)
+	, m_led_num_cb(*this)
+	, m_led_scroll_cb(*this)
 	, m_rxd_high(true)
 	, m_txd_high(true)
 	, m_hold(true)
@@ -267,23 +272,18 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::hold_w)
 	m_hold = CLEAR_LINE == state;
 }
 
-// TODO: Fix proper HOLD of reset line for MCU until released by hist CPU
 WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 {
 	if (state == CLEAR_LINE)
 	{
-		//m_mcu->resume(SUSPEND_REASON_RESET);
 		m_mcu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		LOGRST("KBD: Keyboard mcu reset line is cleared\n");
 	}
 	else
 	{
-		// set_input_line suspends with a true argument which causes "Keyboard error"
-		//m_mcu->suspend(SUSPEND_REASON_RESET, false);  // This causes an assert later when DEBUG==1
 		m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		LOGRST("KBD: Keyboard mcu reset line is asserted\n");
 	}
-
 }
 
 //-------------------------------------------------
@@ -293,6 +293,9 @@ WRITE_LINE_MEMBER(eispc_keyboard_device::rst_line_w)
 void eispc_keyboard_device::device_start()
 {
 	m_txd_cb.resolve_safe();
+	m_led_caps_cb.resolve_safe();
+	m_led_num_cb.resolve_safe();
+	m_led_scroll_cb.resolve_safe();
 
 	save_item(NAME(m_rxd_high));
 	save_item(NAME(m_txd_high));
@@ -335,6 +338,8 @@ void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->out_p1_cb().set([this](uint8_t data)
 	{
 		LOGPORTS("Writing %02x PORT 1\n", data);
+		LOGLEDS("Num: %d\n", BIT(data, 7));
+		m_led_num_cb(BIT(data, 7) ? 1 : 0);
 	});
 
 	m_mcu->in_p2_cb().set([this]
@@ -348,6 +353,9 @@ void eispc_keyboard_device::device_add_mconfig(machine_config &config)
 	m_mcu->out_p2_cb().set([this](uint8_t data)
 	{
 		LOGPORTS("Writing port 2: %02x\n", data);
+		LOGLEDS("Caps: %d Scroll: %d\n", BIT(data, 0), BIT(data, 2));
+		m_led_caps_cb(BIT(data, 0) ? 1 : 0);
+		m_led_scroll_cb(BIT(data, 2) ? 1 : 0); // Only working with "Roger Moore" roms
 		LOGBITS("KBD: writing bit: %02x\n", BIT(data, 4));
 	});
 

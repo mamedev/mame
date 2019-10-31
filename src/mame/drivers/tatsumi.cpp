@@ -882,7 +882,7 @@ void apache3_state::apache3(machine_config &config)
 	m_subcpu2->set_addrmap(AS_PROGRAM, &apache3_state::apache3_z80_map);
 	m_subcpu2->set_vblank_int("screen", FUNC(apache3_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 	MCFG_MACHINE_RESET_OVERRIDE(apache3_state, apache3)
 
@@ -942,7 +942,7 @@ void roundup5_state::roundup5(machine_config &config)
 	Z80(config, m_audiocpu, CLOCK_1 / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &roundup5_state::roundup5_z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("IN0");
@@ -1015,7 +1015,7 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cyclwarr_state::sound_map);
 
 	// saner sync value (avoids crashing after crediting)
-	config.m_minimum_quantum = attotime::from_hz(CLOCK_2 / 1024);
+	config.set_maximum_quantum(attotime::from_hz(CLOCK_2 / 1024));
 
 	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_portb_cb().set_ioport("SERVICE");

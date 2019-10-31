@@ -799,7 +799,7 @@ void nightgal_state::royalqn(machine_config &config)
 	NSC8105(config, m_subcpu, MASTER_CLOCK / 8);
 	m_subcpu->set_addrmap(AS_PROGRAM, &nightgal_state::royalqn_nsc_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	JANGOU_BLITTER(config, m_blitter, MASTER_CLOCK/4);
 

@@ -3212,7 +3212,7 @@ void toaplan2_state::tekipaki(machine_config &config)
 	audiocpu.set_addrmap(AS_IO, &toaplan2_state::hd647180_io_map);
 	audiocpu.in_pa_callback().set(FUNC(toaplan2_state::tekipaki_cmdavailable_r));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3254,7 +3254,7 @@ void toaplan2_state::ghox(machine_config &config)
 	HD647180X(config, m_audiocpu, 10_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::ghox_hd647180_mem_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,ghox)
 
@@ -3509,7 +3509,7 @@ void toaplan2_state::pipibibs(machine_config &config)
 	Z80(config, m_audiocpu, 27_MHz_XTAL/8);         // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3551,7 +3551,7 @@ void toaplan2_state::pipibibsbl(machine_config &config)
 	Z80(config, m_audiocpu, 12_MHz_XTAL / 2); // GoldStar Z8400B; clock source and divider unknown
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::pipibibs_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3921,7 +3921,7 @@ void toaplan2_state::mahoudai(machine_config &config)
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::raizing_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 
@@ -3971,7 +3971,7 @@ void toaplan2_state::bgaregga(machine_config &config)
 	Z80(config, m_audiocpu, 32_MHz_XTAL/8);     // 4MHz, 32MHz Oscillator
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::bgaregga_sound_z80_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
 
@@ -4028,7 +4028,7 @@ void toaplan2_state::batrider(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan2_state::batrider_sound_z80_mem);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::batrider_sound_z80_port);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,bgaregga)
 
@@ -4092,7 +4092,7 @@ void toaplan2_state::bbakraid(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &toaplan2_state::bbakraid_sound_z80_port);
 	m_audiocpu->set_periodic_int(FUNC(toaplan2_state::bbakraid_snd_interrupt), attotime::from_hz(448));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
 

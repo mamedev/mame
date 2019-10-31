@@ -82,8 +82,19 @@ namespace plib {
 
 		parray(const parray &rhs) : m_a(rhs.m_a), m_size(rhs.m_size) {}
 		parray(parray &&rhs) noexcept : m_a(std::move(rhs.m_a)), m_size(std::move(rhs.m_size)) {}
-		parray &operator=(const parray &rhs) { m_a = rhs.m_a; m_size = rhs.m_size; return *this; }
+		parray &operator=(const parray &rhs) noexcept
+		{
+			if (this != &rhs)
+			{
+				m_a = rhs.m_a;
+				m_size = rhs.m_size;
+			}
+			return *this;
+		}
+
 		parray &operator=(parray &&rhs) noexcept { std::swap(m_a,rhs.m_a); std::swap(m_size, rhs.m_size); return *this; }
+
+		~parray() noexcept = default;
 
 		template <int X = SIZE >
 		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0)
@@ -137,6 +148,9 @@ namespace plib {
 		}
 
 		COPYASSIGNMOVE(parray2D, default)
+
+		~parray2D() noexcept = default;
+
 	};
 
 } // namespace plib

@@ -21,7 +21,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -35,15 +35,51 @@ namespace devices
 		 * maximize the efficiency of the incomplete LUT.
 		 * This is already preconditioning.
 		 */
-		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, const std::size_t size)
-			// matrix_solver_direct_t<FT, SIZE>(anetlist, name, matrix_solver_t::PREFER_BAND_MATRIX, params, size)
-				: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
+		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name,
+			analog_net_t::list_t &nets,
+			const solver_parameters_t *params,
+			const std::size_t size)
+			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
 			, m_ops(size, 0)
 			, m_gmres(size)
 			{
+			const std::size_t iN = this->size();
+
+			std::vector<std::vector<unsigned>> fill(iN);
+
+			for (std::size_t k=0; k<iN; k++)
+			{
+				fill[k].resize(iN, decltype(m_ops.m_mat)::FILL_INFINITY);
+				terms_for_net_t & row = this->m_terms[k];
+				for (const auto &nz_j : row.m_nz)
+				{
+					fill[k][static_cast<mattype>(nz_j)] = 0;
+				}
 			}
 
-		void vsetup(analog_net_t::list_t &nets) override;
+			m_ops.build(fill);
+			this->log_fill(fill, m_ops.m_mat);
+
+			/* build pointers into the compressed row format matrix for each terminal */
+
+			for (std::size_t k=0; k<iN; k++)
+			{
+				std::size_t cnt = 0;
+				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				{
+					for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
+						if (this->m_terms[k].m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
+						{
+							this->m_mat_ptr[k][j] = &m_ops.m_mat.A[i];
+							cnt++;
+							break;
+						}
+				}
+				nl_assert(cnt == this->m_terms[k].railstart());
+				this->m_mat_ptr[k][this->m_terms[k].railstart()] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
+			}
+		}
+
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
 	private:
@@ -61,48 +97,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	void matrix_solver_GMRES_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-	{
-		matrix_solver_direct_t<FT, SIZE>::vsetup(nets);
-
-		const std::size_t iN = this->size();
-
-		std::vector<std::vector<unsigned>> fill(iN);
-
-		for (std::size_t k=0; k<iN; k++)
-		{
-			fill[k].resize(iN, decltype(m_ops.m_mat)::FILL_INFINITY);
-			terms_for_net_t * row = this->m_terms[k].get();
-			for (const auto &nz_j : row->m_nz)
-			{
-				fill[k][static_cast<mattype>(nz_j)] = 0;
-			}
-		}
-
-		m_ops.build(fill);
-		this->log_fill(fill, m_ops.m_mat);
-
-		/* build pointers into the compressed row format matrix for each terminal */
-
-		for (std::size_t k=0; k<iN; k++)
-		{
-			std::size_t cnt = 0;
-			for (std::size_t j=0; j< this->m_terms[k]->m_railstart;j++)
-			{
-				for (std::size_t i = m_ops.m_mat.row_idx[k]; i<m_ops.m_mat.row_idx[k+1]; i++)
-					if (this->m_terms[k]->m_connected_net_idx[j] == static_cast<int>(m_ops.m_mat.col_idx[i]))
-					{
-						this->m_mat_ptr[k][j] = &m_ops.m_mat.A[i];
-						cnt++;
-						break;
-					}
-			}
-			nl_assert(cnt == this->m_terms[k]->m_railstart);
-			this->m_mat_ptr[k][this->m_terms[k]->m_railstart] = &m_ops.m_mat.A[m_ops.m_mat.diag[k]];
-		}
-	}
-
-	template <typename FT, int SIZE>
 	unsigned matrix_solver_GMRES_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
 		const std::size_t iN = this->size();
@@ -112,11 +106,11 @@ namespace devices
 		m_ops.m_mat.set_scalar(0.0);
 
 		/* populate matrix and V for first estimate */
-		this->fill_matrix(iN, this->m_mat_ptr, RHS);
+		this->fill_matrix(iN, RHS);
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			this->m_new_V[k] = this->m_terms[k]->getV();
+			this->m_new_V[k] = this->m_terms[k].getV();
 		}
 
 		const float_type accuracy = this->m_params.m_accuracy;
@@ -141,7 +135,7 @@ namespace devices
 
 
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_GMRES_H_ */

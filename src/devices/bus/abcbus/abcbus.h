@@ -118,35 +118,35 @@
 
 class abcbus_slot_device;
 
-class device_abcbus_card_interface : public device_slot_card_interface
+class device_abcbus_card_interface : public device_interface
 {
 public:
 	// required operation overrides
 	virtual void abcbus_cs(uint8_t data) = 0;
 
 	// optional operation overrides
-	virtual uint8_t abcbus_inp() { return 0xff; };
-	virtual void abcbus_out(uint8_t data) { };
-	virtual uint8_t abcbus_stat() { return 0xff; };
-	virtual void abcbus_c1(uint8_t data) { };
-	virtual void abcbus_c2(uint8_t data) { };
-	virtual void abcbus_c3(uint8_t data) { };
-	virtual void abcbus_c4(uint8_t data) { };
+	virtual uint8_t abcbus_inp() { return 0xff; }
+	virtual void abcbus_out(uint8_t data) { }
+	virtual uint8_t abcbus_stat() { return 0xff; }
+	virtual void abcbus_c1(uint8_t data) { }
+	virtual void abcbus_c2(uint8_t data) { }
+	virtual void abcbus_c3(uint8_t data) { }
+	virtual void abcbus_c4(uint8_t data) { }
 
 	// optional operation overrides for ABC 80
-	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; };
-	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { };
+	virtual uint8_t abcbus_xmemfl(offs_t offset) { return 0xff; }
+	virtual void abcbus_xmemw(offs_t offset, uint8_t data) { }
 
 	// optional operation overrides for ABC 1600
 	virtual int abcbus_csb() { return 1; }
-	virtual uint8_t abcbus_ops() { return 0xff; };
-	virtual void abcbus_tren(int state) { };
-	virtual void abcbus_prac(int state) { };
-	virtual uint8_t abcbus_exp() { return 0xff; };
-	virtual int abcbus_xcsb2() { return 1; };
-	virtual int abcbus_xcsb3() { return 1; };
-	virtual int abcbus_xcsb4() { return 1; };
-	virtual int abcbus_xcsb5() { return 1; };
+	virtual uint8_t abcbus_ops() { return 0xff; }
+	virtual void abcbus_tren(int state) { }
+	virtual void abcbus_prac(int state) { }
+	virtual uint8_t abcbus_exp() { return 0xff; }
+	virtual int abcbus_xcsb2() { return 1; }
+	virtual int abcbus_xcsb3() { return 1; }
+	virtual int abcbus_xcsb4() { return 1; }
+	virtual int abcbus_xcsb5() { return 1; }
 
 protected:
 	// construction/destruction
@@ -161,7 +161,7 @@ protected:
 // ======================> abcbus_slot_device
 
 class abcbus_slot_device : public device_t,
-							public device_slot_interface
+							public device_single_card_slot_interface<device_abcbus_card_interface>
 {
 public:
 	// construction/destruction
@@ -245,7 +245,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override { if (m_card) get_card_device()->reset(); }
 
 	devcb_write_line   m_write_irq;
 	devcb_write_line   m_write_nmi;

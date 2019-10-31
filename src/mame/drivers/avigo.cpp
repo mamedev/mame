@@ -755,7 +755,7 @@ void avigo_state::avigo(machine_config &config)
 	Z80(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &avigo_state::avigo_mem);
 	m_maincpu->set_addrmap(AS_IO, &avigo_state::avigo_io);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NS16550(config, m_uart, XTAL(1'843'200));
 	m_uart->out_tx_callback().set(m_serport, FUNC(rs232_port_device::write_txd));

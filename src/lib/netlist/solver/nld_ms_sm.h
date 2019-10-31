@@ -41,7 +41,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -57,9 +57,15 @@ namespace devices
 		static constexpr const std::size_t storage_N = 100;
 
 		matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
-				const solver_parameters_t *params, const std::size_t size);
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params, const std::size_t size)
+		: matrix_solver_t(anetlist, name, nets, params)
+		, m_dim(size)
+		, m_cnt(0)
+		{
+			this->build_mat_ptr(this->size(), m_A);
+		}
 
-		void vsetup(analog_net_t::list_t &nets) override;
 		void reset() override { matrix_solver_t::reset(); }
 
 	protected:
@@ -113,16 +119,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 
 	template <typename FT, int SIZE>
-	void matrix_solver_sm_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-	{
-		matrix_solver_t::setup_base(nets);
-
-		/* FIXME: Shouldn't be necessary */
-		for (std::size_t k = 0; k < size(); k++)
-			state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
-	}
-
-	template <typename FT, int SIZE>
 	void matrix_solver_sm_t<FT, SIZE>::LE_invert()
 	{
 		const std::size_t kN = size();
@@ -141,13 +137,13 @@ namespace devices
 		{
 			/* FIXME: Singular matrix? */
 			const float_type f = 1.0 / W(i,i);
-			const auto * const p = m_terms[i]->m_nzrd.data();
-			const std::size_t e = m_terms[i]->m_nzrd.size();
+			const auto * const p = m_terms[i].m_nzrd.data();
+			const std::size_t e = m_terms[i].m_nzrd.size();
 
 			/* Eliminate column i from row j */
 
-			const auto * const pb = m_terms[i]->m_nzbd.data();
-			const std::size_t eb = m_terms[i]->m_nzbd.size();
+			const auto * const pb = m_terms[i].m_nzbd.data();
+			const std::size_t eb = m_terms[i].m_nzbd.size();
 			for (std::size_t jb = 0; jb < eb; jb++)
 			{
 				const unsigned j = pb[jb];
@@ -236,7 +232,7 @@ namespace devices
 			{
 				std::size_t colcount = 0;
 
-				auto &nz = m_terms[row]->m_nz;
+				auto &nz = m_terms[row].m_nz;
 				for (unsigned & col : nz)
 				{
 					v[col] = A(row,col) - lA(row,col);
@@ -291,23 +287,17 @@ namespace devices
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_sm_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
-		this->build_LE_A(*this);
-		this->build_LE_RHS(*this);
+
+		const std::size_t iN = this->size();
+		this->clear_square_mat(iN, this->m_A);
+		this->fill_matrix(iN, this->m_RHS);
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);
 	}
 
-	template <typename FT, int SIZE>
-	matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
-			const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, params)
-	, m_dim(size)
-	, m_cnt(0)
-	{
-	}
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */

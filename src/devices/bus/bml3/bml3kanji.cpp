@@ -72,13 +72,10 @@ bml3bus_kanji_device::bml3bus_kanji_device(const machine_config &mconfig, const 
 
 void bml3bus_kanji_device::device_start()
 {
-	// set_bml3bus_device makes m_slot valid
-	set_bml3bus_device();
-
 	m_rom = memregion(KANJI_ROM_REGION)->base();
 
 	// install into memory
-	address_space &space_prg = m_bml3bus->space();
+	address_space &space_prg = space();
 	space_prg.install_readwrite_handler(0xff75, 0xff76, read8_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_r)), write8_delegate(*this, FUNC(bml3bus_kanji_device::bml3_kanji_w)));
 }
 

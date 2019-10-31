@@ -20,7 +20,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -32,15 +32,15 @@ namespace devices
 
 		using float_type = FT;
 
-		matrix_solver_SOR_mat_t(netlist_state_t &anetlist, const pstring &name, const solver_parameters_t *params, std::size_t size)
-			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, params, size)
+		matrix_solver_SOR_mat_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
+			const solver_parameters_t *params, std::size_t size)
+			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
 			, m_Vdelta(*this, "m_Vdelta", std::vector<float_type>(size))
 			, m_omega(*this, "m_omega", params->m_gs_sor)
 			, m_lp_fact(*this, "m_lp_fact", 0)
 			{
 			}
-
-		void vsetup(analog_net_t::list_t &nets) override;
 
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 
@@ -56,12 +56,6 @@ namespace devices
 	// ----------------------------------------------------------------------------------------
 	// matrix_solver - Gauss - Seidel
 	// ----------------------------------------------------------------------------------------
-
-	template <typename FT, int SIZE>
-	void matrix_solver_SOR_mat_t<FT, SIZE>::vsetup(analog_net_t::list_t &nets)
-	{
-		matrix_solver_direct_t<FT, SIZE>::vsetup(nets);
-	}
 
 	#if 0
 	//FIXME: move to solve_base
@@ -123,13 +117,12 @@ namespace devices
 
 		const std::size_t iN = this->size();
 
-		this->build_LE_A(*this);
-		this->build_LE_RHS(*this);
+		this->clear_square_mat(iN, this->m_A);
+		this->fill_matrix(iN, this->m_RHS);
 
 		bool resched = false;
 
 		unsigned resched_cnt = 0;
-
 
 	#if 0
 		static int ws_cnt = 0;
@@ -166,7 +159,7 @@ namespace devices
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_terms[k]->getV();
+			this->m_new_V[k] = this->m_terms[k].getV();
 
 		do {
 			resched = false;
@@ -176,28 +169,28 @@ namespace devices
 			{
 				float_type Idrive = 0;
 
-				const auto *p = this->m_terms[k]->m_nz.data();
-				const std::size_t e = this->m_terms[k]->m_nz.size();
+				const auto *p = this->m_terms[k].m_nz.data();
+				const std::size_t e = this->m_terms[k].m_nz.size();
 
 				for (std::size_t i = 0; i < e; i++)
-					Idrive = Idrive + this->A(k,p[i]) * this->m_new_V[p[i]];
+					Idrive = Idrive + this->m_A[k][p[i]] * this->m_new_V[p[i]];
 
-				FT w = m_omega / this->A(k,k);
+				FT w = m_omega / this->m_A[k][k];
 				if (this->m_params.m_use_gabs)
 				{
 					FT gabs_t = 0.0;
 					for (std::size_t i = 0; i < e; i++)
 						if (p[i] != k)
-							gabs_t = gabs_t + std::abs(this->A(k,p[i]));
+							gabs_t = gabs_t + std::abs(this->m_A[k][p[i]]);
 
 					gabs_t *= plib::constants<FT>::one(); // derived by try and error
-					if (gabs_t > this->A(k,k))
+					if (gabs_t > this->m_A[k][k])
 					{
-						w = plib::constants<FT>::one() / (this->A(k,k) + gabs_t);
+						w = plib::constants<FT>::one() / (this->m_A[k][k] + gabs_t);
 					}
 				}
 
-				const float_type delta = w * (this->RHS(k) - Idrive) ;
+				const float_type delta = w * (this->m_RHS[k] - Idrive) ;
 				cerr = std::max(cerr, std::abs(delta));
 				this->m_new_V[k] += delta;
 			}
@@ -224,7 +217,7 @@ namespace devices
 
 	}
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_GAUSS_SEIDEL_H_ */

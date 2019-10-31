@@ -978,7 +978,7 @@ void r9751_state::r9751(machine_config &config)
 	/* basic machine hardware */
 	M68030(config, m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &r9751_state::r9751_mem);
-	config.m_minimum_quantum = attotime::from_hz(1000);
+	config.set_maximum_quantum(attotime::from_hz(1000));
 
 	/* i/o hardware */
 	SMIOC(config, m_smioc, 0);

@@ -91,7 +91,7 @@ public:
 	plib::option_group  opt_grp3;
 	plib::option_str    opt_dir;
 	plib::option_group  opt_grp4;
-	plib::option_num<double> opt_ttr;
+	plib::option_num<nl_fptype> opt_ttr;
 	plib::option_bool   opt_stats;
 	plib::option_vec    opt_logs;
 	plib::option_str    opt_inp;
@@ -311,7 +311,7 @@ struct input_t
 	: m_value(0.0)
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
-		double t(0);
+		nl_fptype t(0);
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
 		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
 		if (e != 3)
@@ -328,7 +328,7 @@ struct input_t
 			case netlist::param_t::POINTER:
 				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
-				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
+				static_cast<netlist::param_fp_t*>(m_param)->setTo(m_value);
 				break;
 			case netlist::param_t::INTEGER:
 				static_cast<netlist::param_int_t*>(m_param)->setTo(static_cast<int>(m_value));
@@ -341,7 +341,7 @@ struct input_t
 
 	netlist::netlist_time m_time;
 	netlist::param_t *m_param;
-	double m_value;
+	nl_fptype m_value;
 };
 
 static std::vector<input_t> read_input(const netlist::setup_t &setup, const pstring &fname)
@@ -456,7 +456,7 @@ void tool_app_t::run()
 		nt.stop();
 	}
 
-	double emutime = t.as_seconds();
+	nl_fptype emutime = t.as_seconds();
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
 			(ttr - nlt).as_double(), emutime,
 			(ttr - nlt).as_double() / emutime * 100.0);

@@ -3949,7 +3949,7 @@ void namcos22s_state::namcos22s(machine_config &config)
 	m_mcu->an2_cb().set(FUNC(namcos22s_state::mcu_adc_r<2>));
 	m_mcu->an3_cb().set(FUNC(namcos22s_state::mcu_adc_r<3>));
 	TIMER(config, "mcu_irq").configure_scanline(FUNC(namcos22s_state::mcu_irq), "screen", 0, 240);
-	config.m_minimum_quantum = attotime::from_hz(9000); // erratic inputs otherwise, probably mcu vs maincpu shareram
+	config.set_maximum_quantum(attotime::from_hz(9000)); // erratic inputs otherwise, probably mcu vs maincpu shareram
 
 	config.device_remove("iomcu");
 

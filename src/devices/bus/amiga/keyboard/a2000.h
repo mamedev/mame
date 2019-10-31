@@ -49,6 +49,7 @@ protected:
 private:
 	required_ioport_array<13>   m_rows;
 	required_device<cpu_device> m_mcu;
+	output_finder<>             m_led_kbd_caps;
 
 	uint16_t                    m_row_drive;
 	bool                        m_host_kdat, m_mcu_kdat, m_mcu_kclk;

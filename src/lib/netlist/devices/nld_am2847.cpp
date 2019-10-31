@@ -32,7 +32,7 @@ namespace netlist
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_array<uint16_t, 5> m_buffer;
+		state_container<std::array<uint16_t, 5>> m_buffer;
 
 		logic_output_t m_OUT;
 		nld_power_pins m_power_pins;

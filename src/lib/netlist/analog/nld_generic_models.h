@@ -54,14 +54,14 @@ namespace analog
 		// so that G depends on un+1 only and Ieq on un only.
 		// In both cases, i = G * un+1 + Ieq
 
-		nl_double G(nl_double cap) const
+		nl_fptype G(nl_fptype cap) const
 		{
 			//return m_h * cap +  m_gmin;
 			return m_h * 0.5 * (cap + m_c) +  m_gmin;
 			//return m_h * cap +  m_gmin;
 		}
 
-		nl_double Ieq(nl_double cap, nl_double v) const
+		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const
 		{
 			plib::unused_var(v);
 			//return -m_h * 0.5 * ((cap + m_c) * m_v + (cap - m_c) * v) ;
@@ -69,20 +69,20 @@ namespace analog
 			//return -m_h * cap * m_v;
 		}
 
-		void timestep(nl_double cap, nl_double v, nl_double step)
+		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step)
 		{
 			m_h = 1.0 / step;
 			m_c = cap;
 			m_v = v;
 		}
 
-		void setparams(nl_double gmin) { m_gmin = gmin; }
+		void setparams(nl_fptype gmin) { m_gmin = gmin; }
 
 	private:
-		state_var<double> m_h;
-		state_var<double> m_c;
-		state_var<double> m_v;
-		nl_double m_gmin;
+		state_var<nl_fptype> m_h;
+		state_var<nl_fptype> m_c;
+		state_var<nl_fptype> m_v;
+		nl_fptype m_gmin;
 	};
 
 	// "Circuit simulation", page 274
@@ -98,24 +98,24 @@ namespace analog
 		}
 
 		capacitor_e type() const { return capacitor_e::CONSTANT_CAPACITY; }
-		nl_double G(nl_double cap) const { return cap * m_h +  m_gmin; }
-		nl_double Ieq(nl_double cap, nl_double v) const
+		nl_fptype G(nl_fptype cap) const { return cap * m_h +  m_gmin; }
+		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const
 		{
 			plib::unused_var(v);
 			return - G(cap) * m_v;
 		}
 
-		void timestep(nl_double cap, nl_double v, nl_double step)
+		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step)
 		{
 			plib::unused_var(cap);
 			m_h = 1.0 / step;
 			m_v = v;
 		}
-		void setparams(nl_double gmin) { m_gmin = gmin; }
+		void setparams(nl_fptype gmin) { m_gmin = gmin; }
 	private:
-		state_var<nl_double> m_h;
-		state_var<double> m_v;
-		nl_double m_gmin;
+		state_var<nl_fptype> m_h;
+		state_var<nl_fptype> m_v;
+		nl_fptype m_gmin;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -149,17 +149,17 @@ namespace analog
 			set_param(1e-15, 1, 1e-15, 300.0);
 		}
 
-		void update_diode(const nl_double nVd)
+		void update_diode(const nl_fptype nVd)
 		{
-			nl_double IseVDVt(0.0);
+			nl_fptype IseVDVt(0.0);
 
 			if (TYPE == diode_e::BIPOLAR)
 			{
-				//printf("%s: %g %g\n", m_name.c_str(), nVd, (double) m_Vd);
+				//printf("%s: %g %g\n", m_name.c_str(), nVd, (nl_fptype) m_Vd);
 				if (nVd > m_Vcrit)
 				{
-					const nl_double d = std::min(1e100, nVd - m_Vd);
-					const nl_double a = std::abs(d) * m_VtInv;
+					const nl_fptype d = std::min(1e100, nVd - m_Vd);
+					const nl_fptype a = std::abs(d) * m_VtInv;
 					m_Vd = m_Vd + (d < 0 ? -1.0 : 1.0) * std::log1p(a) * m_Vt;
 				}
 				else
@@ -196,7 +196,7 @@ namespace analog
 			}
 		}
 
-		void set_param(const nl_double Is, const nl_double n, nl_double gmin, nl_double temp)
+		void set_param(const nl_fptype Is, const nl_fptype n, nl_fptype gmin, nl_fptype temp)
 		{
 			m_Is = Is;
 			m_logIs = std::log(Is);
@@ -213,27 +213,27 @@ namespace analog
 		}
 
 
-		nl_double I() const { return m_Id; }
-		nl_double G() const { return m_G; }
-		nl_double Ieq() const { return (m_Id - m_Vd * m_G); }
-		nl_double Vd() const { return m_Vd; }
+		nl_fptype I() const { return m_Id; }
+		nl_fptype G() const { return m_G; }
+		nl_fptype Ieq() const { return (m_Id - m_Vd * m_G); }
+		nl_fptype Vd() const { return m_Vd; }
 
 		/* owning object must save those ... */
 
 	private:
-		state_var<nl_double> m_Vd;
-		state_var<nl_double> m_Id;
-		state_var<nl_double> m_G;
+		state_var<nl_fptype> m_Vd;
+		state_var<nl_fptype> m_Id;
+		state_var<nl_fptype> m_G;
 
-		nl_double m_Vt;
-		nl_double m_Vmin;
-		nl_double m_Is;
-		nl_double m_logIs;
-		nl_double m_n;
-		nl_double m_gmin;
+		nl_fptype m_Vt;
+		nl_fptype m_Vmin;
+		nl_fptype m_Is;
+		nl_fptype m_logIs;
+		nl_fptype m_n;
+		nl_fptype m_gmin;
 
-		nl_double m_VtInv;
-		nl_double m_Vcrit;
+		nl_fptype m_VtInv;
+		nl_fptype m_Vcrit;
 
 		pstring m_name;
 	};

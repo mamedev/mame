@@ -371,7 +371,7 @@ void deadang_state::deadang(machine_config &config)
 
 	SEI80BU(config, "sei80bu", 0).set_device_rom_tag("audiocpu");
 
-	config.m_minimum_quantum = attotime::from_hz(60); // the game stops working with higher interleave rates..
+	config.set_maximum_quantum(attotime::from_hz(60)); // the game stops working with higher interleave rates..
 
 	WATCHDOG_TIMER(config, "watchdog");
 

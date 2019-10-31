@@ -48,7 +48,7 @@
 class device_colecovision_cartridge_interface;
 
 class colecovision_cartridge_slot_device : public device_t,
-											public device_slot_interface,
+											public device_single_card_slot_interface<device_colecovision_cartridge_interface>,
 											public device_image_interface
 {
 public:
@@ -94,7 +94,7 @@ protected:
 
 // ======================> device_colecovision_cartridge_interface
 
-class device_colecovision_cartridge_interface : public device_slot_card_interface
+class device_colecovision_cartridge_interface : public device_interface
 {
 	friend class colecovision_cartridge_slot_device;
 

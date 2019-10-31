@@ -400,7 +400,7 @@ void divebomb_state::divebomb(machine_config &config)
 	m_rozcpu->set_addrmap(AS_PROGRAM, &divebomb_state::divebomb_rozcpu_map);
 	m_rozcpu->set_addrmap(AS_IO, &divebomb_state::divebomb_rozcpu_iomap);
 
-	config.m_perfect_cpu_quantum = subtag("fgcpu");
+	config.set_perfect_quantum(m_fgcpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_fgcpu_irq).output_handler().set_inputline(m_fgcpu, INPUT_LINE_IRQ0);
 

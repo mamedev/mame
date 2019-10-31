@@ -690,7 +690,7 @@ void fortyl_state::common(machine_config &config)
 
 	TAITO68705_MCU(config, m_bmcu, 18432000/6); /* OK */
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* high interleave to ensure proper synchronization of CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* high interleave to ensure proper synchronization of CPUs */
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -764,7 +764,7 @@ void snesb_state::kinstb(machine_config &config)
 	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &snesb_state::spc_mem);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

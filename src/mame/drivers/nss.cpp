@@ -842,7 +842,7 @@ void nss_state::nss(machine_config &config)
 	SPC700(config, m_soundcpu, XTAL(24'576'000) / 12);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nss_state::spc_mem);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	/* nss hardware */
 	Z80(config, m_bioscpu, 4000000);

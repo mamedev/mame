@@ -22,7 +22,7 @@ namespace plib {
 namespace omp {
 
 template <typename I, class T>
-void for_static(std::size_t numops, const I start, const I end, const T &what)
+void for_static(std::size_t numops, const I start, const I end, const T &what)  noexcept(noexcept(what))
 {
 	if (numops>1000)
 	{
@@ -38,7 +38,7 @@ void for_static(std::size_t numops, const I start, const I end, const T &what)
 }
 
 template <typename I, class T>
-void for_static(const I start, const I end, const T &what)
+void for_static(const I start, const I end, const T &what) noexcept(noexcept(what))
 {
 #if PHAS_OPENMP && PUSE_OPENMP
 	#pragma omp parallel for schedule(static)
@@ -48,14 +48,14 @@ void for_static(const I start, const I end, const T &what)
 }
 
 template <typename I, class T>
-void for_static_np(const I start, const I end, const T &what)
+void for_static_np(const I start, const I end, const T &what) noexcept(noexcept(what))
 {
 	for (I i = start; i <  end; i++)
 		what(i);
 }
 
 
-inline void set_num_threads(const std::size_t threads)
+inline void set_num_threads(const std::size_t threads) noexcept
 {
 #if PHAS_OPENMP && PUSE_OPENMP
 	omp_set_num_threads(threads);
@@ -64,7 +64,7 @@ inline void set_num_threads(const std::size_t threads)
 #endif
 }
 
-inline std::size_t get_max_threads()
+inline std::size_t get_max_threads() noexcept
 {
 #if PHAS_OPENMP && PUSE_OPENMP
 	return omp_get_max_threads();

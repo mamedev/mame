@@ -5987,7 +5987,7 @@ void model3_state::model3_10(machine_config &config)
 	add_base_devices(config);
 	add_scsi_devices(config);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	MCFG_MACHINE_START_OVERRIDE(model3_state,model3_10)
 	MCFG_MACHINE_RESET_OVERRIDE(model3_state,model3_10)

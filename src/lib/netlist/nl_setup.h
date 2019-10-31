@@ -8,7 +8,7 @@
 #ifndef NLSETUP_H_
 #define NLSETUP_H_
 
-#include "plib/pparser.h"
+#include "plib/ppreprocessor.h"
 #include "plib/pstream.h"
 #include "plib/pstring.h"
 #include "plib/putil.h"
@@ -181,7 +181,7 @@ namespace netlist
 		{}
 
 		COPYASSIGNMOVE(source_netlist_t, delete)
-		virtual ~source_netlist_t() noexcept = default;
+		~source_netlist_t() noexcept override = default;
 
 		virtual bool parse(nlparse_t &setup, const pstring &name);
 	};
@@ -197,7 +197,7 @@ namespace netlist
 		{}
 
 		COPYASSIGNMOVE(source_data_t, delete)
-		virtual ~source_data_t() noexcept = default;
+		~source_data_t() noexcept override = default;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -212,7 +212,7 @@ namespace netlist
 
 		pstring value_str(const pstring &model, const pstring &entity);
 
-		nl_double value(const pstring &model, const pstring &entity);
+		nl_fptype value(const pstring &model, const pstring &entity);
 
 		pstring type(const pstring &model) { return value_str(model, "COREMODEL"); }
 
@@ -244,9 +244,9 @@ namespace netlist
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
 		void register_param(const pstring &param, const pstring &value);
-		void register_param(const pstring &param, const double value);
+		void register_param(const pstring &param, const nl_fptype value);
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
-		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
+		void register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT);
 
 		/* register a source */
 		void register_source(plib::unique_ptr<plib::psource_t> &&src)

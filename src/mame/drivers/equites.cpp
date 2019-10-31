@@ -1168,8 +1168,7 @@ void equites_state::equites(machine_config &config)
 	common_sound(config);
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
-
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -1225,7 +1224,7 @@ void splndrbt_state::splndrbt(machine_config &config)
 	common_sound(config);
 
 	ALPHA_8201(config, m_alpha_8201, 4000000/8); // 8303 or 8304 (same device!)
-	config.m_perfect_cpu_quantum = subtag("alpha_8201:mcu");
+	config.set_perfect_quantum("alpha_8201:mcu");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

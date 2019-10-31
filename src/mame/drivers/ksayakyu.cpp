@@ -268,7 +268,7 @@ void ksayakyu_state::ksayakyu(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &ksayakyu_state::soundcpu_map);
 	audiocpu.set_periodic_int(FUNC(ksayakyu_state::irq0_line_hold), attotime::from_hz(60)); //guess, controls music tempo
 
-	config.m_minimum_quantum = attotime::from_hz(60000);
+	config.set_maximum_quantum(attotime::from_hz(60000));
 
 
 	/* video hardware */

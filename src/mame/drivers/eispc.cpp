@@ -43,6 +43,7 @@
 #include "emu.h"
 
 #include "machine/eispc_kb.h"
+#include "epc.lh"
 
 // Devices
 #include "cpu/i86/i86.h"
@@ -113,6 +114,7 @@ public:
 		, m_lpt(*this, "lpt")
 		, m_kbd8251(*this, "kbd8251")
 		, m_keyboard(*this, "keyboard")
+		, m_leds(*this, "kbled%u")
 		, m_pic8259(*this, "pic8259")
 		, m_pit8253(*this, "pit8253")
 		, m_speaker(*this, "speaker")
@@ -170,6 +172,7 @@ private:
 	emu_timer *m_kbdclk_timer;
 	TIMER_CALLBACK_MEMBER(rxtxclk_w);
 	int m_rxtx_clk_state;
+	output_finder<3> m_leds;
 
 	// Interrupt Controller
 	required_device<pic8259_device> m_pic8259;
@@ -475,6 +478,8 @@ void epc_state::machine_start()
 	save_item(NAME(m_drq));
 	save_item(NAME(m_fdc_irq));
 	save_item(NAME(m_fdc_drq));
+
+	m_leds.resolve();
 }
 
 void epc_state::machine_reset()
@@ -738,6 +743,8 @@ static void epc_sd_floppies(device_slot_interface &device)
 
 void epc_state::epc(machine_config &config)
 {
+	config.set_default_layout(layout_epc);
+
 	I8088(config, m_maincpu, XTAL(14'318'181) / 3.0); // TWE crystal marked X1 verified divided through a 82874
 	m_maincpu->set_addrmap(AS_PROGRAM, &epc_state::epc_map);
 	m_maincpu->set_addrmap(AS_IO, &epc_state::epc_io);
@@ -762,11 +769,15 @@ void epc_state::epc(machine_config &config)
 	m_dma8237a->out_dack_callback<3>().set(FUNC(epc_state::epc_dack_w<3>));
 
 	// TTL-level serial keyboard callback
-	EISPC_KB(config, "keyboard").txd_cb().set([this](bool state)
+	EISPC_KB(config, m_keyboard);
+	m_keyboard->txd_cb().set([this](bool state)
 	{
 		LOGBITS("KBD->EPC: %d\n", state);
 		m_kbd8251->write_rxd(state);
 	});
+	m_keyboard->caps_cb().set(  [this](bool state){ m_leds[0] = state; });
+	m_keyboard->num_cb().set(   [this](bool state){ m_leds[1] = state; });
+	m_keyboard->scroll_cb().set([this](bool state){ m_leds[2] = state; });
 
 	// Keyboard USART
 	I8251( config, m_kbd8251, XTAL(14'318'181) / 6.0 ); // TWE crystal marked X1 verified divided through a 82874
@@ -996,7 +1007,7 @@ INPUT_PORTS_END
 ROM_START( epc )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_DEFAULT_BIOS("p860110")
-	ROM_SYSTEM_BIOS(0, "p840705", "P840705") // TODO: Fix "Keyboard error" for this bios
+	ROM_SYSTEM_BIOS(0, "p840705", "P840705")
 	ROMX_LOAD("ericsson_8088.bin", 0xe000, 0x2000, CRC(3953c38d) SHA1(2bfc1f1d11d0da5664c3114994fc7aa3d6dd010d), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "p860110", "P860110")
 	ROMX_LOAD("epcbios1.bin",  0xe000, 0x02000, CRC(79a83706) SHA1(33528c46a24d7f65ef5a860fbed05afcf797fc55), ROM_BIOS(1))

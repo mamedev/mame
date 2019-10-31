@@ -136,7 +136,7 @@ void decodmd_type3_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, XTAL(12'000'000));
 	m_cpu->set_addrmap(AS_PROGRAM, &decodmd_type3_device::decodmd3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	TIMER(config, "irq_timer", 0).configure_periodic(FUNC(decodmd_type3_device::dmd_irq), attotime::from_hz(150));
 

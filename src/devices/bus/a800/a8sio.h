@@ -39,8 +39,7 @@ void a8sio_cards(device_slot_interface &device);
 
 class device_a8sio_card_interface;
 
-class a8sio_device : public device_t,
-							public device_slot_interface
+class a8sio_device : public device_t, public device_single_card_slot_interface<device_a8sio_card_interface>
 {
 public:
 	// construction/destruction
@@ -94,7 +93,7 @@ protected:
 DECLARE_DEVICE_TYPE(A8SIO, a8sio_device)
 
 
-class device_a8sio_card_interface : public device_slot_card_interface
+class device_a8sio_card_interface : public device_interface
 {
 	friend class a8sio_device;
 public:

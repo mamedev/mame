@@ -526,7 +526,7 @@ void gaplus_base_state::gaplus_base(machine_config &config)
 	MC6809E(config, m_subcpu2, XTAL(24'576'000) / 16);   /* 1.536 MHz */
 	m_subcpu2->set_addrmap(AS_PROGRAM, &gaplus_base_state::cpu3_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);  /* a high value to ensure proper synchronization of the CPUs */
+	config.set_maximum_quantum(attotime::from_hz(6000));  /* a high value to ensure proper synchronization of the CPUs */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

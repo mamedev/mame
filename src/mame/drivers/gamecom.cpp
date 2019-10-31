@@ -264,7 +264,7 @@ void gamecom_state::gamecom(machine_config &config)
 	m_maincpu->timer_cb().set(FUNC(gamecom_state::gamecom_update_timers));
 	m_maincpu->set_vblank_int("screen", FUNC(gamecom_state::gamecom_interrupt));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

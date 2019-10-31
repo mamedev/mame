@@ -223,7 +223,7 @@ DEFINE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device, "cbm_iec_slot", "CBM IEC s
 //-------------------------------------------------
 
 device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
+	: device_interface(device, "cbmiec"), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
 {
 }
 

@@ -34,7 +34,6 @@
 #include "sound/mos6581.h"
 #include "video/mos6566.h"
 
-#define M6510_TAG       "u7"
 #define MOS6567_TAG     "u19"
 #define MOS6569_TAG     "u19"
 #define MOS6581_TAG     "u18"
@@ -51,7 +50,7 @@ class c64_state : public driver_device
 public:
 	c64_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, M6510_TAG),
+		m_maincpu(*this, "u7"),
 		m_nmi(*this, "nmi"),
 		m_pla(*this, PLA_TAG),
 		m_vic(*this, MOS6569_TAG),
@@ -1447,7 +1446,7 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1457,7 +1456,7 @@ void c64_state::ntsc(machine_config &config)
 
 	// video hardware
 	mos6567_device &mos6567(MOS6567(config, MOS6567_TAG, XTAL(14'318'181)/14));
-	mos6567.set_cpu(M6510_TAG);
+	mos6567.set_cpu(m_maincpu);
 	mos6567.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos6567.set_screen(SCREEN_TAG);
 	mos6567.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1619,7 +1618,7 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1629,7 +1628,7 @@ void c64_state::pal(machine_config &config)
 
 	// video hardware
 	mos6569_device &mos6569(MOS6569(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos6569.set_cpu(M6510_TAG);
+	mos6569.set_cpu(m_maincpu);
 	mos6569.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos6569.set_screen(SCREEN_TAG);
 	mos6569.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1767,7 +1766,7 @@ void c64gs_state::pal_gs(machine_config &config)
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
-	config.m_perfect_cpu_quantum = subtag(M6510_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	input_merger_device &irq(INPUT_MERGER_ANY_HIGH(config, "irq"));
 	irq.output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
@@ -1777,7 +1776,7 @@ void c64gs_state::pal_gs(machine_config &config)
 
 	// video hardware
 	mos8565_device &mos8565(MOS8565(config, MOS6569_TAG, XTAL(17'734'472)/18));
-	mos8565.set_cpu(M6510_TAG);
+	mos8565.set_cpu(m_maincpu);
 	mos8565.irq_callback().set("irq", FUNC(input_merger_device::in_w<1>));
 	mos8565.set_screen(SCREEN_TAG);
 	mos8565.set_addrmap(0, &c64_state::vic_videoram_map);

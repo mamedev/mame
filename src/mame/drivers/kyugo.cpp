@@ -532,7 +532,7 @@ void kyugo_state::kyugo_base(machine_config &config)
 	m_subcpu->set_addrmap(AS_IO, &kyugo_state::gyrodine_sub_portmap);
 	m_subcpu->set_periodic_int(FUNC(kyugo_state::irq0_line_hold), attotime::from_hz(4*60));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(kyugo_state::nmi_mask_w));

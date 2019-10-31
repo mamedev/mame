@@ -605,7 +605,7 @@ void gal3_state::gal3(machine_config &config)
     m68000_device &psn_b3_cpu(M68000(config, "psn_b3_cpu", 12000000)); // ??
     psn_b3_cpu.set_addrmap(AS_PROGRAM, &gal3_state::psn_b1_cpu_map);
 */
-	config.m_minimum_quantum = attotime::from_hz(60*8000); /* 8000 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(60*8000)); /* 8000 CPU slices per frame */
 
 	NVRAM(config, "nvmem", nvram_device::DEFAULT_ALL_0);
 

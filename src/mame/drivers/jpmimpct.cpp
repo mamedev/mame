@@ -853,7 +853,7 @@ void jpmimpct_state::jpmimpct(machine_config &config)
 	m_dsp->set_shiftreg_in_callback(FUNC(jpmimpct_state::to_shiftreg));
 	m_dsp->set_shiftreg_out_callback(FUNC(jpmimpct_state::from_shiftreg));
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,jpmimpct)
 	MCFG_MACHINE_RESET_OVERRIDE(jpmimpct_state,jpmimpct)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -1314,7 +1314,7 @@ void jpmimpct_state::impctawp(machine_config &config)
 	M68000(config, m_maincpu, 8000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmimpct_state::awp68k_program_map);
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 	S16LF01(config, m_vfd);
 
 	MCFG_MACHINE_START_OVERRIDE(jpmimpct_state,impctawp)

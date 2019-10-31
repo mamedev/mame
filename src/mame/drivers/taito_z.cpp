@@ -3282,7 +3282,7 @@ void taitoz_state::enforce(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::enforce_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq6_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
@@ -3346,7 +3346,7 @@ void taitoz_state::bshark_base(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::bshark_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -3427,7 +3427,7 @@ void taitoz_state::sci(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::sci_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(3000);
+	config.set_maximum_quantum(attotime::from_hz(3000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -3493,7 +3493,7 @@ void taitoz_state::nightstr(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::nightstr_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	adc0809_device &adc(ADC0809(config, "adc", 500000)); // clock unknown
 	adc.eoc_ff_callback().set_inputline("maincpu", 6);
@@ -3567,7 +3567,7 @@ void taitoz_state::aquajack(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::aquajack_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(30000);
+	config.set_maximum_quantum(attotime::from_hz(30000));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -3700,7 +3700,7 @@ void taitoz_state::dblaxle(machine_config &config)
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
 	// make quantum time to be a multiple of the xtal (fixes road layer stuck on continue)
-	config.m_minimum_quantum = attotime::from_hz(XTAL(32'000'000)/1024);
+	config.set_maximum_quantum(attotime::from_hz(XTAL(32'000'000)/1024));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");
@@ -3767,7 +3767,7 @@ void taitoz_state::racingb(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &taitoz_state::racingb_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(taitoz_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0510NIO(config, m_tc0510nio, 0);
 	m_tc0510nio->read_0_callback().set_ioport("DSWA");

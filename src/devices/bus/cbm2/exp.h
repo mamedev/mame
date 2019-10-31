@@ -49,7 +49,7 @@
 class device_cbm2_expansion_card_interface;
 
 class cbm2_expansion_slot_device : public device_t,
-									public device_slot_interface,
+									public device_single_card_slot_interface<device_cbm2_expansion_card_interface>,
 									public device_image_interface
 {
 public:
@@ -75,7 +75,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -100,7 +99,7 @@ protected:
 
 // ======================> device_cbm2_expansion_card_interface
 
-class device_cbm2_expansion_card_interface : public device_slot_card_interface
+class device_cbm2_expansion_card_interface : public device_interface
 {
 	friend class cbm2_expansion_slot_device;
 

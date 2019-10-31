@@ -98,7 +98,7 @@ void ps2_state::ps2m30286(machine_config &config)
 
 	AT_MB(config, m_mb, 0);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	at_softlists(config);
 
@@ -122,7 +122,7 @@ void ps2_state::ps2386(machine_config &config)
 
 	AT_MB(config, m_mb, 0);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 	at_softlists(config);
 
 	// on board devices

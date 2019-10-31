@@ -710,7 +710,7 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_specmem).set_map(&spectrum_state::spectrum_map).set_options(ENDIANNESS_LITTLE, 8, 16, 0x10000);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	MCFG_MACHINE_RESET_OVERRIDE(spectrum_state, spectrum )
 

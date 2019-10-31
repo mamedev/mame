@@ -481,7 +481,7 @@ void missb2_state::missb2(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &missb2_state::sound_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(missb2_state::irq0_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128);
 

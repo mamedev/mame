@@ -24,10 +24,6 @@ namespace netlist
 {
 namespace devices
 {
-	class NETLIB_NAME(solver);
-
-	class matrix_solver_t;
-
 	NETLIB_OBJECT(solver)
 	{
 		NETLIB_CONSTRUCTOR(solver)
@@ -43,7 +39,7 @@ namespace devices
 		void post_start();
 		void stop();
 
-		nl_double gmin() const { return m_params.m_gmin(); }
+		nl_fptype gmin() const { return m_params.m_gmin(); }
 
 		void create_solver_code(std::map<pstring, pstring> &mp);
 
@@ -55,14 +51,15 @@ namespace devices
 		logic_input_t m_fb_step;
 		logic_output_t m_Q_step;
 
-		std::vector<plib::unique_ptr<matrix_solver_t>> m_mat_solvers;
-		std::vector<matrix_solver_t *> m_mat_solvers_all;
-		std::vector<matrix_solver_t *> m_mat_solvers_timestepping;
+		std::vector<plib::unique_ptr<solver::matrix_solver_t>> m_mat_solvers;
+		std::vector<solver::matrix_solver_t *> m_mat_solvers_all;
+		std::vector<solver::matrix_solver_t *> m_mat_solvers_timestepping;
 
-		solver_parameters_t m_params;
+		solver::solver_parameters_t m_params;
 
 		template <typename FT, int SIZE>
-		plib::unique_ptr<matrix_solver_t> create_solver(std::size_t size, const pstring &solvername);
+		plib::unique_ptr<solver::matrix_solver_t> create_solver(std::size_t size,
+			const pstring &solvername, analog_net_t::list_t &nets);
 	};
 
 } // namespace devices

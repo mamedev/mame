@@ -1921,7 +1921,7 @@ void segas24_state::system24(machine_config &config)
 	M68000(config, m_subcpu, MASTER_CLOCK/2);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segas24_state::cpu2_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	sega_315_5296_device &io(SEGA_315_5296(config, "io", VIDEO_CLOCK/2));
 	io.in_pa_callback().set_ioport("P1");

@@ -17,13 +17,13 @@
 
 #pragma once
 
-namespace bus {
-	namespace hp_dio {
+namespace bus { namespace hp_dio {
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+class device_dio16_card_interface;
 class dio16_device;
 
 class dio16_slot_device : public device_t, public device_slot_interface
@@ -57,7 +57,6 @@ protected:
 	required_device<dio16_device> m_dio;
 };
 
-class device_dio16_card_interface;
 // ======================> dio16_device
 class dio16_device : public device_t
 {
@@ -162,7 +161,7 @@ protected:
 // ======================> device_dio16_card_interface
 
 // class representing interface-specific live dio16 card
-class device_dio16_card_interface : public device_slot_card_interface
+class device_dio16_card_interface : public device_interface
 {
 	friend class dio16_device;
 	template <class ElementType> friend class simple_list;
@@ -280,8 +279,8 @@ protected:
 
 	dio32_device &dio() { assert(m_dio_dev); return downcast<dio32_device &>(*m_dio_dev); }
 };
-} // namespace bus::hp_dio
-} // namespace bus
+
+} } // namespace bus::hp_dio
 
 // device type definition
 DECLARE_DEVICE_TYPE_NS(DIO16_SLOT, bus::hp_dio, dio16_slot_device)

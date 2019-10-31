@@ -660,7 +660,7 @@ void eagv5_state::eagv5(machine_config &config)
 
 	// gen_latch syncs on write, but this is still needed with tight cpu comms
 	// (not that it locks up or anything, but it will calculate moves much slower if timing is off)
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void eag_state::eagv7(machine_config &config)

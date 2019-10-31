@@ -37,6 +37,14 @@ constexpr std::array<struct optrom_region , 8> region_tab =
 	  { 0x5c00 ,0x2000 , "rom5c00" }
 	}};
 
+// +------------------------------+
+// |device_hp9825_optrom_interface|
+// +------------------------------+
+device_hp9825_optrom_interface::device_hp9825_optrom_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "hp9825optrom")
+{
+}
+
 // +-------------------------+
 // |hp9825_optrom_cart_device|
 // +-------------------------+
@@ -47,7 +55,7 @@ hp9825_optrom_cart_device::hp9825_optrom_cart_device(const machine_config &mconf
 
 hp9825_optrom_cart_device::hp9825_optrom_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_slot_card_interface(mconfig, *this)
+	, device_hp9825_optrom_interface(mconfig, *this)
 {
 }
 
@@ -62,7 +70,7 @@ hp9825_optrom_slot_device::hp9825_optrom_slot_device(machine_config const &mconf
 hp9825_optrom_slot_device::hp9825_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, HP9825_OPTROM_SLOT, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_slot_interface(mconfig, *this)
+	, device_single_card_slot_interface<device_hp9825_optrom_interface>(mconfig, *this)
 	, m_cart(nullptr)
 	, m_rom_limit(0xffffU)
 	, m_loaded_regions(0)
@@ -115,12 +123,12 @@ void hp9825_optrom_slot_device::install_rw_handlers(address_space *space_r , add
 
 void hp9825_optrom_slot_device::device_add_mconfig(machine_config &config)
 {
-	ADDRESS_MAP_BANK(config , m_bank).set_options(ENDIANNESS_BIG , 16 , 13 , 0x400).set_shift(-1);
+	ADDRESS_MAP_BANK(config, m_bank).set_options(ENDIANNESS_BIG, 16, 13, 0x400).set_shift(-1);
 }
 
 void hp9825_optrom_slot_device::device_start()
 {
-	m_cart = dynamic_cast<hp9825_optrom_cart_device *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 image_init_result hp9825_optrom_slot_device::call_load()

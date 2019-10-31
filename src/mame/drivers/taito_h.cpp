@@ -609,7 +609,7 @@ void taitoh_state::syvalion(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoh_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
@@ -659,7 +659,7 @@ void taitoh_state::recordbr(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        /* 4 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoh_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0040IOC(config, m_tc0040ioc, 0);
 	m_tc0040ioc->read_0_callback().set_ioport("DSWA");
@@ -719,7 +719,7 @@ void taitoh_state::dleague(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000) / 2);        /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &taitoh_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	tc0220ioc_device &tc0220ioc(TC0220IOC(config, "tc0220ioc", 0));
 	tc0220ioc.read_0_callback().set_ioport("DSWA");

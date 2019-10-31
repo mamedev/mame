@@ -421,7 +421,7 @@ void sshangha_state::sshangha(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sshangha_state::sound_map);
 
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);

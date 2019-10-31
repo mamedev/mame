@@ -45,6 +45,15 @@
   * Transmitter FIFO         1
     -------------------------------------------------------------------------
     * = Features that has been implemented  n/a = features that will not
+
+    Mostek not only second-sourced the Z80 SIO but redesigned it for
+    68000 compatibility as the MK68564 SIO. This 48-pin device has a
+    revamped register interface with five address inputs to make every
+    register separately selectable, and most control registers may be read
+    back as written. The RxRDY and TxRDY pins are separate here, and many
+    control bits have been shifted around. The MK68564 also features a
+    built-in baud rate generator (not compatible with the Z8530 SCC's).
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -69,6 +78,7 @@
 #define LOG_SYNC    (1U <<  9)
 #define LOG_BIT     (1U <<  10)
 #define LOG_RTS     (1U <<  11)
+#define LOG_BRG     (1U <<  12)
 
 //#define VERBOSE  (LOG_CMD | LOG_SETUP | LOG_SYNC | LOG_BIT | LOG_TX )
 //#define LOG_OUTPUT_STREAM std::cout
@@ -86,6 +96,7 @@
 #define LOGDCD(...)   LOGMASKED(LOG_DCD,     __VA_ARGS__)
 #define LOGSYNC(...)  LOGMASKED(LOG_SYNC,    __VA_ARGS__)
 #define LOGBIT(...)   LOGMASKED(LOG_BIT,     __VA_ARGS__)
+#define LOGBRG(...)   LOGMASKED(LOG_BRG,     __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -237,11 +248,13 @@ constexpr uint16_t SDLC_RESIDUAL    = 0x1d0f;
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL, z80sio_channel,     "z80sio_channel", "Z80 SIO channel")
-DEFINE_DEVICE_TYPE(I8274_CHANNEL,  i8274_channel,      "i8274_channel",  "Intel 8274 MPSC channel")
-DEFINE_DEVICE_TYPE(Z80SIO,         z80sio_device,      "z80sio",         "Z80 SIO")
-DEFINE_DEVICE_TYPE(I8274_NEW,      i8274_new_device,   "i8274_new",      "Intel 8274 MPSC (new)") // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
-DEFINE_DEVICE_TYPE(UPD7201_NEW,    upd7201_new_device, "upd7201_new",    "NEC uPD7201 MPSC (new)") // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+DEFINE_DEVICE_TYPE(Z80SIO_CHANNEL,  z80sio_channel,     "z80sio_channel",  "Z80 SIO channel")
+DEFINE_DEVICE_TYPE(I8274_CHANNEL,   i8274_channel,      "i8274_channel",   "Intel 8274 MPSC channel")
+DEFINE_DEVICE_TYPE(MK68564_CHANNEL, mk68564_channel,    "mk68564_channel", "Mostek MK68564 SIO channel")
+DEFINE_DEVICE_TYPE(Z80SIO,          z80sio_device,      "z80sio",          "Z80 SIO")
+DEFINE_DEVICE_TYPE(I8274_NEW,       i8274_new_device,   "i8274_new",       "Intel 8274 MPSC (new)") // Remove trailing N when z80dart.cpp's 8274 implementation is fully replaced
+DEFINE_DEVICE_TYPE(UPD7201_NEW,     upd7201_new_device, "upd7201_new",     "NEC uPD7201 MPSC (new)") // Remove trailing N when z80dart.cpp's 7201 implementation is fully replaced
+DEFINE_DEVICE_TYPE(MK68564,         mk68564_device,     "mk68564",         "Mostek MK68564 SIO")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -256,6 +269,12 @@ void i8274_new_device::device_add_mconfig(machine_config &config)
 {
 	I8274_CHANNEL(config, CHANA_TAG, 0);
 	I8274_CHANNEL(config, CHANB_TAG, 0);
+}
+
+void mk68564_device::device_add_mconfig(machine_config &config)
+{
+	MK68564_CHANNEL(config, CHANA_TAG, 0);
+	MK68564_CHANNEL(config, CHANB_TAG, 0);
 }
 
 
@@ -290,9 +309,14 @@ inline bool z80sio_channel::receive_allowed() const
 	return (m_wr3 & WR3_RX_ENABLE) && (!(m_wr3 & WR3_AUTO_ENABLES) || !m_dcd);
 }
 
-inline bool z80sio_channel::transmit_allowed() const
+bool z80sio_channel::transmit_allowed() const
 {
 	return (m_wr5 & WR5_TX_ENABLE) && (!(m_wr3 & WR3_AUTO_ENABLES) || !m_cts);
+}
+
+bool mk68564_channel::transmit_allowed() const
+{
+	return (m_wr5 & WR5_TX_ENABLE) && (!m_tx_auto_enable || !m_cts);
 }
 
 inline void z80sio_channel::set_rts(int state)
@@ -390,6 +414,11 @@ i8274_new_device::i8274_new_device(const machine_config &mconfig, const char *ta
 
 upd7201_new_device::upd7201_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i8274_new_device(mconfig, UPD7201_NEW, tag, owner, clock)
+{
+}
+
+mk68564_device::mk68564_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i8274_new_device(mconfig, MK68564, tag, owner, clock)
 {
 }
 
@@ -947,6 +976,16 @@ i8274_channel::i8274_channel(const machine_config &mconfig, const char *tag, dev
 {
 }
 
+mk68564_channel::mk68564_channel(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z80sio_channel(mconfig, MK68564_CHANNEL, tag, owner, clock, RR1_END_OF_FRAME | RR1_CRC_FRAMING_ERROR | RR1_RESIDUE_CODE_MASK)
+	, m_tx_auto_enable(false)
+	, m_brg_tc(0)
+	, m_brg_control(0)
+	, m_brg_state(false)
+	, m_brg_timer(nullptr)
+{
+}
+
 
 //-------------------------------------------------
 //  resove_objects - channel setup
@@ -1016,6 +1055,18 @@ void z80sio_channel::device_start()
 	save_item(NAME(m_cts));
 }
 
+void mk68564_channel::device_start()
+{
+	z80sio_channel::device_start();
+
+	m_brg_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mk68564_channel::brg_timeout), this));
+
+	save_item(NAME(m_tx_auto_enable));
+	save_item(NAME(m_brg_tc));
+	save_item(NAME(m_brg_control));
+	save_item(NAME(m_brg_state));
+}
+
 
 //-------------------------------------------------
 //  reset - reset channel status
@@ -1064,6 +1115,17 @@ void z80sio_channel::device_reset()
 	// FIXME: should this actually reset all the interrtupts, or just the prioritisation (daisy chain) logic?
 	if (m_index == z80sio_device::CHANNEL_A)
 		m_uart->reset_interrupts();
+}
+
+void mk68564_channel::device_reset()
+{
+	z80sio_channel::device_reset();
+
+	m_tx_auto_enable = false;
+	m_brg_tc = 0;
+	m_brg_control = 0;
+	m_brg_state = false;
+	m_brg_timer->adjust(attotime::never);
 }
 
 bool z80sio_channel::is_tx_idle() const
@@ -1337,7 +1399,7 @@ void z80sio_channel::trigger_ext_int()
 //-------------------------------------------------
 //  get_clock_mode - get clock divisor
 //-------------------------------------------------
-int z80sio_channel::get_clock_mode()
+int z80sio_channel::get_clock_mode() const
 {
 	//LOG("%s %s\n",FUNCNAME, tag());
 	int clocks = 1;
@@ -1385,7 +1447,7 @@ void z80sio_channel::update_dtr_rts_break()
 //-------------------------------------------------
 //  get_rx_word_length - get receive word length
 //-------------------------------------------------
-int z80sio_channel::get_rx_word_length()
+int z80sio_channel::get_rx_word_length() const
 {
 	LOG("%s %s\n",FUNCNAME, tag());
 	int bits = 5;
@@ -2523,4 +2585,375 @@ WRITE_LINE_MEMBER( z80sio_channel::txc_w )
 		}
 	}
 	m_tx_clock = state;
+}
+
+//**************************************************************************
+//  MK68564 REGISTER INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cmdreg_r - read from command register
+//-------------------------------------------------
+uint8_t mk68564_channel::cmdreg_r()
+{
+	return m_wr0;
+}
+
+
+//-------------------------------------------------
+//  cmdreg_w - write to command register
+//-------------------------------------------------
+void mk68564_channel::cmdreg_w(uint8_t data)
+{
+	// TODO: bit 0 sets loop mode (no register select)
+	// FIXME: no return from interrupt command
+	do_sioreg_wr0(data);
+}
+
+
+//-------------------------------------------------
+//  modectl_r - read from mode control register
+//-------------------------------------------------
+uint8_t mk68564_channel::modectl_r()
+{
+	return m_wr4;
+}
+
+
+//-------------------------------------------------
+//  modectl_w - write to mode control register
+//-------------------------------------------------
+void mk68564_channel::modectl_w(uint8_t data)
+{
+	do_sioreg_wr4(data);
+}
+
+
+//-------------------------------------------------
+//  intctl_r - read from interrupt control register
+//-------------------------------------------------
+uint8_t mk68564_channel::intctl_r()
+{
+	return m_wr1 | (m_wr5 & WR5_CRC16 ? 0x80 : 0);
+}
+
+
+//-------------------------------------------------
+//  intctl_w - write to interrupt control register
+//-------------------------------------------------
+void mk68564_channel::intctl_w(uint8_t data)
+{
+	if (BIT(data, 7))
+		m_wr5 |= WR5_CRC16;
+	else
+		m_wr5 &= ~WR5_CRC16;
+
+	// TODO: bits 5 and 6 are independent RxRDY and WxRDY enables
+	do_sioreg_wr1(data & 0x7f);
+}
+
+
+//-------------------------------------------------
+//  sync1_r - read from sync word register 1
+//-------------------------------------------------
+uint8_t mk68564_channel::sync1_r()
+{
+	return m_wr6;
+}
+
+
+//-------------------------------------------------
+//  sync1_w - write to sync word register 1
+//-------------------------------------------------
+void mk68564_channel::sync1_w(uint8_t data)
+{
+	do_sioreg_wr6(data);
+}
+
+
+//-------------------------------------------------
+//  sync2_r - read from sync word register 2
+//-------------------------------------------------
+uint8_t mk68564_channel::sync2_r()
+{
+	return m_wr7;
+}
+
+
+//-------------------------------------------------
+//  sync2_w - write to sync word register 2
+//-------------------------------------------------
+void mk68564_channel::sync2_w(uint8_t data)
+{
+	do_sioreg_wr7(data);
+}
+
+
+//-------------------------------------------------
+//  rcvctl_r - read from receiver control register
+//-------------------------------------------------
+uint8_t mk68564_channel::rcvctl_r()
+{
+	return bitswap<8>(m_wr3, 6, 7, 5, 4, 3, 2, 1, 0) & ~WR3_ENTER_HUNT_PHASE;
+}
+
+
+//-------------------------------------------------
+//  rcvctl_w - write to receiver control register
+//-------------------------------------------------
+void mk68564_channel::rcvctl_w(uint8_t data)
+{
+	do_sioreg_wr3(bitswap<8>(data, 6, 7, 5, 4, 3, 2, 1, 0));
+}
+
+
+//-------------------------------------------------
+//  xmtctl_r - read from transmitter control
+//  register
+//-------------------------------------------------
+uint8_t mk68564_channel::xmtctl_r()
+{
+	uint8_t xmtctl = 0;
+	if (m_wr5 & WR5_TX_ENABLE)
+		xmtctl |= 0x01;
+	if (m_wr5 & WR5_RTS)
+		xmtctl |= 0x02;
+	if (m_wr5 & WR5_DTR)
+		xmtctl |= 0x04;
+	if (m_wr5 & WR5_TX_CRC_ENABLE)
+		xmtctl |= 0x08;
+	if (m_wr5 & WR5_SEND_BREAK)
+		xmtctl |= 0x10;
+	if (m_tx_auto_enable)
+		xmtctl |= 0x20;
+	xmtctl |= (m_wr5 & 0x40) << 1;
+	xmtctl |= (m_wr5 & 0x80) >> 1;
+	return xmtctl;
+}
+
+
+//-------------------------------------------------
+//  xmtctl_w - write to transmitter control
+//  register
+//-------------------------------------------------
+void mk68564_channel::xmtctl_w(uint8_t data)
+{
+	uint8_t control =
+		(BIT(data, 0) ? WR5_TX_ENABLE : 0) |
+		(BIT(data, 1) ? WR5_RTS : 0) |
+		(BIT(data, 2) ? WR5_DTR : 0) |
+		(BIT(data, 3) ? WR5_TX_CRC_ENABLE : 0) |
+		(BIT(data, 4) ? WR5_SEND_BREAK : 0) |
+		(data & 0x40) << 1 |
+		(data & 0x80) >> 1 |
+		(m_wr5 & WR5_CRC16);
+	do_sioreg_wr5(control);
+
+	m_tx_auto_enable = BIT(data, 5);
+}
+
+
+//-------------------------------------------------
+//  tcreg_r - read from time constant register
+//-------------------------------------------------
+uint8_t mk68564_channel::tcreg_r()
+{
+	return m_brg_tc;
+}
+
+
+//-------------------------------------------------
+//  tcreg_w - write to time constant register
+//-------------------------------------------------
+void mk68564_channel::tcreg_w(uint8_t data)
+{
+	m_brg_tc = data;
+}
+
+
+//-------------------------------------------------
+//  brgctl_r - read from baud rate generator
+//  control register
+//-------------------------------------------------
+uint8_t mk68564_channel::brgctl_r()
+{
+	// unused bits are all zero
+	return m_brg_control & 0x0f;
+}
+
+
+//-------------------------------------------------
+//  brgctl_w - write to baud rate generator
+//  control register
+//-------------------------------------------------
+void mk68564_channel::brgctl_w(uint8_t data)
+{
+	if (BIT(data, 0))
+		LOGBRG("%s: BRG enabled, divide by %d, RxC %sternal, TxC %sternal (TC = %d, %.1f Hz)\n",
+			machine().describe_context(),
+			BIT(data, 1) ? 64 : 4,
+			BIT(data, 2) ? "in" : "ex",
+			BIT(data, 3) ? "in" : "ex",
+			m_brg_tc,
+			clocks_to_attotime((m_brg_tc ? m_brg_tc : 256) * (BIT(data, 1) ? 64 : 4)).as_hz());
+	else
+		LOGBRG("%s: BRG disabled\n", machine().describe_context());
+
+	m_brg_control = data & 0x0f;
+	m_brg_state = false;
+	brg_update();
+}
+
+
+//-------------------------------------------------
+//  vectrg_w - write to the interrupt vector
+//  register (only one exists)
+//-------------------------------------------------
+void mk68564_device::vectrg_w(uint8_t data)
+{
+	m_chanB->do_sioreg_wr2(data);
+}
+
+
+//-------------------------------------------------
+//  read - 68000 compatible bus read
+//-------------------------------------------------
+uint8_t mk68564_device::read(offs_t offset)
+{
+	mk68564_channel &channel = downcast<mk68564_channel &>(BIT(offset, 4) ? *m_chanB : *m_chanA);
+
+	switch (offset & 0x0f)
+	{
+	case 0x00:
+		return channel.cmdreg_r();
+
+	case 0x01:
+		return channel.modectl_r();
+
+	case 0x02:
+		return channel.intctl_r();
+
+	case 0x03:
+		return channel.sync1_r();
+
+	case 0x04:
+		return channel.sync2_r();
+
+	case 0x05:
+		return channel.rcvctl_r();
+
+	case 0x06:
+		return channel.xmtctl_r();
+
+	case 0x07:
+		return channel.do_sioreg_rr0();
+
+	case 0x08:
+		return channel.do_sioreg_rr1();
+
+	case 0x09:
+		return channel.data_read();
+
+	case 0x0a:
+		return channel.tcreg_r();
+
+	case 0x0b:
+		return channel.brgctl_r();
+
+	case 0x0c: // vector register is addressable through either channel
+		return read_vector();
+
+	default: // unused registers read as FF
+		return 0xff;
+	}
+}
+
+
+//-------------------------------------------------
+//  write - 68000 compatible bus write
+//-------------------------------------------------
+void mk68564_device::write(offs_t offset, uint8_t data)
+{
+	mk68564_channel &channel = downcast<mk68564_channel &>(BIT(offset, 4) ? *m_chanB : *m_chanA);
+
+	switch (offset & 0x0f)
+	{
+	case 0x00:
+		channel.cmdreg_w(data);
+		break;
+
+	case 0x01:
+		channel.modectl_w(data);
+		break;
+
+	case 0x02:
+		channel.intctl_w(data);
+		break;
+
+	case 0x03:
+		channel.sync1_w(data);
+		break;
+
+	case 0x04:
+		channel.sync2_w(data);
+		break;
+
+	case 0x05:
+		channel.rcvctl_w(data);
+		break;
+
+	case 0x06:
+		channel.xmtctl_w(data);
+		break;
+
+	case 0x09:
+		channel.data_write(data);
+		break;
+
+	case 0x0a:
+		channel.tcreg_w(data);
+		break;
+
+	case 0x0b:
+		channel.brgctl_w(data);
+		break;
+
+	case 0x0c: // vector register is addressable through either channel
+		vectrg_w(data);
+		break;
+
+	default:
+		logerror("Write %02X to unused/read-only register %02X\n", data, offset & 0x1f);
+		break;
+	}
+}
+
+//**************************************************************************
+//  MK68564 BAUD RATE GENERATOR
+//**************************************************************************
+
+void mk68564_device::set_xtal(uint32_t clock)
+{
+	assert(!configured());
+	subdevice<mk68564_channel>(CHANA_TAG)->set_clock(clock);
+	subdevice<mk68564_channel>(CHANB_TAG)->set_clock(clock);
+}
+
+void mk68564_channel::brg_update()
+{
+	if (BIT(m_brg_control, 2))
+		rxc_w(m_brg_state);
+	if (BIT(m_brg_control, 3))
+		txc_w(m_brg_state);
+
+	if (BIT(m_brg_control, 0))
+		m_brg_timer->adjust(clocks_to_attotime((m_brg_tc ? m_brg_tc : 256) * (BIT(m_brg_control, 1) ? 32 : 2)));
+	else
+		m_brg_timer->adjust(attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(mk68564_channel::brg_timeout)
+{
+	m_brg_state = !m_brg_state;
+	brg_update();
 }

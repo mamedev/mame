@@ -581,7 +581,7 @@ void vcombat_state::vcombat(machine_config &config)
 
 /* Temporary hack for experimenting with timing. */
 #if 0
-	//config.m_minimum_quantum = attotime::from_hz(1200);
+	//config.set_maximum_quantum(attotime::from_hz(1200));
 	config.m_perfect_cpu_quantum = subtag("maincpu");
 #endif
 

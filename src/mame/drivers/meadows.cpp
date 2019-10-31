@@ -631,7 +631,7 @@ void meadows_state::meadows(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -691,7 +691,7 @@ void meadows_state::bowl3d(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &meadows_state::audio_map);
 	m_audiocpu->set_periodic_int(FUNC(meadows_state::audio_interrupt), attotime::from_hz((double)5000000/131072));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

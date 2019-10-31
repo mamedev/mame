@@ -23,17 +23,17 @@ namespace netlist
 
 NETLIB_RESET(VCCS)
 {
-	const nl_double m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
-	const nl_double GI = plib::constants<nl_double>::one() / m_RI();
+	const nl_fptype m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
+	const nl_fptype GI = plib::constants<nl_fptype>::one() / m_RI();
 
 	m_IP.set_conductivity(GI);
 	m_IN.set_conductivity(GI);
 
-	m_OP.set_go_gt(-m_mult, plib::constants<nl_double>::zero());
-	m_OP1.set_go_gt(m_mult, plib::constants<nl_double>::zero());
+	m_OP.set_go_gt(-m_mult, plib::constants<nl_fptype>::zero());
+	m_OP1.set_go_gt(m_mult, plib::constants<nl_fptype>::zero());
 
-	m_ON.set_go_gt(m_mult, plib::constants<nl_double>::zero());
-	m_ON1.set_go_gt(-m_mult, plib::constants<nl_double>::zero());
+	m_ON.set_go_gt(m_mult, plib::constants<nl_fptype>::zero());
+	m_ON1.set_go_gt(-m_mult, plib::constants<nl_fptype>::zero());
 }
 
 NETLIB_UPDATE(VCCS)
@@ -65,25 +65,25 @@ NETLIB_UPDATE_PARAM(LVCCS)
 
 NETLIB_UPDATE_TERMINALS(LVCCS)
 {
-	const nl_double m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
-	const nl_double vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
+	const nl_fptype m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
+	const nl_fptype vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
 
 	if (std::abs(m_mult / m_cur_limit() * vi) > 0.5)
 		m_vi = m_vi + 0.2*std::tanh((vi - m_vi)/0.2);
 	else
 		m_vi = vi;
 
-	const nl_double x = m_mult / m_cur_limit() * m_vi;
-	const nl_double X = std::tanh(x);
+	const nl_fptype x = m_mult / m_cur_limit() * m_vi;
+	const nl_fptype X = std::tanh(x);
 
-	const nl_double beta = m_mult * (1.0 - X*X);
-	const nl_double I = m_cur_limit() * X - beta * m_vi;
+	const nl_fptype beta = m_mult * (1.0 - X*X);
+	const nl_fptype I = m_cur_limit() * X - beta * m_vi;
 
-	m_OP.set_go_gt_I(-beta, plib::constants<nl_double>::zero(), I);
-	m_OP1.set_go_gt(beta, plib::constants<nl_double>::zero());
+	m_OP.set_go_gt_I(-beta, plib::constants<nl_fptype>::zero(), I);
+	m_OP1.set_go_gt(beta, plib::constants<nl_fptype>::zero());
 
-	m_ON.set_go_gt_I(beta, plib::constants<nl_double>::zero(), -I);
-	m_ON1.set_go_gt(-beta, plib::constants<nl_double>::zero());
+	m_ON.set_go_gt_I(beta, plib::constants<nl_fptype>::zero(), -I);
+	m_ON1.set_go_gt(-beta, plib::constants<nl_fptype>::zero());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -106,11 +106,11 @@ NETLIB_UPDATE_PARAM(CCCS)
 
 NETLIB_RESET(VCVS)
 {
-	m_gfac = plib::constants<nl_double>::one() / m_RO();
+	m_gfac = plib::constants<nl_fptype>::one() / m_RO();
 	NETLIB_NAME(VCCS)::reset();
 
-	m_OP2.set_conductivity(plib::constants<nl_double>::one() / m_RO());
-	m_ON2.set_conductivity(plib::constants<nl_double>::one() / m_RO());
+	m_OP2.set_conductivity(plib::constants<nl_fptype>::one() / m_RO());
+	m_ON2.set_conductivity(plib::constants<nl_fptype>::one() / m_RO());
 }
 
 	} //namespace analog

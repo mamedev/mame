@@ -2688,6 +2688,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/8080bw.cpp",
 	MAME_DIR .. "src/mame/includes/8080bw.h",
 	MAME_DIR .. "src/mame/audio/8080bw.cpp",
+	MAME_DIR .. "src/mame/audio/8080bw.h",
 	MAME_DIR .. "src/mame/video/8080bw.cpp",
 	MAME_DIR .. "src/mame/drivers/m79amb.cpp",
 	MAME_DIR .. "src/mame/includes/m79amb.h",

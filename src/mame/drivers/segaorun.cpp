@@ -1167,7 +1167,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

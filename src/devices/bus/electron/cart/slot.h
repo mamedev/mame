@@ -116,7 +116,7 @@ class device_electron_cart_interface;
 
 class electron_cartslot_device : public device_t,
 									public device_image_interface,
-									public device_slot_interface
+									public device_single_card_slot_interface<device_electron_cart_interface>
 {
 public:
 	// construction/destruction
@@ -135,10 +135,6 @@ public:
 	// callbacks
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
-
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -165,6 +161,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	device_electron_cart_interface *m_cart;
 
 private:
@@ -175,7 +174,7 @@ private:
 
 // ======================> device_electron_cart_interface
 
-class device_electron_cart_interface : public device_slot_card_interface
+class device_electron_cart_interface : public device_interface
 {
 public:
 	// construction/destruction

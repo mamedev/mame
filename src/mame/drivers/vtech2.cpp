@@ -490,7 +490,7 @@ void vtech2_state::laser350(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vtech2_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &vtech2_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(vtech2_state::vtech2_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ADDRESS_MAP_BANK(config, "banka").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);
 	ADDRESS_MAP_BANK(config, "bankb").set_map(&vtech2_state::m_map350).set_options(ENDIANNESS_LITTLE, 8, 18, 0x4000);

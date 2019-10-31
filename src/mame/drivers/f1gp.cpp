@@ -375,7 +375,7 @@ void f1gp_state::f1gp(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &f1gp_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &f1gp_state::sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);
@@ -442,7 +442,7 @@ void f1gp_state::f1gpb(machine_config &config)
 	sub.set_vblank_int("screen", FUNC(f1gp_state::irq1_line_hold));
 
 	/* NO sound CPU */
-	config.m_minimum_quantum = attotime::from_hz(6000); /* 100 CPU slices per frame */
+	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set_inputline("sub", M68K_IRQ_3);

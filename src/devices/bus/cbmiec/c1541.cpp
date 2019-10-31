@@ -962,7 +962,7 @@ void c1541_base_t::device_add_mconfig(machine_config &config)
 {
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_base_t::c1541_mem);
-	config.m_perfect_cpu_quantum = subtag(M6502_TAG);
+	//config.set_perfect_quantum(m_maincpu); FIXME: not safe in a slot device - add barriers
 
 	VIA6522(config, m_via0, XTAL(16'000'000)/16);
 	m_via0->readpa_handler().set(FUNC(c1541_base_t::via0_pa_r));

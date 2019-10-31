@@ -2074,8 +2074,7 @@ void supracan_state::supracan(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &supracan_state::supracan_sound_mem);
 	m_soundcpu->set_vblank_int("screen", FUNC(supracan_state::sound_irq));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
-	config.m_perfect_cpu_quantum = subtag("soundcpu");
+	config.set_perfect_quantum(m_soundcpu);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(10'738'635)/2, 348, 0, 256, 256, 0, 240);  /* No idea if this is correct */

@@ -280,7 +280,7 @@ void smsbootleg_state::sms_supergame(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &smsbootleg_state::sms_supergame_map);
 	m_maincpu->set_addrmap(AS_IO, &smsbootleg_state::sms_supergame_io);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

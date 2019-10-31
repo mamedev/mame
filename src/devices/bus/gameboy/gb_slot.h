@@ -51,7 +51,7 @@ enum
 
 // ======================> device_gb_cart_interface
 
-class device_gb_cart_interface : public device_slot_card_interface
+class device_gb_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -109,14 +109,11 @@ protected:
 
 class gb_cart_slot_device_base : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<device_gb_cart_interface>
 {
 public:
 	// construction/destruction
 	virtual ~gb_cart_slot_device_base();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -153,6 +150,9 @@ public:
 
 protected:
 	gb_cart_slot_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 	int m_type;
 	device_gb_cart_interface*       m_cart;

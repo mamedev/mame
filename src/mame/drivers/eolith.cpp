@@ -558,7 +558,7 @@ void eolith_state::eolith45(machine_config &config)
 
 //  for testing sound sync
 //  config.m_perfect_cpu_quantum = subtag("maincpu");
-//  config.m_minimum_quantum = attotime::from_hz(6000);
+//  config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

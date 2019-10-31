@@ -349,7 +349,7 @@ void rastan_state::rastan(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(16'000'000)/4);    /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &rastan_state::sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
 	WATCHDOG_TIMER(config, "watchdog");
 

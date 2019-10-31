@@ -789,7 +789,7 @@ void oric_state::oric(machine_config &config, bool add_ext)
 	M6502(config, m_maincpu, 12_MHz_XTAL / 12);
 	m_maincpu->set_addrmap(AS_PROGRAM, &oric_state::oric_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

@@ -56,7 +56,7 @@
 class device_vic20_expansion_card_interface;
 
 class vic20_expansion_slot_device : public device_t,
-									public device_slot_interface,
+									public device_single_card_slot_interface<device_vic20_expansion_card_interface>,
 									public device_image_interface
 {
 public:
@@ -89,7 +89,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -121,7 +120,7 @@ protected:
 // ======================> device_vic20_expansion_card_interface
 
 // class representing interface-specific live vic20_expansion card
-class device_vic20_expansion_card_interface : public device_slot_card_interface
+class device_vic20_expansion_card_interface : public device_interface
 {
 	friend class vic20_expansion_slot_device;
 

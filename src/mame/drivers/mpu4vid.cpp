@@ -1300,7 +1300,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map);
 	m_videocpu->set_reset_callback(FUNC(mpu4vid_state::mpu_video_reset));
 
-//  config.m_minimum_quantum = attotime::from_hz(960);
+//  config.set_maximum_quantum(attotime::from_hz(960));
 
 	PALETTE(config, m_palette).set_entries(ef9369_device::NUMCOLORS);
 

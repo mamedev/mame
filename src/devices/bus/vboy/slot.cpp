@@ -25,11 +25,11 @@ DEFINE_DEVICE_TYPE(VBOY_CART_SLOT, vboy_cart_slot_device, "vboy_cart_slot", "Nin
 //  device_vboy_cart_interface - constructor
 //-------------------------------------------------
 
-device_vboy_cart_interface::device_vboy_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device),
-		m_rom(nullptr),
-		m_rom_size(0),
-		m_rom_mask(0)
+device_vboy_cart_interface::device_vboy_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "vboycart"),
+	m_rom(nullptr),
+	m_rom_size(0),
+	m_rom_mask(0)
 {
 }
 
@@ -77,7 +77,7 @@ void device_vboy_cart_interface::eeprom_alloc(uint32_t size)
 vboy_cart_slot_device::vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VBOY_CART_SLOT, tag, owner, clock),
 	device_image_interface(mconfig, *this),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_vboy_cart_interface>(mconfig, *this),
 	m_type(VBOY_STD),
 	m_cart(nullptr)
 {
@@ -98,7 +98,7 @@ vboy_cart_slot_device::~vboy_cart_slot_device()
 
 void vboy_cart_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_vboy_cart_interface *>(get_card_device());
+	m_cart = get_card_device();
 }
 
 

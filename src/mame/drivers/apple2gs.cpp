@@ -4536,7 +4536,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
 	TIMER(config, m_scantimer, 0);
 	m_scantimer->configure_scanline(FUNC(apple2gs_state::apple2_interrupt), "screen", 0, 1);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	M50741(config, m_adbmicro, A2GS_MASTER_CLOCK/8);
 	m_adbmicro->read_p<0>().set(FUNC(apple2gs_state::adbmicro_p0_in));

@@ -97,6 +97,8 @@ private:
 	required_memory_region m_rom;
 	required_device<centronics_device> m_centronics;
 
+	output_finder<> m_led;
+
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);
 	inline void hdc_irq_enable(int enabled);

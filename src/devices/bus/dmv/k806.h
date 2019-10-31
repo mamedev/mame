@@ -51,7 +51,6 @@ private:
 	required_ioport m_mouse_buttons;
 	required_ioport m_mouse_x;
 	required_ioport m_mouse_y;
-	dmvcart_slot_device * m_bus;
 
 	struct
 	{

@@ -714,7 +714,7 @@ void tigeroad_state::f1dream_comad(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tigeroad_state::comad_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &tigeroad_state::comad_sound_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(3600);
+	config.set_maximum_quantum(attotime::from_hz(3600));
 
 	/* video hardware */
 	BUFFERED_SPRITERAM16(config, "spriteram");

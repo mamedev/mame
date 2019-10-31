@@ -504,7 +504,7 @@ void kenseim_state::kenseim(machine_config &config)
 	ppi_x2.in_pe().set_ioport("MOLEB");
 	ppi_x2.out_pf().set(FUNC(kenseim_state::mb8936_portf_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 static INPUT_PORTS_START( kenseim )

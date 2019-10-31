@@ -226,7 +226,7 @@ namespace plib {
 			}
 		}
 
-		bool operator ==(const mempool &rhs) { return this == &rhs; }
+		bool operator ==(const mempool &rhs) noexcept { return this == &rhs; }
 
 	};
 

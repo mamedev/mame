@@ -822,7 +822,7 @@ void asuka_state::bonzeadv(machine_config &config)
 
 	TIMER(config, "cchip_irq_clear").configure_generic(FUNC(asuka_state::cchip_irq_clear_cb));
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -870,7 +870,7 @@ void asuka_state::asuka(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(16'000'000)/4); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -937,7 +937,7 @@ void asuka_state::cadash(machine_config &config)
 	subcpu.set_addrmap(AS_PROGRAM, &asuka_state::cadash_sub_map);
 	subcpu.set_addrmap(AS_IO, &asuka_state::cadash_sub_io);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -993,7 +993,7 @@ void asuka_state::mofflott(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");
@@ -1056,7 +1056,7 @@ void asuka_state::eto(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);  /* 4 MHz ??? */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &asuka_state::cadash_z80_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	TC0220IOC(config, m_tc0220ioc, 0);
 	m_tc0220ioc->read_0_callback().set_ioport("DSWA");

@@ -237,7 +237,7 @@ void volfied_state::volfied(machine_config &config)
 	m_cchip->in_ad_callback().set_ioport("F0000D");
 	m_cchip->out_pb_callback().set(FUNC(volfied_state::counters_w));
 
-	config.m_minimum_quantum = attotime::from_hz(1200);
+	config.set_maximum_quantum(attotime::from_hz(1200));
 
 	TIMER(config, m_cchip_irq_clear).configure_generic(FUNC(volfied_state::cchip_irq_clear_cb));
 

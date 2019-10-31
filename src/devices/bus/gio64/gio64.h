@@ -61,7 +61,7 @@ DECLARE_DEVICE_TYPE(GIO64_SLOT, gio64_slot_device)
 
 
 // class representing interface-specific live GIO64 card
-class device_gio64_card_interface : public device_slot_card_interface
+class device_gio64_card_interface : public device_interface
 {
 	friend class gio64_device;
 public:

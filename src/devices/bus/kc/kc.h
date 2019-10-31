@@ -21,7 +21,7 @@
 
 // ======================> device_kcexp_interface
 
-class device_kcexp_interface : public device_slot_card_interface
+class device_kcexp_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -43,8 +43,7 @@ protected:
 
 // ======================> kcexp_slot_device
 
-class kcexp_slot_device : public device_t,
-							public device_slot_interface
+class kcexp_slot_device : public device_t, public device_single_card_slot_interface<device_kcexp_interface>
 {
 public:
 	// construction/destruction
@@ -65,7 +64,7 @@ public:
 	auto halt() { return m_out_halt_cb.bind(); }
 
 	// inline configuration
-	void set_next_slot(const char *next_module_tag) { m_next_slot_tag = next_module_tag; }
+	template <typename T> void set_next_slot(T &&next_module_tag) { m_next_slot.set_tag(std::forward<T>(next_module_tag)); }
 
 	// reading and writing
 	virtual uint8_t module_id_r();
@@ -85,18 +84,17 @@ protected:
 	kcexp_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 
 	device_kcexp_interface*     m_cart;
 
-	const char*                 m_next_slot_tag;
-	kcexp_slot_device*          m_next_slot;
+	optional_device<kcexp_slot_device> m_next_slot;
 };
 
 // ======================> kccart_slot_device
 
-class kccart_slot_device : public kcexp_slot_device,
-							public device_image_interface
+class kccart_slot_device : public kcexp_slot_device, public device_image_interface
 {
 public:
 	// construction/destruction

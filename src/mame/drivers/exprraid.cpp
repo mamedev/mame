@@ -501,7 +501,7 @@ void exprraid_state::exprraid(machine_config &config)
 	m_slave->set_addrmap(AS_PROGRAM, &exprraid_state::slave_map);
 	/* IRQs are caused by the YM3526 */
 
-	config.m_minimum_quantum = attotime::from_hz(12000);
+	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

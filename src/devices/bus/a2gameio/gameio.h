@@ -21,7 +21,7 @@ class device_a2gameio_interface;
 
 // ======================> apple2_gameio_device
 
-class apple2_gameio_device : public device_t, public device_slot_interface
+class apple2_gameio_device : public device_t, public device_single_card_slot_interface<device_a2gameio_interface>
 {
 public:
 	// construction/destruction
@@ -82,14 +82,16 @@ private:
 
 // ======================> device_a2gameio_interface
 
-class device_a2gameio_interface : public device_slot_card_interface
+class device_a2gameio_interface : public device_interface
 {
 	friend class apple2_gameio_device;
+
+public:
+	virtual ~device_a2gameio_interface();
 
 protected:
 	// construction/destruction
 	device_a2gameio_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_a2gameio_interface();
 
 	// optional input overrides
 	virtual u8 pdl0_r() { return 0; }

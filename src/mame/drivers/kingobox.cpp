@@ -485,7 +485,7 @@ void kingofb_state::kingofb(machine_config &config)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
+	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
 
 	/* video hardware */
@@ -542,7 +542,7 @@ void kingofb_state::ringking(machine_config &config)
 
 	CLOCK(config, "soundnmi", 6000).signal_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	config.m_minimum_quantum = attotime::from_hz(6000); // We really need heavy synching among the processors
+	config.set_maximum_quantum(attotime::from_hz(6000)); // We really need heavy synching among the processors
 
 
 	/* video hardware */

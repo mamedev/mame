@@ -132,7 +132,7 @@ public:
 	nascom2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: nascom_state(mconfig, type, tag)
 		, m_clock(*this, "uart_clock")
-		, m_nasbus(*this, NASBUS_TAG)
+		, m_nasbus(*this, "nasbus")
 		, m_socket1(*this, "socket1")
 		, m_socket2(*this, "socket2")
 		, m_lsw1(*this, "lsw1")
@@ -855,14 +855,14 @@ void nascom2_state::nascom2(machine_config &config)
 	m_socket2->set_device_load(FUNC(nascom2_state::socket2_load));
 
 	// nasbus expansion bus
-	nasbus_device &nasbus(NASBUS(config, NASBUS_TAG));
-	nasbus.ram_disable().set(FUNC(nascom2_state::ram_disable_w));
-	nasbus.set_program_space(m_maincpu, AS_PROGRAM);
-	nasbus.set_io_space(m_maincpu, AS_IO);
-	NASBUS_SLOT(config, "nasbus1", nasbus_slot_cards, nullptr);
-	NASBUS_SLOT(config, "nasbus2", nasbus_slot_cards, nullptr);
-	NASBUS_SLOT(config, "nasbus3", nasbus_slot_cards, nullptr);
-	NASBUS_SLOT(config, "nasbus4", nasbus_slot_cards, nullptr);
+	NASBUS(config, m_nasbus);
+	m_nasbus->ram_disable().set(FUNC(nascom2_state::ram_disable_w));
+	m_nasbus->set_program_space(m_maincpu, AS_PROGRAM);
+	m_nasbus->set_io_space(m_maincpu, AS_IO);
+	NASBUS_SLOT(config, "nasbus1", m_nasbus, nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus2", m_nasbus, nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus3", m_nasbus, nasbus_slot_cards, nullptr);
+	NASBUS_SLOT(config, "nasbus4", m_nasbus, nasbus_slot_cards, nullptr);
 
 	// software
 	SOFTWARE_LIST(config, "snap_list").set_original("nascom_snap").set_filter("NASCOM2");
@@ -882,7 +882,7 @@ void nascom2_state::nascom2c(machine_config &config)
 
 	m_ram->set_default_size("60K");
 
-	subdevice<nasbus_device>(NASBUS_TAG)->ram_disable().set(FUNC(nascom2_state::ram_disable_cpm_w));
+	m_nasbus->ram_disable().set(FUNC(nascom2_state::ram_disable_cpm_w));
 	subdevice<nasbus_slot_device>("nasbus1")->set_default_option("floppy");
 }
 

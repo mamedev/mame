@@ -2045,7 +2045,7 @@ void dec0_state::birdtry(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dec0_state::dec0_tb_map);
 
 	// needs a tight sync with the mcu
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	i8751_device &mcu(I8751(config, m_mcu, XTAL(8'000'000)));
 	mcu.port_in_cb<0>().set(FUNC(dec0_state::dec0_mcu_port0_r));
@@ -2076,7 +2076,7 @@ void dec0_state::robocop(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::robocop_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	config.m_minimum_quantum = attotime::from_hz(3000);  /* Interleave between HuC6280 & 68000 */
+	config.set_maximum_quantum(attotime::from_hz(3000));  /* Interleave between HuC6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_robocop));
@@ -2102,7 +2102,7 @@ void dec0_state::hippodrm(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 	m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-	config.m_minimum_quantum = attotime::from_hz(300);   /* Interleave between H6280 & 68000 */
+	config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));
@@ -2118,7 +2118,7 @@ void dec0_state::ffantasybl(machine_config &config)
 //  m_subcpu->set_addrmap(AS_PROGRAM, &dec0_state::hippodrm_sub_map);
 //  m_subcpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 
-//  config.m_minimum_quantum = attotime::from_hz(300);   /* Interleave between H6280 & 68000 */
+//  config.set_maximum_quantum(attotime::from_hz(300));   /* Interleave between H6280 & 68000 */
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hippodrm));

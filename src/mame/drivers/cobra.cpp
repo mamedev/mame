@@ -3295,7 +3295,7 @@ void cobra_state::cobra(machine_config &config)
 	m_gfxcpu->set_bus_frequency(XTAL(66'666'700));   /* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 	m_gfxcpu->set_addrmap(AS_PROGRAM, &cobra_state::cobra_gfx_map);
 
-	config.m_minimum_quantum = attotime::from_hz(15005);
+	config.set_maximum_quantum(attotime::from_hz(15005));
 
 	PCI_BUS_LEGACY(config, m_legacy_pci, 0, 0);
 	m_legacy_pci->set_device(0, FUNC(cobra_state::mpc106_pci_r), FUNC(cobra_state::mpc106_pci_w));

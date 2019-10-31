@@ -552,7 +552,7 @@ void tapatune_state::tapatune(machine_config &config)
 	M68000(config, m_videocpu, XTAL(24'000'000) / 2);
 	m_videocpu->set_addrmap(AS_PROGRAM, &tapatune_state::video_map);
 
-	config.m_perfect_cpu_quantum = subtag("videocpu");
+	config.set_perfect_quantum(m_videocpu);
 
 	hd6845s_device &crtc(HD6845S(config, "crtc", XTAL(24'000'000) / 16));
 	crtc.set_screen("screen");

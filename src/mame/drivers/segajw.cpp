@@ -381,7 +381,7 @@ void segajw_state::segajw(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segajw_state::segajw_audiocpu_map);
 	m_audiocpu->set_addrmap(AS_IO, &segajw_state::segajw_audiocpu_io_map);
 
-	config.m_minimum_quantum = attotime::from_hz(2000);
+	config.set_maximum_quantum(attotime::from_hz(2000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 

@@ -140,7 +140,7 @@ void gio64_device::add_gio64_card(gio64_slot_device::slot_type_t slot_type, devi
 
 
 device_gio64_card_interface::device_gio64_card_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "sgigio64")
 	, m_gio64(nullptr)
 	, m_gio64_slottag(nullptr)
 	, m_slot_type(gio64_slot_device::GIO64_SLOT_COUNT)
@@ -157,8 +157,6 @@ void device_gio64_card_interface::interface_validity_check(validity_checker &val
 
 void device_gio64_card_interface::interface_pre_start()
 {
-	device_slot_card_interface::interface_pre_start();
-
 	if (!m_gio64)
 	{
 		fatalerror("Can't find SGI GIO64 device\n");

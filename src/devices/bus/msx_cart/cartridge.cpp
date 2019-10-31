@@ -73,7 +73,7 @@ void msx_cart(device_slot_interface &device)
 
 
 msx_cart_interface::msx_cart_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "msxcart")
 	, m_exp(nullptr)
 {
 }

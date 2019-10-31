@@ -820,7 +820,7 @@ void artmagic_state::artmagic(machine_config &config)
 	m_tms->set_shiftreg_in_callback(FUNC(artmagic_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(artmagic_state::from_shiftreg));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	EEPROM_2816(config, "eeprom").write_time(attotime::from_usec(1)); // FIXME: false-readback polling should make this unnecessary
 

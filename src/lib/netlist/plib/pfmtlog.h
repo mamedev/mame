@@ -248,7 +248,7 @@ protected:
 				strm << std::forward<T>(val);
 				const pstring ps(strm.str());
 				pstring pad("");
-				std::size_t aw(std::abs(ret.width));
+				auto aw(static_cast<std::size_t>(std::abs(ret.width)));
 				if (aw > ps.length())
 					pad = pstring(aw - ps.length(), ' ');
 

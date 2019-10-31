@@ -54,8 +54,7 @@ class floppy_sound_device;
 ***************************************************************************/
 
 class floppy_image_device : public device_t,
-							public device_image_interface,
-							public device_slot_card_interface
+							public device_image_interface
 {
 public:
 	typedef delegate<image_init_result (floppy_image_device *)> load_cb;

@@ -565,7 +565,7 @@ void polygonet_state::plygonet(machine_config &config)
 	Z80(config, m_audiocpu, 8000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &polygonet_state::sound_map);
 
-	config.m_perfect_cpu_quantum = subtag("maincpu"); /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
+	config.set_perfect_quantum(m_maincpu); /* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
 
 	EEPROM_ER5911_8BIT(config, m_eeprom);
 

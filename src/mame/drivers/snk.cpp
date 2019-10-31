@@ -3622,7 +3622,7 @@ void snk_state::marvins(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::marvins_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::nmi_line_assert), attotime::from_hz(244));  // schematics show a separate 244Hz timer
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3684,7 +3684,7 @@ void snk_state::jcross(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &snk_state::jcross_sound_portmap);
 	m_audiocpu->set_periodic_int(FUNC(snk_state::irq0_line_assert), attotime::from_hz(244)); // Marvin's frequency, sounds ok
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3755,7 +3755,7 @@ void snk_state::tnk3(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::tnk3_YM3526_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3848,7 +3848,7 @@ void snk_state::ikari(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_YM3526_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3905,7 +3905,7 @@ void snk_state::bermudat(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(8'000'000)/2); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(24000);
+	config.set_maximum_quantum(attotime::from_hz(24000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -3988,7 +3988,7 @@ void snk_state::tdfever(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &snk_state::YM3526_Y8950_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

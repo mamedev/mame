@@ -939,7 +939,7 @@ void witch_state::witch(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &witch_state::witch_sub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(witch_state::irq0_line_assert));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

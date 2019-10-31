@@ -58,7 +58,7 @@ namespace plib
 			return ptime(lhs.m_time + rhs.m_time);
 		}
 
-		friend constexpr const ptime operator*(ptime lhs, const mult_type &factor) noexcept
+		friend constexpr const ptime operator*(ptime lhs, const mult_type factor) noexcept
 		{
 			return ptime(lhs.m_time * factor);
 		}
@@ -107,18 +107,18 @@ namespace plib
 		// for save states ....
 		C14CONSTEXPR internal_type *get_internaltype_ptr() noexcept { return &m_time; }
 
-		static constexpr ptime from_nsec(const internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
-		static constexpr ptime from_usec(const internal_type us) noexcept { return ptime(us, UINT64_C(   1000000)); }
-		static constexpr ptime from_msec(const internal_type ms) noexcept { return ptime(ms, UINT64_C(      1000)); }
-		static constexpr ptime from_sec(const internal_type s) noexcept   { return ptime(s,  UINT64_C(         1)); }
-		static constexpr ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
-		static constexpr ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
-		static constexpr ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>(std::floor(t * static_cast<double>(RES) + 0.5)), RES); }
+		static constexpr const ptime from_nsec(const internal_type ns) noexcept { return ptime(ns, UINT64_C(1000000000)); }
+		static constexpr const ptime from_usec(const internal_type us) noexcept { return ptime(us, UINT64_C(   1000000)); }
+		static constexpr const ptime from_msec(const internal_type ms) noexcept { return ptime(ms, UINT64_C(      1000)); }
+		static constexpr const ptime from_sec(const internal_type s) noexcept   { return ptime(s,  UINT64_C(         1)); }
+		static constexpr const ptime from_hz(const internal_type hz) noexcept { return ptime(1 , hz); }
+		static constexpr const ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
+		static constexpr const ptime from_double(const double t) noexcept { return ptime(static_cast<internal_type>(std::floor(t * static_cast<double>(RES) + 0.5)), RES); }
 
-		static constexpr ptime zero() noexcept { return ptime(0, RES); }
-		static constexpr ptime quantum() noexcept { return ptime(1, RES); }
-		static constexpr ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
-		static constexpr internal_type resolution() noexcept { return RES; }
+		static constexpr const ptime zero() noexcept { return ptime(0, RES); }
+		static constexpr const ptime quantum() noexcept { return ptime(1, RES); }
+		static constexpr const ptime never() noexcept { return ptime(plib::numeric_limits<internal_type>::max(), RES); }
+		static constexpr const internal_type resolution() noexcept { return RES; }
 
 		constexpr internal_type in_nsec() const noexcept { return m_time / (RES / UINT64_C(1000000000)); }
 		constexpr internal_type in_usec() const noexcept { return m_time / (RES / UINT64_C(   1000000)); }

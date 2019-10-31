@@ -916,7 +916,7 @@ void gaelco3d_state::gaelco3d(machine_config &config)
 
 	EEPROM_93C66_16BIT(config, m_eeprom, eeprom_serial_streaming::ENABLE);
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	TIMER(config, "adsp_timer").configure_generic(FUNC(gaelco3d_state::adsp_autobuffer_irq));
 

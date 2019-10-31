@@ -388,7 +388,7 @@ int running_machine::run(bool quiet)
 	}
 	catch (emu_fatalerror &fatal)
 	{
-		osd_printf_error("Fatal error: %s\n", fatal.string());
+		osd_printf_error("Fatal error: %s\n", fatal.what());
 		error = EMU_ERR_FATALERROR;
 		if (fatal.exitcode() != 0)
 			error = fatal.exitcode();

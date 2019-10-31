@@ -1626,12 +1626,11 @@ void cmi_state::cmi2x(machine_config &config)
 	MC6809E(config, m_maincpu1, Q209_CPU_CLOCK);
 	m_maincpu1->set_addrmap(AS_PROGRAM, &cmi_state::maincpu1_map);
 	m_maincpu1->set_irq_acknowledge_callback(FUNC(cmi_state::cpu1_interrupt_callback));
-	config.m_perfect_cpu_quantum = subtag("maincpu1");
+	config.set_perfect_quantum(m_maincpu1);
 
 	MC6809E(config, m_maincpu2, Q209_CPU_CLOCK);
 	m_maincpu2->set_addrmap(AS_PROGRAM, &cmi_state::maincpu2_map);
 	m_maincpu2->set_irq_acknowledge_callback(FUNC(cmi_state::cpu2_interrupt_callback));
-	config.m_perfect_cpu_quantum = subtag("maincpu2");
 
 	M68000(config, m_midicpu, 20_MHz_XTAL / 2);
 	m_midicpu->set_addrmap(AS_PROGRAM, &cmi_state::midicpu_map);

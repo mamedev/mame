@@ -11,8 +11,8 @@
 #define NL_CONVERT_H_
 
 #include "plib/plists.h"
-#include "plib/pparser.h"
 #include "plib/pstring.h"
+#include "plib/ptokenizer.h"
 #include "plib/ptypes.h"
 
 #include <memory>

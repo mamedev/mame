@@ -984,7 +984,7 @@ void mac_state::add_egret(machine_config &config, int type)
 	m_egret->linechange_callback().set(FUNC(mac_state::adb_linechange_w));
 	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 }
 
 void mac_state::add_cuda(machine_config &config, int type)
@@ -1040,7 +1040,7 @@ void mac_state::mac512ke_base(machine_config &config)
 	M68000(config, m_maincpu, C7M);       /* 7.8336 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::mac512ke_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(C7M*2, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
@@ -1174,7 +1174,7 @@ void mac_state::macprtb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac_state::macprtb_map);
 	m_maincpu->set_dasm_override(FUNC(mac_state::mac_dasm_override));
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	add_pb1xx_screen(config);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macprtb));

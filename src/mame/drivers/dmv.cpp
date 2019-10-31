@@ -803,7 +803,7 @@ void dmv_state::dmv(machine_config &config)
 	kbmcu.p1_out_cb().set(FUNC(dmv_state::kb_mcu_port1_w)); // bit 1 data to kb
 	kbmcu.p2_out_cb().set(FUNC(dmv_state::kb_mcu_port2_w));
 
-	config.m_perfect_cpu_quantum = subtag("maincpu");
+	config.set_perfect_quantum(m_maincpu);
 
 	DMV_KEYBOARD(config, m_keyboard, 0);
 

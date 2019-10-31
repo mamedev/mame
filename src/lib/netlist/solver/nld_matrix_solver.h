@@ -20,7 +20,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 	P_ENUM(matrix_sort_type_e,
 		NOSORT,
@@ -61,7 +61,7 @@ namespace devices
 		/* automatic time step */
 		, m_dynamic_ts(parent, "DYNAMIC_TS", false)
 		, m_dynamic_lte(parent, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
-		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
+		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_fptype timestep resolution
 
 		/* matrix sorting */
 		, m_sort_type(parent, "SORT_TYPE", matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT)
@@ -84,30 +84,30 @@ namespace devices
 			}
 		}
 
-		param_double_t m_freq;
-		param_double_t m_gs_sor;
+		param_fp_t m_freq;
+		param_fp_t m_gs_sor;
 		param_enum_t<matrix_type_e> m_method;
-		param_double_t m_accuracy;
+		param_fp_t m_accuracy;
 		param_num_t<std::size_t> m_gs_loops;
-		param_double_t m_gmin;
+		param_fp_t m_gmin;
 		param_logic_t  m_pivot;
 		param_num_t<std::size_t> m_nr_loops;
-		param_double_t m_nr_recalc_delay;
+		param_fp_t m_nr_recalc_delay;
 		param_int_t m_parallel;
 		param_logic_t  m_dynamic_ts;
-		param_double_t m_dynamic_lte;
-		param_double_t m_dynamic_min_ts;
+		param_fp_t m_dynamic_lte;
+		param_fp_t m_dynamic_min_ts;
 		param_enum_t<matrix_sort_type_e> m_sort_type;
 
 		param_logic_t m_use_gabs;
 		param_logic_t m_use_linear_prediction;
 
-		nl_double m_min_timestep;
-		nl_double m_max_timestep;
+		nl_fptype m_min_timestep;
+		nl_fptype m_max_timestep;
 	};
 
 
-	class terms_for_net_t : plib::nocopyassignmove
+	class terms_for_net_t
 	{
 	public:
 		terms_for_net_t(analog_net_t * net = nullptr);
@@ -116,32 +116,31 @@ namespace devices
 
 		void add_terminal(terminal_t *term, int net_other, bool sorted);
 
-		std::size_t count() const { return m_terms.size(); }
+		std::size_t count() const noexcept { return m_terms.size(); }
 
-		terminal_t **terms() { return m_terms.data(); }
+		std::size_t railstart() const noexcept { return m_railstart; }
 
-		nl_double getV() const { return m_net->Q_Analog(); }
+		terminal_t **terms() noexcept { return m_terms.data(); }
 
-		void setV(nl_double v) { m_net->set_Q_Analog(v); }
+		nl_fptype getV() const noexcept { return m_net->Q_Analog(); }
 
-		bool isNet(const analog_net_t * net) const { return net == m_net; }
+		void setV(nl_fptype v) noexcept { m_net->set_Q_Analog(v); }
 
-		std::size_t m_railstart;
+		bool isNet(const analog_net_t * net) const noexcept { return net == m_net; }
 
-		std::vector<unsigned> m_nz;   /* all non zero for multiplication */
-		std::vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
-		std::vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+		void set_railstart(std::size_t val) noexcept { m_railstart = val; }
 
-		/* state */
-		nl_double m_last_V;
-		nl_double m_DD_n_m_1;
-		nl_double m_h_n_m_1;
+		PALIGNAS_VECTOROPT()
 
-		std::vector<int> m_connected_net_idx;
+		plib::aligned_vector<unsigned> m_nz;   /* all non zero for multiplication */
+		plib::aligned_vector<unsigned> m_nzrd; /* non zero right of the diagonal for elimination, may include RHS element */
+		plib::aligned_vector<unsigned> m_nzbd; /* non zero below of the diagonal for elimination */
+
+		plib::aligned_vector<int> m_connected_net_idx;
 	private:
 		analog_net_t * m_net;
-		std::vector<terminal_t *> m_terms;
-
+		plib::aligned_vector<terminal_t *> m_terms;
+		std::size_t m_railstart;
 	};
 
 	class proxied_analog_output_t : public analog_output_t
@@ -163,21 +162,14 @@ namespace devices
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
 
-		void setup(analog_net_t::list_t &nets)
-		{
-			vsetup(nets);
-		}
-
-		void solve_base();
-
 		/* after every call to solve, update inputs must be called.
 		 * this can be done as well as a batch to ease parallel processing.
 		 */
 		const netlist_time solve(netlist_time now);
 		void update_inputs();
 
-		bool has_dynamic_devices() const { return m_dynamic_devices.size() > 0; }
-		bool has_timestep_devices() const { return m_step_devices.size() > 0; }
+		bool has_dynamic_devices() const noexcept { return m_dynamic_devices.size() > 0; }
+		bool has_timestep_devices() const noexcept { return m_step_devices.size() > 0; }
 
 		void update_forced();
 		void update_after(const netlist_time after)
@@ -190,9 +182,9 @@ namespace devices
 		NETLIB_RESETI();
 
 	public:
-		int get_net_idx(const analog_net_t *net) const;
+		int get_net_idx(const analog_net_t *net) const noexcept;
 		std::pair<int, int> get_left_right_of_diag(std::size_t row, std::size_t diag);
-		double get_weight_around_diag(std::size_t row, std::size_t diag);
+		nl_fptype get_weight_around_diag(std::size_t row, std::size_t diag);
 
 		virtual void log_stats();
 
@@ -207,17 +199,16 @@ namespace devices
 	protected:
 
 		matrix_solver_t(netlist_state_t &anetlist, const pstring &name,
+			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params);
 
 		void sort_terms(matrix_sort_type_e sort);
 
-		void setup_base(analog_net_t::list_t &nets);
 		void update_dynamic();
 
-		virtual void vsetup(analog_net_t::list_t &nets) = 0;
 		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 
-		netlist_time compute_next_timestep(const double cur_ts);
+		netlist_time compute_next_timestep(const nl_fptype cur_ts);
 		/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
 
 		template <typename T>
@@ -225,11 +216,6 @@ namespace devices
 
 		template <typename T>
 		auto delta(const T & V) -> typename std::decay<decltype(V[0])>::type;
-
-		template <typename T>
-		void build_LE_A(T &child);
-		template <typename T>
-		void build_LE_RHS(T &child);
 
 		void set_pointers()
 		{
@@ -239,8 +225,8 @@ namespace devices
 			std::size_t max_rail = 0;
 			for (std::size_t k = 0; k < iN; k++)
 			{
-				max_count = std::max(max_count, m_terms[k]->count());
-				max_rail = std::max(max_rail, m_terms[k]->m_railstart);
+				max_count = std::max(max_count, m_terms[k].count());
+				max_rail = std::max(max_rail, m_terms[k].railstart());
 			}
 
 			m_mat_ptr.resize(iN, max_rail+1);
@@ -251,26 +237,26 @@ namespace devices
 
 			for (std::size_t k = 0; k < iN; k++)
 			{
-				auto count = m_terms[k]->count();
+				auto count = m_terms[k].count();
 
 				for (std::size_t i = 0; i < count; i++)
 				{
-					m_terms[k]->terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
-					m_connected_net_Vn[k][i] = m_terms[k]->terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
+					m_terms[k].terms()[i]->set_ptrs(&m_gtn[k][i], &m_gonn[k][i], &m_Idrn[k][i]);
+					m_connected_net_Vn[k][i] = m_terms[k].terms()[i]->connected_terminal()->net().Q_Analog_state_ptr();
 				}
 			}
 		}
 
-		template <typename AP, typename FT>
-		void fill_matrix(std::size_t N, AP &tcr, FT &RHS)
+		template <typename FT>
+		void fill_matrix(std::size_t N, FT &RHS)
 		{
 			for (std::size_t k = 0; k < N; k++)
 			{
-				auto *net = m_terms[k].get();
-				auto **tcr_r = &(tcr[k][0]);
+				auto &net = m_terms[k];
+				auto **tcr_r = &(m_mat_ptr[k][0]);
 
-				const std::size_t term_count = net->count();
-				const std::size_t railstart = net->m_railstart;
+				const std::size_t term_count = net.count();
+				const std::size_t railstart = net.railstart();
 				const auto &go = m_gonn[k];
 				const auto &gt = m_gtn[k];
 				const auto &Idr = m_Idrn[k];
@@ -359,20 +345,62 @@ namespace devices
 			}
 		}
 
+		template <typename M>
+		void clear_square_mat(std::size_t n, M &m)
+		{
+			for (std::size_t k=0; k < n; k++)
+			{
+				auto *p = &(m[k][0]);
+				for (std::size_t i=0; i < n; i++)
+					p[i] = 0.0;
+			}
+		}
+
+		template <typename M>
+		void build_mat_ptr(std::size_t iN, M &mat)
+		{
+			for (std::size_t k=0; k<iN; k++)
+			{
+				std::size_t cnt(0);
+				/* build pointers into the compressed row format matrix for each terminal */
+				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				{
+					int other = this->m_terms[k].m_connected_net_idx[j];
+					if (other >= 0)
+					{
+						m_mat_ptr[k][j] = &(mat[k][static_cast<std::size_t>(other)]);
+						cnt++;
+					}
+				}
+				nl_assert_always(cnt == this->m_terms[k].railstart(), "Count and railstart mismatch");
+				m_mat_ptr[k][this->m_terms[k].railstart()] = &(mat[k][k]);
+			}
+		}
+
 		template <typename T>
 		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gonn;
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gtn;
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_Idrn;
-		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_mat_ptr;
-		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_connected_net_Vn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
+		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_mat_ptr;
+		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
 
-		std::vector<plib::unique_ptr<terms_for_net_t>> m_terms;
+		plib::aligned_vector<terms_for_net_t> m_terms;
+		plib::aligned_vector<terms_for_net_t> m_rails_temp;
+
+		/* state - variable time_stepping */
+		plib::aligned_vector<nl_fptype> m_last_V;
+		plib::aligned_vector<nl_fptype> m_DD_n_m_1;
+		plib::aligned_vector<nl_fptype> m_h_n_m_1;
+
+		// FIXME: it should be like this, however dimensions are determined
+		//        in vsetup.
+		//state_container<std::vector<nl_fptype>> m_last_V;
+		//state_container<std::vector<nl_fptype>> m_DD_n_m_1;
+		//state_container<std::vector<nl_fptype>> m_h_n_m_1;
 
 		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
-
-		std::vector<plib::unique_ptr<terms_for_net_t>> m_rails_temp;
 
 		const solver_parameters_t &m_params;
 
@@ -390,6 +418,9 @@ namespace devices
 
 		logic_input_t m_fb_sync;
 		logic_output_t m_Q_sync;
+
+		/* base setup - called from constructor */
+		void setup_base(const analog_net_t::list_t &nets);
 
 		/* calculate matrix */
 		void setup_matrix();
@@ -410,7 +441,7 @@ namespace devices
 		const std::size_t iN = this->m_terms.size();
 		typename std::decay<decltype(V[0])>::type cerr = 0;
 		for (std::size_t i = 0; i < iN; i++)
-			cerr = std::max(cerr, std::abs(V[i] - this->m_terms[i]->getV()));
+			cerr = std::max(cerr, std::abs(V[i] - this->m_terms[i].getV()));
 		return cerr;
 	}
 
@@ -419,73 +450,10 @@ namespace devices
 	{
 		const std::size_t iN = this->m_terms.size();
 		for (std::size_t i = 0; i < iN; i++)
-			this->m_terms[i]->setV(V[i]);
+			this->m_terms[i].setV(V[i]);
 	}
 
-	template <typename T>
-	void matrix_solver_t::build_LE_A(T &child)
-	{
-		using float_type = typename T::float_type;
-		static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-
-		const std::size_t iN = child.size();
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			terms_for_net_t *terms = m_terms[k].get();
-			float_type * Ak = &child.A(k, 0ul);
-
-			for (std::size_t i=0; i < iN; i++)
-				Ak[i] = 0.0;
-
-			const std::size_t terms_count = terms->count();
-			const std::size_t railstart =  terms->m_railstart;
-			const float_type * const gt = m_gtn[k];
-
-			{
-				float_type akk  = 0.0;
-				for (std::size_t i = 0; i < terms_count; i++)
-					akk += gt[i];
-
-				Ak[k] = akk;
-			}
-
-			const float_type * const go = m_gonn[k];
-			int * net_other = terms->m_connected_net_idx.data();
-
-			for (std::size_t i = 0; i < railstart; i++)
-				Ak[net_other[i]] += go[i];
-		}
-	}
-
-	template <typename T>
-	void matrix_solver_t::build_LE_RHS(T &child)
-	{
-		static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-		using float_type = typename T::float_type;
-
-		const std::size_t iN = child.size();
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			float_type rhsk_a = 0.0;
-			float_type rhsk_b = 0.0;
-
-			const std::size_t terms_count = m_terms[k]->count();
-			const float_type * const go = m_gonn[k];
-			const float_type * const Idr = m_Idrn[k];
-			const float_type * const * other_cur_analog = m_connected_net_Vn[k];
-
-			for (std::size_t i = 0; i < terms_count; i++)
-				rhsk_a = rhsk_a + Idr[i];
-
-			for (std::size_t i = m_terms[k]->m_railstart; i < terms_count; i++)
-				//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
-				rhsk_b = rhsk_b - go[i] * *other_cur_analog[i];
-
-			child.RHS(k) = rhsk_a + rhsk_b;
-		}
-	}
-
-} //namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */

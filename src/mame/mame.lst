@@ -126,6 +126,7 @@ alieninvp2                      // bootleg
 astropal                        // (c) 19?? Sidam
 attackfc                        // (c) 1979? E.G.S.
 ballbomb                        // TN  (c) 1980 Taito
+cane                            // Model Racing
 claybust                        // (c) 1978 Model Racing
 cosmicin                        // bootleg
 cosmicm2                        // Universal
@@ -186,6 +187,7 @@ lupin3a                         // LP  (c) 1980 Taito
 mlander                         // (c) 1980 Leisure Time Electronics
 moonbase                        // Taito
 moonbasea                       // Zeta - Nichibutsu
+orbite                          // Model Racing
 ozmawars                        // Shin Nihon Kikaku (SNK)
 ozmawars2                       // Shin Nihon Kikaku (SNK)
 ozmawarsmr                      // bootleg (Model Racing)
@@ -10614,6 +10616,7 @@ sf2ui                           // 22/05/1991 (c) 1991 (USA, Rev. I)
 sf2uk                           // 01/11/1991 (c) 1991 (USA)
 sf2v004                         // hack
 sf2yyc                          // hack
+sf2ceds6                        // bootleg
 sf2cems6a                       // bootleg
 sf2cems6b                       // bootleg
 sf2cems6c                       // bootleg
@@ -15191,6 +15194,7 @@ tagteampg                       //
 topsound                        //
 triplay                         //
 triplaya                        //
+triplayg                        //
 txsector                        //
 txsectorf                       //
 txsectorg                       //
@@ -21725,6 +21729,7 @@ nshort                          // 1993 Mephisto Nigel Short
 @source:mephistp.cpp
 mephistp                        //
 mephistp1                       //
+mephistpn                       //
 sport2k                         //
 
 @source:merit.cpp
@@ -37298,7 +37303,7 @@ swtpc09i                        // S09, DC4 Floppy + PIA IDE SBUG rom - FLEX
 swtpc09u                        // S09, DMF2 Floppy UNIBUG rom - UniFLEX
 
 @source:swtpc8212.cpp
-swtpc8212                       //
+swtpc8212                       // Terminal
 
 @source:swyft.cpp
 swyft                           //

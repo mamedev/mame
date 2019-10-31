@@ -464,13 +464,13 @@ void at_vrom_fix_state::machine_start()
 void at_state::cfg_single_1200K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525hd");
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 void at_state::cfg_single_360K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("525dd");
-	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("");
+	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option(nullptr);
 }
 
 static void pci_devices(device_slot_interface &device)
@@ -488,7 +488,7 @@ void at_state::ibm5170(machine_config &config)
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
 	AT_MB(config, m_mb, 0);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	m_mb->at_softlists(config);
 
@@ -593,7 +593,7 @@ void at_state::at386(machine_config &config)
 
 	AT_MB(config, m_mb, 0).at_softlists(config);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -768,7 +768,7 @@ void at_vrom_fix_state::megapcpla(machine_config &config)
 
 	AT_MB(config, m_mb, 0).at_softlists(config);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -800,7 +800,7 @@ void at_state::ficpio2(machine_config &config)
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	AT_MB(config, m_mb, 0).at_softlists(config);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	ds12885_device &rtc(DS12885(config.replace(), "mb:rtc"));
 	rtc.irq().set("mb:pic8259_slave", FUNC(pic8259_device::ir0_w)); // this is in :mb
@@ -843,7 +843,7 @@ void at_state::comportiii(machine_config &config)
 	maincpu.shutdown_callback().set("mb", FUNC(at_mb_device::shutdown));
 
 	AT_MB(config, m_mb, 0).at_softlists(config);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board1", 0, "mb:isabus", pc_isa16_cards, "fdc", true).set_option_machine_config("fdc", cfg_single_1200K);

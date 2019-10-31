@@ -310,6 +310,9 @@ bool cheat_parameter::set_next_state()
 //  CHEAT SCRIPT
 //**************************************************************************
 
+constexpr int cheat_script::script_entry::MAX_ARGUMENTS;
+
+
 //-------------------------------------------------
 //  cheat_script - constructor
 //-------------------------------------------------
@@ -1227,7 +1230,7 @@ bool cheat_manager::save_all(const char *filename)
 	catch (emu_fatalerror const &err)
 	{
 		// catch errors and cleanup
-		osd_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.what());
 		cheatfile.remove_on_close();
 	}
 	return false;
@@ -1447,7 +1450,7 @@ void cheat_manager::load_cheats(const char *filename)
 				catch (emu_fatalerror const &err)
 				{
 					// just move on to the next cheat
-					osd_printf_error("%s\n", err.string());
+					osd_printf_error("%s\n", err.what());
 				}
 			}
 		}
@@ -1455,7 +1458,7 @@ void cheat_manager::load_cheats(const char *filename)
 	catch (emu_fatalerror const &err)
 	{
 		// handle errors cleanly
-		osd_printf_error("%s\n", err.string());
+		osd_printf_error("%s\n", err.what());
 		m_cheatlist.clear();
 	}
 }

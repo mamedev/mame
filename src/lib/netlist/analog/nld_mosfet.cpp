@@ -31,7 +31,7 @@ namespace netlist
 namespace analog
 {
 
-	using constants = plib::constants<nl_double>;
+	using constants = plib::constants<nl_fptype>;
 
 	// -----------------------------------------------------------------------------
 	// nld_FET - Base classes
@@ -223,7 +223,7 @@ namespace analog
 			m_polarity = qtype() == FET_NMOS ? 1.0 : -1.0;
 
 			m_capmod = m_model.m_CAPMOD;
-			// printf("capmod %d %g %g\n", m_capmod, (double)m_model.m_VTO, m_polarity);
+			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
 			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value for " + m_model.name());
 
 			/*
@@ -243,7 +243,7 @@ namespace analog
 			m_Leff = m_model.m_L - 2 * m_model.m_LD;
 			nl_assert_always(m_Leff > 0.0, "Effective Lateral diffusion would be negative for model " + m_model.name());
 
-			nl_double Cox = (m_model.m_TOX > 0.0) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : 0.0;
+			nl_fptype Cox = (m_model.m_TOX > 0.0) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : 0.0;
 
 			// calculate DC transconductance coefficient
 			if (m_model.m_KP > 0)
@@ -254,7 +254,7 @@ namespace analog
 				m_beta = 2e-5 * m_model.m_W / m_Leff;
 
 			//FIXME::UT can disappear
-			const double Vt = constants::T0() * constants::k_b() / constants::Q_e();
+			const nl_fptype Vt = constants::T0() * constants::k_b() / constants::Q_e();
 
 			// calculate surface potential if not given
 
@@ -298,12 +298,12 @@ namespace analog
 		{
 			if (m_capmod != 0)
 			{
-				//const nl_double Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-				//const nl_double Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
-				const nl_double Ugd = m_Vgd; // Gate - Drain
-				const nl_double Ugs = m_Vgs; // Gate - Source
-				const nl_double Ubs = 0.0;                         // Bulk - Source == 0 if connected
-				const nl_double Ugb = Ugs - Ubs;
+				//const nl_nl_fptype Ugd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+				//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
+				const nl_fptype Ugd = m_Vgd; // Gate - Drain
+				const nl_fptype Ugs = m_Vgs; // Gate - Source
+				const nl_fptype Ubs = 0.0;                         // Bulk - Source == 0 if connected
+				const nl_fptype Ugb = Ugs - Ubs;
 
 				m_cap_gb.timestep(m_Cgb, Ugb, step);
 				m_cap_gs.timestep(m_Cgs, Ugs, step);
@@ -343,43 +343,43 @@ namespace analog
 		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gs;
 		generic_capacitor<capacitor_e::VARIABLE_CAPACITY> m_cap_gd;
 
-		nl_double m_phi;
-		nl_double m_gamma;
-		nl_double m_vto;
-		nl_double m_beta;
-		nl_double m_lambda;
+		nl_fptype m_phi;
+		nl_fptype m_gamma;
+		nl_fptype m_vto;
+		nl_fptype m_beta;
+		nl_fptype m_lambda;
 
 		/* used in capacitance calculation */
-		nl_double m_Leff;
-		nl_double m_CoxWL;
-		nl_double m_polarity;
+		nl_fptype m_Leff;
+		nl_fptype m_CoxWL;
+		nl_fptype m_polarity;
 
 		/* capacitance values */
 
-		nl_double m_Cgb;
-		nl_double m_Cgs;
-		nl_double m_Cgd;
+		nl_fptype m_Cgb;
+		nl_fptype m_Cgs;
+		nl_fptype m_Cgd;
 
 		int m_capmod;
-		state_var<nl_double> m_Vgs;
-		state_var<nl_double> m_Vgd;
+		state_var<nl_fptype> m_Vgs;
+		state_var<nl_fptype> m_Vgd;
 
 		void set_cap(generic_capacitor<capacitor_e::VARIABLE_CAPACITY> cap,
-			nl_double capval, nl_double V,
-			nl_double &g11, nl_double &g12, nl_double &g21, nl_double &g22,
-			nl_double &I1, nl_double &I2)
+			nl_fptype capval, nl_fptype V,
+			nl_fptype &g11, nl_fptype &g12, nl_fptype &g21, nl_fptype &g22,
+			nl_fptype &I1, nl_fptype &I2)
 		{
-			const nl_double I = cap.Ieq(capval, V) * m_polarity;
-			const nl_double G = cap.G(capval);
+			const nl_fptype I = cap.Ieq(capval, V) * m_polarity;
+			const nl_fptype G = cap.G(capval);
 			g11 += G; g12 -= G; g21 -= G; g22 += G;
 			I1 -= I; I2 += I;
 			//printf("Cap: %g\n", capval);
 		}
 
-		void calculate_caps(nl_double Vgs, nl_double Vgd, nl_double Vth,
-			nl_double &Cgs, nl_double &Cgd, nl_double &Cgb)
+		void calculate_caps(nl_fptype Vgs, nl_fptype Vgd, nl_fptype Vth,
+			nl_fptype &Cgs, nl_fptype &Cgd, nl_fptype &Cgb)
 		{
-			nl_double Vctrl = Vgs - Vth * m_polarity;
+			nl_fptype Vctrl = Vgs - Vth * m_polarity;
 			// Cut off - now further differentiated into 3 different formulas
 			// Accumulation
 			if (Vctrl <= -m_phi)
@@ -403,8 +403,8 @@ namespace analog
 			}
 			else
 			{
-				const nl_double Vdsat = Vctrl;
-				const nl_double Vds = Vgs - Vgd;
+				const nl_fptype Vdsat = Vctrl;
+				const nl_fptype Vds = Vgs - Vgd;
 				// saturation
 				if (Vdsat <= Vds)
 				{
@@ -415,8 +415,8 @@ namespace analog
 				else
 				{
 					// linear
-					const nl_double Sqr1 = std::pow(Vdsat - Vds, 2);
-					const nl_double Sqr2 = std::pow(2.0 * Vdsat - Vds, 2);
+					const nl_fptype Sqr1 = std::pow(Vdsat - Vds, 2);
+					const nl_fptype Sqr2 = std::pow(2.0 * Vdsat - Vds, 2);
 					Cgb = 0;
 					Cgs = m_CoxWL * (1.0 - Sqr1 / Sqr2) * (2.0 / 3.0);
 					Cgd = m_CoxWL * (1.0 - Vdsat * Vdsat / Sqr2) * (2.0 / 3.0);
@@ -431,6 +431,7 @@ namespace analog
 
 	NETLIB_UPDATE(MOSFET)
 	{
+		// FIXME: This should never be called
 		if (!m_SG.m_P.net().isRailNet())
 			m_SG.m_P.solve_now();   // Basis
 		else if (!m_SG.m_N.net().isRailNet())
@@ -441,13 +442,13 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(MOSFET)
 	{
-		nl_double Vgd = -m_DG.deltaV() * m_polarity; // Gate - Drain
-		nl_double Vgs = -m_SG.deltaV() * m_polarity; // Gate - Source
+		nl_fptype Vgd = -m_DG.deltaV() * m_polarity; // Gate - Drain
+		nl_fptype Vgs = -m_SG.deltaV() * m_polarity; // Gate - Source
 
 		// limit step sizes
 
-		const nl_double k = 3.5; // see "Circuit Simulation", page 185
-		nl_double d = (Vgs - m_Vgs);
+		const nl_fptype k = 3.5; // see "Circuit Simulation", page 185
+		nl_fptype d = (Vgs - m_Vgs);
 		Vgs = m_Vgs + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
 		d = (Vgd - m_Vgd);
 		Vgd = m_Vgd + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
@@ -455,10 +456,10 @@ namespace analog
 		m_Vgs = Vgs;
 		m_Vgd = Vgd;
 
-		const nl_double Vbs = 0.0;                       // Bulk - Source == 0 if connected
-		//const nl_double Vbd = m_SD.deltaV() * m_polarity;  // Bulk - Drain = Source  - Drain
-		const nl_double Vds = Vgs - Vgd;
-		const nl_double Vbd = -Vds;  // Bulk - Drain = Source  - Drain
+		const nl_fptype Vbs = 0.0;                       // Bulk - Source == 0 if connected
+		//const nl_nl_fptype Vbd = m_SD.deltaV() * m_polarity;  // Bulk - Drain = Source  - Drain
+		const nl_fptype Vds = Vgs - Vgd;
+		const nl_fptype Vbd = -Vds;  // Bulk - Drain = Source  - Drain
 
 #if (!BODY_CONNECTED_TO_SOURCE)
 		m_D_BS.update_diode(Vbs);
@@ -470,14 +471,14 @@ namespace analog
 		const bool is_forward = Vds >= 0;
 
 		// calculate Vth
-		const nl_double Vbulk = is_forward ? Vbs : Vbd;
-		const nl_double phi_m_Vbulk = (m_phi > Vbulk) ? std::sqrt(m_phi - Vbulk) : 0.0;
-		const nl_double Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - std::sqrt(m_phi));
+		const nl_fptype Vbulk = is_forward ? Vbs : Vbd;
+		const nl_fptype phi_m_Vbulk = (m_phi > Vbulk) ? std::sqrt(m_phi - Vbulk) : 0.0;
+		const nl_fptype Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - std::sqrt(m_phi));
 
-		const nl_double Vctrl = (is_forward ? Vgs : Vgd) - Vth;
+		const nl_fptype Vctrl = (is_forward ? Vgs : Vgd) - Vth;
 
-		nl_double Ids(0), gm(0), gds(0), gmb(0);
-		const nl_double absVds = std::abs(Vds);
+		nl_fptype Ids(0), gm(0), gds(0), gmb(0);
+		const nl_fptype absVds = std::abs(Vds);
 
 		if (Vctrl <= 0.0)
 		{
@@ -489,7 +490,7 @@ namespace analog
 		}
 		else
 		{
-			const nl_double beta = m_beta * (1.0 + m_lambda * absVds);
+			const nl_fptype beta = m_beta * (1.0 + m_lambda * absVds);
 			if (Vctrl <= absVds)
 			{
 				// saturation region
@@ -506,63 +507,63 @@ namespace analog
 			}
 
 			// backgate transconductance
-			const nl_double bgtc = (phi_m_Vbulk != 0.0) ? (m_gamma / phi_m_Vbulk / 2.0) : 0.0;
+			const nl_fptype bgtc = (phi_m_Vbulk != 0.0) ? (m_gamma / phi_m_Vbulk / 2.0) : 0.0;
 			gmb = gm * bgtc;
 		}
 
 		// FIXME: these are needed to compute capacitance
-		// nl_double Udsat = pol * std::max (Utst, 0.0);
+		// nl_fptype Udsat = pol * std::max (Utst, 0.0);
 		// Uon = pol * Vth;
 
 		// compute bulk diode equivalent currents
 
-		const nl_double IeqBD = m_D_BD.Ieq();
-		const nl_double gbd = m_D_BD.G();
+		const nl_fptype IeqBD = m_D_BD.Ieq();
+		const nl_fptype gbd = m_D_BD.G();
 
 #if (!BODY_CONNECTED_TO_SOURCE)
-		const nl_double IeqBS = m_D_BS.Ieq();
-		const nl_double gbs = m_D_BS.G();
+		const nl_fptype IeqBS = m_D_BS.Ieq();
+		const nl_fptype gbs = m_D_BS.G();
 #else
-		const nl_double IeqBS = 0.0;
-		const nl_double gbs = 0.0;
+		const nl_fptype IeqBS = 0.0;
+		const nl_fptype gbs = 0.0;
 #endif
 		// exchange controlling nodes if necessary
-		const nl_double gsource = is_forward ? (gm + gmb) : 0;
-		const nl_double gdrain  = is_forward ?   0.0 : (gm + gmb);
+		const nl_fptype gsource = is_forward ? (gm + gmb) : 0;
+		const nl_fptype gdrain  = is_forward ?   0.0 : (gm + gmb);
 
-		const nl_double IeqDS = (is_forward) ?
+		const nl_fptype IeqDS = (is_forward) ?
 			   Ids - gm * Vgs - gmb * Vbs - gds * Vds
 			: -Ids - gm * Vgd - gmb * Vbd - gds * Vds;
 
 		// IG = 0
-		nl_double IG = 0.0;
-		nl_double ID = (+IeqBD - IeqDS) * m_polarity;
-		nl_double IS = (+IeqBS + IeqDS) * m_polarity;
-		nl_double IB = (-IeqBD - IeqBS) * m_polarity;
+		nl_fptype IG = 0.0;
+		nl_fptype ID = (+IeqBD - IeqDS) * m_polarity;
+		nl_fptype IS = (+IeqBS + IeqDS) * m_polarity;
+		nl_fptype IB = (-IeqBD - IeqBS) * m_polarity;
 
-		nl_double gGG = 0.0;
-		nl_double gGD = 0.0;
-		nl_double gGS = 0.0;
-		nl_double gGB = 0.0;
+		nl_fptype gGG = 0.0;
+		nl_fptype gGD = 0.0;
+		nl_fptype gGS = 0.0;
+		nl_fptype gGB = 0.0;
 
-		nl_double gDG =  gm;
-		nl_double gDD =  gds + gbd - gdrain;
-		const nl_double gDS = -gds - gsource;
-		const nl_double gDB =  gmb - gbd;
+		nl_fptype gDG =  gm;
+		nl_fptype gDD =  gds + gbd - gdrain;
+		const nl_fptype gDS = -gds - gsource;
+		const nl_fptype gDB =  gmb - gbd;
 
-		nl_double gSG = -gm;
-		const nl_double gSD = -gds + gdrain;
-		nl_double gSS =  gbs + gds + gsource;
-		const nl_double gSB = -gbs - gmb;
+		nl_fptype gSG = -gm;
+		const nl_fptype gSD = -gds + gdrain;
+		nl_fptype gSS =  gbs + gds + gsource;
+		const nl_fptype gSB = -gbs - gmb;
 
-		nl_double gBG =  0.0;
-		const nl_double gBD = -gbd;
-		const nl_double gBS = -gbs;
-		nl_double gBB =  gbs + gbd;
+		nl_fptype gBG =  0.0;
+		const nl_fptype gBD = -gbd;
+		const nl_fptype gBS = -gbs;
+		nl_fptype gBB =  gbs + gbd;
 
 		if (m_capmod != 0)
 		{
-			const nl_double Vgb = Vgs - Vbs;
+			const nl_fptype Vgb = Vgs - Vbs;
 
 			if (is_forward)
 				calculate_caps(Vgs, Vgd, Vth, m_Cgs, m_Cgd, m_Cgb);
@@ -575,7 +576,7 @@ namespace analog
 		}
 
 		// Source connected to body, Diode S-B shorted!
-		const nl_double gSSBB = gSS + gBB + gBS + gSB;
+		const nl_fptype gSSBB = gSS + gBB + gBS + gSB;
 
 		//                 S          G
 		m_SG.set_mat(    gSSBB,   gSG + gBG, +(IS + IB),       // S

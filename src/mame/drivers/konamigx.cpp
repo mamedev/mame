@@ -1620,7 +1620,7 @@ void konamigx_state::konamigx(machine_config &config)
 	m_k053252->int2_ack().set(FUNC(konamigx_state::hblank_irq_ack_w));
 	m_k053252->set_screen("screen");
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	MCFG_MACHINE_START_OVERRIDE(konamigx_state,konamigx)
 	MCFG_MACHINE_RESET_OVERRIDE(konamigx_state,konamigx)

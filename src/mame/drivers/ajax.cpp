@@ -182,7 +182,7 @@ void ajax_state::ajax(machine_config &config)
 	Z80(config, m_audiocpu, 3579545);  /* 3.58 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ajax_state::ajax_sound_map);
 
-	config.m_minimum_quantum = attotime::from_hz(600);
+	config.set_maximum_quantum(attotime::from_hz(600));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 

@@ -72,40 +72,40 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 struct Mono555Desc
 {
 public:
-		nl_double r, c;
+		nl_fptype r, c;
 
-		Mono555Desc(nl_double res, nl_double cap) : r(res), c(cap) { }
+		Mono555Desc(nl_fptype res, nl_fptype cap) : r(res), c(cap) { }
 };
 
 struct Astable555Desc
 {
 public:
-		nl_double r1, r2, c;
+		nl_fptype r1, r2, c;
 
-		Astable555Desc(nl_double res1, nl_double res2, nl_double cap) : r1(res1), r2(res2), c(cap) { }
+		Astable555Desc(nl_fptype res1, nl_fptype res2, nl_fptype cap) : r1(res1), r2(res2), c(cap) { }
 };
 
 struct Mono9602Desc
 {
 public:
-		nl_double r1, c1, r2, c2;
+		nl_fptype r1, c1, r2, c2;
 
-		Mono9602Desc(nl_double res1, nl_double cap1, nl_double res2, nl_double cap2)
+		Mono9602Desc(nl_fptype res1, nl_fptype cap1, nl_fptype res2, nl_fptype cap2)
 		: r1(res1), c1(cap1), r2(res2), c2(cap2) { }
 };
 
 struct SeriesRCDesc
 {
 public:
-		nl_double r, c;
+		nl_fptype r, c;
 
-		SeriesRCDesc(nl_double res, nl_double cap) : r(res), c(cap) { }
+		SeriesRCDesc(nl_fptype res, nl_fptype cap) : r(res), c(cap) { }
 };
 
 struct CapacitorDesc : public SeriesRCDesc
 {
 public:
-	CapacitorDesc(nl_double cap) : SeriesRCDesc(0.0, cap) { }
+	CapacitorDesc(nl_fptype cap) : SeriesRCDesc(0.0, cap) { }
 };
 
 #else

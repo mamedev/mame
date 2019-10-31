@@ -320,8 +320,6 @@ void sega_segacd_device::device_add_mconfig(machine_config &config)
 	m_rfsnd->set_addrmap(0, &sega_segacd_device::segacd_pcm_map);
 
 	NVRAM(config, "backupram", nvram_device::DEFAULT_ALL_0);
-
-	config.m_perfect_cpu_quantum = subtag("segacd_68k"); // perfect sync to the fastest cpu
 }
 
 

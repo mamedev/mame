@@ -1357,7 +1357,7 @@ void msx_state::msx(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx_state::msx_memory_map);
 	m_maincpu->set_addrmap(AS_IO, &msx_state::msx_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(msx_state::msx_interrupt)); /* Needed for mouse updates */
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1422,7 +1422,7 @@ void msx2_state::msx2(machine_config &config)
 	Z80(config, m_maincpu, 21.477272_MHz_XTAL / 6);       /* 3.579545 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2_io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 
@@ -1485,7 +1485,7 @@ void msx2_state::msx2p(machine_config &config)
 	Z80(config, m_maincpu, 21.477272_MHz_XTAL / 6);       /* 3.579545 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &msx2_state::msx_memory_map);
 	m_maincpu->set_addrmap(AS_IO, &msx2_state::msx2p_io_map);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	INPUT_MERGER_ANY_HIGH(config, "mainirq").output_handler().set_inputline("maincpu", INPUT_LINE_IRQ0);
 

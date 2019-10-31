@@ -699,7 +699,7 @@ void hazl1500_state::hazl1500(machine_config &config)
 	I8080(config, m_maincpu, XTAL(18'000'000)/9); // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	m_maincpu->set_addrmap(AS_PROGRAM, &hazl1500_state::hazl1500_mem);
 	m_maincpu->set_addrmap(AS_IO, &hazl1500_state::hazl1500_io);
-	config.m_perfect_cpu_quantum = subtag(CPU_TAG);
+	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 

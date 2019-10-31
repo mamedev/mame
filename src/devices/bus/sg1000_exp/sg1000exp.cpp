@@ -31,8 +31,8 @@ DEFINE_DEVICE_TYPE(SG1000_EXPANSION_SLOT, sg1000_expansion_slot_device, "sg1000_
 //  device_sg1000_expansion_slot_interface - constructor
 //-------------------------------------------------
 
-device_sg1000_expansion_slot_interface::device_sg1000_expansion_slot_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig,device)
+device_sg1000_expansion_slot_interface::device_sg1000_expansion_slot_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "sg1000exp")
 {
 }
 
@@ -57,7 +57,7 @@ device_sg1000_expansion_slot_interface::~device_sg1000_expansion_slot_interface(
 
 sg1000_expansion_slot_device::sg1000_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SG1000_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_sg1000_expansion_slot_interface>(mconfig, *this),
 	m_device(nullptr)
 {
 }
@@ -78,7 +78,7 @@ sg1000_expansion_slot_device::~sg1000_expansion_slot_device()
 
 void sg1000_expansion_slot_device::device_start()
 {
-	m_device = dynamic_cast<device_sg1000_expansion_slot_interface *>(get_card_device());
+	m_device = get_card_device();
 }
 
 

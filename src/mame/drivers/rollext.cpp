@@ -554,7 +554,7 @@ void rollext_state::rollext(machine_config &config)
 	tms32082_pp_device &pp0(TMS32082_PP(config, "pp0", 60000000));
 	pp0.set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 
-	config.m_minimum_quantum = attotime::from_hz(100);
+	config.set_maximum_quantum(attotime::from_hz(100));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);

@@ -155,8 +155,8 @@ void dragon_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
 }
 
 
@@ -166,8 +166,8 @@ void premier_fdc_device_base::device_add_mconfig(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppies[0], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppies[1], dragon_fdc_drives, "qd", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, "", dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[2], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppies[3], dragon_fdc_drives, nullptr, dragon_fdc_device_base::floppy_formats).enable_sound(true);
 }
 
 

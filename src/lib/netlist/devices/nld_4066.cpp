@@ -34,35 +34,35 @@ namespace netlist
 		analog::NETLIB_SUB(R_base) m_R;
 
 		analog_input_t             m_control;
-		param_double_t             m_base_r;
+		param_fp_t             m_base_r;
 	};
 
 	NETLIB_RESET(CD4066_GATE)
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(plib::constants<nl_double>::one() / exec().gmin());
+		m_R.set_R(plib::constants<nl_fptype>::one() / exec().gmin());
 
 	}
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
-		nl_double sup = (m_supply.VCC() - m_supply.GND());
-		nl_double low = plib::constants<nl_double>::cast(0.45) * sup;
-		nl_double high = plib::constants<nl_double>::cast(0.55) * sup;
-		nl_double in = m_control() - m_supply.GND();
-		nl_double rON = m_base_r() * plib::constants<nl_double>::cast(5.0) / sup;
-		nl_double R = -1.0;
+		nl_fptype sup = (m_supply.VCC() - m_supply.GND());
+		nl_fptype low = plib::constants<nl_fptype>::cast(0.45) * sup;
+		nl_fptype high = plib::constants<nl_fptype>::cast(0.55) * sup;
+		nl_fptype in = m_control() - m_supply.GND();
+		nl_fptype rON = m_base_r() * plib::constants<nl_fptype>::cast(5.0) / sup;
+		nl_fptype R = -1.0;
 
 		if (in < low)
 		{
-			R = plib::constants<nl_double>::one() / exec().gmin();
+			R = plib::constants<nl_fptype>::one() / exec().gmin();
 		}
 		else if (in > high)
 		{
 			R = rON;
 		}
-		if (R > plib::constants<nl_double>::zero())
+		if (R > plib::constants<nl_fptype>::zero())
 		{
 			m_R.update();
 			m_R.set_R(R);

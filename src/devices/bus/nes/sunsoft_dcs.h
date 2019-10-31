@@ -17,7 +17,7 @@
 
 // ======================> ntb_cart_interface
 
-class ntb_cart_interface : public device_slot_card_interface
+class ntb_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -41,7 +41,7 @@ class nes_sunsoft_dcs_device;
 
 class nes_ntb_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<ntb_cart_interface>
 {
 	friend class nes_sunsoft_dcs_device;
 public:
@@ -58,9 +58,6 @@ public:
 
 	nes_ntb_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_ntb_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -81,6 +78,9 @@ public:
 	virtual uint8_t read(offs_t offset);
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	ntb_cart_interface*      m_cart;
 };
 

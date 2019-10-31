@@ -210,7 +210,7 @@ void superchs_state::superchs(machine_config &config)
 	m_subcpu->set_addrmap(AS_PROGRAM, &superchs_state::superchs_cpub_map);
 	m_subcpu->set_vblank_int("screen", FUNC(superchs_state::irq4_line_hold));
 
-	config.m_minimum_quantum = attotime::from_hz(480); /* Need to interleave CPU 1 & 3 */
+	config.set_maximum_quantum(attotime::from_hz(480)); /* Need to interleave CPU 1 & 3 */
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 

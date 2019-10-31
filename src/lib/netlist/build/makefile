@@ -86,7 +86,8 @@ POBJS := \
 	$(POBJ)/pfunction.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
-	$(POBJ)/pparser.o \
+	$(POBJ)/ppreprocessor.o \
+	$(POBJ)/ptokenizer.o \
 	$(POBJ)/putil.o \
 
 PMAIN := $(POBJ)/pmain.o
@@ -237,7 +238,7 @@ gcc9:
 	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 clang:
-	$(MAKE) CC=clang++-10 LD=clang++-10 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
+	$(MAKE) CC=clang++-10 LD=clang++-10 CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"
 
 clang-5:
 	$(MAKE) CC=clang++-5.0 LD=clang++-5.0 CEXTRAFLAGS="-march=native -Weverything -Werror -Wno-inconsistent-missing-destructor-override -Wno-unreachable-code -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-format-nonliteral -Wno-weak-template-vtables -Wno-exit-time-destructors"

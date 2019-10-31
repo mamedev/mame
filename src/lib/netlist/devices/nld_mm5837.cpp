@@ -51,7 +51,7 @@ namespace netlist
 		analog_input_t m_VDD;
 		analog_input_t m_VGG;
 		analog_input_t m_VSS;
-		param_double_t m_FREQ;
+		param_fp_t m_FREQ;
 
 		/* clock stage */
 		logic_input_t m_feedback;
@@ -69,7 +69,7 @@ namespace netlist
 	{
 		//m_V0.initial(0.0);
 		//m_RV.do_reset();
-		m_RV.set_G_V_I(plib::constants<nl_double>::one() / R_LOW, 0.0, 0.0);
+		m_RV.set_G_V_I(plib::constants<nl_fptype>::one() / R_LOW, 0.0, 0.0);
 		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
 			log().warning(MW_FREQUENCY_OUTSIDE_OF_SPECS_1(m_FREQ()));
@@ -102,13 +102,13 @@ namespace netlist
 
 		if (state != last_state)
 		{
-			const nl_double R = state ? R_HIGH : R_LOW;
-			const nl_double V = state ? m_VDD() : m_VSS();
+			const nl_fptype R = state ? R_HIGH : R_LOW;
+			const nl_fptype V = state ? m_VDD() : m_VSS();
 
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
 				m_RV.update();
-			m_RV.set_G_V_I(plib::constants<nl_double>::one() / R, V, plib::constants<nl_double>::zero());
+			m_RV.set_G_V_I(plib::constants<nl_fptype>::one() / R, V, plib::constants<nl_fptype>::zero());
 			m_RV.solve_later(NLTIME_FROM_NS(1));
 		}
 

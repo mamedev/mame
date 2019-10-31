@@ -1856,7 +1856,7 @@ void taitosj_state::mcu(machine_config &config)
 	m_mcu->m68intrq_cb().set(FUNC(taitosj_state::mcu_intrq_w));
 	m_mcu->busrq_cb().set(FUNC(taitosj_state::mcu_busrq_w));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 }
 
 

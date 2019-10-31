@@ -1739,7 +1739,7 @@ void drivedge_state::drivedge(machine_config &config)
 
 //  M6803(config, "comm", 8000000/4); -- network CPU
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	m_screen->screen_vblank().set_nop(); // interrupt not used?
 

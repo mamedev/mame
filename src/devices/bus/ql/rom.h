@@ -41,7 +41,7 @@
 
 class ql_rom_cartridge_slot_device;
 
-class device_ql_rom_cartridge_card_interface : public device_slot_card_interface
+class device_ql_rom_cartridge_card_interface : public device_interface
 {
 	friend class ql_rom_cartridge_slot_device;
 
@@ -69,7 +69,7 @@ protected:
 // ======================> ql_rom_cartridge_slot_device
 
 class ql_rom_cartridge_slot_device : public device_t,
-								public device_slot_interface,
+								public device_single_card_slot_interface<device_ql_rom_cartridge_card_interface>,
 								public device_image_interface
 {
 public:
@@ -92,7 +92,6 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_resolve_objects() override;
 	virtual void device_start() override;
 

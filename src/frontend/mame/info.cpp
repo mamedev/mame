@@ -315,7 +315,7 @@ void info_xml_creator::output(std::ostream &out, const std::vector<std::string> 
 		if (iter != matched.end())
 		{
 			int index = iter - matched.begin();
-			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "No matching machines found for '%s'", patterns[index].c_str());
+			throw emu_fatalerror(EMU_ERR_NO_SUCH_SYSTEM, "No matching machines found for '%s'", patterns[index].c_str());
 		}
 	}
 }

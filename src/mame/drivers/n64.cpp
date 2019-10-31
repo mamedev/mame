@@ -447,7 +447,7 @@ void n64_mess_state::n64(machine_config &config)
 	m_rsp->status_set().set(m_rcp_periphs, FUNC(n64_periphs::sp_set_status));
 	m_rsp->set_addrmap(AS_PROGRAM, &n64_mess_state::rsp_map);
 
-	config.m_minimum_quantum = attotime::from_hz(500000);
+	config.set_maximum_quantum(attotime::from_hz(500000));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

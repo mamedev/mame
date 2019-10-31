@@ -833,7 +833,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	Z80(config, m_audiocpu, XTAL(3'579'545));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cybertnk_state::sound_mem);
 
-	config.m_minimum_quantum = attotime::from_hz(60000); //arbitrary value, needed to get the communication to work
+	config.set_maximum_quantum(attotime::from_hz(60000)); //arbitrary value, needed to get the communication to work
 
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);

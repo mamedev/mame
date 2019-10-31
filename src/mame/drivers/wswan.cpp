@@ -141,7 +141,7 @@ void wswan_state::wswan(machine_config &config)
 
 	config.set_default_layout(layout_wswan);
 
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 

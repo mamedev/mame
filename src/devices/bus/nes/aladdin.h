@@ -17,7 +17,7 @@
 
 // ======================> aladdin_cart_interface
 
-class aladdin_cart_interface : public device_slot_card_interface
+class aladdin_cart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -45,7 +45,7 @@ class nes_aladdin_device;
 
 class nes_aladdin_slot_device : public device_t,
 								public device_image_interface,
-								public device_slot_interface
+								public device_single_card_slot_interface<aladdin_cart_interface>
 {
 	friend class nes_aladdin_device;
 public:
@@ -62,9 +62,6 @@ public:
 
 	nes_aladdin_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~nes_aladdin_slot_device();
-
-	// device-level overrides
-	virtual void device_start() override;
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
@@ -86,6 +83,9 @@ public:
 	void write_prg(uint32_t offset, uint8_t data) { if (m_cart) m_cart->write_prg(offset, data); }
 
 protected:
+	// device-level overrides
+	virtual void device_start() override;
+
 	aladdin_cart_interface*      m_cart;
 };
 

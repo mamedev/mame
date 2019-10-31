@@ -21,7 +21,7 @@ class pci_bus_device;
 
 // ======================> pci_device_interface
 
-class pci_device_interface :  public device_slot_card_interface
+class pci_device_interface :  public device_interface
 {
 public:
 	// construction/destruction
@@ -41,7 +41,7 @@ protected:
 };
 
 class pci_connector_device : public device_t,
-						public device_slot_interface
+						public device_single_card_slot_interface<pci_device_interface>
 {
 public:
 	template <typename T>

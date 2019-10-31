@@ -232,7 +232,7 @@ DECLARE_DEVICE_TYPE(ISA8, isa8_device)
 // ======================> device_isa8_card_interface
 
 // class representing interface-specific live isa8 card
-class device_isa8_card_interface : public device_slot_card_interface
+class device_isa8_card_interface : public device_interface
 {
 	friend class isa8_device;
 	template <class ElementType> friend class simple_list;

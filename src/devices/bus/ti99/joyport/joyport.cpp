@@ -44,10 +44,17 @@ DEFINE_DEVICE_TYPE_NS(TI99_JOYPORT, bus::ti99::joyport, joyport_device, "ti99_jo
 
 namespace bus { namespace ti99 { namespace joyport {
 
+device_ti99_joyport_interface::device_ti99_joyport_interface(const machine_config &config, device_t &device)
+	:	device_interface(device, "ti99joyport"),
+		m_joyport(nullptr)
+{
+}
+
 joyport_device::joyport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, TI99_JOYPORT, tag, owner, clock),
-		device_slot_interface(mconfig, *this),
-		m_interrupt(*this), m_connected(nullptr)
+		device_single_card_slot_interface<device_ti99_joyport_interface>(mconfig, *this),
+		m_interrupt(*this),
+		m_connected(nullptr)
 {
 }
 

@@ -103,10 +103,22 @@ protected:
 	void overlay_erase(bitmap_yuy16 &bitmap, float xstart, float xend);
 	void overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart);
 
+	// LED outputs
+	output_finder<>     m_audio1;
+	output_finder<>     m_audio2;
+	output_finder<>     m_clv;
+	output_finder<>     m_cav;
+	output_finder<>     m_srev;
+	output_finder<>     m_sfwd;
+	output_finder<>     m_play;
+	output_finder<>     m_step;
+	output_finder<>     m_pause;
+	output_finder<>     m_standby;
+
 	// internal state
-	uint8_t               m_control;              // control line state
-	uint8_t               m_lastcommand;          // last command seen
-	uint16_t              m_accumulator;          // bit accumulator
+	uint8_t             m_control;              // control line state
+	uint8_t             m_lastcommand;          // last command seen
+	uint16_t            m_accumulator;          // bit accumulator
 	attotime            m_lastcommandtime;      // time of the last command
 	attotime            m_lastbittime;          // time of last bit received
 	attotime            m_firstbittime;         // time of first bit in command
@@ -116,8 +128,8 @@ protected:
 	attotime            m_slowtrg;              // time of the last SLOW TRG
 	pioneer_pia         m_pia;                  // PIA state
 	bool                m_vsync;                // live VSYNC state
-	uint8_t               m_i8049_port1;          // 8049 port 1 state
-	uint8_t               m_i8049_port2;          // 8049 port 2 state
+	uint8_t             m_i8049_port1;          // 8049 port 1 state
+	uint8_t             m_i8049_port2;          // 8049 port 2 state
 
 private:
 	void pr8210_portmap(address_map &map);

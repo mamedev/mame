@@ -1027,7 +1027,7 @@ void namcos1_state::ns1(machine_config &config)
 	m_c117->subres_cb().set(FUNC(namcos1_state::subres_w));
 
 	// heavy sync required to prevent CPUs from fighting for video RAM access and going into deadlocks
-	config.m_minimum_quantum = attotime::from_hz(38400);
+	config.set_maximum_quantum(attotime::from_hz(38400));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 

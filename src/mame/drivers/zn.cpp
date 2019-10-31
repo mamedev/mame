@@ -2721,7 +2721,7 @@ void zn_state::coh1002msnd(machine_config &config)
 	IDT7202(config, m_cbaj_fifo[0]); // LH540202
 	IDT7202(config, m_cbaj_fifo[1]); // "
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* sound hardware */
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));

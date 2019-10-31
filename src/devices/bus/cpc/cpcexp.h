@@ -56,7 +56,7 @@
 // ======================> device_cpc_expansion_card_interface
 
 // class representing interface-specific live cpc_expansion card
-class device_cpc_expansion_card_interface : public device_slot_card_interface
+class device_cpc_expansion_card_interface : public device_interface
 {
 public:
 	enum
@@ -88,8 +88,7 @@ private:
 
 // ======================> cpc_expansion_slot_device
 
-class cpc_expansion_slot_device : public device_t,
-									public device_slot_interface
+class cpc_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_cpc_expansion_card_interface>
 {
 public:
 	// construction/destruction
@@ -130,7 +129,6 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 
 	required_device<cpu_device> m_cpu;
 

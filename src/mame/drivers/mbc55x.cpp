@@ -333,8 +333,8 @@ void mbc55x_state::mbc55x(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy[0], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppy[1], mbc55x_floppies, "qd", mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, "", mbc55x_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, "", mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[2], mbc55x_floppies, nullptr, mbc55x_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy[3], mbc55x_floppies, nullptr, mbc55x_state::floppy_formats);
 
 	/* Software list */
 	SOFTWARE_LIST(config, "disk_list").set_original("mbc55x");

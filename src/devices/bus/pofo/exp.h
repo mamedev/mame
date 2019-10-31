@@ -62,7 +62,7 @@
 
 class portfolio_expansion_slot_device;
 
-class device_portfolio_expansion_slot_interface : public device_slot_card_interface
+class device_portfolio_expansion_slot_interface : public device_interface
 {
 public:
 	virtual bool nmd1() { return 1; }
@@ -91,7 +91,7 @@ protected:
 
 // ======================> portfolio_expansion_slot_device
 
-class portfolio_expansion_slot_device : public device_t, public device_slot_interface
+class portfolio_expansion_slot_device : public device_t, public device_single_card_slot_interface<device_portfolio_expansion_slot_interface>
 {
 public:
 	// construction/destruction

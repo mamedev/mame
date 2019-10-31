@@ -8,9 +8,9 @@
 #ifndef PUTIL_H_
 #define PUTIL_H_
 
+#include "palloc.h"
 #include "pexception.h"
 #include "pstring.h"
-#include "palloc.h"
 
 #include <algorithm>
 #include <initializer_list>
@@ -33,7 +33,7 @@ namespace plib
 	 *
 	 * The c++20 draft for source locations is based on const char * strings.
 	 * It is thus only suitable for c++ source code and not for programmatic
-	 * parsing of files. This class is a replacement dynamic use cases.
+	 * parsing of files. This class is a replacement for dynamic use cases.
 	 *
 	 */
 	struct source_location
@@ -43,11 +43,11 @@ namespace plib
 		{ }
 
 		source_location(pstring file, unsigned line) noexcept
-		: m_file(file), m_func("unknown"), m_line(line), m_col(0)
+		: m_file(std::move(file)), m_func("unknown"), m_line(line), m_col(0)
 		{ }
 
 		source_location(pstring file, pstring func, unsigned line) noexcept
-		: m_file(file), m_func(func), m_line(line), m_col(0)
+		: m_file(std::move(file)), m_func(func), m_line(line), m_col(0)
 		{ }
 
 		unsigned line() const noexcept { return m_line; }
@@ -55,7 +55,7 @@ namespace plib
 		pstring file_name() const noexcept { return m_file; }
 		pstring function_name() const noexcept { return m_func; }
 
-		source_location &operator ++()
+		source_location &operator ++() noexcept
 		{
 			++m_line;
 			return *this;
@@ -81,8 +81,7 @@ namespace plib
 
 		using stream_ptr = plib::unique_ptr<std::istream>;
 
-		psource_t()
-		{}
+		psource_t() noexcept = default;
 
 		COPYASSIGNMOVE(psource_t, delete)
 
@@ -104,11 +103,11 @@ namespace plib
 	{
 	public:
 		psource_str_t(pstring name, pstring str)
-		: m_name(name), m_str(str)
+		: m_name(std::move(name)), m_str(std::move(str))
 		{}
 
 		COPYASSIGNMOVE(psource_str_t, delete)
-		virtual ~psource_str_t() noexcept = default;
+		~psource_str_t() noexcept override = default;
 
 		typename TS::stream_ptr stream(const pstring &name) override
 		{
@@ -133,8 +132,7 @@ namespace plib
 		using source_type = plib::unique_ptr<TS>;
 		using list_t = std::vector<source_type>;
 
-		psource_collection_t()
-		{}
+		psource_collection_t() noexcept = default;
 
 		COPYASSIGNMOVE(psource_collection_t, delete)
 		virtual ~psource_collection_t() noexcept = default;
@@ -161,7 +159,7 @@ namespace plib
 		}
 
 		template <typename S, typename F>
-		bool for_all(pstring name, F lambda)
+		bool for_all(F lambda)
 		{
 			for (auto &s : m_collection)
 			{
@@ -181,8 +179,8 @@ namespace plib
 
 	namespace util
 	{
-		pstring basename(pstring filename);
-		pstring path(pstring filename);
+		pstring basename(const pstring &filename);
+		pstring path(const pstring &filename);
 		pstring buildpath(std::initializer_list<pstring> list );
 		pstring environment(const pstring &var, const pstring &default_val);
 	} // namespace util
@@ -365,7 +363,7 @@ namespace plib
 		return static_cast<T>(ret);
 	}
 
-	template<typename R, bool CLOCALE, typename T>
+	template<typename R, typename T>
 	R pstonum_ne(const T &str, bool &err, std::locale loc = std::locale::classic()) noexcept
 	{
 		try
@@ -377,6 +375,19 @@ namespace plib
 		{
 			err = true;
 			return R(0);
+		}
+	}
+
+	template<typename R, typename T>
+	R pstonum_ne_def(const T &str, R def, std::locale loc = std::locale::classic()) noexcept
+	{
+		try
+		{
+			return pstonum<R>(str, loc);
+		}
+		catch (...)
+		{
+			return def;
 		}
 	}
 
@@ -402,9 +413,9 @@ namespace plib
 			int f = from_string_int(strings(), s); \
 			if (f>=0) { m_v = static_cast<E>(f); return true; } else { return false; } \
 		} \
-		operator E() const {return m_v;} \
-		bool operator==(const ename &rhs) const {return m_v == rhs.m_v;} \
-		bool operator==(const E &rhs) const {return m_v == rhs;} \
+		operator E() const noexcept {return m_v;} \
+		bool operator==(const ename &rhs) const noexcept {return m_v == rhs.m_v;} \
+		bool operator==(const E &rhs) const noexcept {return m_v == rhs;} \
 		std::string name() const { \
 			return nthstr(static_cast<int>(m_v), strings()); \
 		} \

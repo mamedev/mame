@@ -146,7 +146,7 @@ pci_connector_device &bebox_state::add_pci_slot(machine_config &config, const ch
 
 void bebox_state::bebox_peripherals(machine_config &config)
 {
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	PIT8254(config, m_pit8254, 0);
 	m_pit8254->set_clk<0>(4772720/4); /* heartbeat IRQ */

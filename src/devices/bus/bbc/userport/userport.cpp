@@ -26,8 +26,8 @@ DEFINE_DEVICE_TYPE(BBC_USERPORT_SLOT, bbc_userport_slot_device, "bbc_userport_sl
 //  device_bbc_userport_interface - constructor
 //-------------------------------------------------
 
-device_bbc_userport_interface::device_bbc_userport_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+device_bbc_userport_interface::device_bbc_userport_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "bbcuserport")
 {
 	m_slot = dynamic_cast<bbc_userport_slot_device *>(device.owner());
 }
@@ -53,7 +53,7 @@ device_bbc_userport_interface::~device_bbc_userport_interface()
 
 bbc_userport_slot_device::bbc_userport_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BBC_USERPORT_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_bbc_userport_interface>(mconfig, *this),
 	m_device(nullptr),
 	m_cb1_handler(*this),
 	m_cb2_handler(*this)
@@ -68,20 +68,11 @@ bbc_userport_slot_device::bbc_userport_slot_device(const machine_config &mconfig
 
 void bbc_userport_slot_device::device_start()
 {
-	m_device = dynamic_cast<device_bbc_userport_interface *>(get_card_device());
+	m_device = get_card_device();
 
 	// resolve callbacks
 	m_cb1_handler.resolve_safe();
 	m_cb2_handler.resolve_safe();
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void bbc_userport_slot_device::device_reset()
-{
 }
 
 

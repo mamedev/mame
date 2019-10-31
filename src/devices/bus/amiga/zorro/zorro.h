@@ -172,14 +172,14 @@ public:
 		set_fixed(false);
 	}
 
-	// device-level overrides
-	virtual void device_start() override;
-
 	// inline configuration
 	template <class T> void set_zorro_slot(T &&zorro_tag) { m_zorro_bus.set_tag(zorro_tag); }
 
 protected:
 	zorro_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
 
 	// configuration
 	required_device<zorro_device> m_zorro_bus;
@@ -319,7 +319,7 @@ DECLARE_DEVICE_TYPE(ZORRO2, zorro2_device)
 
 // ======================> base zorro card interface
 
-class device_zorro_card_interface : public device_slot_card_interface
+class device_zorro_card_interface : public device_interface
 {
 public:
 	// construction/destruction

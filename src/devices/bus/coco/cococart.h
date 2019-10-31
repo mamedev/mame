@@ -30,7 +30,7 @@ typedef delegate<void (uint8_t *)> cococart_base_update_delegate;
 class device_cococart_interface;
 
 class cococart_slot_device final : public device_t,
-								public device_slot_interface,
+								public device_single_card_slot_interface<device_cococart_interface>,
 								public device_image_interface
 {
 public:
@@ -159,7 +159,7 @@ public:
 
 // ======================> device_cococart_interface
 
-class device_cococart_interface : public device_slot_card_interface
+class device_cococart_interface : public device_interface
 {
 public:
 	// construction/destruction
@@ -176,11 +176,10 @@ public:
 	void set_cart_base_update(cococart_base_update_delegate update);
 	virtual memory_region* get_cart_memregion();
 
-
+protected:
 	virtual void interface_config_complete() override;
 	virtual void interface_pre_start() override;
 
-protected:
 	device_cococart_interface(const machine_config &mconfig, device_t &device);
 
 	void cart_base_changed(void);

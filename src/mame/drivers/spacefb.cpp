@@ -344,7 +344,7 @@ void spacefb_state::spacefb(machine_config &config)
 	m_audiocpu->t0_in_cb().set(FUNC(spacefb_state::audio_t0_r));
 	m_audiocpu->t1_in_cb().set(FUNC(spacefb_state::audio_t1_r));
 
-	config.m_minimum_quantum = attotime::from_hz(180);
+	config.set_maximum_quantum(attotime::from_hz(180));
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

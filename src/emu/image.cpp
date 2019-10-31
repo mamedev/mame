@@ -73,11 +73,11 @@ image_manager::image_manager(running_machine &machine)
 				if (machine.options().write_config())
 					write_config(machine.options(), nullptr, &machine.system());
 
-				fatalerror_exitcode(machine, EMU_ERR_DEVICE, "Device %s load (-%s %s) failed: %s",
-					image.device().name(),
-					image.instance_name().c_str(),
-					startup_image_name.c_str(),
-					image_err.c_str());
+				throw emu_fatalerror(EMU_ERR_DEVICE, "Device %s load (-%s %s) failed: %s",
+						image.device().name(),
+						image.instance_name(),
+						startup_image_name,
+						image_err);
 			}
 		}
 	}
@@ -244,9 +244,9 @@ void image_manager::postdevice_init()
 			/* unload all images */
 			unload_all();
 
-			fatalerror_exitcode(machine(), EMU_ERR_DEVICE, "Device %s load failed: %s",
-				image.device().name(),
-				image_err.c_str());
+			throw emu_fatalerror(EMU_ERR_DEVICE, "Device %s load failed: %s",
+					image.device().name(),
+					image_err);
 		}
 	}
 	/* add a callback for when we shut down */

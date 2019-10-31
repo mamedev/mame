@@ -270,6 +270,7 @@ void wrally_state::wrally(machine_config &config)
 
 	gaelco_ds5002fp_device &ds5002(GAELCO_DS5002FP(config, "gaelco_ds5002fp", XTAL(24'000'000) / 2)); /* verified on pcb */
 	ds5002.set_addrmap(0, &wrally_state::mcu_hostmem_map);
+	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

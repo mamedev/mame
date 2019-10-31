@@ -91,20 +91,20 @@ namespace analog
 
 		void solve_later(netlist_time delay = netlist_time::quantum());
 
-		void set_G_V_I(const nl_double G, const nl_double V, const nl_double I)
+		void set_G_V_I(const nl_fptype G, const nl_fptype V, const nl_fptype I)
 		{
 			/*      GO, GT, I                */
 			m_P.set_go_gt_I( -G,  G, (  V) * G - I);
 			m_N.set_go_gt_I( -G,  G, ( -V) * G + I);
 		}
 
-		nl_double deltaV() const
+		nl_fptype deltaV() const
 		{
 			return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 		}
 
-		void set_mat(const nl_double a11, const nl_double a12, const nl_double rhs1,
-					 const nl_double a21, const nl_double a22, const nl_double rhs2)
+		void set_mat(const nl_fptype a11, const nl_fptype a12, const nl_fptype rhs1,
+					 const nl_fptype a21, const nl_fptype a22, const nl_fptype rhs2)
 		{
 			/*      GO, GT, I                */
 			m_P.set_go_gt_I(a12, a11, rhs1);
@@ -125,9 +125,9 @@ namespace analog
 		{
 		}
 
-		void set_R(const nl_double R)
+		void set_R(const nl_fptype R)
 		{
-			const nl_double G = plib::constants<nl_double>::one() / R;
+			const nl_fptype G = plib::constants<nl_fptype>::one() / R;
 			set_mat( G, -G, 0.0,
 					-G,  G, 0.0);
 		}
@@ -163,7 +163,7 @@ namespace analog
 		}
 
 	private:
-		param_double_t m_R;
+		param_fp_t m_R;
 		/* protect set_R ... it's a recipe to desaster when used to bypass the parameter */
 		using NETLIB_NAME(R_base)::set_R;
 	};
@@ -198,8 +198,8 @@ namespace analog
 		NETLIB_SUB(R_base) m_R1;
 		NETLIB_SUB(R_base) m_R2;
 
-		param_double_t m_R;
-		param_double_t m_Dial;
+		param_fp_t m_R;
+		param_fp_t m_Dial;
 		param_logic_t m_DialIsLog;
 		param_logic_t m_Reverse;
 	};
@@ -225,8 +225,8 @@ namespace analog
 	private:
 		NETLIB_SUB(R_base) m_R1;
 
-		param_double_t m_R;
-		param_double_t m_Dial;
+		param_fp_t m_R;
+		param_fp_t m_Dial;
 		param_logic_t m_DialIsLog;
 		param_logic_t m_Reverse;
 	};
@@ -250,8 +250,8 @@ namespace analog
 			m_cap.timestep(m_C(), deltaV(), step);
 			if (m_cap.type() == capacitor_e::CONSTANT_CAPACITY)
 			{
-				const nl_double I = m_cap.Ieq(m_C(), deltaV());
-				const nl_double G = m_cap.G(m_C());
+				const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
+				const nl_fptype G = m_cap.G(m_C());
 				set_mat( G, -G, -I,
 						-G,  G,  I);
 			}
@@ -260,13 +260,13 @@ namespace analog
 		NETLIB_IS_DYNAMIC(m_cap.type() == capacitor_e::VARIABLE_CAPACITY)
 		NETLIB_UPDATE_TERMINALSI()
 		{
-			const nl_double I = m_cap.Ieq(m_C(), deltaV());
-			const nl_double G = m_cap.G(m_C());
+			const nl_fptype I = m_cap.Ieq(m_C(), deltaV());
+			const nl_fptype G = m_cap.G(m_C());
 			set_mat( G, -G, -I,
 					-G,  G,  I);
 		}
 
-		param_double_t m_C;
+		param_fp_t m_C;
 		NETLIB_RESETI()
 		{
 			m_cap.setparams(exec().gmin());
@@ -307,11 +307,11 @@ namespace analog
 		NETLIB_UPDATE_PARAMI();
 
 	private:
-		param_double_t m_L;
+		param_fp_t m_L;
 
-		nl_double m_gmin;
-		nl_double m_G;
-		nl_double m_I;
+		nl_fptype m_gmin;
+		nl_fptype m_G;
+		nl_fptype m_I;
 	};
 
 	/*! Class representing the diode model paramers.
@@ -426,12 +426,12 @@ namespace analog
 		}
 
 	private:
-		state_var<double> m_t;
-		param_double_t m_R;
-		param_double_t m_V;
+		state_var<nl_fptype> m_t;
+		param_fp_t m_R;
+		param_fp_t m_V;
 		param_str_t m_func;
 		plib::pfunction m_compiled;
-		std::vector<double> m_funcparam;
+		std::vector<nl_fptype> m_funcparam;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -459,7 +459,7 @@ namespace analog
 		{
 			m_t += step;
 			m_funcparam[0] = m_t;
-			const double I = m_compiled.evaluate(m_funcparam);
+			const nl_fptype I = m_compiled.evaluate(m_funcparam);
 			set_mat(0.0, 0.0, -I,
 					0.0, 0.0,  I);
 		}
@@ -483,11 +483,11 @@ namespace analog
 
 
 	private:
-		state_var<double> m_t;
-		param_double_t m_I;
+		state_var<nl_fptype> m_t;
+		param_fp_t m_I;
 		param_str_t m_func;
 		plib::pfunction m_compiled;
-		std::vector<double> m_funcparam;
+		std::vector<nl_fptype> m_funcparam;
 	};
 
 

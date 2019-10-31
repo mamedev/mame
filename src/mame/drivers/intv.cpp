@@ -463,7 +463,7 @@ void intv_state::intv(machine_config &config)
 	CP1610(config, m_maincpu, XTAL(3'579'545)/4);        /* Colorburst/4 */
 	m_maincpu->set_addrmap(AS_PROGRAM, &intv_state::intv_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(intv_state::intv_interrupt));
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
 	STIC(config, m_stic, XTAL(3'579'545));
@@ -542,7 +542,7 @@ void intv_state::intvkbd(machine_config &config)
 	m_keyboard->set_addrmap(AS_PROGRAM, &intv_state::intvkbd2_mem);
 	m_keyboard->set_vblank_int("screen", FUNC(intv_state::intv_interrupt2));
 
-	config.m_minimum_quantum = attotime::from_hz(6000);
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_intvkbd);

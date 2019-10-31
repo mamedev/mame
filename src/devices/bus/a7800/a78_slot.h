@@ -42,7 +42,7 @@ enum
 
 // ======================> device_a78_cart_interface
 
-class device_a78_cart_interface : public device_slot_card_interface
+class device_a78_cart_interface : public device_interface
 {
 public:
 	// construction/destruction

@@ -56,7 +56,8 @@ constexpr unsigned P1_NDAC_BIT = 1;
 constexpr unsigned P1_NRFD_BIT = 0;
 
 hp82937_io_card_device::hp82937_io_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp80_io_card_device(mconfig , HP82937_IO_CARD , tag , owner , clock),
+	: device_t(mconfig , HP82937_IO_CARD , tag , owner , clock),
+	  device_hp80_io_interface(mconfig, *this),
 	  m_cpu(*this , "cpu"),
 	  m_translator(*this , "xlator"),
 	  m_sw1(*this , "sw1"),
@@ -243,8 +244,6 @@ void hp82937_io_card_device::device_start()
 
 void hp82937_io_card_device::device_reset()
 {
-	hp80_io_card_device::device_reset();
-
 	m_latch = 0;
 	m_updating = false;
 	update_signals();

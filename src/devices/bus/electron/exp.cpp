@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(ELECTRON_EXPANSION_SLOT, electron_expansion_slot_device, "ele
 //-------------------------------------------------
 
 device_electron_expansion_interface::device_electron_expansion_interface(const machine_config &mconfig, device_t &device)
-	: device_slot_card_interface(mconfig, device)
+	: device_interface(device, "electronexp")
 {
 	m_slot = dynamic_cast<electron_expansion_slot_device *>(device.owner());
 }
@@ -42,7 +42,7 @@ device_electron_expansion_interface::device_electron_expansion_interface(const m
 
 electron_expansion_slot_device::electron_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ELECTRON_EXPANSION_SLOT, tag, owner, clock),
-	device_slot_interface(mconfig, *this),
+	device_single_card_slot_interface<device_electron_expansion_interface>(mconfig, *this),
 	m_card(nullptr),
 	m_irq_handler(*this),
 	m_nmi_handler(*this)
@@ -56,7 +56,7 @@ electron_expansion_slot_device::electron_expansion_slot_device(const machine_con
 
 void electron_expansion_slot_device::device_start()
 {
-	m_card = dynamic_cast<device_electron_expansion_interface *>(get_card_device());
+	m_card = get_card_device();
 
 	// resolve callbacks
 	m_irq_handler.resolve_safe();

@@ -759,7 +759,7 @@ void ace_state::ace(machine_config &config)
 	Z80(config, m_maincpu, XTAL(6'500'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_state::ace_mem);
 	m_maincpu->set_addrmap(AS_IO, &ace_state::ace_io);
-	config.m_minimum_quantum = attotime::from_hz(60);
+	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));

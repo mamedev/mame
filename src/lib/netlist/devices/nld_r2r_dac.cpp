@@ -30,8 +30,8 @@ namespace netlist
 		//NETLIB_UPDATEI();
 
 	protected:
-		param_double_t m_VIN;
-		param_double_t m_R;
+		param_fp_t m_VIN;
+		param_fp_t m_R;
 		param_int_t m_num;
 		param_int_t m_val;
 	};
@@ -41,8 +41,8 @@ namespace netlist
 	{
 		solve_now();
 
-		double V = m_VIN() / static_cast<double>(1 << m_num())
-				* static_cast<double>(m_val());
+		nl_fptype V = m_VIN() / static_cast<nl_fptype>(1 << m_num())
+				* static_cast<nl_fptype>(m_val());
 
 		this->set_G_V_I(1.0 / m_R(), V, 0.0);
 	}

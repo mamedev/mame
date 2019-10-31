@@ -19,7 +19,7 @@ namespace plib
 		static constexpr const char PATH_SEP = '/';
 		#endif
 
-		pstring basename(pstring filename)
+		pstring basename(const pstring &filename)
 		{
 			auto p=find_last_of(filename, pstring(1, PATH_SEP));
 			if (p == pstring::npos)
@@ -28,7 +28,7 @@ namespace plib
 				return filename.substr(p+1);
 		}
 
-		pstring path(pstring filename)
+		pstring path(const pstring &filename)
 		{
 			auto p=find_last_of(filename, pstring(1, PATH_SEP));
 			if (p == pstring::npos)

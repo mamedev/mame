@@ -3,8 +3,6 @@
 /*
  * nld_truthtable.h
  *
- *  Created on: 19 Jun 2014
- *      Author: andre
  */
 
 #ifndef NLID_TRUTHTABLE_H_
@@ -37,31 +35,6 @@ namespace devices
 	template<> struct uint_for_size<4> { using type = uint_least32_t; };
 	template<> struct uint_for_size<8> { using type = uint_least64_t; };
 
-	template<std::size_t NUM, typename R>
-	struct aa
-	{
-		template<typename T>
-		R f(T &arr, const R ign)
-		{
-			R r = aa<NUM-1, R>().f(arr, ign);
-			if (ign & (1 << (NUM-1)))
-				arr[NUM-1].activate();
-			return r | (arr[NUM-1]() << (NUM-1));
-		}
-	};
-
-	template<typename R>
-	struct aa<1, R>
-	{
-		template<typename T>
-		R f(T &arr, const R ign)
-		{
-			if ((ign & 1))
-				arr[0].activate();
-			return arr[0]();
-		}
-	};
-
 	template<std::size_t m_NI, std::size_t m_NO>
 	NETLIB_OBJECT(truthtable_t)
 	{
@@ -79,13 +52,11 @@ namespace devices
 		{
 			truthtable_t()
 			: m_timing_index{0}
-			, m_initialized(false)
 			{}
 
 			std::array<type_t, m_size> m_out_state;
 			std::array<uint_least8_t, m_size * m_NO> m_timing_index;
 			std::array<netlist_time, 16> m_timing_nt;
-			bool m_initialized;
 		};
 
 		template <class C>
@@ -141,40 +112,28 @@ namespace devices
 	private:
 
 		template<bool doOUT>
-		void process()
+		void process() noexcept
 		{
 			netlist_time mt(netlist_time::zero());
 
 			type_t nstate(0);
 			type_t ign(m_ign);
-#if 1
-			if (!doOUT)
+
+			if (doOUT)
+			{
+				for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
+					if (ign & 1)
+						I->activate();
+				for (std::size_t i = 0; i < m_NI; i++)
+					nstate |= (m_I[i]() << i);
+			}
+			else
 				for (std::size_t i = 0; i < m_NI; i++)
 				{
 					m_I[i].activate();
-					//nstate |= (m_I[i]() ? (1 << i) : 0);
 					nstate |= (m_I[i]() << i);
 					mt = std::max(this->m_I[i].net().next_scheduled_time(), mt);
 				}
-			else
-				for (std::size_t i = 0; i < m_NI; i++)
-				{
-					if ((ign & 1))
-						m_I[i].activate();
-					//nstate |= (m_I[i]() ? (1 << i) : 0);
-					nstate |= (m_I[i]() << i);
-					ign >>= 1;
-				}
-#else
-			if (!doOUT)
-			{
-				nstate = aa<m_NI, type_t>().f(m_I, ~0);
-				for (std::size_t i = 0; i < m_NI; i++)
-					mt = std::max(this->m_I[i].net().time(), mt);
-			}
-			else
-				nstate = aa<m_NI, type_t>().f(m_I, ign);
-#endif
 
 			const type_t outstate(m_ttp.m_out_state[nstate]);
 			type_t out(outstate & m_outmask);
