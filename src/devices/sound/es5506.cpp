@@ -101,12 +101,12 @@ Ensoniq OTIS - ES5505                                            Ensoniq OTTO - 
 
 #define RAINE_CHECK             0
 
-static constexpr unsigned FINE_FILTER_BIT = 16;
-static constexpr unsigned FILTER_BIT      = 12;
-static constexpr unsigned FILTER_SHIFT    = FINE_FILTER_BIT - FILTER_BIT;
+static constexpr u32 FINE_FILTER_BIT = 16;
+static constexpr u32 FILTER_BIT      = 12;
+static constexpr u32 FILTER_SHIFT    = FINE_FILTER_BIT - FILTER_BIT;
 
-static constexpr unsigned MAX_SAMPLE_CHUNK    = 10000;
-static constexpr unsigned ULAW_MAXBITS        = 8;
+static constexpr u32 MAX_SAMPLE_CHUNK    = 10000;
+static constexpr u32 ULAW_MAXBITS        = 8;
 
 namespace {
 
@@ -201,9 +201,6 @@ void es550x_device::device_start()
 	m_sample_rate_changed_cb.resolve();
 	m_irqv = 0x80;
 
-	/* compute the tables */
-	compute_tables();
-
 	/* allocate memory */
 	m_scratch = make_unique_clear<s32[]>(2 * MAX_SAMPLE_CHUNK);
 
@@ -286,6 +283,9 @@ void es5506_device::device_start()
 		}
 	}
 
+	/* compute the tables */
+	compute_tables(VOLUME_BIT_ES5506, 4, 8, 11); // 4 bit exponent, 8 bit mantissa
+
 	/* initialize the rest of the structure */
 	m_channels = channels;
 
@@ -296,14 +296,13 @@ void es5506_device::device_start()
 
 	/* init the voices */
 	// 21 bit integer and 11 bit fraction
-	m_accum_shift = ADDRESS_FRAC_BIT - ADDRESS_FRAC_BIT_ES5506;
-	m_accum_mask = (((((1 << 21) - 1) << ADDRESS_FRAC_BIT_ES5506) | ((1 << ADDRESS_FRAC_BIT_ES5506) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+	get_accum_mask(ADDRESS_INTEGER_BIT_ES5506, ADDRESS_FRAC_BIT_ES5506);
 	for (int j = 0; j < 32; j++)
 	{
 		m_voice[j].index = j;
 		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = 0xffff << VOLUME_SHIFT_ES5506; // 16 bit volume
-		m_voice[j].rvol = 0xffff << VOLUME_SHIFT_ES5506;
+		m_voice[j].lvol = 0xffff << m_volume_shift; // 16 bit volume
+		m_voice[j].rvol = 0xffff << m_volume_shift;
 		m_voice[j].exbank = 0;
 	}
 
@@ -404,19 +403,21 @@ void es5505_device::device_start()
 		m_region_base[1] = region ? reinterpret_cast<u16 *>(region->base()) : nullptr;
 	}
 
+	/* compute the tables */
+	compute_tables(VOLUME_BIT_ES5505, 4, 4, 15); // 4 bit exponent, 4 bit mantissa
+
 	/* initialize the rest of the structure */
 	m_channels = channels;
 
 	/* init the voices */
 	// 20 bit integer and 9 bit fraction
-	m_accum_shift = ADDRESS_FRAC_BIT - ADDRESS_FRAC_BIT_ES5505;
-	m_accum_mask = (((((1 << 20) - 1) << ADDRESS_FRAC_BIT_ES5505) | ((1 << ADDRESS_FRAC_BIT_ES5505) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+	get_accum_mask(ADDRESS_INTEGER_BIT_ES5505, ADDRESS_FRAC_BIT_ES5505);
 	for (int j = 0; j < 32; j++)
 	{
 		m_voice[j].index = j;
 		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = 0xff << VOLUME_SHIFT_ES5505; // 8 bit volume
-		m_voice[j].rvol = 0xff << VOLUME_SHIFT_ES5505;
+		m_voice[j].lvol = 0xff << m_volume_shift; // 8 bit volume
+		m_voice[j].rvol = 0xff << m_volume_shift;
 		m_voice[j].exbank = 0;
 	}
 
@@ -461,7 +462,7 @@ void es550x_device::update_internal_irq_state()
 
 ***********************************************************************************************/
 
-void es550x_device::compute_tables()
+void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 mantissa_bit, u32 mantissa_shift)
 {
 	/* allocate ulaw lookup table */
 	m_ulaw_lookup = make_unique_clear<s16[]>(1 << ULAW_MAXBITS);
@@ -469,8 +470,8 @@ void es550x_device::compute_tables()
 	/* generate ulaw lookup table */
 	for (int i = 0; i < (1 << ULAW_MAXBITS); i++)
 	{
-		u16 rawval = (i << (16 - ULAW_MAXBITS)) | (1 << (15 - ULAW_MAXBITS));
-		u8 exponent = rawval >> 13;
+		const u16 rawval = (i << (16 - ULAW_MAXBITS)) | (1 << (15 - ULAW_MAXBITS));
+		const u8 exponent = rawval >> 13;
 		u32 mantissa = (rawval << 3) & 0xffff;
 
 		if (exponent == 0)
@@ -482,23 +483,37 @@ void es550x_device::compute_tables()
 		}
 	}
 
-	const u32 volume_len = 1 << VOLUME_INTEGER_BIT;
+	const u32 volume_bit = (exponent_bit + mantissa_bit);
+	m_volume_shift = FINE_VOLUME_BIT - total_volume_bit;
+	m_volume_shift_int = FINE_VOLUME_BIT - volume_bit;
+	const u32 volume_len = 1 << volume_bit;
 	/* allocate volume lookup table */
 	m_volume_lookup = make_unique_clear<u32[]>(volume_len);
 
 	/* generate volume lookup table */
-	const u8 exponent_bit = (VOLUME_INTEGER_BIT - 4);
-	const u32 mantissa_len = (1 << exponent_bit);
+	const u8 exponent_mask = (1 << exponent_bit) - 1;
+	const u32 mantissa_len = (1 << mantissa_bit);
 	const u32 mantissa_mask = (mantissa_len - 1);
 	for (int i = 0; i < volume_len; i++)
 	{
-		u8 exponent = i >> exponent_bit;
-		u32 mantissa = (i & mantissa_mask) | mantissa_len;
+		const u8 exponent = (i >> mantissa_bit) & exponent_mask;
+		const u32 mantissa = (i & mantissa_mask) | mantissa_len;
 
-		m_volume_lookup[i] = (mantissa << 11) >> (20 - exponent);
+		m_volume_lookup[i] = (mantissa << mantissa_shift) >> (((mantissa_shift - mantissa_bit) + 1 + (1 << exponent_bit)) - exponent);
 	}
 }
 
+/**********************************************************************************************
+
+     get_accum_mask -- get address accumulator mask
+
+***********************************************************************************************/
+
+void es550x_device::get_accum_mask(u32 address_integer, u32 address_frac)
+{
+	m_accum_shift = ADDRESS_FRAC_BIT - address_frac;
+	m_accum_mask = (((((1 << address_integer) - 1) << address_frac) | ((1 << address_frac) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+}
 
 
 /**********************************************************************************************
@@ -1765,13 +1780,13 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 		case 0x08:  /* LVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->lvol = (voice->lvol & ~0xff00) | (data & 0xff00);
-			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol >> VOLUME_SHIFT_ES5505);
+			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol >> m_volume_shift);
 			break;
 
 		case 0x09:  /* RVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->rvol = (voice->rvol & ~0xff00) | (data & 0xff00);
-			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol >> VOLUME_SHIFT_ES5505);
+			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol >> m_volume_shift);
 			break;
 
 		case 0x0a:  /* ACC (hi) */
