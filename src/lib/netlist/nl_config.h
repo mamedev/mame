@@ -139,8 +139,8 @@ namespace netlist
 		static constexpr const float DIODE_MAXDIFF = 1e5;
 		static constexpr const float DIODE_MAXVOLT = 30.0;
 
-		static constexpr const float TIMESTEP_MAXDIFF = 1e30;
-		static constexpr const float TIMESTEP_MINDIV = 1e-8;
+		static constexpr const float TIMESTEP_MAXDIFF = 1e30f;
+		static constexpr const float TIMESTEP_MINDIV = 1e-8f;
 	};
 } // namespace netlist
 

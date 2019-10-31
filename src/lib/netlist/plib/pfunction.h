@@ -114,8 +114,8 @@ namespace plib {
 		std::uint16_t m_lfsr; //!< lfsr used for generating random numbers
 	};
 
-	extern template struct pfunction<float>;
-	extern template struct pfunction<double>;
+	extern template class pfunction<float>;
+	extern template class pfunction<double>;
 
 } // namespace plib
 

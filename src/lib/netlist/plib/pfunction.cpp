@@ -67,7 +67,7 @@ namespace plib {
 					if (inputs[i] == cmd)
 					{
 						rc.m_cmd = PUSH_INPUT;
-						rc.m_param = static_cast<double>(i);
+						rc.m_param = static_cast<NT>(i);
 						stk += 1;
 						break;
 					}
@@ -224,7 +224,7 @@ namespace plib {
 		return stack[ptr-1];
 	}
 
-	template struct pfunction<float>;
-	template struct pfunction<double>;
+	template class pfunction<float>;
+	template class pfunction<double>;
 
 } // namespace plib

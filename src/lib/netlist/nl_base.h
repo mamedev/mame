@@ -362,7 +362,7 @@ namespace netlist
 		template <typename O>
 		state_container(O &owner,           //!< owner must have a netlist() method.
 				const pstring &name,        //!< identifier/name for this state variable
-				std::size_t n,				//!< number of elements to allocate
+				std::size_t n,              //!< number of elements to allocate
 				const value_type &value     //!< Initial value after construction
 				);
 		//! Copy Constructor.
