@@ -305,6 +305,8 @@ void ibmpc_state::ibm5150(machine_config &config)
 
 	ibm5150_mb_device &mb(IBM5150_MOTHERBOARD(config, "mb", 0));
 	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock
@@ -343,6 +345,8 @@ void ibmpc_state::ibm5160(machine_config &config)
 
 	ibm5160_mb_device &mb(IBM5160_MOTHERBOARD(config, "mb", 0));
 	mb.set_cputag(m_maincpu);
+	mb.int_callback().set_inputline(m_maincpu, 0);
+	mb.nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	mb.set_input_default(DEVICE_INPUT_DEFAULTS_NAME(cga));
 
 	ISA8_SLOT(config, "isa1", 0, "mb:isa", pc_isa8_cards, "cga", false); // FIXME: determine ISA bus clock

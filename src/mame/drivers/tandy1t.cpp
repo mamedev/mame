@@ -662,6 +662,8 @@ void tandy1000_state::tandy1000_common(machine_config &config)
 {
 	T1000_MOTHERBOARD(config, m_mb, 0);
 	m_mb->set_cputag("maincpu");
+	m_mb->int_callback().set_inputline("maincpu", 0);
+	m_mb->nmi_callback().set_inputline("maincpu", INPUT_LINE_NMI);
 
 	/* video hardware */
 	PCVIDEO_T1000(config, m_video, 0);
