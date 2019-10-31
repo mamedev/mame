@@ -410,8 +410,12 @@ uint32_t _8080bw_state::screen_update_spacecom(screen_device &screen, bitmap_rgb
 	return 0;
 }
 
-
-uint32_t _8080bw_state::screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+/*******************************************************/
+/*                                                     */
+/* Model Racing "Orbite"                               */
+/*                                                     */
+/*******************************************************/
+uint32_t orbite_state::screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (offs_t offs = 0; offs < m_main_ram.bytes(); offs++)
 	{

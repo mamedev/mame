@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "audio/8080bw.h"
 #include "includes/mw8080bw.h"
 
 #include "machine/eepromser.h"
@@ -43,7 +44,6 @@ public:
 		, m_colorram(*this, "colorram")
 		, m_gunx(*this, "GUNX")
 		, m_guny(*this, "GUNY")
-		, m_cane_vco_timer(*this, "cane_vco_timer")
 		, m_timer_state(1)
 	{ }
 
@@ -78,9 +78,6 @@ public:
 	void spacerng(machine_config &config);
 	void steelwkr(machine_config &config);
 	void schaser(machine_config &config);
-	void cane(machine_config &config);
-	void cane_audio(machine_config &config);
-	void orbite(machine_config &config);
 
 	void init_invmulti();
 	void init_spacecom();
@@ -93,7 +90,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
 	DECLARE_READ_LINE_MEMBER(claybust_gun_on_r);
 
-private:
+protected:
+	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
+	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
+
 	/* devices/memory pointers */
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<timer_device> m_schaser_effect_555_timer;
@@ -105,11 +105,10 @@ private:
 	optional_device<palette_device> m_palette;
 	optional_shared_ptr<uint8_t> m_colorram;
 
+private:
 	/* misc game specific */
 	optional_ioport m_gunx;
 	optional_ioport m_guny;
-
-	optional_device<timer_device> m_cane_vco_timer;
 
 	uint8_t m_color_map;
 	uint8_t m_screen_red;
@@ -135,8 +134,6 @@ private:
 	uint16_t m_claybust_gun_pos;
 	u8 m_sound_data;
 	bool m_timer_state;
-
-	double m_cane_vco_rc_chargetime;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
 	DECLARE_READ8_MEMBER(indianbt_r);
@@ -186,11 +183,6 @@ private:
 	DECLARE_READ8_MEMBER(invmulti_eeprom_r);
 	DECLARE_WRITE8_MEMBER(invmulti_eeprom_w);
 	DECLARE_WRITE8_MEMBER(invmulti_bank_w);
-	DECLARE_WRITE8_MEMBER(cane_sh_port_1_w);
-	DECLARE_WRITE8_MEMBER(cane_music_w);
-	DECLARE_WRITE8_MEMBER(cane_unknown_port0_w);
-	DECLARE_WRITE8_MEMBER(cane_76477_en_w);
-	DECLARE_WRITE8_MEMBER(cane_76477_dis_w);
 
 	DECLARE_READ8_MEMBER(rollingc_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram_w);
@@ -198,9 +190,6 @@ private:
 	DECLARE_WRITE8_MEMBER(rollingc_scattered_colorram2_w);
 	DECLARE_READ8_MEMBER(schaser_scattered_colorram_r);
 	DECLARE_WRITE8_MEMBER(schaser_scattered_colorram_w);
-
-	DECLARE_READ8_MEMBER(orbite_scattered_colorram_r);
-	DECLARE_WRITE8_MEMBER(orbite_scattered_colorram_w);
 
 	DECLARE_MACHINE_START(extra_8080bw);
 	DECLARE_MACHINE_START(rollingc);
@@ -217,12 +206,6 @@ private:
 	DECLARE_MACHINE_RESET(schaser_sh);
 	DECLARE_MACHINE_START(claybust);
 
-	DECLARE_MACHINE_START(cane);
-	DECLARE_MACHINE_RESET(cane);
-
-	DECLARE_MACHINE_START(orbite);
-	DECLARE_MACHINE_RESET(orbite);
-
 	void rollingc_palette(palette_device &palette) const;
 	void sflush_palette(palette_device &palette) const;
 
@@ -238,12 +221,10 @@ private:
 	uint32_t screen_update_ballbomb(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(polaris_60hz_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(cane_vco_voltage_timer);	
 	DECLARE_WRITE8_MEMBER(indianbt_sh_port_3_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_2_w);
@@ -251,8 +232,6 @@ private:
 
 	void schaser_reinit_555_time_remain();
 	inline void set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, int color );
-	inline void set_8_pixels( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, int fore_color, int back_color );
-	void clear_extra_columns( bitmap_rgb32 &bitmap, int color );
 
 	void invaders_samples_audio(machine_config &config);
 
@@ -294,10 +273,6 @@ private:
 	void vortex_io_map(address_map &map);
 	void yosakdon_io_map(address_map &map);
 	void yosakdon_map(address_map &map);
-	void cane_io_map(address_map &map);
-	void cane_map(address_map &map);
-	void orbite_io_map(address_map &map);
-	void orbite_map(address_map &map);
 };
 
 
@@ -309,6 +284,68 @@ DISCRETE_SOUND_EXTERN( ballbomb_discrete );
 DISCRETE_SOUND_EXTERN( indianbt_discrete );
 DISCRETE_SOUND_EXTERN( polaris_discrete );
 DISCRETE_SOUND_EXTERN( schaser_discrete );
+
+/*******************************************************/
+/*                                                     */
+/* Cane (Model Racing)                                 */
+/*                                                     */
+/*******************************************************/
+class cane_state : public _8080bw_state
+{
+public:
+	cane_state(machine_config const &mconfig, device_type type, char const *tag) :
+		_8080bw_state(mconfig, type, tag),
+		m_soundboard(*this, "soundboard")
+	{
+	}
+
+	void cane(machine_config &config);
+	void cane_audio(machine_config &config);
+
+protected:
+	void cane_unknown_port0_w(u8 data);
+
+private:
+	virtual void machine_start() override;
+
+	void cane_io_map(address_map &map);
+	void cane_map(address_map &map);
+
+	required_device<cane_audio_device> m_soundboard;
+};
+
 DISCRETE_SOUND_EXTERN( cane_discrete );
+
+/*******************************************************/
+/*                                                     */
+/* Model Racing "Orbite"                               */
+/*                                                     */
+/*******************************************************/
+class orbite_state : public _8080bw_state
+{
+public:
+	orbite_state(machine_config const &mconfig, device_type type, char const *tag) :
+		_8080bw_state(mconfig, type, tag),
+		m_main_ram(*this, "main_ram")
+	{
+	}
+
+	void orbite(machine_config &config);
+
+protected:
+	required_shared_ptr<uint8_t> m_main_ram;
+	std::unique_ptr<uint8_t[]> m_scattered_colorram;
+
+	u8 orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask = 0xff);
+	void orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask = 0xff);
+
+private:
+	virtual void machine_start() override;
+
+	void orbite_io_map(address_map &map);
+	void orbite_map(address_map &map);
+
+	u32 screen_update_orbite(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+};
 
 #endif // MAME_INCLUDES_8080BW_H

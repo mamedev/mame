@@ -24,6 +24,13 @@ MACHINE_START_MEMBER(_8080bw_state,extra_8080bw_sh)
 	save_item(NAME(m_port_3_last_extra));
 }
 
+/*************************************
+ *
+ *  Device type globals
+ *
+ *************************************/
+
+DEFINE_DEVICE_TYPE(CANE_AUDIO,  cane_audio_device,  "cane_audio",  "Model Racing Cane Audio")
 
 
 /*************************************
@@ -1404,39 +1411,6 @@ WRITE8_MEMBER( _8080bw_state::darthvdr_08_w )
 /* Model Racing "Cane" (Slightly based on Claybuster hw) */
 /*                                                       */
 /*********************************************************/
-
-void _8080bw_state::cane_audio(machine_config &config)
-{
-  m_cane_vco_rc_chargetime = INT_MAX;
-
-  TIMER(config, "cane_vco_timer").configure_periodic(FUNC(_8080bw_state::cane_vco_voltage_timer), attotime::from_hz(1000));
-
-  SPEAKER(config, "mono").front_center();
-
-  SN76477(config, m_sn);
-
-  // Amplitude res in the schematic is connected to a 470K potentiometer, so from the schematic is impossible to know the real res.
-  // This parameter drives the amp just before the audio output pin 13.
-  m_sn->set_amp_res(100+RES_K(20));
-  m_sn->set_noise_params(RES_K(39), RES_K(1), CAP_P(1000));
-  m_sn->set_decay_res(RES_M(1));
-  m_sn->set_attack_params(CAP_U(1.0), RES_K(47));  
-  m_sn->set_feedback_res(RES_K(4.7));
-  m_sn->set_vco_params(0, CAP_P(3300), RES_K(100));
-  m_sn->set_pitch_voltage(5.0);
-  m_sn->set_slf_params(CAP_U(1.0), RES_K(33));
-  m_sn->set_oneshot_params(CAP_U(10), RES_K(100));
-  m_sn->set_vco_mode(0);
-  m_sn->set_mixer_params(0, 0, 0);
-  m_sn->set_envelope_params(1, 0);
-  m_sn->set_enable(0);
-  m_sn->add_route(0, "discrete", 1.0, 0);
-
-  DISCRETE(config, m_discrete, cane_discrete);
-  m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
-}
-
-
 #define CANE_CLOCK   (19968000.0)
 #define CANE_H64     CANE_CLOCK /2 /2 /4
 
@@ -1468,6 +1442,109 @@ void _8080bw_state::cane_audio(machine_config &config)
 
 /* Node output */
 #define CANE_SOUND_OUT     NODE_90
+
+static INPUT_PORTS_START( cane_audio )
+	PORT_START("VR1")
+	PORT_ADJUSTER( 80, "VR1 - SFX from 76477" )
+
+	PORT_START("VR2")
+	PORT_ADJUSTER( 90, "VR2 - TOS music" )
+
+	PORT_START("VR3")
+	PORT_ADJUSTER( 70, "VR3 - Shoot SFX from 555" )  
+INPUT_PORTS_END
+
+cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CANE_AUDIO, tag, owner, clock),
+	m_cane_vco_timer(*this, "cane_vco_timer"),	
+	m_sn(*this, "snsnd"),
+	m_discrete(*this, "discrete"),
+	m_cane_vco_rc_chargetime(INT_MAX)
+{
+}
+
+void cane_audio_device::device_add_mconfig(machine_config &config)
+{
+	// provare a commentare
+	m_cane_vco_rc_chargetime = INT_MAX;
+
+	TIMER(config, "cane_vco_timer").configure_periodic(FUNC(cane_vco_voltage_timer), attotime::from_hz(1000));
+
+	SPEAKER(config, "mono").front_center();
+
+	SN76477(config, m_sn);
+	// Amplitude res in the schematic is connected to a 470K potentiometer, so from the schematic is impossible to know the real res.
+	// This parameter drives the amp just before the audio output pin 13.
+	m_sn->set_amp_res(100+RES_K(20));
+	m_sn->set_noise_params(RES_K(39), RES_K(1), CAP_P(1000));
+	m_sn->set_decay_res(RES_M(1));
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(47));  
+	m_sn->set_feedback_res(RES_K(4.7));
+	m_sn->set_vco_params(0, CAP_P(3300), RES_K(100));
+	m_sn->set_pitch_voltage(5.0);
+	m_sn->set_slf_params(CAP_U(1.0), RES_K(33));
+	m_sn->set_oneshot_params(CAP_U(10), RES_K(100));
+	m_sn->set_vco_mode(0);
+	m_sn->set_mixer_params(0, 0, 0);
+	m_sn->set_envelope_params(1, 0);
+	m_sn->set_enable(0);
+	m_sn->add_route(0, "discrete", 1.0, 0);
+
+	DISCRETE(config, m_discrete, cane_discrete);
+	m_discrete->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+ioport_constructor cane_audio_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(cane_audio);
+}
+
+void cane_audio_device::device_start()
+{
+}
+
+void cane_audio_device::cane_sh_port_1_w(u8 data)
+{
+	/* 
+		bit 0 - SX0 - Sound enable on mixer 
+		bit 1 - SX1 - SN76477 - Mixer select C - pin 27
+		bit 2 - SX2 - SN76477 - Mixer select A - pin 26
+		bit 3 - SX3 - SN76477 - Mixer select B - pin 25
+		bit 4 - SX4 - NE555 - Trigger (Step, high output level for 1.1*RC = 1.1*100K*0.47u = 51.7 ms)
+	*/
+
+	m_discrete->write(CANE_SND_EN, data & 0x01); // BIT(data, 0) - bit 0 - SX0 - Sound enable on mixer
+	m_discrete->write(CANE_555_EN, data & 0x10); // BIT(data, 4) - bit 4 - SX4 - NE555 - Trigger
+
+	// 76477 enable bit is connected to the select line of the out port 3 (inverted).
+	m_sn->enable_w(1);
+	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
+
+	m_cane_vco_timer->adjust(attotime::zero, m_cane_vco_timer->param(), attotime::from_hz(1000));
+	m_cane_vco_rc_chargetime = m_cane_vco_timer->start_time().as_double();
+
+	// Little hack...
+	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
+	// and disable it every time the CPU read/write from/to port 3.
+	// Actually this can not be done easily so I decided to enable it preemptively here after every port 3 access
+	m_sn->enable_w(0);
+}
+
+void cane_audio_device::cane_music_w(u8 data)
+{
+	m_sn->enable_w(1);
+	m_discrete->write(CANE_MUSIC_DATA, data);
+}
+
+void cane_audio_device::cane_76477_en_w(u8 data)
+{
+	m_sn->enable_w(0);
+}
+
+void cane_audio_device::cane_76477_dis_w(u8 data)
+{
+	m_sn->enable_w(1);
+}
 
 /*******************************************************************************************************************************************************/
 /* Cane discrete implementation, slightly based on Claybuster hw.                                                                                      */
@@ -1549,16 +1626,16 @@ DISCRETE_SOUND_START(cane_discrete)
 	DISCRETE_MULTIPLY(CANE_SFX_SND, CANE_TMP_SND, CANE_VR3)
 
 /*****************************************************************************
- *
- * Music Generator (TOS)
- *
- * Values for this section of the sound hardware where derived from comments
- * in the source code and the analysis of TOS.ED sources.
- * 
- * For further info look at the relevant comments reported into 
- * drivers/8080bw.cpp
- *
- *****************************************************************************/
+*
+* Music Generator (TOS)
+*
+* Values for this section of the sound hardware where derived from comments
+* in the source code and the analysis of TOS.ED sources.
+* 
+* For further info look at the relevant comments reported into 
+* drivers/8080bw.cpp
+*
+******************************************************************************/
 	DISCRETE_NOTE(CANE_MUSIC_NOTE_PF, 1, CANE_H64, CANE_MUSIC_DATA, 255, 1, DISC_CLK_IS_FREQ)
 	DISCRETE_CRFILTER(CANE_MUSIC_NOTE, CANE_MUSIC_NOTE_PF, RES_K(10), CAP_U(0.1))  // high pass filter
 	DISCRETE_MULTIPLY(CANE_MUSIC_SND, CANE_MUSIC_NOTE, CANE_VR2)
@@ -1588,53 +1665,9 @@ DISCRETE_SOUND_START(cane_discrete)
 	DISCRETE_WAVLOG1(CANE_MUSIC_SND, 1)
 	DISCRETE_WAVLOG1(CANE_SOUND_OUT, 1)
 */
-
 DISCRETE_SOUND_END
 
-WRITE8_MEMBER( _8080bw_state::cane_music_w )
-{
-  	m_sn->enable_w(1);
-	m_discrete->write(CANE_MUSIC_DATA, data);
-}
-
-WRITE8_MEMBER( _8080bw_state::cane_76477_en_w )
-{
-  	m_sn->enable_w(0);
-}
-
-WRITE8_MEMBER( _8080bw_state::cane_76477_dis_w )
-{
-  	m_sn->enable_w(1);
-}
-
-WRITE8_MEMBER(_8080bw_state::cane_sh_port_1_w)
-{
-	/* 
-		bit 0 - SX0 - Sound enable on mixer 
-		bit 1 - SX1 - SN76477 - Mixer select C - pin 27
-		bit 2 - SX2 - SN76477 - Mixer select A - pin 26
-		bit 3 - SX3 - SN76477 - Mixer select B - pin 25
-		bit 4 - SX4 - NE555 - Trigger (Step, high output level for 1.1*RC = 1.1*100K*0.47u = 51.7 ms)
-	*/
-
-	m_discrete->write(CANE_SND_EN, data & 0x01); // BIT(data, 0) - bit 0 - SX0 - Sound enable on mixer
-	m_discrete->write(CANE_555_EN, data & 0x10); // BIT(data, 4) - bit 4 - SX4 - NE555 - Trigger
-
-	// 76477 enable bit is connected to the select line of the out port 3 (inverted).
-  	m_sn->enable_w(1);
-	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
-
-	m_cane_vco_timer->adjust(attotime::zero, m_cane_vco_timer->param(), attotime::from_hz(1000));
-	m_cane_vco_rc_chargetime = m_cane_vco_timer->start_time().as_double();
-
-	// Little hack...
-	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
-	// and disable it every time the CPU read/write from/to port 3.
-	// Actually this can not be done easily so I decided to enable it preemptively here after every port 3 access
-	m_sn->enable_w(0);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::cane_vco_voltage_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::cane_vco_voltage_timer)
 {
 	double voltage;
 	voltage = 5 * (1 - exp(- (m_cane_vco_timer->fire_time().as_double() - m_cane_vco_rc_chargetime) / 47));
