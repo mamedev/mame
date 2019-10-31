@@ -96,7 +96,7 @@
 static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
-//#define nl_double float
-using nl_double = double;
+//#define nl_fptype float
+using nl_fptype = double;
 
 #endif /* NLCONFIG_H_ */

@@ -106,7 +106,7 @@ namespace solver
 		m_ops.m_mat.set_scalar(0.0);
 
 		/* populate matrix and V for first estimate */
-		this->fill_matrix(iN, this->m_mat_ptr, RHS);
+		this->fill_matrix(iN, RHS);
 
 		for (std::size_t k = 0; k < iN; k++)
 		{

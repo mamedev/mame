@@ -51,7 +51,7 @@ namespace netlist
 	{
 		nl_assert(m_logic_family != nullptr);
 		// FIXME: Variable supply voltage!
-		double supply_V = logic_family()->fixed_V();
+		nl_fptype supply_V = logic_family()->fixed_V();
 		if (supply_V == 0.0) supply_V = 5.0;
 
 		if (m_I.Q_Analog() > logic_family()->high_thresh_V(0.0, supply_V))
@@ -147,7 +147,7 @@ namespace netlist
 	void nld_d_to_a_proxy::reset()
 	{
 		// FIXME: Variable voltage
-		double supply_V = logic_family()->fixed_V();
+		nl_fptype supply_V = logic_family()->fixed_V();
 		if (supply_V == 0.0) supply_V = 5.0;
 
 		//m_Q.initial(0.0);
@@ -159,7 +159,7 @@ namespace netlist
 		if (m_VCCHack)
 			m_VCCHack->initial(supply_V);
 		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
-		m_RN.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
+		m_RN.set_G_V_I(plib::constants<nl_fptype>::one() / logic_family()->R_low(),
 				logic_family()->low_offset_V(), 0.0);
 		m_RP.set_G_V_I(G_OFF,
 				0.0, 0.0);
@@ -179,12 +179,12 @@ namespace netlist
 			{
 				m_RN.set_G_V_I(G_OFF,
 						0.0, 0.0);
-				m_RP.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_high(),
+				m_RP.set_G_V_I(plib::constants<nl_fptype>::one() / logic_family()->R_high(),
 						logic_family()->high_offset_V(), 0.0);
 			}
 			else
 			{
-				m_RN.set_G_V_I(plib::constants<nl_double>::one() / logic_family()->R_low(),
+				m_RN.set_G_V_I(plib::constants<nl_fptype>::one() / logic_family()->R_low(),
 						logic_family()->low_offset_V(), 0.0);
 				m_RP.set_G_V_I(G_OFF,
 						0.0, 0.0);

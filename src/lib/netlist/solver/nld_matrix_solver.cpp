@@ -341,9 +341,9 @@ namespace solver
 		 * save states
 		 */
 
-		m_last_V.resize(iN, plib::constants<nl_double>::zero());
-		m_DD_n_m_1.resize(iN, plib::constants<nl_double>::zero());
-		m_h_n_m_1.resize(iN, plib::constants<nl_double>::zero());
+		m_last_V.resize(iN, plib::constants<nl_fptype>::zero());
+		m_DD_n_m_1.resize(iN, plib::constants<nl_fptype>::zero());
+		m_h_n_m_1.resize(iN, plib::constants<nl_fptype>::zero());
 
 		state().save(*this, m_last_V.as_base(), this->name(), "m_last_V");
 		state().save(*this, m_DD_n_m_1.as_base(), this->name(), "m_DD_n_m_1");
@@ -411,7 +411,7 @@ namespace solver
 
 	void matrix_solver_t::step(const netlist_time &delta)
 	{
-		const nl_double dd = delta.as_double();
+		const nl_fptype dd = delta.as_double();
 		for (auto &d : m_step_devices)
 			d->timestep(dd);
 	}
@@ -500,7 +500,7 @@ namespace solver
 		return {colmax, colmin};
 	}
 
-	double matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
+	nl_fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
 	{
 		{
 			/*
@@ -509,7 +509,7 @@ namespace solver
 
 			std::vector<bool> touched(1024, false); // FIXME!
 
-			double weight = 0.0;
+			nl_fptype weight = 0.0;
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term.count(); i++)
 			{
@@ -522,12 +522,12 @@ namespace solver
 						if (colu==row) colu = static_cast<unsigned>(diag);
 						else if (colu==diag) colu = static_cast<unsigned>(row);
 
-						weight = weight + std::abs(static_cast<double>(colu) - static_cast<double>(diag));
+						weight = weight + std::abs(static_cast<nl_fptype>(colu) - static_cast<nl_fptype>(diag));
 						touched[colu] = true;
 					}
 				}
 			}
-			return weight; // / static_cast<double>(term.railstart());
+			return weight; // / static_cast<nl_fptype>(term.railstart());
 		}
 	}
 
@@ -553,29 +553,29 @@ namespace solver
 		}
 	}
 
-	netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
+	netlist_time matrix_solver_t::compute_next_timestep(const nl_fptype cur_ts)
 	{
-		nl_double new_solver_timestep = m_params.m_max_timestep;
+		nl_fptype new_solver_timestep = m_params.m_max_timestep;
 
 		if (m_params.m_dynamic_ts)
 		{
 			for (std::size_t k = 0; k < m_terms.size(); k++)
 			{
 				auto &t = m_terms[k];
-				//const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
+				//const nl_fptype DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
 
-				const nl_double DD_n = std::max(-1e100, std::min(1e100,(t.getV() - m_last_V[k])));
-				const nl_double hn = cur_ts;
+				const nl_fptype DD_n = std::max(-1e100, std::min(1e100,(t.getV() - m_last_V[k])));
+				const nl_fptype hn = cur_ts;
 
 				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
-				nl_double DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
-				nl_double new_net_timestep(0);
+				nl_fptype DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
+				nl_fptype new_net_timestep(0);
 
 				m_h_n_m_1[k] = hn;
 				m_DD_n_m_1[k] = DD_n;
-				if (std::fabs(DD2) > plib::constants<nl_double>::cast(1e-60)) // avoid div-by-zero
-					new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_double>::cast(0.5)*DD2));
+				if (std::fabs(DD2) > plib::constants<nl_fptype>::cast(1e-60)) // avoid div-by-zero
+					new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_fptype>::cast(0.5)*DD2));
 				else
 					new_net_timestep = m_params.m_max_timestep;
 
@@ -607,14 +607,14 @@ namespace solver
 			log().verbose("       has {1} elements", this->has_dynamic_devices() ? "dynamic" : "no dynamic");
 			log().verbose("       has {1} elements", this->has_timestep_devices() ? "timestep" : "no timestep");
 			log().verbose("       {1:6.3} average newton raphson loops",
-						static_cast<double>(this->m_stat_newton_raphson) / static_cast<double>(this->m_stat_vsolver_calls));
+						static_cast<nl_fptype>(this->m_stat_newton_raphson) / static_cast<nl_fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 					this->m_stat_calculations,
-					static_cast<double>(this->m_stat_calculations) / this->exec().time().as_double(),
+					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_double(),
 					this->m_iterative_fail,
-					100.0 * static_cast<double>(this->m_iterative_fail)
-						/ static_cast<double>(this->m_stat_calculations),
-					static_cast<double>(this->m_iterative_total) / static_cast<double>(this->m_stat_calculations));
+					100.0 * static_cast<nl_fptype>(this->m_iterative_fail)
+						/ static_cast<nl_fptype>(this->m_stat_calculations),
+					static_cast<nl_fptype>(this->m_iterative_total) / static_cast<nl_fptype>(this->m_stat_calculations));
 		}
 	}
 

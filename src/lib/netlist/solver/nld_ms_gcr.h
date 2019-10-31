@@ -90,9 +90,9 @@ namespace solver
 
 			this->log().verbose("maximum fill: {1}", gr.first);
 			this->log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
-					static_cast<double>(mat.nz_num) / static_cast<double>(iN * iN));
+					static_cast<nl_fptype>(mat.nz_num) / static_cast<nl_fptype>(iN * iN));
 			this->log().verbose(" Pre elimination occupancy ratio: {2}",
-					static_cast<double>(raw_elements) / static_cast<double>(iN * iN));
+					static_cast<nl_fptype>(raw_elements) / static_cast<nl_fptype>(iN * iN));
 
 			// FIXME: Move me
 
@@ -131,7 +131,7 @@ namespace solver
 
 		mat_type mat;
 
-		plib::dynproc<void, double * , double * , double * > m_proc;
+		plib::dynproc<void, nl_fptype * , nl_fptype * , nl_fptype * > m_proc;
 
 	};
 
@@ -238,7 +238,7 @@ namespace solver
 
 		/* populate matrix */
 
-		this->fill_matrix(iN, m_mat_ptr, RHS);
+		this->fill_matrix(iN, RHS);
 
 		/* now solve it */
 

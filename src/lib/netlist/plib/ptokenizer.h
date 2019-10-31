@@ -100,6 +100,7 @@ namespace plib {
 		pstring get_string();
 		pstring get_identifier();
 		pstring get_identifier_or_number();
+
 		double get_number_double();
 		long get_number_long();
 

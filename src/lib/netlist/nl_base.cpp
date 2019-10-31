@@ -482,7 +482,7 @@ namespace netlist
 				if (stats->m_stat_inc_active() > 3 * stats->m_stat_total_time.count()
 					&& stats->m_stat_inc_active() > trigger)
 					log().verbose("HINT({}, NO_DEACTIVATE) // {} {} {}", ep->name(),
-						static_cast<double>(stats->m_stat_inc_active()) / static_cast<double>(stats->m_stat_total_time.count()),
+						static_cast<nl_fptype>(stats->m_stat_inc_active()) / static_cast<nl_fptype>(stats->m_stat_total_time.count()),
 						stats->m_stat_inc_active(), stats->m_stat_total_time.count());
 			}
 		}
@@ -847,7 +847,7 @@ namespace netlist
 		state().setup().register_term(*this);
 	}
 
-	void analog_output_t::initial(const nl_double val)
+	void analog_output_t::initial(const nl_fptype val)
 	{
 		net().set_Q_Analog(val);
 	}
@@ -878,7 +878,7 @@ namespace netlist
 	{
 		if (dynamic_cast<const param_str_t *>(this) != nullptr)
 			return STRING;
-		else if (dynamic_cast<const param_double_t *>(this) != nullptr)
+		else if (dynamic_cast<const param_fp_t *>(this) != nullptr)
 			return DOUBLE;
 		else if (dynamic_cast<const param_int_t *>(this) != nullptr)
 			return INTEGER;
@@ -938,7 +938,7 @@ namespace netlist
 		return state().setup().models().value_str(str(), entity);
 	}
 
-	nl_double param_model_t::value(const pstring &entity)
+	nl_fptype param_model_t::value(const pstring &entity)
 	{
 		return state().setup().models().value(str(), entity);
 	}

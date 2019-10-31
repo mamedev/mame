@@ -79,7 +79,7 @@ namespace devices
 		logic_output_t m_Q;
 		netlist_time m_inc;
 	private:
-		param_double_t m_freq;
+		param_fp_t m_freq;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -113,7 +113,7 @@ namespace devices
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
 
-		param_double_t m_freq;
+		param_fp_t m_freq;
 		netlist_time m_inc;
 	};
 
@@ -150,7 +150,7 @@ namespace devices
 
 		param_str_t m_func;
 		plib::pfunction m_compiled;
-		std::vector<double> m_funcparam;
+		std::vector<nl_fptype> m_funcparam;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -207,9 +207,9 @@ namespace devices
 
 	private:
 
-		param_double_t m_freq;
+		param_fp_t m_freq;
 		param_str_t m_pattern;
-		param_double_t m_offset;
+		param_fp_t m_offset;
 
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
@@ -260,7 +260,7 @@ namespace devices
 
 	private:
 		analog_output_t m_Q;
-		param_double_t m_IN;
+		param_fp_t m_IN;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -347,8 +347,8 @@ namespace devices
 		analog_input_t m_I;
 		analog_output_t m_Q;
 
-		param_double_t m_p_RIN;
-		param_double_t m_p_ROUT;
+		param_fp_t m_p_RIN;
+		param_fp_t m_p_ROUT;
 	};
 
 	/* -----------------------------------------------------------------------------
@@ -388,7 +388,7 @@ namespace devices
 		analog_output_t m_Q;
 		std::vector<unique_pool_ptr<analog_input_t>> m_I;
 
-		std::vector<double> m_vals;
+		std::vector<nl_fptype> m_vals;
 		plib::pfunction m_compiled;
 	};
 
@@ -416,8 +416,8 @@ namespace devices
 
 		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
-		param_double_t m_RON;
-		param_double_t m_ROFF;
+		param_fp_t m_RON;
+		param_fp_t m_ROFF;
 
 	private:
 
@@ -452,8 +452,8 @@ namespace devices
 		}
 
 		/* FIXME: this will seg-fault if force_analog_input = false */
-		nl_double VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
-		nl_double GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
+		nl_fptype VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
+		nl_fptype GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
 
 		NETLIB_SUBXX(analog, R) m_RVG; // dummy resistor between VCC and GND
 

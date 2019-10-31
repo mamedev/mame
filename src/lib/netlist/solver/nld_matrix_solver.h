@@ -61,7 +61,7 @@ namespace solver
 		/* automatic time step */
 		, m_dynamic_ts(parent, "DYNAMIC_TS", false)
 		, m_dynamic_lte(parent, "DYNAMIC_LTE", 1e-5)                     // diff/timestep
-		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_double timestep resolution
+		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", 1e-6)   // nl_fptype timestep resolution
 
 		/* matrix sorting */
 		, m_sort_type(parent, "SORT_TYPE", matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT)
@@ -84,26 +84,26 @@ namespace solver
 			}
 		}
 
-		param_double_t m_freq;
-		param_double_t m_gs_sor;
+		param_fp_t m_freq;
+		param_fp_t m_gs_sor;
 		param_enum_t<matrix_type_e> m_method;
-		param_double_t m_accuracy;
+		param_fp_t m_accuracy;
 		param_num_t<std::size_t> m_gs_loops;
-		param_double_t m_gmin;
+		param_fp_t m_gmin;
 		param_logic_t  m_pivot;
 		param_num_t<std::size_t> m_nr_loops;
-		param_double_t m_nr_recalc_delay;
+		param_fp_t m_nr_recalc_delay;
 		param_int_t m_parallel;
 		param_logic_t  m_dynamic_ts;
-		param_double_t m_dynamic_lte;
-		param_double_t m_dynamic_min_ts;
+		param_fp_t m_dynamic_lte;
+		param_fp_t m_dynamic_min_ts;
 		param_enum_t<matrix_sort_type_e> m_sort_type;
 
 		param_logic_t m_use_gabs;
 		param_logic_t m_use_linear_prediction;
 
-		nl_double m_min_timestep;
-		nl_double m_max_timestep;
+		nl_fptype m_min_timestep;
+		nl_fptype m_max_timestep;
 	};
 
 
@@ -122,9 +122,9 @@ namespace solver
 
 		terminal_t **terms() noexcept { return m_terms.data(); }
 
-		nl_double getV() const noexcept { return m_net->Q_Analog(); }
+		nl_fptype getV() const noexcept { return m_net->Q_Analog(); }
 
-		void setV(nl_double v) noexcept { m_net->set_Q_Analog(v); }
+		void setV(nl_fptype v) noexcept { m_net->set_Q_Analog(v); }
 
 		bool isNet(const analog_net_t * net) const noexcept { return net == m_net; }
 
@@ -184,7 +184,7 @@ namespace solver
 	public:
 		int get_net_idx(const analog_net_t *net) const noexcept;
 		std::pair<int, int> get_left_right_of_diag(std::size_t row, std::size_t diag);
-		double get_weight_around_diag(std::size_t row, std::size_t diag);
+		nl_fptype get_weight_around_diag(std::size_t row, std::size_t diag);
 
 		virtual void log_stats();
 
@@ -208,7 +208,7 @@ namespace solver
 
 		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 
-		netlist_time compute_next_timestep(const double cur_ts);
+		netlist_time compute_next_timestep(const nl_fptype cur_ts);
 		/* virtual */ void  add_term(std::size_t net_idx, terminal_t *term);
 
 		template <typename T>
@@ -216,11 +216,6 @@ namespace solver
 
 		template <typename T>
 		auto delta(const T & V) -> typename std::decay<decltype(V[0])>::type;
-
-		template <typename T>
-		void build_LE_A(T &child);
-		template <typename T>
-		void build_LE_RHS(T &child);
 
 		void set_pointers()
 		{
@@ -252,13 +247,13 @@ namespace solver
 			}
 		}
 
-		template <typename AP, typename FT>
-		void fill_matrix(std::size_t N, AP &tcr, FT &RHS)
+		template <typename FT>
+		void fill_matrix(std::size_t N, FT &RHS)
 		{
 			for (std::size_t k = 0; k < N; k++)
 			{
 				auto &net = m_terms[k];
-				auto **tcr_r = &(tcr[k][0]);
+				auto **tcr_r = &(m_mat_ptr[k][0]);
 
 				const std::size_t term_count = net.count();
 				const std::size_t railstart = net.railstart();
@@ -350,28 +345,60 @@ namespace solver
 			}
 		}
 
+		template <typename M>
+		void clear_square_mat(std::size_t n, M &m)
+		{
+			for (std::size_t k=0; k < n; k++)
+			{
+				auto *p = &(m[k][0]);
+				for (std::size_t i=0; i < n; i++)
+					p[i] = 0.0;
+			}
+		}
+
+		template <typename M>
+		void build_mat_ptr(std::size_t iN, M &mat)
+		{
+			for (std::size_t k=0; k<iN; k++)
+			{
+				std::size_t cnt(0);
+				/* build pointers into the compressed row format matrix for each terminal */
+				for (std::size_t j=0; j< this->m_terms[k].railstart();j++)
+				{
+					int other = this->m_terms[k].m_connected_net_idx[j];
+					if (other >= 0)
+					{
+						m_mat_ptr[k][j] = &(mat[k][static_cast<std::size_t>(other)]);
+						cnt++;
+					}
+				}
+				nl_assert_always(cnt == this->m_terms[k].railstart(), "Count and railstart mismatch");
+				m_mat_ptr[k][this->m_terms[k].railstart()] = &(mat[k][k]);
+			}
+		}
+
 		template <typename T>
 		using aligned_alloc = plib::aligned_allocator<T, PALIGN_VECTOROPT>;
 
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gonn;
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_gtn;
-		plib::pmatrix2d<nl_double, aligned_alloc<nl_double>>        m_Idrn;
-		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_mat_ptr;
-		plib::pmatrix2d<nl_double *, aligned_alloc<nl_double *>>    m_connected_net_Vn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
+		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
+		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_mat_ptr;
+		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
 
 		plib::aligned_vector<terms_for_net_t> m_terms;
 		plib::aligned_vector<terms_for_net_t> m_rails_temp;
 
 		/* state - variable time_stepping */
-		plib::aligned_vector<nl_double> m_last_V;
-		plib::aligned_vector<nl_double> m_DD_n_m_1;
-		plib::aligned_vector<nl_double> m_h_n_m_1;
+		plib::aligned_vector<nl_fptype> m_last_V;
+		plib::aligned_vector<nl_fptype> m_DD_n_m_1;
+		plib::aligned_vector<nl_fptype> m_h_n_m_1;
 
 		// FIXME: it should be like this, however dimensions are determined
 		//        in vsetup.
-		//state_container<std::vector<nl_double>> m_last_V;
-		//state_container<std::vector<nl_double>> m_DD_n_m_1;
-		//state_container<std::vector<nl_double>> m_h_n_m_1;
+		//state_container<std::vector<nl_fptype>> m_last_V;
+		//state_container<std::vector<nl_fptype>> m_DD_n_m_1;
+		//state_container<std::vector<nl_fptype>> m_h_n_m_1;
 
 		std::vector<unique_pool_ptr<proxied_analog_output_t>> m_inps;
 
@@ -424,69 +451,6 @@ namespace solver
 		const std::size_t iN = this->m_terms.size();
 		for (std::size_t i = 0; i < iN; i++)
 			this->m_terms[i].setV(V[i]);
-	}
-
-	template <typename T>
-	void matrix_solver_t::build_LE_A(T &child)
-	{
-		using float_type = typename T::float_type;
-		static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-
-		const std::size_t iN = child.size();
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			terms_for_net_t &terms = m_terms[k];
-			float_type * Ak = &child.A(k, 0ul);
-
-			for (std::size_t i=0; i < iN; i++)
-				Ak[i] = 0.0;
-
-			const std::size_t terms_count = terms.count();
-			const std::size_t railstart =  terms.railstart();
-			const float_type * const gt = m_gtn[k];
-
-			{
-				float_type akk  = 0.0;
-				for (std::size_t i = 0; i < terms_count; i++)
-					akk += gt[i];
-
-				Ak[k] = akk;
-			}
-
-			const float_type * const go = m_gonn[k];
-			int * net_other = terms.m_connected_net_idx.data();
-
-			for (std::size_t i = 0; i < railstart; i++)
-				Ak[net_other[i]] += go[i];
-		}
-	}
-
-	template <typename T>
-	void matrix_solver_t::build_LE_RHS(T &child)
-	{
-		static_assert(std::is_base_of<matrix_solver_t, T>::value, "T must derive from matrix_solver_t");
-		using float_type = typename T::float_type;
-
-		const std::size_t iN = child.size();
-		for (std::size_t k = 0; k < iN; k++)
-		{
-			float_type rhsk_a = 0.0;
-			float_type rhsk_b = 0.0;
-
-			const std::size_t terms_count = m_terms[k].count();
-			const float_type * const go = m_gonn[k];
-			const float_type * const Idr = m_Idrn[k];
-			const float_type * const * other_cur_analog = m_connected_net_Vn[k];
-
-			for (std::size_t i = 0; i < terms_count; i++)
-				rhsk_a += Idr[i];
-
-			for (std::size_t i = m_terms[k].railstart(); i < terms_count; i++)
-				//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
-				rhsk_b += - go[i] * *other_cur_analog[i];
-
-			child.RHS(k) = rhsk_a + rhsk_b;
-		}
 	}
 
 } // namespace solver

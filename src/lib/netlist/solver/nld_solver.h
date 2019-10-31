@@ -39,7 +39,7 @@ namespace devices
 		void post_start();
 		void stop();
 
-		nl_double gmin() const { return m_params.m_gmin(); }
+		nl_fptype gmin() const { return m_params.m_gmin(); }
 
 		void create_solver_code(std::map<pstring, pstring> &mp);
 

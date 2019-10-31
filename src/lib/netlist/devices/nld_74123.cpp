@@ -74,10 +74,10 @@ namespace netlist
 
 		state_var<netlist_sig_t> m_last_trig;
 		state_var<unsigned>      m_state;
-		state_var<double>        m_KP;
+		state_var<nl_fptype>        m_KP;
 
-		param_double_t m_K;
-		param_double_t m_RI;
+		param_fp_t m_K;
+		param_fp_t m_RI;
 	};
 
 	NETLIB_OBJECT(74123_dip)
@@ -232,7 +232,7 @@ namespace netlist
 
 		if (m_state == 1)
 		{
-			const nl_double vLow = m_KP * m_RP.m_R.m_P();
+			const nl_fptype vLow = m_KP * m_RP.m_R.m_P();
 			if (m_CV() < vLow)
 			{
 				m_RN_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -241,7 +241,7 @@ namespace netlist
 		}
 		if (m_state == 2)
 		{
-			const nl_double vHigh = m_RP.m_R.m_P() * (1.0 - m_KP);
+			const nl_fptype vHigh = m_RP.m_R.m_P() * (1.0 - m_KP);
 			if (m_CV() > vHigh)
 			{
 				m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF

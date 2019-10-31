@@ -16,33 +16,33 @@ namespace netlist
 {
 namespace analog
 {
-	using constants = plib::constants<nl_double>;
+	using constants = plib::constants<nl_fptype>;
 
 	class diode
 	{
 	public:
 		diode() : m_Is(1e-15), m_VT(0.0258), m_VT_inv(1.0 / m_VT) {}
-		diode(const nl_double Is, const nl_double n)
+		diode(const nl_fptype Is, const nl_fptype n)
 		{
 			m_Is = Is;
 			m_VT = 0.0258 * n;
 			m_VT_inv = 1.0 / m_VT;
 		}
-		void set(const nl_double Is, const nl_double n)
+		void set(const nl_fptype Is, const nl_fptype n)
 		{
 			m_Is = Is;
 			m_VT = 0.0258 * n;
 			m_VT_inv = 1.0 / m_VT;
 		}
-		nl_double I(const nl_double V) const { return m_Is * std::exp(V * m_VT_inv) - m_Is; }
-		nl_double g(const nl_double V) const { return m_Is * m_VT_inv * std::exp(V * m_VT_inv); }
-		nl_double V(const nl_double I) const { return std::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
-		nl_double gI(const nl_double I) const { return m_VT_inv * (I + m_Is); }
+		nl_fptype I(const nl_fptype V) const { return m_Is * std::exp(V * m_VT_inv) - m_Is; }
+		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * std::exp(V * m_VT_inv); }
+		nl_fptype V(const nl_fptype I) const { return std::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
+		nl_fptype gI(const nl_fptype I) const { return m_VT_inv * (I + m_Is); }
 
 	private:
-		nl_double m_Is;
-		nl_double m_VT;
-		nl_double m_VT_inv;
+		nl_fptype m_Is;
+		nl_fptype m_VT;
+		nl_fptype m_VT_inv;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -203,9 +203,9 @@ namespace analog
 		nld_twoterm m_RC;
 		nld_twoterm m_BC;
 
-		nl_double m_gB; // base conductance / switch on
-		nl_double m_gC; // collector conductance / switch on
-		nl_double m_V; // internal voltage source
+		nl_fptype m_gB; // base conductance / switch on
+		nl_fptype m_gC; // collector conductance / switch on
+		nl_fptype m_V; // internal voltage source
 		state_var<unsigned> m_state_on;
 
 	private:
@@ -267,8 +267,8 @@ namespace analog
 		nld_twoterm m_D_EB;  // gee, gec - gee, gce - gee, gee - gec | Ie
 		nld_twoterm m_D_EC;  // 0, -gec, -gcc, 0 | 0
 
-		nl_double m_alpha_f;
-		nl_double m_alpha_r;
+		nl_fptype m_alpha_f;
+		nl_fptype m_alpha_r;
 
 		NETLIB_SUBXX(analog, C) m_CJE;
 		NETLIB_SUBXX(analog, C) m_CJC;
@@ -316,14 +316,14 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_switch)
 	{
-		nl_double IS = m_model.m_IS;
-		nl_double BF = m_model.m_BF;
-		nl_double NF = m_model.m_NF;
-		//nl_double VJE = m_model.dValue("VJE", 0.75);
+		nl_fptype IS = m_model.m_IS;
+		nl_fptype BF = m_model.m_BF;
+		nl_fptype NF = m_model.m_NF;
+		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
-		nl_double alpha = BF / (1.0 + BF);
+		nl_fptype alpha = BF / (1.0 + BF);
 
 		diode d(IS, NF);
 
@@ -345,14 +345,14 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_switch)
 	{
-		const nl_double m = (is_qtype( BJT_NPN) ? 1 : -1);
+		const nl_fptype m = (is_qtype( BJT_NPN) ? 1 : -1);
 
 		const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
 		{
-			const nl_double gb = new_state ? m_gB : exec().gmin();
-			const nl_double gc = new_state ? m_gC : exec().gmin();
-			const nl_double v  = new_state ? m_V * m : 0;
+			const nl_fptype gb = new_state ? m_gB : exec().gmin();
+			const nl_fptype gc = new_state ? m_gC : exec().gmin();
+			const nl_fptype v  = new_state ? m_V * m : 0;
 
 			m_RB.set_G_V_I(gb, v,   0.0);
 			m_RC.set_G_V_I(gc, 0.0, 0.0);
@@ -395,19 +395,19 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_double polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+		const nl_fptype polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
 
-		const nl_double gee = m_gD_BE.G();
-		const nl_double gcc = m_gD_BC.G();
-		const nl_double gec =  m_alpha_r * gcc;
-		const nl_double gce =  m_alpha_f * gee;
-		const nl_double sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
-		const nl_double sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
-		const nl_double Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
-		const nl_double Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
+		const nl_fptype gee = m_gD_BE.G();
+		const nl_fptype gcc = m_gD_BC.G();
+		const nl_fptype gec =  m_alpha_r * gcc;
+		const nl_fptype gce =  m_alpha_f * gee;
+		const nl_fptype sIe = -m_gD_BE.I() + m_alpha_r * m_gD_BC.I();
+		const nl_fptype sIc = m_alpha_f * m_gD_BE.I() - m_gD_BC.I();
+		const nl_fptype Ie = (sIe + gee * m_gD_BE.Vd() - gec * m_gD_BC.Vd()) * polarity;
+		const nl_fptype Ic = (sIc - gce * m_gD_BE.Vd() + gcc * m_gD_BC.Vd()) * polarity;
 
 		// "Circuit Design", page 174
 
@@ -422,12 +422,12 @@ namespace analog
 
 	NETLIB_UPDATE_PARAM(QBJT_EB)
 	{
-		nl_double IS = m_model.m_IS;
-		nl_double BF = m_model.m_BF;
-		nl_double NF = m_model.m_NF;
-		nl_double BR = m_model.m_BR;
-		nl_double NR = m_model.m_NR;
-		//nl_double VJE = m_model.dValue("VJE", 0.75);
+		nl_fptype IS = m_model.m_IS;
+		nl_fptype BF = m_model.m_BF;
+		nl_fptype NF = m_model.m_NF;
+		nl_fptype BR = m_model.m_BR;
+		nl_fptype NR = m_model.m_NR;
+		//nl_fptype VJE = m_model.dValue("VJE", 0.75);
 
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 

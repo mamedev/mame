@@ -103,10 +103,10 @@ namespace netlist
 		state_var<bool> m_ff;
 		state_var<bool> m_last_reset;
 
-		nl_double clamp(const nl_double v, const nl_double a, const nl_double b)
+		nl_fptype clamp(const nl_fptype v, const nl_fptype a, const nl_fptype b)
 		{
-			nl_double ret = v;
-			nl_double vcc = m_R1.m_P();
+			nl_fptype ret = v;
+			nl_fptype vcc = m_R1.m_P();
 
 			if (ret >  vcc - a)
 				ret = vcc - a;
@@ -161,7 +161,7 @@ namespace netlist
 		}
 		else
 		{
-			const nl_double vt = clamp(m_R2.m_P(), 0.7, 1.4);
+			const nl_fptype vt = clamp(m_R2.m_P(), 0.7, 1.4);
 			const bool bthresh = (m_THRES() > vt);
 			const bool btrig = (m_TRIG() > clamp(m_R2.m_N(), 0.7, 1.4));
 

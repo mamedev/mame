@@ -117,13 +117,12 @@ namespace solver
 
 		const std::size_t iN = this->size();
 
-		this->build_LE_A(*this);
-		this->build_LE_RHS(*this);
+		this->clear_square_mat(iN, this->m_A);
+		this->fill_matrix(iN, this->m_RHS);
 
 		bool resched = false;
 
 		unsigned resched_cnt = 0;
-
 
 	#if 0
 		static int ws_cnt = 0;
@@ -174,24 +173,24 @@ namespace solver
 				const std::size_t e = this->m_terms[k].m_nz.size();
 
 				for (std::size_t i = 0; i < e; i++)
-					Idrive = Idrive + this->A(k,p[i]) * this->m_new_V[p[i]];
+					Idrive = Idrive + this->m_A[k][p[i]] * this->m_new_V[p[i]];
 
-				FT w = m_omega / this->A(k,k);
+				FT w = m_omega / this->m_A[k][k];
 				if (this->m_params.m_use_gabs)
 				{
 					FT gabs_t = 0.0;
 					for (std::size_t i = 0; i < e; i++)
 						if (p[i] != k)
-							gabs_t = gabs_t + std::abs(this->A(k,p[i]));
+							gabs_t = gabs_t + std::abs(this->m_A[k][p[i]]);
 
 					gabs_t *= plib::constants<FT>::one(); // derived by try and error
-					if (gabs_t > this->A(k,k))
+					if (gabs_t > this->m_A[k][k])
 					{
-						w = plib::constants<FT>::one() / (this->A(k,k) + gabs_t);
+						w = plib::constants<FT>::one() / (this->m_A[k][k] + gabs_t);
 					}
 				}
 
-				const float_type delta = w * (this->RHS(k) - Idrive) ;
+				const float_type delta = w * (this->m_RHS[k] - Idrive) ;
 				cerr = std::max(cerr, std::abs(delta));
 				this->m_new_V[k] += delta;
 			}

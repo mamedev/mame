@@ -119,7 +119,7 @@ namespace netlist
 		m_namespace_stack.pop();
 	}
 
-	void nlparse_t::register_param(const pstring &param, const double value)
+	void nlparse_t::register_param(const pstring &param, const nl_fptype value)
 	{
 		if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
 			register_param(param, plib::pfmt("{1:.9}").e(value));
@@ -150,7 +150,7 @@ namespace netlist
 		m_factory.register_device(plib::make_unique<factory::library_element_t>(name, name, "", sourcefile));
 	}
 
-	void nlparse_t::register_frontier(const pstring &attach, const double r_IN, const double r_OUT)
+	void nlparse_t::register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT)
 	{
 		pstring frontier_name = plib::pfmt("frontier_{1}")(m_frontier_cnt);
 		m_frontier_cnt++;
@@ -932,7 +932,7 @@ pstring models_t::value_str(const pstring &model, const pstring &entity)
 	return ret;
 }
 
-nl_double models_t::value(const pstring &model, const pstring &entity)
+nl_fptype models_t::value(const pstring &model, const pstring &entity)
 {
 	model_map_t &map = m_cache[model];
 
@@ -941,7 +941,7 @@ nl_double models_t::value(const pstring &model, const pstring &entity)
 
 	pstring tmp = value_str(model, entity);
 
-	nl_double factor = plib::constants<nl_double>::one();
+	nl_fptype factor = plib::constants<nl_fptype>::one();
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
@@ -958,12 +958,12 @@ nl_double models_t::value(const pstring &model, const pstring &entity)
 			if (*p < '0' || *p > '9')
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
 	}
-	if (factor != plib::constants<nl_double>::one())
+	if (factor != plib::constants<nl_fptype>::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
-	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_double>(tmp), factor);
+	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_fptype>(tmp), factor);
 	bool err(false);
-	auto val = plib::pstonum_ne<nl_double>(tmp, err);
+	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
 	if (err)
 		throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
 	return val * factor;
@@ -1124,7 +1124,7 @@ void setup_t::prepare_to_run()
 			{
 				//FIXME: check for errors ...
 				bool err(false);
-				auto v = plib::pstonum_ne<double>(p->second, err);
+				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
 				if (err || std::abs(v - std::floor(v)) > 1e-6 )
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
 				d.second->set_hint_deactivate(v == 0.0);

@@ -48,7 +48,7 @@ namespace netlist
 		void verror(const pstring &msg) override;
 	private:
 
-		nl_double eval_param(const token_t &tok);
+		nl_fptype eval_param(const token_t &tok);
 
 		token_id_t m_tok_param_left;
 		token_id_t m_tok_param_right;

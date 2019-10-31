@@ -70,9 +70,7 @@ namespace solver
 		, m_cnt(0)
 		, m_dim(size)
 		{
-			// FIXME: This shouldn't be necessary, recalculate on each entry ...
-			for (std::size_t k = 0; k < this->size(); k++)
-				state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
+			this->build_mat_ptr(this->size(), m_A);
 		}
 
 		void reset() override { matrix_solver_t::reset(); }
@@ -267,7 +265,7 @@ namespace solver
 				for (unsigned i = 0; i < rowcount; i++)
 				{
 					const unsigned r = rows[i];
-					double tmp = 0.0;
+					nl_fptype tmp = 0.0;
 					for (unsigned k = 0; k < iN; k++)
 						tmp += VT(r,k) * new_V[k];
 					w[i] = tmp;
@@ -359,8 +357,9 @@ namespace solver
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
-		this->build_LE_A(*this);
-		this->build_LE_RHS(*this);
+		const std::size_t iN = this->size();
+		this->clear_square_mat(iN, this->m_A);
+		this->fill_matrix(iN, this->m_RHS);
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);

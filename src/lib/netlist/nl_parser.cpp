@@ -236,9 +236,9 @@ void parser_t::frontier()
 	// don't do much
 	pstring attachat = get_identifier();
 	require_token(m_tok_comma);
-	double r_IN = eval_param(get_token());
+	nl_fptype r_IN = eval_param(get_token());
 	require_token(m_tok_comma);
-	double r_OUT = eval_param(get_token());
+	nl_fptype r_OUT = eval_param(get_token());
 	require_token(m_tok_param_right);
 
 	m_setup.register_frontier(attachat, r_IN, r_OUT);
@@ -334,7 +334,7 @@ void parser_t::netdev_param()
 	}
 	else
 	{
-		nl_double val = eval_param(tok);
+		nl_fptype val = eval_param(tok);
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
 		m_setup.register_param(param, val);
 	}
@@ -394,7 +394,7 @@ void parser_t::device(const pstring &dev_type)
 			}
 			else
 			{
-				nl_double val = eval_param(tok);
+				nl_fptype val = eval_param(tok);
 				m_setup.register_param(paramfq, val);
 			}
 		}
@@ -410,12 +410,12 @@ void parser_t::device(const pstring &dev_type)
 // ----------------------------------------------------------------------------------------
 
 
-nl_double parser_t::eval_param(const token_t &tok)
+nl_fptype parser_t::eval_param(const token_t &tok)
 {
 	static std::array<pstring, 7> macs = {"", "RES_R", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
-	static std::array<nl_double, 7> facs = {1, 1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
+	static std::array<nl_fptype, 7> facs = {1, 1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
 	std::size_t f=0;
-	nl_double ret(0);
+	nl_fptype ret(0);
 
 	for (std::size_t i=1; i<macs.size();i++)
 		if (tok.str() == macs[i])
@@ -429,9 +429,9 @@ nl_double parser_t::eval_param(const token_t &tok)
 	else
 	{
 		bool err(false);
-		ret = plib::pstonum_ne<nl_double>(tok.str(), err);
+		ret = plib::pstonum_ne<nl_fptype>(tok.str(), err);
 		if (err)
-			error(plib::pfmt("Parameter value <{1}> not double \n")(tok.str()));
+			error(plib::pfmt("Parameter value <{1}> not floating point \n")(tok.str()));
 	}
 	return ret * facs[f];
 
