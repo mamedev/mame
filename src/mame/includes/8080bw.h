@@ -294,8 +294,7 @@ class cane_state : public _8080bw_state
 {
 public:
 	cane_state(machine_config const &mconfig, device_type type, char const *tag) :
-		_8080bw_state(mconfig, type, tag),
-		m_soundboard(*this, "soundboard")
+		_8080bw_state(mconfig, type, tag)
 	{
 	}
 
@@ -306,12 +305,8 @@ protected:
 	void cane_unknown_port0_w(u8 data);
 
 private:
-	virtual void machine_start() override;
-
 	void cane_io_map(address_map &map);
 	void cane_map(address_map &map);
-
-	required_device<cane_audio_device> m_soundboard;
 };
 
 DISCRETE_SOUND_EXTERN( cane_discrete );
@@ -336,12 +331,12 @@ protected:
 	required_shared_ptr<uint8_t> m_main_ram;
 	std::unique_ptr<uint8_t[]> m_scattered_colorram;
 
+	virtual void machine_start() override;
+
 	u8 orbite_scattered_colorram_r(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask = 0xff);
 	void orbite_scattered_colorram_w(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask = 0xff);
 
 private:
-	virtual void machine_start() override;
-
 	void orbite_io_map(address_map &map);
 	void orbite_map(address_map &map);
 

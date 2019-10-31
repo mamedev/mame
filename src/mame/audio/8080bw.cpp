@@ -10,6 +10,9 @@
 #include "sound/discrete.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 /*******************************************************/
 /*                                                     */
@@ -1451,24 +1454,24 @@ static INPUT_PORTS_START( cane_audio )
 	PORT_ADJUSTER( 90, "VR2 - TOS music" )
 
 	PORT_START("VR3")
-	PORT_ADJUSTER( 70, "VR3 - Shoot SFX from 555" )  
+	PORT_ADJUSTER( 70, "VR3 - Shoot SFX from 555" )
 INPUT_PORTS_END
 
 cane_audio_device::cane_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CANE_AUDIO, tag, owner, clock),
-	m_cane_vco_timer(*this, "cane_vco_timer"),	
+	m_vco_timer(*this, "vco_timer"),
 	m_sn(*this, "snsnd"),
 	m_discrete(*this, "discrete"),
-	m_cane_vco_rc_chargetime(INT_MAX)
+	m_vco_rc_chargetime(INT_MAX)
 {
 }
 
 void cane_audio_device::device_add_mconfig(machine_config &config)
 {
 	// provare a commentare
-	m_cane_vco_rc_chargetime = INT_MAX;
+	m_vco_rc_chargetime = INT_MAX;
 
-	TIMER(config, "cane_vco_timer").configure_periodic(FUNC(cane_vco_voltage_timer), attotime::from_hz(1000));
+	TIMER(config, m_vco_timer).configure_periodic(FUNC(cane_audio_device::vco_voltage_timer), attotime::from_hz(1000));
 
 	SPEAKER(config, "mono").front_center();
 
@@ -1478,7 +1481,7 @@ void cane_audio_device::device_add_mconfig(machine_config &config)
 	m_sn->set_amp_res(100+RES_K(20));
 	m_sn->set_noise_params(RES_K(39), RES_K(1), CAP_P(1000));
 	m_sn->set_decay_res(RES_M(1));
-	m_sn->set_attack_params(CAP_U(1.0), RES_K(47));  
+	m_sn->set_attack_params(CAP_U(1.0), RES_K(47));
 	m_sn->set_feedback_res(RES_K(4.7));
 	m_sn->set_vco_params(0, CAP_P(3300), RES_K(100));
 	m_sn->set_pitch_voltage(5.0);
@@ -1503,10 +1506,10 @@ void cane_audio_device::device_start()
 {
 }
 
-void cane_audio_device::cane_sh_port_1_w(u8 data)
+void cane_audio_device::sh_port_1_w(u8 data)
 {
-	/* 
-		bit 0 - SX0 - Sound enable on mixer 
+	/*
+		bit 0 - SX0 - Sound enable on mixer
 		bit 1 - SX1 - SN76477 - Mixer select C - pin 27
 		bit 2 - SX2 - SN76477 - Mixer select A - pin 26
 		bit 3 - SX3 - SN76477 - Mixer select B - pin 25
@@ -1520,8 +1523,8 @@ void cane_audio_device::cane_sh_port_1_w(u8 data)
 	m_sn->enable_w(1);
 	m_sn->set_mixer_params(BIT(data, 2), BIT(data, 3), BIT(data, 1));
 
-	m_cane_vco_timer->adjust(attotime::zero, m_cane_vco_timer->param(), attotime::from_hz(1000));
-	m_cane_vco_rc_chargetime = m_cane_vco_timer->start_time().as_double();
+	m_vco_timer->adjust(attotime::zero, m_vco_timer->param(), attotime::from_hz(1000));
+	m_vco_rc_chargetime = m_vco_timer->start_time().as_double();
 
 	// Little hack...
 	// To be precise I should enable the 76477 every time the CPU reads or write to a port different from port 3
@@ -1530,18 +1533,18 @@ void cane_audio_device::cane_sh_port_1_w(u8 data)
 	m_sn->enable_w(0);
 }
 
-void cane_audio_device::cane_music_w(u8 data)
+void cane_audio_device::music_w(u8 data)
 {
 	m_sn->enable_w(1);
 	m_discrete->write(CANE_MUSIC_DATA, data);
 }
 
-void cane_audio_device::cane_76477_en_w(u8 data)
+void cane_audio_device::sn76477_en_w(u8 data)
 {
 	m_sn->enable_w(0);
 }
 
-void cane_audio_device::cane_76477_dis_w(u8 data)
+void cane_audio_device::sn76477_dis_w(u8 data)
 {
 	m_sn->enable_w(1);
 }
@@ -1631,8 +1634,8 @@ DISCRETE_SOUND_START(cane_discrete)
 *
 * Values for this section of the sound hardware where derived from comments
 * in the source code and the analysis of TOS.ED sources.
-* 
-* For further info look at the relevant comments reported into 
+*
+* For further info look at the relevant comments reported into
 * drivers/8080bw.cpp
 *
 ******************************************************************************/
@@ -1645,7 +1648,7 @@ DISCRETE_SOUND_START(cane_discrete)
 * From 76477 output
 *
 ******************************************************************************/
-	DISCRETE_MULTIPLY(CANE_EXP_SND, CANE_EXP_STREAM, CANE_VR1)	
+	DISCRETE_MULTIPLY(CANE_EXP_SND, CANE_EXP_STREAM, CANE_VR1)
 
 /******************************************************************************
 *
@@ -1667,13 +1670,13 @@ DISCRETE_SOUND_START(cane_discrete)
 */
 DISCRETE_SOUND_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::cane_vco_voltage_timer)
+TIMER_DEVICE_CALLBACK_MEMBER(cane_audio_device::vco_voltage_timer)
 {
 	double voltage;
-	voltage = 5 * (1 - exp(- (m_cane_vco_timer->fire_time().as_double() - m_cane_vco_rc_chargetime) / 47));
+	voltage = 5 * (1 - exp(- (m_vco_timer->fire_time().as_double() - m_vco_rc_chargetime) / 47));
 
-	logerror("t = %d\n", m_cane_vco_timer->fire_time().as_double() - m_cane_vco_rc_chargetime);
-	logerror("vco_voltage = %d\n", voltage);
-	
+	LOG("t = %d\n", m_vco_timer->fire_time().as_double() - m_vco_rc_chargetime);
+	LOG("vco_voltage = %d\n", voltage);
+
 	m_sn->vco_voltage_w(voltage);
 }

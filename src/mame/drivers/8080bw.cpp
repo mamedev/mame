@@ -3567,26 +3567,21 @@ void _8080bw_state::init_invmulti()
 /*******************************************************/
 /***********************************************************************************************************************************
 	This game was never released by Model Racing to the public.
- 
-	The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer 
+
+	The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer
 	Adolfo Melilli (adolfo@melilli.com).
-	Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and 
+	Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
 	dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
 	Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
 	romset and wrote a mame driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
- 
+
 	The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
-	code and comments written into the source files of the game. Several of those hypothesis came following the directions of 
+	code and comments written into the source files of the game. Several of those hypothesis came following the directions of
 	previous yet contemporary Model Racing works (Eg: Claybuster) and where confirmed by Melilli himself.
- 
+
 	Being unreleased this games has not an official name, thus the name used in the source files was used instead.
 
 ***********************************************************************************************************************************/
-void cane_state::machine_start()
-{
-	mw8080bw_state::machine_start();
-}
-
 void cane_state::cane_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom().nopw();
@@ -3609,7 +3604,7 @@ void cane_state::cane_io_map(address_map &map)
 													 sx4 routed to 555 one-shot trigger
 	$04 - Reset watchdog timer
 	$05 - Audio TOS
-	
+
 	in:
 	$01 - CPO / coin input port
 	$03 - Hardware shift register - Shift result
@@ -3626,7 +3621,7 @@ Source file: CANE1.ED - Referred only once in code, in the "rifle routine" (ROUT
 ------------
 -- OUT 1 --
 Source files: CANE2.ED, MIRINO.ED
-	
+
 	Defined in CANE2.ED
 
 	> PRMTR EQU 1
@@ -3641,7 +3636,7 @@ Source files: CANE2.ED, MIRINO.ED
 ------------
 -- OUT 2 --
 Source files: CANE1.ED, CANE2.ED, MIRINO.ED
-	
+
 	Defined in CANE2.ED
 
 	> DATO  EQU 2
@@ -3679,7 +3674,7 @@ Source file: CANE1.ED, CANE2.ED
 	Called directly in CANE1.ED
 
 	> INT8:
-	>   OUT 4 
+	>   OUT 4
 	> ;PER LAUTORESET
 
 	Also defined in CANE2.ED
@@ -3695,7 +3690,7 @@ Source file: CANE1.ED, CANE2.ED
 Source file: CANE2.ED, TOS.ED
 
 TOS sound
-D0-D7 is pushed into a LS273 (Octal D-type Flip-Flop) and it's value is used to preload the starting value of 
+D0-D7 is pushed into a LS273 (Octal D-type Flip-Flop) and it's value is used to preload the starting value of
 two, cascaded, LS161 (Synchronous 4-Bit Counters).
 The counters drive a J-K Flip-Flop generating a square wave signal drived in frequency by the preloaded value.
 
@@ -3734,7 +3729,7 @@ The musical note is defined in a library source file TOS.ED and referred later b
 	LA    114   - 1000/(255-114) = 7.09 KHz
 	LAD   122   - 1000/(255-122) = 7.52 KHz
 	SI    129   - 1000/(255-129) = 7.94 KHz
-	
+
 	DO2   136   - 1000/(255-136) = 8.4  KHz
 	DOD2  143   - 1000/(255-143) = 8.93 KHz
 	RE2   149.5 - 1000/(255-150) = 9.52 KHz
@@ -3747,7 +3742,7 @@ The musical note is defined in a library source file TOS.ED and referred later b
 	LA2   185   - 1000/(255-185) = 14.29 KHz
 	LAD2  189   - 1000/(255-189) = 15.15 KHz
 	SI2   192.5 - 1000/(255-193) = 16.13 KHz
-	
+
 	Pause code:
 	PAU EQU 255
 
@@ -3773,16 +3768,16 @@ Source file: CANE1.ED, CANE2.ED
 	> OUT LOW DATO
 	> IN  LOW PRONTO
 
-**********************************************************************************************************************************/  
+**********************************************************************************************************************************/
 	map(0x00, 0x00).w(FUNC(cane_state::cane_unknown_port0_w));
 
 	map(0x01, 0x01).portr("IN1").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w("soundboard", FUNC(cane_audio_device::cane_sh_port_1_w));
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w("soundboard", FUNC(cane_audio_device::sh_port_1_w));
 
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 
-	map(0x05, 0x05).w("soundboard", FUNC(cane_audio_device::cane_music_w));
+	map(0x05, 0x05).w("soundboard", FUNC(cane_audio_device::music_w));
 }
 
 static INPUT_PORTS_START( cane )
@@ -3867,7 +3862,7 @@ void cane_state::cane(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	// audio hardware
-	CANE_AUDIO(config, "soundboard");  
+	CANE_AUDIO(config, "soundboard");
 }
 
 void cane_state::cane_unknown_port0_w(u8 data)
@@ -3883,18 +3878,18 @@ void cane_state::cane_unknown_port0_w(u8 data)
 /***********************************************************************************************************************************
 	This game was never completed and released by Model Racing to the public.
 	It's in a nearly incomplete form (eg: doesn't have any sound or score routine in the code) and it's barely playable.
- 
-	The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer 
+
+	The assembler source files for this game where extracted from the original floppy disks used by the former Model Racing developer
 	Adolfo Melilli (adolfo@melilli.com).
-	Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and 
+	Those disks where retrieved by Alessandro Bolgia (xadhoom76@gmail.com) and Lorenzo Fongaro (lorenzo.fongaro@virgilio.it) and
 	dumped by Piero Andreini (pieroandreini@gmail.com) using KryoFlux hardware and software.
 	Subsequently Jean Paul Piccato (j2pguard-spam@yahoo.com) mounted the images and compiled the source files, managed to set up a
 	romset and wrote a mame driver that aims to reproduce in the most faithful way the work of Melilli at Model Racing in late '70s.
- 
+
 	The game driver is not based on hardware inspection and is solely derived from assumptions I've made looking at the assembler
-	code and comments written into the source files of the game. Several of those hypothesis came following the directions of 
+	code and comments written into the source files of the game. Several of those hypothesis came following the directions of
 	previous yet contemporary Model Racing works (Eg: Claybuster) and where confirmed by Melilli himself.
- 
+
 	Being unreleased this games has not an official name, thus the name used in the source files was used instead.
 
 ***********************************************************************************************************************************/
@@ -3951,9 +3946,10 @@ INPUT_PORTS_END
 
 void orbite_state::machine_start()
 {
-	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);  
+	_8080bw_state::machine_start();
+
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
-	mw8080bw_state::machine_start();  
 }
 
 void orbite_state::orbite(machine_config &config)
