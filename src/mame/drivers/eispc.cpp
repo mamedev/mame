@@ -27,7 +27,6 @@
  * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
  * - Implement the descrete baudrate generator
- * - Implement logic around enabling/resetting NMI and ISA bus I/O CHK
  *
  * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
@@ -48,6 +47,7 @@
 // Devices
 #include "cpu/i86/i86.h"
 #include "machine/am9517a.h"
+#include "machine/i8087.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -82,8 +82,9 @@
 #define LOG_LPT     (1U << 8)
 #define LOG_NMI     (1U << 9)
 #define LOG_BITS    (1U << 10)
+#define LOG_FPU     (1U << 11)
 
-//#define VERBOSE (LOG_BITS|LOG_KBD|LOG_IRQ)
+//#define VERBOSE (LOG_FPU)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -97,7 +98,8 @@
 #define LOGFDC(...)  LOGMASKED(LOG_FDC,  __VA_ARGS__)
 #define LOGLPT(...)  LOGMASKED(LOG_LPT,  __VA_ARGS__)
 #define LOGNMI(...)  LOGMASKED(LOG_NMI,  __VA_ARGS__)
-#define LOGBITS(...) LOGMASKED(LOG_BITS,  __VA_ARGS__)
+#define LOGBITS(...) LOGMASKED(LOG_BITS, __VA_ARGS__)
+#define LOGFPU(...)  LOGMASKED(LOG_FPU,  __VA_ARGS__)
 
 class epc_state : public driver_device
 {
@@ -745,10 +747,23 @@ void epc_state::epc(machine_config &config)
 {
 	config.set_default_layout(layout_epc);
 
+	// CPU
 	I8088(config, m_maincpu, XTAL(14'318'181) / 3.0); // TWE crystal marked X1 verified divided through a 82874
 	m_maincpu->set_addrmap(AS_PROGRAM, &epc_state::epc_map);
 	m_maincpu->set_addrmap(AS_IO, &epc_state::epc_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
+	m_maincpu->esc_opcode_handler().set("fpu8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("fpu8087", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "fpu8087", XTAL(14'318'181) / 3.0));
+	i8087.set_space_88(m_maincpu, AS_PROGRAM);
+	i8087.irq().set([this](bool state)
+	{
+		LOGFPU("8087 INT: %d\n", state);
+		m_8087_int = state;
+		update_nmi();
+	});
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	// DMA
 	AM9517A(config, m_dma8237a, XTAL(14'318'181) / 3.0); // TWE crystal marked X1 verified
