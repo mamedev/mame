@@ -81,7 +81,7 @@ namespace devices
 
 		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 
-		std::vector<matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
+		std::vector<solver::matrix_solver_t *> &solvers = (force_solve ? m_mat_solvers_all : m_mat_solvers_timestepping);
 
 		if (nthreads > 1 && solvers.size() > 1)
 		{
@@ -110,45 +110,45 @@ namespace devices
 	}
 
 	template <class C>
-	plib::unique_ptr<matrix_solver_t> create_it(netlist_state_t &nl, pstring name,
+	plib::unique_ptr<solver::matrix_solver_t> create_it(netlist_state_t &nl, pstring name,
 		analog_net_t::list_t &nets,
-		solver_parameters_t &params, std::size_t size)
+		solver::solver_parameters_t &params, std::size_t size)
 	{
 		return plib::make_unique<C>(nl, name, nets, &params, size);
 	}
 
 	template <typename FT, int SIZE>
-	plib::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size,
+	plib::unique_ptr<solver::matrix_solver_t> NETLIB_NAME(solver)::create_solver(std::size_t size,
 		const pstring &solvername,
 		analog_net_t::list_t &nets)
 	{
 		switch (m_params.m_method())
 		{
-			case matrix_type_e::MAT_CR:
+			case solver::matrix_type_e::MAT_CR:
 				if (size > 0) // GCR always outperforms MAT solver
 				{
-					return create_it<matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+					return create_it<solver::matrix_solver_GCR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 				}
 				else
 				{
-					return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+					return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 				}
-			case matrix_type_e::SOR_MAT:
-				return create_it<matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case matrix_type_e::MAT:
-				return create_it<matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case matrix_type_e::SM:
+			case solver::matrix_type_e::SOR_MAT:
+				return create_it<solver::matrix_solver_SOR_mat_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::MAT:
+				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::SM:
 				/* Sherman-Morrison Formula */
-				return create_it<matrix_solver_sm_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case matrix_type_e::W:
+				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::W:
 				/* Woodbury Formula */
-				return create_it<matrix_solver_w_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case matrix_type_e::SOR:
-				return create_it<matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
-			case matrix_type_e::GMRES:
-				return create_it<matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::SOR:
+				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
+			case solver::matrix_type_e::GMRES:
+				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 		}
-		return plib::unique_ptr<matrix_solver_t>();
+		return plib::unique_ptr<solver::matrix_solver_t>();
 	}
 
 	struct net_splitter
@@ -224,17 +224,17 @@ namespace devices
 		log().verbose("Found {1} net groups in {2} nets\n", splitter.groups.size(), state().nets().size());
 		for (auto & grp : splitter.groups)
 		{
-			plib::unique_ptr<matrix_solver_t> ms;
+			plib::unique_ptr<solver::matrix_solver_t> ms;
 			std::size_t net_count = grp.size();
 			pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
 			switch (net_count)
 			{
 				case 1:
-					ms = plib::make_unique<matrix_solver_direct1_t<double>>(state(), sname, grp, &m_params);
+					ms = plib::make_unique<solver::matrix_solver_direct1_t<double>>(state(), sname, grp, &m_params);
 					break;
 				case 2:
-					ms = plib::make_unique<matrix_solver_direct2_t<double>>(state(), sname, grp, &m_params);
+					ms = plib::make_unique<solver::matrix_solver_direct2_t<double>>(state(), sname, grp, &m_params);
 					break;
 #if 0
 				case 3:

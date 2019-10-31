@@ -13,7 +13,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	// ----------------------------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace devices
 
 	};
 
-} //namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_DIRECT2_H_ */

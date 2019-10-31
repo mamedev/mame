@@ -21,7 +21,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -135,7 +135,7 @@ namespace devices
 
 
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_GMRES_H_ */

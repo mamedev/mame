@@ -51,14 +51,14 @@ namespace devices
 		logic_input_t m_fb_step;
 		logic_output_t m_Q_step;
 
-		std::vector<plib::unique_ptr<matrix_solver_t>> m_mat_solvers;
-		std::vector<matrix_solver_t *> m_mat_solvers_all;
-		std::vector<matrix_solver_t *> m_mat_solvers_timestepping;
+		std::vector<plib::unique_ptr<solver::matrix_solver_t>> m_mat_solvers;
+		std::vector<solver::matrix_solver_t *> m_mat_solvers_all;
+		std::vector<solver::matrix_solver_t *> m_mat_solvers_timestepping;
 
-		solver_parameters_t m_params;
+		solver::solver_parameters_t m_params;
 
 		template <typename FT, int SIZE>
-		plib::unique_ptr<matrix_solver_t> create_solver(std::size_t size,
+		plib::unique_ptr<solver::matrix_solver_t> create_solver(std::size_t size,
 			const pstring &solvername, analog_net_t::list_t &nets);
 	};
 

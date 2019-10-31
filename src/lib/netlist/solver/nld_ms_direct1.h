@@ -13,7 +13,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 	template <typename FT>
 	class matrix_solver_direct1_t: public matrix_solver_direct_t<FT, 1>
@@ -49,7 +49,7 @@ namespace devices
 
 
 
-} //namespace devices
+} // namespace solver
 } // namespace netlist
 
 

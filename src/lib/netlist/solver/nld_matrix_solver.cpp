@@ -12,7 +12,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	terms_for_net_t::terms_for_net_t(analog_net_t * net)
@@ -58,11 +58,13 @@ namespace devices
 	{
 		connect_post_start(m_fb_sync, m_Q_sync);
 		setup_base(nets);
+
+		/* now setup the matrix */
+		setup_matrix();
 	}
 
 	void matrix_solver_t::setup_base(const analog_net_t::list_t &nets)
 	{
-
 		log().debug("New solver setup\n");
 
 		m_terms.clear();
@@ -130,9 +132,6 @@ namespace devices
 			}
 			log().debug("added net with {1} populated connections\n", net->core_terms().size());
 		}
-
-		/* now setup the matrix */
-		setup_matrix();
 	}
 
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
@@ -417,8 +416,19 @@ namespace devices
 			d->timestep(dd);
 	}
 
-	void matrix_solver_t::solve_base()
+	const netlist_time matrix_solver_t::solve(netlist_time now)
 	{
+		const netlist_time delta = now - m_last_step;
+
+		// We are already up to date. Avoid oscillations.
+		// FIXME: Make this a parameter!
+		if (delta < netlist_time::quantum())
+			return netlist_time::zero();
+
+		/* update all terminals for new time step */
+		m_last_step = now;
+		step(delta);
+
 		++m_stat_vsolver_calls;
 		if (has_dynamic_devices())
 		{
@@ -444,21 +454,7 @@ namespace devices
 		{
 			this->vsolve_non_dynamic(false);
 		}
-	}
 
-	const netlist_time matrix_solver_t::solve(netlist_time now)
-	{
-		const netlist_time delta = now - m_last_step;
-
-		// We are already up to date. Avoid oscillations.
-		// FIXME: Make this a parameter!
-		if (delta < netlist_time::quantum())
-			return netlist_time::zero();
-
-		/* update all terminals for new time step */
-		m_last_step = now;
-		step(delta);
-		solve_base();
 		const netlist_time next_time_step = compute_next_timestep(delta.as_double());
 
 		return next_time_step;
@@ -622,6 +618,6 @@ namespace devices
 		}
 	}
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 

@@ -186,13 +186,17 @@ namespace netlist
 
 	namespace devices
 	{
-		class matrix_solver_t;
 		class NETLIB_NAME(solver);
 		class NETLIB_NAME(mainclock);
 		class NETLIB_NAME(base_proxy);
 		class NETLIB_NAME(base_d_to_a_proxy);
 		class NETLIB_NAME(base_a_to_d_proxy);
 	} // namespace devices
+
+	namespace solver
+	{
+		class matrix_solver_t;
+	} // namespace solver
 
 	class logic_output_t;
 	class logic_input_t;
@@ -902,12 +906,12 @@ namespace netlist
 		nl_double *Q_Analog_state_ptr() NL_NOEXCEPT { return m_cur_Analog.ptr(); }
 
 		//FIXME: needed by current solver code
-		devices::matrix_solver_t *solver() const noexcept { return m_solver; }
-		void set_solver(devices::matrix_solver_t *solver) noexcept { m_solver = solver; }
+		solver::matrix_solver_t *solver() const noexcept { return m_solver; }
+		void set_solver(solver::matrix_solver_t *solver) noexcept { m_solver = solver; }
 
 	private:
 		state_var<nl_double>     m_cur_Analog;
-		devices::matrix_solver_t *m_solver;
+		solver::matrix_solver_t *m_solver;
 	};
 
 	// -----------------------------------------------------------------------------

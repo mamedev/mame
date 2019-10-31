@@ -20,7 +20,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 	P_ENUM(matrix_sort_type_e,
 		NOSORT,
@@ -161,8 +161,6 @@ namespace devices
 	{
 	public:
 		using list_t = std::vector<matrix_solver_t *>;
-
-		void solve_base();
 
 		/* after every call to solve, update inputs must be called.
 		 * this can be done as well as a batch to ease parallel processing.
@@ -481,17 +479,17 @@ namespace devices
 			const float_type * const * other_cur_analog = m_connected_net_Vn[k];
 
 			for (std::size_t i = 0; i < terms_count; i++)
-				rhsk_a = rhsk_a + Idr[i];
+				rhsk_a += Idr[i];
 
 			for (std::size_t i = m_terms[k].railstart(); i < terms_count; i++)
 				//rhsk = rhsk + go[i] * terms[i]->m_otherterm->net().as_analog().Q_Analog();
-				rhsk_b = rhsk_b - go[i] * *other_cur_analog[i];
+				rhsk_b += - go[i] * *other_cur_analog[i];
 
 			child.RHS(k) = rhsk_a + rhsk_b;
 		}
 	}
 
-} //namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */

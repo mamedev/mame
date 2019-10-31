@@ -20,7 +20,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -218,7 +218,7 @@ namespace devices
 
 	}
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_GAUSS_SEIDEL_H_ */

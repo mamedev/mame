@@ -22,7 +22,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -262,7 +262,7 @@ namespace devices
 		return (err > this->m_params.m_accuracy) ? 2 : 1;
 	}
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_GCR_H_ */

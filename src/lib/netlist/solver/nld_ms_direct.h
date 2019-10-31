@@ -18,7 +18,7 @@
 
 namespace netlist
 {
-namespace devices
+namespace solver
 {
 
 	template <typename FT, int SIZE>
@@ -51,6 +51,8 @@ namespace devices
 
 		const FT &RHS(std::size_t r) const noexcept { return m_A[r][size()]; }
 		FT &RHS(std::size_t r) noexcept { return m_A[r][size()]; }
+
+		PALIGNAS_VECTOROPT()
 		plib::parray<FT, SIZE>  m_new_V;
 
 	private:
@@ -59,6 +61,8 @@ namespace devices
 
 		const std::size_t m_dim;
 		const std::size_t m_pitch;
+
+		PALIGNAS_VECTOROPT()
 		plib::parray2D<FT, SIZE, m_pitch_ABS> m_A;
 	};
 
@@ -79,10 +83,10 @@ namespace devices
 				const auto &nzrd = m_terms[i].m_nzrd;
 				const auto &nzbd = m_terms[i].m_nzbd;
 
-				for (auto j : nzbd)
+				for (auto &j : nzbd)
 				{
 					const FT f1 = -f * A(j, i);
-					for (auto k : nzrd)
+					for (auto &k : nzrd)
 						A(j, k) += A(i, k) * f1;
 					//RHS(j) += RHS(i) * f1;
 				}
@@ -215,7 +219,7 @@ namespace devices
 			state().save(*this, RHS(k), this->name(), plib::pfmt("RHS.{1}")(k));
 	}
 
-} // namespace devices
+} // namespace solver
 } // namespace netlist
 
 #endif /* NLD_MS_DIRECT_H_ */
