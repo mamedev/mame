@@ -131,7 +131,7 @@ namespace solver
 
 		mat_type mat;
 
-		plib::dynproc<void, nl_fptype * , nl_fptype * , nl_fptype * > m_proc;
+		plib::dynproc<void, FT * , FT * , FT * > m_proc;
 
 	};
 

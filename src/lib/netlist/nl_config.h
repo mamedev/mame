@@ -96,7 +96,52 @@
 static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
-//#define nl_fptype float
+//============================================================
+// Floating point types used
+//
+// Don't change this. Simple analog circuits like pong
+// work with float. Kidniki just doesn't work at all
+// due to numeric issues
+//============================================================
+
 using nl_fptype = double;
+//using nl_fptype = float;
+
+using nl_mat_fptype = nl_fptype;
+
+namespace netlist
+{
+	/*! Specific constants depending on floating type
+	 *
+	 *  @tparam FT floating point type: double/float
+	 */
+	template <typename FT>
+	struct fp_constants
+	{ };
+
+	/*! Specific constants for double floating point type
+	 */
+	template <>
+	struct fp_constants<double>
+	{
+		static constexpr const double DIODE_MAXDIFF = 1e100;
+		static constexpr const double DIODE_MAXVOLT = 300.0;
+
+		static constexpr const double TIMESTEP_MAXDIFF = 1e100;
+		static constexpr const double TIMESTEP_MINDIV = 1e-60;
+	};
+
+	/*! Specific constants for float floating point type
+	 */
+	template <>
+	struct fp_constants<float>
+	{
+		static constexpr const float DIODE_MAXDIFF = 1e5;
+		static constexpr const float DIODE_MAXVOLT = 30.0;
+
+		static constexpr const float TIMESTEP_MAXDIFF = 1e30;
+		static constexpr const float TIMESTEP_MINDIV = 1e-8;
+	};
+} // namespace netlist
 
 #endif /* NLCONFIG_H_ */

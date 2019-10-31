@@ -149,7 +149,7 @@ namespace devices
 		logic_output_t m_Q;
 
 		param_str_t m_func;
-		plib::pfunction m_compiled;
+		plib::pfunction<nl_fptype> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -389,7 +389,7 @@ namespace devices
 		std::vector<unique_pool_ptr<analog_input_t>> m_I;
 
 		std::vector<nl_fptype> m_vals;
-		plib::pfunction m_compiled;
+		plib::pfunction<nl_fptype> m_compiled;
 	};
 
 	// -----------------------------------------------------------------------------

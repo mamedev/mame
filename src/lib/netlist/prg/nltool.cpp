@@ -311,11 +311,14 @@ struct input_t
 	: m_value(0.0)
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
-		nl_fptype t(0);
+		double t(0);
+		double val(0);
+
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-vararg)
-		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &m_value);
+		int e = std::sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf.data(), &val);
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
+		m_value = static_cast<nl_fptype>(val);
 		m_time = netlist::netlist_time::from_double(t);
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}

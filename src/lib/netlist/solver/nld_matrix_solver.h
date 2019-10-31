@@ -383,7 +383,7 @@ namespace solver
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gonn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_gtn;
 		plib::pmatrix2d<nl_fptype, aligned_alloc<nl_fptype>>        m_Idrn;
-		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_mat_ptr;
+		plib::pmatrix2d<nl_mat_fptype *, aligned_alloc<nl_mat_fptype *>>    m_mat_ptr;
 		plib::pmatrix2d<nl_fptype *, aligned_alloc<nl_fptype *>>    m_connected_net_Vn;
 
 		plib::aligned_vector<terms_for_net_t> m_terms;
@@ -439,9 +439,10 @@ namespace solver
 		 */
 
 		const std::size_t iN = this->m_terms.size();
-		typename std::decay<decltype(V[0])>::type cerr = 0;
+		using vtype = typename std::decay<decltype(V[0])>::type;
+		vtype cerr = 0;
 		for (std::size_t i = 0; i < iN; i++)
-			cerr = std::max(cerr, std::abs(V[i] - this->m_terms[i].getV()));
+			cerr = std::max(cerr, std::abs(V[i] - static_cast<vtype>(this->m_terms[i].getV())));
 		return cerr;
 	}
 

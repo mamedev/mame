@@ -565,7 +565,7 @@ namespace solver
 				//const nl_fptype DD_n = (n->Q_Analog() - t->m_last_V);
 				// avoid floating point exceptions
 
-				const nl_fptype DD_n = std::max(-1e100, std::min(1e100,(t.getV() - m_last_V[k])));
+				const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF, std::min(fp_constants<nl_fptype>::TIMESTEP_MAXDIFF,(t.getV() - m_last_V[k])));
 				const nl_fptype hn = cur_ts;
 
 				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
@@ -574,7 +574,7 @@ namespace solver
 
 				m_h_n_m_1[k] = hn;
 				m_DD_n_m_1[k] = DD_n;
-				if (std::fabs(DD2) > plib::constants<nl_fptype>::cast(1e-60)) // avoid div-by-zero
+				if (std::fabs(DD2) > fp_constants<nl_fptype>::TIMESTEP_MINDIV) // avoid div-by-zero
 					new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_fptype>::cast(0.5)*DD2));
 				else
 					new_net_timestep = m_params.m_max_timestep;

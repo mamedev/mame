@@ -231,62 +231,62 @@ namespace devices
 			switch (net_count)
 			{
 				case 1:
-					ms = plib::make_unique<solver::matrix_solver_direct1_t<nl_fptype>>(state(), sname, grp, &m_params);
+					ms = plib::make_unique<solver::matrix_solver_direct1_t<nl_mat_fptype>>(state(), sname, grp, &m_params);
 					break;
 				case 2:
-					ms = plib::make_unique<solver::matrix_solver_direct2_t<nl_fptype>>(state(), sname, grp, &m_params);
+					ms = plib::make_unique<solver::matrix_solver_direct2_t<nl_mat_fptype>>(state(), sname, grp, &m_params);
 					break;
 #if 0
 				case 3:
-					ms = create_solver<nl_fptype, 3>(3, sname, grp);
+					ms = create_solver<nl_mat_fptype, 3>(3, sname, grp);
 					break;
 				case 4:
-					ms = create_solver<nl_fptype, 4>(4, sname, grp);
+					ms = create_solver<nl_mat_fptype, 4>(4, sname, grp);
 					break;
 				case 5:
-					ms = create_solver<nl_fptype, 5>(5, sname, grp);
+					ms = create_solver<nl_mat_fptype, 5>(5, sname, grp);
 					break;
 				case 6:
-					ms = create_solver<nl_fptype, 6>(6, sname, grp);
+					ms = create_solver<nl_mat_fptype, 6>(6, sname, grp);
 					break;
 				case 7:
-					ms = create_solver<nl_fptype, 7>(7, sname, grp);
+					ms = create_solver<nl_mat_fptype, 7>(7, sname, grp);
 					break;
 				case 8:
-					ms = create_solver<nl_fptype, 8>(8, sname, grp);
+					ms = create_solver<nl_mat_fptype, 8>(8, sname, grp);
 					break;
 				case 9:
-					ms = create_solver<nl_fptype, 9>(9, sname, grp);
+					ms = create_solver<nl_mat_fptype, 9>(9, sname, grp);
 					break;
 				case 10:
-					ms = create_solver<nl_fptype, 10>(10, sname, grp);
+					ms = create_solver<nl_mat_fptype, 10>(10, sname, grp);
 					break;
 	#if 0
 				case 11:
-					ms = create_solver<nl_fptype, 11>(11, sname);
+					ms = create_solver<nl_mat_fptype, 11>(11, sname);
 					break;
 				case 12:
-					ms = create_solver<nl_fptype, 12>(12, sname);
+					ms = create_solver<nl_mat_fptype, 12>(12, sname);
 					break;
 				case 15:
-					ms = create_solver<nl_fptype, 15>(15, sname);
+					ms = create_solver<nl_mat_fptype, 15>(15, sname);
 					break;
 				case 31:
-					ms = create_solver<nl_fptype, 31>(31, sname);
+					ms = create_solver<nl_mat_fptype, 31>(31, sname);
 					break;
 				case 35:
-					ms = create_solver<nl_fptype, 35>(35, sname);
+					ms = create_solver<nl_mat_fptype, 35>(35, sname);
 					break;
 				case 43:
-					ms = create_solver<nl_fptype, 43>(43, sname);
+					ms = create_solver<nl_mat_fptype, 43>(43, sname);
 					break;
 				case 49:
-					ms = create_solver<nl_fptype, 49>(49, sname);
+					ms = create_solver<nl_mat_fptype, 49>(49, sname);
 					break;
 	#endif
 	#if 1
 				case 87:
-					ms = create_solver<nl_fptype,86>(86, sname, grp);
+					ms = create_solver<nl_mat_fptype,86>(86, sname, grp);
 					break;
 	#endif
 	#endif
@@ -294,35 +294,35 @@ namespace devices
 					log().info(MI_NO_SPECIFIC_SOLVER(net_count));
 					if (net_count <= 8)
 					{
-						ms = create_solver<nl_fptype, -8>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -8>(net_count, sname, grp);
 					}
 					else if (net_count <= 16)
 					{
-						ms = create_solver<nl_fptype, -16>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -16>(net_count, sname, grp);
 					}
 					else if (net_count <= 32)
 					{
-						ms = create_solver<nl_fptype, -32>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -32>(net_count, sname, grp);
 					}
 					else if (net_count <= 64)
 					{
-						ms = create_solver<nl_fptype, -64>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -64>(net_count, sname, grp);
 					}
 					else if (net_count <= 128)
 					{
-						ms = create_solver<nl_fptype, -128>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -128>(net_count, sname, grp);
 					}
 					else if (net_count <= 256)
 					{
-						ms = create_solver<nl_fptype, -256>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -256>(net_count, sname, grp);
 					}
 					else if (net_count <= 512)
 					{
-						ms = create_solver<nl_fptype, -512>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, -512>(net_count, sname, grp);
 					}
 					else
 					{
-						ms = create_solver<nl_fptype, 0>(net_count, sname, grp);
+						ms = create_solver<nl_mat_fptype, 0>(net_count, sname, grp);
 					}
 					break;
 			}
