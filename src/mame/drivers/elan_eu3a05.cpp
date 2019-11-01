@@ -39,7 +39,9 @@
     RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if between
     certain values? probably read via serial??
 
+	-----------------------
     Custom Interrupt purposes
+	-----------------------
 
     TETRIS
 
@@ -68,6 +70,8 @@
 
     ffdc
     accesses 501d / 501b
+
+	-----------------------
 
     SPACE INVADERS
 
@@ -124,6 +128,37 @@
     ffec
     dead loop
 
+	-----------------------
+	
+	AIR BLASTER JOYSTICK
+
+	all these 60xx jumps expect bank 00 or 0e or 3a or 7d to be active, so IRQs must be masked
+
+	ffb0: jmp to 6000  (ends up jumping to pointer from RAM)
+	ffb4: jmp to e08e  (stuff with 500c/500d/506e etc.)
+	ffb8: jmp to 601c  (stub handler) (has function in bank 0e - writes 00 then 01 to 50a5)
+	ffbc: jmp to 602a  (stub handler)
+	ffc0: jmp to 6038  (stub handler)
+	ffc4: jmp to 6046  (stub handler)
+	ffc8: jmp to 6054  (stub handler)
+	ffcc: jmp to 6062  (stub handler)
+	ffd0: jmp to 6070  (stub handler)
+	ffd4: jmp to 607e  (valid code - main IRQ?)
+	ffd8: jmp to 608c  (stub handler)
+	ffdc: jmp to 609a  (stub handler)
+	ffe0: jmp to 60a8  (stub handler)
+	ffe4: jmp to 60b6  (stub handler)
+	ffe8: jmp to 60c4  (stub handler)
+	ffec: jmp to 60d2  (stub handler)
+
+	fff0: 7d
+
+	fffa: e0 60 (60e0 vector) (stub handler)
+	fffc: 88 e1 (e188 startup vector)
+	fffe: 02 e0 (e002 vector)
+
+
+	----
 
     Flaws (NOT emulation bugs, happen on hardware):
     --
