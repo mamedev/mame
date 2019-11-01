@@ -93,11 +93,45 @@ Parts:
 | CN0                          | 7805A                                  |
 | CN1                          | LED PCB                                |
 | CN3                          | Volume Control PCB                     |
-| CN4                          | Unpopulated                            |
+| CN4                          | unpopulated                            |
 | CN5                          | PCM Card Slot                          |
 | X1                           | Crystal 12MHz                          |
 | X2                           | Crystal 32.768KHz                      |
 |-----------------------------------------------------------------------|
+
+
+CM-32P Firmware Work RAM Layout
+-------------------------------
+2344..23C1 - Part 1..6 "Patch temporary area" (see manual page 21, 0x15 bytes per partial)
+23C4..23D4 - "System area" settings (see manual page 22, master volume, reverb setting, channel assignments)
+23D6..25B5 - Part 1..6 instrument data (0x50 bytes per partial, from PCM ROM at 0x1000/0x1050/0x10A0/...)
+25B8..2B57 - Part 1..6 sample table data (0xF0 bytes per partial, from PCM ROM at 0x0100/0x010A/0x0114/...)
+
+34DC..34E1 - Part 1..6 Modulation (CC #1, initialized with 0)
+34E2..34E7 - Part 1..6 Pitch Bend LSB (initialized with 0)
+34E8..34ED - Part 1..6 Pitch Bend MSB (initialized with 64)
+34EE..34F3 - Part 1..6 Expression setting (CC #11, initialized with 100)
+34F4..34F9 - Part 1..6 Sustain setting (CC #64, initialized with 0)
+34FA..34FF - Part 1..6 unused (initialized with 0)
+3500..3505 - Part 1..6 RPN LSB (CC #98, initialized with 0xFF)
+3506..350B - Part 1..6 RPN MSB (CC #99, initialized with 0xFF)
+350C..3511 - Part 1..6 NRPN received (initialized with 0xFF, set to 0 when RPN LSB/MSB is received, set to 0xFF when NRPN is received)
+3512..3517 - Part 1..6 ?? (initialized with 0)
+3518..351D - Part 1..6 Instrument setting
+351E - Reverb Mode
+351F - Reverb Time
+3521 - ?? (initialized with 1)
+
+Some routine locations
+----------------------
+0x45CB	Initialization (memory clear + checks), external memory is checked from 0x4679 on
+0x5024	decide whether or not Test Mode is entered (normal boot == jump to 0x502A)
+0x50F5	MIDI handling code
+0x65E8	PCM ROM instrument check
+0x6650	PCM card instrument check (Note: requires the SN-U110-04 PCM card to be inserted to succeed)
+0xB027	read instrument data from PCM ROM
+0xB316	PCM ROM signature check
+0xBBBB	write text to LCD
 
 */
 
@@ -125,16 +159,19 @@ static INPUT_PORTS_START( cm32p )
 	PORT_START("A7")
 	PORT_BIT(0x03ff, 0x0000, IPT_DIAL) PORT_NAME("Knob") PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
 
-	PORT_START("SW")	// test switches
-	//PORT_BIT(0x00, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Check/Tune") PORT_CODE(KEYCODE_0)	// default after booting test mode
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("MSB Adj.") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("THD Check") PORT_CODE(KEYCODE_W)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: String 1") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: Sax 1") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Long Reverb") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Short Reverb") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Down Check") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Up Check") PORT_CODE(KEYCODE_F)
+	PORT_START("SERVICE")	// connected to Port 0 of the P8098 CPU.
+	PORT_SERVICE(0x80, IP_ACTIVE_LOW)	// SW A (checked during boot)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Check/Tune") PORT_CODE(KEYCODE_B)	// SW B
+
+	PORT_START("SW")	// test switches, accessed by reading from address 0x1300
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("MSB Adj.") PORT_CODE(KEYCODE_1)	// SW 1
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("THD Check") PORT_CODE(KEYCODE_2)	// SW 2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: String 1") PORT_CODE(KEYCODE_3)	// SW 3
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: Sax 1") PORT_CODE(KEYCODE_4)	// SW 4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Long Reverb") PORT_CODE(KEYCODE_5)	// SW 5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Short Reverb") PORT_CODE(KEYCODE_6)	// SW 6
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Down Check") PORT_CODE(KEYCODE_7)	// SW 7
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Up Check") PORT_CODE(KEYCODE_8)	// SW 8
 INPUT_PORTS_END
 
 class cm32p_state : public driver_device
@@ -152,7 +189,9 @@ private:
 	required_device<i8x9x_device> cpu;
 	required_device<msm6222b_device> lcd;
 	required_device<timer_device> midi_timer;
+	required_device<ram_device> some_ram;
 	required_ioport test_sw;
+	required_ioport service_port;
 
 	void mt32_palette(palette_device &palette) const;
 
@@ -165,6 +204,8 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_READ16_MEMBER(port0_r);
 	DECLARE_READ8_MEMBER(pcmrom_r);
+	DECLARE_READ8_MEMBER(some_io_r);
+	DECLARE_WRITE8_MEMBER(some_io_w);
 	DECLARE_READ8_MEMBER(snd_io_r);
 	DECLARE_WRITE8_MEMBER(snd_io_w);
 	DECLARE_READ8_MEMBER(test_sw_r);
@@ -174,12 +215,11 @@ private:
 
 	void cm32p_map(address_map &map);
 
-	//uint8_t lcd_data_buffer[256];
-	//int lcd_data_buffer_pos;
-	uint8_t midi;
+	u8 midi;
 	int midi_pos;
-	uint8_t port0;
-	uint8_t sound_io_buffer[256];
+	u8 port0;
+	u8 sound_io_buffer[0x100];
+	u8 some_io_buffer[0x80];
 };
 
 cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -187,7 +227,9 @@ cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const 
 	, cpu(*this, "maincpu")
 	, lcd(*this, "lcd")
 	, midi_timer(*this, "midi_timer")
+	, some_ram(*this, "some_ram")
 	, test_sw(*this, "SW")
+	, service_port(*this, "SERVICE")
 {
 }
 
@@ -226,9 +268,10 @@ uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void cm32p_state::machine_start()
 {
-	//lcd_data_buffer_pos = 0;
-	uint8_t *rom = memregion("maincpu")->base();
-	rom[0xBB2D] = 0x03;	// hack to make test mode work (TODO: remove)
+	// TODO: The IC8 gate array has an "LCD INT" line that needs to be emulated. Then, the hack can be removed.
+	// Note: The hack is not necessary when *not* using test mode.
+	u8 *rom = memregion("maincpu")->base();
+	rom[0xBB2D] = 0x03;	// hack to make test mode not freeze when displaying the LCD text
 }
 
 void cm32p_state::machine_reset()
@@ -241,9 +284,6 @@ void cm32p_state::machine_reset()
 WRITE8_MEMBER(cm32p_state::lcd_ctrl_w)
 {
 	lcd->control_w(data);
-	//for(int i=0; i != lcd_data_buffer_pos; i++)
-	//	lcd->data_w(lcd_data_buffer[i]);
-	//lcd_data_buffer_pos = 0;
 }
 
 READ8_MEMBER(cm32p_state::lcd_ctrl_r)
@@ -255,7 +295,6 @@ READ8_MEMBER(cm32p_state::lcd_ctrl_r)
 
 WRITE8_MEMBER(cm32p_state::lcd_data_w)
 {
-	//lcd_data_buffer[lcd_data_buffer_pos++] = data;
 	lcd->data_w(data);
 }
 
@@ -277,14 +316,49 @@ TIMER_DEVICE_CALLBACK_MEMBER(cm32p_state::midi_timer_cb)
 
 READ16_MEMBER(cm32p_state::port0_r)
 {
-	return port0;
+	return port0 | service_port->read();
 }
 
 READ8_MEMBER(cm32p_state::pcmrom_r)
 {
 	offs_t romOfs = SCRAMBLE_ADDRESS(offset);
-	const uint8_t* pcm_rom = memregion("pcm32")->base();
+	const u8* pcm_rom = memregion("pcm32")->base();
 	return UNSCRAMBLE_DATA(pcm_rom[romOfs]);
+}
+
+READ8_MEMBER(cm32p_state::some_io_r)
+{
+	return some_io_buffer[offset];
+}
+
+WRITE8_MEMBER(cm32p_state::some_io_w)
+{
+	some_io_buffer[offset] = data;
+	// do read/write to some external memory, makes the RCC-CPU check pass. (routine at 0x4679)
+	switch(offset)
+	{
+	case 0x04:
+		// write to partials?? (written in loop at 0x4375)
+		break;
+	case 0x06:
+		{
+			u8* ram = some_ram->pointer();
+			offs_t ofs = data;
+			ram[0x000 | ofs] = some_io_buffer[0x00] & 0x03;
+			ram[0x100 | ofs] = some_io_buffer[0x01];
+			ram[0x200 | ofs] = some_io_buffer[0x02];
+		}
+		break;
+	case 0x0A:
+		{
+			const u8* ram = some_ram->pointer();
+			offs_t ofs = data;
+			some_io_buffer[0x00] = ram[0x000 | ofs];
+			some_io_buffer[0x01] = ram[0x100 | ofs];
+			some_io_buffer[0x02] = ram[0x200 | ofs];
+		}
+		break;
+	}
 }
 
 READ8_MEMBER(cm32p_state::snd_io_r)
@@ -296,7 +370,7 @@ READ8_MEMBER(cm32p_state::snd_io_r)
 		// It waits a few cycles and at 0xB0F7 it reads the resulting data from 1401.
 		offs_t bank = sound_io_buffer[0x03];
 		offs_t addr = (sound_io_buffer[0x09] << 0) | (sound_io_buffer[0x0A] << 8) | (sound_io_buffer[0x0B] << 16);
-		addr = (addr >> 6) + 2;
+		addr = ((addr >> 6) + 2) & 0x3FFFF;
 		addr |= (bank << 16);
 		// write actual ROM address to 1440..1443 for debugging
 		sound_io_buffer[0x43] = (addr >>  0) & 0xFF;
@@ -331,11 +405,10 @@ void cm32p_state::mt32_palette(palette_device &palette) const
 
 void cm32p_state::cm32p_map(address_map &map)
 {
-	map(0x1000, 0x10ff).ram();	// I/O ?? (writes to 1080..82/86/8C/8D)
+	map(0x1080, 0x10ff).rw(FUNC(cm32p_state::some_io_r), FUNC(cm32p_state::some_io_w));	// I/O ?? (writes to 1080..82/86/8C/8D)
 	map(0x1100, 0x1100).rw(FUNC(cm32p_state::lcd_ctrl_r), FUNC(cm32p_state::lcd_ctrl_w));
 	map(0x1102, 0x1102).w(FUNC(cm32p_state::lcd_data_w));
-	//map(0x1200, 0x13ff).ram();	// I/O ?? (reads 1300)
-	map(0x1300, 0x1300).r(FUNC(cm32p_state::test_sw_r));
+	map(0x1300, 0x1300).r(FUNC(cm32p_state::test_sw_r));	// test switch state
 	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));	// sound chip area? (writes to 1400..1F, reads 1401)
 	map(0x2000, 0x20ff).rom().region("maincpu", 0x2000);	// init vector @ 2080
 	map(0x2100, 0x3fff).ram();	// the program clears region 2100..3EFF at init and sets SP=3FFE
@@ -350,6 +423,8 @@ void cm32p_state::cm32p(machine_config &config)
 	maincpu.ach7_cb().set_ioport("A7");
 	maincpu.serial_tx_cb().set(FUNC(cm32p_state::midi_w));
 	maincpu.in_p0_cb().set(FUNC(cm32p_state::port0_r));
+
+	RAM(config, some_ram).set_default_size("8K");
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
