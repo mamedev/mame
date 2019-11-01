@@ -34,6 +34,7 @@ public:
 	{ }
 
 	void inteladv(machine_config &config);
+	void dyndesk(machine_config &config);
 
 protected:
 	virtual void machine_start() override;
@@ -41,10 +42,10 @@ protected:
 	virtual void video_start() override;
 
 private:
-	uint32_t screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void inteladv_main(address_map &map);
-	void inteladv(address_map &map);
+	void dyndesk_main(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -54,7 +55,7 @@ void inteladv_state::video_start()
 {
 }
 
-uint32_t inteladv_state::screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 inteladv_state::screen_update_inteladv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	screen.priority().fill(0, cliprect);
@@ -68,6 +69,14 @@ void inteladv_state::inteladv_main(address_map &map)
 	map(0x4000, 0x5fff).rom().region("maincpu", 0x0000);    // boot code at 4000
 	map(0x8000, 0x8fff).rom().region("maincpu", 0x8000);    // fixed ROM region?
 	map(0xf000, 0xffff).rom().region("maincpu", 0x3000);    // boot and other vectors at 3FFx
+}
+
+void inteladv_state::dyndesk_main(address_map &map)
+{
+	map(0x0000, 0x0fff).ram();
+	map(0x4000, 0x5fff).rom().region("maincpu", 0x4000);    // FIXME: this is banked
+	map(0xc000, 0xdfff).rom().region("maincpu", 0x4000);
+	map(0xffe0, 0xffff).rom().region("maincpu", 0x7fe0);    // vectors are good for boot, but may also be banked
 }
 
 static INPUT_PORTS_START( inteladv )
@@ -103,9 +112,20 @@ void inteladv_state::inteladv(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+void inteladv_state::dyndesk(machine_config &config)
+{
+	inteladv(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &inteladv_state::dyndesk_main);
+}
+
 ROM_START( inteladv )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "vtechinteladv.bin", 0x000000, 0x800000, CRC(e24dbbcb) SHA1(7cb7f25f5eb123ae4c46cd4529aafd95508b2210) )
+ROM_END
+
+ROM_START( dyndesk )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "27-07710-000.u2", 0x000000, 0x200000, CRC(092b0303) SHA1(e3a58cac9b0a1c68f1bdb5ea0af0b0dd223fb340) )
 ROM_END
 
 ROM_START( cars2lap )
@@ -116,4 +136,5 @@ ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                                 FLAGS
 COMP( 1995, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )
+COMP( 2003, dyndesk,  0,      0,      dyndesk,  inteladv, inteladv_state, empty_init, "VTech", "DynamiDesk",                            MACHINE_NOT_WORKING )
 COMP( 2012, cars2lap, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",               MACHINE_IS_SKELETON ) // might not belong here

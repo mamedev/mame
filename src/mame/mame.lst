@@ -16194,6 +16194,7 @@ instruct                        //
 
 @source:inteladv.cpp
 cars2lap                        // CARS 2 Laptop (Germany)
+dyndesk
 inteladv
 
 @source:intellec4.cpp
