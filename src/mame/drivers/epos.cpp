@@ -813,7 +813,7 @@ GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, empty_init, ROT270
 GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
+GAME( 1983, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
 /* EPOS TRISTAR 9000 PCB based */
 GAME( 1984, dealer,   0,        dealer, dealer,   epos_state, init_dealer, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )
