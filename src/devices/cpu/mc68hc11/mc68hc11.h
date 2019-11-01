@@ -13,6 +13,7 @@ enum {
 
 DECLARE_DEVICE_TYPE(MC68HC11A1, mc68hc11a1_device)
 DECLARE_DEVICE_TYPE(MC68HC11D0, mc68hc11d0_device)
+DECLARE_DEVICE_TYPE(MC68HC11F1, mc68hc11f1_device)
 DECLARE_DEVICE_TYPE(MC68HC11K1, mc68hc11k1_device)
 DECLARE_DEVICE_TYPE(MC68HC11M0, mc68hc11m0_device)
 
@@ -48,7 +49,7 @@ public:
 	auto out_spi2_data_callback() { return m_spi2_data_output_cb.bind(); }
 
 protected:
-	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int reg_bits, uint16_t internal_ram_size, uint8_t init_value, address_map_constructor reg_map);
+	mc68hc11_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint16_t internal_ram_size, uint16_t reg_block_size, uint8_t init_value, address_map_constructor reg_map);
 
 	// device-level overrides
 	virtual void device_resolve_objects() override;
@@ -152,8 +153,8 @@ private:
 	int m_ram_position;
 	int m_reg_position;
 
-	const uint16_t m_reg_block_size; // size of internal I/O space
 	const uint16_t m_internal_ram_size;
+	const uint16_t m_reg_block_size; // size of internal I/O space
 	const uint8_t m_init_value; // default value for INIT register
 
 	uint8_t m_wait_state;
@@ -538,6 +539,16 @@ protected:
 	uint8_t pactl_r();
 	void pactl_w(uint8_t data);
 
+	void io_map(address_map &map);
+};
+
+class mc68hc11f1_device : public mc68hc11_cpu_device
+{
+public:
+	// construction/destruction
+	mc68hc11f1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	void io_map(address_map &map);
 };
 
