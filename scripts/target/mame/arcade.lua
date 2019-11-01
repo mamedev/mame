@@ -2796,6 +2796,8 @@ files {
 	MAME_DIR .. "src/mame/video/galaga.cpp",
 	MAME_DIR .. "src/mame/video/bosco.cpp",
 	MAME_DIR .. "src/mame/includes/bosco.h",
+	MAME_DIR .. "src/mame/video/starfield_05xx.cpp",
+	MAME_DIR .. "src/mame/video/starfield_05xx.h",
 	MAME_DIR .. "src/mame/video/digdug.cpp",
 	MAME_DIR .. "src/mame/includes/digdug.h",
 	MAME_DIR .. "src/mame/machine/xevious.cpp",

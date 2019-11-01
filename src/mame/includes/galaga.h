@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "video/starfield_05xx.h"
 #include "machine/74259.h"
 #include "sound/discrete.h"
 #include "sound/namco.h"
@@ -12,48 +13,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
-
-
-#define LFSR_CYCLES_PER_LINE 		256
-#define VISIBLE_LINES			224
-#define STARFIELD_X_OFFSET_GALAGA	16
-#define STARFIELD_Y_OFFSET_BOSCO	16
-#define STARFIELD_PIXEL_WIDTH		256
-
-#define LFSR_HIT_MASK		0xFA14
-#define LFSR_HIT_VALUE		0x7800
-#define LFSR_SEED		0x7FFF
-
-
-static const int speed_X_cycle_count_offset[] =
-{
-	0,  1,  2,  3, -4, -3, -2, -1 
-};
-
-static const int pre_vis_cycle_count_values[] = 
-{
-	22 * LFSR_CYCLES_PER_LINE, 
-	23 * LFSR_CYCLES_PER_LINE, 
-	22 * LFSR_CYCLES_PER_LINE, 
-	23 * LFSR_CYCLES_PER_LINE, 
-	19 * LFSR_CYCLES_PER_LINE, 
-	20 * LFSR_CYCLES_PER_LINE, 
-	20 * LFSR_CYCLES_PER_LINE, 
-	22 * LFSR_CYCLES_PER_LINE
-};
-
-static const int post_vis_cycle_count_values[] = 
-{
-	10 * LFSR_CYCLES_PER_LINE, 
-	10 * LFSR_CYCLES_PER_LINE, 
-	12 * LFSR_CYCLES_PER_LINE, 
-	12 * LFSR_CYCLES_PER_LINE, 
-	9  * LFSR_CYCLES_PER_LINE, 
-	9  * LFSR_CYCLES_PER_LINE, 
-	10 * LFSR_CYCLES_PER_LINE, 
-	9  * LFSR_CYCLES_PER_LINE
-};
-
 
 
 class galaga_state : public driver_device
@@ -74,6 +33,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
+		, m_starfield(*this, "starfield")
 	{ }
 
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
@@ -126,18 +86,10 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	output_finder<2> m_leds;
+	optional_device<starfield_05xx_device> m_starfield; // not present on battles, digdug, xevious
 	emu_timer *m_cpu3_interrupt_timer;
 
-	// Current LFSR state
-	uint16_t m_lfsr;
-
-	// Current scroll indexes
-	uint8_t m_stars_scroll_index_x;
-	uint8_t m_stars_scroll_index_y;
-
 	uint32_t m_galaga_gfxbank; // used by catsbee
-
-	uint8_t m_bosco_starclr; // used by bosco
 
 	/* devices */
 

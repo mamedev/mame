@@ -718,6 +718,12 @@ TODO:
 #define MASTER_CLOCK (XTAL(18'432'000))
 
 
+#define STARFIELD_X_OFFSET_GALAGA       16
+#define STARFIELD_X_LIMIT_GALAGA 	256 + STARFIELD_X_OFFSET_GALAGA
+
+#define STARFIELD_Y_OFFSET_BOSCO        16
+#define STARFIELD_X_LIMIT_BOSCO		224
+
 
 READ8_MEMBER(galaga_state::bosco_dsw_r)
 {
@@ -1660,6 +1666,9 @@ void bosco_state::bosco(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bosco);
 	PALETTE(config, m_palette, FUNC(bosco_state::bosco_palette), 64*4 + 64*4 + 4 + 64, 32+64);
 
+	STARFIELD_05XX(config, m_starfield, 0);
+	m_starfield->set_starfield_config(0, STARFIELD_Y_OFFSET_BOSCO, STARFIELD_X_LIMIT_BOSCO);
+
 	MCFG_VIDEO_START_OVERRIDE(bosco_state,bosco)
 
 	/* sound hardware */
@@ -1729,6 +1738,9 @@ void galaga_state::galaga(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_galaga);
 	PALETTE(config, m_palette, FUNC(galaga_state::galaga_palette), 64*4 + 64*4 + 4 + 64, 32+64);
+
+	STARFIELD_05XX(config, m_starfield, 0);
+	m_starfield->set_starfield_config(STARFIELD_X_OFFSET_GALAGA, 0, STARFIELD_X_LIMIT_GALAGA);
 
 	MCFG_VIDEO_START_OVERRIDE(galaga_state,galaga)
 
