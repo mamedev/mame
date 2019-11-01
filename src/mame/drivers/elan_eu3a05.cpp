@@ -1223,6 +1223,16 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 	//	m_custom_irq_vector = 0xffd4;
 	//	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
 	
+	// 5007        5008
+	// ---- --v-   ---- -2-0
+	//
+	// vector = 0xffb0 + 4 * bit position from right
+
+	// each bit seems to relate to an IRQ level
+	// v = vblank bit (vector 0xffd4)
+	// 0 = used for object movement (enemies / bullets) on air blaster chase levels (vector 0xffb0) needs to be frequent, timer? or hbl?
+	// 2 = used for ? on air blaster 2d levels (`vector 0xffb8)
+
 	m_custom_nmi = 1;
 	m_custom_nmi_vector = 0xffd4;
 
