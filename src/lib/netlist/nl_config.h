@@ -124,11 +124,11 @@ namespace netlist
 	template <>
 	struct fp_constants<double>
 	{
-		static constexpr const double DIODE_MAXDIFF = 1e100;
-		static constexpr const double DIODE_MAXVOLT = 300.0;
+		static inline constexpr const double DIODE_MAXDIFF() noexcept { return  1e100; }
+		static inline constexpr double DIODE_MAXVOLT() noexcept { return  300.0; }
 
-		static constexpr const double TIMESTEP_MAXDIFF = 1e100;
-		static constexpr const double TIMESTEP_MINDIV = 1e-60;
+		static inline constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; }
+		static inline constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; }
 	};
 
 	/*! Specific constants for float floating point type
@@ -136,11 +136,11 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static constexpr const float DIODE_MAXDIFF = 1e5;
-		static constexpr const float DIODE_MAXVOLT = 30.0;
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e5; }
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  30.0; }
 
-		static constexpr const float TIMESTEP_MAXDIFF = 1e30f;
-		static constexpr const float TIMESTEP_MINDIV = 1e-8f;
+		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30f; }
+		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
 	};
 } // namespace netlist
 
