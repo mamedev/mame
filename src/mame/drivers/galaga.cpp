@@ -796,7 +796,7 @@ TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
 	int scanline = param;
 
 	if(m_sub2_nmi_mask)
-		nmi_line_pulse(*m_subcpu2);
+		m_subcpu2->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 
 	scanline = scanline + 128;
 	if (scanline >= 272)

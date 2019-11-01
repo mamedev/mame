@@ -209,8 +209,8 @@ public:
 	DECLARE_READ8_MEMBER(epos_decryption_w);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
-	DECLARE_MACHINE_START(eeekk);
-	DECLARE_MACHINE_RESET(eeekk);
+	DECLARE_MACHINE_START(eeekkp);
+	DECLARE_MACHINE_RESET(eeekkp);
 	DECLARE_MACHINE_START(acitya);
 	DECLARE_MACHINE_RESET(acitya);
 
@@ -226,7 +226,7 @@ public:
 	void s2650games(machine_config &config);
 	void woodpek(machine_config &config);
 	void crushs(machine_config &config);
-	void eeekk(machine_config &config);
+	void eeekkp(machine_config &config);
 	void superabc(machine_config &config);
 	void numcrash(machine_config &config);
 	void crush4(machine_config &config);

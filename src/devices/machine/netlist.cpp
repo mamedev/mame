@@ -1266,13 +1266,12 @@ void netlist_mame_cpu_device::device_start()
 	{
 		if (n->is_logic())
 		{
-			state_add(index, n->name().c_str(), *(downcast<netlist::logic_net_t &>(*n).Q_state_ptr()));
+			state_add(index++, n->name().c_str(), *(downcast<netlist::logic_net_t &>(*n).Q_state_ptr()));
 		}
 		else
 		{
-			state_add(index, n->name().c_str(), *(downcast<netlist::analog_net_t &>(*n).Q_Analog_state_ptr()));
+			//state_add(index++, n->name().c_str(), *(downcast<netlist::analog_net_t &>(*n).Q_Analog_state_ptr()));
 		}
-		index++;
 	}
 
 	// set our instruction counter

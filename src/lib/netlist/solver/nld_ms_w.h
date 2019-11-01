@@ -52,7 +52,7 @@ namespace solver
 {
 
 	template <typename FT, int SIZE>
-	class matrix_solver_w_t: public matrix_solver_t
+	class matrix_solver_w_t: public matrix_solver_ext_t<FT, SIZE>
 	{
 		friend class matrix_solver_t;
 
@@ -66,11 +66,10 @@ namespace solver
 		matrix_solver_w_t(netlist_state_t &anetlist, const pstring &name,
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
-		: matrix_solver_t(anetlist, name, nets, params)
+		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
 		, m_cnt(0)
-		, m_dim(size)
 		{
-			this->build_mat_ptr(this->size(), m_A);
+			this->build_mat_ptr(m_A);
 		}
 
 		void reset() override { matrix_solver_t::reset(); }
@@ -78,8 +77,6 @@ namespace solver
 	protected:
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 		unsigned solve_non_dynamic(const bool newton_raphson);
-
-		constexpr std::size_t size() const { return m_dim; }
 
 		void LE_invert();
 
@@ -121,11 +118,6 @@ namespace solver
 		std::array<unsigned, storage_N> colcount;
 
 		unsigned m_cnt;
-
-		//float_ext_type m_RHSx[storage_N];
-
-		const std::size_t m_dim;
-
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -135,7 +127,7 @@ namespace solver
 	template <typename FT, int SIZE>
 	void matrix_solver_w_t<FT, SIZE>::LE_invert()
 	{
-		const std::size_t kN = size();
+		const std::size_t kN = this->size();
 
 		for (std::size_t i = 0; i < kN; i++)
 		{
@@ -151,13 +143,13 @@ namespace solver
 		{
 			/* FIXME: Singular matrix? */
 			const float_type f = 1.0 / W(i,i);
-			const auto * const p = m_terms[i].m_nzrd.data();
-			const size_t e = m_terms[i].m_nzrd.size();
+			const auto * const p = this->m_terms[i].m_nzrd.data();
+			const size_t e = this->m_terms[i].m_nzrd.size();
 
 			/* Eliminate column i from row j */
 
-			const auto * const pb = m_terms[i].m_nzbd.data();
-			const size_t eb = m_terms[i].m_nzbd.size();
+			const auto * const pb = this->m_terms[i].m_nzbd.data();
+			const size_t eb = this->m_terms[i].m_nzbd.size();
 			for (std::size_t jb = 0; jb < eb; jb++)
 			{
 				const auto j = pb[jb];
@@ -199,7 +191,7 @@ namespace solver
 	void matrix_solver_w_t<FT, SIZE>::LE_compute_x(
 			T & x)
 	{
-		const std::size_t kN = size();
+		const std::size_t kN = this->size();
 
 		for (std::size_t i=0; i<kN; i++)
 			x[i] = 0.0;
@@ -217,7 +209,7 @@ namespace solver
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_w_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
 	{
-		const auto iN = size();
+		const auto iN = this->size();
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 		std::array<float_type, storage_N> new_V;
@@ -245,7 +237,7 @@ namespace solver
 			for (unsigned row = 0; row < iN; row ++)
 			{
 				unsigned cc=0;
-				auto &nz = m_terms[row].m_nz;
+				auto &nz = this->m_terms[row].m_nz;
 				for (auto & col : nz)
 				{
 					if (A(row,col) != lA(row,col))
@@ -349,17 +341,16 @@ namespace solver
 					plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, std::abs(tmp-RHS(i)), RHS(i));
 			}
 
-		const float_type err = (newton_raphson ? delta(new_V) : 0.0);
-		store(new_V);
+		const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
+		this->store(new_V);
 		return (err > this->m_params.m_accuracy) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
-		const std::size_t iN = this->size();
-		this->clear_square_mat(iN, this->m_A);
-		this->fill_matrix(iN, this->m_RHS);
+		this->clear_square_mat(this->m_A);
+		this->fill_matrix(this->m_RHS);
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);

@@ -79,9 +79,9 @@ namespace solver
 			float_type RHS_t = 0.0;
 
 			const std::size_t term_count = this->m_terms[k].count();
-			const float_type * const gt = this->m_gtn[k];
-			const float_type * const go = this->m_gonn[k];
-			const float_type * const Idr = this->m_Idrn[k];
+			const nl_fptype * const gt = this->m_gtn[k];
+			const nl_fptype * const go = this->m_gonn[k];
+			const nl_fptype * const Idr = this->m_Idrn[k];
 			auto other_cur_analog = this->m_connected_net_Vn[k];
 
 			this->m_new_V[k] = this->m_terms[k].getV();
@@ -130,7 +130,7 @@ namespace solver
 			{
 				const int * net_other = this->m_terms[k].m_connected_net_idx.data();
 				const std::size_t railstart = this->m_terms[k].railstart();
-				const float_type * go = this->m_gonn[k];
+				const nl_fptype * go = this->m_gonn[k];
 
 				float_type Idrive = 0.0;
 				for (std::size_t i = 0; i < railstart; i++)

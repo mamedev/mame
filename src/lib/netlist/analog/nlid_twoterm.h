@@ -430,7 +430,7 @@ namespace analog
 		param_fp_t m_R;
 		param_fp_t m_V;
 		param_str_t m_func;
-		plib::pfunction m_compiled;
+		plib::pfunction<nl_fptype> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 
@@ -486,7 +486,7 @@ namespace analog
 		state_var<nl_fptype> m_t;
 		param_fp_t m_I;
 		param_str_t m_func;
-		plib::pfunction m_compiled;
+		plib::pfunction<nl_fptype> m_compiled;
 		std::vector<nl_fptype> m_funcparam;
 	};
 

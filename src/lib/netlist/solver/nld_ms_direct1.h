@@ -34,8 +34,8 @@ namespace solver
 		// ----------------------------------------------------------------------------------------
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override
 		{
-			this->clear_square_mat(1, this->m_A);
-			this->fill_matrix(1, this->m_RHS);
+			this->clear_square_mat(this->m_A);
+			this->fill_matrix(this->m_RHS);
 
 			std::array<FT, 1> new_V = { this->m_RHS[0] / this->m_A[0][0] };
 

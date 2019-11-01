@@ -105,6 +105,8 @@ namespace plib {
 				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
 		}
 
+		base_type &as_base() noexcept { return m_a; }
+
 		inline size_type size() const noexcept { return SIZE <= 0 ? m_size : SIZEABS(); }
 
 		constexpr size_type max_size() const noexcept { return base_type::max_size(); }
