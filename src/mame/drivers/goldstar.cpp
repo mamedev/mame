@@ -9275,6 +9275,7 @@ void wingco_state::wcat3(machine_config &config)
 	/* basic machine hardware */
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::wcat3_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::super972_decrypted_opcodes_map);
 	//m_maincpu->set_addrmap(AS_IO, &wingco_state::goldstar_readport);
 
 	I8255A(config, m_ppi[0]);
@@ -16903,6 +16904,36 @@ void goldstar_state::init_ladylinre()
 	}
 }
 
+void wingco_state::init_wcat3()
+{
+	// the following is very preliminary and only good to decrypt text strings. Treat everything as incomplete and probably incorrect.
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int i = 0x0000; i < 0x10000; i++)
+	{
+		uint8_t x = rom[i];
+
+		m_decrypted_opcodes[i] = x;
+	}
+
+	// data encryption seems to involve only bits 4, 5 and 7 and some conditional XORs
+	for (int i = 0x4000; i < 0x10000; i++) 
+	{
+		uint8_t x = rom[i];
+
+		switch (i & 0x405)
+		{
+			case 0x001: x = bitswap<8>(BIT(x, 6) ? x ^ 0x10 : x, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x004: x = bitswap<8>(!BIT(x, 7) ? x ^ 0x20 : x, 4, 6, 5, 7, 3, 2, 1, 0); break;
+			case 0x005: x = bitswap<8>(BIT(x, 7) ? x ^ 0x80 : x, 7, 6, 4, 5, 3, 2, 1, 0); break;
+			case 0x401: x = bitswap<8>(!BIT(x, 7) ? x ^ 0x10 : x, 5, 6, 7, 4, 3, 2, 1, 0); break;
+			case 0x404: x = bitswap<8>(x, 4, 6, 5, 7, 3, 2, 1, 0); break;
+			case 0x405: x = bitswap<8>(x, 4, 6, 5, 7, 3, 2, 1, 0); break;
+		}
+
+		rom[i] = x;
+	}
+}
 
 //  this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
@@ -17899,7 +17930,7 @@ GAME(  198?, ladylinrb, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladyl
 GAME(  198?, ladylinrc, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrc, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 2)",                            0 )
 GAME(  198?, ladylinrd, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinrd, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 3)",                            0 )
 GAME(  198?, ladylinre, ladylinr, ladylinrb,ladylinr, goldstar_state, init_ladylinre, ROT0, "TAB Austria",       "Lady Liner (encrypted, set 4)",                            0 )
-GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   empty_init,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
+GAME(  198?, wcat3,     0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING )
 
 GAME(  1985, luckylad,  0,        lucky8,   luckylad, wingco_state,   init_luckylad,  ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING )  // encrypted (see notes in rom_load)...
 GAME(  1991, megaline,  0,        megaline, megaline, unkch_state,    empty_init,     ROT0, "Fun World",         "Mega Lines",                                               MACHINE_NOT_WORKING )
