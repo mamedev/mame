@@ -18041,7 +18041,7 @@
 		<info name="alt_title" value="ポケット麻雀" />
 		<sharedfeat name="compatibility" value="GB" />
 		<part name="cart" interface="gameboy_cart">
-		 <feature name="pcb" value="DMG-BEAN-10" />
+		<feature name="pcb" value="DMG-BEAN-10" />
 			<feature name="u1" value="U1 PRG" />
 			<feature name="u2" value="U2 MBC1/1B/1B1" />
 			<feature name="slot" value="rom_mbc1" />
