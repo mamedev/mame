@@ -445,7 +445,7 @@ void mc68hc11f1_device::io_map(address_map &map)
 	map(0x2b, 0x2b).nopw(); // BAUD
 	map(0x2c, 0x2c).r(FUNC(mc68hc11f1_device::sccr1_r)).nopw(); // SCCR1
 	map(0x2d, 0x2d).r(FUNC(mc68hc11f1_device::sccr2_r)).nopw(); // SCCR2
-	map(0x2e, 0x2e).r(FUNC(mc68hc11m0_device::scsr1_r)); // SCSR
+	map(0x2e, 0x2e).r(FUNC(mc68hc11f1_device::scsr1_r)); // SCSR
 	map(0x2f, 0x2f).nopw(); // SCDR
 	map(0x30, 0x30).rw(FUNC(mc68hc11f1_device::adctl_r), FUNC(mc68hc11f1_device::adctl_w)); // ADCTL
 	map(0x31, 0x34).r(FUNC(mc68hc11f1_device::adr_r)); // ADR1-ADR4
