@@ -408,7 +408,7 @@ namespace netlist
 	}
 
 
-	void netlist_t::print_stats() const NL_NOEXCEPT
+	void netlist_t::print_stats() const
 	{
 		if (m_use_stats)
 		{
@@ -894,7 +894,7 @@ namespace netlist
 	}
 
 
-	void param_t::update_param() NL_NOEXCEPT
+	void param_t::update_param() noexcept
 	{
 		device().update_param();
 	}
@@ -949,48 +949,48 @@ namespace netlist
 		return device().state().setup().get_data_stream(str());
 	}
 
-	bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
+	bool detail::core_terminal_t::is_logic() const noexcept
 	{
 		return dynamic_cast<const logic_t *>(this) != nullptr;
 	}
 
-	bool detail::core_terminal_t::is_logic_input() const NL_NOEXCEPT
+	bool detail::core_terminal_t::is_logic_input() const noexcept
 	{
 		return dynamic_cast<const logic_input_t *>(this) != nullptr;
 	}
 
-	bool detail::core_terminal_t::is_logic_output() const NL_NOEXCEPT
+	bool detail::core_terminal_t::is_logic_output() const noexcept
 	{
 		return dynamic_cast<const logic_output_t *>(this) != nullptr;
 	}
 
-	bool detail::core_terminal_t::is_analog() const NL_NOEXCEPT
+	bool detail::core_terminal_t::is_analog() const noexcept
 	{
 		return dynamic_cast<const analog_t *>(this) != nullptr;
 	}
 
-	bool detail::core_terminal_t::is_analog_input() const NL_NOEXCEPT
+	bool detail::core_terminal_t::is_analog_input() const noexcept
 	{
 		return dynamic_cast<const analog_input_t *>(this) != nullptr;
 	}
 
-	bool detail::core_terminal_t::is_analog_output() const NL_NOEXCEPT
+	bool detail::core_terminal_t::is_analog_output() const noexcept
 	{
 		return dynamic_cast<const analog_output_t *>(this) != nullptr;
 	}
 
 
-	bool detail::net_t::is_logic() const NL_NOEXCEPT
+	bool detail::net_t::is_logic() const noexcept
 	{
 		return dynamic_cast<const logic_net_t *>(this) != nullptr;
 	}
 
-	bool detail::net_t::is_analog() const NL_NOEXCEPT
+	bool detail::net_t::is_analog() const noexcept
 	{
 		return dynamic_cast<const analog_net_t *>(this) != nullptr;
 	}
 
-	void netlist_t::process_queue(const netlist_time delta) NL_NOEXCEPT
+	void netlist_t::process_queue(const netlist_time delta) noexcept
 	{
 		if (!m_use_stats)
 			process_queue_stats<false>(delta, m_mainclock);

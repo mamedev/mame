@@ -403,17 +403,15 @@ namespace solver
 		static constexpr const std::size_t SIZEABS = plib::parray<FT, SIZE>::SIZEABS();
 		static constexpr const std::size_t m_pitch_ABS = (((SIZEABS + 0) + 7) / 8) * 8;
 
+		PALIGNAS_VECTOROPT()
 		plib::parray2D<float_type *, SIZE, 0> m_mat_ptr;
 		/* state - variable time_stepping */
+		PALIGNAS_VECTOROPT()
 		plib::parray<float_type, SIZE> m_last_V;
+		PALIGNAS_VECTOROPT()
 		plib::parray<float_type, SIZE> m_DD_n_m_1;
+		PALIGNAS_VECTOROPT()
 		plib::parray<float_type, SIZE> m_h_n_m_1;
-
-		// FIXME: it should be like this, however dimensions are determined
-		//        in vsetup.
-		//state_container<std::vector<nl_fptype>> m_last_V;
-		//state_container<std::vector<nl_fptype>> m_DD_n_m_1;
-		//state_container<std::vector<nl_fptype>> m_h_n_m_1;
 
 		constexpr std::size_t size() const noexcept { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
 

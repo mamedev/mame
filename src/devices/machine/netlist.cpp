@@ -672,6 +672,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name(param_name)
+	, m_value_for_device_timer(0)
 {
 }
 
@@ -681,6 +682,7 @@ netlist_mame_analog_input_device::netlist_mame_analog_input_device(const machine
 	, m_param(nullptr)
 	, m_auto_port(true)
 	, m_param_name("")
+	, m_value_for_device_timer(0)
 {
 }
 

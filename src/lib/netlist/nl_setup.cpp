@@ -96,7 +96,7 @@ namespace netlist
 		}
 		log().fatal(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
 #endif
-		if (m_sources.for_all<source_netlist_t>([this, &netlist_name] (auto &src)
+		if (m_sources.for_all<source_netlist_t>([this, &netlist_name] (source_netlist_t *src)
 			{
 				return src->parse(*this, netlist_name);
 			}))

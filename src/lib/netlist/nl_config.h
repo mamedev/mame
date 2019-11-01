@@ -108,6 +108,7 @@ using nl_fptype = double;
 //using nl_fptype = float;
 
 using nl_mat_fptype = nl_fptype;
+//using nl_mat_fptype = float;
 
 namespace netlist
 {
@@ -124,7 +125,7 @@ namespace netlist
 	template <>
 	struct fp_constants<double>
 	{
-		static inline constexpr const double DIODE_MAXDIFF() noexcept { return  1e100; }
+		static inline constexpr double DIODE_MAXDIFF() noexcept { return  1e100; }
 		static inline constexpr double DIODE_MAXVOLT() noexcept { return  300.0; }
 
 		static inline constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; }

@@ -70,6 +70,32 @@ namespace plib {
 		{
 		}
 
+		template <int X = SIZE >
+		parray(size_type size, FT val, typename std::enable_if<(X==0), int>::type = 0)
+		: m_a(size, val), m_size(size)
+		{
+		}
+
+		template <int X = SIZE >
+		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0)
+		: m_size(size)
+		{
+			if ((SIZE < 0 && size > SIZEABS())
+				|| (SIZE > 0 && size != SIZEABS()))
+				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+		}
+
+		template <int X = SIZE >
+		parray(size_type size, FT val, typename std::enable_if<(X != 0), int>::type = 0)
+		: m_size(size)
+		{
+			if ((SIZE < 0 && size > SIZEABS())
+				|| (SIZE > 0 && size != SIZEABS()))
+				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+			m_a.fill(val);
+		}
+
+
 		/* allow construction in fixed size arrays */
 		parray()
 		: m_size(SIZEABS())
@@ -95,15 +121,6 @@ namespace plib {
 		parray &operator=(parray &&rhs) noexcept { std::swap(m_a,rhs.m_a); std::swap(m_size, rhs.m_size); return *this; }
 
 		~parray() noexcept = default;
-
-		template <int X = SIZE >
-		parray(size_type size, typename std::enable_if<(X != 0), int>::type = 0)
-		: m_size(size)
-		{
-			if ((SIZE < 0 && size > SIZEABS())
-				|| (SIZE > 0 && size != SIZEABS()))
-				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
-		}
 
 		base_type &as_base() noexcept { return m_a; }
 
