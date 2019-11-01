@@ -284,7 +284,7 @@ void es5506_device::device_start()
 	}
 
 	/* compute the tables */
-	compute_tables(VOLUME_BIT_ES5506, 4, 8, 11); // 4 bit exponent, 8 bit mantissa
+	compute_tables(VOLUME_BIT_ES5506, 4, 8); // 4 bit exponent, 8 bit mantissa
 
 	/* initialize the rest of the structure */
 	m_channels = channels;
@@ -301,8 +301,8 @@ void es5506_device::device_start()
 	{
 		m_voice[j].index = j;
 		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = 0xffff << m_volume_shift; // 16 bit volume
-		m_voice[j].rvol = 0xffff << m_volume_shift;
+		m_voice[j].lvol = get_shifted_volume(0xffff); // 16 bit volume
+		m_voice[j].rvol = get_shifted_volume(0xffff);
 		m_voice[j].exbank = 0;
 	}
 
@@ -404,7 +404,7 @@ void es5505_device::device_start()
 	}
 
 	/* compute the tables */
-	compute_tables(VOLUME_BIT_ES5505, 4, 4, 15); // 4 bit exponent, 4 bit mantissa
+	compute_tables(VOLUME_BIT_ES5505, 4, 4); // 4 bit exponent, 4 bit mantissa
 
 	/* initialize the rest of the structure */
 	m_channels = channels;
@@ -416,8 +416,8 @@ void es5505_device::device_start()
 	{
 		m_voice[j].index = j;
 		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = 0xff << m_volume_shift; // 8 bit volume
-		m_voice[j].rvol = 0xff << m_volume_shift;
+		m_voice[j].lvol = get_shifted_volume(0xff); // 8 bit volume
+		m_voice[j].rvol = get_shifted_volume(0xff);
 		m_voice[j].exbank = 0;
 	}
 
@@ -462,7 +462,7 @@ void es550x_device::update_internal_irq_state()
 
 ***********************************************************************************************/
 
-void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 mantissa_bit, u32 mantissa_shift)
+void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 mantissa_bit)
 {
 	/* allocate ulaw lookup table */
 	m_ulaw_lookup = make_unique_clear<s16[]>(1 << ULAW_MAXBITS);
@@ -491,16 +491,21 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 	m_volume_lookup = make_unique_clear<u32[]>(volume_len);
 
 	/* generate volume lookup table */
-	const u8 exponent_mask = (1 << exponent_bit) - 1;
+	const u32 exponent_shift = 1 << exponent_bit;
+	const u32 exponent_mask = exponent_shift - 1;
+
 	const u32 mantissa_len = (1 << mantissa_bit);
 	const u32 mantissa_mask = (mantissa_len - 1);
+	const u32 mantissa_shift = exponent_shift - mantissa_bit - 1;
+
 	for (int i = 0; i < volume_len; i++)
 	{
-		const u8 exponent = (i >> mantissa_bit) & exponent_mask;
+		const u32 exponent = (i >> mantissa_bit) & exponent_mask;
 		const u32 mantissa = (i & mantissa_mask) | mantissa_len;
 
-		m_volume_lookup[i] = (mantissa << mantissa_shift) >> ((mantissa_shift + mantissa_bit + 1) - exponent);
+		m_volume_lookup[i] = (mantissa << mantissa_shift) >> (exponent_shift - exponent);
 	}
+	m_volume_acc_shift = (16 + exponent_mask) - VOLUME_ACC_BIT;
 }
 
 /**********************************************************************************************
@@ -511,8 +516,10 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 
 void es550x_device::get_accum_mask(u32 address_integer, u32 address_frac)
 {
-	m_accum_shift = ADDRESS_FRAC_BIT - address_frac;
-	m_accum_mask = (((((1 << address_integer) - 1) << address_frac) | ((1 << address_frac) - 1)) << m_accum_shift) | ((1 << m_accum_shift) - 1);
+	m_address_acc_shift = ADDRESS_FRAC_BIT - address_frac;
+	m_address_acc_mask = lshift_signed<u64, s8>(((((1 << address_integer) - 1) << address_frac) | ((1 << address_frac) - 1)), m_address_acc_shift);
+	if (m_address_acc_shift > 0)
+		m_address_acc_mask |= ((1 << m_address_acc_shift) - 1);
 }
 
 
@@ -522,11 +529,11 @@ void es550x_device::get_accum_mask(u32 address_integer, u32 address_frac)
 
 ***********************************************************************************************/
 
-inline s32 es550x_device::interpolate(s32 sample1, s32 sample2, u32 accum)
+inline s32 es550x_device::interpolate(s32 sample1, s32 sample2, u64 accum)
 {
 	const u32 shifted = 1 << ADDRESS_FRAC_BIT;
 	const u32 mask = shifted - 1;
-	accum &= mask & m_accum_mask;
+	accum &= mask & m_address_acc_mask;
 	return (sample1 * (s32)(shifted - accum) +
 			sample2 * (s32)(accum)) >> ADDRESS_FRAC_BIT;
 }
@@ -679,7 +686,7 @@ inline void es5505_device::update_envelopes(es550x_voice *voice)
 
 ***********************************************************************************************/
 
-inline void es5506_device::check_for_end_forward(es550x_voice *voice, u32 &accum)
+inline void es5506_device::check_for_end_forward(es550x_voice *voice, u64 &accum)
 {
 	/* are we past the end? */
 	if (accum > voice->end && !(voice->control & CONTROL_LEI))
@@ -698,25 +705,25 @@ inline void es5506_device::check_for_end_forward(es550x_voice *voice, u32 &accum
 
 			/* uni-directional looping */
 			case CONTROL_LPE:
-				accum = (voice->start + (accum - voice->end)) & m_accum_mask;
+				accum = (voice->start + (accum - voice->end)) & m_address_acc_mask;
 				break;
 
 			/* trans-wave looping */
 			case CONTROL_BLE:
-				accum = (voice->start + (accum - voice->end)) & m_accum_mask;
+				accum = (voice->start + (accum - voice->end)) & m_address_acc_mask;
 				voice->control = (voice->control & ~CONTROL_LOOPMASK) | CONTROL_LEI;
 				break;
 
 			/* bi-directional looping */
 			case CONTROL_LPE | CONTROL_BLE:
-				accum = (voice->end - (accum - voice->end)) & m_accum_mask;
+				accum = (voice->end - (accum - voice->end)) & m_address_acc_mask;
 				voice->control ^= CONTROL_DIR;
 				break;
 		}
 	}
 }
 
-inline void es5506_device::check_for_end_reverse(es550x_voice *voice, u32 &accum)
+inline void es5506_device::check_for_end_reverse(es550x_voice *voice, u64 &accum)
 {
 	/* are we past the end? */
 	if (accum < voice->start && !(voice->control & CONTROL_LEI))
@@ -735,18 +742,18 @@ inline void es5506_device::check_for_end_reverse(es550x_voice *voice, u32 &accum
 
 			/* uni-directional looping */
 			case CONTROL_LPE:
-				accum = (voice->end - (voice->start - accum)) & m_accum_mask;
+				accum = (voice->end - (voice->start - accum)) & m_address_acc_mask;
 				break;
 
 			/* trans-wave looping */
 			case CONTROL_BLE:
-				accum = (voice->end - (voice->start - accum)) & m_accum_mask;
+				accum = (voice->end - (voice->start - accum)) & m_address_acc_mask;
 				voice->control = (voice->control & ~CONTROL_LOOPMASK) | CONTROL_LEI;
 				break;
 
 			/* bi-directional looping */
 			case CONTROL_LPE | CONTROL_BLE:
-				accum = (voice->start + (voice->start - accum)) & m_accum_mask;
+				accum = (voice->start + (voice->start - accum)) & m_address_acc_mask;
 				voice->control ^= CONTROL_DIR;
 				break;
 		}
@@ -754,7 +761,7 @@ inline void es5506_device::check_for_end_reverse(es550x_voice *voice, u32 &accum
 }
 
 // ES5505 : BLE is ignored when LPE = 0
-inline void es5505_device::check_for_end_forward(es550x_voice *voice, u32 &accum)
+inline void es5505_device::check_for_end_forward(es550x_voice *voice, u64 &accum)
 {
 	/* are we past the end? */
 	if (accum > voice->end)
@@ -774,19 +781,19 @@ inline void es5505_device::check_for_end_forward(es550x_voice *voice, u32 &accum
 
 			/* uni-directional looping */
 			case CONTROL_LPE:
-				accum = (voice->start + (accum - voice->end)) & m_accum_mask;
+				accum = (voice->start + (accum - voice->end)) & m_address_acc_mask;
 				break;
 
 			/* bi-directional looping */
 			case CONTROL_LPE | CONTROL_BLE:
-				accum = (voice->end - (accum - voice->end)) & m_accum_mask;
+				accum = (voice->end - (accum - voice->end)) & m_address_acc_mask;
 				voice->control ^= CONTROL_DIR;
 				break;
 		}
 	}
 }
 
-inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u32 &accum)
+inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u64 &accum)
 {
 	/* are we past the end? */
 	if (accum < voice->start)
@@ -806,12 +813,12 @@ inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u32 &accum
 
 			/* uni-directional looping */
 			case CONTROL_LPE:
-				accum = (voice->end - (voice->start - accum)) & m_accum_mask;
+				accum = (voice->end - (voice->start - accum)) & m_address_acc_mask;
 				break;
 
 			/* bi-directional looping */
 			case CONTROL_LPE | CONTROL_BLE:
-				accum = (voice->start + (voice->start - accum)) & m_accum_mask;
+				accum = (voice->start + (voice->start - accum)) & m_address_acc_mask;
 				voice->control ^= CONTROL_DIR;
 				break;
 		}
@@ -829,7 +836,7 @@ inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u32 &accum
 void es550x_device::generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples)
 {
 	const u32 freqcount = voice->freqcount;
-	u32 accum = voice->accum & m_accum_mask;
+	u64 accum = voice->accum & m_address_acc_mask;
 
 	/* outer loop, in case we switch directions */
 	if (!(voice->control & CONTROL_STOPMASK))
@@ -838,7 +845,7 @@ void es550x_device::generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer,
 		if (!(voice->control & CONTROL_DIR))
 		{
 			/* fetch two samples */
-			accum = (accum + freqcount) & m_accum_mask;
+			accum = (accum + freqcount) & m_address_acc_mask;
 
 			/* update filters/volumes */
 			if (voice->ecount != 0)
@@ -852,7 +859,7 @@ void es550x_device::generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer,
 		else
 		{
 			/* fetch two samples */
-			accum = (accum - freqcount) & m_accum_mask;
+			accum = (accum - freqcount) & m_address_acc_mask;
 
 			/* update filters/volumes */
 			if (voice->ecount != 0)
@@ -882,9 +889,7 @@ void es550x_device::generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer,
 void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples)
 {
 	const u32 freqcount = voice->freqcount;
-	u32 accum = voice->accum & m_accum_mask;
-	s32 lvol = get_volume(voice->lvol);
-	s32 rvol = get_volume(voice->rvol);
+	u64 accum = voice->accum & m_address_acc_mask;
 
 	/* pre-add the bank offset */
 	base += voice->exbank;
@@ -905,22 +910,18 @@ void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, 
 
 			/* interpolate */
 			val1 = interpolate(val1, val2, accum);
-			accum = (accum + freqcount) & m_accum_mask;
+			accum = (accum + freqcount) & m_address_acc_mask;
 
 			/* apply filters */
 			apply_filters(voice, val1);
 
 			/* update filters/volumes */
 			if (voice->ecount != 0)
-			{
 				update_envelopes(voice);
-				lvol = get_volume(voice->lvol);
-				rvol = get_volume(voice->rvol);
-			}
 
 			/* apply volumes and add */
-			*lbuffer += (val1 * lvol) >> VOLUME_ACC_SHIFT;
-			*rbuffer += (val1 * rvol) >> VOLUME_ACC_SHIFT;
+			*lbuffer += get_sample(val1, voice->lvol);
+			*rbuffer += get_sample(val1, voice->rvol);
 
 			/* check for loop end */
 			check_for_end_forward(voice, accum);
@@ -939,22 +940,18 @@ void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, 
 
 			/* interpolate */
 			val1 = interpolate(val1, val2, accum);
-			accum = (accum - freqcount) & m_accum_mask;
+			accum = (accum - freqcount) & m_address_acc_mask;
 
 			/* apply filters */
 			apply_filters(voice, val1);
 
 			/* update filters/volumes */
 			if (voice->ecount != 0)
-			{
 				update_envelopes(voice);
-				lvol = get_volume(voice->lvol);
-				rvol = get_volume(voice->rvol);
-			}
 
 			/* apply volumes and add */
-			*lbuffer += (val1 * lvol) >> VOLUME_ACC_SHIFT;
-			*rbuffer += (val1 * rvol) >> VOLUME_ACC_SHIFT;
+			*lbuffer += get_sample(val1, voice->lvol);
+			*rbuffer += get_sample(val1, voice->rvol);
 
 			/* check for loop end */
 			check_for_end_reverse(voice, accum);
@@ -981,9 +978,7 @@ void es550x_device::generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, 
 void es550x_device::generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples)
 {
 	const u32 freqcount = voice->freqcount;
-	u32 accum = voice->accum & m_accum_mask;
-	s32 lvol = get_volume(voice->lvol);
-	s32 rvol = get_volume(voice->rvol);
+	u64 accum = voice->accum & m_address_acc_mask;
 
 	/* pre-add the bank offset */
 	base += voice->exbank;
@@ -1000,22 +995,18 @@ void es550x_device::generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s
 
 			/* interpolate */
 			val1 = interpolate(val1, val2, accum);
-			accum = (accum + freqcount) & m_accum_mask;
+			accum = (accum + freqcount) & m_address_acc_mask;
 
 			/* apply filters */
 			apply_filters(voice, val1);
 
 			/* update filters/volumes */
 			if (voice->ecount != 0)
-			{
 				update_envelopes(voice);
-				lvol = get_volume(voice->lvol);
-				rvol = get_volume(voice->rvol);
-			}
 
 			/* apply volumes and add */
-			*lbuffer += (val1 * lvol) >> VOLUME_ACC_SHIFT;
-			*rbuffer += (val1 * rvol) >> VOLUME_ACC_SHIFT;
+			*lbuffer += get_sample(val1, voice->lvol);
+			*rbuffer += get_sample(val1, voice->rvol);
 
 			/* check for loop end */
 			check_for_end_forward(voice, accum);
@@ -1030,22 +1021,18 @@ void es550x_device::generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s
 
 			/* interpolate */
 			val1 = interpolate(val1, val2, accum);
-			accum = (accum - freqcount) & m_accum_mask;
+			accum = (accum - freqcount) & m_address_acc_mask;
 
 			/* apply filters */
 			apply_filters(voice, val1);
 
 			/* update filters/volumes */
 			if (voice->ecount != 0)
-			{
 				update_envelopes(voice);
-				lvol = get_volume(voice->lvol);
-				rvol = get_volume(voice->rvol);
-			}
 
 			/* apply volumes and add */
-			*lbuffer += (val1 * lvol) >> VOLUME_ACC_SHIFT;
-			*rbuffer += (val1 * rvol) >> VOLUME_ACC_SHIFT;
+			*lbuffer += get_sample(val1, voice->lvol);
+			*rbuffer += get_sample(val1, voice->rvol);
 
 			/* check for loop end */
 			check_for_end_reverse(voice, accum);
@@ -1221,8 +1208,8 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			break;
 
 		case 0x08/8:    /* FC */
-			voice->freqcount = get_accum_shifted_val(data & 0x1ffff);
-			LOG("voice %d, freq count=%08x\n", m_current_page & 0x1f, get_accum_res(voice->freqcount));
+			voice->freqcount = get_address_acc_shifted_val(data & 0x1ffff);
+			LOG("voice %d, freq count=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->freqcount));
 			break;
 
 		case 0x10/8:    /* LVOL */
@@ -1311,18 +1298,18 @@ inline void es5506_device::reg_write_high(es550x_voice *voice, offs_t offset, u3
 			break;
 
 		case 0x08/8:    /* START */
-			voice->start = get_accum_shifted_val(data & 0xfffff800);
-			LOG("voice %d, loop start=%08x\n", m_current_page & 0x1f, get_accum_res(voice->start));
+			voice->start = get_address_acc_shifted_val(data & 0xfffff800);
+			LOG("voice %d, loop start=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->start));
 			break;
 
 		case 0x10/8:    /* END */
-			voice->end = get_accum_shifted_val(data & 0xffffff80);
-			LOG("voice %d, loop end=%08x\n", m_current_page & 0x1f, get_accum_res(voice->end));
+			voice->end = get_address_acc_shifted_val(data & 0xffffff80);
+			LOG("voice %d, loop end=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->end));
 			break;
 
 		case 0x18/8:    /* ACCUM */
-			voice->accum = get_accum_shifted_val(data);
-			LOG("voice %d, accum=%08x\n", m_current_page & 0x1f, get_accum_res(voice->accum));
+			voice->accum = get_address_acc_shifted_val(data);
+			LOG("voice %d, accum=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->accum));
 			break;
 
 		case 0x20/8:    /* O4(n-1) */
@@ -1489,7 +1476,7 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x08/8:    /* FC */
-			result = get_accum_res(voice->freqcount);
+			result = get_address_acc_res(voice->freqcount);
 			break;
 
 		case 0x10/8:    /* LVOL */
@@ -1566,15 +1553,15 @@ inline u32 es5506_device::reg_read_high(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x08/8:    /* START */
-			result = get_accum_res(voice->start);
+			result = get_address_acc_res(voice->start);
 			break;
 
 		case 0x10/8:    /* END */
-			result = get_accum_res(voice->end);
+			result = get_address_acc_res(voice->end);
 			break;
 
 		case 0x18/8:    /* ACCUM */
-			result = get_accum_res(voice->accum);
+			result = get_address_acc_res(voice->accum);
 			break;
 
 		case 0x20/8:    /* O4(n-1) */
@@ -1717,48 +1704,48 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 
 		case 0x01:  /* FC */
 			if (ACCESSING_BITS_0_7)
-				voice->freqcount = (voice->freqcount & ~get_accum_shifted_val(0x00fe, 1)) | (get_accum_shifted_val((data & 0x00fe), 1));
+				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0x00fe, 1)) | (get_address_acc_shifted_val((data & 0x00fe), 1));
 			if (ACCESSING_BITS_8_15)
-				voice->freqcount = (voice->freqcount & ~get_accum_shifted_val(0xff00, 1)) | (get_accum_shifted_val((data & 0xff00), 1));
-			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->freqcount, 1));
+				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0xff00, 1)) | (get_address_acc_shifted_val((data & 0xff00), 1));
+			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->freqcount, 1));
 			break;
 
 		case 0x02:  /* STRT (hi) */
 			if (ACCESSING_BITS_0_7)
-				voice->start = (voice->start & ~get_accum_shifted_val(0x00ff0000)) | (get_accum_shifted_val((data & 0x00ff) << 16));
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
-				voice->start = (voice->start & ~get_accum_shifted_val(0x1f000000)) | (get_accum_shifted_val((data & 0x1f00) << 16));
-			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->start));
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->start));
 			break;
 
 		case 0x03:  /* STRT (lo) */
 			if (ACCESSING_BITS_0_7)
-				voice->start = (voice->start & ~get_accum_shifted_val(0x000000e0)) | (get_accum_shifted_val(data & 0x00e0));
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
 			if (ACCESSING_BITS_8_15)
-				voice->start = (voice->start & ~get_accum_shifted_val(0x0000ff00)) | (get_accum_shifted_val(data & 0xff00));
-			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->start));
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->start));
 			break;
 
 		case 0x04:  /* END (hi) */
 			if (ACCESSING_BITS_0_7)
-				voice->end = (voice->end & ~get_accum_shifted_val(0x00ff0000)) | (get_accum_shifted_val((data & 0x00ff) << 16));
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
-				voice->end = (voice->end & ~get_accum_shifted_val(0x1f000000)) | (get_accum_shifted_val((data & 0x1f00) << 16));
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->end));
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->end));
 			break;
 
 		case 0x05:  /* END (lo) */
 			if (ACCESSING_BITS_0_7)
-				voice->end = (voice->end & ~get_accum_shifted_val(0x000000e0)) | (get_accum_shifted_val(data & 0x00e0));
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
 			if (ACCESSING_BITS_8_15)
-				voice->end = (voice->end & ~get_accum_shifted_val(0x0000ff00)) | (get_accum_shifted_val(data & 0xff00));
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->end));
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->end));
 			break;
 
 		case 0x06:  /* K2 */
@@ -1780,29 +1767,29 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 		case 0x08:  /* LVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->lvol = (voice->lvol & ~0xff00) | (data & 0xff00);
-			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol >> m_volume_shift);
+			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, get_shifted_volume_res(voice->lvol));
 			break;
 
 		case 0x09:  /* RVOL */
 			if (ACCESSING_BITS_8_15)
 				voice->rvol = (voice->rvol & ~0xff00) | (data & 0xff00);
-			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol >> m_volume_shift);
+			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, get_shifted_volume_res(voice->rvol));
 			break;
 
 		case 0x0a:  /* ACC (hi) */
 			if (ACCESSING_BITS_0_7)
-				voice->accum = (voice->accum & ~get_accum_shifted_val(0x00ff0000)) | (get_accum_shifted_val((data & 0x00ff) << 16));
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
-				voice->accum = (voice->accum & ~get_accum_shifted_val(0x1f000000)) | (get_accum_shifted_val((data & 0x1f00) << 16));
-			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->accum));
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->accum));
 			break;
 
 		case 0x0b:  /* ACC (lo) */
 			if (ACCESSING_BITS_0_7)
-				voice->accum = (voice->accum & ~get_accum_shifted_val(0x000000ff)) | (get_accum_shifted_val(data & 0x00ff));
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x000000ff)) | (get_address_acc_shifted_val(data & 0x00ff));
 			if (ACCESSING_BITS_8_15)
-				voice->accum = (voice->accum & ~get_accum_shifted_val(0x0000ff00)) | (get_accum_shifted_val(data & 0xff00));
-			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_accum_res(voice->accum));
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->accum));
 			break;
 
 		case 0x0c:  /* unused */
@@ -1891,7 +1878,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 				voice->o1n1 = (voice->o1n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o1n1 = (s16)((voice->o1n1 & ~0xff00) | (data & 0xff00));
-			LOG("%s:voice %d, O1(n-1)=%04x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, voice->o1n1 & 0xffff, get_accum_res(voice->accum));
+			LOG("%s:voice %d, O1(n-1)=%04x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, voice->o1n1 & 0xffff, get_address_acc_res(voice->accum));
 			break;
 
 		case 0x07:
@@ -2012,23 +1999,23 @@ inline u16 es5505_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x01:  /* FC */
-			result = get_accum_res(voice->freqcount, 1);
+			result = get_address_acc_res(voice->freqcount, 1);
 			break;
 
 		case 0x02:  /* STRT (hi) */
-			result = get_accum_res(voice->start) >> 16;
+			result = get_address_acc_res(voice->start) >> 16;
 			break;
 
 		case 0x03:  /* STRT (lo) */
-			result = get_accum_res(voice->start);
+			result = get_address_acc_res(voice->start);
 			break;
 
 		case 0x04:  /* END (hi) */
-			result = get_accum_res(voice->end) >> 16;
+			result = get_address_acc_res(voice->end) >> 16;
 			break;
 
 		case 0x05:  /* END (lo) */
-			result = get_accum_res(voice->end);
+			result = get_address_acc_res(voice->end);
 			break;
 
 		case 0x06:  /* K2 */
@@ -2048,11 +2035,11 @@ inline u16 es5505_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x0a:  /* ACC (hi) */
-			result = get_accum_res(voice->accum) >> 16;
+			result = get_address_acc_res(voice->accum) >> 16;
 			break;
 
 		case 0x0b:  /* ACC (lo) */
-			result = get_accum_res(voice->accum);
+			result = get_address_acc_res(voice->accum);
 			break;
 
 		case 0x0c:  /* unused */

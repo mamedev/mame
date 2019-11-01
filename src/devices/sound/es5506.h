@@ -37,7 +37,7 @@ protected:
 	// constants for volumes
 	const u32 FINE_VOLUME_BIT = 16;
 
-	const u32 VOLUME_ACC_SHIFT = 11;
+	const u32 VOLUME_ACC_BIT = 20;
 
 	// constants for address
 	const u32 ADDRESS_FRAC_BIT = 11;
@@ -88,23 +88,31 @@ protected:
 
 	void update_irq_state();
 	void update_internal_irq_state();
-	void compute_tables(u32 total_volume_bit = 16, u32 exponent_bit = 4, u32 mantissa_bit = 8, u32 mantissa_shift = 11);
-	void get_accum_mask(u32 address_integer, u32 address_frac);
+	void compute_tables(u32 total_volume_bit = 16, u32 exponent_bit = 4, u32 mantissa_bit = 8);
+	void get_accum_mask(u32 address_integer = 21, u32 address_frac = 11);
 
 	virtual inline u32 get_bank(u32 control) { return 0; }
 	virtual inline u32 get_ca(u32 control) { return 0; }
 	virtual inline u32 get_lp(u32 control) { return 0; }
 
-	inline u32 get_volume(u16 volume) { return m_volume_lookup[volume >> m_volume_shift_int]; }
-	inline u32 get_accum_shifted_val(u32 val, int bias = 0) { return val << (m_accum_shift - bias); }
-	inline u32 get_accum_res(u32 val, int bias = 0) { return val >> (m_accum_shift - bias); }
-	inline u32 get_integer_addr(u32 accum, s32 bias = 0) { return ((accum + (bias << ADDRESS_FRAC_BIT)) & m_accum_mask) >> ADDRESS_FRAC_BIT; }
+	template<typename T, typename U> inline T lshift_signed(T val, U shift) { return (shift >= 0) ? val << shift : val >> (-shift); }
+	template<typename T, typename U> inline T rshift_signed(T val, U shift) { return (shift >= 0) ? val >> shift : val << (-shift); }
 
-	inline s32 interpolate(s32 sample1, s32 sample2, u32 accum);
+	inline u64 get_shifted_volume_res(u64 volume) { return rshift_signed<u64, s8>(volume, m_volume_shift); }
+	inline u64 get_shifted_volume(u64 volume) { return lshift_signed<u64, s8>(volume, m_volume_shift); }
+	inline u64 get_volume(u32 volume) { return m_volume_lookup[rshift_signed<u32, s8>(volume, m_volume_shift_int)]; }
+
+	inline u64 get_address_acc_shifted_val(u64 val, int bias = 0) { return lshift_signed<u64, s8>(val, m_address_acc_shift - bias); }
+	inline u64 get_address_acc_res(u64 val, int bias = 0) { return rshift_signed<u64, s8>(val, m_address_acc_shift - bias); }
+	inline u64 get_integer_addr(u64 accum, s32 bias = 0) { return ((accum + (bias << ADDRESS_FRAC_BIT)) & m_address_acc_mask) >> ADDRESS_FRAC_BIT; }
+
+	inline s64 get_sample(s32 sample, u32 volume) { return rshift_signed<s64, s8>(sample * get_volume(volume), m_volume_acc_shift); }
+
+	inline s32 interpolate(s32 sample1, s32 sample2, u64 accum);
 	inline void apply_filters(es550x_voice *voice, s32 &sample);
 	virtual inline void update_envelopes(es550x_voice *voice) {};
-	virtual inline void check_for_end_forward(es550x_voice *voice, u32 &accum) {};
-	virtual inline void check_for_end_reverse(es550x_voice *voice, u32 &accum) {};
+	virtual inline void check_for_end_forward(es550x_voice *voice, u64 &accum) {};
+	virtual inline void check_for_end_reverse(es550x_voice *voice, u64 &accum) {};
 	void generate_dummy(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
 	void generate_ulaw(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
 	void generate_pcm(es550x_voice *voice, u16 *base, s32 *lbuffer, s32 *rbuffer, int samples);
@@ -116,11 +124,12 @@ protected:
 	int           m_sample_rate;          /* current sample rate */
 	u16 *         m_region_base[4];       /* pointer to the base of the region */
 	u32           m_master_clock;         /* master clock frequency */
-	u64           m_accum_shift;
-	u64           m_accum_mask;
+	s8            m_address_acc_shift;
+	u64           m_address_acc_mask;
 
-	u64           m_volume_shift;
-	u64           m_volume_shift_int;
+	s8            m_volume_shift;
+	s8            m_volume_shift_int;
+	s64           m_volume_acc_shift;
 
 	u8            m_current_page;         /* current register page */
 	u8            m_active_voices;        /* number of active voices */
@@ -173,8 +182,8 @@ protected:
 	virtual inline u32 get_lp(u32 control) override { return (control >> 8) & LP_MASK; }
 
 	virtual inline void update_envelopes(es550x_voice *voice) override;
-	virtual inline void check_for_end_forward(es550x_voice *voice, u32 &accum) override;
-	virtual inline void check_for_end_reverse(es550x_voice *voice, u32 &accum) override;
+	virtual inline void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
+	virtual inline void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
 private:
@@ -218,8 +227,8 @@ protected:
 	virtual inline u32 get_bank(u32 control) override { return (control >> 2) & 1; }
 
 	virtual inline void update_envelopes(es550x_voice *voice) override;
-	virtual inline void check_for_end_forward(es550x_voice *voice, u32 &accum) override;
-	virtual inline void check_for_end_reverse(es550x_voice *voice, u32 &accum) override;
+	virtual inline void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
+	virtual inline void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(s32 **outputs, int offset, int samples) override;
 
 private:
