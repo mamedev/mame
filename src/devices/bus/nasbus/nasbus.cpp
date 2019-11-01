@@ -130,6 +130,7 @@ device_nasbus_card_interface::~device_nasbus_card_interface()
 
 void device_nasbus_card_interface::set_nasbus_device(nasbus_device &nasbus)
 {
+	assert(!device().started());
 	m_nasbus = &nasbus;
 }
 

@@ -168,6 +168,7 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "printer.h"
 #include "pty.h"
 #include "sun_kbd.h"
+#include "swtpc8212.h"
 #include "terminal.h"
 #include "ie15.h"
 
@@ -182,4 +183,5 @@ void default_rs232_devices(device_slot_interface &device)
 	device.option_add("pty", PSEUDO_TERMINAL);
 	device.option_add("sunkbd", SUN_KBD_ADAPTOR);
 	device.option_add("ie15", SERIAL_TERMINAL_IE15);
+	device.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 }
