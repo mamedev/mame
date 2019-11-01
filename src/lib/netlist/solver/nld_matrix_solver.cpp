@@ -341,14 +341,6 @@ namespace solver
 		 * save states
 		 */
 
-		m_last_V.resize(iN, plib::constants<nl_fptype>::zero());
-		m_DD_n_m_1.resize(iN, plib::constants<nl_fptype>::zero());
-		m_h_n_m_1.resize(iN, plib::constants<nl_fptype>::zero());
-
-		state().save(*this, m_last_V.as_base(), this->name(), "m_last_V");
-		state().save(*this, m_DD_n_m_1.as_base(), this->name(), "m_DD_n_m_1");
-		state().save(*this, m_h_n_m_1.as_base(), this->name(), "m_h_n_m_1");
-
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			pstring num = plib::pfmt("{1}")(k);
@@ -551,50 +543,6 @@ namespace solver
 				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
-	}
-
-	netlist_time matrix_solver_t::compute_next_timestep(const nl_fptype cur_ts)
-	{
-		nl_fptype new_solver_timestep = m_params.m_max_timestep;
-
-		if (m_params.m_dynamic_ts)
-		{
-			for (std::size_t k = 0; k < m_terms.size(); k++)
-			{
-				auto &t = m_terms[k];
-				//const nl_fptype DD_n = (n->Q_Analog() - t->m_last_V);
-				// avoid floating point exceptions
-
-				const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF, std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF,(t.getV() - m_last_V[k])));
-				const nl_fptype hn = cur_ts;
-
-				//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
-				nl_fptype DD2 = (DD_n / hn - m_DD_n_m_1[k] / m_h_n_m_1[k]) / (hn + m_h_n_m_1[k]);
-				nl_fptype new_net_timestep(0);
-
-				m_h_n_m_1[k] = hn;
-				m_DD_n_m_1[k] = DD_n;
-				if (std::fabs(DD2) > fp_constants<nl_fptype>::TIMESTEP_MINDIV) // avoid div-by-zero
-					new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_fptype>::cast(0.5)*DD2));
-				else
-					new_net_timestep = m_params.m_max_timestep;
-
-				if (new_net_timestep < new_solver_timestep)
-					new_solver_timestep = new_net_timestep;
-
-				m_last_V[k] = t.getV();
-			}
-			if (new_solver_timestep < m_params.m_min_timestep)
-			{
-				new_solver_timestep = m_params.m_min_timestep;
-			}
-		}
-		//if (new_solver_timestep > 10.0 * hn)
-		//    new_solver_timestep = 10.0 * hn;
-		/*
-		 * FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
-		 */
-		return std::max(netlist_time::from_double(new_solver_timestep), netlist_time::quantum() * 2);
 	}
 
 	void matrix_solver_t::log_stats()

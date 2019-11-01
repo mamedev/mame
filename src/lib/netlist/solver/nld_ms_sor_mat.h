@@ -114,11 +114,10 @@ namespace solver
 		 * Need something like that for gaussian elimination as well.
 		 */
 
-
 		const std::size_t iN = this->size();
 
-		this->clear_square_mat(iN, this->m_A);
-		this->fill_matrix(iN, this->m_RHS);
+		this->clear_square_mat(this->m_A);
+		this->fill_matrix(this->m_RHS);
 
 		bool resched = false;
 

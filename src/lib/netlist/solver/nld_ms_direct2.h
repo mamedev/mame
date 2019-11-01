@@ -34,8 +34,8 @@ namespace solver
 		{}
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override
 		{
-			this->clear_square_mat(2, this->m_A);
-			this->fill_matrix(2, this->m_RHS);
+			this->clear_square_mat(this->m_A);
+			this->fill_matrix(this->m_RHS);
 
 			const float_type a = this->m_A[0][0];
 			const float_type b = this->m_A[0][1];

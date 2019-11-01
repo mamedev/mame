@@ -22,7 +22,7 @@ namespace solver
 {
 
 	template <typename FT, int SIZE>
-	class matrix_solver_direct_t: public matrix_solver_t
+	class matrix_solver_direct_t: public matrix_solver_ext_t<FT, SIZE>
 	{
 		friend class matrix_solver_t;
 	public:
@@ -37,7 +37,6 @@ namespace solver
 
 	private:
 
-		const std::size_t m_dim;
 		const std::size_t m_pitch;
 
 	protected:
@@ -46,8 +45,6 @@ namespace solver
 
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override;
 		unsigned solve_non_dynamic(const bool newton_raphson);
-
-		constexpr std::size_t size() const noexcept { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
 
 		void LE_solve();
 
@@ -69,15 +66,15 @@ namespace solver
 	template <typename FT, int SIZE>
 	void matrix_solver_direct_t<FT, SIZE>::LE_solve()
 	{
-		const std::size_t kN = size();
-		if (!m_params.m_pivot)
+		const std::size_t kN = this->size();
+		if (!this->m_params.m_pivot)
 		{
 			for (std::size_t i = 0; i < kN; i++)
 			{
 				/* FIXME: Singular matrix? */
 				const FT f = 1.0 / m_A[i][i];
-				const auto &nzrd = m_terms[i].m_nzrd;
-				const auto &nzbd = m_terms[i].m_nzbd;
+				const auto &nzrd = this->m_terms[i].m_nzrd;
+				const auto &nzbd = this->m_terms[i].m_nzbd;
 
 				for (auto &j : nzbd)
 				{
@@ -138,10 +135,10 @@ namespace solver
 	void matrix_solver_direct_t<FT, SIZE>::LE_back_subst(
 			T & x)
 	{
-		const std::size_t kN = size();
+		const std::size_t kN = this->size();
 
 		/* back substitution */
-		if (m_params.m_pivot)
+		if (this->m_params.m_pivot)
 		{
 			for (std::size_t j = kN; j-- > 0; )
 			{
@@ -156,7 +153,7 @@ namespace solver
 			for (std::size_t j = kN; j-- > 0; )
 			{
 				FT tmp = 0;
-				const auto &nzrd = m_terms[j].m_nzrd;
+				const auto &nzrd = this->m_terms[j].m_nzrd;
 				const auto e = nzrd.size(); // - 1; /* exclude RHS element */
 				for ( std::size_t k = 0; k < e; k++)
 					tmp += m_A[j][nzrd[k]] * x[nzrd[k]];
@@ -171,20 +168,17 @@ namespace solver
 		this->LE_solve();
 		this->LE_back_subst(m_new_V);
 
-		const FT err = (newton_raphson ? delta(m_new_V) : 0.0);
-		store(m_new_V);
+		const FT err = (newton_raphson ? this->delta(m_new_V) : 0.0);
+		this->store(m_new_V);
 		return (err > this->m_params.m_accuracy) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
-		const std::size_t iN = this->size();
-
 		/* populate matrix */
-
-		this->clear_square_mat(iN, m_A);
-		this->fill_matrix(iN, m_RHS);
+		this->clear_square_mat(m_A);
+		this->fill_matrix(m_RHS);
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);
@@ -195,14 +189,13 @@ namespace solver
 		const analog_net_t::list_t &nets,
 		const solver_parameters_t *params,
 		const std::size_t size)
-	: matrix_solver_t(anetlist, name, nets, params)
-	, m_dim(size)
-	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((m_dim + 0) + 7) / 8) * 8)
+	: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
+	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((size + 0) + 7) / 8) * 8)
 	, m_new_V(size)
 	, m_A(size, m_pitch)
 	, m_RHS(size)
 	{
-		this->build_mat_ptr(size, m_A);
+		this->build_mat_ptr(m_A);
 	}
 
 } // namespace solver
