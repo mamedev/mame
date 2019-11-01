@@ -167,10 +167,14 @@ public:
 	radica_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
 		m_ram(*this, "ram"),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
 		m_palram(*this, "palram"),
+		m_unk5007(*this, "unk5007"),
+		m_unk5008(*this, "unk5008"),
+		m_gpio(*this, "gpio"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -178,6 +182,7 @@ public:
 	{ }
 
 	void radicasi(machine_config &config);
+	void airblsjs(machine_config& config);
 
 private:
 	// screen updates
@@ -247,10 +252,14 @@ private:
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_palram;
+	required_shared_ptr<uint8_t> m_unk5007;
+	required_shared_ptr<uint8_t> m_unk5008;
+	required_device<radica6502_gpio_device> m_gpio;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -913,6 +922,11 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	// 500x system regs?
 	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::radicasi_5003_r));
+
+	map(0x5007, 0x5007).ram().share("unk5007"); // main NMI?IRQ? mask on 0x02
+	map(0x5008, 0x5008).ram().share("unk5008"); // timer IRQ masks or enables?
+
+
 	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
 	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
 	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
@@ -988,6 +1002,13 @@ static INPUT_PORTS_START( rad_sinv )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) // MENU
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rad_tetr )
@@ -1005,6 +1026,32 @@ static INPUT_PORTS_START( rad_tetr )
 	   the game doesn't read them directly, or even let
 	   you select player 2 mode by default
 	*/
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( airblsjs )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Pause")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )	PORT_NAME("Start")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Trigger")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
 INPUT_PORTS_END
 
 /* both NMI and IRQ vectors just point to RTI
@@ -1049,6 +1096,9 @@ void radica_eu3a05_state::machine_start()
 	m_custom_nmi_vector = 0x0000;
 
 	m_bank->set_bank(0x7f);
+
+	save_item(NAME(m_rombank_lo));
+	save_item(NAME(m_rombank_hi)); 
 }
 
 void radica_eu3a05_state::machine_reset()
@@ -1133,48 +1183,66 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 {
-	m_custom_irq = 1;
-	m_custom_irq_vector = 0xffd4;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
-	/*
+	// Air Blaster uses brk in the code, which is problematic for custom IRQs
+	//	m_custom_irq = 1;
+	//	m_custom_irq_vector = 0xffd4;
+	//	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+	
 	m_custom_nmi = 1;
 	m_custom_nmi_vector = 0xffd4;
 
-	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	*/
+	if (m_unk5007[0] & 0x02) // seems to be correct otherwise Air Blaster will crash / give random mid-level Game Over messages
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
+
+
+// Tetris (PAL version)      has XTAL of 21.281370
+// Air Blaster (PAL version) has XTAL of 21.2813
+// what are the NTSC clocks?
+
+// not confirmed on Space Invaders, actual CPU clock unknown.
+// 21281370 is the same value as a PAL SNES
+// game speed in Air Blaster appears to be limited entirely by CPU speed (and therefore needs to be around 2mhz at most to match hardware)
+// low clock speed also helps with the badly programmed controls in Tetris
+
 
 void radica_eu3a05_state::radicasi(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(21'281'370)/2); // Tetris has a XTAL(21'281'370), not confirmed on Space Invaders, actual CPU clock unknown.
+	M6502(config, m_maincpu, XTAL(21'281'370)/12); // wrong, this is the PAL clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a05_state::radicasi_map);
 	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a05_state::interrupt));
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::radicasi_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
-	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(radica_eu3a05_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_palette(m_palette);
-
 	PALETTE(config, m_palette).set_entries(256);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(radica_eu3a05_state::screen_update));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_radicasi_fake);
 
-	radica6502_gpio_device &gpio(RADICA6502_GPIO(config, "gpio", 0));
-	gpio.read_0_callback().set_ioport("IN0");
+	RADICA6502_GPIO(config, m_gpio, 0);
+	m_gpio->read_0_callback().set_ioport("IN0");
+	m_gpio->read_1_callback().set_ioport("IN1");
+	m_gpio->read_2_callback().set_ioport("IN2");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
 	sound.space_read_callback().set(FUNC(radica_eu3a05_state::read_full_space));
 	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void radica_eu3a05_state::airblsjs(machine_config& config)
+{
+	radicasi(config);
+	m_screen->set_refresh_hz(50);
 }
 
 
@@ -1194,5 +1262,15 @@ ROM_START( rad_sinv )
 	ROM_RELOAD(0x300000, 0x100000)
 ROM_END
 
+ROM_START( airblsjs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "airblsjs.bin", 0x000000, 0x400000, BAD_DUMP CRC(d10a6a84) SHA1(fa65f06e7da229006ddaffb245eef2cc4f90a66d) ) // ROM probably ok, but needs verification pass
+ROM_END
+
+
 CONS( 2004, rad_sinv, 0, 0, radicasi, rad_sinv, radica_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+
 CONS( 2004, rad_tetr, 0, 0, radicasi, rad_tetr, radica_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+
+// ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
+CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, radica_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
