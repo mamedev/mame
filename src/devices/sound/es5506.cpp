@@ -632,23 +632,28 @@ inline void es550x_device::apply_filters(es550x_voice *voice, s32 &sample)
 
 inline void es5506_device::update_envelopes(es550x_voice *voice)
 {
+	const u32 volume_max = (1 << VOLUME_BIT_ES5506) - 1;
 	/* decrement the envelope counter */
 	voice->ecount--;
 
 	/* ramp left volume */
 	if (voice->lvramp)
 	{
+		voice->lvol = get_shifted_volume_res(voice->lvol);
 		voice->lvol += (int8_t)voice->lvramp;
 		if ((s32)voice->lvol < 0) voice->lvol = 0;
-		else if (voice->lvol > 0xffff) voice->lvol = 0xffff;
+		else if (voice->lvol > volume_max) voice->lvol = volume_max;
+		voice->lvol = get_shifted_volume(voice->lvol);
 	}
 
 	/* ramp right volume */
 	if (voice->rvramp)
 	{
+		voice->rvol = get_shifted_volume_res(voice->rvol);
 		voice->rvol += (int8_t)voice->rvramp;
 		if ((s32)voice->rvol < 0) voice->rvol = 0;
-		else if (voice->rvol > 0xffff) voice->rvol = 0xffff;
+		else if (voice->rvol > volume_max) voice->rvol = volume_max;
+		voice->rvol = get_shifted_volume(voice->rvol);
 	}
 
 	/* ramp k1 filter constant */
@@ -1213,8 +1218,8 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			break;
 
 		case 0x10/8:    /* LVOL */
-			voice->lvol = data & 0xffff; // low 4 bit is used for finer envelope control
-			LOG("voice %d, left vol=%04x\n", m_current_page & 0x1f, voice->lvol);
+			voice->lvol = get_shifted_volume(data & 0xffff); // low 4 bit is used for finer envelope control
+			LOG("voice %d, left vol=%04x\n", m_current_page & 0x1f, get_shifted_volume_res(voice->lvol));
 			break;
 
 		case 0x18/8:    /* LVRAMP */
@@ -1223,8 +1228,8 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			break;
 
 		case 0x20/8:    /* RVOL */
-			voice->rvol = data & 0xffff; // low 4 bit is used for finer envelope control
-			LOG("voice %d, right vol=%04x\n", m_current_page & 0x1f, voice->rvol);
+			voice->rvol = get_shifted_volume(data & 0xffff); // low 4 bit is used for finer envelope control
+			LOG("voice %d, right vol=%04x\n", m_current_page & 0x1f, get_shifted_volume_res(voice->rvol));
 			break;
 
 		case 0x28/8:    /* RVRAMP */
@@ -1480,7 +1485,7 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x10/8:    /* LVOL */
-			result = voice->lvol;
+			result = get_shifted_volume_res(voice->lvol);
 			break;
 
 		case 0x18/8:    /* LVRAMP */
@@ -1488,7 +1493,7 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x20/8:    /* RVOL */
-			result = voice->rvol;
+			result = get_shifted_volume_res(voice->rvol);
 			break;
 
 		case 0x28/8:    /* RVRAMP */
