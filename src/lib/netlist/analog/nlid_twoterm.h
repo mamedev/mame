@@ -128,8 +128,8 @@ namespace analog
 		void set_R(const nl_fptype R)
 		{
 			const nl_fptype G = plib::constants<nl_fptype>::one() / R;
-			set_mat( G, -G, 0.0,
-					-G,  G, 0.0);
+			set_mat( G, -G, plib::constants<nl_fptype>::zero(),
+					-G,  G, plib::constants<nl_fptype>::zero());
 		}
 
 		NETLIB_RESETI();
@@ -142,7 +142,7 @@ namespace analog
 	NETLIB_OBJECT_DERIVED(R, R_base)
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(R, R_base)
-		, m_R(*this, "R", 1e9)
+		, m_R(*this, "R", plib::constants<nl_fptype>::cast(1e9))
 		{
 		}
 
@@ -178,7 +178,7 @@ namespace analog
 		, m_R1(*this, "_R1")
 		, m_R2(*this, "_R2")
 		, m_R(*this, "R", 10000)
-		, m_Dial(*this, "DIAL", 0.5)
+		, m_Dial(*this, "DIAL", plib::constants<nl_fptype>::half())
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
@@ -208,8 +208,8 @@ namespace analog
 	{
 		NETLIB_CONSTRUCTOR(POT2)
 		, m_R1(*this, "_R1")
-		, m_R(*this, "R", 10000)
-		, m_Dial(*this, "DIAL", 0.5)
+		, m_R(*this, "R", plib::constants<nl_fptype>::cast(10000.0))
+		, m_Dial(*this, "DIAL", plib::constants<nl_fptype>::half())
 		, m_DialIsLog(*this, "DIALLOG", false)
 		, m_Reverse(*this, "REVERSE", false)
 		{
@@ -239,7 +239,7 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(C, twoterm)
-		, m_C(*this, "C", 1e-6)
+		, m_C(*this, "C", plib::constants<nl_fptype>::cast(1e-6))
 		, m_cap(*this, "m_cap")
 		{
 		}
@@ -289,10 +289,10 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(L, twoterm)
-		, m_L(*this, "L", 1e-6)
-		, m_gmin(0.0)
-		, m_G(0.0)
-		, m_I(0.0)
+		, m_L(*this, "L", plib::constants<nl_fptype>::cast(1e-6))
+		, m_gmin(plib::constants<nl_fptype>::zero())
+		, m_G(plib::constants<nl_fptype>::zero())
+		, m_I(plib::constants<nl_fptype>::zero())
 		{
 			//register_term("1", m_P);
 			//register_term("2", m_N);
@@ -392,12 +392,12 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(VS, twoterm)
-		, m_t(*this, "m_t", 0.0)
-		, m_R(*this, "R", 0.1)
-		, m_V(*this, "V", 0.0)
+		, m_t(*this, "m_t", plib::constants<nl_fptype>::zero())
+		, m_R(*this, "R", plib::constants<nl_fptype>::cast(0.1))
+		, m_V(*this, "V", plib::constants<nl_fptype>::zero())
 		, m_func(*this,"FUNC", "")
 		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
-		, m_funcparam({0.0})
+		, m_funcparam({plib::constants<nl_fptype>::zero()})
 		{
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
@@ -413,7 +413,7 @@ namespace analog
 			m_funcparam[0] = m_t;
 			this->set_G_V_I(plib::reciprocal(m_R()),
 					m_compiled.evaluate(m_funcparam),
-					0.0);
+					plib::constants<nl_fptype>::zero());
 		}
 
 	protected:
@@ -422,7 +422,7 @@ namespace analog
 		NETLIB_RESETI()
 		{
 			NETLIB_NAME(twoterm)::reset();
-			this->set_G_V_I(plib::reciprocal(m_R()), m_V(), 0.0);
+			this->set_G_V_I(plib::reciprocal(m_R()), m_V(), plib::constants<nl_fptype>::zero());
 		}
 
 	private:
@@ -442,11 +442,11 @@ namespace analog
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(CS, twoterm)
-		, m_t(*this, "m_t", 0.0)
-		, m_I(*this, "I", 1.0)
+		, m_t(*this, "m_t", plib::constants<nl_fptype>::zero())
+		, m_I(*this, "I", plib::constants<nl_fptype>::one())
 		, m_func(*this,"FUNC", "")
 		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
-		, m_funcparam({0.0})
+		, m_funcparam({plib::constants<nl_fptype>::zero()})
 		{
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
@@ -460,8 +460,9 @@ namespace analog
 			m_t += step;
 			m_funcparam[0] = m_t;
 			const nl_fptype I = m_compiled.evaluate(m_funcparam);
-			set_mat(0.0, 0.0, -I,
-					0.0, 0.0,  I);
+			const auto zero(plib::constants<nl_fptype>::zero());
+			set_mat(zero, zero, -I,
+					zero, zero,  I);
 		}
 
 	protected:
@@ -470,15 +471,17 @@ namespace analog
 		NETLIB_RESETI()
 		{
 			NETLIB_NAME(twoterm)::reset();
-			set_mat(0.0, 0.0, -m_I(),
-					0.0, 0.0,  m_I());
+			const auto zero(plib::constants<nl_fptype>::zero());
+			set_mat(zero, zero, -m_I(),
+					zero, zero,  m_I());
 		}
 
 		NETLIB_UPDATE_PARAMI()
 		{
 			solve_now();
-			set_mat(0.0, 0.0, -m_I(),
-					0.0, 0.0,  m_I());
+			const auto zero(plib::constants<nl_fptype>::zero());
+			set_mat(zero, zero, -m_I(),
+					zero, zero,  m_I());
 		}
 
 

@@ -764,12 +764,12 @@ namespace netlist
 
 		void set_conductivity(const nl_fptype G) noexcept
 		{
-			set_go_gt_I(-G, G, 0.0);
+			set_go_gt_I(-G, G, plib::constants<nl_fptype>::zero());
 		}
 
 		void set_go_gt(const nl_fptype GO, const nl_fptype GT)  noexcept
 		{
-			set_go_gt_I(GO, GT, 0.0);
+			set_go_gt_I(GO, GT, plib::constants<nl_fptype>::zero());
 		}
 
 		void set_go_gt_I(const nl_fptype GO, const nl_fptype GT, const nl_fptype I)  noexcept

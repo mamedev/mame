@@ -117,7 +117,7 @@ namespace solver
 		const std::size_t iN = this->size();
 
 		this->clear_square_mat(this->m_A);
-		this->fill_matrix(this->m_RHS);
+		this->fill_matrix_and_rhs();
 
 		bool resched = false;
 
@@ -210,10 +210,11 @@ namespace solver
 			return matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(newton_raphson);
 		}
 
-		const float_type err = (newton_raphson ? this->delta(this->m_new_V) : plib::constants<FT>::zero());
-		this->store(this->m_new_V);
-		return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
-
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

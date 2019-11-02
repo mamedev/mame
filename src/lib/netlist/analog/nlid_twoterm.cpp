@@ -64,7 +64,7 @@ NETLIB_RESET(POT)
 {
 	nl_fptype v = m_Dial();
 	if (m_DialIsLog())
-		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
+		v = (std::exp(v) - plib::constants<nl_fptype>::one()) / (std::exp(plib::constants<nl_fptype>::one()) - plib::constants<nl_fptype>::one());
 
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 	m_R2.set_R(std::max(m_R() * (plib::constants<nl_fptype>::one() - v), exec().gmin()));
@@ -77,9 +77,9 @@ NETLIB_UPDATE_PARAM(POT)
 
 	nl_fptype v = m_Dial();
 	if (m_DialIsLog())
-		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
+		v = (std::exp(v) - plib::constants<nl_fptype>::one()) / (std::exp(plib::constants<nl_fptype>::one()) - plib::constants<nl_fptype>::one());
 	if (m_Reverse())
-		v = 1.0 - v;
+		v = plib::constants<nl_fptype>::one() - v;
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 	m_R2.set_R(std::max(m_R() * (plib::constants<nl_fptype>::one() - v), exec().gmin()));
 
@@ -94,9 +94,9 @@ NETLIB_RESET(POT2)
 	nl_fptype v = m_Dial();
 
 	if (m_DialIsLog())
-		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
+		v = (std::exp(v) - plib::constants<nl_fptype>::one()) / (std::exp(plib::constants<nl_fptype>::one()) - plib::constants<nl_fptype>::one());
 	if (m_Reverse())
-		v = 1.0 - v;
+		v = plib::constants<nl_fptype>::one() - v;
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 }
 
@@ -108,9 +108,9 @@ NETLIB_UPDATE_PARAM(POT2)
 	nl_fptype v = m_Dial();
 
 	if (m_DialIsLog())
-		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
+		v = (std::exp(v) - plib::constants<nl_fptype>::one()) / (std::exp(plib::constants<nl_fptype>::one()) - plib::constants<nl_fptype>::one());
 	if (m_Reverse())
-		v = 1.0 - v;
+		v = plib::constants<nl_fptype>::one() - v;
 	m_R1.set_R(std::max(m_R() * v, exec().gmin()));
 }
 
@@ -121,7 +121,7 @@ NETLIB_UPDATE_PARAM(POT2)
 NETLIB_RESET(L)
 {
 	m_gmin = exec().gmin();
-	m_I = 0.0;
+	m_I = plib::constants<nl_fptype>::zero();
 	m_G = m_gmin;
 	set_mat( m_G, -m_G, -m_I,
 			-m_G,  m_G,  m_I);
@@ -152,7 +152,7 @@ NETLIB_RESET(D)
 	nl_fptype n = m_model.m_N;
 
 	m_D.set_param(Is, n, exec().gmin(), constants::T0());
-	set_G_V_I(m_D.G(), 0.0, m_D.Ieq());
+	set_G_V_I(m_D.G(), plib::constants<nl_fptype>::zero(), m_D.Ieq());
 }
 
 NETLIB_UPDATE_PARAM(D)

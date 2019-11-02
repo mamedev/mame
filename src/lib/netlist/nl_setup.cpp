@@ -119,9 +119,10 @@ namespace netlist
 		m_namespace_stack.pop();
 	}
 
-	void nlparse_t::register_param(const pstring &param, const nl_fptype value)
+	void nlparse_t::register_param_x(const pstring &param, const nl_fptype value)
 	{
-		if (std::abs(value - std::floor(value)) > 1e-30 || std::abs(value) > 1e9)
+		if (std::abs(value - std::floor(value)) > plib::constants<nl_fptype>::cast(1e-30)
+			|| std::abs(value) > plib::constants<nl_fptype>::cast(1e9))
 			register_param(param, plib::pfmt("{1:.9}").e(value));
 		else
 			register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
@@ -945,15 +946,15 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
-		case 'M': factor = 1e6; break;
+		case 'M': factor = plib::constants<nl_fptype>::cast(1e6); break;
 		case 'k':
-		case 'K': factor = 1e3; break;
-		case 'm': factor = 1e-3; break;
-		case 'u': factor = 1e-6; break;
-		case 'n': factor = 1e-9; break;
-		case 'p': factor = 1e-12; break;
-		case 'f': factor = 1e-15; break;
-		case 'a': factor = 1e-18; break;
+		case 'K': factor = plib::constants<nl_fptype>::cast(1e3); break;
+		case 'm': factor = plib::constants<nl_fptype>::cast(1e-3); break;
+		case 'u': factor = plib::constants<nl_fptype>::cast(1e-6); break;
+		case 'n': factor = plib::constants<nl_fptype>::cast(1e-9); break;
+		case 'p': factor = plib::constants<nl_fptype>::cast(1e-12); break;
+		case 'f': factor = plib::constants<nl_fptype>::cast(1e-15); break;
+		case 'a': factor = plib::constants<nl_fptype>::cast(1e-18); break;
 		default:
 			if (*p < '0' || *p > '9')
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
@@ -1125,9 +1126,10 @@ void setup_t::prepare_to_run()
 				//FIXME: check for errors ...
 				bool err(false);
 				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
-				if (err || std::abs(v - std::floor(v)) > 1e-6 )
+				if (err || std::abs(v - std::floor(v)) > plib::constants<nl_fptype>::cast(1e-6) )
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
-				d.second->set_hint_deactivate(v == 0.0);
+				// FIXME comparison with zero
+				d.second->set_hint_deactivate(v == plib::constants<nl_fptype>::zero());
 			}
 		}
 		else

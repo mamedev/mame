@@ -216,8 +216,9 @@ namespace plib {
 			type total() const noexcept { return m_time; }
 			ctype count() const noexcept { return m_count; }
 
-			double as_seconds() const noexcept { return static_cast<double>(total())
-					/ static_cast<double>(T::per_second()); }
+			template <typename S>
+			S as_seconds() const noexcept { return static_cast<S>(total())
+					/ static_cast<S>(T::per_second()); }
 
 			guard_t guard() noexcept { return guard_t(*this); }
 		private:
@@ -247,7 +248,8 @@ namespace plib {
 			constexpr type average() const noexcept { return 0; }
 			constexpr type total() const noexcept { return 0; }
 			constexpr ctype count() const noexcept { return 0; }
-			constexpr double as_seconds() const noexcept { return 0.0; }
+			template <typename S>
+			S as_seconds() const noexcept { return static_cast<S>(0.0); }
 			constexpr static bool enabled = false;
 			guard_t guard() { return guard_t(); }
 		};

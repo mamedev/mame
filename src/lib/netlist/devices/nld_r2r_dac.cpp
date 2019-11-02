@@ -16,8 +16,8 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(r2r_dac, twoterm)
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(r2r_dac, twoterm)
-		, m_VIN(*this, "VIN", 1.0)
-		, m_R(*this, "R", 1.0)
+		, m_VIN(*this, "VIN", plib::constants<nl_fptype>::one())
+		, m_R(*this, "R", plib::constants<nl_fptype>::one())
 		, m_num(*this, "N", 1)
 		, m_val(*this, "VAL", 1)
 		{
@@ -44,7 +44,7 @@ namespace netlist
 		nl_fptype V = m_VIN() / static_cast<nl_fptype>(1 << m_num())
 				* static_cast<nl_fptype>(m_val());
 
-		this->set_G_V_I(plib::reciprocal(m_R()), V, 0.0);
+		this->set_G_V_I(plib::reciprocal(m_R()), V, plib::constants<nl_fptype>::zero());
 	}
 	} //namespace analog
 

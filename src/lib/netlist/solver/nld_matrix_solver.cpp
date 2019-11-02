@@ -501,7 +501,7 @@ namespace solver
 
 			std::vector<bool> touched(1024, false); // FIXME!
 
-			nl_fptype weight = 0.0;
+			nl_fptype weight = plib::constants<nl_fptype>::zero();
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term.count(); i++)
 			{
@@ -560,7 +560,7 @@ namespace solver
 					this->m_stat_calculations,
 					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_fp<nl_fptype>(),
 					this->m_iterative_fail,
-					100.0 * static_cast<nl_fptype>(this->m_iterative_fail)
+					plib::constants<nl_fptype>::cast(100.0) * static_cast<nl_fptype>(this->m_iterative_fail)
 						/ static_cast<nl_fptype>(this->m_stat_calculations),
 					static_cast<nl_fptype>(this->m_iterative_total) / static_cast<nl_fptype>(this->m_stat_calculations));
 		}

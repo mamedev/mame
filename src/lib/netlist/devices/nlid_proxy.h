@@ -104,7 +104,7 @@ namespace netlist
 
 	private:
 
-		static constexpr const nl_fptype G_OFF = 1e-9;
+		static constexpr const nl_fptype G_OFF = plib::constants<nl_fptype>::cast(1e-9);
 
 		plib::unique_ptr<analog_output_t> m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
 		plib::unique_ptr<analog_output_t> m_VCCHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd

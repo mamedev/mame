@@ -214,8 +214,6 @@ namespace solver
 		const auto iN = this->size();
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-		std::array<float_type, storage_N> new_V;
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 		std::array<float_type, storage_N> t;  // FIXME: convert to member
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 		std::array<float_type, storage_N> w;
@@ -224,12 +222,12 @@ namespace solver
 		{
 			/* complete calculation */
 			this->LE_invert();
-			this->LE_compute_x(new_V);
+			this->LE_compute_x(this->m_new_V);
 		}
 		else
 		{
 			/* Solve Ay = b for y */
-			this->LE_compute_x(new_V);
+			this->LE_compute_x(this->m_new_V);
 
 			/* determine changed rows */
 
@@ -261,7 +259,7 @@ namespace solver
 					const unsigned r = rows[i];
 					FT tmp = plib::constants<FT>::zero();
 					for (unsigned k = 0; k < iN; k++)
-						tmp += VT(r,k) * new_V[k];
+						tmp += VT(r,k) * this->m_new_V[k];
 					w[i] = tmp;
 				}
 
@@ -328,7 +326,7 @@ namespace solver
 						const unsigned row = rows[j];
 						tmp += Ainv(i,row) * t[j];
 					}
-					new_V[i] -= tmp;
+					this->m_new_V[i] -= tmp;
 				}
 			}
 		}
@@ -340,22 +338,24 @@ namespace solver
 				float_type tmp = plib::constants<FT>::zero();
 				for (unsigned j=0; j<iN; j++)
 				{
-					tmp += A(i,j) * new_V[j];
+					tmp += A(i,j) * this->m_new_V[j];
 				}
 				if (std::abs(tmp-RHS(i)) > static_cast<float_type>(1e-6))
 					plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, std::abs(tmp-RHS(i)), RHS(i));
 			}
 
-		const float_type err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
-		this->store(new_V);
-		return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_w_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
 		this->clear_square_mat(this->m_A);
-		this->fill_matrix(this->m_RHS);
+		this->fill_matrix_and_rhs();
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);
