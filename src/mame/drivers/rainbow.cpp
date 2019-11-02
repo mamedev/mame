@@ -4,7 +4,7 @@
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Portions (2013 - 2018) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
+Portions (2013 - 2019) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
 Baud rate generator by AJR (2018) and Shattered (2016), keyboard & GDC fixes by Cracyc (June - Nov. 2016).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
@@ -19,7 +19,7 @@ ALWAYS USE THE RIGHT SLOT AND SAVE YOUR DATA BEFORE MOUNTING FOREIGN DISK FORMAT
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF DECEMBER 2018
+STATE AS OF NOVEMBER 2019
 -------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
@@ -143,15 +143,9 @@ To obtain pixel exact graphics use 'Graphics Only' in Video Options and cmd.line
 
 CURRENTY UNEMULATED
 -------------------
-(a) the serial printer on port B prints garbage. It is worth to mention that port B relies on XON/XOFF,
-    while DTR_L (CTS B) means 'printer ready'. There is also a ROM patch in place (WORKAROUND macro)...
+(a) LOOPBACK circuit not emulated (used in startup tests).
 
-(b1) LOOPBACK circuit not emulated (used in startup tests).
-
-(b2) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
- to see what happens (key 3 - individual tests, then 12 - system interaction). Uses LOOPBACK too?
-
-(c) arbitration chip (E11; in 100-A schematics or E13 in -B) is dumped, but yet unemulated.
+(b) arbitration chip (E11; in 100-A schematics or E13 in -B) is dumped, but yet unemulated.
 It is a 6308 OTP ROM (2048 bit, 256 x 8) used as a lookup table (LUT) with the address pins (A)
 used as inputs and the data pins (D) as output.
 
@@ -1254,8 +1248,18 @@ void rainbow_state::machine_reset()
 	for (int i = 0; i < 32; i++)
 		m_gdc_color_map[i] = 0x00;
 	m_gdc_color_map_index = 0;
-	// *********** Z80
+	
+	m_hgdc->write(1, 0x00); // 7220 reset
+	m_hgdc->write(0, 0x16); // Mode: 16 
+	m_hgdc->write(0, 0x16); // AW: 24   
+	m_hgdc->write(0, 0x61); // HS: 2   
+	m_hgdc->write(0, 0x04); // VS: 3
+	m_hgdc->write(0, 0x02); // HFP : 2  
+	m_hgdc->write(0, 0x03); // HBP: 3   + VFP: 3
+	m_hgdc->write(0, 0xf0); // AL: 240  
+	m_hgdc->write(0, 0x40); // VBP: 16 + PITCH: 24 
 
+	// *********** Z80:
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_z80_halted = true;
 
@@ -1265,12 +1269,12 @@ void rainbow_state::machine_reset()
 	m_intz80 = false;
 	m_int88 = false;
 
-	// *********** SERIAL COMM. (7201)
+	// *********** SERIAL COMM. (7201):
 	m_mpsc->reset();
 	m_mpsc_irq = 0;
 	m_printer_bitrate = 0;
 
-	// *********** KEYBOARD + IRQ
+	// *********** KEYBOARD + IRQ:
 	m_kbd_tx_ready = m_kbd_rx_ready = false;
 	m_kbd8251->write_cts(0);
 	m_KBD = 0;
