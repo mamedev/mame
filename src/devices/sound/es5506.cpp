@@ -294,17 +294,8 @@ void es5506_device::device_start()
 	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
 	m_stream->set_sample_rate(m_sample_rate);
 
-	/* init the voices */
 	// 21 bit integer and 11 bit fraction
 	get_accum_mask(ADDRESS_INTEGER_BIT_ES5506, ADDRESS_FRAC_BIT_ES5506);
-	for (int j = 0; j < 32; j++)
-	{
-		m_voice[j].index = j;
-		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = get_shifted_volume(0xffff); // 16 bit volume
-		m_voice[j].rvol = get_shifted_volume(0xffff);
-		m_voice[j].exbank = 0;
-	}
 
 	/* register save */
 	save_item(NAME(m_write_latch));
@@ -409,17 +400,8 @@ void es5505_device::device_start()
 	/* initialize the rest of the structure */
 	m_channels = channels;
 
-	/* init the voices */
 	// 20 bit integer and 9 bit fraction
 	get_accum_mask(ADDRESS_INTEGER_BIT_ES5505, ADDRESS_FRAC_BIT_ES5505);
-	for (int j = 0; j < 32; j++)
-	{
-		m_voice[j].index = j;
-		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = get_shifted_volume(0xff); // 8 bit volume
-		m_voice[j].rvol = get_shifted_volume(0xff);
-		m_voice[j].exbank = 0;
-	}
 
 	/* success */
 }
@@ -484,8 +466,7 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 	}
 
 	const u32 volume_bit = (exponent_bit + mantissa_bit);
-	m_volume_shift = FINE_VOLUME_BIT - total_volume_bit;
-	m_volume_shift_int = FINE_VOLUME_BIT - volume_bit;
+	m_volume_shift = total_volume_bit - volume_bit;
 	const u32 volume_len = 1 << volume_bit;
 	/* allocate volume lookup table */
 	m_volume_lookup = make_unique_clear<u32[]>(volume_len);
@@ -506,6 +487,16 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 		m_volume_lookup[i] = (mantissa << mantissa_shift) >> (exponent_shift - exponent);
 	}
 	m_volume_acc_shift = (16 + exponent_mask) - VOLUME_ACC_BIT;
+
+	/* init the voices */
+	for (int j = 0; j < 32; j++)
+	{
+		m_voice[j].index = j;
+		m_voice[j].control = CONTROL_STOPMASK;
+		m_voice[j].lvol = (1 << total_volume_bit - 1);
+		m_voice[j].rvol = (1 << total_volume_bit - 1);
+		m_voice[j].exbank = 0;
+	}
 }
 
 /**********************************************************************************************
@@ -639,21 +630,17 @@ inline void es5506_device::update_envelopes(es550x_voice *voice)
 	/* ramp left volume */
 	if (voice->lvramp)
 	{
-		voice->lvol = get_shifted_volume_res(voice->lvol);
 		voice->lvol += (int8_t)voice->lvramp;
 		if ((s32)voice->lvol < 0) voice->lvol = 0;
 		else if (voice->lvol > volume_max) voice->lvol = volume_max;
-		voice->lvol = get_shifted_volume(voice->lvol);
 	}
 
 	/* ramp right volume */
 	if (voice->rvramp)
 	{
-		voice->rvol = get_shifted_volume_res(voice->rvol);
 		voice->rvol += (int8_t)voice->rvramp;
 		if ((s32)voice->rvol < 0) voice->rvol = 0;
 		else if (voice->rvol > volume_max) voice->rvol = volume_max;
-		voice->rvol = get_shifted_volume(voice->rvol);
 	}
 
 	/* ramp k1 filter constant */
@@ -1218,8 +1205,8 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			break;
 
 		case 0x10/8:    /* LVOL */
-			voice->lvol = get_shifted_volume(data & 0xffff); // low 4 bit is used for finer envelope control
-			LOG("voice %d, left vol=%04x\n", m_current_page & 0x1f, get_shifted_volume_res(voice->lvol));
+			voice->lvol = data & 0xffff; // low 4 bit is used for finer envelope control
+			LOG("voice %d, left vol=%04x\n", m_current_page & 0x1f, voice->lvol);
 			break;
 
 		case 0x18/8:    /* LVRAMP */
@@ -1228,8 +1215,8 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 			break;
 
 		case 0x20/8:    /* RVOL */
-			voice->rvol = get_shifted_volume(data & 0xffff); // low 4 bit is used for finer envelope control
-			LOG("voice %d, right vol=%04x\n", m_current_page & 0x1f, get_shifted_volume_res(voice->rvol));
+			voice->rvol = data & 0xffff; // low 4 bit is used for finer envelope control
+			LOG("voice %d, right vol=%04x\n", m_current_page & 0x1f, voice->rvol);
 			break;
 
 		case 0x28/8:    /* RVRAMP */
@@ -1485,7 +1472,7 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x10/8:    /* LVOL */
-			result = get_shifted_volume_res(voice->lvol);
+			result = voice->lvol;
 			break;
 
 		case 0x18/8:    /* LVRAMP */
@@ -1493,7 +1480,7 @@ inline u32 es5506_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x20/8:    /* RVOL */
-			result = get_shifted_volume_res(voice->rvol);
+			result = voice->rvol;
 			break;
 
 		case 0x28/8:    /* RVRAMP */
@@ -1771,14 +1758,14 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 
 		case 0x08:  /* LVOL */
 			if (ACCESSING_BITS_8_15)
-				voice->lvol = (voice->lvol & ~0xff00) | (data & 0xff00);
-			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, get_shifted_volume_res(voice->lvol));
+				voice->lvol = (voice->lvol & ~0xff) | ((data & 0xff00) >> 8);
+			LOG("%s:voice %d, left vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->lvol);
 			break;
 
 		case 0x09:  /* RVOL */
 			if (ACCESSING_BITS_8_15)
-				voice->rvol = (voice->rvol & ~0xff00) | (data & 0xff00);
-			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, get_shifted_volume_res(voice->rvol));
+				voice->rvol = (voice->rvol & ~0xff) | ((data & 0xff00) >> 8);
+			LOG("%s:voice %d, right vol=%02x\n", machine().describe_context(), m_current_page & 0x1f, voice->rvol);
 			break;
 
 		case 0x0a:  /* ACC (hi) */
@@ -2032,11 +2019,11 @@ inline u16 es5505_device::reg_read_low(es550x_voice *voice, offs_t offset)
 			break;
 
 		case 0x08:  /* LVOL */
-			result = voice->lvol;
+			result = voice->lvol << 8;
 			break;
 
 		case 0x09:  /* RVOL */
-			result = voice->rvol;
+			result = voice->rvol << 8;
 			break;
 
 		case 0x0a:  /* ACC (hi) */
