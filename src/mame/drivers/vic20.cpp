@@ -860,7 +860,6 @@ void vic20_state::add_clocked_devices(machine_config &config, uint32_t clock)
 	// basic machine hardware
 	M6502(config, m_maincpu, clock);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic20_state::vic20_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 
 	VIA6522(config, m_via1, clock);
 	m_via1->readpa_handler().set(FUNC(vic20_state::via1_pa_r));

@@ -18,20 +18,13 @@ public:
 	m6507_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	class mi_6507_normal : public memory_interface {
+	class mi_6507 : public memory_interface {
 	public:
-		virtual ~mi_6507_normal() {}
+		virtual ~mi_6507() {}
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_6507_nd : public mi_6507_normal {
-	public:
-		virtual ~mi_6507_nd() {}
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	virtual void device_start() override;
