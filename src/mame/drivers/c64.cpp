@@ -1441,7 +1441,6 @@ void c64_state::ntsc(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(14'318'181)/14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
@@ -1613,7 +1612,6 @@ void c64_state::pal(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(17'734'472)/18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64_state::cpu_w));
 	m_maincpu->set_pulls(0x17, 0xc8);
@@ -1761,7 +1759,6 @@ void c64gs_state::pal_gs(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(17'734'472)/18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64gs_state::c64_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(c64gs_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(c64gs_state::cpu_w));
 	m_maincpu->set_pulls(0x07, 0xc0);
