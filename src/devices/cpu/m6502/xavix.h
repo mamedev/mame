@@ -147,26 +147,17 @@ public:
 	void write_full_data(uint32_t addr, uint8_t val);
 
 protected:
-	class mi_xavix_normal : public memory_interface {
+	class mi_xavix : public memory_interface {
 	public:
 		xavix_device *base;
 
-		mi_xavix_normal(xavix_device *base);
-		virtual ~mi_xavix_normal() {}
+		mi_xavix(xavix_device *base);
+		virtual ~mi_xavix() {}
 
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_xavix_nd : public mi_xavix_normal {
-	public:
-		mi_xavix_nd(xavix_device *base);
-		virtual ~mi_xavix_nd() {}
-
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	uint8_t m_databank;

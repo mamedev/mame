@@ -644,7 +644,6 @@ void vic10_state::vic10(machine_config &config)
 	// basic hardware
 	M6510(config, m_maincpu, XTAL(8'000'000)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vic10_state::vic10_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(vic10_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(vic10_state::cpu_w));
 	m_maincpu->set_pulls(0x10, 0x20);

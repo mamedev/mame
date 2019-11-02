@@ -2248,7 +2248,6 @@ void p500_state::p500_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(14'318'181)/14);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
 	config.set_perfect_quantum(m_maincpu);
 
@@ -2382,7 +2381,6 @@ void p500_state::p500_pal(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(17'734'472)/18);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &p500_state::p500_mem);
 	config.set_perfect_quantum(m_maincpu);
 
@@ -2513,7 +2511,6 @@ void cbm2_state::cbm2lp_ntsc(machine_config &config)
 
 	// basic hardware
 	M6509(config, m_maincpu, XTAL(18'000'000)/9);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm2_state::cbm2_mem);
 	config.set_perfect_quantum(m_maincpu);
 

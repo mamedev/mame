@@ -23,7 +23,6 @@ public:
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	bool get_sync() const { return sync; }
-	void disable_cache() { cache_disabled = true; }
 
 	auto sync_cb() { return sync_w.bind(); }
 
@@ -46,20 +45,13 @@ protected:
 		virtual void write_9(uint16_t adr, uint8_t val);
 	};
 
-	class mi_default_normal : public memory_interface {
+	class mi_default : public memory_interface {
 	public:
-		virtual ~mi_default_normal() {}
+		virtual ~mi_default() {}
 		virtual uint8_t read(uint16_t adr) override;
 		virtual uint8_t read_sync(uint16_t adr) override;
 		virtual uint8_t read_arg(uint16_t adr) override;
 		virtual void write(uint16_t adr, uint8_t val) override;
-	};
-
-	class mi_default_nd : public mi_default_normal {
-	public:
-		virtual ~mi_default_nd() {}
-		virtual uint8_t read_sync(uint16_t adr) override;
-		virtual uint8_t read_arg(uint16_t adr) override;
 	};
 
 	enum {
@@ -122,7 +114,7 @@ protected:
 	int inst_state, inst_substate;
 	int icount, bcount, count_before_instruction_step;
 	bool nmi_state, irq_state, apu_irq_state, v_state;
-	bool irq_taken, sync, cache_disabled, inhibit_interrupts;
+	bool irq_taken, sync, inhibit_interrupts;
 
 	uint8_t read(uint16_t adr) { return mintf->read(adr); }
 	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
