@@ -136,6 +136,6 @@ ROM_START( cars2lap )
 ROM_END
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                                 FLAGS
-COMP( 1995, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R Lerncomputer", MACHINE_NOT_WORKING )
-COMP( 2003, dyndesk,  0,      0,      dyndesk,  inteladv, inteladv_state, empty_init, "VTech", "DynamiDesk",                            MACHINE_NOT_WORKING )
-COMP( 2012, cars2lap, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",               MACHINE_IS_SKELETON ) // might not belong here
+COMP( 2005, inteladv, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "Intelligence Advance E/R (Germany)", MACHINE_NOT_WORKING )
+COMP( 2003, dyndesk,  0,      0,      dyndesk,  inteladv, inteladv_state, empty_init, "VTech", "DynamiDesk (Germany)",               MACHINE_NOT_WORKING )
+COMP( 2012, cars2lap, 0,      0,      inteladv, inteladv, inteladv_state, empty_init, "VTech", "CARS 2 Laptop (Germany)",            MACHINE_IS_SKELETON ) // might not belong here
