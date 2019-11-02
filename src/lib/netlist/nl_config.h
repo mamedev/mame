@@ -104,7 +104,7 @@ static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 // due to numeric issues
 //============================================================
 
-using nl_fptype = double;
+using nl_fptype = float;
 
 namespace netlist
 {

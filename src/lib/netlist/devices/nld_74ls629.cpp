@@ -85,7 +85,7 @@ namespace netlist
 		, m_ENQ(*this, "ENQ")
 		, m_RNG(*this, "RNG")
 		, m_FC(*this, "FC")
-		, m_CAP(*this, "CAP", plib::constants<nl_fptype>::cast(1e-6))
+		, m_CAP(*this, "CAP", nlconst::magic(1e-6))
 		{
 			register_subalias("GND",    m_R_FC.m_N);
 
@@ -98,8 +98,8 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_R_FC.set_R( plib::constants<nl_fptype>::cast(90000.0));
-			m_R_RNG.set_R(plib::constants<nl_fptype>::cast(90000.0));
+			m_R_FC.set_R( nlconst::magic(90000.0));
+			m_R_RNG.set_R(nlconst::magic(90000.0));
 			m_clock.reset();
 		}
 		NETLIB_UPDATEI();
@@ -179,16 +179,16 @@ namespace netlist
 			nl_fptype  v_rng = m_RNG();
 
 			/* coefficients */
-			const nl_fptype k1 =  plib::constants<nl_fptype>::cast( 1.9904769024796283E+03);
-			const nl_fptype k2 =  plib::constants<nl_fptype>::cast( 1.2070059213983407E+03);
-			const nl_fptype k3 =  plib::constants<nl_fptype>::cast( 1.3266985579561108E+03);
-			const nl_fptype k4 =  plib::constants<nl_fptype>::cast(-1.5500979825922698E+02);
-			const nl_fptype k5 =  plib::constants<nl_fptype>::cast( 2.8184536266938172E+00);
-			const nl_fptype k6 =  plib::constants<nl_fptype>::cast(-2.3503421582744556E+02);
-			const nl_fptype k7 =  plib::constants<nl_fptype>::cast(-3.3836786704527788E+02);
-			const nl_fptype k8 =  plib::constants<nl_fptype>::cast(-1.3569136703258670E+02);
-			const nl_fptype k9 =  plib::constants<nl_fptype>::cast( 2.9914575453819188E+00);
-			const nl_fptype k10 = plib::constants<nl_fptype>::cast( 1.6855569086173170E+00);
+			const nl_fptype k1 =  nlconst::magic( 1.9904769024796283E+03);
+			const nl_fptype k2 =  nlconst::magic( 1.2070059213983407E+03);
+			const nl_fptype k3 =  nlconst::magic( 1.3266985579561108E+03);
+			const nl_fptype k4 =  nlconst::magic(-1.5500979825922698E+02);
+			const nl_fptype k5 =  nlconst::magic( 2.8184536266938172E+00);
+			const nl_fptype k6 =  nlconst::magic(-2.3503421582744556E+02);
+			const nl_fptype k7 =  nlconst::magic(-3.3836786704527788E+02);
+			const nl_fptype k8 =  nlconst::magic(-1.3569136703258670E+02);
+			const nl_fptype k9 =  nlconst::magic( 2.9914575453819188E+00);
+			const nl_fptype k10 = nlconst::magic( 1.6855569086173170E+00);
 
 			/* scale due to input resistance */
 
@@ -208,11 +208,11 @@ namespace netlist
 			freq += k9 * v_rng * v_freq_3;
 			freq += k10 * v_rng * v_freq_4;
 
-			freq *= plib::constants<nl_fptype>::cast(0.1e-6) / m_CAP();
+			freq *= nlconst::magic(0.1e-6) / m_CAP();
 
 			// FIXME: we need a possibility to remove entries from queue ...
 			//        or an exact model ...
-			m_clock.m_inc = netlist_time::from_fp(plib::constants<nl_fptype>::half() / freq);
+			m_clock.m_inc = netlist_time::from_fp(nlconst::half() / freq);
 			//m_clock.update();
 
 			//NL_VERBOSE_OUT(("{1} {2} {3} {4}\n", name(), v_freq, v_rng, freq));

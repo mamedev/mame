@@ -39,19 +39,19 @@ namespace netlist {
 	{
 	public:
 		NETLIB_CONSTRUCTOR(VCCS)
-		, m_G(*this, "G", plib::constants<nl_fptype>::one())
-		, m_RI(*this, "RI", plib::constants<nl_fptype>::cast(1e9))
+		, m_G(*this, "G", nlconst::one())
+		, m_RI(*this, "RI", nlconst::magic(1e9))
 		, m_OP(*this, "OP", &m_IP)
 		, m_ON(*this, "ON", &m_IP)
 		, m_IP(*this, "IP", &m_IN)   // <= this should be NULL and terminal be filtered out prior to solving...
 		, m_IN(*this, "IN", &m_IP)   // <= this should be NULL and terminal be filtered out prior to solving...
 		, m_OP1(*this, "_OP1", &m_IN)
 		, m_ON1(*this, "_ON1", &m_IN)
-		, m_gfac(plib::constants<nl_fptype>::one())
+		, m_gfac(nlconst::one())
 		{
 			connect(m_OP, m_OP1);
 			connect(m_ON, m_ON1);
-			m_gfac = plib::constants<nl_fptype>::one();
+			m_gfac = nlconst::one();
 		}
 
 		NETLIB_RESETI();
@@ -85,8 +85,8 @@ namespace netlist {
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(LVCCS, VCCS)
-		, m_cur_limit(*this, "CURLIM", plib::constants<nl_fptype>::cast(1000.0))
-		, m_vi(plib::constants<nl_fptype>::zero())
+		, m_cur_limit(*this, "CURLIM", nlconst::magic(1000.0))
+		, m_vi(nlconst::zero())
 		{
 		}
 
@@ -131,7 +131,7 @@ namespace netlist {
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
 		{
-			m_gfac = plib::constants<nl_fptype>::one() / m_RI();
+			m_gfac = nlconst::one() / m_RI();
 		}
 
 		NETLIB_RESETI();
@@ -174,7 +174,7 @@ namespace netlist {
 	{
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(VCVS, VCCS)
-		, m_RO(*this, "RO", plib::constants<nl_fptype>::one())
+		, m_RO(*this, "RO", nlconst::one())
 		, m_OP2(*this, "_OP2", &m_ON2)
 		, m_ON2(*this, "_ON2", &m_OP2)
 		{

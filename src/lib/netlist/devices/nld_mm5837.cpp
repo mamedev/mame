@@ -69,11 +69,11 @@ namespace netlist
 	{
 		//m_V0.initial(0.0);
 		//m_RV.do_reset();
-		m_RV.set_G_V_I(plib::constants<nl_fptype>::one() / plib::constants<nl_fptype>::cast(R_LOW),
-			plib::constants<nl_fptype>::zero(),
-			plib::constants<nl_fptype>::zero());
+		m_RV.set_G_V_I(nlconst::one() / nlconst::magic(R_LOW),
+			nlconst::zero(),
+			nlconst::zero());
 		m_inc = netlist_time::from_fp(plib::reciprocal(m_FREQ()));
-		if (m_FREQ() < plib::constants<nl_fptype>::cast(24000) || m_FREQ() > plib::constants<nl_fptype>::cast(56000))
+		if (m_FREQ() < nlconst::magic(24000) || m_FREQ() > nlconst::magic(56000))
 			log().warning(MW_FREQUENCY_OUTSIDE_OF_SPECS_1(m_FREQ()));
 
 		m_shift = 0x1ffff;
@@ -83,7 +83,7 @@ namespace netlist
 	NETLIB_UPDATE_PARAM(MM5837_dip)
 	{
 		m_inc = netlist_time::from_fp(plib::reciprocal(m_FREQ()));
-		if (m_FREQ() < plib::constants<nl_fptype>::cast(24000) || m_FREQ() > plib::constants<nl_fptype>::cast(56000))
+		if (m_FREQ() < nlconst::magic(24000) || m_FREQ() > nlconst::magic(56000))
 			log().warning(MW_FREQUENCY_OUTSIDE_OF_SPECS_1(m_FREQ()));
 	}
 
@@ -104,13 +104,13 @@ namespace netlist
 
 		if (state != last_state)
 		{
-			const nl_fptype R = plib::constants<nl_fptype>::cast(state ? R_HIGH : R_LOW);
+			const nl_fptype R = nlconst::magic(state ? R_HIGH : R_LOW);
 			const nl_fptype V = state ? m_VDD() : m_VSS();
 
 			// We only need to update the net first if this is a time stepping net
 			if (m_is_timestep)
 				m_RV.update();
-			m_RV.set_G_V_I(plib::constants<nl_fptype>::one() / R, V, plib::constants<nl_fptype>::zero());
+			m_RV.set_G_V_I(nlconst::one() / R, V, nlconst::zero());
 			m_RV.solve_later(NLTIME_FROM_NS(1));
 		}
 

@@ -29,10 +29,10 @@ namespace netlist
 {
 	/*! @brief plib::constants struct specialized for nl_fptype
 	 *
-	 *  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
-	 *  The choice has little to no impact on performance.
 	 */
-	using constants = plib::constants<nl_fptype>;
+	struct nlconst : public plib::constants<nl_fptype>
+	{
+	};
 
 	/*! @brief netlist_sig_t is the type used for logic signals.
 	 *

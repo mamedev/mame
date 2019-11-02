@@ -31,8 +31,8 @@ namespace netlist
 		, m_last_trig(*this, "m_last_trig", 0)
 		, m_state(*this, "m_state", 0)
 		, m_KP(*this, "m_KP", 0)
-		, m_K(*this, "K", plib::constants<nl_fptype>::cast((m_dev_type == 4538) ? 1.0 : 0.4)) // CD4538 datasheet states PW=RC
-		, m_RI(*this, "RI", plib::constants<nl_fptype>::cast(400.0)) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
+		, m_K(*this, "K", nlconst::magic((m_dev_type == 4538) ? 1.0 : 0.4)) // CD4538 datasheet states PW=RC
+		, m_RI(*this, "RI", nlconst::magic(400.0)) // around 250 for HC series, 400 on LS/TTL, estimated from datasheets
 		{
 			if ((m_dev_type != 9602) && (m_dev_type != 4538) )
 				m_dev_type = 74123;
@@ -241,7 +241,7 @@ namespace netlist
 		}
 		if (m_state == 2)
 		{
-			const nl_fptype vHigh = m_RP.m_R.m_P() * (plib::constants<nl_fptype>::one() - m_KP);
+			const nl_fptype vHigh = m_RP.m_R.m_P() * (nlconst::one() - m_KP);
 			if (m_CV() > vHigh)
 			{
 				m_RP_Q.push(0, NLTIME_FROM_NS(10)); // R_OFF
@@ -255,7 +255,7 @@ namespace netlist
 
 	NETLIB_RESET(74123)
 	{
-		m_KP = plib::reciprocal(plib::constants<nl_fptype>::one() + std::exp(m_K()));
+		m_KP = plib::reciprocal(nlconst::one() + std::exp(m_K()));
 
 		m_RP.reset();
 		m_RN.reset();

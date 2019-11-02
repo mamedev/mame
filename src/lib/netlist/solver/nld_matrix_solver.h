@@ -49,20 +49,20 @@ namespace solver
 	struct solver_parameters_t
 	{
 		solver_parameters_t(device_t &parent)
-		: m_freq(parent, "FREQ", plib::constants<nl_fptype>::cast(48000.0))
+		: m_freq(parent, "FREQ", nlconst::magic(48000.0))
 
 		/* iteration parameters */
-		, m_gs_sor(parent,   "SOR_FACTOR", plib::constants<nl_fptype>::cast(1.059))
+		, m_gs_sor(parent,   "SOR_FACTOR", nlconst::magic(1.059))
 		, m_method(parent,   "METHOD", matrix_type_e::MAT_CR)
 		, m_fp_type(parent,  "FPTYPE", matrix_fp_type_e::DOUBLE)
-		, m_reltol(parent,   "RELTOL", plib::constants<nl_fptype>::cast(1e-3))			///< SPICE RELTOL parameter
-		, m_vntol(parent,    "VNTOL",  plib::constants<nl_fptype>::cast(1e-6))			///< SPICE VNTOL parameter
-		, m_accuracy(parent, "ACCURACY", plib::constants<nl_fptype>::cast(1e-7))			///< Iterative solver accuracy
+		, m_reltol(parent,   "RELTOL", nlconst::magic(1e-3))			///< SPICE RELTOL parameter
+		, m_vntol(parent,    "VNTOL",  nlconst::magic(1e-6))			///< SPICE VNTOL parameter
+		, m_accuracy(parent, "ACCURACY", nlconst::magic(1e-7))			///< Iterative solver accuracy
 		, m_nr_loops(parent, "NR_LOOPS", 250)           ///< Maximum number of Newton-Raphson loops
 		, m_gs_loops(parent, "GS_LOOPS", 9)             ///< Maximum number of Gauss-Seidel loops
 
 		/* general parameters */
-		, m_gmin(parent, "GMIN", plib::constants<nl_fptype>::cast(1e-9))
+		, m_gmin(parent, "GMIN", nlconst::magic(1e-9))
 		, m_pivot(parent, "PIVOT", false)               ///< use pivoting on supported solvers
 		, m_nr_recalc_delay(parent, "NR_RECALC_DELAY",
 			netlist_time::quantum().as_fp<nl_fptype>()) ///< Delay to next solve attempt if nr loops exceeded
@@ -70,8 +70,8 @@ namespace solver
 
 		/* automatic time step */
 		, m_dynamic_ts(parent, "DYNAMIC_TS", false)		///< Use dynamic time stepping
-		, m_dynamic_lte(parent, "DYNAMIC_LTE", plib::constants<nl_fptype>::cast(1e-5))    ///< dynamic time stepping slope
-		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", plib::constants<nl_fptype>::cast(1e-6)) ///< smallest time step allowed
+		, m_dynamic_lte(parent, "DYNAMIC_LTE", nlconst::magic(1e-5))    ///< dynamic time stepping slope
+		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", nlconst::magic(1e-6)) ///< smallest time step allowed
 
 		/* matrix sorting */
 		, m_sort_type(parent, "SORT_TYPE", matrix_sort_type_e::PREFER_IDENTITY_TOP_LEFT)
@@ -375,9 +375,9 @@ namespace solver
 		, m_new_V(size)
 		, m_RHS(size)
 		, m_mat_ptr(size, this->max_railstart() + 1)
-		, m_last_V(size, plib::constants<nl_fptype>::zero())
-		, m_DD_n_m_1(size, plib::constants<nl_fptype>::zero())
-		, m_h_n_m_1(size, plib::constants<nl_fptype>::zero())
+		, m_last_V(size, nlconst::zero())
+		, m_DD_n_m_1(size, nlconst::zero())
+		, m_h_n_m_1(size, nlconst::zero())
 		{
 			/*
 			 * save states
@@ -468,7 +468,7 @@ namespace solver
 					m_h_n_m_1[k] = hn;
 					m_DD_n_m_1[k] = DD_n;
 					if (std::fabs(DD2) > fp_constants<nl_fptype>::TIMESTEP_MINDIV()) // avoid div-by-zero
-						new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(plib::constants<nl_fptype>::cast(0.5)*DD2));
+						new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::fabs(nlconst::magic(0.5)*DD2));
 					else
 						new_net_timestep = m_params.m_max_timestep;
 
@@ -549,8 +549,8 @@ namespace solver
 					*tcr_r[i]       += static_cast<FT>(go[i]);
 
 				/* use native floattype for now */
-				auto gtot_t(plib::constants<nl_fptype>::zero());
-				auto RHS_t (plib::constants<nl_fptype>::zero());
+				auto gtot_t(nlconst::zero());
+				auto RHS_t (nlconst::zero());
 
 				for (std::size_t i = 0; i < term_count; i++)
 				{

@@ -197,13 +197,13 @@ namespace netlist
 
 	NETLIB_UPDATE(opamp)
 	{
-		const nl_fptype cVt = plib::constants<nl_fptype>::cast(0.0258 * 1.0); // * m_n;
+		const nl_fptype cVt = nlconst::magic(0.0258 * 1.0); // * m_n;
 		const nl_fptype cId = m_model.m_DAB; // 3 mA
-		const nl_fptype cVd = cVt * std::log(cId / plib::constants<nl_fptype>::cast(1e-15) + plib::constants<nl_fptype>::one());
+		const nl_fptype cVd = cVt * std::log(cId / nlconst::magic(1e-15) + nlconst::one());
 
 		m_VH.push(m_VCC() - m_model.m_VLH - cVd);
 		m_VL.push(m_GND() + m_model.m_VLL + cVd);
-		m_VREF.push((m_VCC() + m_GND()) / plib::constants<nl_fptype>::two());
+		m_VREF.push((m_VCC() + m_GND()) / nlconst::two());
 	}
 
 	NETLIB_UPDATE_PARAM(opamp)
@@ -220,11 +220,11 @@ namespace netlist
 		if (m_type == 3 || m_type == 2)
 		{
 			nl_fptype CP = m_model.m_DAB / m_model.m_SLEW;
-			nl_fptype RP = plib::constants<nl_fptype>::half() / constants::pi() / CP / m_model.m_FPF;
+			nl_fptype RP = nlconst::half() / nlconst::pi() / CP / m_model.m_FPF;
 			nl_fptype G = m_model.m_UGF / m_model.m_FPF / RP;
 
 			//printf("OPAMP %s: %g %g %g\n", name().c_str(), CP, RP, G);
-			if (m_model.m_SLEW / (plib::constants<nl_fptype>::four() * constants::pi() * plib::constants<nl_fptype>::cast(0.0258)) < m_model.m_UGF)
+			if (m_model.m_SLEW / (nlconst::four() * nlconst::pi() * nlconst::magic(0.0258)) < m_model.m_UGF)
 				log().warning(MW_OPAMP_FAIL_CONVERGENCE(this->name()));
 
 			m_CP->m_C.setTo(CP);
@@ -234,12 +234,12 @@ namespace netlist
 		}
 		if (m_type == 2)
 		{
-			m_EBUF->m_G.setTo(plib::constants<nl_fptype>::one());
+			m_EBUF->m_G.setTo(nlconst::one());
 			m_EBUF->m_RO.setTo(m_model.m_RO);
 		}
 		if (m_type == 3)
 		{
-			m_EBUF->m_G.setTo(plib::constants<nl_fptype>::one());
+			m_EBUF->m_G.setTo(nlconst::one());
 			m_EBUF->m_RO.setTo(m_model.m_RO);
 		}
 	}

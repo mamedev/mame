@@ -311,7 +311,7 @@ void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls
 struct input_t
 {
 	input_t(const netlist::setup_t &setup, const pstring &line)
-	: m_value(plib::constants<nl_fptype>::zero())
+	: m_value(netlist::nlconst::zero())
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t(0);
@@ -465,7 +465,7 @@ void tool_app_t::run()
 	auto emutime(t.as_seconds<nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
 			(ttr - nlt).as_fp<nl_fptype>(), emutime,
-			(ttr - nlt).as_fp<nl_fptype>() / emutime * plib::constants<nl_fptype>::cast(100.0));
+			(ttr - nlt).as_fp<nl_fptype>() / emutime * netlist::nlconst::magic(100.0));
 }
 
 void tool_app_t::validate()
