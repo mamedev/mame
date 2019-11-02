@@ -22,7 +22,7 @@ Notes:
 
 - 4 known game carts where produced, these are:
 
-    Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Black Jack,
+    Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Magic Black Jack,
                 Twenty One Thunder Plus, Power Pairs, Prism Poker Plus & Have A Cow
     Star Pak 2: Pac-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
     Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
@@ -30,6 +30,10 @@ Notes:
 
 - Allegedly there is a hard lock that SP1 and the PAC-MAN games (on SP2) cannot play together. Was a licensing issue with Namco.
   The system checks for cartridges on power up by querying the PIC parts. If the system sees SP1 & SP2 it disables SP2.
+
+- Early flyers show "Star Pak 1" titled as Cardmania!
+- Early flyers show "Star Pak 2" titled as Galaxy Games Volume 2
+- There is an early flyer showing a Cardmania! cartridge in front of a partialy blocked cartridge labeled Casino
 
 ***************************************************************************/
 
@@ -1225,7 +1229,7 @@ ROM_START(galgame4)
 ROM_END
 
 
-GAME(1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT)
+GAME(1998, galgbios, 0,        galgbios, galgames, galgames_state, empty_init, ROT0, "",         "Galaxy Games BIOS",                  MACHINE_IS_BIOS_ROOT)
 GAME(1998, galgame2, galgbios, galgame2, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",             0)
 GAME(1998, galgame3, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software / Atari", "Galaxy Games StarPak 3",             0)
 GAME(1998, galgame4, galgbios, galgame3, galgames, galgames_state, empty_init, ROT0, "Creative Electronics & Software",         "Galaxy Games StarPak 4 (prototype)", MACHINE_IMPERFECT_GRAPHICS)
