@@ -257,9 +257,15 @@ namespace plib
 		 * \brief Intrinsic carrier concentration in 1/m^3 of Silicon
 		 */
 		static inline constexpr T NiSi() noexcept { return static_cast<T>(1.45e16); }
-
+		/*!
+		 * \brief clearly identify magic numbers in code
+		 *
+		 * Magic numbers should be avoided. The magic member at least clearly
+		 * identifies them and makes it easier to convert them to named constants
+		 * later.
+		 */
 		template <typename V>
-		static inline constexpr const T cast(V &&v) noexcept { return static_cast<T>(v); }
+		static inline constexpr const T magic(V &&v) noexcept { return static_cast<T>(v); }
 	};
 
 	/*! typesafe reciprocal function

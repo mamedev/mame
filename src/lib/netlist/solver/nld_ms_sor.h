@@ -70,9 +70,9 @@ namespace solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			nl_fptype gtot_t = plib::constants<nl_fptype>::zero();
-			nl_fptype gabs_t = plib::constants<nl_fptype>::zero();
-			nl_fptype RHS_t = plib::constants<nl_fptype>::zero();
+			nl_fptype gtot_t = nlconst::zero();
+			nl_fptype gabs_t = nlconst::zero();
+			nl_fptype RHS_t = nlconst::zero();
 
 			const std::size_t term_count = this->m_terms[k].count();
 			const nl_fptype * const gt = this->m_gtn[k];
@@ -98,7 +98,7 @@ namespace solver
 				for (std::size_t i = 0; i < term_count; i++)
 					gabs_t = gabs_t + std::abs(go[i]);
 
-				gabs_t *= plib::constants<nl_fptype>::cast(0.5); // derived by try and error
+				gabs_t *= nlconst::magic(0.5); // derived by try and error
 				if (gabs_t <= gtot_t)
 				{
 					w[k] = ws / static_cast<float_type>(gtot_t);

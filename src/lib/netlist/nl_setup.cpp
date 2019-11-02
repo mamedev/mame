@@ -121,8 +121,8 @@ namespace netlist
 
 	void nlparse_t::register_param_x(const pstring &param, const nl_fptype value)
 	{
-		if (std::abs(value - std::floor(value)) > plib::constants<nl_fptype>::cast(1e-30)
-			|| std::abs(value) > plib::constants<nl_fptype>::cast(1e9))
+		if (std::abs(value - std::floor(value)) > nlconst::magic(1e-30)
+			|| std::abs(value) > nlconst::magic(1e9))
 			register_param(param, plib::pfmt("{1:.9}").e(value));
 		else
 			register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
@@ -942,24 +942,24 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 
 	pstring tmp = value_str(model, entity);
 
-	nl_fptype factor = plib::constants<nl_fptype>::one();
+	nl_fptype factor = nlconst::one();
 	auto p = std::next(tmp.begin(), static_cast<pstring::difference_type>(tmp.size() - 1));
 	switch (*p)
 	{
-		case 'M': factor = plib::constants<nl_fptype>::cast(1e6); break;
+		case 'M': factor = nlconst::magic(1e6); break;
 		case 'k':
-		case 'K': factor = plib::constants<nl_fptype>::cast(1e3); break;
-		case 'm': factor = plib::constants<nl_fptype>::cast(1e-3); break;
-		case 'u': factor = plib::constants<nl_fptype>::cast(1e-6); break;
-		case 'n': factor = plib::constants<nl_fptype>::cast(1e-9); break;
-		case 'p': factor = plib::constants<nl_fptype>::cast(1e-12); break;
-		case 'f': factor = plib::constants<nl_fptype>::cast(1e-15); break;
-		case 'a': factor = plib::constants<nl_fptype>::cast(1e-18); break;
+		case 'K': factor = nlconst::magic(1e3); break;
+		case 'm': factor = nlconst::magic(1e-3); break;
+		case 'u': factor = nlconst::magic(1e-6); break;
+		case 'n': factor = nlconst::magic(1e-9); break;
+		case 'p': factor = nlconst::magic(1e-12); break;
+		case 'f': factor = nlconst::magic(1e-15); break;
+		case 'a': factor = nlconst::magic(1e-18); break;
 		default:
 			if (*p < '0' || *p > '9')
 				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
 	}
-	if (factor != plib::constants<nl_fptype>::one())
+	if (factor != nlconst::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
 	// FIXME: check for errors
 	//printf("%s %s %e %e\n", entity.c_str(), tmp.c_str(), plib::pstonum<nl_fptype>(tmp), factor);
@@ -1126,10 +1126,10 @@ void setup_t::prepare_to_run()
 				//FIXME: check for errors ...
 				bool err(false);
 				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
-				if (err || std::abs(v - std::floor(v)) > plib::constants<nl_fptype>::cast(1e-6) )
+				if (err || std::abs(v - std::floor(v)) > nlconst::magic(1e-6) )
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
 				// FIXME comparison with zero
-				d.second->set_hint_deactivate(v == plib::constants<nl_fptype>::zero());
+				d.second->set_hint_deactivate(v == nlconst::zero());
 			}
 		}
 		else

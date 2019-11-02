@@ -13,7 +13,7 @@
 /* FIXME : convert to parameters */
 
 #define R_OFF   (plib::reciprocal(exec().gmin()))
-#define R_ON    plib::constants<nl_fptype>::cast(0.01)
+#define R_ON    nlconst::magic(0.01)
 
 namespace netlist
 {

@@ -197,7 +197,6 @@ public:
 		return *this;
 	}
 
-
 	template<typename X, typename Y, typename... Args>
 	pfmt &operator()(X&& x, Y && y, Args&&... args)
 	{
