@@ -195,9 +195,9 @@ namespace plib {
 	template <typename NT>
 	NT pfunction<NT>::evaluate(const std::vector<NT> &values) noexcept
 	{
-		std::array<NT, 20> stack = { 0 };
+		std::array<NT, 20> stack = { plib::constants<NT>::zero() };
 		unsigned ptr = 0;
-		stack[0] = 0.0;
+		stack[0] = plib::constants<NT>::zero();
 		for (auto &rc : m_precompiled)
 		{
 			switch (rc.m_cmd)
@@ -226,5 +226,6 @@ namespace plib {
 
 	template class pfunction<float>;
 	template class pfunction<double>;
+	template class pfunction<long double>;
 
 } // namespace plib

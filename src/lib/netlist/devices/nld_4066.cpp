@@ -22,7 +22,7 @@ namespace netlist
 		, m_supply(*this, "VDD", "VSS", true)
 		, m_R(*this, "R")
 		, m_control(*this, "CTL")
-		, m_base_r(*this, "BASER", 270.0)
+		, m_base_r(*this, "BASER", plib::constants<nl_fptype>::cast(270.0))
 		{
 		}
 
@@ -52,7 +52,7 @@ namespace netlist
 		nl_fptype high = plib::constants<nl_fptype>::cast(0.55) * sup;
 		nl_fptype in = m_control() - m_supply.GND();
 		nl_fptype rON = m_base_r() * plib::constants<nl_fptype>::cast(5.0) / sup;
-		nl_fptype R = -1.0;
+		nl_fptype R = -plib::constants<nl_fptype>::one();
 
 		if (in < low)
 		{

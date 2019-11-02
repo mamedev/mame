@@ -413,7 +413,15 @@ void parser_t::device(const pstring &dev_type)
 nl_fptype parser_t::eval_param(const token_t &tok)
 {
 	static std::array<pstring, 7> macs = {"", "RES_R", "RES_K", "RES_M", "CAP_U", "CAP_N", "CAP_P"};
-	static std::array<nl_fptype, 7> facs = {1, 1, 1e3, 1e6, 1e-6, 1e-9, 1e-12};
+	static std::array<nl_fptype, 7> facs = {
+		plib::constants<nl_fptype>::cast(1.0),
+		plib::constants<nl_fptype>::cast(1.0),
+		plib::constants<nl_fptype>::cast(1e3),
+		plib::constants<nl_fptype>::cast(1e6),
+		plib::constants<nl_fptype>::cast(1e-6),
+		plib::constants<nl_fptype>::cast(1e-9),
+		plib::constants<nl_fptype>::cast(1e-12)
+	};
 	std::size_t f=0;
 	nl_fptype ret(0);
 
@@ -423,7 +431,7 @@ nl_fptype parser_t::eval_param(const token_t &tok)
 	if (f>0)
 	{
 		require_token(m_tok_param_left);
-		ret = get_number_double();
+		ret = static_cast<nl_fptype>(get_number_double());
 		require_token(m_tok_param_right);
 	}
 	else

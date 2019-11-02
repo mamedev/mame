@@ -67,16 +67,17 @@ NETLIB_UPDATE_TERMINALS(LVCCS)
 {
 	const nl_fptype m_mult = m_G() * m_gfac; // 1.0 ==> 1V ==> 1A
 	const nl_fptype vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
+	const auto c1(plib::constants<nl_fptype>::cast(0.2));
 
-	if (std::abs(m_mult / m_cur_limit() * vi) > 0.5)
-		m_vi = m_vi + 0.2*std::tanh((vi - m_vi)/0.2);
+	if (std::abs(m_mult / m_cur_limit() * vi) > plib::constants<nl_fptype>::half())
+		m_vi = m_vi + c1 * std::tanh((vi - m_vi) / c1);
 	else
 		m_vi = vi;
 
 	const nl_fptype x = m_mult / m_cur_limit() * m_vi;
 	const nl_fptype X = std::tanh(x);
 
-	const nl_fptype beta = m_mult * (1.0 - X*X);
+	const nl_fptype beta = m_mult * (plib::constants<nl_fptype>::one() - X*X);
 	const nl_fptype I = m_cur_limit() * X - beta * m_vi;
 
 	m_OP.set_go_gt_I(-beta, plib::constants<nl_fptype>::zero(), I);

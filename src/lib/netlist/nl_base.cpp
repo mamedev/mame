@@ -40,14 +40,14 @@ namespace netlist
 	public:
 		logic_family_ttl_t() : logic_family_desc_t()
 		{
-			m_fixed_V = 5.0;
-			m_low_thresh_PCNT = 0.8 / 5.0;
-			m_high_thresh_PCNT = 2.0 / 5.0;
+			m_fixed_V = plib::constants<nl_fptype>::cast(5.0);
+			m_low_thresh_PCNT = plib::constants<nl_fptype>::cast(0.8 / 5.0);
+			m_high_thresh_PCNT = plib::constants<nl_fptype>::cast(2.0 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-			m_low_VO = 0.1;
-			m_high_VO = 1.0; // 4.0
-			m_R_low = 1.0;
-			m_R_high = 130.0;
+			m_low_VO = plib::constants<nl_fptype>::cast(0.1);
+			m_high_VO = plib::constants<nl_fptype>::cast(1.0); // 4.0
+			m_R_low = plib::constants<nl_fptype>::cast(1.0);
+			m_R_high = plib::constants<nl_fptype>::cast(130.0);
 		}
 		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
 		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
@@ -67,14 +67,14 @@ namespace netlist
 	public:
 		logic_family_cd4xxx_t() : logic_family_desc_t()
 		{
-			m_fixed_V = 0.0;
-			m_low_thresh_PCNT = 1.5 / 5.0;
-			m_high_thresh_PCNT = 3.5 / 5.0;
+			m_fixed_V = plib::constants<nl_fptype>::cast(0.0);
+			m_low_thresh_PCNT = plib::constants<nl_fptype>::cast(1.5 / 5.0);
+			m_high_thresh_PCNT = plib::constants<nl_fptype>::cast(3.5 / 5.0);
 			// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-			m_low_VO = 0.05;
-			m_high_VO = 0.05; // 4.95
-			m_R_low = 10.0;
-			m_R_high = 10.0;
+			m_low_VO = plib::constants<nl_fptype>::cast(0.05);
+			m_high_VO = plib::constants<nl_fptype>::cast(0.05); // 4.95
+			m_R_low = plib::constants<nl_fptype>::cast(10.0);
+			m_R_high = plib::constants<nl_fptype>::cast(10.0);
 		}
 		unique_pool_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_state_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
 		unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
@@ -669,7 +669,7 @@ namespace netlist
 		auto *p = dynamic_cast<analog_net_t *>(this);
 
 		if (p != nullptr)
-			p->m_cur_Analog = 0.0;
+			p->m_cur_Analog = plib::constants<nl_fptype>::zero();
 
 		/* rebuild m_list and reset terminals to active or analog out state */
 
@@ -727,7 +727,7 @@ namespace netlist
 
 	analog_net_t::analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr)
 		: net_t(nl, aname, mr)
-		, m_cur_Analog(*this, "m_cur_Analog", 0.0)
+		, m_cur_Analog(*this, "m_cur_Analog", plib::constants<nl_fptype>::zero())
 		, m_solver(nullptr)
 	{
 	}

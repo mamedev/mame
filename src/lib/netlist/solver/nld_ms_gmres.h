@@ -101,12 +101,10 @@ namespace solver
 	{
 		const std::size_t iN = this->size();
 
-		plib::parray<FT, SIZE> RHS(iN);
-
 		m_ops.m_mat.set_scalar(plib::constants<FT>::zero());
 
 		/* populate matrix and V for first estimate */
-		this->fill_matrix(RHS);
+		this->fill_matrix_and_rhs();
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
@@ -116,7 +114,7 @@ namespace solver
 		const float_type accuracy = static_cast<float_type>(this->m_params.m_accuracy);
 
 		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops());
-		auto gsl = m_gmres.solve(m_ops, this->m_new_V, RHS, iter, accuracy);
+		auto gsl = m_gmres.solve(m_ops, this->m_new_V, this->m_RHS, iter, accuracy);
 
 		this->m_iterative_total += gsl;
 		this->m_stat_calculations++;
@@ -127,9 +125,11 @@ namespace solver
 			return matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(newton_raphson);
 		}
 
-		const float_type err = (newton_raphson ? this->delta(this->m_new_V) : plib::constants<FT>::zero());
-		this->store(this->m_new_V);
-		return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 

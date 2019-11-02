@@ -52,11 +52,11 @@ namespace netlist
 		nl_assert(m_logic_family != nullptr);
 		// FIXME: Variable supply voltage!
 		nl_fptype supply_V = logic_family()->fixed_V();
-		if (supply_V == 0.0) supply_V = 5.0;
+		if (supply_V == plib::constants<nl_fptype>::zero()) supply_V = plib::constants<nl_fptype>::cast(5.0);
 
-		if (m_I.Q_Analog() > logic_family()->high_thresh_V(0.0, supply_V))
+		if (m_I.Q_Analog() > logic_family()->high_thresh_V(plib::constants<nl_fptype>::zero(), supply_V))
 			out().push(1, netlist_time::quantum());
-		else if (m_I.Q_Analog() < logic_family()->low_thresh_V(0.0, supply_V))
+		else if (m_I.Q_Analog() < logic_family()->low_thresh_V(plib::constants<nl_fptype>::zero(), supply_V))
 			out().push(0, netlist_time::quantum());
 		else
 		{
@@ -112,7 +112,7 @@ namespace netlist
 		//FIXME: Use power terminals and change info to warning or error
 		if (!f)
 		{
-			if (logic_family()->fixed_V() == 0.0)
+			if (logic_family()->fixed_V() == plib::constants<nl_fptype>::zero())
 				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_1(state().setup().de_alias(out_proxied->device().name())));
 			else
 				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(state().setup().de_alias(out_proxied->device().name())));
@@ -148,7 +148,9 @@ namespace netlist
 	{
 		// FIXME: Variable voltage
 		nl_fptype supply_V = logic_family()->fixed_V();
-		if (supply_V == 0.0) supply_V = 5.0;
+		// FIXME: comparison to zero
+		if (supply_V == plib::constants<nl_fptype>::zero())
+			supply_V = plib::constants<nl_fptype>::cast(5.0);
 
 		//m_Q.initial(0.0);
 		m_last_state = -1;
@@ -160,9 +162,10 @@ namespace netlist
 			m_VCCHack->initial(supply_V);
 		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
 		m_RN.set_G_V_I(plib::constants<nl_fptype>::one() / logic_family()->R_low(),
-				logic_family()->low_offset_V(), 0.0);
+				logic_family()->low_offset_V(), plib::constants<nl_fptype>::zero());
 		m_RP.set_G_V_I(G_OFF,
-				0.0, 0.0);
+			plib::constants<nl_fptype>::zero(),
+			plib::constants<nl_fptype>::zero());
 	}
 
 	NETLIB_UPDATE(d_to_a_proxy)
@@ -178,16 +181,18 @@ namespace netlist
 			if (state)
 			{
 				m_RN.set_G_V_I(G_OFF,
-						0.0, 0.0);
+					plib::constants<nl_fptype>::zero(),
+					plib::constants<nl_fptype>::zero());
 				m_RP.set_G_V_I(plib::constants<nl_fptype>::one() / logic_family()->R_high(),
-						logic_family()->high_offset_V(), 0.0);
+						logic_family()->high_offset_V(), plib::constants<nl_fptype>::zero());
 			}
 			else
 			{
 				m_RN.set_G_V_I(plib::constants<nl_fptype>::one() / logic_family()->R_low(),
-						logic_family()->low_offset_V(), 0.0);
+						logic_family()->low_offset_V(), plib::constants<nl_fptype>::zero());
 				m_RP.set_G_V_I(G_OFF,
-						0.0, 0.0);
+					plib::constants<nl_fptype>::zero(),
+					plib::constants<nl_fptype>::zero());
 			}
 			m_RN.solve_later(); // RN, RP are connected ...
 			m_last_state = state;

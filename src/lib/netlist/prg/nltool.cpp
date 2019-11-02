@@ -47,7 +47,7 @@ public:
 		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files"),
 
 		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
-		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
+		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
 		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
@@ -311,7 +311,7 @@ void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls
 struct input_t
 {
 	input_t(const netlist::setup_t &setup, const pstring &line)
-	: m_value(0.0)
+	: m_value(plib::constants<nl_fptype>::zero())
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t(0);
@@ -402,7 +402,7 @@ void tool_app_t::run()
 	}
 
 
-	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
+	pout("startup time ==> {1:5.3f}\n", t.as_seconds<nl_fptype>() );
 
 	t.reset();
 
@@ -462,10 +462,10 @@ void tool_app_t::run()
 		nt.stop();
 	}
 
-	nl_fptype emutime = t.as_seconds();
+	auto emutime(t.as_seconds<nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
-			(ttr - nlt).as_double(), emutime,
-			(ttr - nlt).as_double() / emutime * 100.0);
+			(ttr - nlt).as_fp<nl_fptype>(), emutime,
+			(ttr - nlt).as_fp<nl_fptype>() / emutime * plib::constants<nl_fptype>::cast(100.0));
 }
 
 void tool_app_t::validate()

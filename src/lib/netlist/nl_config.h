@@ -128,6 +128,7 @@ namespace netlist
 		static inline constexpr long double TIMESTEP_MINDIV() noexcept { return  1e-60L; }
 
 		static inline constexpr const char * name() noexcept { return "long double"; }
+		static inline constexpr const char * suffix() noexcept { return "L"; }
 	};
 
 	/*! Specific constants for double floating point type
@@ -142,6 +143,7 @@ namespace netlist
 		static inline constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; }
 
 		static inline constexpr const char * name() noexcept { return "double"; }
+		static inline constexpr const char * suffix() noexcept { return ""; }
 	};
 
 	/*! Specific constants for float floating point type
@@ -156,6 +158,7 @@ namespace netlist
 		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
 
 		static inline constexpr const char * name() noexcept { return "float"; }
+		static inline constexpr const char * suffix() noexcept { return "f"; }
 	};
 } // namespace netlist
 

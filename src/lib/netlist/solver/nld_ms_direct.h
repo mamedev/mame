@@ -52,11 +52,7 @@ namespace solver
 		void LE_back_subst(T & x);
 
 		PALIGNAS_VECTOROPT()
-		plib::parray<FT, SIZE>  m_new_V;
-		PALIGNAS_VECTOROPT()
 		plib::parray2D<FT, SIZE, m_pitch_ABS> m_A;
-		PALIGNAS_VECTOROPT()
-		plib::parray<FT, SIZE> m_RHS;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -81,7 +77,7 @@ namespace solver
 					const FT f1 = -f * m_A[j][i];
 					for (auto &k : nzrd)
 						m_A[j][k] += m_A[i][k] * f1;
-					m_RHS[j] += m_RHS[i] * f1;
+					this->m_RHS[j] += this->m_RHS[i] * f1;
 				}
 			}
 		}
@@ -93,8 +89,8 @@ namespace solver
 				std::size_t maxrow = i;
 				for (std::size_t j = i + 1; j < kN; j++)
 				{
-					//if (std::abs(m_A[j][i]) > std::abs(m_A[maxrow][i]))
-					if (m_A[j][i] * m_A[j][i] > m_A[maxrow][i] * m_A[maxrow][i])
+					if (std::abs(m_A[j][i]) > std::abs(m_A[maxrow][i]))
+					//if (m_A[j][i] * m_A[j][i] > m_A[maxrow][i] * m_A[maxrow][i])
 						maxrow = j;
 				}
 
@@ -104,7 +100,7 @@ namespace solver
 					for (std::size_t k = 0; k < kN; k++) {
 						std::swap(m_A[i][k], m_A[maxrow][k]);
 					}
-					std::swap(m_RHS[i], m_RHS[maxrow]);
+					std::swap(this->m_RHS[i], this->m_RHS[maxrow]);
 				}
 				/* FIXME: Singular matrix? */
 				const FT f = plib::reciprocal(m_A[i][i]);
@@ -123,7 +119,7 @@ namespace solver
 						//  pj[k] = pj[k] + pi[k] * f1;
 						//for (unsigned k = i+1; k < kN; k++)
 							//A(j,k) += A(i,k) * f1;
-						m_RHS[j] += m_RHS[i] * f1;
+						this->m_RHS[j] += this->m_RHS[i] * f1;
 					}
 				}
 			}
@@ -145,7 +141,7 @@ namespace solver
 				FT tmp = 0;
 				for (std::size_t k = j+1; k < kN; k++)
 					tmp += m_A[j][k] * x[k];
-				x[j] = (m_RHS[j] - tmp) / m_A[j][j];
+				x[j] = (this->m_RHS[j] - tmp) / m_A[j][j];
 			}
 		}
 		else
@@ -157,7 +153,7 @@ namespace solver
 				const auto e = nzrd.size(); // - 1; /* exclude RHS element */
 				for ( std::size_t k = 0; k < e; k++)
 					tmp += m_A[j][nzrd[k]] * x[nzrd[k]];
-				x[j] = (m_RHS[j] - tmp) / m_A[j][j];
+				x[j] = (this->m_RHS[j] - tmp) / m_A[j][j];
 			}
 		}
 	}
@@ -166,11 +162,13 @@ namespace solver
 	unsigned matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(const bool newton_raphson)
 	{
 		this->LE_solve();
-		this->LE_back_subst(m_new_V);
+		this->LE_back_subst(this->m_new_V);
 
-		const FT err = (newton_raphson ? this->delta(m_new_V) : plib::constants<FT>::zero());
-		this->store(m_new_V);
-		return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
@@ -178,7 +176,7 @@ namespace solver
 	{
 		/* populate matrix */
 		this->clear_square_mat(m_A);
-		this->fill_matrix(m_RHS);
+		this->fill_matrix_and_rhs();
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);
@@ -191,9 +189,7 @@ namespace solver
 		const std::size_t size)
 	: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
 	, m_pitch(m_pitch_ABS ? m_pitch_ABS : (((size + 0) + 7) / 8) * 8)
-	, m_new_V(size)
 	, m_A(size, m_pitch)
-	, m_RHS(size)
 	{
 		this->build_mat_ptr(m_A);
 	}

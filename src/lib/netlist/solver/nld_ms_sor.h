@@ -36,8 +36,6 @@ namespace solver
 			, m_lp_fact(*this, "m_lp_fact", 0)
 			, w(size, plib::constants<FT>::zero())
 			, one_m_w(size, plib::constants<FT>::zero())
-			, RHS(size, plib::constants<FT>::zero())
-			//, new_V(size, 0.0)
 			{
 			}
 
@@ -47,8 +45,6 @@ namespace solver
 		state_var<float_type> m_lp_fact;
 		std::vector<float_type> w;
 		std::vector<float_type> one_m_w;
-		std::vector<float_type> RHS;
-		//std::vector<float_type> new_V;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -74,9 +70,9 @@ namespace solver
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
-			nl_fptype gtot_t = 0.0;
-			nl_fptype gabs_t = 0.0;
-			nl_fptype RHS_t = 0.0;
+			nl_fptype gtot_t = plib::constants<nl_fptype>::zero();
+			nl_fptype gabs_t = plib::constants<nl_fptype>::zero();
+			nl_fptype RHS_t = plib::constants<nl_fptype>::zero();
 
 			const std::size_t term_count = this->m_terms[k].count();
 			const nl_fptype * const gt = this->m_gtn[k];
@@ -95,7 +91,7 @@ namespace solver
 			for (std::size_t i = this->m_terms[k].railstart(); i < term_count; i++)
 				RHS_t = RHS_t  - go[i] * *other_cur_analog[i];
 
-			RHS[k] = static_cast<float_type>(RHS_t);
+			this->m_RHS[k] = static_cast<float_type>(RHS_t);
 
 			if (this->m_params.m_use_gabs)
 			{
@@ -136,7 +132,7 @@ namespace solver
 				for (std::size_t i = 0; i < railstart; i++)
 					Idrive = Idrive - static_cast<float_type>(go[i]) * this->m_new_V[static_cast<std::size_t>(net_other[i])];
 
-				const float_type new_val = this->m_new_V[k] * one_m_w[k] + (Idrive + RHS[k]) * w[k];
+				const float_type new_val = this->m_new_V[k] * one_m_w[k] + (Idrive + this->m_RHS[k]) * w[k];
 
 				err = std::max(std::abs(new_val - this->m_new_V[k]), err);
 				this->m_new_V[k] = new_val;
@@ -158,9 +154,11 @@ namespace solver
 			return matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(newton_raphson);
 		}
 
-		const float_type err = (newton_raphson ? this->delta(this->m_new_V) : plib::constants<FT>::zero());
-		this->store(this->m_new_V);
-		return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

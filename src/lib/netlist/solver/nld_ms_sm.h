@@ -205,8 +205,6 @@ namespace solver
 		const std::size_t iN = this->size();
 
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
-		std::array<float_type, storage_N> new_V;
-		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 		std::array<float_type, m_pitch> v;
 		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
 		std::array<std::size_t, m_pitch> cols;
@@ -277,11 +275,13 @@ namespace solver
 
 		m_cnt++;
 
-		this->LE_compute_x(new_V);
+		this->LE_compute_x(this->m_new_V);
 
-		const float_type err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
-		this->store(new_V);
-		return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
@@ -289,7 +289,7 @@ namespace solver
 	{
 
 		this->clear_square_mat(this->m_A);
-		this->fill_matrix(this->m_RHS);
+		this->fill_matrix_and_rhs();
 
 		this->m_stat_calculations++;
 		return this->solve_non_dynamic(newton_raphson);

@@ -123,7 +123,7 @@ namespace plib
 
 		template <typename FT>
 		static constexpr const typename std::enable_if<std::is_floating_point<FT>::value, ptime>::type
-		from_fp(const FT t) noexcept { return ptime(static_cast<internal_type>(std::floor(t * static_cast<FT>(RES) + 0.5)), RES); }
+		from_fp(const FT t) noexcept { return ptime(static_cast<internal_type>(std::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
 
 		static constexpr const ptime from_double(const double t) noexcept
 		{ return from_fp<double>(t); }

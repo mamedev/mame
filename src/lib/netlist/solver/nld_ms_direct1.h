@@ -35,17 +35,17 @@ namespace solver
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override
 		{
 			this->clear_square_mat(this->m_A);
-			this->fill_matrix(this->m_RHS);
+			this->fill_matrix_and_rhs();
 
-			std::array<FT, 1> new_V = { this->m_RHS[0] / this->m_A[0][0] };
+			this->m_new_V[0] = this->m_RHS[0] / this->m_A[0][0];
 
-			const FT err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
-			this->store(new_V);
-			return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
+			bool err(false);
+			if (newton_raphson)
+				err = this->check_err();
+			this->store();
+			return (err) ? 2 : 1;
 		}
-
 	};
-
 
 
 } // namespace solver

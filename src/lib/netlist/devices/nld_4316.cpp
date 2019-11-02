@@ -20,7 +20,7 @@ namespace netlist { namespace devices {
 		, m_R(*this, "_R")
 		, m_S(*this, "S")
 		, m_E(*this, "E")
-		, m_base_r(*this, "BASER", 45.0)
+		, m_base_r(*this, "BASER", plib::constants<nl_fptype>::cast(45.0))
 		{
 		}
 
