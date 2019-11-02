@@ -493,8 +493,8 @@ void es550x_device::compute_tables(u32 total_volume_bit, u32 exponent_bit, u32 m
 	{
 		m_voice[j].index = j;
 		m_voice[j].control = CONTROL_STOPMASK;
-		m_voice[j].lvol = (1 << total_volume_bit - 1);
-		m_voice[j].rvol = (1 << total_volume_bit - 1);
+		m_voice[j].lvol = (1 << (total_volume_bit - 1));
+		m_voice[j].rvol = (1 << (total_volume_bit - 1));
 		m_voice[j].exbank = 0;
 	}
 }
