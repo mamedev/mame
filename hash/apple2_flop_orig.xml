@@ -8259,4 +8259,259 @@
 		</part>
 	</software>
 
+	<software name="eqsf1906">
+		<description>Earthquake: San Francisco 1906</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-10-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A (Boot)"/>
+			<dataarea name="flop" size="228182">
+				<rom name="earthquake - san francisco 1906 side a (boot).woz" size="228182" crc="bef86d69" sha1="6a866918312becdf7a12a0dceecf4fe892015768" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234838">
+				<rom name="earthquake - san francisco 1906 side b.woz" size="234838" crc="9b235ebd" sha1="979a55d9e0353f4e19bb9c051a4718e27b35afb4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ijtmepdm">
+		<description>Indiana Jones and the Temple of Doom</description>
+		<year>1989</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-10-25"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234774">
+				<rom name="indiana jones and the temple of doom side a.woz" size="234774" crc="b2fd5a62" sha1="825cfc98c220a58a5bcc4a9d48c584bd5c8ddb2a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234774">
+				<rom name="indiana jones and the temple of doom side b.woz" size="234774" crc="887d8284" sha1="a8d3fd906e10e7deddf33d8ec0b5b95e3c504d84" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ltlcmppl">
+		<description>Little Computer People</description>
+		<year>1985</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-10-25"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234752">
+				<rom name="little computer people side a.woz" size="234752" crc="2d34b263" sha1="d3c86984960e66b4a1bf988047b495d766973225" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234752">
+				<rom name="little computer people side b.woz" size="234752" crc="8103193f" sha1="3e1d682b2c0b925cb1ace58c66f446cd85922d2b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pndrabox">
+		<description>Pandora's Box</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2019-10-25"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="195431">
+				<rom name="pandora's box.woz" size="195431" crc="0740d7e5" sha1="374b821a534a8894fd8c773a0a76bab0b379e72b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vidvegas">
+		<description>Video Vegas (Version 12501)</description>
+		<year>1985</year>
+		<publisher></publisher>
+		<info name="release" value="2019-10-25"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234702">
+				<rom name="video vegas.woz" size="234702" crc="f47a8783" sha1="2b8e0f911b4a98f0b0f009e2508c4e0a348736bd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phmdrock">
+		<description>Physics of Model Rocketry</description>
+		<year>1987</year>
+		<publisher>Estes Industries</publisher>
+		<info name="release" value="2019-10-25"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235471">
+				<rom name="physics of model rocketry side a.woz" size="235471" crc="e9fb8526" sha1="85c5396950d7109288346aff2157e0837b5985ce" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235471">
+				<rom name="physics of model rocketry side b.woz" size="235471" crc="4c9e5642" sha1="746ef6765c1e807d54f25a121dcf6241d213ec4e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pnctbbls">
+		<description>Punctuation: Building Better Language Skills</description>
+		<year>1991</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="release" value="2019-10-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235489">
+				<rom name="punctuation - building better language skills.woz" size="235489" crc="0c41a2e0" sha1="dca8d539917b8c6f17bd5e9632828fb31044be9b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="howwest">
+		<description>How The West Was One + Three x Four</description>
+		<year>1987</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-10-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235513">
+				<rom name="how the west was one + three x four.woz" size="235513" crc="d9222021" sha1="101db6d0c3f8ccd627522abc353e7e79a57204db" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deadlr26">
+		<description>Deadline (Release 26 / 821108)</description>
+		<year>1982</year>
+		<publisher>Infocom</publisher>
+		<info name="release" value="2019-10-30"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 32K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234828">
+				<rom name="deadline r26.woz" size="234828" crc="073b5fd9" sha1="44385e7f2a1b58867255db3ce2c255bac2d9628e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gulfstrk">
+		<description>Gulf Strike</description>
+		<year>1985</year>
+		<publisher>The Avalon Hill</publisher>
+		<info name="release" value="2019-10-30"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234778">
+				<rom name="gulf strike.woz" size="234778" crc="96a4634b" sha1="1c0b551b093789d67557c8bc4f23201df6108127" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mghtmgc2">
+		<description>Might and Magic Book Two</description>
+		<year>1988</year>
+		<publisher>New World Computing</publisher>
+		<info name="release" value="2019-10-30"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk A"/>
+			<dataarea name="flop" size="234818">
+				<rom name="might and magic book two disk a.woz" size="234818" crc="49f2fbba" sha1="4fe2badcaf85aa734927c29143f280094fb6f6dc" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk B"/>
+			<dataarea name="flop" size="234818">
+				<rom name="might and magic book two disk b.woz" size="234818" crc="75376447" sha1="e6165d3544689d6ffc2a07bfa2feb3fbf4eb6761" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk C"/>
+			<dataarea name="flop" size="234818">
+				<rom name="might and magic book two disk c.woz" size="234818" crc="eeac4b29" sha1="ba6156d8396055d6c01321cdce0a77420a095e63" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk D"/>
+			<dataarea name="flop" size="234818">
+				<rom name="might and magic book two disk d.woz" size="234818" crc="25ea0800" sha1="055406125e4f8eb8ea68d0a2d3adcfe5619c2804" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk E"/>
+			<dataarea name="flop" size="234818">
+				<rom name="might and magic book two disk e.woz" size="234818" crc="57a014a4" sha1="967a27fae812144cf15d6a77dc0667832277c782" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk F"/>
+			<dataarea name="flop" size="234818">
+				<rom name="might and magic book two disk f.woz" size="234818" crc="bd68ba52" sha1="251394526324b1ea65c5fa6daf6def2467b7d16c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rlmimpos">
+		<description>Realm of Impossibility</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-10-31"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228113">
+				<rom name="realm of impossibility.woz" size="228113" crc="58ac103e" sha1="0373968235eae4a9a8e4381c635e2a01eefa7ed7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="appiledu">
+		<description>Appilot Edu-Disk</description>
+		<year>1978</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-11-01"/>
+		<sharedfeat name="compatibility" value="A2" />
+		<!-- It requires an Apple ][ with Integer BASIC ROM and at least 32K.
+        Due to reliance on Integer ROM, it will not run on later models. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234809">
+				<rom name="appilot edu-disk.woz" size="234809" crc="d8c62a72" sha1="21d9518179cc8b9f32211b1252f36b49a6b1c5ff" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
