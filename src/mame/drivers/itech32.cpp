@@ -2982,6 +2982,7 @@ ROM_START( sftm110 )   /* Version 1.10, P/N 1064 REV 1 Mainboard, P/N 1073 REV 0
 	ROM_LOAD16_BYTE( "sfm_srom3.srom3", 0x000000, 0x080000, CRC(4f181534) SHA1(e858a33b22558665427146ec79dfba48edc20c2c) )
 ROM_END
 
+/* There is known to exist a PCB with hand written labels shown as V1.23 */
 
 ROM_START( sftmj114 )   /* Version 1.14N (Japan), P/N 1064 REV 1 Mainboard, P/N 1073 REV 0 ROM board, P/N 1066 REV 2 Sound board  */
 	ROM_REGION32_BE( CODE_SIZE, "user1", 0 )
