@@ -1863,6 +1863,8 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	g_profiler.start(PROFILER_VIDEO);
 
+	cache_background();
+
 	if (m_screen_disabled) /* screen is forced blank */
 		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
 			bitmap.pix32(0, x) = rgb_t::black();
@@ -1900,8 +1902,6 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 		/* Prepare OAM for this scanline */
 		update_objects_rto(curline);
-
-		cache_background();
 
 		/* Draw scanline */
 		draw_screens(curline);
