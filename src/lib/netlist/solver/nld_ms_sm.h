@@ -124,15 +124,15 @@ namespace solver
 			for (std::size_t j = 0; j < kN; j++)
 			{
 				W(i,j) = lA(i,j) = A(i,j);
-				Ainv(i,j) = 0.0;
+				Ainv(i,j) = plib::constants<FT>::zero();
 			}
-			Ainv(i,i) = 1.0;
+			Ainv(i,i) = plib::constants<FT>::one();
 		}
 		/* down */
 		for (std::size_t i = 0; i < kN; i++)
 		{
 			/* FIXME: Singular matrix? */
-			const float_type f = 1.0 / W(i,i);
+			const float_type f = plib::reciprocal(W(i,i));
 			const auto * const p = this->m_terms[i].m_nzrd.data();
 			const std::size_t e = this->m_terms[i].m_nzrd.size();
 
@@ -144,7 +144,8 @@ namespace solver
 			{
 				const unsigned j = pb[jb];
 				const float_type f1 = - W(j,i) * f;
-				if (f1 != 0.0)
+				// FIXME: comparison to zero
+				if (f1 != plib::constants<float_type>::zero())
 				{
 					for (std::size_t k = 0; k < e; k++)
 						W(j,p[k]) += W(i,p[k]) * f1;
@@ -157,11 +158,12 @@ namespace solver
 		for (std::size_t i = kN; i-- > 0; )
 		{
 			/* FIXME: Singular matrix? */
-			const float_type f = 1.0 / W(i,i);
+			const float_type f = plib::reciprocal(W(i,i));
 			for (std::size_t j = i; j-- > 0; )
 			{
 				const float_type f1 = - W(j,i) * f;
-				if (f1 != 0.0)
+				// FIXME: comparison to zero
+				if (f1 != plib::constants<float_type>::zero())
 				{
 					for (std::size_t k = i; k < kN; k++)
 						W(j,k) += W(i,k) * f1;
@@ -185,7 +187,7 @@ namespace solver
 		const std::size_t kN = this->size();
 
 		for (std::size_t i=0; i<kN; i++)
-			x[i] = 0.0;
+			x[i] = plib::constants<FT>::zero();
 
 		for (std::size_t k=0; k<kN; k++)
 		{
@@ -234,13 +236,14 @@ namespace solver
 					v[col] = A(row,col) - lA(row,col);
 					if (incremental)
 						lA(row,col) = A(row,col);
-					if (v[col] != 0.0)
+					// FIXME: comparison to zero
+					if (v[col] != plib::constants<float_type>::zero())
 						cols[colcount++] = col;
 				}
 
 				if (colcount > 0)
 				{
-					float_type lamba = 0.0;
+					auto lamba(plib::constants<FT>::zero());
 					std::array<float_type, m_pitch> w = {0};
 
 					/* compute w and lamba */
@@ -258,11 +261,12 @@ namespace solver
 							w[k] += Ainv(col,k) * f; /* Transpose(Ainv) * v */
 					}
 
-					lamba = -1.0 / (1.0 + lamba);
+					lamba = -plib::reciprocal(plib::constants<float_type>::one() + lamba);
 					for (std::size_t i=0; i<iN; i++)
 					{
 						const float_type f = lamba * z[i];
-						if (f != 0.0)
+						// FIXME: comparison to zero
+						if (f != plib::constants<float_type>::zero())
 							for (std::size_t k = 0; k < iN; k++)
 								Ainv(i,k) += f * w[k];
 					}
@@ -275,9 +279,9 @@ namespace solver
 
 		this->LE_compute_x(new_V);
 
-		const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
+		const float_type err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
 		this->store(new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
+		return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>

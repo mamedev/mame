@@ -37,7 +37,7 @@ namespace solver
 			const solver_parameters_t *params, std::size_t size)
 			: matrix_solver_direct_t<FT, SIZE>(anetlist, name, nets, params, size)
 			, m_Vdelta(*this, "m_Vdelta", std::vector<float_type>(size))
-			, m_omega(*this, "m_omega", params->m_gs_sor)
+			, m_omega(*this, "m_omega", static_cast<float_type>(params->m_gs_sor))
 			, m_lp_fact(*this, "m_lp_fact", 0)
 			{
 			}
@@ -84,7 +84,7 @@ namespace solver
 		{
 			float_type sq = 0;
 			float_type sqo = 0;
-			const float_type rez_cts = 1.0 / this->current_timestep();
+			const float_type rez_cts = plib::reciprocal(this->current_timestep());
 			for (unsigned k = 0; k < this->size(); k++)
 			{
 				const analog_net_t *n = this->m_nets[k];
@@ -158,11 +158,11 @@ namespace solver
 	#endif
 
 		for (std::size_t k = 0; k < iN; k++)
-			this->m_new_V[k] = this->m_terms[k].getV();
+			this->m_new_V[k] = this->m_terms[k].template getV<FT>();
 
 		do {
 			resched = false;
-			float_type cerr = 0.0;
+			FT cerr = plib::constants<FT>::zero();
 
 			for (std::size_t k = 0; k < iN; k++)
 			{
@@ -177,7 +177,7 @@ namespace solver
 				FT w = m_omega / this->m_A[k][k];
 				if (this->m_params.m_use_gabs)
 				{
-					FT gabs_t = 0.0;
+					FT gabs_t = plib::constants<FT>::zero();
 					for (std::size_t i = 0; i < e; i++)
 						if (p[i] != k)
 							gabs_t = gabs_t + std::abs(this->m_A[k][p[i]]);
@@ -194,7 +194,7 @@ namespace solver
 				this->m_new_V[k] += delta;
 			}
 
-			if (cerr > this->m_params.m_accuracy)
+			if (cerr > static_cast<float_type>(this->m_params.m_accuracy))
 			{
 				resched = true;
 			}
@@ -210,9 +210,9 @@ namespace solver
 			return matrix_solver_direct_t<FT, SIZE>::solve_non_dynamic(newton_raphson);
 		}
 
-		const float_type err = (newton_raphson ? this->delta(this->m_new_V) : 0.0);
+		const float_type err = (newton_raphson ? this->delta(this->m_new_V) : plib::constants<FT>::zero());
 		this->store(this->m_new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
+		return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
 
 	}
 

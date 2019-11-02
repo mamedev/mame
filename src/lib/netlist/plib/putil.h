@@ -259,6 +259,19 @@ namespace plib
 		static inline constexpr const T cast(V &&v) noexcept { return static_cast<T>(v); }
 	};
 
+	/*! typesafe reciprocal function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return reciprocal of argument
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	reciprocal(T v) noexcept
+	{
+		return constants<T>::one() / v;
+	}
+
 	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
 
 

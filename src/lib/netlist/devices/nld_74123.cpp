@@ -255,7 +255,7 @@ namespace netlist
 
 	NETLIB_RESET(74123)
 	{
-		m_KP = 1.0 / (1.0 + exp(m_K()));
+		m_KP = plib::reciprocal(1.0 + exp(m_K()));
 
 		m_RP.reset();
 		m_RN.reset();

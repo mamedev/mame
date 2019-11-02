@@ -411,7 +411,7 @@ namespace analog
 		{
 			m_t += step;
 			m_funcparam[0] = m_t;
-			this->set_G_V_I(1.0 / m_R(),
+			this->set_G_V_I(plib::reciprocal(m_R()),
 					m_compiled.evaluate(m_funcparam),
 					0.0);
 		}
@@ -422,7 +422,7 @@ namespace analog
 		NETLIB_RESETI()
 		{
 			NETLIB_NAME(twoterm)::reset();
-			this->set_G_V_I(1.0 / m_R(), m_V(), 0.0);
+			this->set_G_V_I(plib::reciprocal(m_R()), m_V(), 0.0);
 		}
 
 	private:

@@ -227,7 +227,7 @@ namespace solver
 	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
 		/* populate matrix */
-		mat.set_scalar(0.0);
+		mat.set_scalar(plib::constants<FT>::zero());
 		this->fill_matrix(RHS);
 
 		/* now solve it */
@@ -247,9 +247,9 @@ namespace solver
 
 		this->m_stat_calculations++;
 
-		const FT err = (newton_raphson ? this->delta(new_V) : 0.0);
+		const FT err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
 		this->store(new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
+		return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
 	}
 
 } // namespace solver

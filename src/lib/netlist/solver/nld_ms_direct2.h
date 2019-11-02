@@ -47,9 +47,9 @@ namespace solver
 			std::array<float_type, 2> new_V = {v0, v1};
 
 			this->m_stat_calculations++;
-			const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
+			const float_type err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
 			this->store(new_V);
-			return (err > this->m_params.m_accuracy) ? 2 : 1;
+			return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
 		}
 
 	};

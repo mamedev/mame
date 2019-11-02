@@ -54,7 +54,7 @@ namespace devices
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5)
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc = netlist_time::from_fp<decltype(m_freq())>(1.0 / (m_freq()*2.0));
 		}
 
 		NETLIB_RESETI()
@@ -64,7 +64,7 @@ namespace devices
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc = netlist_time::from_fp<decltype(m_freq())>(1.0 / (m_freq()*2.0));
 		}
 
 		NETLIB_UPDATEI()
@@ -93,7 +93,7 @@ namespace devices
 		, m_Q(*this, "Q")
 		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc = netlist_time::from_fp<decltype(m_freq())>(1.0 / (m_freq()*2.0));
 
 			connect(m_feedback, m_Q);
 		}
@@ -101,7 +101,7 @@ namespace devices
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq() * 2.0));
+			m_inc = netlist_time::from_fp<decltype(m_freq())>(1.0 / (m_freq() * 2.0));
 		}
 
 		NETLIB_UPDATEI()
@@ -139,8 +139,8 @@ namespace devices
 
 		NETLIB_UPDATEI()
 		{
-			m_funcparam[0] = exec().time().as_double();
-			const netlist_time m_inc = netlist_time::from_double(m_compiled.evaluate(m_funcparam));
+			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
+			const netlist_time m_inc = netlist_time::from_fp(m_compiled.evaluate(m_funcparam));
 			m_Q.push(!m_feedback(), m_inc);
 		}
 
@@ -168,13 +168,13 @@ namespace devices
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_double(1.0 / (m_freq() * 2.0));
+			m_inc[0] = netlist_time::from_fp<decltype(m_freq())>(1.0 / (m_freq() * 2.0));
 
 			connect(m_feedback, m_Q);
 
-			netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			netlist_time base = netlist_time::from_fp<decltype(m_freq())>(1.0 / (m_freq()*2.0));
 			std::vector<pstring> pat(plib::psplit(m_pattern(),","));
-			m_off = netlist_time::from_double(m_offset());
+			m_off = netlist_time::from_fp(m_offset());
 
 			std::array<std::int64_t, 32> pati = { 0 };
 
@@ -331,8 +331,8 @@ namespace devices
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set_G_V_I(1.0 / m_p_RIN(),0,0);
-			m_ROUT.set_G_V_I(1.0 / m_p_ROUT(),0,0);
+			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
+			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
 		}
 
 		NETLIB_UPDATEI()

@@ -72,7 +72,7 @@ namespace solver
 			for (std::size_t i = 0; i < kN; i++)
 			{
 				/* FIXME: Singular matrix? */
-				const FT f = 1.0 / m_A[i][i];
+				const FT f = plib::reciprocal(m_A[i][i]);
 				const auto &nzrd = this->m_terms[i].m_nzrd;
 				const auto &nzbd = this->m_terms[i].m_nzbd;
 
@@ -101,13 +101,13 @@ namespace solver
 				if (maxrow != i)
 				{
 					/* Swap the maxrow and ith row */
-					for (std::size_t k = 0; k < kN + 1; k++) {
+					for (std::size_t k = 0; k < kN; k++) {
 						std::swap(m_A[i][k], m_A[maxrow][k]);
 					}
-					//std::swap(RHS(i), RHS(maxrow));
+					std::swap(m_RHS[i], m_RHS[maxrow]);
 				}
 				/* FIXME: Singular matrix? */
-				const FT f = 1.0 / m_A[i][i];
+				const FT f = plib::reciprocal(m_A[i][i]);
 
 				/* Eliminate column i from row j */
 
@@ -168,9 +168,9 @@ namespace solver
 		this->LE_solve();
 		this->LE_back_subst(m_new_V);
 
-		const FT err = (newton_raphson ? this->delta(m_new_V) : 0.0);
+		const FT err = (newton_raphson ? this->delta(m_new_V) : plib::constants<FT>::zero());
 		this->store(m_new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
+		return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>

@@ -40,6 +40,12 @@ namespace solver
 		GMRES
 	)
 
+	P_ENUM(matrix_fp_type_e,
+		FLOAT,
+		DOUBLE,
+		LONGDOUBLE
+	)
+
 	struct solver_parameters_t
 	{
 		solver_parameters_t(device_t &parent)
@@ -48,6 +54,7 @@ namespace solver
 		/* iteration parameters */
 		, m_gs_sor(parent, "SOR_FACTOR", 1.059)
 		, m_method(parent, "METHOD", matrix_type_e::MAT_CR)
+		, m_fp_type(parent, "FPTYPE", matrix_fp_type_e::DOUBLE)
 		, m_accuracy(parent, "ACCURACY", 1e-7)
 		, m_gs_loops(parent, "GS_LOOPS", 9)              // Gauss-Seidel loops
 
@@ -55,7 +62,7 @@ namespace solver
 		, m_gmin(parent, "GMIN", 1e-9)
 		, m_pivot(parent, "PIVOT", false)                    // use pivoting - on supported solvers
 		, m_nr_loops(parent, "NR_LOOPS", 250)            // Newton-Raphson loops
-		, m_nr_recalc_delay(parent, "NR_RECALC_DELAY", netlist_time::quantum().as_double()) // Delay to next solve attempt if nr loops exceeded
+		, m_nr_recalc_delay(parent, "NR_RECALC_DELAY", netlist_time::quantum().as_fp<nl_fptype>()) // Delay to next solve attempt if nr loops exceeded
 		, m_parallel(parent, "PARALLEL", 0)
 
 		/* automatic time step */
@@ -72,7 +79,7 @@ namespace solver
 
 		{
 			m_min_timestep = m_dynamic_min_ts();
-			m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
+			m_max_timestep = netlist_time::from_fp(plib::reciprocal(m_freq())).as_fp<decltype(m_max_timestep)>();
 
 			if (m_dynamic_ts)
 			{
@@ -87,6 +94,7 @@ namespace solver
 		param_fp_t m_freq;
 		param_fp_t m_gs_sor;
 		param_enum_t<matrix_type_e> m_method;
+		param_enum_t<matrix_fp_type_e> m_fp_type;
 		param_fp_t m_accuracy;
 		param_num_t<std::size_t> m_gs_loops;
 		param_fp_t m_gmin;
@@ -122,9 +130,11 @@ namespace solver
 
 		terminal_t **terms() noexcept { return m_terms.data(); }
 
-		nl_fptype getV() const noexcept { return m_net->Q_Analog(); }
+		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, void>>
+		FT getV() const noexcept { return static_cast<FT>(m_net->Q_Analog()); }
 
-		void setV(nl_fptype v) noexcept { m_net->set_Q_Analog(v); }
+		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, void>>
+		void setV(FT v) noexcept { m_net->set_Q_Analog(static_cast<nl_fptype>(v)); }
 
 		bool isNet(const analog_net_t * net) const noexcept { return net == m_net; }
 
@@ -240,7 +250,7 @@ namespace solver
 			using vtype = typename std::decay<decltype(V[0])>::type;
 			vtype cerr = 0;
 			for (std::size_t i = 0; i < iN; i++)
-				cerr = std::max(cerr, std::abs(V[i] - static_cast<vtype>(this->m_terms[i].getV())));
+				cerr = std::max(cerr, std::abs(V[i] - this->m_terms[i].getV<vtype>()));
 			return cerr;
 		}
 
@@ -383,9 +393,9 @@ namespace solver
 		: matrix_solver_t(anetlist, name, nets, params)
 		, m_dim(size)
 		, m_mat_ptr(size, this->max_railstart() + 1)
-		, m_last_V(size, plib::constants<float_type>::zero())
-		, m_DD_n_m_1(size, plib::constants<float_type>::zero())
-		, m_h_n_m_1(size, plib::constants<float_type>::zero())
+		, m_last_V(size, plib::constants<nl_fptype>::zero())
+		, m_DD_n_m_1(size, plib::constants<nl_fptype>::zero())
+		, m_h_n_m_1(size, plib::constants<nl_fptype>::zero())
 		{
 			/*
 			 * save states
@@ -407,11 +417,11 @@ namespace solver
 		plib::parray2D<float_type *, SIZE, 0> m_mat_ptr;
 		/* state - variable time_stepping */
 		PALIGNAS_VECTOROPT()
-		plib::parray<float_type, SIZE> m_last_V;
+		plib::parray<nl_fptype, SIZE> m_last_V;
 		PALIGNAS_VECTOROPT()
-		plib::parray<float_type, SIZE> m_DD_n_m_1;
+		plib::parray<nl_fptype, SIZE> m_DD_n_m_1;
 		PALIGNAS_VECTOROPT()
-		plib::parray<float_type, SIZE> m_h_n_m_1;
+		plib::parray<nl_fptype, SIZE> m_h_n_m_1;
 
 		constexpr std::size_t size() const noexcept { return (SIZE > 0) ? static_cast<std::size_t>(SIZE) : m_dim; }
 
@@ -428,7 +438,7 @@ namespace solver
 					// avoid floating point exceptions
 
 					const nl_fptype DD_n = std::max(-fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),
-						std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(t.getV() - m_last_V[k])));
+						std::min(+fp_constants<nl_fptype>::TIMESTEP_MAXDIFF(),(t.template getV<nl_fptype>() - m_last_V[k])));
 					const nl_fptype hn = cur_ts;
 
 					//printf("%g %g %g %g\n", DD_n, hn, t.m_DD_n_m_1, t.m_h_n_m_1);
@@ -445,7 +455,7 @@ namespace solver
 					if (new_net_timestep < new_solver_timestep)
 						new_solver_timestep = new_net_timestep;
 
-					m_last_V[k] = t.getV();
+					m_last_V[k] = t.template getV<nl_fptype>();
 				}
 				if (new_solver_timestep < m_params.m_min_timestep)
 				{
@@ -457,7 +467,7 @@ namespace solver
 			/*
 			 * FIXME: Factor 2 below is important. Without, we get timing issues. This must be a bug elsewhere.
 			 */
-			return std::max(netlist_time::from_double(new_solver_timestep), netlist_time::quantum() * 2);
+			return std::max(netlist_time::from_fp(new_solver_timestep), netlist_time::quantum() * 2);
 		}
 
 
@@ -488,12 +498,12 @@ namespace solver
 		void clear_square_mat(M &m)
 		{
 			const std::size_t n = size();
-
 			for (std::size_t k=0; k < n; k++)
 			{
 				auto *p = &(m[k][0]);
+				using mat_elem_type = typename std::decay<decltype(*p)>::type;
 				for (std::size_t i=0; i < n; i++)
-					p[i] = 0.0;
+					p[i] = plib::constants<mat_elem_type>::zero();
 			}
 		}
 
@@ -514,11 +524,14 @@ namespace solver
 				const auto &Idr = m_Idrn[k];
 				const auto &cnV = m_connected_net_Vn[k];
 
-				for (std::size_t i = 0; i < railstart; i++)
-					*tcr_r[i]       += go[i];
+				// FIXME: gonn, gtn and Idr - which float types should they have?
 
-				typename RT::value_type gtot_t = 0.0;
-				typename RT::value_type RHS_t = 0.0;
+				for (std::size_t i = 0; i < railstart; i++)
+					*tcr_r[i]       += static_cast<FT>(go[i]);
+
+				/* use native floattype for now */
+				auto gtot_t(plib::constants<nl_fptype>::zero());
+				auto RHS_t (plib::constants<nl_fptype>::zero());
 
 				for (std::size_t i = 0; i < term_count; i++)
 				{
@@ -536,9 +549,9 @@ namespace solver
 					RHS_t += (/*m_Idr[i]*/ (- go[i]) * *cnV[i]);
 				}
 
-				RHS[k] = RHS_t;
+				RHS[k] = static_cast<FT>(RHS_t);
 				// update diagonal element ...
-				*tcr_r[railstart] += gtot_t; //mat.A[mat.diag[k]] += gtot_t;
+				*tcr_r[railstart] += static_cast<FT>(gtot_t); //mat.A[mat.diag[k]] += gtot_t;
 			}
 
 		}

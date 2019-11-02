@@ -167,7 +167,7 @@ namespace plib
 			const std::size_t oe = nz_num;
 			while (k < oe)
 			{
-				T tmp = 0.0;
+				T tmp = plib::constants<T>::zero();
 				const std::size_t e = row_idx[row+1];
 				for (; k < e; k++)
 					tmp += A[k] * x[col_idx[k]];
@@ -294,7 +294,7 @@ namespace plib
 			{
 				std::size_t nzbdp = 0;
 				std::size_t pi = base::diag[i];
-				const typename base::value_type f = 1.0 / base::A[pi++];
+				auto f = reciprocal(base::A[pi++]);
 				const std::size_t piie = base::row_idx[i+1];
 				const auto &nz = base::nzbd[i];
 
@@ -345,7 +345,7 @@ namespace plib
 					{
 						std::size_t nzbdp = 0;
 						std::size_t pi = base::diag[i];
-						const typename base::value_type f = 1.0 / base::A[pi++];
+						const auto f = reciprocal(base::A[pi++]);
 						const std::size_t piie = base::row_idx[i+1];
 						const auto &nz = base::nzbd[i];
 
@@ -358,7 +358,7 @@ namespace plib
 							while (base::col_idx[pj] < i)
 								pj++;
 
-							const typename base::value_type f1 = - base::A[pj++] * f;
+							auto f1 = - base::A[pj++] * f;
 
 							// subtract row i from j
 							// fill-in available assumed, i.e. matrix was prepared

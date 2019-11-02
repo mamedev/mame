@@ -71,7 +71,7 @@ namespace analog
 
 		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step)
 		{
-			m_h = 1.0 / step;
+			m_h = plib::reciprocal(step);
 			m_c = cap;
 			m_v = v;
 		}
@@ -108,7 +108,7 @@ namespace analog
 		void timestep(nl_fptype cap, nl_fptype v, nl_fptype step)
 		{
 			plib::unused_var(cap);
-			m_h = 1.0 / step;
+			m_h = plib::reciprocal(step);
 			m_v = v;
 		}
 		void setparams(nl_fptype gmin) { m_gmin = gmin; }

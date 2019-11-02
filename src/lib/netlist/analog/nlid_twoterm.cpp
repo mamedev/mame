@@ -53,7 +53,7 @@ NETLIB_UPDATE(twoterm)
 NETLIB_RESET(R_base)
 {
 	NETLIB_NAME(twoterm)::reset();
-	set_R(1.0 / exec().gmin());
+	set_R(plib::reciprocal(exec().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------

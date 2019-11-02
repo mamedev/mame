@@ -53,6 +53,8 @@ public:
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
 		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
+		opt_fperr(*this,    "",  "fperr",
+			"raise exception on floating point errors. This is intended to be used during debugging."),
 
 		opt_grp5(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
@@ -97,6 +99,7 @@ public:
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
 	plib::option_str    opt_savestate;
+	plib::option_bool   opt_fperr;
 	plib::option_group  opt_grp5;
 	plib::option_str_limit<unsigned> opt_type;
 	plib::option_group  opt_grp6;
@@ -319,7 +322,7 @@ struct input_t
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_value = static_cast<nl_fptype>(val);
-		m_time = netlist::netlist_time::from_double(t);
+		m_time = netlist::netlist_time::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
@@ -395,7 +398,7 @@ void tool_app_t::run()
 		nt.reset();
 
 		inps = read_input(nt.setup(), opt_inp());
-		ttr = netlist::netlist_time::from_double(opt_ttr());
+		ttr = netlist::netlist_time::from_fp(opt_ttr());
 	}
 
 
@@ -831,10 +834,6 @@ int tool_app_t::execute()
 {
 	tool_app_t opts;
 
-	/* make SIGFPE actually deliver signals on supoorted platforms */
-	plib::fpsignalenabler::global_enable(true);
-	plib::fpsignalenabler sigen(plib::FP_ALL & ~plib::FP_INEXACT & ~plib::FP_UNDERFLOW);
-
 	if (opt_help())
 	{
 		pout(usage());
@@ -869,6 +868,9 @@ int tool_app_t::execute()
 
 	try
 	{
+		plib::fpsignalenabler::global_enable(opt_fperr());
+		plib::fpsignalenabler fpprotect(plib::FP_DIVBYZERO | plib::FP_UNDERFLOW | plib::FP_OVERFLOW | plib::FP_INVALID);
+
 		pstring cmd = opt_cmd.as_string();
 		if (cmd == "listdevices")
 			listdevices();
@@ -902,6 +904,7 @@ int tool_app_t::execute()
 		perr("plib exception caught: {}\n", e.text());
 		return 2;
 	}
+
 #if 0
 	std::cout.imbue(std::locale("de_DE.utf8"));
 	std::cout.imbue(std::locale("C.UTF-8"));

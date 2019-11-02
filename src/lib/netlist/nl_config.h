@@ -105,10 +105,6 @@ static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 //============================================================
 
 using nl_fptype = double;
-//using nl_fptype = float;
-
-using nl_mat_fptype = nl_fptype;
-//using nl_mat_fptype = float;
 
 namespace netlist
 {
@@ -120,6 +116,20 @@ namespace netlist
 	struct fp_constants
 	{ };
 
+	/*! Specific constants for long double floating point type
+	 */
+	template <>
+	struct fp_constants<long double>
+	{
+		static inline constexpr long double DIODE_MAXDIFF() noexcept { return  1e100L; }
+		static inline constexpr long double DIODE_MAXVOLT() noexcept { return  300.0L; }
+
+		static inline constexpr long double TIMESTEP_MAXDIFF() noexcept { return  1e100L; }
+		static inline constexpr long double TIMESTEP_MINDIV() noexcept { return  1e-60L; }
+
+		static inline constexpr const char * name() noexcept { return "long double"; }
+	};
+
 	/*! Specific constants for double floating point type
 	 */
 	template <>
@@ -130,6 +140,8 @@ namespace netlist
 
 		static inline constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; }
 		static inline constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; }
+
+		static inline constexpr const char * name() noexcept { return "double"; }
 	};
 
 	/*! Specific constants for float floating point type
@@ -137,11 +149,13 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e5; }
-		static inline constexpr float DIODE_MAXVOLT() noexcept { return  30.0; }
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e2; }
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  20.0; }
 
 		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30f; }
 		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
+
+		static inline constexpr const char * name() noexcept { return "float"; }
 	};
 } // namespace netlist
 

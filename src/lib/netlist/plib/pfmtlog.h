@@ -128,6 +128,12 @@ struct ptype_traits<double> : ptype_traits_base<double>
 };
 
 template<>
+struct ptype_traits<long double> : ptype_traits_base<long double>
+{
+	static char32_t fmt_spec() { return 'f'; }
+};
+
+template<>
 struct ptype_traits<char *> : ptype_traits_base<char *>
 {
 	static const char *cast(const char *x) { return x; }

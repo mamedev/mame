@@ -21,18 +21,18 @@ namespace analog
 	class diode
 	{
 	public:
-		diode() : m_Is(1e-15), m_VT(0.0258), m_VT_inv(1.0 / m_VT) {}
+		diode() : m_Is(1e-15), m_VT(0.0258), m_VT_inv(plib::reciprocal(m_VT)) {}
 		diode(const nl_fptype Is, const nl_fptype n)
 		{
 			m_Is = Is;
 			m_VT = 0.0258 * n;
-			m_VT_inv = 1.0 / m_VT;
+			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		void set(const nl_fptype Is, const nl_fptype n)
 		{
 			m_Is = Is;
 			m_VT = 0.0258 * n;
-			m_VT_inv = 1.0 / m_VT;
+			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		nl_fptype I(const nl_fptype V) const { return m_Is * std::exp(V * m_VT_inv) - m_Is; }
 		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * std::exp(V * m_VT_inv); }
@@ -334,7 +334,7 @@ namespace analog
 		/* Base current is 0.005 / beta
 		 * as a rough estimate, we just scale the conductance down */
 
-		m_gB = 1.0 / (m_V/(0.005 / BF));
+		m_gB = plib::reciprocal((m_V/(0.005 / BF)));
 
 		//m_gB = d.gI(0.005 / alpha);
 

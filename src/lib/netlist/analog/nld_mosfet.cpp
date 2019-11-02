@@ -449,9 +449,9 @@ namespace analog
 
 		const nl_fptype k = 3.5; // see "Circuit Simulation", page 185
 		nl_fptype d = (Vgs - m_Vgs);
-		Vgs = m_Vgs + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		Vgs = m_Vgs + plib::reciprocal(k) * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
 		d = (Vgd - m_Vgd);
-		Vgd = m_Vgd + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		Vgd = m_Vgd + plib::reciprocal(k) * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
 
 		m_Vgs = Vgs;
 		m_Vgd = Vgd;

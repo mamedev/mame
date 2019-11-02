@@ -44,7 +44,7 @@ namespace netlist
 		nl_fptype V = m_VIN() / static_cast<nl_fptype>(1 << m_num())
 				* static_cast<nl_fptype>(m_val());
 
-		this->set_G_V_I(1.0 / m_R(), V, 0.0);
+		this->set_G_V_I(plib::reciprocal(m_R()), V, 0.0);
 	}
 	} //namespace analog
 

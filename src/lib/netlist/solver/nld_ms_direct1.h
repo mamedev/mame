@@ -39,9 +39,9 @@ namespace solver
 
 			std::array<FT, 1> new_V = { this->m_RHS[0] / this->m_A[0][0] };
 
-			const FT err = (newton_raphson ? this->delta(new_V) : 0.0);
+			const FT err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
 			this->store(new_V);
-			return (err > this->m_params.m_accuracy) ? 2 : 1;
+			return (err > static_cast<FT>(this->m_params.m_accuracy)) ? 2 : 1;
 		}
 
 	};

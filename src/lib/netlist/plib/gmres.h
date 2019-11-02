@@ -126,7 +126,7 @@ namespace plib
 				// 136%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += m_mat.A[j] * m_mat.A[j];
-				m_diag[i] = 1.0 / std::sqrt(v);
+				m_diag[i] = reciprocal(std::sqrt(v));
 #elif 0
 				// works halfway, i.e. Mame perforamnce 50%
 				// 147% - lowest average solution time with 7.094
@@ -151,14 +151,14 @@ namespace plib
 				// 151%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v += std::abs(m_mat.A[j]);
-				m_diag[i] =  1.0 / v;
+				m_diag[i] =  reciprocal(v);
 #else
 				// 124%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
 					v = std::max(v, std::abs(m_mat.A[j]));
-				m_diag[i] = 1.0 / v;
+				m_diag[i] = reciprocal(v);
 #endif
-				//m_diag[i] = 1.0 / m_mat.A[m_mat.diag[i]];
+				//m_diag[i] = reciprocal(m_mat.A[m_mat.diag[i]]);
 			}
 		}
 
@@ -261,18 +261,19 @@ namespace plib
 			}
 			m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
 
-			if (m_ht[kp1][k] != 0.0)
-				vec_scale(n, m_v[kp1], constants<FT>::one() / m_ht[kp1][k]);
+			// FIXME: comparison to zero
+			if (m_ht[kp1][k] != plib::constants<FT>::zero())
+				vec_scale(n, m_v[kp1], reciprocal(m_ht[kp1][k]));
 
 			for (std::size_t j = 0; j < k; j++)
 				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
 
-			const float_type mu = 1.0 / std::hypot(m_ht[k][k], m_ht[kp1][k]);
+			const float_type mu = reciprocal(std::hypot(m_ht[k][k], m_ht[kp1][k]));
 
 			m_c[k] = m_ht[k][k] * mu;
 			m_s[k] = -m_ht[kp1][k] * mu;
 			m_ht[k][k] = m_c[k] * m_ht[k][k] - m_s[k] * m_ht[kp1][k];
-			m_ht[kp1][k] = 0.0;
+			m_ht[kp1][k] = plib::constants<FT>::zero();
 
 			givens_mult(m_c[k], m_s[k], m_g[k], m_g[kp1]);
 
@@ -287,7 +288,7 @@ namespace plib
 				/* x += m_v[j] * m_y[j]       */
 				for (std::size_t i = k + 1; i-- > 0;)
 				{
-					double tmp = m_g[i];
+					auto tmp(m_g[i]);
 					for (std::size_t j = i + 1; j <= k; j++)
 						tmp -= m_ht[i][j] * m_y[j];
 					m_y[i] = tmp / m_ht[i][i];
@@ -334,7 +335,7 @@ namespace plib
 			 *------------------------------------------------------------------------*/
 
 			std::size_t itr_used = 0;
-			double rho_delta = 0.0;
+			auto rho_delta(plib::constants<float_type>::zero());
 
 			const    std::size_t n = size();
 
@@ -400,7 +401,7 @@ namespace plib
 				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero());
 				m_g[0] = rho;
 
-				vec_mult_scalar(n, m_v[0], residual, constants<FT>::one() / rho);
+				vec_mult_scalar(n, m_v[0], residual, reciprocal(rho));
 
 				if (do_k<RESTART-1>(ops, x, itr_used, rho_delta, true))
 					// converged
@@ -504,7 +505,7 @@ namespace plib
 				else
 				{
 					  beta = alpha * ( c / 2.0)*( c / 2.0);
-					  alpha = 1.0 / (d - beta);
+					  alpha = reciprocal(d - beta);
 					  for (std::size_t k = 0; k < size(); k++)
 						  p[k] = residual[k] + beta * p[k];
 				}

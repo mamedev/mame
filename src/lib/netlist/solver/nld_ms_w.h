@@ -134,15 +134,15 @@ namespace solver
 			for (std::size_t j = 0; j < kN; j++)
 			{
 				W(i,j) = lA(i,j) = A(i,j);
-				Ainv(i,j) = 0.0;
+				Ainv(i,j) = plib::constants<FT>::zero();
 			}
-			Ainv(i,i) = 1.0;
+			Ainv(i,i) = plib::constants<FT>::one();
 		}
 		/* down */
 		for (std::size_t i = 0; i < kN; i++)
 		{
 			/* FIXME: Singular matrix? */
-			const float_type f = 1.0 / W(i,i);
+			const float_type f = plib::reciprocal(W(i,i));
 			const auto * const p = this->m_terms[i].m_nzrd.data();
 			const size_t e = this->m_terms[i].m_nzrd.size();
 
@@ -154,7 +154,8 @@ namespace solver
 			{
 				const auto j = pb[jb];
 				const float_type f1 = - W(j,i) * f;
-				if (f1 != 0.0)
+				// FIXME: comparison to zero
+				if (f1 != plib::constants<float_type>::zero())
 				{
 					for (std::size_t k = 0; k < e; k++)
 						W(j,p[k]) += W(i,p[k]) * f1;
@@ -167,11 +168,12 @@ namespace solver
 		for (std::size_t i = kN; i-- > 0; )
 		{
 			/* FIXME: Singular matrix? */
-			const float_type f = 1.0 / W(i,i);
+			const float_type f = plib::reciprocal(W(i,i));
 			for (std::size_t j = i; j-- > 0; )
 			{
 				const float_type f1 = - W(j,i) * f;
-				if (f1 != 0.0)
+				// FIXME: comparison to zero
+				if (f1 != plib::constants<float_type>::zero())
 				{
 					for (std::size_t k = i; k < kN; k++)
 						W(j,k) += W(i,k) * f1;
@@ -194,7 +196,7 @@ namespace solver
 		const std::size_t kN = this->size();
 
 		for (std::size_t i=0; i<kN; i++)
-			x[i] = 0.0;
+			x[i] = plib::constants<FT>::zero();
 
 		for (std::size_t k=0; k<kN; k++)
 		{
@@ -257,7 +259,7 @@ namespace solver
 				for (unsigned i = 0; i < rowcount; i++)
 				{
 					const unsigned r = rows[i];
-					nl_fptype tmp = 0.0;
+					FT tmp = plib::constants<FT>::zero();
 					for (unsigned k = 0; k < iN; k++)
 						tmp += VT(r,k) * new_V[k];
 					w[i] = tmp;
@@ -265,17 +267,18 @@ namespace solver
 
 				for (unsigned i = 0; i < rowcount; i++)
 					for (unsigned k=0; k< rowcount; k++)
-						H[i][k] = 0.0;
+						H[i][k] = plib::constants<FT>::zero();
 
 				for (unsigned i = 0; i < rowcount; i++)
-					H[i][i] = 1.0;
+					H[i][i] = plib::constants<FT>::one();
 				/* Construct H = (I + VT*Z) */
 				for (unsigned i = 0; i < rowcount; i++)
 					for (unsigned k=0; k< colcount[i]; k++)
 					{
 						const unsigned col = cols[i][k];
 						float_type f = VT(rows[i],col);
-						if (f!=0.0)
+						// FIXME: comparison to zero
+						if (f != plib::constants<float_type>::zero())
 							for (unsigned j= 0; j < rowcount; j++)
 								H[i][j] += f * Ainv(col,rows[j]);
 					}
@@ -283,14 +286,16 @@ namespace solver
 				/* Gaussian elimination of H */
 				for (unsigned i = 0; i < rowcount; i++)
 				{
-					if (H[i][i] == 0.0)
+					// FIXME: comparison to zero
+					if (H[i][i] == plib::constants<float_type>::zero())
 						plib::perrlogger("{} H singular\n", this->name());
-					const float_type f = 1.0 / H[i][i];
+					const float_type f = plib::reciprocal(H[i][i]);
 					for (unsigned j = i+1; j < rowcount; j++)
 					{
 						const float_type f1 = - f * H[j][i];
 
-						if (f1!=0.0)
+						// FIXME: comparison to zero
+						if (f1 != plib::constants<float_type>::zero())
 						{
 							float_type *pj = &H[j][i+1];
 							const float_type *pi = &H[i][i+1];
@@ -317,7 +322,7 @@ namespace solver
 				/* x = y - Zt */
 				for (unsigned i=0; i<iN; i++)
 				{
-					float_type tmp = 0.0;
+					float_type tmp = plib::constants<FT>::zero();
 					for (unsigned j=0; j<rowcount;j++)
 					{
 						const unsigned row = rows[j];
@@ -332,18 +337,18 @@ namespace solver
 		if (false)
 			for (unsigned i=0; i<iN; i++)
 			{
-				float_type tmp = 0.0;
+				float_type tmp = plib::constants<FT>::zero();
 				for (unsigned j=0; j<iN; j++)
 				{
 					tmp += A(i,j) * new_V[j];
 				}
-				if (std::abs(tmp-RHS(i)) > 1e-6)
+				if (std::abs(tmp-RHS(i)) > static_cast<float_type>(1e-6))
 					plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, std::abs(tmp-RHS(i)), RHS(i));
 			}
 
-		const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
+		const float_type err = (newton_raphson ? this->delta(new_V) : plib::constants<FT>::zero());
 		this->store(new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
+		return (err > static_cast<float_type>(this->m_params.m_accuracy)) ? 2 : 1;
 	}
 
 	template <typename FT, int SIZE>
