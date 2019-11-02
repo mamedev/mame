@@ -7,6 +7,8 @@
 
 #include "softlist_dev.h"
 
+#include <cassert>
+
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -15,6 +17,41 @@
 class device_generic_cart_interface : public device_interface
 {
 public:
+	// TODO: find a better home for this helper
+	template <unsigned Shift, typename T>
+	static void install_non_power_of_two(
+			offs_t length,
+			offs_t decode_limit,
+			offs_t decode_mask,
+			offs_t decode_offset,
+			offs_t base,
+			T &&install)
+	{
+		assert(!(decode_limit & base));
+		for (offs_t remain = length, start = 0U; remain && (decode_limit >= start); )
+		{
+			unsigned const msb(31 - count_leading_zeros(u32(remain)));
+			offs_t const chunk(offs_t(1) << msb);
+			offs_t range((chunk - 1) & decode_limit);
+			offs_t mirror(decode_limit & ~decode_mask & ~range);
+
+			// TODO: deal with small offsets - probably requires breaking into smaller chunks with mirror set
+			if (decode_offset & range)
+				throw emu_fatalerror("Can't deal with offset/size combination\n");
+
+			range = (range << Shift) | ((offs_t(1) << Shift) - 1);
+			mirror <<= Shift;
+			offs_t const begin(start << Shift);
+			offs_t const end(begin | range);
+			offs_t const src(start | ((chunk - 1) & decode_offset));
+
+			install(base | begin, base | end, mirror, src);
+
+			remain ^= chunk;
+			start ^= chunk;
+		}
+	}
+
 	// construction/destruction
 	virtual ~device_generic_cart_interface();
 

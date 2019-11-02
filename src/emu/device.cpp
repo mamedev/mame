@@ -879,16 +879,15 @@ std::string device_t::subtag(std::string _tag) const
 {
 	const char *tag = _tag.c_str();
 	std::string result;
-	// if the tag begins with a colon, ignore our path and start from the root
 	if (*tag == ':')
 	{
+		// if the tag begins with a colon, ignore our path and start from the root
 		tag++;
 		result.assign(":");
 	}
-
-	// otherwise, start with our path
 	else
 	{
+		// otherwise, start with our path
 		result.assign(m_tag);
 		if (result != ":")
 			result.append(":");

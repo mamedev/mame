@@ -1,5 +1,66 @@
 // license:BSD-3-Clause
 // copyright-holders:Wilbert Pol
+/***************************************************************************
+ Bandai WonderSwan cartridge slot
+
+ 48-pin single-sided PCB edge connector
+
+ The SoC maps the following ranges to the cartridge slot:
+ * Memory  0x10000-0x1ffff  8-bit read/write (typically used for cartridge SRAM)
+                            3-cycle access on WonderSwan, 1-cycle access on WonderSwan Color
+ * Memory  0x20000-0xfffff  16-bit read-only (writes not emitted)
+ * I/O     0xc0-0xff
+
+ Pin  Name  Notes
+   1  GND
+   2  A15
+   3  A10
+   4  A11
+   5  A9
+   6  A8
+   7  A13
+   8  A14
+   9  A12
+  10  A7
+  11  A6
+  12  A5
+  13  A4
+  14  D15
+  15  D14
+  16  D7
+  17  D6
+  18  D5
+  19  D4
+  20  D3
+  21  D2
+  22  D1
+  23  D0
+  24  +3.3V
+  25  +3.3V
+  26  A0
+  27  A1
+  28  A2
+  29  A3
+  30  A19
+  31  A18
+  32  A17
+  33  A16
+  34  D8
+  35  D9
+  36  D10
+  37  D11
+  38  D12
+  39  D13
+  40  /RESET
+  41  ?       input used while authenticating cartridge
+  42  IO/M    low when accessing I/O ports
+  43  /RD
+  44  /WR
+  45  /CART   low when accessing cartridge
+  46  INT     usually used for RTC alarm interrupt
+  47  CLK     384 kHz on WonderSwan
+  48  GND
+ ***************************************************************************/
 #ifndef MAME_BUS_WSWAN_SLOT_H
 #define MAME_BUS_WSWAN_SLOT_H
 
