@@ -135,13 +135,13 @@ template <unsigned N> void dcebridge_state::dcd(int state)
 			ioport_value const conf_local(m_conf[N]->read());
 			if ((conf_local & DTR_SOURCE_MASK) == DTR_SOURCE_DCD_LOCAL)
 				m_ports[N]->write_dtr(state);
-			if ((conf_local & RTS_SOURCE_MASK) == DTR_SOURCE_DCD_LOCAL)
+			if ((conf_local & RTS_SOURCE_MASK) == RTS_SOURCE_DCD_LOCAL)
 				m_ports[N]->write_rts(state);
 
 			ioport_value const conf_remote(m_conf[N ^ 1U]->read());
 			if ((conf_remote & DTR_SOURCE_MASK) == DTR_SOURCE_DCD_REMOTE)
 				m_ports[N ^ 1U]->write_dtr(state);
-			if ((conf_remote & RTS_SOURCE_MASK) == DTR_SOURCE_DCD_REMOTE)
+			if ((conf_remote & RTS_SOURCE_MASK) == RTS_SOURCE_DCD_REMOTE)
 				m_ports[N ^ 1U]->write_rts(state);
 		}
 	}
@@ -158,13 +158,13 @@ template <unsigned N> void dcebridge_state::dsr(int state)
 			ioport_value const conf_local(m_conf[N]->read());
 			if ((conf_local & DTR_SOURCE_MASK) == DTR_SOURCE_DSR_LOCAL)
 				m_ports[N]->write_dtr(state);
-			if ((conf_local & RTS_SOURCE_MASK) == DTR_SOURCE_DSR_LOCAL)
+			if ((conf_local & RTS_SOURCE_MASK) == RTS_SOURCE_DSR_LOCAL)
 				m_ports[N]->write_rts(state);
 
 			ioport_value const conf_remote(m_conf[N ^ 1U]->read());
 			if ((conf_remote & DTR_SOURCE_MASK) == DTR_SOURCE_DSR_REMOTE)
 				m_ports[N ^ 1U]->write_dtr(state);
-			if ((conf_remote & RTS_SOURCE_MASK) == DTR_SOURCE_DSR_REMOTE)
+			if ((conf_remote & RTS_SOURCE_MASK) == RTS_SOURCE_DSR_REMOTE)
 				m_ports[N ^ 1U]->write_rts(state);
 		}
 	}
