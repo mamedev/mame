@@ -343,7 +343,7 @@ void st2204_device::int_map(address_map &map)
 	map(0x0044, 0x0044).rw(FUNC(st2204_device::lymax_r), FUNC(st2204_device::lymax_w));
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	map(0x004e, 0x004e).w(FUNC(st2204_device::pcl_w));
-	map(0x0080, 0x27ff).ram(); // 10K internal SRAM; extent of mapping guessed
+	map(0x0080, 0x287f).ram();
 	map(0x4000, 0x7fff).rw(FUNC(st2204_device::pmem_r), FUNC(st2204_device::pmem_w));
 	map(0x8000, 0xffff).rw(FUNC(st2204_device::dmem_r), FUNC(st2204_device::dmem_w));
 }
