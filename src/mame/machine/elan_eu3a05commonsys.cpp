@@ -168,10 +168,16 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device, "elan_eu3a05commonsys", "Elan EU3A05/EU3A14 Common System")
 
-elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ELAN_EU3A05_COMMONSYS, tag, owner, clock),
+
+elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_bank(*this, finder_base::DUMMY_TAG)
+{
+}
+
+elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A05_COMMONSYS, tag, owner, clock)
 {
 }
 

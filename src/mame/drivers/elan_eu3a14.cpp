@@ -68,15 +68,15 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/timer.h"
-#include "machine/elan_eu3a05commonsys.h"
+#include "machine/elan_eu3a14sys.h"
 #include "video/elan_eu3a05commonvid.h"
 
 
 
-class radica_eu3a14_state : public driver_device
+class elan_eu3a14_state : public driver_device
 {
 public:
-	radica_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
+	elan_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sys(*this, "sys"),
@@ -92,7 +92,6 @@ public:
 		m_spriteaddr(*this, "spriteaddr"),
 		m_spritebase(*this, "spritebase"),
 		m_mainram(*this, "mainram"),
-		m_dmaparams(*this, "dmaparams"),
 		m_bank(*this, "bank"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -120,8 +119,6 @@ private:
 
 	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
 
-	DECLARE_READ8_MEMBER(dma_trigger_r);
-	DECLARE_WRITE8_MEMBER(dma_trigger_w);
 
 	DECLARE_WRITE8_MEMBER(porta_dir_w);
 	DECLARE_WRITE8_MEMBER(portb_dir_w);
@@ -151,7 +148,7 @@ private:
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<elan_eu3a05commonsys_device> m_sys;
+	required_device<elan_eu3a14sys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05commonvid_device> m_commonvid;
 	required_region_ptr<uint8_t> m_mainregion;
@@ -164,7 +161,6 @@ private:
 	required_shared_ptr<uint8_t> m_spriteaddr;
 	required_shared_ptr<uint8_t> m_spritebase;
 	required_shared_ptr<uint8_t> m_mainram;
-	required_shared_ptr<uint8_t> m_dmaparams;
 	required_device<address_map_bank_device> m_bank;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -189,12 +185,12 @@ private:
 };
 
 
-void radica_eu3a14_state::video_start()
+void elan_eu3a14_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_prioritybitmap);
 }
 
-void radica_eu3a14_state::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
+void elan_eu3a14_state::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
 	int baseaddr = base * 256;
 
@@ -401,7 +397,7 @@ void radica_eu3a14_state::draw_background_tile(bitmap_ind16& bitmap, const recta
 	}
 }
 
-int radica_eu3a14_state::get_xscroll_for_screenypos(int ydraw)
+int elan_eu3a14_state::get_xscroll_for_screenypos(int ydraw)
 {
 	if ((ydraw < 0) || (ydraw >= 224))
 		return 0;
@@ -447,7 +443,7 @@ int radica_eu3a14_state::get_xscroll_for_screenypos(int ydraw)
 }
 
 
-void radica_eu3a14_state::draw_background_page(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
+void elan_eu3a14_state::draw_background_page(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
 {
 
 	int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
@@ -500,7 +496,7 @@ void radica_eu3a14_state::draw_background_page(screen_device& screen, bitmap_ind
 	}
 }
 
-void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+void elan_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
 	// this register use is questionable
 	if (m_ramtilecfg[0] & 0x80)
@@ -559,7 +555,7 @@ void radica_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap
 }
 
 
-void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void elan_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
 
@@ -677,7 +673,7 @@ void radica_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &b
 
 }
 
-void radica_eu3a14_state::draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
+void elan_eu3a14_state::draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
 {
 	if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 	{
@@ -692,7 +688,7 @@ void radica_eu3a14_state::draw_sprite_pix(const rectangle& cliprect, uint16_t* d
 	}
 }
 
-void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int palette, int flipx, int priority, int xpos, int ypos, int bpp)
+void elan_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int palette, int flipx, int priority, int xpos, int ypos, int bpp)
 {
 	offset = offset * 2;
 
@@ -805,7 +801,7 @@ void radica_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &
 }
 
 
-void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void elan_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
 	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
@@ -899,7 +895,7 @@ void radica_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t elan_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_spriterambase = (m_spriteaddr[0] * 0x200) - 0x200;
 
@@ -914,14 +910,14 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 }
 
 // sound callback
-READ8_MEMBER(radica_eu3a14_state::read_full_space)
+READ8_MEMBER(elan_eu3a14_state::read_full_space)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);
 }
 
 
-READ8_MEMBER(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)
+READ8_MEMBER(elan_eu3a14_state::elan_eu3a05_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
@@ -929,73 +925,75 @@ READ8_MEMBER(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)
 	return m_tvtype->read();
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::porta_dir_w)
+WRITE8_MEMBER(elan_eu3a14_state::porta_dir_w)
 {
 	m_portdir[0] = data;
 	// update state
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::portb_dir_w)
+WRITE8_MEMBER(elan_eu3a14_state::portb_dir_w)
 {
 	m_portdir[1] = data;
 	// update state
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::portc_dir_w)
+WRITE8_MEMBER(elan_eu3a14_state::portc_dir_w)
 {
 	m_portdir[2] = data;
 	// update state
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::porta_dat_w)
+WRITE8_MEMBER(elan_eu3a14_state::porta_dat_w)
 {
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::portb_dat_w)
+WRITE8_MEMBER(elan_eu3a14_state::portb_dat_w)
 {
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::portc_dat_w)
+WRITE8_MEMBER(elan_eu3a14_state::portc_dat_w)
 {
 }
 
 
 
-void radica_eu3a14_state::bank_map(address_map &map)
+void elan_eu3a14_state::bank_map(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
 }
 
-void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
+void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
 	map(0x4800, 0x4bff).rw(m_commonvid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
+	// 5000 - 501f = SYSTEM AREA
+
 	// similar to eu3a05, at least for pal flags and rom banking
 	// 5001 write
 	// 5004 write
 	// 5006 write
 	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
-	map(0x5009, 0x5009).r(FUNC(radica_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
+	map(0x5009, 0x5009).r(FUNC(elan_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
 	map(0x500a, 0x500a).nopw(); // startup
-	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
+	map(0x500b, 0x500b).r(FUNC(elan_eu3a14_state::elan_eu3a05_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
 	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
-
 	// DMA is similar to, but not the same as eu3a05
-	map(0x500f, 0x5017).ram().share("dmaparams");
-	map(0x5018, 0x5018).rw(FUNC(radica_eu3a14_state::dma_trigger_r), FUNC(radica_eu3a14_state::dma_trigger_w));
+	map(0x500f, 0x5017).rw(m_sys, FUNC(elan_eu3a14sys_device::dma_param_r), FUNC(elan_eu3a14sys_device::dma_param_w));
+	map(0x5018, 0x5018).rw(m_sys, FUNC(elan_eu3a14sys_device::dma_trigger_r), FUNC(elan_eu3a14sys_device::dma_trigger_w));
 	// 5019 - 46 on startup (hnt3) 22 (bb3, foot) na (gtg) 09    (rsg)
 	// 501a - 01 on startup (hnt3) 03 (bb3, foot) na (gtg) 02,01 (rsg)
 
+
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
-	map(0x5040, 0x5040).w(FUNC(radica_eu3a14_state::porta_dir_w));
-	map(0x5041, 0x5041).portr("IN0").w(FUNC(radica_eu3a14_state::porta_dat_w));
-	map(0x5042, 0x5042).w(FUNC(radica_eu3a14_state::portb_dir_w));
-	map(0x5043, 0x5043).portr("IN1").w(FUNC(radica_eu3a14_state::portb_dat_w));
-	map(0x5044, 0x5044).w(FUNC(radica_eu3a14_state::portc_dir_w));
-	map(0x5045, 0x5045).portr("IN2").w(FUNC(radica_eu3a14_state::portc_dat_w));
+	map(0x5040, 0x5040).w(FUNC(elan_eu3a14_state::porta_dir_w));
+	map(0x5041, 0x5041).portr("IN0").w(FUNC(elan_eu3a14_state::porta_dat_w));
+	map(0x5042, 0x5042).w(FUNC(elan_eu3a14_state::portb_dir_w));
+	map(0x5043, 0x5043).portr("IN1").w(FUNC(elan_eu3a14_state::portb_dat_w));
+	map(0x5044, 0x5044).w(FUNC(elan_eu3a14_state::portc_dir_w));
+	map(0x5045, 0x5045).portr("IN2").w(FUNC(elan_eu3a14_state::portc_dat_w));
 
 	map(0x5046, 0x5046).nopw();
 	map(0x5047, 0x5047).nopw();
@@ -1066,37 +1064,6 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 
 	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
 	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
-}
-
-READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)
-{
-	logerror("%s: dma_trigger_r\n", machine().describe_context());
-	return 0;
-}
-
-WRITE8_MEMBER(radica_eu3a14_state::dma_trigger_w)
-{
-	uint32_t dmasrc = (m_dmaparams[2] << 16) | (m_dmaparams[1] << 8) | (m_dmaparams[0] << 0);
-	uint32_t dmadst = (m_dmaparams[5] << 16) | (m_dmaparams[4] << 8) | (m_dmaparams[3] << 0);
-	uint32_t dmalen = (m_dmaparams[8] << 16) | (m_dmaparams[7] << 8) | (m_dmaparams[6] << 0);
-
-	//logerror("%s: dma_trigger_w %02x (src %08x dst %08x size %08x)\n", machine().describe_context(), data, dmasrc, dmadst, dmalen);
-
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	address_space& destspace = m_maincpu->space(AS_PROGRAM);
-
-	if (data == 0x08)
-	{
-		for (int i = 0; i < dmalen; i++)
-		{
-			uint8_t dat = fullbankspace.read_byte(dmasrc + i);
-			destspace.write_byte(dmadst + i, dat);
-		}
-	}
-	else
-	{
-		logerror("UNKNOWN DMA TRIGGER VALUE\n");
-	}
 }
 
 
@@ -1548,11 +1515,11 @@ static INPUT_PORTS_START( radica_bb3p )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void radica_eu3a14_state::machine_start()
+void elan_eu3a14_state::machine_start()
 {
 }
 
-void radica_eu3a14_state::machine_reset()
+void elan_eu3a14_state::machine_reset()
 {
 	// rather be safe
 	m_maincpu->set_state_int(M6502_S, 0x1ff);
@@ -1567,7 +1534,7 @@ void radica_eu3a14_state::machine_reset()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(radica_eu3a14_state::scanline_cb)
+TIMER_DEVICE_CALLBACK_MEMBER(elan_eu3a14_state::scanline_cb)
 {
 	// these interrupts need to occur based on how fast the trackball is
 	// being moved, the direction is read in a port.
@@ -1587,7 +1554,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(radica_eu3a14_state::scanline_cb)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(radica_eu3a14_state::interrupt)
+INTERRUPT_GEN_MEMBER(elan_eu3a14_state::interrupt)
 {
 	m_sys->generate_custom_interrupt(9);
 }
@@ -1649,16 +1616,16 @@ GFXDECODE_END
 
 
 
-void radica_eu3a14_state::radica_eu3a14(machine_config &config)
+void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, XTAL(21'477'272)/2); // marked as 21'477'270
-	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a14_state::radica_eu3a14_map);
-	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a14_state::interrupt));
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a14_state::radica_eu3a14_map);
+	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a14_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
-	ELAN_EU3A05_COMMONSYS(config, m_sys, 0);
+	ELAN_EU3A14_SYS(config, m_sys, 0);
 	m_sys->set_cpu("maincpu");
 	m_sys->set_addrbank("bank");
 
@@ -1668,7 +1635,7 @@ void radica_eu3a14_state::radica_eu3a14(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(radica_eu3a14_state::screen_update));
+	screen.set_screen_update(FUNC(elan_eu3a14_state::screen_update));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	screen.set_palette(m_palette);
@@ -1683,19 +1650,19 @@ void radica_eu3a14_state::radica_eu3a14(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	ELAN_EU3A05_SOUND(config, m_sound, 8000);
-	m_sound->space_read_callback().set(FUNC(radica_eu3a14_state::read_full_space));
+	m_sound->space_read_callback().set(FUNC(elan_eu3a14_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void radica_eu3a14_state::radica_eu3a14_adc(machine_config &config)
+void elan_eu3a14_state::radica_eu3a14_adc(machine_config &config)
 {
 	radica_eu3a14(config);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(radica_eu3a14_state::scanline_cb), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(elan_eu3a14_state::scanline_cb), "screen", 0, 1);
 }
 
 
-void radica_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks differ too, what are they on PAL?
+void elan_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks differ too, what are they on PAL?
 {
 	radica_eu3a14(config);
 
@@ -1703,19 +1670,19 @@ void radica_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks
 }
 
 
-void radica_eu3a14_state::init_rad_gtg()
+void elan_eu3a14_state::init_rad_gtg()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0a00 - 0x200;
 }
 
-void radica_eu3a14_state::init_rad_foot()
+void elan_eu3a14_state::init_rad_foot()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
 }
 
-void radica_eu3a14_state::init_rad_hnt3()
+void elan_eu3a14_state::init_rad_hnt3()
 {
 	// must be registers to control this
 	m_tilerambase = 0x0200 - 0x200;
@@ -1773,20 +1740,20 @@ ROM_START( rad_baskp )
 	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
 ROM_END
 
-CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_adc, rad_gtg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_adc, rad_gtg,       elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_rsg,  0,        0, radica_eu3a14,     rad_rsg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
+CONS( 2005, rad_rsg,  0,        0, radica_eu3a14,     rad_rsg,       elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
 // some Connectv branded Real Swing Golf units have a language selection (checksum in test mode confirmed as different on said units)
-CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p,    rad_rsgp,      radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
+CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p,    rad_rsgp,      elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,    radica_foot,   radica_eu3a14_state, init_rad_foot, "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
+CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,    radica_foot,   elan_eu3a14_state, init_rad_foot, "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_bb3,  0,        0, radica_eu3a14,     radica_bb3,    radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p,    radica_bb3p,   radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3,  0,        0, radica_eu3a14,     radica_bb3,    elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p,    radica_bb3p,   elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,     radica_hnt3,   radica_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,    radica_hnt3p,  radica_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,     radica_hnt3,   elan_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,    radica_hnt3p,  elan_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_bask, 0,        0, radica_eu3a14,     radica_bask,   radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
-CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14,     radica_baskp,  radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bask, 0,        0, radica_eu3a14,     radica_bask,   elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14,     radica_baskp,  elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )

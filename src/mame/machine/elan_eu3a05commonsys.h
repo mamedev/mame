@@ -11,6 +11,7 @@ class elan_eu3a05commonsys_device : public device_t
 {
 public:
 	elan_eu3a05commonsys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	elan_eu3a05commonsys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
@@ -31,7 +32,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-private:
 	required_device<m6502_device> m_cpu;
 	required_device<address_map_bank_device> m_bank;
 	uint8_t m_intmask[2];

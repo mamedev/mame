@@ -11,10 +11,16 @@
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_COMMONVID, elan_eu3a05commonvid_device, "elan_eu3a05commonvid", "Elan EU3A05/EU3A14 Common Video")
 
 elan_eu3a05commonvid_device::elan_eu3a05commonvid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELAN_EU3A05_COMMONVID, tag, owner, clock)
+	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_COMMONVID, tag, owner, clock)
+{
+}
+
+elan_eu3a05commonvid_device::elan_eu3a05commonvid_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
+
 
 void elan_eu3a05commonvid_device::device_start()
 {
