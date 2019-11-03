@@ -40,11 +40,20 @@ namespace solver
 		GMRES
 	)
 
+#if (NL_USE_FLOAT128)
 	P_ENUM(matrix_fp_type_e,
-		FLOAT,
-		DOUBLE,
-		LONGDOUBLE
+		  FLOAT
+		, DOUBLE
+		, LONGDOUBLE
+		, FLOAT128
 	)
+#else
+	P_ENUM(matrix_fp_type_e,
+		  FLOAT
+		, DOUBLE
+		, LONGDOUBLE
+	)
+#endif
 
 	struct solver_parameters_t
 	{
@@ -56,7 +65,7 @@ namespace solver
 		, m_method(parent,   "METHOD", matrix_type_e::MAT_CR)
 		, m_fp_type(parent,  "FPTYPE", matrix_fp_type_e::DOUBLE)
 		, m_reltol(parent,   "RELTOL", nlconst::magic(1e-3))			///< SPICE RELTOL parameter
-		, m_vntol(parent,    "VNTOL",  nlconst::magic(1e-6))			///< SPICE VNTOL parameter
+		, m_vntol(parent,    "VNTOL",  nlconst::magic(1e-7))			///< SPICE VNTOL parameter
 		, m_accuracy(parent, "ACCURACY", nlconst::magic(1e-7))			///< Iterative solver accuracy
 		, m_nr_loops(parent, "NR_LOOPS", 250)           ///< Maximum number of Newton-Raphson loops
 		, m_gs_loops(parent, "GS_LOOPS", 9)             ///< Maximum number of Gauss-Seidel loops
@@ -438,8 +447,8 @@ namespace solver
 			{
 				const auto vold(this->m_terms[i].template getV<FT>());
 				const auto vnew(m_new_V[i]);
-				const auto tol(vntol + reltol * std::max(std::abs(vnew),std::abs(vold)));
-				if (std::abs(vnew - vold) > tol)
+				const auto tol(vntol + reltol * std::max(plib::abs(vnew),plib::abs(vold)));
+				if (plib::abs(vnew - vold) > tol)
 					return true;
 			}
 			return false;

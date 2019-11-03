@@ -89,7 +89,7 @@ namespace solver
 				std::size_t maxrow = i;
 				for (std::size_t j = i + 1; j < kN; j++)
 				{
-					if (std::abs(m_A[j][i]) > std::abs(m_A[maxrow][i]))
+					if (plib::abs(m_A[j][i]) > plib::abs(m_A[maxrow][i]))
 					//if (m_A[j][i] * m_A[j][i] > m_A[maxrow][i] * m_A[maxrow][i])
 						maxrow = j;
 				}

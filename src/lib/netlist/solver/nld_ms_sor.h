@@ -134,7 +134,7 @@ namespace solver
 
 				const float_type new_val = this->m_new_V[k] * one_m_w[k] + (Idrive + this->m_RHS[k]) * w[k];
 
-				err = std::max(std::abs(new_val - this->m_new_V[k]), err);
+				err = std::max(plib::abs(new_val - this->m_new_V[k]), err);
 				this->m_new_V[k] = new_val;
 			}
 

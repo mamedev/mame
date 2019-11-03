@@ -340,8 +340,8 @@ namespace solver
 				{
 					tmp += A(i,j) * this->m_new_V[j];
 				}
-				if (std::abs(tmp-RHS(i)) > static_cast<float_type>(1e-6))
-					plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, std::abs(tmp-RHS(i)), RHS(i));
+				if (plib::abs(tmp-RHS(i)) > static_cast<float_type>(1e-6))
+					plib::perrlogger("{} failed on row {}: {} RHS: {}\n", this->name(), i, plib::abs(tmp-RHS(i)), RHS(i));
 			}
 
 		bool err(false);

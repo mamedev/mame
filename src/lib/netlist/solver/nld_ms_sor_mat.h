@@ -180,7 +180,7 @@ namespace solver
 					FT gabs_t = plib::constants<FT>::zero();
 					for (std::size_t i = 0; i < e; i++)
 						if (p[i] != k)
-							gabs_t = gabs_t + std::abs(this->m_A[k][p[i]]);
+							gabs_t = gabs_t + plib::abs(this->m_A[k][p[i]]);
 
 					gabs_t *= plib::constants<FT>::one(); // derived by try and error
 					if (gabs_t > this->m_A[k][k])
@@ -190,7 +190,7 @@ namespace solver
 				}
 
 				const float_type delta = w * (this->m_RHS[k] - Idrive) ;
-				cerr = std::max(cerr, std::abs(delta));
+				cerr = std::max(cerr, plib::abs(delta));
 				this->m_new_V[k] += delta;
 			}
 
