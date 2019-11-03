@@ -34,6 +34,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_leds(*this, "led%u", 0U)
 		, m_starfield(*this, "starfield")
+		, m_galaga_gfxbank(0)
+		, m_main_irq_mask(0)
+		, m_sub_irq_mask(0)
+		, m_sub2_nmi_mask(0)
 	{ }
 
 	DECLARE_READ8_MEMBER(bosco_dsw_r);
