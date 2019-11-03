@@ -273,10 +273,29 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 			{
 				int realstartrow = (startrow + y);
 
-				if (realstartrow >= 28)
-					realstartrow -= 28;
+				int yrows;
 
-				int base = (((realstartrow + y) & 0x1f) * 8) + x;
+				if (m_vidctrl & 0x01)
+					yrows = 14;
+				else
+					yrows = 28;
+
+				if (realstartrow >= yrows)
+					realstartrow -= yrows;
+
+				// in double width & double height mode the page addressing needs adjusting
+				if (!(m_vidctrl & 0x02))
+				{
+					if (!(m_vidctrl & 0x01))
+					{
+						if (realstartrow >= (yrows / 2))
+						{
+							realstartrow += yrows / 2;
+						}
+					}
+				}
+
+				int base = (((realstartrow + y) & 0x3f) * 8) + x;
 
 				int tile,attr,unk2;
 
@@ -344,10 +363,29 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 			{
 				int realstartrow = (startrow + y);
 
-				if (realstartrow >= 56)
-					realstartrow -= 56;
+				int yrows;
 
-				int base = (((realstartrow) & 0x3f) * 32) + x;
+				if (m_vidctrl & 0x01)
+					yrows = 28;
+				else
+					yrows = 56;
+
+				if (realstartrow >= yrows)
+					realstartrow -= yrows;
+
+				// in double width & double height mode the page addressing needs adjusting
+				if (!(m_vidctrl & 0x02))
+				{
+					if (!(m_vidctrl & 0x01))
+					{
+						if (realstartrow >= (yrows / 2))
+						{
+							realstartrow += yrows / 2;
+						}
+					}
+				}
+
+				int base = (((realstartrow) & 0x7f) * 32) + x;
 
 				int tile,attr,unk2;
 
