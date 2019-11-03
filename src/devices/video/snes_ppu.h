@@ -31,7 +31,7 @@
 #define SNES_PAL              0x10
 
 
-#define SNES_LAYER_DEBUG  1
+#define SNES_LAYER_DEBUG  0
 
 
 // ======================> snes_ppu_device
