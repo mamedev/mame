@@ -23,6 +23,9 @@
     Emulation is largely based on documentation for the ST2202, which
     has similar though somewhat lesser capabilities.
 
+    Reverse-engineered documentation for SS2204's internal registers:
+    http://blog.kevtris.org/blogfiles/Game%20King%20Inside.txt
+
 **********************************************************************/
 
 #include "emu.h"
