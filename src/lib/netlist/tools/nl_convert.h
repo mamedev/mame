@@ -5,8 +5,6 @@
  *
  */
 
-#pragma once
-
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
 

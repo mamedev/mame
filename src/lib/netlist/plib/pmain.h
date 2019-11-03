@@ -5,8 +5,6 @@
  *
  */
 
-#pragma once
-
 #ifndef PMAIN_H_
 #define PMAIN_H_
 

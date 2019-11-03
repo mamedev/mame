@@ -5,8 +5,6 @@
  *
  */
 
-//#pragma once
-
 #ifndef NLD_OPAMPS_H_
 #define NLD_OPAMPS_H_
 
