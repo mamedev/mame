@@ -92,12 +92,12 @@ namespace devices
 			process<true>();
 		}
 
-		void inc_active() NL_NOEXCEPT override
+		void inc_active() noexcept override
 		{
 			process<false>();
 		}
 
-		void dec_active() NL_NOEXCEPT override
+		void dec_active() noexcept override
 		{
 			for (std::size_t i = 0; i< m_NI; i++)
 				m_I[i].inactivate();

@@ -28,10 +28,21 @@ P_ENUM(plog_level,
 template <typename T>
 struct ptype_traits_base
 {
-	static const T cast(const T &x) { return x; }
-	static const bool is_signed = std::numeric_limits<T>::is_signed;
+	static constexpr const T cast(const T &x) { return x; }
+	static constexpr const bool is_signed = std::numeric_limits<T>::is_signed;
 	static char32_t fmt_spec() { return 'u'; }
 };
+
+#if (PUSE_FLOAT128)
+template <>
+struct ptype_traits_base<__float128>
+{
+	// FIXME: need native support at some time
+	static constexpr const long double cast(const __float128 &x) { return static_cast<long double>(x); }
+	static constexpr const bool is_signed = true;
+	static char32_t fmt_spec() { return 'f'; }
+};
+#endif
 
 template <>
 struct ptype_traits_base<bool>
@@ -128,6 +139,20 @@ struct ptype_traits<double> : ptype_traits_base<double>
 };
 
 template<>
+struct ptype_traits<long double> : ptype_traits_base<long double>
+{
+	static char32_t fmt_spec() { return 'f'; }
+};
+
+#if (PUSE_FLOAT128)
+template<>
+struct ptype_traits<__float128> : ptype_traits_base<__float128>
+{
+	static char32_t fmt_spec() { return 'f'; }
+};
+#endif
+
+template<>
 struct ptype_traits<char *> : ptype_traits_base<char *>
 {
 	static const char *cast(const char *x) { return x; }
@@ -167,6 +192,11 @@ public:
 	typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
 	e(const T &x) {return format_element('e', x);  }
 
+#if PUSE_FLOAT128
+	// FIXME: not what we want
+	pfmt & e(const __float128 &x) {return format_element('e', static_cast<long double>(x));  }
+#endif
+
 	template <typename T>
 	typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
 	g(const T &x) {return format_element('g', x);  }
@@ -190,7 +220,6 @@ public:
 	{
 		return *this;
 	}
-
 
 	template<typename X, typename Y, typename... Args>
 	pfmt &operator()(X&& x, Y && y, Args&&... args)

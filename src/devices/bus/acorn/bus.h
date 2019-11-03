@@ -104,7 +104,7 @@ public:
 	virtual ~device_acorn_bus_interface();
 
 	// inline configuration
-	void set_acorn_bus(acorn_bus_device &bus) { m_bus = &bus; }
+	void set_acorn_bus(acorn_bus_device &bus) { assert(!device().started()); m_bus = &bus; }
 
 protected:
 	device_acorn_bus_interface(const machine_config &mconfig, device_t &device);

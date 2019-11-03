@@ -844,7 +844,6 @@ void plus4_state::plus4(machine_config &config)
 	// basic machine hardware
 	M7501(config, m_maincpu, 0);
 	m_maincpu->set_addrmap(AS_PROGRAM, &plus4_state::plus4_mem);
-	m_maincpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_maincpu->read_callback().set(FUNC(plus4_state::cpu_r));
 	m_maincpu->write_callback().set(FUNC(plus4_state::cpu_w));
 	m_maincpu->set_pulls(0x00, 0xc0);

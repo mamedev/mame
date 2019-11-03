@@ -195,20 +195,20 @@ namespace analog
 		, m_cap_gb(*this, "m_cap_gb")
 		, m_cap_gs(*this, "m_cap_gs")
 		, m_cap_gd(*this, "m_cap_gd")
-		, m_phi(0.0)
-		, m_gamma(0.0)
-		, m_vto(0.0)
-		, m_beta(0.0)
-		, m_lambda(0.0)
-		, m_Leff(0.0)
-		, m_CoxWL(0.0)
-		, m_polarity(qtype() == FET_NMOS ? 1.0 : -1.0)
-		, m_Cgb(0.0)
-		, m_Cgs(0.0)
-		, m_Cgd(0.0)
+		, m_phi(nlconst::zero())
+		, m_gamma(nlconst::zero())
+		, m_vto(nlconst::zero())
+		, m_beta(nlconst::zero())
+		, m_lambda(nlconst::zero())
+		, m_Leff(nlconst::zero())
+		, m_CoxWL(nlconst::zero())
+		, m_polarity(nlconst::magic(qtype() == FET_NMOS ? 1.0 : -1.0))
+		, m_Cgb(nlconst::zero())
+		, m_Cgs(nlconst::zero())
+		, m_Cgd(nlconst::zero())
 		, m_capmod(2)
-		, m_Vgs(*this, "m_Vgs", 0.0)
-		, m_Vgd(*this, "m_Vgd", 0.0)
+		, m_Vgs(*this, "m_Vgs", nlconst::zero())
+		, m_Vgd(*this, "m_Vgd", nlconst::zero())
 	{
 			register_subalias("S", m_SG.m_P);   // Source
 			register_subalias("G", m_SG.m_N);   // Gate
@@ -220,7 +220,7 @@ namespace analog
 			connect(m_DG.m_P, m_SD.m_N);
 
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = qtype() == FET_NMOS ? 1.0 : -1.0;
+			m_polarity = qtype() == nlconst::magic(FET_NMOS ? 1.0 : -1.0);
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
@@ -241,46 +241,49 @@ namespace analog
 
 			// calculate effective channel length
 			m_Leff = m_model.m_L - 2 * m_model.m_LD;
-			nl_assert_always(m_Leff > 0.0, "Effective Lateral diffusion would be negative for model " + m_model.name());
+			nl_assert_always(m_Leff > nlconst::zero(), "Effective Lateral diffusion would be negative for model " + m_model.name());
 
-			nl_fptype Cox = (m_model.m_TOX > 0.0) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : 0.0;
+			nl_fptype Cox = (m_model.m_TOX > nlconst::zero()) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : nlconst::zero();
 
 			// calculate DC transconductance coefficient
-			if (m_model.m_KP > 0)
+			if (m_model.m_KP > nlconst::zero())
 				m_beta = m_model.m_KP * m_model.m_W / m_Leff;
-			else if (Cox > 0 && m_model.m_UO > 0)
-				m_beta = m_model.m_UO * 1e-4 * Cox * m_model.m_W / m_Leff;
+			else if (Cox > nlconst::zero() && m_model.m_UO > nlconst::zero())
+				m_beta = m_model.m_UO * nlconst::magic(1e-4) * Cox * m_model.m_W / m_Leff;
 			else
-				m_beta = 2e-5 * m_model.m_W / m_Leff;
+				m_beta = nlconst::magic(2e-5) * m_model.m_W / m_Leff;
 
 			//FIXME::UT can disappear
 			const nl_fptype Vt = constants::T0() * constants::k_b() / constants::Q_e();
 
 			// calculate surface potential if not given
 
-			if (m_model.m_PHI > 0.0)
+			if (m_model.m_PHI > nlconst::zero())
 				m_phi = m_model.m_PHI;
-			else if (m_model.m_NSUB > 0.0)
+			else if (m_model.m_NSUB > nlconst::zero())
 			{
-				nl_assert_always(m_model.m_NSUB * 1e6 >= constants::NiSi(), "Error calculating phi for model " + m_model.name());
-				m_phi = 2 * Vt * std::log (m_model.m_NSUB * 1e6 / constants::NiSi());
+				nl_assert_always(m_model.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model " + m_model.name());
+				m_phi = nlconst::two() * Vt * plib::log (m_model.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
 			}
 			else
-				m_phi = 0.6;
+				m_phi = nlconst::magic(0.6);
 
 			// calculate bulk threshold if not given
-			if (m_model.m_GAMMA > 0.0)
+			if (m_model.m_GAMMA > nlconst::zero())
 				m_gamma = m_model.m_GAMMA;
 			else
 			{
-				if (Cox > 0.0 && m_model.m_NSUB > 0)
-					m_gamma = std::sqrt (2.0 * constants::Q_e() * constants::eps_Si() * constants::eps_0() * m_model.m_NSUB * 1e6) / Cox;
+				if (Cox > nlconst::zero() && m_model.m_NSUB > nlconst::zero())
+					m_gamma = plib::sqrt (nlconst::two()
+						* constants::Q_e() * constants::eps_Si() * constants::eps_0()
+					 	* m_model.m_NSUB * nlconst::magic(1e6)) / Cox;
 				else
-					m_gamma = 0.0;
+					m_gamma = nlconst::zero();
 			}
 
 			m_vto = m_model.m_VTO;
-			if(m_vto != 0.0)
+			// FIXME zero conversion
+			if(m_vto != nlconst::zero())
 				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
 
 			/* FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
@@ -302,7 +305,7 @@ namespace analog
 				//const nl_nl_fptype Ugs = -m_SG.deltaV() * m_polarity; // Gate - Source
 				const nl_fptype Ugd = m_Vgd; // Gate - Drain
 				const nl_fptype Ugs = m_Vgs; // Gate - Source
-				const nl_fptype Ubs = 0.0;                         // Bulk - Source == 0 if connected
+				const nl_fptype Ubs = nlconst::zero(); // Bulk - Source == 0 if connected
 				const nl_fptype Ugb = Ugs - Ubs;
 
 				m_cap_gb.timestep(m_Cgb, Ugb, step);
@@ -385,21 +388,21 @@ namespace analog
 			if (Vctrl <= -m_phi)
 			{
 				Cgb = m_CoxWL;
-				Cgs = 0.0;
-				Cgd = 0.0;
+				Cgs = nlconst::zero();
+				Cgd = nlconst::zero();
 			}
-			else if (Vctrl <= -m_phi / 2.0)
+			else if (Vctrl <= -m_phi / nlconst::two())
 			{
 				Cgb = -Vctrl * m_CoxWL / m_phi;
-				Cgs = 0.0;
-				Cgd = 0.0;
+				Cgs = nlconst::zero();
+				Cgd = nlconst::zero();
 			}
 			// Depletion
 			else if (Vctrl <= 0)
 			{
 				Cgb = -Vctrl * m_CoxWL / m_phi;
-				Cgs = Vctrl * m_CoxWL * (4.0 / 3.0) / m_phi + (2.0 / 3.0) * m_CoxWL;
-				Cgd = 0.0;
+				Cgs = Vctrl * m_CoxWL * nlconst::magic(4.0 / 3.0) / m_phi + nlconst::magic(2.0 / 3.0) * m_CoxWL;
+				Cgd = nlconst::zero();
 			}
 			else
 			{
@@ -408,18 +411,18 @@ namespace analog
 				// saturation
 				if (Vdsat <= Vds)
 				{
-					Cgb = 0;
-					Cgs = (2.0 / 3.0) * m_CoxWL;
-					Cgd = 0;
+					Cgb = nlconst::zero();
+					Cgs = nlconst::magic(2.0 / 3.0) * m_CoxWL;
+					Cgd = nlconst::zero();
 				}
 				else
 				{
 					// linear
-					const nl_fptype Sqr1 = std::pow(Vdsat - Vds, 2);
-					const nl_fptype Sqr2 = std::pow(2.0 * Vdsat - Vds, 2);
+					const nl_fptype Sqr1 = static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2));
+					const nl_fptype Sqr2 = static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2));
 					Cgb = 0;
-					Cgs = m_CoxWL * (1.0 - Sqr1 / Sqr2) * (2.0 / 3.0);
-					Cgd = m_CoxWL * (1.0 - Vdsat * Vdsat / Sqr2) * (2.0 / 3.0);
+					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::magic(2.0 / 3.0);
+					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::magic(2.0 / 3.0);
 				}
 			}
 		}
@@ -447,16 +450,16 @@ namespace analog
 
 		// limit step sizes
 
-		const nl_fptype k = 3.5; // see "Circuit Simulation", page 185
+		const nl_fptype k = nlconst::magic(3.5); // see "Circuit Simulation", page 185
 		nl_fptype d = (Vgs - m_Vgs);
-		Vgs = m_Vgs + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		Vgs = m_Vgs + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
 		d = (Vgd - m_Vgd);
-		Vgd = m_Vgd + 1.0/k * (d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		Vgd = m_Vgd + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
 
 		m_Vgs = Vgs;
 		m_Vgd = Vgd;
 
-		const nl_fptype Vbs = 0.0;                       // Bulk - Source == 0 if connected
+		const nl_fptype Vbs = nlconst::zero(); // Bulk - Source == 0 if connected
 		//const nl_nl_fptype Vbd = m_SD.deltaV() * m_polarity;  // Bulk - Drain = Source  - Drain
 		const nl_fptype Vds = Vgs - Vgd;
 		const nl_fptype Vbd = -Vds;  // Bulk - Drain = Source  - Drain
@@ -468,46 +471,46 @@ namespace analog
 
 		// Are we in forward mode ?
 		// in backward mode, just swap source and drain
-		const bool is_forward = Vds >= 0;
+		const bool is_forward = Vds >= nlconst::zero();
 
 		// calculate Vth
 		const nl_fptype Vbulk = is_forward ? Vbs : Vbd;
-		const nl_fptype phi_m_Vbulk = (m_phi > Vbulk) ? std::sqrt(m_phi - Vbulk) : 0.0;
-		const nl_fptype Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - std::sqrt(m_phi));
+		const nl_fptype phi_m_Vbulk = (m_phi > Vbulk) ? plib::sqrt(m_phi - Vbulk) : nlconst::zero();
+		const nl_fptype Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - plib::sqrt(m_phi));
 
 		const nl_fptype Vctrl = (is_forward ? Vgs : Vgd) - Vth;
 
 		nl_fptype Ids(0), gm(0), gds(0), gmb(0);
-		const nl_fptype absVds = std::abs(Vds);
+		const nl_fptype absVds = plib::abs(Vds);
 
-		if (Vctrl <= 0.0)
+		if (Vctrl <= nlconst::zero())
 		{
 			// cutoff region
-			Ids = 0.0;
-			gm  = 0.0;
-			gds = 0.0;
-			gmb = 0.0;
+			Ids = nlconst::zero();
+			gm  = nlconst::zero();
+			gds = nlconst::zero();
+			gmb = nlconst::zero();
 		}
 		else
 		{
-			const nl_fptype beta = m_beta * (1.0 + m_lambda * absVds);
+			const nl_fptype beta = m_beta * (nlconst::one() + m_lambda * absVds);
 			if (Vctrl <= absVds)
 			{
 				// saturation region
-				Ids = beta * Vctrl * Vctrl / 2.0;
+				Ids = beta * Vctrl * Vctrl / nlconst::two();
 				gm  = beta * Vctrl;
-				gds = m_lambda * m_beta * Vctrl * Vctrl / 2.0;
+				gds = m_lambda * m_beta * Vctrl * Vctrl / nlconst::two();
 			}
 			else
 			{
 				// linear region
-				Ids = beta * absVds * (Vctrl - absVds / 2);
+				Ids = beta * absVds * (Vctrl - absVds / nlconst::two());
 				gm  = beta * absVds;
-				gds = beta * (Vctrl - absVds) + m_lambda * m_beta * absVds * (Vctrl - absVds / 2.0);
+				gds = beta * (Vctrl - absVds) + m_lambda * m_beta * absVds * (Vctrl - absVds / nlconst::two());
 			}
 
 			// backgate transconductance
-			const nl_fptype bgtc = (phi_m_Vbulk != 0.0) ? (m_gamma / phi_m_Vbulk / 2.0) : 0.0;
+			const nl_fptype bgtc = (phi_m_Vbulk != nlconst::zero()) ? (m_gamma / phi_m_Vbulk / nlconst::two()) : nlconst::zero();
 			gmb = gm * bgtc;
 		}
 
@@ -524,27 +527,27 @@ namespace analog
 		const nl_fptype IeqBS = m_D_BS.Ieq();
 		const nl_fptype gbs = m_D_BS.G();
 #else
-		const nl_fptype IeqBS = 0.0;
-		const nl_fptype gbs = 0.0;
+		const nl_fptype IeqBS = nlconst::zero();
+		const nl_fptype gbs = nlconst::zero();
 #endif
 		// exchange controlling nodes if necessary
-		const nl_fptype gsource = is_forward ? (gm + gmb) : 0;
-		const nl_fptype gdrain  = is_forward ?   0.0 : (gm + gmb);
+		const nl_fptype gsource = is_forward ? (gm + gmb) : nlconst::zero();
+		const nl_fptype gdrain  = is_forward ? nlconst::zero() : (gm + gmb);
 
 		const nl_fptype IeqDS = (is_forward) ?
 			   Ids - gm * Vgs - gmb * Vbs - gds * Vds
 			: -Ids - gm * Vgd - gmb * Vbd - gds * Vds;
 
 		// IG = 0
-		nl_fptype IG = 0.0;
+		nl_fptype IG = nlconst::zero();
 		nl_fptype ID = (+IeqBD - IeqDS) * m_polarity;
 		nl_fptype IS = (+IeqBS + IeqDS) * m_polarity;
 		nl_fptype IB = (-IeqBD - IeqBS) * m_polarity;
 
-		nl_fptype gGG = 0.0;
-		nl_fptype gGD = 0.0;
-		nl_fptype gGS = 0.0;
-		nl_fptype gGB = 0.0;
+		nl_fptype gGG = nlconst::zero();
+		nl_fptype gGD = nlconst::zero();
+		nl_fptype gGS = nlconst::zero();
+		nl_fptype gGB = nlconst::zero();
 
 		nl_fptype gDG =  gm;
 		nl_fptype gDD =  gds + gbd - gdrain;
@@ -556,7 +559,7 @@ namespace analog
 		nl_fptype gSS =  gbs + gds + gsource;
 		const nl_fptype gSB = -gbs - gmb;
 
-		nl_fptype gBG =  0.0;
+		nl_fptype gBG =  nlconst::zero();
 		const nl_fptype gBD = -gbd;
 		const nl_fptype gBS = -gbs;
 		nl_fptype gBB =  gbs + gbd;
@@ -577,16 +580,16 @@ namespace analog
 
 		// Source connected to body, Diode S-B shorted!
 		const nl_fptype gSSBB = gSS + gBB + gBS + gSB;
-
+		const auto zero(nlconst::zero());
 		//                 S          G
 		m_SG.set_mat(    gSSBB,   gSG + gBG, +(IS + IB),       // S
 					   gGS + gGB,    gGG,      IG       );     // G
 		//                 D          G
 		m_DG.set_mat(     gDD,       gDG,    +ID,              // D
-						  gGD,       0.0,    0.0        );     // G
+						  gGD,      zero,   zero        );     // G
 		//                 S          D
-		m_SD.set_mat(     0.0,    gSD + gBD,  0.0,             // S
-					   gDS + gDB,    0.0,     0.0);            // D
+		m_SD.set_mat(    zero,    gSD + gBD, zero,             // S
+					   gDS + gDB,   zero,    zero);            // D
 	}
 
 	NETLIB_UPDATE_PARAM(MOSFET)

@@ -509,7 +509,6 @@ void a2600_state::a2600(machine_config &config)
 {
 	/* basic machine hardware */
 	M6507(config, m_maincpu, MASTER_CLOCK_NTSC / 3);
-	m_maincpu->disable_cache();
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
 
 	/* video hardware */
@@ -556,7 +555,6 @@ void a2600_state::a2600p(machine_config &config)
 	/* basic machine hardware */
 	M6507(config, m_maincpu, MASTER_CLOCK_PAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &a2600_state::a2600_mem);
-	m_maincpu->disable_cache();
 
 	/* video hardware */
 	TIA_PAL_VIDEO(config, m_tia, 0, "tia");

@@ -25,7 +25,7 @@ namespace netlist
 	NETLIB_RESET(extclock)
 	{
 		m_cnt = 0;
-		m_off = netlist_time::from_double(m_offset());
+		m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
 		m_feedback.m_delegate = NETLIB_DELEGATE(extclock, update);
 
 		//m_feedback.m_delegate .set(&NETLIB_NAME(extclock)::update, this);

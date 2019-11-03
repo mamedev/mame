@@ -60,6 +60,10 @@ namespace devices
 		template <typename FT, int SIZE>
 		plib::unique_ptr<solver::matrix_solver_t> create_solver(std::size_t size,
 			const pstring &solvername, analog_net_t::list_t &nets);
+
+		template <typename FT>
+		plib::unique_ptr<solver::matrix_solver_t> create_solvers(
+			const pstring &sname, analog_net_t::list_t &nets);
 	};
 
 } // namespace devices

@@ -1826,6 +1826,43 @@ void riscii_series_device::execute_tbrd(u32 ptr)
 		m_exec_state = EXEC_CYCLE1;
 }
 
+bool riscii_series_device::interrupt_active() const
+{
+	if (!BIT(m_cpucon, 2))
+		return false;
+	else
+		return (m_intcon & m_intsta) != 0
+			|| (m_painten & m_paintsta) != 0
+			|| (m_spista & 0x30) == 0x30
+			|| (m_sphtcon & 0x30) == 0x30;
+}
+
+u32 riscii_series_device::vector_interrupt() const
+{
+	// Input port A
+	if ((m_painten & m_paintsta) != 0)
+		return 0x00002;
+
+	// Capture
+	if ((m_intcon & m_intsta & 0x80) != 0)
+		return 0x00004;
+
+	// Speech timer
+	if ((m_sphtcon & 0x30) == 0x30)
+		return 0x00006;
+
+	// Timers 0–2
+	if ((m_intcon & m_intsta & 0x07) != 0)
+		return 0x00008;
+
+	// Peripheral
+	if ((m_intcon & m_intsta & 0x78) != 0 || (m_spista & 0x30) == 0x30)
+		return 0x0000a;
+
+	// Should not reach here
+	return 0x00000;
+}
+
 void riscii_series_device::execute_run()
 {
 	while (m_icount > 0)
@@ -1843,6 +1880,12 @@ void riscii_series_device::execute_run()
 					--m_repeat;
 					m_pc = m_ppc;
 				}
+			}
+			else if (interrupt_active())
+			{
+				// Disable interrupts and call handler
+				m_cpucon &= 0xfb;
+				execute_call(vector_interrupt());
 			}
 			else
 				execute_cycle1(fetch_program_word());

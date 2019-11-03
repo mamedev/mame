@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+license:CC0
+copyright-holders:Vas Crabb
+RS-232 DCE-DCE bridge layout
+-->
+<mamelayout version="2">
+	<element name="led">
+		<disk state="0">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</disk>
+		<disk state="1">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="label_a">
+		<text string="A" />
+	</element>
+	<element name="label_b">
+		<text string="B" />
+	</element>
+
+	<element name="label_dcd">
+		<text string="DCD" />
+	</element>
+	<element name="label_dsr">
+		<text string="DSR" />
+	</element>
+	<element name="label_ri">
+		<text string="RI" />
+	</element>
+	<element name="label_cts">
+		<text string="CTS" />
+	</element>
+
+	<view name="Control Lines">
+		<bounds x="0" y="0" width="95" height="45" />
+
+		<element ref="label_a">
+			<bounds x="5" y="16" width="10" height="8" />
+		</element>
+		<element ref="label_b">
+			<bounds x="5" y="31" width="10" height="8" />
+		</element>
+
+		<element ref="label_dcd">
+			<bounds x="18" y="5" width="14" height="8" />
+		</element>
+		<element ref="label_dsr">
+			<bounds x="38" y="5" width="14" height="8" />
+		</element>
+		<element ref="label_ri">
+			<bounds x="58" y="5" width="14" height="8" />
+		</element>
+		<element ref="label_cts">
+			<bounds x="78" y="5" width="14" height="8" />
+		</element>
+
+		<element ref="led" name="dcd_a">
+			<bounds x="20" y="15" width="10" height="10" />
+		</element>
+		<element ref="led" name="dsr_a">
+			<bounds x="40" y="15" width="10" height="10" />
+		</element>
+		<element ref="led" name="ri_a">
+			<bounds x="60" y="15" width="10" height="10" />
+		</element>
+		<element ref="led" name="cts_a">
+			<bounds x="80" y="15" width="10" height="10" />
+		</element>
+
+		<element ref="led" name="dcd_b">
+			<bounds x="20" y="30" width="10" height="10" />
+		</element>
+		<element ref="led" name="dsr_b">
+			<bounds x="40" y="30" width="10" height="10" />
+		</element>
+		<element ref="led" name="ri_b">
+			<bounds x="60" y="30" width="10" height="10" />
+		</element>
+		<element ref="led" name="cts_b">
+			<bounds x="80" y="30" width="10" height="10" />
+		</element>
+	</view>
+</mamelayout>

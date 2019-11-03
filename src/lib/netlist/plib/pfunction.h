@@ -10,6 +10,7 @@
 
 #include "pstate.h"
 #include "pstring.h"
+#include "putil.h"
 
 #include <vector>
 
@@ -42,7 +43,7 @@ namespace plib {
 		};
 		struct rpn_inst
 		{
-			rpn_inst() : m_cmd(ADD), m_param(0.0) { }
+			rpn_inst() : m_cmd(ADD), m_param(plib::constants<NT>::zero()) { }
 			rpn_cmd m_cmd;
 			NT m_param;
 		};
@@ -116,7 +117,10 @@ namespace plib {
 
 	extern template class pfunction<float>;
 	extern template class pfunction<double>;
-
+	extern template class pfunction<long double>;
+#if (PUSE_FLOAT128)
+	extern template class pfunction<__float128>;
+#endif
 } // namespace plib
 
 #endif /* PEXCEPTION_H_ */

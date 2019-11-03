@@ -244,5 +244,6 @@ device_svi_slot_interface::~device_svi_slot_interface()
 
 void device_svi_slot_interface::set_bus_device(svi_slot_bus_device &bus)
 {
+	assert(!device().started());
 	m_bus = &bus;
 }

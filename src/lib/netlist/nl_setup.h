@@ -244,7 +244,24 @@ namespace netlist
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
 		void register_param(const pstring &param, const pstring &value);
-		void register_param(const pstring &param, const nl_fptype value);
+
+		// FIXME: quick hack
+		void register_param_x(const pstring &param, const nl_fptype value);
+
+		template <typename T>
+		typename std::enable_if<std::is_floating_point<T>::value || std::is_integral<T>::value>::type
+		register_param(const pstring &param, T value)
+		{
+			register_param_x(param, static_cast<nl_fptype>(value));
+		}
+
+#if PUSE_FLOAT128
+		void register_param(const pstring &param, __float128 value)
+		{
+			register_param_x(param, static_cast<nl_fptype>(value));
+		}
+#endif
+
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
 		void register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT);
 

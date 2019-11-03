@@ -77,7 +77,7 @@ namespace devices
 		netlist_time now(exec().time());
 		/* force solving during start up if there are no time-step devices */
 		/* FIXME: Needs a more elegant solution */
-		bool force_solve = (now < netlist_time::from_double(2 * m_params.m_max_timestep));
+		bool force_solve = (now < netlist_time::from_fp<decltype(m_params.m_max_timestep)>(2 * m_params.m_max_timestep));
 
 		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
 
@@ -105,7 +105,7 @@ namespace devices
 		/* step circuit */
 		if (!m_Q_step.net().is_queued())
 		{
-			m_Q_step.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_max_timestep));
+			m_Q_step.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_max_timestep));
 		}
 	}
 
@@ -149,6 +149,112 @@ namespace devices
 				return create_it<solver::matrix_solver_GMRES_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 		}
 		return plib::unique_ptr<solver::matrix_solver_t>();
+	}
+
+	template <typename FT>
+	plib::unique_ptr<solver::matrix_solver_t> NETLIB_NAME(solver)::create_solvers(
+		const pstring &sname,
+		analog_net_t::list_t &nets)
+	{
+		std::size_t net_count = nets.size();
+		switch (net_count)
+		{
+			case 1:
+				return plib::make_unique<solver::matrix_solver_direct1_t<FT>>(state(), sname, nets, &m_params);
+				break;
+			case 2:
+				return plib::make_unique<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
+				break;
+#if 0
+			case 3:
+				return create_solver<FT, 3>(3, sname, nets);
+				break;
+			case 4:
+				return create_solver<FT, 4>(4, sname, nets);
+				break;
+			case 5:
+				return create_solver<FT, 5>(5, sname, nets);
+				break;
+			case 6:
+				return create_solver<FT, 6>(6, sname, nets);
+				break;
+			case 7:
+				return create_solver<FT, 7>(7, sname, nets);
+				break;
+			case 8:
+				return create_solver<FT, 8>(8, sname, nets);
+				break;
+			case 9:
+				return create_solver<FT, 9>(9, sname, nets);
+				break;
+			case 10:
+				return create_solver<FT, 10>(10, sname, nets);
+				break;
+#if 0
+			case 11:
+				return create_solver<FT, 11>(11, sname);
+				break;
+			case 12:
+				return create_solver<FT, 12>(12, sname);
+				break;
+			case 15:
+				return create_solver<FT, 15>(15, sname);
+				break;
+			case 31:
+				return create_solver<FT, 31>(31, sname);
+				break;
+			case 35:
+				return create_solver<FT, 35>(35, sname);
+				break;
+			case 43:
+				return create_solver<FT, 43>(43, sname);
+				break;
+			case 49:
+				return create_solver<FT, 49>(49, sname);
+				break;
+#endif
+#if 1
+			case 87:
+				return create_solver<FT,86>(86, sname, nets);
+				break;
+#endif
+#endif
+			default:
+				log().info(MI_NO_SPECIFIC_SOLVER(net_count));
+				if (net_count <= 8)
+				{
+					return create_solver<FT, -8>(net_count, sname, nets);
+				}
+				else if (net_count <= 16)
+				{
+					return create_solver<FT, -16>(net_count, sname, nets);
+				}
+				else if (net_count <= 32)
+				{
+					return create_solver<FT, -32>(net_count, sname, nets);
+				}
+				else if (net_count <= 64)
+				{
+					return create_solver<FT, -64>(net_count, sname, nets);
+				}
+				else if (net_count <= 128)
+				{
+					return create_solver<FT, -128>(net_count, sname, nets);
+				}
+				else if (net_count <= 256)
+				{
+					return create_solver<FT, -256>(net_count, sname, nets);
+				}
+				else if (net_count <= 512)
+				{
+					return create_solver<FT, -512>(net_count, sname, nets);
+				}
+				else
+				{
+					return create_solver<FT, 0>(net_count, sname, nets);
+				}
+				break;
+		}
 	}
 
 	struct net_splitter
@@ -212,7 +318,6 @@ namespace devices
 
 	void NETLIB_NAME(solver)::post_start()
 	{
-
 		log().verbose("Scanning net groups ...");
 		// determine net groups
 
@@ -225,106 +330,24 @@ namespace devices
 		for (auto & grp : splitter.groups)
 		{
 			plib::unique_ptr<solver::matrix_solver_t> ms;
-			std::size_t net_count = grp.size();
 			pstring sname = plib::pfmt("Solver_{1}")(m_mat_solvers.size());
 
-			switch (net_count)
+			switch (m_params.m_fp_type())
 			{
-				case 1:
-					ms = plib::make_unique<solver::matrix_solver_direct1_t<nl_mat_fptype>>(state(), sname, grp, &m_params);
+				case solver::matrix_fp_type_e::FLOAT:
+					ms = create_solvers<float>(sname, grp);
 					break;
-				case 2:
-					ms = plib::make_unique<solver::matrix_solver_direct2_t<nl_mat_fptype>>(state(), sname, grp, &m_params);
+				case solver::matrix_fp_type_e::DOUBLE:
+					ms = create_solvers<double>(sname, grp);
 					break;
-#if 0
-				case 3:
-					ms = create_solver<nl_mat_fptype, 3>(3, sname, grp);
+				case solver::matrix_fp_type_e::LONGDOUBLE:
+					ms = create_solvers<long double>(sname, grp);
 					break;
-				case 4:
-					ms = create_solver<nl_mat_fptype, 4>(4, sname, grp);
+#if (NL_USE_FLOAT128)
+				case solver::matrix_fp_type_e::FLOAT128:
+					ms = create_solvers<__float128>(sname, grp);
 					break;
-				case 5:
-					ms = create_solver<nl_mat_fptype, 5>(5, sname, grp);
-					break;
-				case 6:
-					ms = create_solver<nl_mat_fptype, 6>(6, sname, grp);
-					break;
-				case 7:
-					ms = create_solver<nl_mat_fptype, 7>(7, sname, grp);
-					break;
-				case 8:
-					ms = create_solver<nl_mat_fptype, 8>(8, sname, grp);
-					break;
-				case 9:
-					ms = create_solver<nl_mat_fptype, 9>(9, sname, grp);
-					break;
-				case 10:
-					ms = create_solver<nl_mat_fptype, 10>(10, sname, grp);
-					break;
-	#if 0
-				case 11:
-					ms = create_solver<nl_mat_fptype, 11>(11, sname);
-					break;
-				case 12:
-					ms = create_solver<nl_mat_fptype, 12>(12, sname);
-					break;
-				case 15:
-					ms = create_solver<nl_mat_fptype, 15>(15, sname);
-					break;
-				case 31:
-					ms = create_solver<nl_mat_fptype, 31>(31, sname);
-					break;
-				case 35:
-					ms = create_solver<nl_mat_fptype, 35>(35, sname);
-					break;
-				case 43:
-					ms = create_solver<nl_mat_fptype, 43>(43, sname);
-					break;
-				case 49:
-					ms = create_solver<nl_mat_fptype, 49>(49, sname);
-					break;
-	#endif
-	#if 1
-				case 87:
-					ms = create_solver<nl_mat_fptype,86>(86, sname, grp);
-					break;
-	#endif
-	#endif
-				default:
-					log().info(MI_NO_SPECIFIC_SOLVER(net_count));
-					if (net_count <= 8)
-					{
-						ms = create_solver<nl_mat_fptype, -8>(net_count, sname, grp);
-					}
-					else if (net_count <= 16)
-					{
-						ms = create_solver<nl_mat_fptype, -16>(net_count, sname, grp);
-					}
-					else if (net_count <= 32)
-					{
-						ms = create_solver<nl_mat_fptype, -32>(net_count, sname, grp);
-					}
-					else if (net_count <= 64)
-					{
-						ms = create_solver<nl_mat_fptype, -64>(net_count, sname, grp);
-					}
-					else if (net_count <= 128)
-					{
-						ms = create_solver<nl_mat_fptype, -128>(net_count, sname, grp);
-					}
-					else if (net_count <= 256)
-					{
-						ms = create_solver<nl_mat_fptype, -256>(net_count, sname, grp);
-					}
-					else if (net_count <= 512)
-					{
-						ms = create_solver<nl_mat_fptype, -512>(net_count, sname, grp);
-					}
-					else
-					{
-						ms = create_solver<nl_mat_fptype, 0>(net_count, sname, grp);
-					}
-					break;
+#endif
 			}
 
 			log().verbose("Solver {1}", ms->name());

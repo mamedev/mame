@@ -22,7 +22,7 @@ namespace netlist
 		, m_supply(*this, "VDD", "VSS", true)
 		, m_R(*this, "R")
 		, m_control(*this, "CTL")
-		, m_base_r(*this, "BASER", 270.0)
+		, m_base_r(*this, "BASER", nlconst::magic(270.0))
 		{
 		}
 
@@ -41,28 +41,28 @@ namespace netlist
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(plib::constants<nl_fptype>::one() / exec().gmin());
+		m_R.set_R(nlconst::one() / exec().gmin());
 
 	}
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
 		nl_fptype sup = (m_supply.VCC() - m_supply.GND());
-		nl_fptype low = plib::constants<nl_fptype>::cast(0.45) * sup;
-		nl_fptype high = plib::constants<nl_fptype>::cast(0.55) * sup;
+		nl_fptype low = nlconst::magic(0.45) * sup;
+		nl_fptype high = nlconst::magic(0.55) * sup;
 		nl_fptype in = m_control() - m_supply.GND();
-		nl_fptype rON = m_base_r() * plib::constants<nl_fptype>::cast(5.0) / sup;
-		nl_fptype R = -1.0;
+		nl_fptype rON = m_base_r() * nlconst::magic(5.0) / sup;
+		nl_fptype R = -nlconst::one();
 
 		if (in < low)
 		{
-			R = plib::constants<nl_fptype>::one() / exec().gmin();
+			R = nlconst::one() / exec().gmin();
 		}
 		else if (in > high)
 		{
 			R = rON;
 		}
-		if (R > plib::constants<nl_fptype>::zero())
+		if (R > nlconst::zero())
 		{
 			m_R.update();
 			m_R.set_R(R);

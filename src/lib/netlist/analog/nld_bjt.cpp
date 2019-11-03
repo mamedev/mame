@@ -16,27 +16,30 @@ namespace netlist
 {
 namespace analog
 {
-	using constants = plib::constants<nl_fptype>;
-
 	class diode
 	{
 	public:
-		diode() : m_Is(1e-15), m_VT(0.0258), m_VT_inv(1.0 / m_VT) {}
+		diode()
+		: m_Is(nlconst::magic(1e-15))
+		, m_VT(nlconst::magic(0.0258))
+		, m_VT_inv(plib::reciprocal(m_VT))
+		{}
+
 		diode(const nl_fptype Is, const nl_fptype n)
 		{
 			m_Is = Is;
-			m_VT = 0.0258 * n;
-			m_VT_inv = 1.0 / m_VT;
+			m_VT = nlconst::magic(0.0258) * n;
+			m_VT_inv = plib::reciprocal(m_VT);
 		}
 		void set(const nl_fptype Is, const nl_fptype n)
 		{
 			m_Is = Is;
-			m_VT = 0.0258 * n;
-			m_VT_inv = 1.0 / m_VT;
+			m_VT = nlconst::magic(0.0258) * n;
+			m_VT_inv = plib::reciprocal(m_VT);
 		}
-		nl_fptype I(const nl_fptype V) const { return m_Is * std::exp(V * m_VT_inv) - m_Is; }
-		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * std::exp(V * m_VT_inv); }
-		nl_fptype V(const nl_fptype I) const { return std::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
+		nl_fptype I(const nl_fptype V) const { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }
+		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * plib::exp(V * m_VT_inv); }
+		nl_fptype V(const nl_fptype I) const { return plib::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
 		nl_fptype gI(const nl_fptype I) const { return m_VT_inv * (I + m_Is); }
 
 	private:
@@ -179,9 +182,9 @@ namespace analog
 			, m_RB(*this, "m_RB", true)
 			, m_RC(*this, "m_RC", true)
 			, m_BC(*this, "m_BC", true)
-			, m_gB(1e-9)
-			, m_gC(1e-9)
-			, m_V(0.0)
+			, m_gB(nlconst::magic(1e-9))
+			, m_gC(nlconst::magic(1e-9))
+			, m_V(nlconst::zero())
 			, m_state_on(*this, "m_state_on", 0)
 		{
 			register_subalias("B", m_RB.m_P);
@@ -237,13 +240,13 @@ namespace analog
 			connect(m_D_EB.m_N, m_D_CB.m_N);
 			connect(m_D_CB.m_P, m_D_EC.m_N);
 
-			if (m_model.m_CJE > 0.0)
+			if (m_model.m_CJE > nlconst::zero())
 			{
 				create_and_register_subdevice("m_CJE", m_CJE);
 				connect("B", "m_CJE.1");
 				connect("E", "m_CJE.2");
 			}
-			if (m_model.m_CJC > 0.0)
+			if (m_model.m_CJC > nlconst::zero())
 			{
 				create_and_register_subdevice("m_CJC", m_CJC);
 				connect("B", "m_CJC.1");
@@ -292,13 +295,14 @@ namespace analog
 	NETLIB_RESET(QBJT_switch)
 	{
 		NETLIB_NAME(QBJT)::reset();
+		const auto zero(nlconst::zero());
 
 		m_state_on = 0;
 
-		m_RB.set_G_V_I(exec().gmin(), 0.0, 0.0);
-		m_RC.set_G_V_I(exec().gmin(), 0.0, 0.0);
+		m_RB.set_G_V_I(exec().gmin(), zero, zero);
+		m_RC.set_G_V_I(exec().gmin(), zero, zero);
 
-		m_BC.set_G_V_I(exec().gmin() / 10.0, 0.0, 0.0);
+		m_BC.set_G_V_I(exec().gmin() / nlconst::magic(10.0), zero, zero);
 
 	}
 
@@ -323,24 +327,25 @@ namespace analog
 
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
-		nl_fptype alpha = BF / (1.0 + BF);
+		nl_fptype alpha = BF / (nlconst::one() + BF);
 
 		diode d(IS, NF);
 
 		// Assume 5mA Collector current for switch operation
 
-		m_V = d.V(0.005 / alpha);
+		const auto cc(nlconst::magic(0.005));
+		m_V = d.V(cc / alpha);
 
 		/* Base current is 0.005 / beta
 		 * as a rough estimate, we just scale the conductance down */
 
-		m_gB = 1.0 / (m_V/(0.005 / BF));
+		m_gB = plib::reciprocal((m_V/(cc / BF)));
 
 		//m_gB = d.gI(0.005 / alpha);
 
 		if (m_gB < exec().gmin())
 			m_gB = exec().gmin();
-		m_gC =  d.gI(0.005); // very rough estimate
+		m_gC =  d.gI(cc); // very rough estimate
 	}
 
 	NETLIB_UPDATE_TERMINALS(QBJT_switch)
@@ -350,12 +355,13 @@ namespace analog
 		const unsigned new_state = (m_RB.deltaV() * m > m_V ) ? 1 : 0;
 		if (m_state_on ^ new_state)
 		{
+			const auto zero(nlconst::zero());
 			const nl_fptype gb = new_state ? m_gB : exec().gmin();
 			const nl_fptype gc = new_state ? m_gC : exec().gmin();
-			const nl_fptype v  = new_state ? m_V * m : 0;
+			const nl_fptype v  = new_state ? m_V * m : zero;
 
-			m_RB.set_G_V_I(gb, v,   0.0);
-			m_RC.set_G_V_I(gc, 0.0, 0.0);
+			m_RB.set_G_V_I(gb,   v,   zero);
+			m_RC.set_G_V_I(gc, zero, zero);
 			m_state_on = new_state;
 		}
 	}
@@ -395,7 +401,7 @@ namespace analog
 
 	NETLIB_UPDATE_TERMINALS(QBJT_EB)
 	{
-		const nl_fptype polarity = (qtype() == BJT_NPN ? 1.0 : -1.0);
+		const nl_fptype polarity = nlconst::magic(qtype() == BJT_NPN ? 1.0 : -1.0);
 
 		m_gD_BE.update_diode(-m_D_EB.deltaV() * polarity);
 		m_gD_BC.update_diode(-m_D_CB.deltaV() * polarity);
@@ -431,11 +437,11 @@ namespace analog
 
 		set_qtype((m_model.type() == "NPN") ? BJT_NPN : BJT_PNP);
 
-		m_alpha_f = BF / (1.0 + BF);
-		m_alpha_r = BR / (1.0 + BR);
+		m_alpha_f = BF / (nlconst::one() + BF);
+		m_alpha_r = BR / (nlconst::one() + BR);
 
-		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin(), constants::T0());
-		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin(), constants::T0());
+		m_gD_BE.set_param(IS / m_alpha_f, NF, exec().gmin(), nlconst::T0());
+		m_gD_BC.set_param(IS / m_alpha_r, NR, exec().gmin(), nlconst::T0());
 	}
 
 } // namespace analog

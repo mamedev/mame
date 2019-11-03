@@ -36,8 +36,6 @@ namespace solver
 			const analog_net_t::list_t &nets,
 			const solver_parameters_t *params, const std::size_t size)
 		: matrix_solver_ext_t<FT, SIZE>(anetlist, name, nets, params, size)
-		, RHS(size)
-		, new_V(size)
 		, mat(static_cast<typename mat_type::index_type>(size))
 		, m_proc()
 		{
@@ -120,9 +118,6 @@ namespace solver
 
 		pstring static_compile_name();
 
-		plib::parray<FT, SIZE> RHS;
-		plib::parray<FT, SIZE> new_V;
-
 		mat_type mat;
 
 		plib::dynproc<void, FT * , FT * , FT * > m_proc;
@@ -137,9 +132,11 @@ namespace solver
 	void matrix_solver_GCR_t<FT, SIZE>::generate_code(plib::putf8_fmt_writer &strm)
 	{
 		const std::size_t iN = this->size();
+		pstring fptype(fp_constants<FT>::name());
+		pstring fpsuffix(fp_constants<FT>::suffix());
 
 		for (std::size_t i = 0; i < mat.nz_num; i++)
-			strm("double m_A{1} = m_A[{2}];\n", i, i);
+			strm("{1} m_A{2} = m_A[{3}];\n", fptype, i, i);
 
 		for (std::size_t i = 0; i < iN - 1; i++)
 		{
@@ -150,7 +147,7 @@ namespace solver
 				std::size_t pi = mat.diag[i];
 
 				//const FT f = 1.0 / m_A[pi++];
-				strm("const double f{1} = 1.0 / m_A{2};\n", i, pi);
+				strm("const {1} f{2} = 1.0{3} / m_A{4};\n", fptype, i, fpsuffix, pi);
 				pi++;
 				const std::size_t piie = mat.row_idx[i+1];
 
@@ -164,7 +161,7 @@ namespace solver
 						pj++;
 
 					//const FT f1 = - m_A[pj++] * f;
-					strm("\tconst double f{1}_{2} = -f{3} * m_A{4};\n", i, j, i, pj);
+					strm("\tconst {1} f{2}_{3} = -f{4} * m_A{5};\n", fptype, i, j, i, pj);
 					pj++;
 
 					// subtract row i from j */
@@ -186,7 +183,7 @@ namespace solver
 		strm("\tV[{1}] = RHS[{2}] / m_A{3};\n", iN - 1, iN - 1, mat.diag[iN - 1]);
 		for (std::size_t j = iN - 1; j-- > 0;)
 		{
-			strm("\tdouble tmp{1} = 0.0;\n", j);
+			strm("\t{1} tmp{2} = 0.0{3};\n", fptype, j, fpsuffix);
 			const std::size_t e = mat.row_idx[j+1];
 			for (std::size_t pk = mat.diag[j] + 1; pk < e; pk++)
 			{
@@ -214,8 +211,9 @@ namespace solver
 		t.imbue(std::locale::classic());
 		plib::putf8_fmt_writer strm(&t);
 		pstring name = static_compile_name();
+		pstring fptype(fp_constants<FT>::name());
 
-		strm.writeline(plib::pfmt("extern \"C\" void {1}(double * __restrict m_A, double * __restrict RHS, double * __restrict V)\n")(name));
+		strm.writeline(plib::pfmt("extern \"C\" void {1}({2} * __restrict m_A, {2} * __restrict RHS, {2} * __restrict V)\n")(name, fptype));
 		strm.writeline("{\n");
 		generate_code(strm);
 		strm.writeline("}\n");
@@ -227,29 +225,31 @@ namespace solver
 	unsigned matrix_solver_GCR_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
 		/* populate matrix */
-		mat.set_scalar(0.0);
-		this->fill_matrix(RHS);
+		mat.set_scalar(plib::constants<FT>::zero());
+		this->fill_matrix_and_rhs();
 
 		/* now solve it */
 
 		if (m_proc.resolved())
 		{
-			m_proc(&mat.A[0], &RHS[0], &new_V[0]);
+			m_proc(&mat.A[0], &this->m_RHS[0], &this->m_new_V[0]);
 		}
 		else
 		{
 			// parallel is slow -- very slow
 			//mat.gaussian_elimination_parallel(RHS);
-			mat.gaussian_elimination(RHS);
+			mat.gaussian_elimination(this->m_RHS);
 			/* backward substitution */
-			mat.gaussian_back_substitution(new_V, RHS);
+			mat.gaussian_back_substitution(this->m_new_V, this->m_RHS);
 		}
 
 		this->m_stat_calculations++;
 
-		const FT err = (newton_raphson ? this->delta(new_V) : 0.0);
-		this->store(new_V);
-		return (err > this->m_params.m_accuracy) ? 2 : 1;
+		bool err(false);
+		if (newton_raphson)
+			err = this->check_err();
+		this->store();
+		return (err) ? 2 : 1;
 	}
 
 } // namespace solver

@@ -52,9 +52,9 @@ namespace devices
 	{
 		NETLIB_CONSTRUCTOR(mainclock)
 		, m_Q(*this, "Q")
-		, m_freq(*this, "FREQ", 7159000.0 * 5)
+		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5))
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 		}
 
 		NETLIB_RESETI()
@@ -64,7 +64,7 @@ namespace devices
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 		}
 
 		NETLIB_UPDATEI()
@@ -91,9 +91,9 @@ namespace devices
 		NETLIB_CONSTRUCTOR(clock)
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
-		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
+		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 
 			connect(m_feedback, m_Q);
 		}
@@ -101,7 +101,7 @@ namespace devices
 
 		NETLIB_UPDATE_PARAMI()
 		{
-			m_inc = netlist_time::from_double(1.0 / (m_freq() * 2.0));
+			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 		}
 
 		NETLIB_UPDATEI()
@@ -128,7 +128,7 @@ namespace devices
 		, m_Q(*this, "Q")
 		, m_func(*this,"FUNC", "")
 		, m_compiled(this->name() + ".FUNCC", this, this->state().run_state_manager())
-		, m_funcparam({0.0})
+		, m_funcparam({nlconst::zero()})
 		{
 			if (m_func() != "")
 				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
@@ -139,8 +139,8 @@ namespace devices
 
 		NETLIB_UPDATEI()
 		{
-			m_funcparam[0] = exec().time().as_double();
-			const netlist_time m_inc = netlist_time::from_double(m_compiled.evaluate(m_funcparam));
+			m_funcparam[0] = exec().time().as_fp<nl_fptype>();
+			const netlist_time m_inc = netlist_time::from_fp(m_compiled.evaluate(m_funcparam));
 			m_Q.push(!m_feedback(), m_inc);
 		}
 
@@ -160,21 +160,21 @@ namespace devices
 	NETLIB_OBJECT(extclock)
 	{
 		NETLIB_CONSTRUCTOR(extclock)
-		, m_freq(*this, "FREQ", 7159000.0 * 5.0)
+		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5.0))
 		, m_pattern(*this, "PATTERN", "1,1")
-		, m_offset(*this, "OFFSET", 0.0)
+		, m_offset(*this, "OFFSET", nlconst::zero())
 		, m_feedback(*this, "FB")
 		, m_Q(*this, "Q")
 		, m_cnt(*this, "m_cnt", 0)
 		, m_off(*this, "m_off", netlist_time::zero())
 		{
-			m_inc[0] = netlist_time::from_double(1.0 / (m_freq() * 2.0));
+			m_inc[0] = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 
 			connect(m_feedback, m_Q);
 
-			netlist_time base = netlist_time::from_double(1.0 / (m_freq()*2.0));
+			netlist_time base = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
 			std::vector<pstring> pat(plib::psplit(m_pattern(),","));
-			m_off = netlist_time::from_double(m_offset());
+			m_off = netlist_time::from_fp(m_offset());
 
 			std::array<std::int64_t, 32> pati = { 0 };
 
@@ -250,12 +250,12 @@ namespace devices
 	{
 		NETLIB_CONSTRUCTOR(analog_input)
 		, m_Q(*this, "Q")
-		, m_IN(*this, "IN", 0.0)
+		, m_IN(*this, "IN", nlconst::zero())
 		{
 		}
 
 		NETLIB_UPDATEI() {  }
-		NETLIB_RESETI() { m_Q.initial(0.0); }
+		NETLIB_RESETI() { m_Q.initial(nlconst::zero()); }
 		NETLIB_UPDATE_PARAMI() { m_Q.push(m_IN()); }
 
 	private:
@@ -275,7 +275,7 @@ namespace devices
 		}
 		NETLIB_UPDATEI()
 		{
-			m_Q.push(0.0);
+			m_Q.push(nlconst::zero());
 		}
 		NETLIB_RESETI() { }
 	protected:
@@ -316,8 +316,8 @@ namespace devices
 		, m_ROUT(*this, "m_ROUT", true)
 		, m_I(*this, "_I")
 		, m_Q(*this, "_Q")
-		, m_p_RIN(*this, "RIN", 1.0e6)
-		, m_p_ROUT(*this, "ROUT", 50.0)
+		, m_p_RIN(*this, "RIN", nlconst::magic(1.0e6))
+		, m_p_ROUT(*this, "ROUT", nlconst::magic(50.0))
 
 		{
 			register_subalias("I", m_RIN.m_P);
@@ -331,8 +331,8 @@ namespace devices
 
 		NETLIB_RESETI()
 		{
-			m_RIN.set_G_V_I(1.0 / m_p_RIN(),0,0);
-			m_ROUT.set_G_V_I(1.0 / m_p_ROUT(),0,0);
+			m_RIN.set_G_V_I(plib::reciprocal(m_p_RIN()),0,0);
+			m_ROUT.set_G_V_I(plib::reciprocal(m_p_ROUT()),0,0);
 		}
 
 		NETLIB_UPDATEI()
@@ -371,7 +371,7 @@ namespace devices
 				pstring n = plib::pfmt("A{1}")(i);
 				m_I.push_back(pool().make_unique<analog_input_t>(*this, n));
 				inps.push_back(n);
-				m_vals.push_back(0.0);
+				m_vals.push_back(nlconst::zero());
 			}
 			m_compiled.compile(inps, m_func());
 		}
@@ -402,8 +402,8 @@ namespace devices
 		NETLIB_CONSTRUCTOR(res_sw)
 		, m_R(*this, "_R")
 		, m_I(*this, "I")
-		, m_RON(*this, "RON", 1.0)
-		, m_ROFF(*this, "ROFF", 1.0E20)
+		, m_RON(*this, "RON", nlconst::one())
+		, m_ROFF(*this, "ROFF", nlconst::magic(1.0E20))
 		, m_last_state(*this, "m_last_state", 0)
 		{
 			register_subalias("1", m_R.m_P);

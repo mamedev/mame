@@ -35,7 +35,7 @@ namespace solver
 		unsigned vsolve_non_dynamic(const bool newton_raphson) override
 		{
 			this->clear_square_mat(this->m_A);
-			this->fill_matrix(this->m_RHS);
+			this->fill_matrix_and_rhs();
 
 			const float_type a = this->m_A[0][0];
 			const float_type b = this->m_A[0][1];
@@ -44,12 +44,15 @@ namespace solver
 
 			const float_type v1 = (a * this->m_RHS[1] - c * this->m_RHS[0]) / (a * d - b * c);
 			const float_type v0 = (this->m_RHS[0] - b * v1) / a;
-			std::array<float_type, 2> new_V = {v0, v1};
+			this->m_new_V[0] = v0;
+			this->m_new_V[1] = v1;
 
 			this->m_stat_calculations++;
-			const float_type err = (newton_raphson ? this->delta(new_V) : 0.0);
-			this->store(new_V);
-			return (err > this->m_params.m_accuracy) ? 2 : 1;
+			bool err(false);
+			if (newton_raphson)
+				err = this->check_err();
+			this->store();
+			return (err) ? 2 : 1;
 		}
 
 	};

@@ -397,13 +397,13 @@ namespace solver
 
 		if (m_params.m_dynamic_ts && has_timestep_devices())
 		{
-			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_min_timestep));
+			m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_min_timestep));
 		}
 	}
 
 	void matrix_solver_t::step(const netlist_time &delta)
 	{
-		const nl_fptype dd = delta.as_double();
+		const nl_fptype dd = delta.as_fp<nl_fptype>();
 		for (auto &d : m_step_devices)
 			d->timestep(dd);
 	}
@@ -439,7 +439,7 @@ namespace solver
 			if (this_resched > 1 && !m_Q_sync.net().is_queued())
 			{
 				log().warning(MW_NEWTON_LOOPS_EXCEEDED_ON_NET_1(this->name()));
-				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_double(m_params.m_nr_recalc_delay));
+				m_Q_sync.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_nr_recalc_delay()));
 			}
 		}
 		else
@@ -447,7 +447,7 @@ namespace solver
 			this->vsolve_non_dynamic(false);
 		}
 
-		const netlist_time next_time_step = compute_next_timestep(delta.as_double());
+		const netlist_time next_time_step = compute_next_timestep(delta.as_fp<nl_fptype>());
 
 		return next_time_step;
 	}
@@ -501,7 +501,7 @@ namespace solver
 
 			std::vector<bool> touched(1024, false); // FIXME!
 
-			nl_fptype weight = 0.0;
+			nl_fptype weight = nlconst::zero();
 			auto &term = m_terms[row];
 			for (std::size_t i = 0; i < term.count(); i++)
 			{
@@ -514,7 +514,7 @@ namespace solver
 						if (colu==row) colu = static_cast<unsigned>(diag);
 						else if (colu==diag) colu = static_cast<unsigned>(row);
 
-						weight = weight + std::abs(static_cast<nl_fptype>(colu) - static_cast<nl_fptype>(diag));
+						weight = weight + plib::abs(static_cast<nl_fptype>(colu) - static_cast<nl_fptype>(diag));
 						touched[colu] = true;
 					}
 				}
@@ -558,9 +558,9 @@ namespace solver
 						static_cast<nl_fptype>(this->m_stat_newton_raphson) / static_cast<nl_fptype>(this->m_stat_vsolver_calls));
 			log().verbose("       {1:10} invocations ({2:6.0} Hz)  {3:10} gs fails ({4:6.2} %) {5:6.3} average",
 					this->m_stat_calculations,
-					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_double(),
+					static_cast<nl_fptype>(this->m_stat_calculations) / this->exec().time().as_fp<nl_fptype>(),
 					this->m_iterative_fail,
-					100.0 * static_cast<nl_fptype>(this->m_iterative_fail)
+					nlconst::magic(100.0) * static_cast<nl_fptype>(this->m_iterative_fail)
 						/ static_cast<nl_fptype>(this->m_stat_calculations),
 					static_cast<nl_fptype>(this->m_iterative_total) / static_cast<nl_fptype>(this->m_stat_calculations));
 		}

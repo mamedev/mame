@@ -57,7 +57,8 @@
 #define NL_USE_COPY_INSTEAD_OF_REFERENCE (0)
 #endif
 
-/*
+/*! Use the truthtable implementation of 7448 instead of the coded device
+ *
  * FIXME: Using truthtable is a lot slower than the explicit device
  *        in breakout. Performance drops by 20%. This can be fixed by
  *        setting param USE_DEACTIVATE for the device.
@@ -67,7 +68,8 @@
 #define NL_USE_TRUTHTABLE_7448 (0)
 #endif
 
-/*
+/*! Use the truthtable implementation of 74107 instead of the coded device
+ *
  * FIXME: The truthtable implementation of 74107 (JK-Flipflop)
  *        is included for educational purposes to demonstrate how
  *        to implement state holding devices as truthtables.
@@ -76,6 +78,15 @@
 
 #ifndef NL_USE_TRUTHTABLE_74107
 #define NL_USE_TRUTHTABLE_74107 (0)
+#endif
+
+/*! Use the __float128 type for matrix calculations.
+ *
+ * Defaults to PUSE_FLOAT128
+ */
+
+#ifndef NL_USE_FLOAT128
+#define NL_USE_FLOAT128 PUSE_FLOAT128
 #endif
 
 //============================================================
@@ -96,18 +107,19 @@
 static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
-//============================================================
-// Floating point types used
-//
-// Don't change this. Simple analog circuits like pong
-// work with float. Kidniki just doesn't work at all
-// due to numeric issues
-//============================================================
+/*! Floating point types used
+ *
+ * nl_fptype is the floating point type used throughout the
+ * netlist core.
+ *
+ *  Don't change this! Simple analog circuits like pong
+ *  work with float. Kidniki just doesn't work at all.
+ *
+ *  FIXME: More work needed. Review magic numbers.
+ *
+ */
 
 using nl_fptype = double;
-//using nl_fptype = float;
-
-using nl_mat_fptype = nl_fptype;
 
 namespace netlist
 {
@@ -119,16 +131,34 @@ namespace netlist
 	struct fp_constants
 	{ };
 
+	/*! Specific constants for long double floating point type
+	 */
+	template <>
+	struct fp_constants<long double>
+	{
+		static inline constexpr long double DIODE_MAXDIFF() noexcept { return  1e100L; }
+		static inline constexpr long double DIODE_MAXVOLT() noexcept { return  300.0L; }
+
+		static inline constexpr long double TIMESTEP_MAXDIFF() noexcept { return  1e100L; }
+		static inline constexpr long double TIMESTEP_MINDIV() noexcept { return  1e-60L; }
+
+		static inline constexpr const char * name() noexcept { return "long double"; }
+		static inline constexpr const char * suffix() noexcept { return "L"; }
+	};
+
 	/*! Specific constants for double floating point type
 	 */
 	template <>
 	struct fp_constants<double>
 	{
-		static inline constexpr const double DIODE_MAXDIFF() noexcept { return  1e100; }
+		static inline constexpr double DIODE_MAXDIFF() noexcept { return  1e100; }
 		static inline constexpr double DIODE_MAXVOLT() noexcept { return  300.0; }
 
 		static inline constexpr double TIMESTEP_MAXDIFF() noexcept { return  1e100; }
 		static inline constexpr double TIMESTEP_MINDIV() noexcept { return  1e-60; }
+
+		static inline constexpr const char * name() noexcept { return "double"; }
+		static inline constexpr const char * suffix() noexcept { return ""; }
 	};
 
 	/*! Specific constants for float floating point type
@@ -136,12 +166,45 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e5; }
-		static inline constexpr float DIODE_MAXVOLT() noexcept { return  30.0; }
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20; }
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0; }
 
 		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30f; }
 		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
+
+		static inline constexpr const char * name() noexcept { return "float"; }
+		static inline constexpr const char * suffix() noexcept { return "f"; }
 	};
+
+#if (NL_USE_FLOAT128)
+	/*! Specific constants for __float128 floating point type
+	 */
+	template <>
+	struct fp_constants<__float128>
+	{
+#if 0
+		// MAME compile doesn't support Q
+		static inline constexpr __float128 DIODE_MAXDIFF() noexcept { return  1e100Q; }
+		static inline constexpr __float128 DIODE_MAXVOLT() noexcept { return  300.0Q; }
+
+		static inline constexpr __float128 TIMESTEP_MAXDIFF() noexcept { return  1e100Q; }
+		static inline constexpr __float128 TIMESTEP_MINDIV() noexcept { return  1e-60Q; }
+
+		static inline constexpr const char * name() noexcept { return "__float128"; }
+		static inline constexpr const char * suffix() noexcept { return "Q"; }
+#else
+	static inline constexpr __float128 DIODE_MAXDIFF() noexcept { return static_cast<__float128>(1e100L); }
+	static inline constexpr __float128 DIODE_MAXVOLT() noexcept { return static_cast<__float128>(300.0L); }
+
+	static inline constexpr __float128 TIMESTEP_MAXDIFF() noexcept { return static_cast<__float128>(1e100L); }
+	static inline constexpr __float128 TIMESTEP_MINDIV() noexcept { return static_cast<__float128>(1e-60L); }
+
+	static inline constexpr const char * name() noexcept { return "__float128"; }
+	static inline constexpr const char * suffix() noexcept { return "Q"; }
+
+#endif
+	};
+#endif
 } // namespace netlist
 
 #endif /* NLCONFIG_H_ */

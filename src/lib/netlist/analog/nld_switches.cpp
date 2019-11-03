@@ -12,8 +12,8 @@
 
 /* FIXME : convert to parameters */
 
-#define R_OFF   (1.0 / exec().gmin())
-#define R_ON    0.01
+#define R_OFF   (plib::reciprocal(exec().gmin()))
+#define R_ON    nlconst::magic(0.01)
 
 namespace netlist
 {

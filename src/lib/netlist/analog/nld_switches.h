@@ -5,8 +5,6 @@
  *
  */
 
-#pragma once
-
 #ifndef NLD_SWITCHES_H_
 #define NLD_SWITCHES_H_
 

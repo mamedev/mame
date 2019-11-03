@@ -11319,6 +11319,9 @@ dceu                            // 1999 Sega Dreamcast (Europe)
 dcjp                            // 1998 Sega Dreamcast (Japan)
 dctream                         // 200? Treamcast
 
+@source:dcebridge.cpp
+dcebridge                       // generic
+
 @source:dcheese.cpp
 cecmatch                        // (c) 1993 Coastal Amusements
 dcheese                         // (c) 1993 HAR
@@ -12709,6 +12712,7 @@ rad_baskp
 @source:elan_eu3a05.cpp
 rad_sinv
 rad_tetr
+airblsjs
 
 @source:electra.cpp
 avenger                         // (c) 1975 Electra
@@ -16191,6 +16195,7 @@ instruct                        //
 
 @source:inteladv.cpp
 cars2lap                        // CARS 2 Laptop (Germany)
+dyndesk
 inteladv
 
 @source:intellec4.cpp
@@ -30862,6 +30867,7 @@ ragnagrd                        // 0218 (c) 1996 Saurus
 rbff1                           // 0095 (c) 1995 SNK
 rbff1a                          // 0095 (c) 1995 SNK
 rbff1k                          // 0095 (c) 1995 SNK
+rbff1ka                         // 0095 (c) 1995 SNK
 rbff2                           // 0240 (c) 1998 SNK
 rbff2h                          // 0240 (c) 1998 SNK
 rbff2k                          // 0140 Censored Korean release of rbff2
@@ -34674,8 +34680,9 @@ sandscrpa                       // (c) 1992 Face
 sandscrpb                       // (c) 1992 Face
 
 @source:sangho.cpp
-pzlestar                        // (c) 199? Sang Ho Soft
+pzlestar                        // (c) 1991 Sang Ho Soft
 sexyboom                        // (c) 1992 Sang Ho Soft
+sprpuzzle                       // (c) 1991 Sang Ho Soft
 
 @source:sanremmg.cpp
 elsygame                        // Elsy
@@ -36484,7 +36491,8 @@ spcforc2                        // bootleg
 spcforce                        // (c) 1980 Venture Line
 
 @source:spdheat.cpp
-spdheat                         // (c) 1985 Taito
+spdheat                         // A55 (c) 1985 Taito Corporation (World)
+spdheatj                        // A55 (c) 1985 Taito Corporation (Japan)
 
 @source:spdodgeb.cpp
 nkdodge                         // TA-0022 (c) 1987 (Japan)
@@ -39399,6 +39407,7 @@ startrks                        // Sidam bootleg
 subhunt                         // ?   [1977 Taito]
 supcrash                        // bootleg
 tranqgun                        // 413-428 (c) 1980 Sega
+verbena                         //
 wantsega                        // ? (c) 1982 Sega
 
 @source:victor9k.cpp

@@ -210,6 +210,7 @@ void device_bml3bus_card_interface::interface_pre_start()
 void device_bml3bus_card_interface::set_bml3bus(bml3bus_device &bus, const char *slottag)
 {
 	assert(!m_bml3bus);
+	assert(!device().started());
 
 	// extract the slot number from the last digit of the slot tag
 	int tlen = strlen(slottag);

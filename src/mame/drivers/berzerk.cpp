@@ -1197,6 +1197,8 @@ Both sets of ROMs contain the same data.
 
 */
 
+/* There is known to exist a PCB with ROM 5C labeled as RC31A, it's unknown if the data is different then the RC31 labeled ROM 5C */
+
 ROM_START( berzerk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "berzerk_rc31_1c.rom0.1c", 0x0000, 0x0800, CRC(ca566dbc) SHA1(fae2647f12f1cd82826db61b53b116a5e0c9f995) )

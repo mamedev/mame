@@ -33,6 +33,15 @@
 #define PHAS_INT128 (0)
 #endif
 
+/*! Add support for the __float128 floating point type.
+ *
+ *
+ */
+
+#ifndef PUSE_FLOAT128
+#define PUSE_FLOAT128 (0)
+#endif
+
 /*
  * OpenMP adds about 10% to 20% performance for analog
  * netlists like kidniki.

@@ -5,8 +5,6 @@
  *
  */
 
-#pragma once
-
 #ifndef PLISTS_H_
 #define PLISTS_H_
 

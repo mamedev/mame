@@ -1634,7 +1634,6 @@ void c128_state::ntsc(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
 
 	M8502(config, m_subcpu, XTAL(14'318'181)*2/3.5/8);
-	m_subcpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x20);
@@ -1820,7 +1819,6 @@ void c128_state::pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &c128_state::z80_io);
 
 	M8502(config, m_subcpu, XTAL(17'734'472)*2/4.5/8);
-	m_subcpu->disable_cache(); // address decoding is 100% dynamic, no RAM/ROM banks
 	m_subcpu->read_callback().set(FUNC(c128_state::cpu_r));
 	m_subcpu->write_callback().set(FUNC(c128_state::cpu_w));
 	m_subcpu->set_pulls(0x07, 0x20);

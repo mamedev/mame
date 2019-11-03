@@ -47,12 +47,14 @@ public:
 		opt_dir(*this,      "d", "dir",        "",          "output directory for the generated files"),
 
 		opt_grp4(*this,     "Options for run command",      "These options are only used by the run command."),
-		opt_ttr (*this,     "t", "time_to_run", 1.0,        "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
+		opt_ttr (*this,     "t", "time_to_run", 1,          "time to run the emulation (seconds)\n\n  abc def\n\n xyz"),
 		opt_stats(*this,    "s", "statistics",              "gather runtime statistics"),
 		opt_logs(*this,     "l", "log" ,                    "define terminal to log. This option may be specified repeatedly."),
 		opt_inp(*this,      "i", "input",       "",         "input file to process (default is none)"),
 		opt_loadstate(*this,"",  "loadstate",   "",         "load state from file and continue from there"),
 		opt_savestate(*this,"",  "savestate",   "",         "save state to file at end of run"),
+		opt_fperr(*this,    "",  "fperr",
+			"raise exception on floating point errors. This is intended to be used during debugging."),
 
 		opt_grp5(*this,     "Options for convert command",  "These options are only used by the convert command."),
 		opt_type(*this,     "y", "type",        0,          std::vector<pstring>({"spice","eagle","rinf"}), "type of file to be converted: spice,eagle,rinf"),
@@ -97,6 +99,7 @@ public:
 	plib::option_str    opt_inp;
 	plib::option_str    opt_loadstate;
 	plib::option_str    opt_savestate;
+	plib::option_bool   opt_fperr;
 	plib::option_group  opt_grp5;
 	plib::option_str_limit<unsigned> opt_type;
 	plib::option_group  opt_grp6;
@@ -308,7 +311,7 @@ void netlist_tool_callbacks_t::vlog(const plib::plog_level &l, const pstring &ls
 struct input_t
 {
 	input_t(const netlist::setup_t &setup, const pstring &line)
-	: m_value(0.0)
+	: m_value(netlist::nlconst::zero())
 	{
 		std::array<char, 400> buf; // NOLINT(cppcoreguidelines-pro-type-member-init)
 		double t(0);
@@ -319,7 +322,7 @@ struct input_t
 		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_value = static_cast<nl_fptype>(val);
-		m_time = netlist::netlist_time::from_double(t);
+		m_time = netlist::netlist_time::from_fp(t);
 		m_param = setup.find_param(pstring(buf.data()), true);
 	}
 
@@ -395,11 +398,11 @@ void tool_app_t::run()
 		nt.reset();
 
 		inps = read_input(nt.setup(), opt_inp());
-		ttr = netlist::netlist_time::from_double(opt_ttr());
+		ttr = netlist::netlist_time::from_fp(opt_ttr());
 	}
 
 
-	pout("startup time ==> {1:5.3f}\n", t.as_seconds() );
+	pout("startup time ==> {1:5.3f}\n", t.as_seconds<nl_fptype>() );
 
 	t.reset();
 
@@ -459,10 +462,10 @@ void tool_app_t::run()
 		nt.stop();
 	}
 
-	nl_fptype emutime = t.as_seconds();
+	auto emutime(t.as_seconds<nl_fptype>());
 	pout("{1:f} seconds emulation took {2:f} real time ==> {3:5.2f}%\n",
-			(ttr - nlt).as_double(), emutime,
-			(ttr - nlt).as_double() / emutime * 100.0);
+			(ttr - nlt).as_fp<nl_fptype>(), emutime,
+			(ttr - nlt).as_fp<nl_fptype>() / emutime * netlist::nlconst::magic(100.0));
 }
 
 void tool_app_t::validate()
@@ -831,10 +834,6 @@ int tool_app_t::execute()
 {
 	tool_app_t opts;
 
-	/* make SIGFPE actually deliver signals on supoorted platforms */
-	plib::fpsignalenabler::global_enable(true);
-	plib::fpsignalenabler sigen(plib::FP_ALL & ~plib::FP_INEXACT & ~plib::FP_UNDERFLOW);
-
 	if (opt_help())
 	{
 		pout(usage());
@@ -869,6 +868,9 @@ int tool_app_t::execute()
 
 	try
 	{
+		plib::fpsignalenabler::global_enable(opt_fperr());
+		plib::fpsignalenabler fpprotect(plib::FP_DIVBYZERO | plib::FP_UNDERFLOW | plib::FP_OVERFLOW | plib::FP_INVALID);
+
 		pstring cmd = opt_cmd.as_string();
 		if (cmd == "listdevices")
 			listdevices();
@@ -902,6 +904,7 @@ int tool_app_t::execute()
 		perr("plib exception caught: {}\n", e.text());
 		return 2;
 	}
+
 #if 0
 	std::cout.imbue(std::locale("de_DE.utf8"));
 	std::cout.imbue(std::locale("C.UTF-8"));

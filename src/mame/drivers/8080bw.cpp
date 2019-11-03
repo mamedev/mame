@@ -5596,11 +5596,11 @@ ROM_START( cane )
 	ROM_LOAD( "mrcane.62",     0x1800, 0x0800, CRC(0d37cc00) SHA1(02f136b499cca35c70a6aaae475c516d91392e36) )
 ROM_END
 
-ROM_START( orbite )
+ROM_START( orbite ) // romset created from sources and assembled.  mrxx.69 is "00" padded to retain size consistancy
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mrxx.71",     0x0000, 0x0800, CRC(78cf0c8a) SHA1(0bda9352c35e2ac175bd5ce6ee42e94247f5149a) )
 	ROM_LOAD( "mrxx.70",     0x0800, 0x0800, CRC(2914a5c4) SHA1(ac38c3a1c537ab22301bede0013db0d485012237) )
-	ROM_LOAD( "mrxx.69",     0x1000, 0x0800, CRC(46a8468b) SHA1(bf5dfed67fa4986994b8a74971e094bbff57c873) )
+	ROM_LOAD( "mrxx.69",     0x1000, 0x0800, CRC(c3e464f5) SHA1(731897c69547eaf103ccaed156b2ef947c72274a) )
 ROM_END
 
 //    year  rom          parent    machine    inp        class           init           monitor ...
@@ -5755,5 +5755,5 @@ GAME( 2002, invmultis2a, invmulti, invmulti,  invmulti,  _8080bw_state,  init_in
 GAME( 2002, invmultis1a, invmulti, invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (S0.81A)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, invmultip,   invmulti, invmulti,  invmulti,  _8080bw_state,  init_invmulti, ROT270, "hack (Braze Technologies)", "Space Invaders Multigame (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME(1979?, cane,     0,     cane,      cane,   cane_state,  empty_init,    ROT0, "Model Racing", "Cane", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
-GAME(1979?, orbite,   0,   orbite,    orbite,   orbite_state,  empty_init,    ROT270, "Model Racing", "Orbite", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW)
+GAME( 1979?, cane,       0,        cane,      cane,      cane_state,     empty_init,    ROT0,   "Model Racing", "Cane", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND)
+GAME( 1979?, orbite,     0,        orbite,    orbite,    orbite_state,   empty_init,    ROT270, "Model Racing", "Orbite", MACHINE_SUPPORTS_SAVE | MACHINE_IS_INCOMPLETE | MACHINE_NO_SOUND_HW)

@@ -35,12 +35,10 @@ protected:
 	};
 
 	// constants for volumes
-	const u32 FINE_VOLUME_BIT = 16;
-
-	const u32 VOLUME_ACC_BIT = 20;
+	const s8 VOLUME_ACC_BIT = 20;
 
 	// constants for address
-	const u32 ADDRESS_FRAC_BIT = 11;
+	const s8 ADDRESS_FRAC_BIT = 11;
 
 	// struct describing a single playing voice
 	struct es550x_voice
@@ -98,9 +96,7 @@ protected:
 	template<typename T, typename U> inline T lshift_signed(T val, U shift) { return (shift >= 0) ? val << shift : val >> (-shift); }
 	template<typename T, typename U> inline T rshift_signed(T val, U shift) { return (shift >= 0) ? val >> shift : val << (-shift); }
 
-	inline u64 get_shifted_volume_res(u64 volume) { return rshift_signed<u64, s8>(volume, m_volume_shift); }
-	inline u64 get_shifted_volume(u64 volume) { return lshift_signed<u64, s8>(volume, m_volume_shift); }
-	inline u64 get_volume(u32 volume) { return m_volume_lookup[rshift_signed<u32, s8>(volume, m_volume_shift_int)]; }
+	inline u64 get_volume(u32 volume) { return m_volume_lookup[rshift_signed<u32, s8>(volume, m_volume_shift)]; }
 
 	inline u64 get_address_acc_shifted_val(u64 val, int bias = 0) { return lshift_signed<u64, s8>(val, m_address_acc_shift - bias); }
 	inline u64 get_address_acc_res(u64 val, int bias = 0) { return rshift_signed<u64, s8>(val, m_address_acc_shift - bias); }
@@ -128,7 +124,6 @@ protected:
 	u64           m_address_acc_mask;
 
 	s8            m_volume_shift;
-	s8            m_volume_shift_int;
 	s64           m_volume_acc_shift;
 
 	u8            m_current_page;         /* current register page */
@@ -173,9 +168,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	const u32 VOLUME_BIT_ES5506 = 16;
-	const u32 ADDRESS_INTEGER_BIT_ES5506 = 21;
-	const u32 ADDRESS_FRAC_BIT_ES5506 = 11;
+	const s8 VOLUME_BIT_ES5506 = 16;
+	const s8 ADDRESS_INTEGER_BIT_ES5506 = 21;
+	const s8 ADDRESS_FRAC_BIT_ES5506 = 11;
 
 	virtual inline u32 get_bank(u32 control) override { return (control >> 14) & 3; }
 	virtual inline u32 get_ca(u32 control) override { return (control >> 10) & 7; }
@@ -218,9 +213,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	const u32 VOLUME_BIT_ES5505 = 8;
-	const u32 ADDRESS_INTEGER_BIT_ES5505 = 20;
-	const u32 ADDRESS_FRAC_BIT_ES5505 = 9;
+	const s8 VOLUME_BIT_ES5505 = 8;
+	const s8 ADDRESS_INTEGER_BIT_ES5505 = 20;
+	const s8 ADDRESS_FRAC_BIT_ES5505 = 9;
 
 	virtual inline u32 get_lp(u32 control) override { return (control >> 10) & LP_MASK; }
 	virtual inline u32 get_ca(u32 control) override { return (control >> 8) & 3; }

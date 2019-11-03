@@ -808,10 +808,11 @@ inline void snes_ppu_device::update_line( uint16_t curline, uint8_t layer_idx, u
 
 	uint32_t y = layer.mosaic_enabled ? layer.mosaic_offset : curline;
 
+	//printf("h:%d i:%d l:%d ", hires ? 1 : 0, m_interlace, curline);
 	if (hires)
 	{
 		hscroll <<= 1;
-		if (m_interlace == 2) y = y << 1 | (m_stat78 >> 7);
+		if (m_interlace == 2) y = (y & ~1) | (m_stat78 >> 7);
 	}
 
 	uint32_t mosaic_counter = 1;
@@ -1863,6 +1864,8 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	g_profiler.start(PROFILER_VIDEO);
 
+	cache_background();
+
 	if (m_screen_disabled) /* screen is forced blank */
 		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
 			bitmap.pix32(0, x) = rgb_t::black();
@@ -1900,8 +1903,6 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 		/* Prepare OAM for this scanline */
 		update_objects_rto(curline);
-
-		cache_background();
 
 		/* Draw scanline */
 		draw_screens(curline);

@@ -10,7 +10,6 @@
 #include "mps.h"
 
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/swtpc8212.h"
 #include "machine/6850acia.h"
 
 //**************************************************************************
@@ -116,7 +115,6 @@ void ss50_mps_device::device_add_mconfig(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, "terminal"));
 	rs232.rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	rs232.cts_handler().set(FUNC(ss50_mps_device::route_cts_r));
-	rs232.option_add("swtpc8212", SERIAL_TERMINAL_SWTPC8212);
 	rs232.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 }
 

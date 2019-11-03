@@ -44,10 +44,7 @@ void m65ce02_device::init()
 
 void m65ce02_device::device_start()
 {
-	if(cache_disabled)
-		mintf = std::make_unique<mi_default_nd>();
-	else
-		mintf = std::make_unique<mi_default_normal>();
+	mintf = std::make_unique<mi_default>();
 
 	init();
 }
