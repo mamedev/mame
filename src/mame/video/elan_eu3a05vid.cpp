@@ -218,7 +218,7 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 	   for the same reasons
 	*/
 
-	int scroll = (m_bg_scroll[1] << 8) | m_bg_scroll[0];
+	int scroll = (m_tile_scroll[1] << 8) | m_tile_scroll[0];
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
 	if (m_vidctrl & 0x40) // 16x16 tiles
@@ -352,67 +352,75 @@ uint32_t elan_eu3a05vid_device::screen_update(screen_device &screen, bitmap_ind1
 
 // Tile bases
 
-WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_lo_w)
+WRITE8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_lo_w)
 {
-	//logerror("%s: elan_eu3a05_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
+	//logerror("%s: tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_hi_w)
+WRITE8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_hi_w)
 {
-	//logerror("%s: elan_eu3a05_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
+	//logerror("%s: tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_hi_data = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_lo_r)
+READ8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_lo_r)
 {
-	//logerror("%s: elan_eu3a05_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
+	//logerror("%s: tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
 	return m_tile_gfxbase_lo_data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_hi_r)
+READ8_MEMBER(elan_eu3a05vid_device::tile_gfxbase_hi_r)
 {
-	//logerror("%s: elan_eu3a05_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
+	//logerror("%s: tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
 	return m_tile_gfxbase_hi_data;
 }
 
+
+
 // Sprite Tile bases
 
-WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_lo_w)
+WRITE8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_lo_w)
 {
-	//logerror("%s: elan_eu3a05_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
+	//logerror("%s: sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_hi_w)
+WRITE8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_hi_w)
 {
-	//logerror("%s: elan_eu3a05_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
+	//logerror("%s: sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_hi_data = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_lo_r)
+READ8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_lo_r)
 {
-	//logerror("%s: elan_eu3a05_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
+	//logerror("%s: sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
 	return m_sprite_gfxbase_lo_data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_hi_r)
+READ8_MEMBER(elan_eu3a05vid_device::sprite_gfxbase_hi_r)
 {
-	//logerror("%s: elan_eu3a05_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
+	//logerror("%s: sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
 	return m_sprite_gfxbase_hi_data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_sprite_bg_scroll_r)
-{
-	return m_bg_scroll[offset];
 
+
+READ8_MEMBER(elan_eu3a05vid_device::tile_scroll_r)
+{
+	return m_tile_scroll[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_sprite_bg_scroll_w)
+WRITE8_MEMBER(elan_eu3a05vid_device::tile_scroll_w)
 {
-	m_bg_scroll[offset] = data;
+	m_tile_scroll[offset] = data;
 }
 
+
+READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r)
+{
+	return m_vidctrl;
+}
 
 WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 {

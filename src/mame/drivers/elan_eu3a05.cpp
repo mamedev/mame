@@ -105,6 +105,7 @@ private:
 	// system
 	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
 	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
 
 	// more sound regs?
 	DECLARE_READ8_MEMBER(elan_eu3a05_50a9_r);
@@ -192,12 +193,22 @@ WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_50a9_w)
 	m_50a9_data = data;
 }
 
+WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_500b_unk_w)
+{
+	// this is the PAL / NTSC flag when read, so what are writes?
+	logerror("%s: elan_eu3a05_500b_unk_w %02x\n", machine().describe_context(), data);
+}
+
 // sound callback
 READ8_MEMBER(elan_eu3a05_state::read_full_space)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);
 }
+
+// code at 8bc6 in Air Blaster makes unwanted reads, why, bug in code, flow issue?
+//[:maincpu] ':maincpu' (8BC6): unmapped program memory read from 5972 & FF
+
 
 void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 {
@@ -206,11 +217,17 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
 	// 500x system regs?
+	map(0x5000, 0x5000).ram();
+	map(0x5001, 0x5001).ram();
+	// 5002
 	map(0x5003, 0x5003).r(FUNC(elan_eu3a05_state::elan_eu3a05_5003_r));
-
+	map(0x5004, 0x5004).ram();
+	// 5005
+	map(0x5006, 0x5006).ram();
 	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
-
-	map(0x500b, 0x500b).r(FUNC(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r)); // PAL / NTSC flag at least
+	map(0x5009, 0x5009).ram();
+	map(0x500a, 0x500a).ram();
+	map(0x500b, 0x500b).rw(FUNC(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r), FUNC(elan_eu3a05_state::elan_eu3a05_500b_unk_w)); // PAL / NTSC flag at least
 	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
 
 	// 501x DMA controller
@@ -219,18 +236,28 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 
 	// 502x - 503x video regs area?
 	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).w(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
+	map(0x5027, 0x5027).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
+	map(0x5028, 0x5028).ram();
+	map(0x5029, 0x5029).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_w)); // tilebase
+	map(0x502a, 0x502a).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w)); // tilebase
+	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w)); // tilebase (spr?)
+	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w)); // tilebase (spr?)
+	map(0x502d, 0x502d).ram();
+	map(0x502e, 0x502e).ram();
+	map(0x502f, 0x502f).ram();
 
-	map(0x5029, 0x5029).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_tile_gfxbase_hi_w)); // tilebase
-
-	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_sprite_gfxbase_hi_w)); // tilebase (spr?)
-
-	map(0x5031, 0x5032).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_sprite_bg_scroll_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_sprite_bg_scroll_w));
+	map(0x5030, 0x5030).ram();
+	map(0x5031, 0x5032).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w));
+	map(0x5033, 0x5033).ram();
+	map(0x5034, 0x5034).ram();
+	map(0x5035, 0x5035).ram();
+	map(0x5036, 0x5036).ram();
+	// 5037
+	map(0x5038, 0x5038).ram();
 
 	// 504x GPIO area?
 	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
+	// 5047
 	map(0x5048, 0x504a).w(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_unk_w));
 
 	// 506x unknown
@@ -241,9 +268,9 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x5092, 0x50a3).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w));
 	map(0x50a4, 0x50a4).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w));
 	map(0x50a5, 0x50a5).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
-
+	map(0x50a6, 0x50a6).ram();
+	map(0x50a7, 0x50a7).ram();
 	map(0x50a8, 0x50a8).r(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
-
 	map(0x50a9, 0x50a9).rw(FUNC(elan_eu3a05_state::elan_eu3a05_50a9_r), FUNC(elan_eu3a05_state::elan_eu3a05_50a9_w));
 
 	//map(0x5000, 0x50ff).ram();
