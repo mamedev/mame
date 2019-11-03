@@ -314,15 +314,137 @@ namespace plib
 
 	/*! hypot function
 	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return absolute value of argument
+	 * @tparam T type of the arguments
+	 * @param  v1 first argument
+	 * @param  v1 second argument
+	 * @return sqrt(v1*v1+v2*v2)
 	 */
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	hypot(T v1, T v2) noexcept
 	{
 		return std::hypot(v1, v2);
+	}
+
+	/*! exp function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return exp(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	exp(T v) noexcept
+	{
+		return std::exp(v);
+	}
+
+	/*! log function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return log(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	log(T v) noexcept
+	{
+		return std::log(v);
+	}
+
+	/*! tanh function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return tanh(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	tanh(T v) noexcept
+	{
+		return std::tanh(v);
+	}
+
+	/*! floor function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return floor(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	floor(T v) noexcept
+	{
+		return std::floor(v);
+	}
+
+	/*! log1p function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return log(1 + v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	log1p(T v) noexcept
+	{
+		return std::log1p(v);
+	}
+
+	/*! sin function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return sin(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	sin(T v) noexcept
+	{
+		return std::sin(v);
+	}
+
+	/*! cos function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return cos(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	cos(T v) noexcept
+	{
+		return std::cos(v);
+	}
+
+	/*! trunc function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return trunc(v)
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	trunc(T v) noexcept
+	{
+		return std::trunc(v);
+	}
+
+	/*! pow function
+	 *
+	 * @tparam T1 type of the first argument
+	 * @tparam T2 type of the second argument
+	 * @param  v argument
+	 * @param  p power
+	 * @return v^p
+	 *
+	 * FIXME: limited implementation
+	 */
+	template <typename T1, typename T2>
+	static inline T1
+	pow(T1 v, T2 p) noexcept
+	{
+		return std::pow(v, p);
 	}
 
 #if (PUSE_FLOAT128)
@@ -345,6 +467,61 @@ namespace plib
 	{
 		return hypotq(v1, v2);
 	}
+
+	static inline __float128 exp(__float128 v) noexcept
+	{
+		return expq(v);
+	}
+
+	static inline __float128 log(__float128 v) noexcept
+	{
+		return logq(v);
+	}
+
+	static inline __float128 tanh(__float128 v) noexcept
+	{
+		return tanhq(v);
+	}
+
+	static inline __float128 floor(__float128 v) noexcept
+	{
+		return floorq(v);
+	}
+
+	static inline __float128 log1p(__float128 v) noexcept
+	{
+		return log1pq(v);
+	}
+
+	static inline __float128 sin(__float128 v) noexcept
+	{
+		return sinq(v);
+	}
+
+	static inline __float128 cos(__float128 v) noexcept
+	{
+		return cosq(v);
+	}
+
+	static inline __float128 trunc(__float128 v) noexcept
+	{
+		return truncq(v);
+	}
+
+	template <typename T>
+	static inline __float128 pow(__float128 v, T p) noexcept
+	{
+		return powq(v, static_cast<__float128>(p));
+	}
+
+	static inline __float128 pow(__float128 v, int p) noexcept
+	{
+		if (p==2)
+			return v*v;
+		else
+			return powq(v, static_cast<__float128>(p));
+	}
+
 #endif
 
 	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
@@ -429,6 +606,19 @@ namespace plib
 			return pstonum_locale<long double>(loc, arg, idx);
 		}
 	};
+
+#if PUSE_FLOAT128
+	template<>
+	struct pstonum_helper<__float128>
+	{
+		// FIXME: use strtoflt128 from quadmath.h
+		template <typename S>
+		__float128 operator()(std::locale loc, const S &arg, std::size_t *idx)
+		{
+			return static_cast<__float128>(pstonum_locale<long double>(loc, arg, idx));
+		}
+	};
+#endif
 
 	template<typename T, typename S>
 	T pstonum(const S &arg, const std::locale &loc = std::locale::classic())

@@ -193,7 +193,7 @@ public:
 
 		// FIXME: make this a parameter
 		// avoid calls due to noise
-		if (std::fabs(cur - m_last) > 1e-6)
+		if (plib::abs(cur - m_last) > 1e-6)
 		{
 			m_cpu_device->update_icount(exec().time());
 			(*m_callback)(cur, m_cpu_device->local_time());
@@ -446,7 +446,7 @@ public:
 		nl_fptype val = m_in() * m_mult() + m_offset();
 		sound_update(exec().time());
 		/* ignore spikes */
-		if (std::abs(val) < 32767.0)
+		if (plib::abs(val) < 32767.0)
 			m_cur = val;
 		else if (val > 0.0)
 			m_cur = 32767.0;

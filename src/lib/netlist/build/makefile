@@ -52,7 +52,7 @@ endif
 
 CFLAGS =  $(LTO) -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../.. $(CEXTRAFLAGS)
 LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
-LIBS = -lpthread -ldl
+LIBS = -lpthread -ldl $(EXTRALIBS)
 
 CC = g++
 LD = @g++
@@ -235,7 +235,7 @@ native:
 	$(MAKE) CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
 
 gcc9: 
-	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra "
+	$(MAKE) CC=g++-9 LD=g++-9 CEXTRAFLAGS="-march=native -msse4.2 -Wall -Wpedantic -Wsign-compare -Wextra" EXTRALIBS="-lquadmath"
 
 clang:
 	$(MAKE) CC=clang++-10 LD=clang++-10 CEXTRAFLAGS="-march=native -msse4.2 -Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-unused-template -Wno-missing-variable-declarations -Wno-float-equal -Wconversion -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-format-nonliteral  -Wno-exit-time-destructors"

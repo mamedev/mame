@@ -263,7 +263,7 @@ namespace analog
 			else if (m_model.m_NSUB > nlconst::zero())
 			{
 				nl_assert_always(m_model.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model " + m_model.name());
-				m_phi = nlconst::two() * Vt * std::log (m_model.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
+				m_phi = nlconst::two() * Vt * plib::log (m_model.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
 			}
 			else
 				m_phi = nlconst::magic(0.6);
@@ -274,7 +274,7 @@ namespace analog
 			else
 			{
 				if (Cox > nlconst::zero() && m_model.m_NSUB > nlconst::zero())
-					m_gamma = std::sqrt (nlconst::two()
+					m_gamma = plib::sqrt (nlconst::two()
 						* constants::Q_e() * constants::eps_Si() * constants::eps_0()
 					 	* m_model.m_NSUB * nlconst::magic(1e6)) / Cox;
 				else
@@ -418,8 +418,8 @@ namespace analog
 				else
 				{
 					// linear
-					const nl_fptype Sqr1 = static_cast<nl_fptype>(std::pow(Vdsat - Vds, 2));
-					const nl_fptype Sqr2 = static_cast<nl_fptype>(std::pow(nlconst::two() * Vdsat - Vds, 2));
+					const nl_fptype Sqr1 = static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2));
+					const nl_fptype Sqr2 = static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2));
 					Cgb = 0;
 					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::magic(2.0 / 3.0);
 					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::magic(2.0 / 3.0);
@@ -452,9 +452,9 @@ namespace analog
 
 		const nl_fptype k = nlconst::magic(3.5); // see "Circuit Simulation", page 185
 		nl_fptype d = (Vgs - m_Vgs);
-		Vgs = m_Vgs + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		Vgs = m_Vgs + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
 		d = (Vgd - m_Vgd);
-		Vgd = m_Vgd + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * std::log1p(k * std::abs(d));
+		Vgd = m_Vgd + plib::reciprocal(k) * nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(k * plib::abs(d));
 
 		m_Vgs = Vgs;
 		m_Vgd = Vgd;
@@ -475,13 +475,13 @@ namespace analog
 
 		// calculate Vth
 		const nl_fptype Vbulk = is_forward ? Vbs : Vbd;
-		const nl_fptype phi_m_Vbulk = (m_phi > Vbulk) ? std::sqrt(m_phi - Vbulk) : nlconst::zero();
-		const nl_fptype Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - std::sqrt(m_phi));
+		const nl_fptype phi_m_Vbulk = (m_phi > Vbulk) ? plib::sqrt(m_phi - Vbulk) : nlconst::zero();
+		const nl_fptype Vth = m_vto * m_polarity + m_gamma * (phi_m_Vbulk - plib::sqrt(m_phi));
 
 		const nl_fptype Vctrl = (is_forward ? Vgs : Vgd) - Vth;
 
 		nl_fptype Ids(0), gm(0), gds(0), gmb(0);
-		const nl_fptype absVds = std::abs(Vds);
+		const nl_fptype absVds = plib::abs(Vds);
 
 		if (Vctrl <= nlconst::zero())
 		{

@@ -206,10 +206,10 @@ namespace plib {
 				OP(MULT, 1, ST2 * ST1)
 				OP(SUB,  1, ST2 - ST1)
 				OP(DIV,  1, ST2 / ST1)
-				OP(POW,  1, std::pow(ST2, ST1))
-				OP(SIN,  0, std::sin(ST2))
-				OP(COS,  0, std::cos(ST2))
-				OP(TRUNC,  0, std::trunc(ST2))
+				OP(POW,  1, plib::pow(ST2, ST1))
+				OP(SIN,  0, plib::sin(ST2))
+				OP(COS,  0, plib::cos(ST2))
+				OP(TRUNC,  0, plib::trunc(ST2))
 				case RAND:
 					stack[ptr++] = lfsr_random();
 					break;
@@ -227,5 +227,8 @@ namespace plib {
 	template class pfunction<float>;
 	template class pfunction<double>;
 	template class pfunction<long double>;
+#if (PUSE_FLOAT128)
+	template class pfunction<__float128>;
+#endif
 
 } // namespace plib

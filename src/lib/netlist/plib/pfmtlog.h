@@ -192,6 +192,11 @@ public:
 	typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
 	e(const T &x) {return format_element('e', x);  }
 
+#if PUSE_FLOAT128
+	// FIXME: not what we want
+	pfmt & e(const __float128 &x) {return format_element('e', static_cast<long double>(x));  }
+#endif
+
 	template <typename T>
 	typename std::enable_if<std::is_floating_point<T>::value, pfmt &>::type
 	g(const T &x) {return format_element('g', x);  }

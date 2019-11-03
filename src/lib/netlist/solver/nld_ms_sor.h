@@ -96,7 +96,7 @@ namespace solver
 			if (this->m_params.m_use_gabs)
 			{
 				for (std::size_t i = 0; i < term_count; i++)
-					gabs_t = gabs_t + std::abs(go[i]);
+					gabs_t = gabs_t + plib::abs(go[i]);
 
 				gabs_t *= nlconst::magic(0.5); // derived by try and error
 				if (gabs_t <= gtot_t)
