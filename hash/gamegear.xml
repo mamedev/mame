@@ -7298,7 +7298,7 @@ a certain item) -->
 	</software>
 
 	<software name="sonicc">
-		<description>Sonic Chaos (Euro, USA, Bra)</description>
+		<description>Sonic the Hedgehog Chaos (Euro, USA, Bra)</description>
 		<year>199?</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="2515, 1204, 077080"/>
@@ -7308,6 +7308,21 @@ a certain item) -->
 			<feature name="ic1" value="MPR-15973-F" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15973-f.ic1" size="524288" crc="663f2abb" sha1="5b5b7d9cd8adf0f8e1ee15fd4557828f91dfdca1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: Sega Europe labels; internal version not ideal for reference -->
+	<software name="sonicc517" cloneof="sonicc">
+		<description>Sonic the Hedgehog Chaos (Euro, Prototype 19930517)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gg sonic chaos 0 17-5.bin" size="131072" crc="19ac09ff" sha1="ce2b641a8907868fd314795e2e1d41b62cfa6ae7" offset="0x00000" />
+				<rom name="gg sonic chaos 1 17-5.bin" size="131072" crc="9e3ba273" sha1="02635627f0ebdb7a8cc5f5f835d051de497244c9" offset="0x20000" />
+				<rom name="gg sonic chaos 2 17-5.bin" size="131072" crc="8cfeb3c0" sha1="0b6eadcd60511bba0b22abdbef54e05ed1410cba" offset="0x40000" />
+				<rom name="gg sonic chaos 3 17-5.bin" size="131072" crc="d82f30e4" sha1="1f3a7c30363ddd6972dec7c114f11f4f62b96d50" offset="0x60000" />
 			</dataarea>
 		</part>
 	</software>
