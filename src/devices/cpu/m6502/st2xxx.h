@@ -37,7 +37,11 @@ public:
 		ST_PRR,
 		ST_DRR,
 		ST_IREQ,
-		ST_IENA
+		ST_IENA,
+		ST_LSSA,
+		ST_LVPW,
+		ST_LXMAX,
+		ST_LYMAX
 	};
 
 	auto in_pa_callback() { return m_in_port_cb[0].bind(); }
@@ -107,6 +111,14 @@ protected:
 	u8 ienah_r();
 	void ienah_w(u8 data);
 
+	void lssal_w(u8 data);
+	void lssah_w(u8 data);
+	void lvpw_w(u8 data);
+	u8 lxmax_r();
+	void lxmax_w(u8 data);
+	u8 lymax_r();
+	void lymax_w(u8 data);
+
 #define O(o) void o ## _full(); void o ## _partial()
 
 	O(brk_st_imp);
@@ -129,6 +141,10 @@ protected:
 	u16 m_iena;
 	const u16 m_ireq_mask;
 	u8 m_sys;
+	u16 m_lssa;
+	u8 m_lvpw;
+	u8 m_lxmax;
+	u8 m_lymax;
 };
 
 #endif // MAME_CPU_M6502_ST2XXX_H

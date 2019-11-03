@@ -36,8 +36,20 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 					address_map_constructor(FUNC(st2205u_device::int_map), this),
 					26, // logical; only 23 address lines are brought out
 					0xdfff)
+	, m_bten(0)
+	, m_btreq(0)
+	, m_btc(0)
+	, m_base_timer{0}
 	, m_lvctr(0)
 {
+}
+
+template<int N>
+TIMER_CALLBACK_MEMBER(st2205u_device::bt_interrupt)
+{
+	m_btreq |= 1 << N;
+	m_ireq |= 0x0020;
+	update_irq_state();
 }
 
 void st2205u_device::device_start()
@@ -52,16 +64,32 @@ void st2205u_device::device_start()
 	intf->brr = 0;
 	intf->irq_service = false;
 
+	m_base_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<0>), this));
+	m_base_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<1>), this));
+	m_base_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<2>), this));
+	m_base_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<3>), this));
+	m_base_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<4>), this));
+	m_base_timer[5] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<5>), this));
+	m_base_timer[6] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<6>), this));
+	m_base_timer[7] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<7>), this));
+
 	intf->ram = make_unique_clear<u8[]>(0x8000);
 
 	save_item(NAME(m_pdata));
 	save_item(NAME(m_pctrl));
 	save_item(NAME(m_psel));
 	save_item(NAME(m_pfun));
+	save_item(NAME(m_bten));
+	save_item(NAME(m_btreq));
+	save_item(NAME(m_btc));
 	save_item(NAME(m_sys));
 	save_item(NAME(m_pmcr));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
+	save_item(NAME(m_lssa));
+	save_item(NAME(m_lvpw));
+	save_item(NAME(m_lxmax));
+	save_item(NAME(m_lymax));
 	save_item(NAME(m_lvctr));
 	save_item(NAME(intf->irr_enable));
 	save_item(NAME(intf->irr));
@@ -93,6 +121,13 @@ void st2205u_device::device_start()
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); }).mask(0xfe);
+	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); });
+	state_add(ST_BTREQ, "BTREQ", m_btreq);
+	state_add(ST_BTC, "BTC", m_btc);
+	state_add(ST_LSSA, "LSSA", m_lssa);
+	state_add(ST_LVPW, "LVPW", m_lvpw);
+	state_add(ST_LXMAX, "LXMAX", m_lxmax);
+	state_add(ST_LYMAX, "LYMAX", m_lymax);
 	state_add(ST_LVCTR, "LVCTR", m_lvctr).mask(0x0f);
 }
 
@@ -105,6 +140,10 @@ void st2205u_device::device_reset()
 	m.irr = 0;
 	m.prr = 0;
 	m.drr = 0;
+
+	bten_w(0);
+	m_btreq = 0;
+	m_btc = 0;
 
 	m_lvctr = 0;
 }
@@ -315,7 +354,63 @@ u8 st2205u_device::sys_r()
 void st2205u_device::sys_w(u8 data)
 {
 	m_sys = data & 0xfe;
-	downcast<mi_st2205u &>(*mintf).irr_enable = BIT(data, 2);
+	downcast<mi_st2205u &>(*mintf).irr_enable = BIT(data, 1);
+}
+
+u8 st2205u_device::bten_r()
+{
+	return m_bten;
+}
+
+void st2205u_device::bten_w(u8 data)
+{
+	if (BIT(data, 0) && !BIT(m_bten, 0))
+		m_base_timer[0]->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
+	else if (!BIT(data, 0) && BIT(m_bten, 0))
+		m_base_timer[0]->adjust(attotime::never);
+
+	for (int n = 1; n <= 5; n++)
+	{
+		if (BIT(data, n) && !BIT(m_bten, n))
+			m_base_timer[n]->adjust(attotime::from_hz(16 << n), 0, attotime::from_hz(16 << n));
+		else if (!BIT(data, n) && BIT(m_bten, n))
+			m_base_timer[n]->adjust(attotime::never);
+	}
+
+	if (BIT(data, 6) && !BIT(m_bten, 6))
+		m_base_timer[6]->adjust(attotime::from_hz(2048), 0, attotime::from_hz(2048));
+	else if (!BIT(data, 6) && BIT(m_bten, 6))
+		m_base_timer[6]->adjust(attotime::never);
+
+	if (BIT(data, 7) && !BIT(m_bten, 7))
+	{
+		attotime period = attotime::from_hz(8192) * (m_btc ? m_btc : 256);
+		m_base_timer[7]->adjust(period, 0, period);
+	}
+	else if (!BIT(data, 7) && BIT(m_bten, 7))
+		m_base_timer[7]->adjust(attotime::never);
+
+	m_bten = data;
+}
+
+u8 st2205u_device::btreq_r()
+{
+	return m_btreq;
+}
+
+void st2205u_device::btclr_w(u8 data)
+{
+	m_btreq &= ~data;
+}
+
+u8 st2205u_device::btc_r()
+{
+	return m_btc;
+}
+
+void st2205u_device::btc_w(u8 data)
+{
+	m_btc = data;
 }
 
 u8 st2205u_device::lvctr_r()
@@ -376,6 +471,9 @@ void st2205u_device::int_map(address_map &map)
 	map(0x0008, 0x000d).rw(FUNC(st2205u_device::pctrl_r), FUNC(st2205u_device::pctrl_w));
 	map(0x000e, 0x000e).rw(FUNC(st2205u_device::pfc_r), FUNC(st2205u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
+	map(0x002a, 0x002a).rw(FUNC(st2205u_device::bten_r), FUNC(st2205u_device::bten_w));
+	map(0x002b, 0x002b).rw(FUNC(st2205u_device::btreq_r), FUNC(st2205u_device::btclr_w));
+	map(0x002c, 0x002c).rw(FUNC(st2205u_device::btc_r), FUNC(st2205u_device::btc_w));
 	map(0x0030, 0x0030).rw(FUNC(st2205u_device::irrl_r), FUNC(st2205u_device::irrl_w));
 	map(0x0031, 0x0031).rw(FUNC(st2205u_device::irrh_r), FUNC(st2205u_device::irrh_w));
 	map(0x0032, 0x0032).rw(FUNC(st2205u_device::prrl_r), FUNC(st2205u_device::prrl_w));
@@ -390,6 +488,11 @@ void st2205u_device::int_map(address_map &map)
 	map(0x003d, 0x003d).rw(FUNC(st2205u_device::ireqh_r), FUNC(st2205u_device::ireqh_w));
 	map(0x003e, 0x003e).rw(FUNC(st2205u_device::ienal_r), FUNC(st2205u_device::ienal_w));
 	map(0x003f, 0x003f).rw(FUNC(st2205u_device::ienah_r), FUNC(st2205u_device::ienah_w));
+	map(0x0040, 0x0040).w(FUNC(st2205u_device::lssal_w));
+	map(0x0041, 0x0041).w(FUNC(st2205u_device::lssah_w));
+	map(0x0042, 0x0042).w(FUNC(st2205u_device::lvpw_w));
+	map(0x0043, 0x0043).rw(FUNC(st2205u_device::lxmax_r), FUNC(st2205u_device::lxmax_w));
+	map(0x0044, 0x0044).rw(FUNC(st2205u_device::lymax_r), FUNC(st2205u_device::lymax_w));
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));

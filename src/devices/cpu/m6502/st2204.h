@@ -16,6 +16,11 @@
 class st2204_device : public st2xxx_device
 {
 public:
+	enum {
+		ST_BTEN = ST_LYMAX + 1,
+		ST_BTSR
+	};
+
 	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
@@ -44,6 +49,8 @@ private:
 		u16 drr;
 	};
 
+	template<int N> TIMER_CALLBACK_MEMBER(bt_interrupt);
+
 	u8 sys_r();
 	void sys_w(u8 data);
 	u8 irr_r();
@@ -58,6 +65,10 @@ private:
 	void drrh_w(u8 data);
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
+	u8 bten_r();
+	void bten_w(u8 data);
+	u8 btsr_r();
+	void btsr_w(u8 data);
 
 	u8 pmem_r(offs_t offset);
 	void pmem_w(offs_t offset, u8 data);
@@ -65,6 +76,10 @@ private:
 	void dmem_w(offs_t offset, u8 data);
 
 	void int_map(address_map &map);
+
+	u8 m_bten;
+	u8 m_btsr;
+	emu_timer *m_base_timer[5];
 };
 
 DECLARE_DEVICE_TYPE(ST2204, st2204_device)
