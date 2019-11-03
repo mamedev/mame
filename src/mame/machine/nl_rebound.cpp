@@ -1288,11 +1288,11 @@ NETLIST_END()
 NETLIST_START(rebound)
 
 	LOCAL_SOURCE(rebound_schematics)
-	SOLVER(Solver, 4800)
+	SOLVER(Solver, 480)
 	PARAM(Solver.VNTOL, 1e-9)
 	PARAM(Solver.RELTOL, 1e-9)
 	PARAM(Solver.DYNAMIC_TS, 1)
-	PARAM(Solver.DYNAMIC_LTE, 1e-4)
+	PARAM(Solver.DYNAMIC_LTE, 1e-6)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
 
 	PARAM(Solver.PARALLEL, 0) // Don't do parallel solvers
