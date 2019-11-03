@@ -96,9 +96,10 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    bb = sometimes set in invaders
 	    cc = same as attr on tiles (colour / priority?)
 
-	    AA = attributes
-	    e--- fFsS
+	    AA = attributes  ( e-dD fFsS )
 	    e = enable
+		D = ZoomX to double size (boss explosions on Air Blaster)
+		d = ZoomY to double size (boss explosions on Air Blaster)
 	    S = SizeX
 	    s = SizeY
 	    F = FlipX
