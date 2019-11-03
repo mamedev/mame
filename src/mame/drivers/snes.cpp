@@ -1385,7 +1385,7 @@ void snes_console_state::snespal(machine_config &config)
 	snes(config);
 	m_maincpu->set_clock(MCLK_PAL);
 
-	m_screen->set_raw(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL);
+	m_screen->set_raw(DOTCLK_PAL * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL);
 
 	m_ppu->set_clock(MCLK_PAL);
 	m_cartslot->set_clock(MCLK_PAL);
