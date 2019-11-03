@@ -11,6 +11,7 @@
 #define PLIB_VECTOR_OPS_H_
 
 #include "pconfig.h"
+#include "pmath.h"
 
 #include <algorithm>
 #include <array>

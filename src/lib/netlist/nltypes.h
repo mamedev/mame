@@ -22,7 +22,6 @@
 #include "plib/ptime.h"
 #include "plib/putil.h"
 
-//#include <cstdint>
 #include <unordered_map>
 
 namespace netlist

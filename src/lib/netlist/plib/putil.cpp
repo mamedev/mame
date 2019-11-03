@@ -7,7 +7,7 @@
 #include "ptypes.h"
 
 #include <algorithm>
-#include <cstdlib>
+#include <cstdlib> // needed for getenv ...
 #include <initializer_list>
 
 namespace plib

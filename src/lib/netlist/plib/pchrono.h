@@ -12,7 +12,6 @@
 #include "ptypes.h"
 
 #include <chrono>
-//#include <cstdint>
 
 namespace plib {
 	namespace chrono {
