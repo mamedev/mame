@@ -628,7 +628,17 @@ static INPUT_PORTS_START( spdheat )
 
 	PORT_START("ACCEL4")
 	PORT_BIT( 0xff, 0x40, IPT_PEDAL ) PORT_MINMAX(0x40,0xFF) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)  PORT_PLAYER(4)
+INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( spdheatj )
+	PORT_INCLUDE( spdheat )
+
+	PORT_MODIFY("DSWC")
+	// Default to Japanese as all the speech is in Japanese
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Language ) ) PORT_DIPLOCATION("DSWC:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 INPUT_PORTS_END
 
 
@@ -780,19 +790,49 @@ void spdheat_state::spdheat(machine_config &config)
 
 ROM_START( spdheat )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "a55-04-1.ic37", 0x00000, 0x08000, CRC(bb1dd6b2) SHA1(f0d45f82e643fbc5cf6ec75fd8d7ae4c4b7d8b23) )
-	ROM_LOAD16_BYTE( "a55-01-1.ic26", 0x00001, 0x08000, CRC(7ee12547) SHA1(79395cc622a315c3b3c3000224e150311da8073d) )
-	ROM_LOAD16_BYTE( "a55-05-1.ic36", 0x10000, 0x08000, CRC(b396ef0b) SHA1(7a7f59faf4478c417f0928b22fb81462cb2628c2) )
-	ROM_LOAD16_BYTE( "a55-02-1.ic25", 0x10001, 0x08000, CRC(4b76870a) SHA1(6bc1a594e37e2e3f2f0b4f23ba9bd7c87c3a27d9) )
-	ROM_LOAD16_BYTE( "a55-06.ic34",   0x20000, 0x08000, CRC(900ecd44) SHA1(352b196bfe3b61cfbcdde72a03d3064be05be41e) )
-	ROM_LOAD16_BYTE( "a55-03.ic23",   0x20001, 0x08000, CRC(6a5d2fe5) SHA1(595cc6028dbd0ceaf519b9a5eddfeffa74e2d27c) )
+	ROM_LOAD16_BYTE( "a55-04.ic37", 0x00000, 0x08000, CRC(bb1dd6b2) SHA1(f0d45f82e643fbc5cf6ec75fd8d7ae4c4b7d8b23) )
+	ROM_LOAD16_BYTE( "a55-01.ic26", 0x00001, 0x08000, CRC(7ee12547) SHA1(79395cc622a315c3b3c3000224e150311da8073d) )
+	ROM_LOAD16_BYTE( "a55-05.ic36", 0x10000, 0x08000, CRC(b396ef0b) SHA1(7a7f59faf4478c417f0928b22fb81462cb2628c2) )
+	ROM_LOAD16_BYTE( "a55-02.ic25", 0x10001, 0x08000, CRC(4b76870a) SHA1(6bc1a594e37e2e3f2f0b4f23ba9bd7c87c3a27d9) )
+	ROM_LOAD16_BYTE( "a55-06.ic34", 0x20000, 0x08000, CRC(900ecd44) SHA1(352b196bfe3b61cfbcdde72a03d3064be05be41e) )
+	ROM_LOAD16_BYTE( "a55-03.ic23", 0x20001, 0x08000, CRC(6a5d2fe5) SHA1(595cc6028dbd0ceaf519b9a5eddfeffa74e2d27c) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "a55-17.ic11",  0x00000, 0x08000, CRC(43c2318f) SHA1(472e9cc68bb8ff3c5c3d4ec475491ad1a97261e7) )
+
+    ROM_REGION( 0x10000, "subcpu", 0 ) // TODO: What are the correct labels for these?
+	ROM_LOAD( "a55-15.ic5", 0x00000, 0x08000, CRC(c43b85ee) SHA1(7d7ed6b5f3e48a38b3e387f2dbc2f2bb0662db94) )
+	ROM_LOAD( "a55-16.ic6", 0x08000, 0x08000, CRC(8f45edbd) SHA1(29a696691bd199b6fff0fe0e9fd9241cec9f3fbe) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "a55-07.ic6",   0x00000, 0x04000, CRC(cf85d3a0) SHA1(8ad330fd33b94b7bc0eb49edc4e5eafd2df54010) )
+	ROM_LOAD( "a55-08.ic5",   0x04000, 0x04000, CRC(9ce4214d) SHA1(ea461d00af87bb0618604a02bd72338bcfb31f5b) )
+	ROM_LOAD( "a55-09.ic22",  0x08000, 0x04000, CRC(00d7fba1) SHA1(ff0418856f469aa0b570c7a9c9af6cd3442e9b97) )
+	ROM_LOAD( "a55-10.ic21",  0x0c000, 0x04000, CRC(743a04c5) SHA1(b878f4cdf1585eedddb8d18453474996a10b0804) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "a55-11.ic55",  0x00000, 0x08000, CRC(db979542) SHA1(a857e2ad12b07ccedd4453819fcb8f946893eedf) )
+	ROM_LOAD( "a55-12.ic53",  0x08000, 0x08000, CRC(3d8211c2) SHA1(587caaf5775001a9aa2f266b3d084bd93fa0d575) )
+	ROM_LOAD( "a55-13.ic52",  0x10000, 0x08000, CRC(38085e40) SHA1(5e4d6f9ce39a95bdddf5b2f4504fe3c34b5a8585) )
+	ROM_LOAD( "a55-14.ic36",  0x18000, 0x08000, CRC(31c38779) SHA1(42ce3441a540644d17f27e84f8c5693cbee3e9f1) )
+ROM_END
+
+
+ROM_START( spdheatj )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "a55-04.ic37", 0x00000, 0x08000, CRC(bb1dd6b2) SHA1(f0d45f82e643fbc5cf6ec75fd8d7ae4c4b7d8b23) )
+	ROM_LOAD16_BYTE( "a55-01.ic26", 0x00001, 0x08000, CRC(7ee12547) SHA1(79395cc622a315c3b3c3000224e150311da8073d) )
+	ROM_LOAD16_BYTE( "a55-05.ic36", 0x10000, 0x08000, CRC(b396ef0b) SHA1(7a7f59faf4478c417f0928b22fb81462cb2628c2) )
+	ROM_LOAD16_BYTE( "a55-02.ic25", 0x10001, 0x08000, CRC(4b76870a) SHA1(6bc1a594e37e2e3f2f0b4f23ba9bd7c87c3a27d9) )
+	ROM_LOAD16_BYTE( "a55-06.ic34", 0x20000, 0x08000, CRC(900ecd44) SHA1(352b196bfe3b61cfbcdde72a03d3064be05be41e) )
+	ROM_LOAD16_BYTE( "a55-03.ic23", 0x20001, 0x08000, CRC(6a5d2fe5) SHA1(595cc6028dbd0ceaf519b9a5eddfeffa74e2d27c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a55-17.ic11",  0x00000, 0x08000, CRC(43c2318f) SHA1(472e9cc68bb8ff3c5c3d4ec475491ad1a97261e7) )
 
 	ROM_REGION( 0x10000, "subcpu", 0 )
-	ROM_LOAD( "a55-15.ic5",   0x00000, 0x08000, CRC(c43b85ee) SHA1(7d7ed6b5f3e48a38b3e387f2dbc2f2bb0662db94) )
-	ROM_LOAD( "a55-16.ic6",   0x08000, 0x08000, CRC(8f45edbd) SHA1(29a696691bd199b6fff0fe0e9fd9241cec9f3fbe) )
+	ROM_LOAD( "a55-15.ic5",   0x00000, 0x08000, CRC(d076c1b7) SHA1(925390d09471f946b31a0a65da7d62eda4c05ec0) )
+	ROM_LOAD( "a55-16.ic6",   0x08000, 0x08000, CRC(0b091bdb) SHA1(f86d2cc32eb8008b27035d7622f16ce7fb4daa61) )
 
 	ROM_REGION( 0x10000, "gfx1", 0 )
 	ROM_LOAD( "a55-07.ic6",   0x00000, 0x04000, CRC(cf85d3a0) SHA1(8ad330fd33b94b7bc0eb49edc4e5eafd2df54010) )
@@ -814,4 +854,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, spdheat, 0, spdheat,  spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat", 0 )
+GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (World)", 0 )
+GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (Japan)", 0 )
