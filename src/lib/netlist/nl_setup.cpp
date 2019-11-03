@@ -121,8 +121,8 @@ namespace netlist
 
 	void nlparse_t::register_param_x(const pstring &param, const nl_fptype value)
 	{
-		if (std::abs(value - std::floor(value)) > nlconst::magic(1e-30)
-			|| std::abs(value) > nlconst::magic(1e9))
+		if (plib::abs(value - plib::floor(value)) > nlconst::magic(1e-30)
+			|| plib::abs(value) > nlconst::magic(1e9))
 			register_param(param, plib::pfmt("{1:.9}").e(value));
 		else
 			register_param(param, plib::pfmt("{1}")(static_cast<long>(value)));
@@ -1126,7 +1126,7 @@ void setup_t::prepare_to_run()
 				//FIXME: check for errors ...
 				bool err(false);
 				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
-				if (err || std::abs(v - std::floor(v)) > nlconst::magic(1e-6) )
+				if (err || plib::abs(v - plib::floor(v)) > nlconst::magic(1e-6) )
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
 				// FIXME comparison with zero
 				d.second->set_hint_deactivate(v == nlconst::zero());

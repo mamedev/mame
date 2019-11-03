@@ -37,9 +37,9 @@ namespace analog
 			m_VT = nlconst::magic(0.0258) * n;
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
-		nl_fptype I(const nl_fptype V) const { return m_Is * std::exp(V * m_VT_inv) - m_Is; }
-		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * std::exp(V * m_VT_inv); }
-		nl_fptype V(const nl_fptype I) const { return std::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
+		nl_fptype I(const nl_fptype V) const { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }
+		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * plib::exp(V * m_VT_inv); }
+		nl_fptype V(const nl_fptype I) const { return plib::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
 		nl_fptype gI(const nl_fptype I) const { return m_VT_inv * (I + m_Is); }
 
 	private:

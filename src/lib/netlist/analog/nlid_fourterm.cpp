@@ -69,13 +69,13 @@ NETLIB_UPDATE_TERMINALS(LVCCS)
 	const nl_fptype vi = m_IP.net().Q_Analog() - m_IN.net().Q_Analog();
 	const auto c1(nlconst::magic(0.2));
 
-	if (std::abs(m_mult / m_cur_limit() * vi) > nlconst::half())
-		m_vi = m_vi + c1 * std::tanh((vi - m_vi) / c1);
+	if (plib::abs(m_mult / m_cur_limit() * vi) > nlconst::half())
+		m_vi = m_vi + c1 * plib::tanh((vi - m_vi) / c1);
 	else
 		m_vi = vi;
 
 	const nl_fptype x = m_mult / m_cur_limit() * m_vi;
-	const nl_fptype X = std::tanh(x);
+	const nl_fptype X = plib::tanh(x);
 
 	const nl_fptype beta = m_mult * (nlconst::one() - X*X);
 	const nl_fptype I = m_cur_limit() * X - beta * m_vi;

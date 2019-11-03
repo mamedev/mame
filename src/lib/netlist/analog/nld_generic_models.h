@@ -163,8 +163,8 @@ namespace analog
 				if (nVd > m_Vcrit)
 				{
 					const nl_fptype d = std::min(+fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd - m_Vd);
-					const nl_fptype a = std::abs(d) * m_VtInv;
-					m_Vd = m_Vd + nlconst::magic(d < 0 ? -1.0 : 1.0) * std::log1p(a) * m_Vt;
+					const nl_fptype a = plib::abs(d) * m_VtInv;
+					m_Vd = m_Vd + nlconst::magic(d < 0 ? -1.0 : 1.0) * plib::log1p(a) * m_Vt;
 				}
 				else
 					m_Vd = std::max(-fp_constants<nl_fptype>::DIODE_MAXDIFF(), nVd);
@@ -177,7 +177,7 @@ namespace analog
 				}
 				else
 				{
-					IseVDVt = std::exp(m_logIs + m_Vd * m_VtInv);
+					IseVDVt = plib::exp(m_logIs + m_Vd * m_VtInv);
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
 				}
@@ -193,7 +193,7 @@ namespace analog
 				else /* log stepping should already be done in mosfet */
 				{
 					m_Vd = nVd;
-					IseVDVt = std::exp(std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(), m_logIs + m_Vd * m_VtInv));
+					IseVDVt = plib::exp(std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(), m_logIs + m_Vd * m_VtInv));
 					m_Id = IseVDVt - m_Is;
 					m_G = IseVDVt * m_VtInv + m_gmin;
 				}
@@ -203,7 +203,7 @@ namespace analog
 		void set_param(const nl_fptype Is, const nl_fptype n, nl_fptype gmin, nl_fptype temp)
 		{
 			m_Is = Is;
-			m_logIs = std::log(Is);
+			m_logIs = plib::log(Is);
 			m_n = n;
 			m_gmin = gmin;
 
@@ -211,7 +211,7 @@ namespace analog
 
 			m_Vmin = nlconst::magic(-5.0) * m_Vt;
 
-			m_Vcrit = m_Vt * std::log(m_Vt / m_Is / nlconst::sqrt2());
+			m_Vcrit = m_Vt * plib::log(m_Vt / m_Is / nlconst::sqrt2());
 			m_VtInv = nlconst::one() / m_Vt;
 			//printf("%g %g\n", m_Vmin, m_Vcrit);
 		}

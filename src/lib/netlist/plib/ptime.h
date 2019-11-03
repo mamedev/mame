@@ -100,12 +100,20 @@ namespace plib
 
 		constexpr internal_type as_raw() const noexcept { return m_time; }
 
-		template <typename FT>
-		constexpr typename std::enable_if<std::is_floating_point<FT>::value, FT>::type
+		template <typename FT, typename = std::enable_if<std::is_floating_point<FT>::value, FT>>
+		constexpr FT
 		as_fp() const noexcept
 		{
 			return static_cast<FT>(m_time) * inv_res<FT>();
 		}
+
+#if PUSE_FLOAT128
+		constexpr __float128
+		as_fp() const noexcept
+		{
+			return static_cast<__float128>(m_time) * inv_res<__float128>();
+		}
+#endif
 
 		constexpr double as_double() const noexcept { return as_fp<double>(); }
 		constexpr double as_float() const noexcept { return as_fp<float>(); }
@@ -122,8 +130,12 @@ namespace plib
 		static constexpr const ptime from_raw(const internal_type raw) noexcept { return ptime(raw); }
 
 		template <typename FT>
-		static constexpr const typename std::enable_if<std::is_floating_point<FT>::value, ptime>::type
-		from_fp(const FT t) noexcept { return ptime(static_cast<internal_type>(std::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
+		static constexpr const typename std::enable_if<std::is_floating_point<FT>::value
+#if PUSE_FLOAT128
+			|| std::is_same<FT, __float128>::value
+#endif
+		, ptime>::type
+		from_fp(const FT t) noexcept { return ptime(static_cast<internal_type>(plib::floor(t * static_cast<FT>(RES) + static_cast<FT>(0.5))), RES); }
 
 		static constexpr const ptime from_double(const double t) noexcept
 		{ return from_fp<double>(t); }

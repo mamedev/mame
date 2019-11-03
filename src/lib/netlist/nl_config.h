@@ -107,13 +107,17 @@
 static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
-//============================================================
-// Floating point types used
-//
-// Don't change this. Simple analog circuits like pong
-// work with float. Kidniki just doesn't work at all
-// due to numeric issues
-//============================================================
+/*! Floating point types used
+ *
+ * nl_fptype is the floating point type used throughout the
+ * netlist core.
+ *
+ *  Don't change this! Simple analog circuits like pong
+ *  work with float. Kidniki just doesn't work at all.
+ *
+ *  FIXME: More work needed. Review magic numbers.
+ *
+ */
 
 using nl_fptype = double;
 
@@ -162,8 +166,8 @@ namespace netlist
 	template <>
 	struct fp_constants<float>
 	{
-		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e2; }
-		static inline constexpr float DIODE_MAXVOLT() noexcept { return  20.0; }
+		static inline constexpr float DIODE_MAXDIFF() noexcept { return  1e20; }
+		static inline constexpr float DIODE_MAXVOLT() noexcept { return  90.0; }
 
 		static inline constexpr float TIMESTEP_MAXDIFF() noexcept { return  1e30f; }
 		static inline constexpr float TIMESTEP_MINDIV() noexcept { return  1e-8f; }
