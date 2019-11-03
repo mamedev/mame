@@ -11,6 +11,7 @@
 #include "plists.h"
 #include "pstring.h"
 #include "putil.h"
+#include "pstonum.h"
 
 namespace plib {
 /***************************************************************************

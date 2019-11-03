@@ -11,6 +11,7 @@
 #include "pstate.h"
 #include "pstring.h"
 #include "putil.h"
+#include "pmath.h"
 
 #include <vector>
 

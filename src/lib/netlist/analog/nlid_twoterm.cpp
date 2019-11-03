@@ -10,8 +10,6 @@
 #include "netlist/nl_factory.h"
 #include "nlid_twoterm.h"
 
-#include <cmath>
-
 namespace netlist
 {
 	namespace analog

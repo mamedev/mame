@@ -42,7 +42,7 @@ namespace plib {
 	 * Passing SIZE > 0 has the same functionality as a std::array.
 	 * SIZE = 0 is pure dynamic allocation, the actual array size is passed to the
 	 * constructor.
-	 * SIZE < 0 reserves std::abs(SIZE) elements statically in place allocated. The
+	 * SIZE < 0 reserves abs(SIZE) elements statically in place allocated. The
 	 * actual size is passed in by the constructor.
 	 * This array is purely intended for HPC application where depending on the
 	 * architecture a preference dynamic/static has to be made.

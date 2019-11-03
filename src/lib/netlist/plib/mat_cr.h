@@ -17,10 +17,10 @@
 #include "pstate.h"
 #include "ptypes.h"
 #include "putil.h"
+#include "pmath.h"
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <type_traits>
 #include <vector>
 
@@ -120,7 +120,7 @@ namespace plib
 				row_idx[k] = nz;
 
 				for (std::size_t j=0; j < size(); j++)
-					if (f[k][j] <= max_fill && std::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
+					if (f[k][j] <= max_fill && plib::abs(static_cast<int>(k)-static_cast<int>(j)) <= static_cast<int>(band_width))
 					{
 						col_idx[nz] = static_cast<C>(j);
 						if (j == k)

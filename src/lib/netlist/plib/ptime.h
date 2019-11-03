@@ -9,9 +9,7 @@
 
 #include "pconfig.h"
 #include "ptypes.h"
-
-#include <cmath> // std::floor
-//#include <cstdint>
+#include "pmath.h" // std::floor
 
 // ----------------------------------------------------------------------------------------
 // netlist_time

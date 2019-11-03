@@ -11,8 +11,6 @@
 #include "nlid_fourterm.h"
 #include "nlid_twoterm.h"
 
-#include <cmath>
-
 namespace netlist
 {
 	namespace analog

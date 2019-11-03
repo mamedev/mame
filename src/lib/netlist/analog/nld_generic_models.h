@@ -11,8 +11,6 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 
-#include <cmath>
-
 namespace netlist
 {
 namespace analog

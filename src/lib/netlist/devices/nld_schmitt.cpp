@@ -12,9 +12,6 @@
 #include "netlist/nl_errstr.h"
 #include "netlist/solver/nld_solver.h"
 
-#include <cmath>
-
-
 namespace netlist
 {
 	namespace devices

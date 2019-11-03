@@ -16,8 +16,6 @@
 #include "plib/vector_ops.h"
 
 #include <algorithm>
-#include <cmath>
-
 
 namespace netlist
 {

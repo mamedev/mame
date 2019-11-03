@@ -6,11 +6,12 @@
  */
 
 #include "plib/palloc.h"
-#include "nl_convert.h"
 #include "plib/putil.h"
+#include "plib/pstonum.h"
+
+#include "nl_convert.h"
 
 #include <algorithm>
-#include <cmath>
 #include <unordered_map>
 
 /* FIXME: temporarily defined here - should be in a file */
@@ -206,7 +207,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 {
 	for (auto &e : m_units)
 	{
-		if (e.m_mult <= std::abs(val))
+		if (e.m_mult <= plib::abs(val))
 			return plib::pfmt(e.m_func)(val / e.m_mult);
 	}
 	return plib::pfmt("{1}")(val);

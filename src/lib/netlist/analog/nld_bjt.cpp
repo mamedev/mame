@@ -9,9 +9,6 @@
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
-
-#include <cmath>
-
 namespace netlist
 {
 namespace analog
