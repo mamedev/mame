@@ -68,36 +68,8 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/timer.h"
+#include "machine/elan_eu3a05sys.h"
 
-/*
-
-TODO: fill these in for other games, this is for Golden Tee Home
-
-ffb0  rti
-ffb4  rti
-ffb8  rti
-ffbc  rti
-
-ffc0  rti
-ffc4  rti
-ffc8  rti
-ffcc  rti
-
-ffd0  rti
-ffd4  main irq?
-ffd8  rti
-ffdc  rti
-
-ffe0  something with 5045 bit 0x08 and 9d in ram (increase or decrease)  (ADC interrupt)
-ffe4  something with 5045 bit 0x20 and 9c in ram (increase of decrease)  (ADC interrupt)
-
-ffe8  rti
-ffec  rti
-
-regular NMI (e3f0 - jump to ($19e2) which seems to point to rti, but could move..)
-regular IRQ (e3f3 - points to rti)
-
-*/
 
 
 class radica_eu3a14_state : public driver_device
@@ -106,6 +78,7 @@ public:
 	radica_eu3a14_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_sys(*this, "sys"),
 		m_mainregion(*this, "maincpu"),
 		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
@@ -184,6 +157,7 @@ private:
 	double hue2rgb(double p, double q, double t);
 
 	required_device<cpu_device> m_maincpu;
+	required_device<elan_eu3a05sys_device> m_sys;
 	required_region_ptr<uint8_t> m_mainregion;
 	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
@@ -1115,8 +1089,7 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// 5001 write
 	// 5004 write
 	// 5006 write
-	map(0x5007, 0x5007).noprw();
-	map(0x5008, 0x5008).nopw(); // startup (read too)
+	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05sys_device::intmask_r), FUNC(elan_eu3a05sys_device::intmask_w));
 	map(0x5009, 0x5009).r(FUNC(radica_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
 	map(0x500a, 0x500a).nopw(); // startup
 	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::radicasi_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
@@ -1204,7 +1177,8 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 
-	map(0xfffe, 0xffff).r(FUNC(radica_eu3a14_state::irq_vector_r));
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05sys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05sys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)
@@ -1710,29 +1684,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(radica_eu3a14_state::scanline_cb)
 {
 	// these interrupts need to occur based on how fast the trackball is
 	// being moved, the direction is read in a port.
-
 	int scanline = param;
 
 	if (scanline == 20)
 	{
 		// vertical trackball
-		m_custom_irq_vector = 0xffe0;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+		m_sys->generate_custom_interrupt(12);
 	}
 
 	if (scanline == 40)
 	{
 		// horizontal trackball
-		m_custom_irq_vector = 0xffe4;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+		m_sys->generate_custom_interrupt(13);
+
 	}
 }
 
 INTERRUPT_GEN_MEMBER(radica_eu3a14_state::interrupt)
 {
-	m_custom_irq = 1;
-	m_custom_irq_vector = 0xffd4;
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
+	m_sys->generate_custom_interrupt(9);
 }
 
 
@@ -1798,6 +1768,9 @@ void radica_eu3a14_state::radica_eu3a14(machine_config &config)
 	M6502(config, m_maincpu, XTAL(21'477'272)/2); // marked as 21'477'270
 	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a14_state::radica_eu3a14_map);
 	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a14_state::interrupt));
+
+	ELAN_EU3A05_SYS(config, m_sys, 0);
+	m_sys->set_cpu("maincpu");
 
 	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 

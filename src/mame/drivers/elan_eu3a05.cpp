@@ -19,144 +19,23 @@
 
     Tetris
     Space Invaders
-
-    Possible other games on this hardawre
-
-    ConnecTV Football (aka ConnecTV International Football)
-     - Soccer game, not the same as Play TV Football, or Play TV Soccer
-       (it has the same XTAL etc. as this driver at least)
+	ABL Air-Blaster Joystick
 
     ---
-    The XaviX ones seem to have a XaviX logo on the external packaging while the
-    ones for this driver don't seem to have any specific marking.
-
+    XaviX plug and play units almost always have a XaviX logo on the external packaging
+	while the ones for this driver (and SunPlus etc.) don't seem to have any specific
+	markings.
 
     Notes:
-    To access internal test on Tetris hold P1 Down + P1 Anticlockwise (Button 2) on boot
-    There appears to be a similar mode for Invaders but I don't know if it's accessible
+    
+	Tetris - RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if
+	between certain values? probably read via serial (or ADC abuse?)
 
-
-    RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if between
-    certain values? probably read via serial??
-
-	-----------------------
-    Custom Interrupt purposes
-	-----------------------
-
-    TETRIS
-
-    ffb0
-    nothing of note?
-
-    ffb4
-    stuff with 500e, 500c and 500d
-
-    ffb8
-    stuff with 50a4 / 50a5 / 50a6  and memory address e2
-
-    ffbc
-    stuff with 50a4 / 50a5 / 50a6  and memory address e2 (similar to above, different bits)
-
-    ffc0 - doesn't exist
-    ffc4 - doesn't exist
-    ffc8 - doesn't exist
-    ffd0 - doesn't exist
-
-    ffd4
-    main irq?
-
-    ffd8
-    jumps straight to an rti
-
-    ffdc
-    accesses 501d / 501b
-
-	-----------------------
-
-    SPACE INVADERS
-
-    ffb0
-    rti
-
-    ffb4
-    rti
-
-    ffb8
-    rti
-
-    ffbc
-    decreases 301  bit 02
-    stuff wit 50a5
-
-    ffc0
-    decreases 302
-    stuff with 50a5 bit 04
-
-    ffc4
-    decreases 303
-    stuff with 50a5  bit 08
-
-    ffc8
-    decreases 304
-    stuff with 50a5  bit 10
-
-    ffcc
-    uses 307
-    stuff with 50a5  bit 20
-
-    ffd0
-    dead loop
-
-    ffd4
-    main interrupt
-
-    ffd8
-    dead loop
-
-    ffdc
-    dead loop
-
-    ffe0
-    dead loop
-
-    ffe4
-    rti
-
-    ffe8
-    dead loop
-
-    ffec
-    dead loop
-
-	-----------------------
+	Internal Test Menus:
 	
-	AIR BLASTER JOYSTICK
-
-	all these 60xx jumps expect bank 00 or 0e or 3a or 7d to be active, so IRQs must be masked
-
-	ffb0: jmp to 6000  (ends up jumping to pointer from RAM)
-	ffb4: jmp to e08e  (stuff with 500c/500d/506e etc.)
-	ffb8: jmp to 601c  (stub handler) (has function in bank 0e - writes 00 then 01 to 50a5)
-	ffbc: jmp to 602a  (stub handler)
-	ffc0: jmp to 6038  (stub handler)
-	ffc4: jmp to 6046  (stub handler)
-	ffc8: jmp to 6054  (stub handler)
-	ffcc: jmp to 6062  (stub handler)
-	ffd0: jmp to 6070  (stub handler)
-	ffd4: jmp to 607e  (valid code - main IRQ?)
-	ffd8: jmp to 608c  (stub handler)
-	ffdc: jmp to 609a  (stub handler)
-	ffe0: jmp to 60a8  (stub handler)
-	ffe4: jmp to 60b6  (stub handler)
-	ffe8: jmp to 60c4  (stub handler)
-	ffec: jmp to 60d2  (stub handler)
-
-	fff0: 7d
-
-	fffa: e0 60 (60e0 vector) (stub handler)
-	fffc: 88 e1 (e188 startup vector)
-	fffe: 02 e0 (e002 vector)
-
+	Tetris - hold P1 Down + P1 Anticlockwise (Button 2) on boot
+    Space Invaders - hold P1 Down + P1 Button 1 on boot
+	ABL Air-Blaster - none?
 
 	----
 
@@ -195,6 +74,7 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/elan_eu3a05gpio.h"
+#include "machine/elan_eu3a05sys.h"
 
 class radica_eu3a05_state : public driver_device
 {
@@ -207,9 +87,8 @@ public:
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
 		m_palram(*this, "palram"),
-		m_unk5007(*this, "unk5007"),
-		m_unk5008(*this, "unk5008"),
 		m_gpio(*this, "gpio"),
+		m_sys(*this, "sys"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -271,9 +150,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	DECLARE_READ8_MEMBER(radicasi_nmi_vector_r);
-	DECLARE_READ8_MEMBER(radicasi_irq_vector_r);
-
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
@@ -292,9 +168,8 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_shared_ptr<uint8_t> m_palram;
-	required_shared_ptr<uint8_t> m_unk5007;
-	required_shared_ptr<uint8_t> m_unk5008;
-	required_device<radica6502_gpio_device> m_gpio;
+	required_device<elan_eu3a05gpio_device> m_gpio;
+	required_device<elan_eu3a05sys_device> m_sys;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -320,11 +195,6 @@ private:
 	uint8_t m_sprite_gfxbase_hi_data;
 
 	uint8_t m_bg_scroll[2];
-
-	int m_custom_irq;
-	int m_custom_nmi;
-	uint16_t m_custom_irq_vector;
-	uint16_t m_custom_nmi_vector;
 
 	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
@@ -958,9 +828,7 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 	// 500x system regs?
 	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::radicasi_5003_r));
 
-	map(0x5007, 0x5007).ram().share("unk5007"); // main NMI?IRQ? mask on 0x02
-	map(0x5008, 0x5008).ram().share("unk5008"); // timer IRQ masks or enables?
-
+	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05sys_device::intmask_r), FUNC(elan_eu3a05sys_device::intmask_w));
 
 	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
 	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
@@ -993,8 +861,8 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 
 	// 504x GPIO area?
-	map(0x5040, 0x5046).rw("gpio", FUNC(radica6502_gpio_device::gpio_r), FUNC(radica6502_gpio_device::gpio_w));
-	map(0x5048, 0x504a).w("gpio", FUNC(radica6502_gpio_device::gpio_unk_w));
+	map(0x5040, 0x5046).rw("gpio", FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
+	map(0x5048, 0x504a).w("gpio", FUNC(elan_eu3a05gpio_device::gpio_unk_w));
 
 	// 506x unknown
 	map(0x5060, 0x506d).ram(); // read/written by tetris
@@ -1014,8 +882,8 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
 	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
-	map(0xfffe, 0xffff).r(FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05sys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05sys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
 
@@ -1089,47 +957,10 @@ static INPUT_PORTS_START( airblsjs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
 INPUT_PORTS_END
 
-/* both NMI and IRQ vectors just point to RTI
-    there is a table of jumps just before that, those appear to be the real interrupt functions?
 
-    patch the main IRQ to be the one that decreases an address the code is waiting for
-    the others look like they might be timer service routines
-*/
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_nmi_vector_r)
-{
-	if (m_custom_nmi)
-	{
-		return m_custom_nmi_vector >> (offset*8);
-	}
-	else
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		return rom[0x3f9ffa + offset];
-	}
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_irq_vector_r)
-{
-	if (m_custom_irq)
-	{
-		return m_custom_irq_vector >> (offset*8);
-	}
-	else
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		return rom[0x3f9ffe + offset];
-	}
-}
 
 void radica_eu3a05_state::machine_start()
 {
-	m_custom_irq = 0;
-	m_custom_irq_vector = 0x0000;
-
-	m_custom_nmi = 0;
-	m_custom_nmi_vector = 0x0000;
-
 	m_bank->set_bank(0x7f);
 
 	save_item(NAME(m_rombank_lo));
@@ -1216,28 +1047,11 @@ static GFXDECODE_START( gfx_radicasi_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
+
+
 INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 {
-	// Air Blaster uses brk in the code, which is problematic for custom IRQs
-	//	m_custom_irq = 1;
-	//	m_custom_irq_vector = 0xffd4;
-	//	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
-	
-	// 5007        5008
-	// ---- --v-   ---- -2-0
-	//
-	// vector = 0xffb0 + 4 * bit position from right
-
-	// each bit seems to relate to an IRQ level
-	// v = vblank bit (vector 0xffd4)
-	// 0 = used for object movement (enemies / bullets) on air blaster chase levels (vector 0xffb0) needs to be frequent, timer? or hbl?
-	// 2 = used for ? on air blaster 2d levels (`vector 0xffb8)
-
-	m_custom_nmi = 1;
-	m_custom_nmi_vector = 0xffd4;
-
-	if (m_unk5007[0] & 0x02) // seems to be correct otherwise Air Blaster will crash / give random mid-level Game Over messages
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_sys->generate_custom_interrupt(9);
 }
 
 
@@ -1272,10 +1086,13 @@ void radica_eu3a05_state::radicasi(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_radicasi_fake);
 
-	RADICA6502_GPIO(config, m_gpio, 0);
+	ELAN_EU3A05_GPIO(config, m_gpio, 0);
 	m_gpio->read_0_callback().set_ioport("IN0");
 	m_gpio->read_1_callback().set_ioport("IN1");
 	m_gpio->read_2_callback().set_ioport("IN2");
+
+	ELAN_EU3A05_SYS(config, m_sys, 0);
+	m_sys->set_cpu("maincpu");
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
