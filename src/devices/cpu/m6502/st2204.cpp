@@ -35,7 +35,18 @@ st2204_device::st2204_device(const machine_config &mconfig, const char *tag, dev
 					address_map_constructor(FUNC(st2204_device::int_map), this),
 					26, // logical; only 23 address lines are brought out
 					0x0f7f)
+	, m_bten(0)
+	, m_btsr(0)
+	, m_base_timer{0}
 {
+}
+
+template<int N>
+TIMER_CALLBACK_MEMBER(st2204_device::bt_interrupt)
+{
+	m_btsr |= 1 << N;
+	m_ireq |= 0x020;
+	update_irq_state();
 }
 
 void st2204_device::device_start()
@@ -49,14 +60,26 @@ void st2204_device::device_start()
 	intf->drr = 0;
 	intf->irq_service = false;
 
+	m_base_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::bt_interrupt<0>), this));
+	m_base_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::bt_interrupt<1>), this));
+	m_base_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::bt_interrupt<2>), this));
+	m_base_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::bt_interrupt<3>), this));
+	m_base_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::bt_interrupt<4>), this));
+
 	save_item(NAME(m_pdata));
 	save_item(NAME(m_pctrl));
 	save_item(NAME(m_psel));
 	save_item(NAME(m_pfun));
+	save_item(NAME(m_bten));
+	save_item(NAME(m_btsr));
 	save_item(NAME(m_sys));
 	save_item(NAME(m_pmcr));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
+	save_item(NAME(m_lssa));
+	save_item(NAME(m_lvpw));
+	save_item(NAME(m_lxmax));
+	save_item(NAME(m_lymax));
 	save_item(NAME(intf->irr_enable));
 	save_item(NAME(intf->irr));
 	save_item(NAME(intf->prr));
@@ -83,7 +106,13 @@ void st2204_device::device_start()
 	state_add(ST_PDL, "PDL", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
+	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); }).mask(0x1f);
+	state_add(ST_BTSR, "BTSR", m_btsr).mask(0x1f);
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); });
+	state_add(ST_LSSA, "LSSA", m_lssa);
+	state_add(ST_LVPW, "LVPW", m_lvpw);
+	state_add(ST_LXMAX, "LXMAX", m_lxmax);
+	state_add(ST_LYMAX, "LYMAX", m_lymax);
 }
 
 void st2204_device::device_reset()
@@ -95,6 +124,9 @@ void st2204_device::device_reset()
 	m.irr = 0;
 	m.prr = 0;
 	m.drr = 0;
+
+	bten_w(0);
+	m_btsr = 0;
 }
 
 u8 st2204_device::mi_st2204::pread(u16 adr)
@@ -165,6 +197,40 @@ void st2204_device::pmcr_w(u8 data)
 	m_pmcr = data;
 }
 
+u8 st2204_device::bten_r()
+{
+	return m_bten;
+}
+
+void st2204_device::bten_w(u8 data)
+{
+	for (int n = 0; n < 5; n++)
+	{
+		if (BIT(data, n) && !BIT(m_bten, n))
+		{
+			// 2 Hz, 8 Hz, 64 Hz, 256 Hz, 2048 Hz
+			attotime period = attotime::from_hz(2 << ((n & 1) * 2 + (n >> 1) * 5));
+			m_base_timer[n]->adjust(period, 0, period);
+		}
+		else if (!BIT(data, n) && BIT(m_bten, n))
+			m_base_timer[n]->adjust(attotime::never);
+	}
+
+	m_bten = data & 0x1f;
+}
+
+u8 st2204_device::btsr_r()
+{
+	return m_btsr;
+}
+
+void st2204_device::btsr_w(u8 data)
+{
+	// Only bit 7 has any effect
+	if (BIT(data, 7))
+		m_btsr = 0;
+}
+
 u8 st2204_device::sys_r()
 {
 	return m_sys | 0x01;
@@ -173,7 +239,7 @@ u8 st2204_device::sys_r()
 void st2204_device::sys_w(u8 data)
 {
 	m_sys = data;
-	downcast<mi_st2204 &>(*mintf).irr_enable = BIT(data, 2);
+	downcast<mi_st2204 &>(*mintf).irr_enable = BIT(data, 1);
 }
 
 u8 st2204_device::irr_r()
@@ -258,6 +324,8 @@ void st2204_device::int_map(address_map &map)
 	map(0x000d, 0x000d).rw(FUNC(st2204_device::pfc_r), FUNC(st2204_device::pfc_w));
 	map(0x000e, 0x000e).rw(FUNC(st2204_device::pfd_r), FUNC(st2204_device::pfd_w));
 	map(0x000f, 0x000f).rw(FUNC(st2204_device::pmcr_r), FUNC(st2204_device::pmcr_w));
+	map(0x0020, 0x0020).rw(FUNC(st2204_device::bten_r), FUNC(st2204_device::bten_w));
+	map(0x0021, 0x0021).rw(FUNC(st2204_device::btsr_r), FUNC(st2204_device::btsr_w));
 	map(0x0030, 0x0030).rw(FUNC(st2204_device::sys_r), FUNC(st2204_device::sys_w));
 	map(0x0031, 0x0031).rw(FUNC(st2204_device::irr_r), FUNC(st2204_device::irr_w));
 	map(0x0032, 0x0032).rw(FUNC(st2204_device::prrl_r), FUNC(st2204_device::prrl_w));
@@ -268,6 +336,11 @@ void st2204_device::int_map(address_map &map)
 	map(0x003d, 0x003d).rw(FUNC(st2204_device::ireqh_r), FUNC(st2204_device::ireqh_w));
 	map(0x003e, 0x003e).rw(FUNC(st2204_device::ienal_r), FUNC(st2204_device::ienal_w));
 	map(0x003f, 0x003f).rw(FUNC(st2204_device::ienah_r), FUNC(st2204_device::ienah_w));
+	map(0x0040, 0x0040).w(FUNC(st2204_device::lssal_w));
+	map(0x0041, 0x0041).w(FUNC(st2204_device::lssah_w));
+	map(0x0042, 0x0042).w(FUNC(st2204_device::lvpw_w));
+	map(0x0043, 0x0043).rw(FUNC(st2204_device::lxmax_r), FUNC(st2204_device::lxmax_w));
+	map(0x0044, 0x0044).rw(FUNC(st2204_device::lymax_r), FUNC(st2204_device::lymax_w));
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	map(0x004e, 0x004e).w(FUNC(st2204_device::pcl_w));
 	map(0x0080, 0x27ff).ram(); // 10K internal SRAM; extent of mapping guessed

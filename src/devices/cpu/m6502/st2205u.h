@@ -17,7 +17,10 @@ class st2205u_device : public st2xxx_device
 {
 public:
 	enum {
-		ST_BRR = ST_IENA + 1,
+		ST_BTEN = ST_LYMAX + 1,
+		ST_BTREQ,
+		ST_BTC,
+		ST_BRR,
 		ST_LVCTR
 	};
 
@@ -55,6 +58,8 @@ private:
 		std::unique_ptr<u8[]> ram;
 	};
 
+	template<int N> TIMER_CALLBACK_MEMBER(bt_interrupt);
+
 	u8 irrl_r();
 	void irrl_w(u8 data);
 	u8 irrh_r();
@@ -75,6 +80,12 @@ private:
 	void sys_w(u8 data);
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
+	u8 bten_r();
+	void bten_w(u8 data);
+	u8 btreq_r();
+	void btclr_w(u8 data);
+	u8 btc_r();
+	void btc_w(u8 data);
 	u8 lvctr_r();
 	void lvctr_w(u8 data);
 
@@ -89,6 +100,10 @@ private:
 
 	void int_map(address_map &map);
 
+	u8 m_bten;
+	u8 m_btreq;
+	u8 m_btc;
+	emu_timer *m_base_timer[8];
 	u8 m_lvctr;
 };
 

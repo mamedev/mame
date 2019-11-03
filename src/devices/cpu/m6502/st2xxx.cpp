@@ -76,6 +76,12 @@ void st2xxx_device::device_reset()
 
 	// reset miscellaneous registers
 	m_sys = 0;
+
+	// reset LCDC registers
+	m_lssa = 0;
+	m_lvpw = 0;
+	m_lxmax = 0;
+	m_lymax = 0;
 }
 
 std::unique_ptr<util::disasm_interface> st2xxx_device::create_disassembler()
@@ -247,6 +253,41 @@ void st2xxx_device::ienah_w(u8 data)
 {
 	m_iena = (m_iena & 0x00ff) | ((u16(data) << 8) & m_ireq_mask);
 	update_irq_state();
+}
+
+void st2xxx_device::lssal_w(u8 data)
+{
+	m_lssa = (m_lssa & 0xff00) | data;
+}
+
+void st2xxx_device::lssah_w(u8 data)
+{
+	m_lssa = (m_lssa & 0x00ff) | (u16(data) << 8);
+}
+
+void st2xxx_device::lvpw_w(u8 data)
+{
+	m_lvpw = data;
+}
+
+u8 st2xxx_device::lxmax_r()
+{
+	return m_lxmax;
+}
+
+void st2xxx_device::lxmax_w(u8 data)
+{
+	m_lxmax = data;
+}
+
+u8 st2xxx_device::lymax_r()
+{
+	return m_lymax;
+}
+
+void st2xxx_device::lymax_w(u8 data)
+{
+	m_lymax = data;
 }
 
 #include "cpu/m6502/st2xxx.hxx"
