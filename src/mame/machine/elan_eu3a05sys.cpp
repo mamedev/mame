@@ -6,7 +6,7 @@
 
 // DMA size and destination are 16-bit here, they're 24-bit on EU3A14
 
-DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a14sys", "Elan EU3A05 System")
+DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a05sys", "Elan EU3A05 System")
 
 elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A05_SYS, tag, owner, clock)
