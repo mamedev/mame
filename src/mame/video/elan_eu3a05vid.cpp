@@ -86,7 +86,7 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 	/*
 	    Sprites
-	    AA yy xx cc XX YY aa bb
+	    FF yy xx AA XX YY aa bb
 
 	    yy = y position
 	    xx = x position
@@ -94,9 +94,9 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	    YY = texture y start
 	    aa = same as unk2 on tiles
 	    bb = sometimes set in invaders
-	    cc = same as attr on tiles (colour / priority?)
+	    AA = same as attr on tiles (colour / priority?)
 
-	    AA = attributes  ( e-dD fFsS )
+	    FF = flags  ( e-dD fFsS )
 	    e = enable
 		D = ZoomX to double size (boss explosions on Air Blaster)
 		d = ZoomY to double size (boss explosions on Air Blaster)
@@ -121,6 +121,9 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		   top of the screen - there are no extra y co-ordinate bits.  However there would have been easier
 		   ways to hide this tho as there are a bunch of unseen lines at the bottom of the screen anyway!
 
+		   Air Blaster Joystick seems to indicate there is no sprite wrapping - sprites abruptly enter 
+		   the screen in pieces on real hardware.
+
 		   needs further investigation.
 		*/
 		if (y==255)
@@ -133,6 +136,8 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		uint8_t attr = read_spriteram(i + 3);
 		uint8_t unk2 = read_spriteram(i + 6);
 
+		const int doubleX = (flags & 0x10)>>4;
+		const int doubleY = (flags & 0x20)>>5;
 
 		//int priority = attr & 0x0f;
 		int colour = attr & 0xf0;
@@ -172,6 +177,12 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
 
+		if (doubleX)
+			sizex = sizex * 2;
+
+		if (doubleY)
+			sizey = sizey * 2;
+
 		for (int yy = 0; yy < sizey; yy++)
 		{
 			uint16_t* row;
@@ -187,8 +198,17 @@ void elan_eu3a05vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 
 			for (int xx = 0; xx < sizex; xx++)
 			{
-				int realaddr = base + ((tex_x + xx) & 0xff);
-				realaddr += ((tex_y + yy) & 0xff) * 256;
+				int realaddr;
+				
+				if (!doubleX)
+					realaddr = base + ((tex_x + xx) & 0xff);
+				else
+					realaddr = base + ((tex_x + (xx>>1)) & 0xff);
+
+				if (!doubleY)
+					realaddr += ((tex_y + yy) & 0xff) * 256;
+				else
+					realaddr += ((tex_y + (yy>>1)) & 0xff) * 256;
 
 				uint8_t pix = fullbankspace.read_byte(realaddr);
 
