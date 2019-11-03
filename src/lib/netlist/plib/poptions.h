@@ -5,8 +5,6 @@
  *
  */
 
-#pragma once
-
 #ifndef POPTIONS_H_
 #define POPTIONS_H_
 
