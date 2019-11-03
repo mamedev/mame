@@ -18,6 +18,11 @@
 #include <locale>
 #include <sstream>
 #include <vector>
+#include <cmath>
+
+#if (PUSE_FLOAT128)
+#include <quadmath.h>
+#endif
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -280,6 +285,67 @@ namespace plib
 	{
 		return constants<T>::one() / v;
 	}
+
+	/*! abs function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return absolute value of argument
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	abs(T v) noexcept
+	{
+		return std::abs(v);
+	}
+
+	/*! sqrt function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return absolute value of argument
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	sqrt(T v) noexcept
+	{
+		return std::sqrt(v);
+	}
+
+	/*! hypot function
+	 *
+	 * @tparam T type of the argument
+	 * @param  v argument
+	 * @return absolute value of argument
+	 */
+	template <typename T>
+	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
+	hypot(T v1, T v2) noexcept
+	{
+		return std::hypot(v1, v2);
+	}
+
+#if (PUSE_FLOAT128)
+	static inline constexpr __float128 reciprocal(__float128 v) noexcept
+	{
+		return constants<__float128>::one() / v;
+	}
+
+	static inline __float128 abs(__float128 v) noexcept
+	{
+		return fabsq(v);
+	}
+
+	static inline __float128 sqrt(__float128 v) noexcept
+	{
+		return sqrtq(v);
+	}
+
+	static inline __float128 hypot(__float128 v1, __float128 v2) noexcept
+	{
+		return hypotq(v1, v2);
+	}
+#endif
 
 	static_assert(noexcept(constants<double>::one()) == true, "Not evaluated as constexpr");
 

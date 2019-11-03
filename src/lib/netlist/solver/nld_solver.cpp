@@ -343,6 +343,11 @@ namespace devices
 				case solver::matrix_fp_type_e::LONGDOUBLE:
 					ms = create_solvers<long double>(sname, grp);
 					break;
+#if (NL_USE_FLOAT128)
+				case solver::matrix_fp_type_e::FLOAT128:
+					ms = create_solvers<__float128>(sname, grp);
+					break;
+#endif
 			}
 
 			log().verbose("Solver {1}", ms->name());

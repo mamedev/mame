@@ -259,7 +259,7 @@ namespace plib
 				m_ht[j][k] = vec_mult<FT>(n, m_v[kp1], m_v[j]);
 				vec_add_mult_scalar(n, m_v[kp1], m_v[j], -m_ht[j][k]);
 			}
-			m_ht[kp1][k] = std::sqrt(vec_mult2<FT>(n, m_v[kp1]));
+			m_ht[kp1][k] = plib::sqrt(vec_mult2<FT>(n, m_v[kp1]));
 
 			// FIXME: comparison to zero
 			if (m_ht[kp1][k] != plib::constants<FT>::zero())
@@ -268,7 +268,7 @@ namespace plib
 			for (std::size_t j = 0; j < k; j++)
 				givens_mult(m_c[j], m_s[j], m_ht[j][k], m_ht[j+1][k]);
 
-			const float_type mu = reciprocal(std::hypot(m_ht[k][k], m_ht[kp1][k]));
+			const float_type mu = reciprocal(plib::hypot(m_ht[k][k], m_ht[kp1][k]));
 
 			m_c[k] = m_ht[k][k] * mu;
 			m_s[k] = -m_ht[kp1][k] * mu;
@@ -277,7 +277,7 @@ namespace plib
 
 			givens_mult(m_c[k], m_s[k], m_g[k], m_g[kp1]);
 
-			FT rho = std::abs(m_g[kp1]);
+			FT rho = plib::abs(m_g[kp1]);
 
 			// FIXME ..
 			itr_used = itr_used + 1;
@@ -359,12 +359,12 @@ namespace plib
 
 				ops.solve_inplace(Ax);
 
-				const float_type rho_to_accuracy = std::sqrt(vec_mult2<FT>(n, Ax)) / accuracy;
+				const float_type rho_to_accuracy = plib::sqrt(vec_mult2<FT>(n, Ax)) / accuracy;
 
 				rho_delta = accuracy * rho_to_accuracy;
 			}
 			else
-				rho_delta = accuracy * std::sqrt(static_cast<FT>(n));
+				rho_delta = accuracy * plib::sqrt(static_cast<FT>(n));
 
 			/*
 			 * Using
@@ -389,7 +389,7 @@ namespace plib
 
 				ops.solve_inplace(residual);
 
-				rho = std::sqrt(vec_mult2<FT>(n, residual));
+				rho = plib::sqrt(vec_mult2<FT>(n, residual));
 
 				if (rho < rho_delta)
 					return itr_used + 1;
