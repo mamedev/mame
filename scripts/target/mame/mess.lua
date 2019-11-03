@@ -3697,6 +3697,8 @@ files {
 	MAME_DIR .. "src/mame/machine/elan_eu3a05gpio.h",
 	MAME_DIR .. "src/mame/machine/elan_eu3a05sys.cpp",
 	MAME_DIR .. "src/mame/machine/elan_eu3a05sys.h",
+	MAME_DIR .. "src/mame/video/elan_eu3a05commonvid.cpp",
+	MAME_DIR .. "src/mame/video/elan_eu3a05commonvid.h",
 	MAME_DIR .. "src/mame/drivers/trkfldch.cpp",
 	MAME_DIR .. "src/mame/drivers/tvgame.cpp",
 	MAME_DIR .. "src/mame/drivers/spg110.cpp",

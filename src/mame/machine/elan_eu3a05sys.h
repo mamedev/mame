@@ -34,10 +34,8 @@ private:
 	int m_custom_nmi;
 	uint16_t m_custom_irq_vector;
 	uint16_t m_custom_nmi_vector;
-
-
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device)
 
-#endif // MAME_MACHINE_RAD_EU3A05SYS_H
+#endif // MAME_MACHINE_ELAN_EU3A05SYS_H

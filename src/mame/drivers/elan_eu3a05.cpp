@@ -75,6 +75,7 @@
 #include "audio/elan_eu3a05.h"
 #include "machine/elan_eu3a05gpio.h"
 #include "machine/elan_eu3a05sys.h"
+#include "video/elan_eu3a05commonvid.h"
 
 class radica_eu3a05_state : public driver_device
 {
@@ -86,16 +87,17 @@ public:
 		m_ram(*this, "ram"),
 		m_vram(*this, "vram"),
 		m_spriteram(*this, "spriteram"),
-		m_palram(*this, "palram"),
 		m_gpio(*this, "gpio"),
 		m_sys(*this, "sys"),
+		m_sound(*this, "eu3a05sound"),
+		m_commonvid(*this, "commonvid"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
-	void radicasi(machine_config &config);
+	void elan_eu3a05(machine_config &config);
 	void airblsjs(machine_config& config);
 
 private:
@@ -103,58 +105,58 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// system
-	DECLARE_READ8_MEMBER(radicasi_5003_r);
-	DECLARE_READ8_MEMBER(radicasi_pal_ntsc_r);
-	DECLARE_READ8_MEMBER(radicasi_rombank_lo_r);
-	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_lo_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_hi_w);
 
 	// DMA
-	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_md_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_dmasrc_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_dmasrc_md_r);
-	DECLARE_READ8_MEMBER(radicasi_dmasrc_hi_r);
-	DECLARE_WRITE8_MEMBER(radicasi_dmadst_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmadst_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_dmadst_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_dmadst_hi_r);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasize_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasize_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_dmasize_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_dmasize_hi_r);
-	DECLARE_READ8_MEMBER(radicasi_dmatrg_r);
-	DECLARE_WRITE8_MEMBER(radicasi_dmatrg_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmasrc_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmasrc_md_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmasrc_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmasrc_lo_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmasrc_md_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmasrc_hi_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmadst_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmadst_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmadst_lo_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmadst_hi_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmasize_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmasize_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmasize_lo_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmasize_hi_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_dmatrg_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmatrg_w);
 
 	// VIDEO
 	// tile bases
-	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_hi_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_tile_gfxbase_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_tile_gfxbase_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_tile_gfxbase_lo_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_tile_gfxbase_hi_r);
 	// sprite tile bases
-	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_sprite_gfxbase_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_sprite_gfxbase_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_sprite_gfxbase_lo_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_sprite_gfxbase_hi_r);
 
-	DECLARE_WRITE8_MEMBER(radicasi_vidctrl_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_vidctrl_w);
 
-	DECLARE_READ8_MEMBER(radicasi_sprite_bg_scroll_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sprite_bg_scroll_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_sprite_bg_scroll_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_sprite_bg_scroll_w);
 
 	// more sound regs?
-	DECLARE_READ8_MEMBER(radicasi_50a9_r);
-	DECLARE_WRITE8_MEMBER(radicasi_50a9_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_50a9_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_50a9_w);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
-	void radicasi_bank_map(address_map &map);
-	void radicasi_map(address_map &map);
+	void elan_eu3a05_bank_map(address_map &map);
+	void elan_eu3a05_map(address_map &map);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -167,9 +169,10 @@ private:
 	required_shared_ptr<uint8_t> m_ram;
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_palram;
 	required_device<elan_eu3a05gpio_device> m_gpio;
 	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05_sound_device> m_sound;
+	required_device<elan_eu3a05commonvid_device> m_commonvid;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -338,16 +341,6 @@ void radica_eu3a05_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitm
 	}
 }
 
-double hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
 // a hacky mess for now
 bool radica_eu3a05_state::get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2)
 {
@@ -504,42 +497,6 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 {
 	bitmap.fill(0, cliprect);
 
-	// Palette
-	int offs = 0;
-	for (int index = 0;index < 256; index++)
-	{
-		uint16_t dat = m_palram[offs++] << 8;
-		dat |= m_palram[offs++];
-
-		// llll lsss ---h hhhh
-		int l_raw = (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x0700) >> 8;
-		int h_raw = (dat & 0x001f) >> 0;
-
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
-
-		double r, g, b;
-
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		} else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1/3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1/3.0f);
-		}
-
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
-	}
-
-
 	draw_tilemaps(screen,bitmap,cliprect,0);
 	draw_sprites(screen,bitmap,cliprect);
 	draw_tilemaps(screen,bitmap,cliprect,1);
@@ -549,36 +506,36 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 
 // System control
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_hi_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_rombank_hi_w)
 {
 	// written with the banking?
-	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
 	m_rombank_hi = data;
 
 	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_lo_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_rombank_lo_w)
 {
-	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
 	m_rombank_lo = data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_rombank_lo_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_rombank_lo_r)
 {
 	return m_rombank_lo;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_pal_ntsc_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
-	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
 	return 0xff; // NTSC
 	//return 0x00; // PAL
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_5003_r)
 {
 	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
 
@@ -590,7 +547,7 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
 
 	*/
 
-	logerror("%s: radicasi_5003_r (RNG?)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_5003_r (RNG?)\n", machine().describe_context());
 
 	return machine().rand();
 }
@@ -600,71 +557,71 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
 
 // Tile bases
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_lo_w)
 {
-	//logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_hi_w)
 {
-	//logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
 	m_tile_gfxbase_hi_data = data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_lo_r)
 {
-	//logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
+	//logerror("%s: elan_eu3a05_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
 	return m_tile_gfxbase_lo_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_hi_r)
 {
-	//logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
+	//logerror("%s: elan_eu3a05_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
 	return m_tile_gfxbase_hi_data;
 }
 
 // Sprite Tile bases
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_lo_w)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_hi_w)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
 	m_sprite_gfxbase_hi_data = data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_lo_r)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
+	//logerror("%s: elan_eu3a05_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
 	return m_sprite_gfxbase_lo_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_hi_r)
 {
-	//logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
+	//logerror("%s: elan_eu3a05_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
 	return m_sprite_gfxbase_hi_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_bg_scroll_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_sprite_bg_scroll_r)
 {
 	return m_bg_scroll[offset];
 
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_bg_scroll_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_sprite_bg_scroll_w)
 {
 	m_bg_scroll[offset] = data;
 }
 
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_vidctrl_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_vidctrl_w)
 {
-	logerror("%s: radicasi_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
 	/*
 	    c3  8bpp 16x16         1100 0011
 	    e3  4bpp 16x16         1110 0011
@@ -676,103 +633,103 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_vidctrl_w)
 
 // DMA device
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_lo_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_w)
 {
-	logerror("%s: radicasi_dmasrc_lo_w (select DMA source low) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmasrc_lo_w (select DMA source low) %02x\n", machine().describe_context(), data);
 	m_dmasrc_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_md_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasrc_md_w)
 {
-	logerror("%s: radicasi_dmasrc_md_w (select DMA source middle) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmasrc_md_w (select DMA source middle) %02x\n", machine().describe_context(), data);
 	m_dmasrc_md_data = data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasrc_hi_w)
 {
-	logerror("%s: radicasi_dmasrc_hi_w (select DMA source upper) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmasrc_hi_w (select DMA source upper) %02x\n", machine().describe_context(), data);
 	m_dmasrc_hi_data = data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_lo_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_r)
 {
-	logerror("%s: radicasi_dmasrc_lo_r (DMA source low)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmasrc_lo_r (DMA source low)\n", machine().describe_context());
 	return m_dmasrc_lo_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_md_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasrc_md_r)
 {
-	logerror("%s: radicasi_dmasrc_md_r (DMA source middle)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmasrc_md_r (DMA source middle)\n", machine().describe_context());
 	return m_dmasrc_md_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasrc_hi_r)
 {
-	logerror("%s: radicasi_dmasrc_hi_r (DMA source upper)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmasrc_hi_r (DMA source upper)\n", machine().describe_context());
 	return m_dmasrc_hi_data;
 }
 
 
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmadst_lo_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmadst_lo_w)
 {
-	logerror("%s: radicasi_dmadst_lo_w (select DMA Dest lower) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmadst_lo_w (select DMA Dest lower) %02x\n", machine().describe_context(), data);
 	m_dmadst_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmadst_hi_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmadst_hi_w)
 {
-	logerror("%s: radicasi_dmadst_hi_w (select DMA Dest upper) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmadst_hi_w (select DMA Dest upper) %02x\n", machine().describe_context(), data);
 	m_dmadst_hi_data = data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmadst_lo_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmadst_lo_r)
 {
-	logerror("%s: radicasi_dmadst_lo_r (DMA Dest lower)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmadst_lo_r (DMA Dest lower)\n", machine().describe_context());
 	return m_dmadst_lo_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmadst_hi_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmadst_hi_r)
 {
-	logerror("%s: radicasi_dmadst_hi_r (DMA Dest upper)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmadst_hi_r (DMA Dest upper)\n", machine().describe_context());
 	return m_dmadst_hi_data;
 }
 
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasize_lo_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasize_lo_w)
 {
-	logerror("%s: radicasi_dmasize_lo_w (select DMA Size lower) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmasize_lo_w (select DMA Size lower) %02x\n", machine().describe_context(), data);
 	m_dmasize_lo_data = data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasize_hi_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasize_hi_w)
 {
-	logerror("%s: radicasi_dmasize_hi_w (select DMA Size upper) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmasize_hi_w (select DMA Size upper) %02x\n", machine().describe_context(), data);
 	m_dmasize_hi_data = data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasize_lo_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasize_lo_r)
 {
-	logerror("%s: radicasi_dmasize_lo_r (DMA Size lower)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmasize_lo_r (DMA Size lower)\n", machine().describe_context());
 	return m_dmasize_lo_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasize_hi_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmasize_hi_r)
 {
-	logerror("%s: radicasi_dmasize_hi_r (DMA Size upper)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmasize_hi_r (DMA Size upper)\n", machine().describe_context());
 	return m_dmasize_hi_data;
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmatrg_r)
 {
-	logerror("%s: radicasi_dmatrg_r (DMA operation state?)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_dmatrg_r (DMA operation state?)\n", machine().describe_context());
 	return 0x00;//m_dmatrg_data;
 }
 
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_dmatrg_w)
 {
-	logerror("%s: radicasi_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
 	//m_dmatrg_data = data;
 
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
@@ -798,15 +755,15 @@ WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_w)
 
 
 // probably also sound device, maybe for forcing channels to stop?
-READ8_MEMBER(radica_eu3a05_state::radicasi_50a9_r)
+READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_50a9_r)
 {
-	logerror("%s: radicasi_50a9_r\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_50a9_r\n", machine().describe_context());
 	return m_50a9_data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_50a9_w)
+WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_50a9_w)
 {
-	logerror("%s: radicasi_50a9_w %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_50a9_w %02x\n", machine().describe_context(), data);
 	m_50a9_data = data;
 }
 
@@ -817,65 +774,64 @@ READ8_MEMBER(radica_eu3a05_state::read_full_space)
 	return fullbankspace.read_byte(offset);
 }
 
-void radica_eu3a05_state::radicasi_map(address_map &map)
+void radica_eu3a05_state::elan_eu3a05_map(address_map &map)
 {
 	// can the addresses move around?
 	map(0x0000, 0x05ff).ram().share("ram");
 	map(0x0600, 0x3dff).ram().share("vram");
 	map(0x3e00, 0x3fff).ram().share("spriteram");
-	map(0x4800, 0x49ff).ram().share("palram");
+	map(0x4800, 0x49ff).rw(m_commonvid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
 	// 500x system regs?
-	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::radicasi_5003_r));
+	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::elan_eu3a05_5003_r));
 
 	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05sys_device::intmask_r), FUNC(elan_eu3a05sys_device::intmask_w));
 
-	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
-	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
+	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::elan_eu3a05_pal_ntsc_r)); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::elan_eu3a05_rombank_hi_w));
+	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::elan_eu3a05_rombank_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_rombank_lo_w));
 
 	// 501x DMA controller
-	map(0x500F, 0x500F).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
-	map(0x5010, 0x5010).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
-	map(0x5011, 0x5011).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
+	map(0x500F, 0x500F).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_w));
+	map(0x5010, 0x5010).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_md_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_md_w));
+	map(0x5011, 0x5011).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_hi_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_hi_w));
 
-	map(0x5012, 0x5012).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
-	map(0x5013, 0x5013).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
+	map(0x5012, 0x5012).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmadst_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmadst_lo_w));
+	map(0x5013, 0x5013).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmadst_hi_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmadst_hi_w));
 
-	map(0x5014, 0x5014).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
-	map(0x5015, 0x5015).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
+	map(0x5014, 0x5014).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasize_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasize_lo_w));
+	map(0x5015, 0x5015).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasize_hi_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasize_hi_w));
 
-	map(0x5016, 0x5016).rw(FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
+	map(0x5016, 0x5016).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmatrg_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmatrg_w));
 
 	// 502x - 503x video regs area?
 	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).w(FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
+	map(0x5027, 0x5027).w(FUNC(radica_eu3a05_state::elan_eu3a05_vidctrl_w));
 
-	map(0x5029, 0x5029).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
+	map(0x5029, 0x5029).rw(FUNC(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_lo_w)); // tilebase
+	map(0x502a, 0x502a).rw(FUNC(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::elan_eu3a05_tile_gfxbase_hi_w)); // tilebase
 
-	map(0x502b, 0x502b).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
+	map(0x502b, 0x502b).rw(FUNC(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_lo_w)); // tilebase (spr?)
+	map(0x502c, 0x502c).rw(FUNC(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::elan_eu3a05_sprite_gfxbase_hi_w)); // tilebase (spr?)
 
-	map(0x5031, 0x5032).rw(FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
-
+	map(0x5031, 0x5032).rw(FUNC(radica_eu3a05_state::elan_eu3a05_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::elan_eu3a05_sprite_bg_scroll_w));
 
 	// 504x GPIO area?
-	map(0x5040, 0x5046).rw("gpio", FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
-	map(0x5048, 0x504a).w("gpio", FUNC(elan_eu3a05gpio_device::gpio_unk_w));
+	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
+	map(0x5048, 0x504a).w(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_unk_w));
 
 	// 506x unknown
 	map(0x5060, 0x506d).ram(); // read/written by tetris
 
 	// 508x sound
-	map(0x5080, 0x5091).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_addr_r), FUNC(radica6502_sound_device::radicasi_sound_addr_w));
-	map(0x5092, 0x50a3).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_size_r), FUNC(radica6502_sound_device::radicasi_sound_size_w));
-	map(0x50a4, 0x50a4).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_unk_r), FUNC(radica6502_sound_device::radicasi_sound_unk_w));
-	map(0x50a5, 0x50a5).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_trigger_r), FUNC(radica6502_sound_device::radicasi_sound_trigger_w));
+	map(0x5080, 0x5091).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w));
+	map(0x5092, 0x50a3).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w));
+	map(0x50a4, 0x50a4).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w));
+	map(0x50a5, 0x50a5).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
 
-	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
+	map(0x50a8, 0x50a8).r(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
 
-	map(0x50a9, 0x50a9).rw(FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
+	map(0x50a9, 0x50a9).rw(FUNC(radica_eu3a05_state::elan_eu3a05_50a9_r), FUNC(radica_eu3a05_state::elan_eu3a05_50a9_w));
 
 	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
@@ -887,7 +843,7 @@ void radica_eu3a05_state::radicasi_map(address_map &map)
 }
 
 
-void radica_eu3a05_state::radicasi_bank_map(address_map &map)
+void radica_eu3a05_state::elan_eu3a05_bank_map(address_map &map)
 {
 	map(0x000000, 0xffffff).noprw(); // shut up any logging when video params are invalid
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
@@ -1040,7 +996,7 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
-static GFXDECODE_START( gfx_radicasi_fake )
+static GFXDECODE_START( gfx_elan_eu3a05_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
@@ -1065,14 +1021,14 @@ INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
 // low clock speed also helps with the badly programmed controls in Tetris
 
 
-void radica_eu3a05_state::radicasi(machine_config &config)
+void radica_eu3a05_state::elan_eu3a05(machine_config &config)
 {
 	/* basic machine hardware */
 	M6502(config, m_maincpu, XTAL(21'281'370)/12); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a05_state::radicasi_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a05_state::elan_eu3a05_map);
 	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a05_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::radicasi_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	PALETTE(config, m_palette).set_entries(256);
 
@@ -1084,7 +1040,7 @@ void radica_eu3a05_state::radicasi(machine_config &config)
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_radicasi_fake);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_elan_eu3a05_fake);
 
 	ELAN_EU3A05_GPIO(config, m_gpio, 0);
 	m_gpio->read_0_callback().set_ioport("IN0");
@@ -1094,16 +1050,20 @@ void radica_eu3a05_state::radicasi(machine_config &config)
 	ELAN_EU3A05_SYS(config, m_sys, 0);
 	m_sys->set_cpu("maincpu");
 
+	ELAN_EU3A05_COMMONVID(config, m_commonvid, 0);
+	m_commonvid->set_palette("palette");
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
-	sound.space_read_callback().set(FUNC(radica_eu3a05_state::read_full_space));
-	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	ELAN_EU3A05_SOUND(config, m_sound, 8000);
+	m_sound->space_read_callback().set(FUNC(radica_eu3a05_state::read_full_space));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void radica_eu3a05_state::airblsjs(machine_config& config)
 {
-	radicasi(config);
+	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
 }
 
@@ -1130,9 +1090,9 @@ ROM_START( airblsjs )
 ROM_END
 
 
-CONS( 2004, rad_sinv, 0, 0, radicasi, rad_sinv, radica_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, radica_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
-CONS( 2004, rad_tetr, 0, 0, radicasi, rad_tetr, radica_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, radica_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
 CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, radica_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )

@@ -69,6 +69,7 @@
 #include "audio/elan_eu3a05.h"
 #include "machine/timer.h"
 #include "machine/elan_eu3a05sys.h"
+#include "video/elan_eu3a05commonvid.h"
 
 
 
@@ -79,8 +80,9 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_sys(*this, "sys"),
+		m_sound(*this, "eu3a05sound"),
+		m_commonvid(*this, "commonvid"),
 		m_mainregion(*this, "maincpu"),
-		m_palram(*this, "palram"),
 		m_scrollregs(*this, "scrollregs"),
 		m_tilecfg(*this, "tilecfg"),
 		m_rowscrollregs(*this, "rowscrollregs"),
@@ -108,8 +110,6 @@ public:
 	void init_rad_hnt3();
 
 private:
-	READ8_MEMBER(irq_vector_r);
-
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -118,14 +118,14 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	DECLARE_READ8_MEMBER(radicasi_pal_ntsc_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
 
 	DECLARE_READ8_MEMBER(dma_trigger_r);
 	DECLARE_WRITE8_MEMBER(dma_trigger_w);
 
-	DECLARE_READ8_MEMBER(radicasi_rombank_lo_r);
-	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_lo_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_lo_w);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_hi_w);
 
 	DECLARE_WRITE8_MEMBER(porta_dir_w);
 	DECLARE_WRITE8_MEMBER(portb_dir_w);
@@ -154,12 +154,11 @@ private:
 
 	virtual void video_start() override;
 
-	double hue2rgb(double p, double q, double t);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05_sound_device> m_sound;
+	required_device<elan_eu3a05commonvid_device> m_commonvid;
 	required_region_ptr<uint8_t> m_mainregion;
-	required_shared_ptr<uint8_t> m_palram;
 	required_shared_ptr<uint8_t> m_scrollregs;
 	required_shared_ptr<uint8_t> m_tilecfg;
 	required_shared_ptr<uint8_t> m_rowscrollregs;
@@ -185,8 +184,6 @@ private:
 
 	uint8_t m_portdir[3];
 
-	void handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
 	int get_xscroll_for_screenypos(int line);
 	void draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram);
@@ -201,55 +198,6 @@ private:
 void radica_eu3a14_state::video_start()
 {
 	m_screen->register_screen_bitmap(m_prioritybitmap);
-}
-
-double radica_eu3a14_state::hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
-void radica_eu3a14_state::handle_palette(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// Palette
-	int offs = 0;
-	for (int index = 0; index < 512; index++)
-	{
-		uint16_t dat = m_palram[offs++] << 8;
-		dat |= m_palram[offs++];
-
-		// llll lsss ---h hhhh
-		int l_raw = (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x0700) >> 8;
-		int h_raw = (dat & 0x001f) >> 0;
-
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
-
-		double r, g, b;
-
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		}
-		else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1 / 3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1 / 3.0f);
-		}
-
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
-	}
 }
 
 void radica_eu3a14_state::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
@@ -964,7 +912,6 @@ uint32_t radica_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 
 	bitmap.fill(0, cliprect);
 	m_prioritybitmap.fill(0, cliprect);
 
-	handle_palette(screen, bitmap, cliprect);
 	draw_background(screen, bitmap, cliprect);
 
 	draw_sprites(screen, bitmap, cliprect);
@@ -977,20 +924,6 @@ READ8_MEMBER(radica_eu3a14_state::read_full_space)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);
-}
-
-// irq controller seems to be like the Radica Space Invaders
-READ8_MEMBER(radica_eu3a14_state::irq_vector_r)
-{
-	if (m_custom_irq)
-	{
-		return m_custom_irq_vector >> (offset*8);
-	}
-	else
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		return rom[0x001ffe + offset];
-	}
 }
 
 /*
@@ -1013,31 +946,31 @@ READ8_MEMBER(radica_eu3a14_state::irq_vector_r)
            e000 maps to c000
 */
 
-WRITE8_MEMBER(radica_eu3a14_state::radicasi_rombank_hi_w)
+WRITE8_MEMBER(radica_eu3a14_state::elan_eu3a05_rombank_hi_w)
 {
 	// written with the banking?
-	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
 	m_rombank_hi = data;
 
 	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
 }
 
-WRITE8_MEMBER(radica_eu3a14_state::radicasi_rombank_lo_w)
+WRITE8_MEMBER(radica_eu3a14_state::elan_eu3a05_rombank_lo_w)
 {
-	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
+	//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
 	m_rombank_lo = data;
 }
 
-READ8_MEMBER(radica_eu3a14_state::radicasi_rombank_lo_r)
+READ8_MEMBER(radica_eu3a14_state::elan_eu3a05_rombank_lo_r)
 {
 	return m_rombank_lo;
 }
 
-READ8_MEMBER(radica_eu3a14_state::radicasi_pal_ntsc_r)
+READ8_MEMBER(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
-	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
 	return m_tvtype->read();
 }
 
@@ -1083,7 +1016,7 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
-	map(0x4800, 0x4bff).ram().share("palram");
+	map(0x4800, 0x49ff).rw(m_commonvid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
 	// similar to eu3a05, at least for pal flags and rom banking
 	// 5001 write
@@ -1092,9 +1025,9 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05sys_device::intmask_r), FUNC(elan_eu3a05sys_device::intmask_w));
 	map(0x5009, 0x5009).r(FUNC(radica_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
 	map(0x500a, 0x500a).nopw(); // startup
-	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::radicasi_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(FUNC(radica_eu3a14_state::radicasi_rombank_hi_w));
-	map(0x500d, 0x500d).rw(FUNC(radica_eu3a14_state::radicasi_rombank_lo_r), FUNC(radica_eu3a14_state::radicasi_rombank_lo_w));
+	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
+	map(0x500c, 0x500c).w(FUNC(radica_eu3a14_state::elan_eu3a05_rombank_hi_w));
+	map(0x500d, 0x500d).rw(FUNC(radica_eu3a14_state::elan_eu3a05_rombank_lo_r), FUNC(radica_eu3a14_state::elan_eu3a05_rombank_lo_w));
 
 	// DMA is similar to, but not the same as eu3a05
 	map(0x500f, 0x5017).ram().share("dmaparams");
@@ -1117,13 +1050,13 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// 5060 - 506e  r/w during startup on foot
 
 	// sound appears to be the same as eu3a05
-	map(0x5080, 0x5091).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_addr_r), FUNC(radica6502_sound_device::radicasi_sound_addr_w));
-	map(0x5092, 0x50a3).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_size_r), FUNC(radica6502_sound_device::radicasi_sound_size_w));
-	map(0x50a4, 0x50a4).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_unk_r), FUNC(radica6502_sound_device::radicasi_sound_unk_w)); // read frequently on this
-	map(0x50a5, 0x50a5).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_trigger_r), FUNC(radica6502_sound_device::radicasi_sound_trigger_w));
+	map(0x5080, 0x5091).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w));
+	map(0x5092, 0x50a3).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w));
+	map(0x50a4, 0x50a4).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w)); // read frequently on this
+	map(0x50a5, 0x50a5).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
 	map(0x50a6, 0x50a6).nopw(); // startup
 	map(0x50a7, 0x50a7).nopw(); // startup
-	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r));
+	map(0x50a8, 0x50a8).r(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r));
 	map(0x50a9, 0x50a9).nopw(); // startup, read foot
 
 	// video regs are in the 51xx range
@@ -1787,11 +1720,15 @@ void radica_eu3a14_state::radica_eu3a14(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
+	ELAN_EU3A05_COMMONVID(config, m_commonvid, 0);
+	m_commonvid->set_palette("palette");
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
-	sound.space_read_callback().set(FUNC(radica_eu3a14_state::read_full_space));
-	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	ELAN_EU3A05_SOUND(config, m_sound, 8000);
+	m_sound->space_read_callback().set(FUNC(radica_eu3a14_state::read_full_space));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void radica_eu3a14_state::radica_eu3a14_adc(machine_config &config)
@@ -1883,7 +1820,7 @@ ROM_END
 CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_adc, rad_gtg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_rsg,  0,        0, radica_eu3a14,     rad_rsg,       radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
-// some Connectv branded Real Swing Golf units have a language selection, so there are likely other PAL revisions of this
+// some Connectv branded Real Swing Golf units have a language selection (checksum in test mode confirmed as different on said units)
 CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p,    rad_rsgp,      radica_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
