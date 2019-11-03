@@ -19,11 +19,32 @@ elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, cons
 void elan_eu3a05vid_device::device_start()
 {
 	elan_eu3a05commonvid_device::device_start();
+
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_tile_gfxbase_lo_data));
+	save_item(NAME(m_tile_gfxbase_hi_data));
+	save_item(NAME(m_sprite_gfxbase_lo_data));
+	save_item(NAME(m_sprite_gfxbase_hi_data));
+	save_item(NAME(m_tile_scroll));
 }
 
 void elan_eu3a05vid_device::device_reset()
 {
 	elan_eu3a05commonvid_device::device_reset();
+
+	m_vidctrl = 0x00; // need to default to an 8x8 mode for Space Invaders test mode at least
+
+	for (int i=0;i<2;i++)
+		m_tile_scroll[i] = 0x00;
+
+	for (int i=0;i<2;i++)
+		m_tile_xscroll[i] = 0x00;
+
+	m_tile_gfxbase_lo_data = 0x00;
+	m_tile_gfxbase_hi_data = 0x00;
+
+	m_sprite_gfxbase_lo_data = 0x00;
+	m_sprite_gfxbase_hi_data = 0x00;
 }
 
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
@@ -416,6 +437,17 @@ WRITE8_MEMBER(elan_eu3a05vid_device::tile_scroll_w)
 	m_tile_scroll[offset] = data;
 }
 
+READ8_MEMBER(elan_eu3a05vid_device::tile_xscroll_r)
+{
+	return m_tile_xscroll[offset];
+}
+
+WRITE8_MEMBER(elan_eu3a05vid_device::tile_xscroll_w)
+{
+	m_tile_xscroll[offset] = data;
+}
+
+
 
 READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r)
 {
@@ -426,10 +458,24 @@ WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 {
 	logerror("%s: elan_eu3a05_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
 	/*
-	    c3  8bpp 16x16         1100 0011
+	    c3  8bpp 16x16         1100 0011  abl logo
 	    e3  4bpp 16x16         1110 0011
-	    83  8bpp 8x8           1000 0011
-	    02  8bpp 8x8 (phoenix) 0000 0010
+	    83  8bpp 8x8           1000 0011  air blaster logo
+	    02  8bpp 8x8 (phoenix) 0000 0010  air blaster 2d normal
+		03  8bpp 8x8           0000 0011  air blaster 2d bosses
+		00                     0000 0000  air blaster 3d stages
+
+		?tb- --wh
+
+		? = unknown
+		t = tile size (1 = 16x16, 0 = 8x8)
+		b = bpp (0 = 8bpp, 1 = 4bpp)
+		- = haven't seen used
+		h = tilemap height? (0 = double height)
+		w = tilemap width? (0 = double width)
+
+		space invaders test mode doesn't initialize this
+
 	*/
 	m_vidctrl = data;
 }

@@ -34,6 +34,9 @@ public:
 	DECLARE_READ8_MEMBER(tile_scroll_r);
 	DECLARE_WRITE8_MEMBER(tile_scroll_w);
 
+	DECLARE_READ8_MEMBER(tile_xscroll_r);
+	DECLARE_WRITE8_MEMBER(tile_xscroll_w);
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -54,6 +57,7 @@ private:
 	uint8_t m_sprite_gfxbase_hi_data;
 
 	uint8_t m_tile_scroll[2];
+	uint8_t m_tile_xscroll[4];
 
 	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
 	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);

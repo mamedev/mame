@@ -248,10 +248,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 
 	map(0x5030, 0x5030).ram();
 	map(0x5031, 0x5032).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w));
-	map(0x5033, 0x5033).ram();
-	map(0x5034, 0x5034).ram();
-	map(0x5035, 0x5035).ram();
-	map(0x5036, 0x5036).ram();
+	map(0x5033, 0x5036).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_xscroll_r), FUNC(elan_eu3a05vid_device::tile_xscroll_w)); // there are 2 scroll values in here, air blaster 3d stages uses split scrolling like huntin'3 on eu3a14
 	// 5037
 	map(0x5038, 0x5038).ram();
 
