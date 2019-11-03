@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "elan_eu3a05sys.h"
+#include "elan_eu3a05commonsys.h"
 
 /*
 	Both the Elan EU3A05 and EU3A14 CPU types implement some kind of custom interrupt handling
@@ -166,19 +166,27 @@
 */
 
 
-DEFINE_DEVICE_TYPE(ELAN_EU3A05_SYS, elan_eu3a05sys_device, "elan_eu3a05sys", "Elan EU3A05/EU3A14 Common System")
+DEFINE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device, "elan_eu3a05commonsys", "Elan EU3A05/EU3A14 Common System")
 
-elan_eu3a05sys_device::elan_eu3a05sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELAN_EU3A05_SYS, tag, owner, clock)
-	, m_cpu(*this, finder_base::DUMMY_TAG)
+elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ELAN_EU3A05_COMMONSYS, tag, owner, clock),
+	m_cpu(*this, finder_base::DUMMY_TAG),
+	m_bank(*this, finder_base::DUMMY_TAG)
 {
 }
 
-void elan_eu3a05sys_device::device_start()
+void elan_eu3a05commonsys_device::device_start()
 {
+	save_item(NAME(m_rombank_lo));
+	save_item(NAME(m_rombank_hi)); 
+	save_item(NAME(m_intmask)); 
+	save_item(NAME(m_custom_irq)); 
+	save_item(NAME(m_custom_nmi)); 
+	save_item(NAME(m_custom_irq_vector)); 
+	save_item(NAME(m_custom_nmi_vector)); 
 }
 
-void elan_eu3a05sys_device::device_reset()
+void elan_eu3a05commonsys_device::device_reset()
 {
 	// all interrupts disabled?
 	m_intmask[0] = 0x00;
@@ -189,20 +197,25 @@ void elan_eu3a05sys_device::device_reset()
 
 	m_custom_nmi = 0;
 	m_custom_nmi_vector = 0x0000;
+
+	m_rombank_lo = 0x7f;
+	m_rombank_hi = 0x00;
+	m_bank->set_bank(0x7f);
+
 }
 
-READ8_MEMBER(elan_eu3a05sys_device::intmask_r)
+READ8_MEMBER(elan_eu3a05commonsys_device::intmask_r)
 {
 	return m_intmask[offset];
 }
 
-WRITE8_MEMBER(elan_eu3a05sys_device::intmask_w)
+WRITE8_MEMBER(elan_eu3a05commonsys_device::intmask_w)
 {
 	m_intmask[offset] = data;
 }
 
 
-void elan_eu3a05sys_device::generate_custom_interrupt(int level)
+void elan_eu3a05commonsys_device::generate_custom_interrupt(int level)
 {
 	// Air Blaster uses brk in the code, which is problematic for custom IRQs
 	//	m_custom_irq = 1;
@@ -232,7 +245,7 @@ void elan_eu3a05sys_device::generate_custom_interrupt(int level)
 	}
 }
 
-READ8_MEMBER(elan_eu3a05sys_device::nmi_vector_r)
+READ8_MEMBER(elan_eu3a05commonsys_device::nmi_vector_r)
 {
 	if (m_custom_nmi)
 	{
@@ -245,7 +258,7 @@ READ8_MEMBER(elan_eu3a05sys_device::nmi_vector_r)
 }
 
 // not currently used
-READ8_MEMBER(elan_eu3a05sys_device::irq_vector_r)
+READ8_MEMBER(elan_eu3a05commonsys_device::irq_vector_r)
 {
 	if (m_custom_irq)
 	{
@@ -254,5 +267,35 @@ READ8_MEMBER(elan_eu3a05sys_device::irq_vector_r)
 	else
 	{
 		fatalerror("IRQ without custom vector!");
+	}
+}
+
+
+WRITE8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w)
+{
+	if (offset == 0x00)
+	{
+		// written with the banking?
+		//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
+		m_rombank_hi = data;
+
+		m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
+	}
+	else
+	{
+		//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
+		m_rombank_lo = data;
+	}
+}
+
+READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r)
+{
+	if (offset == 0x00)
+	{
+		return m_rombank_hi;
+	}
+	else
+	{
+		return m_rombank_lo;
 	}
 }

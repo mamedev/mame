@@ -12,6 +12,7 @@ public:
 	elan_eu3a05commonvid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename T> void set_palette(T &&tag) { m_palette.set_tag(std::forward<T>(tag)); }
+	void set_entries(int entries) { m_palram.resize(entries*2); }
 
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);

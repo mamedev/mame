@@ -74,7 +74,7 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/elan_eu3a05gpio.h"
-#include "machine/elan_eu3a05sys.h"
+#include "machine/elan_eu3a05commonsys.h"
 #include "video/elan_eu3a05commonvid.h"
 
 class radica_eu3a05_state : public driver_device
@@ -107,9 +107,6 @@ private:
 	// system
 	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
 	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
-	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_lo_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_lo_w);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_hi_w);
 
 	// DMA
 	DECLARE_WRITE8_MEMBER(elan_eu3a05_dmasrc_lo_w);
@@ -170,7 +167,7 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<elan_eu3a05gpio_device> m_gpio;
-	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05commonsys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05commonvid_device> m_commonvid;
 	required_shared_ptr<uint8_t> m_pixram;
@@ -178,8 +175,6 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_rombank_hi;
-	uint8_t m_rombank_lo;
 	uint8_t m_vidctrl;
 	uint8_t m_50a9_data;
 
@@ -506,26 +501,6 @@ uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 
 
 // System control
 
-WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_rombank_hi_w)
-{
-	// written with the banking?
-	//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
-	m_rombank_hi = data;
-
-	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::elan_eu3a05_rombank_lo_w)
-{
-	//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
-	m_rombank_lo = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_rombank_lo_r)
-{
-	return m_rombank_lo;
-}
-
 READ8_MEMBER(radica_eu3a05_state::elan_eu3a05_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
@@ -785,14 +760,13 @@ void radica_eu3a05_state::elan_eu3a05_map(address_map &map)
 	// 500x system regs?
 	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::elan_eu3a05_5003_r));
 
-	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05sys_device::intmask_r), FUNC(elan_eu3a05sys_device::intmask_w));
+	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
 
 	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::elan_eu3a05_pal_ntsc_r)); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::elan_eu3a05_rombank_hi_w));
-	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::elan_eu3a05_rombank_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_rombank_lo_w));
+	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
 
 	// 501x DMA controller
-	map(0x500F, 0x500F).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_w));
+	map(0x500f, 0x500f).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_lo_w));
 	map(0x5010, 0x5010).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_md_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_md_w));
 	map(0x5011, 0x5011).rw(FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_hi_r), FUNC(radica_eu3a05_state::elan_eu3a05_dmasrc_hi_w));
 
@@ -838,8 +812,8 @@ void radica_eu3a05_state::elan_eu3a05_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
 	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05sys_device::nmi_vector_r)); // custom vectors handled with NMI for now
-	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05sys_device::irq_vector_r));  // allow normal IRQ for brk
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
 
@@ -917,10 +891,6 @@ INPUT_PORTS_END
 
 void radica_eu3a05_state::machine_start()
 {
-	m_bank->set_bank(0x7f);
-
-	save_item(NAME(m_rombank_lo));
-	save_item(NAME(m_rombank_hi)); 
 }
 
 void radica_eu3a05_state::machine_reset()
@@ -1047,11 +1017,13 @@ void radica_eu3a05_state::elan_eu3a05(machine_config &config)
 	m_gpio->read_1_callback().set_ioport("IN1");
 	m_gpio->read_2_callback().set_ioport("IN2");
 
-	ELAN_EU3A05_SYS(config, m_sys, 0);
+	ELAN_EU3A05_COMMONSYS(config, m_sys, 0);
 	m_sys->set_cpu("maincpu");
+	m_sys->set_addrbank("bank");
 
 	ELAN_EU3A05_COMMONVID(config, m_commonvid, 0);
 	m_commonvid->set_palette("palette");
+	m_commonvid->set_entries(256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

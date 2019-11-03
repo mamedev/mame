@@ -68,7 +68,7 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/timer.h"
-#include "machine/elan_eu3a05sys.h"
+#include "machine/elan_eu3a05commonsys.h"
 #include "video/elan_eu3a05commonvid.h"
 
 
@@ -123,10 +123,6 @@ private:
 	DECLARE_READ8_MEMBER(dma_trigger_r);
 	DECLARE_WRITE8_MEMBER(dma_trigger_w);
 
-	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_lo_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_lo_w);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_hi_w);
-
 	DECLARE_WRITE8_MEMBER(porta_dir_w);
 	DECLARE_WRITE8_MEMBER(portb_dir_w);
 	DECLARE_WRITE8_MEMBER(portc_dir_w);
@@ -155,7 +151,7 @@ private:
 	virtual void video_start() override;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05commonsys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;
 	required_device<elan_eu3a05commonvid_device> m_commonvid;
 	required_region_ptr<uint8_t> m_mainregion;
@@ -175,8 +171,6 @@ private:
 	required_device<screen_device> m_screen;
 	required_ioport m_tvtype;
 
-	uint8_t m_rombank_hi;
-	uint8_t m_rombank_lo;
 	int m_tilerambase;
 	int m_spriterambase;
 
@@ -926,45 +920,6 @@ READ8_MEMBER(radica_eu3a14_state::read_full_space)
 	return fullbankspace.read_byte(offset);
 }
 
-/*
-   code at 0000 maps to e000
-   code at 1000 maps to f000
-
-   data at 2000
-   data at 3000
-   data at 4000
-   blank   5000
-   blank   6000
-
-   code at 7000 maps to 3000
-   code at 8000 maps to 6000
-           9000 maps to 7000
-           a000 maps to 8000
-           b000 maps to 9000
-           c000 maps to a000
-           d000 maps to b000
-           e000 maps to c000
-*/
-
-WRITE8_MEMBER(radica_eu3a14_state::elan_eu3a05_rombank_hi_w)
-{
-	// written with the banking?
-	//logerror("%s: elan_eu3a05_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
-	m_rombank_hi = data;
-
-	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
-}
-
-WRITE8_MEMBER(radica_eu3a14_state::elan_eu3a05_rombank_lo_w)
-{
-	//logerror("%s: elan_eu3a05_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
-	m_rombank_lo = data;
-}
-
-READ8_MEMBER(radica_eu3a14_state::elan_eu3a05_rombank_lo_r)
-{
-	return m_rombank_lo;
-}
 
 READ8_MEMBER(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)
 {
@@ -1016,18 +971,17 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
-	map(0x4800, 0x49ff).rw(m_commonvid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
+	map(0x4800, 0x4bff).rw(m_commonvid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
 	// similar to eu3a05, at least for pal flags and rom banking
 	// 5001 write
 	// 5004 write
 	// 5006 write
-	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05sys_device::intmask_r), FUNC(elan_eu3a05sys_device::intmask_w));
+	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
 	map(0x5009, 0x5009).r(FUNC(radica_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
 	map(0x500a, 0x500a).nopw(); // startup
 	map(0x500b, 0x500b).r(FUNC(radica_eu3a14_state::elan_eu3a05_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(FUNC(radica_eu3a14_state::elan_eu3a05_rombank_hi_w));
-	map(0x500d, 0x500d).rw(FUNC(radica_eu3a14_state::elan_eu3a05_rombank_lo_r), FUNC(radica_eu3a14_state::elan_eu3a05_rombank_lo_w));
+	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
 
 	// DMA is similar to, but not the same as eu3a05
 	map(0x500f, 0x5017).ram().share("dmaparams");
@@ -1110,8 +1064,8 @@ void radica_eu3a14_state::radica_eu3a14_map(address_map &map)
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);
 
-	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05sys_device::nmi_vector_r)); // custom vectors handled with NMI for now
-	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05sys_device::irq_vector_r));  // allow normal IRQ for brk
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
 READ8_MEMBER(radica_eu3a14_state::dma_trigger_r)
@@ -1702,10 +1656,11 @@ void radica_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a14_state::radica_eu3a14_map);
 	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a14_state::interrupt));
 
-	ELAN_EU3A05_SYS(config, m_sys, 0);
-	m_sys->set_cpu("maincpu");
-
 	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a14_state::bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+
+	ELAN_EU3A05_COMMONSYS(config, m_sys, 0);
+	m_sys->set_cpu("maincpu");
+	m_sys->set_addrbank("bank");
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_helper);
 
@@ -1722,6 +1677,7 @@ void radica_eu3a14_state::radica_eu3a14(machine_config &config)
 
 	ELAN_EU3A05_COMMONVID(config, m_commonvid, 0);
 	m_commonvid->set_palette("palette");
+	m_commonvid->set_entries(512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

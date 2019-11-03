@@ -18,7 +18,6 @@ elan_eu3a05commonvid_device::elan_eu3a05commonvid_device(const machine_config &m
 
 void elan_eu3a05commonvid_device::device_start()
 {
-	m_palram.resize(512);
 }
 
 void elan_eu3a05commonvid_device::device_reset()
