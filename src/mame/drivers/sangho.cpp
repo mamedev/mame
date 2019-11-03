@@ -531,7 +531,7 @@ ROM_START( pzlestar )
 	/* ROM15 empty */
 ROM_END
 
-ROM_START( superstar )
+ROM_START( sprpuzzle )
 	ROM_REGION( 0x20000*16, "user1", 0 ) // 15 sockets, 12 used
 	ROM_LOAD( "01.rom1",  0x000000, 0x20000, CRC(c494d996) SHA1(755a8e49845f3168130a83a4c7363d3ee9da359b) )
 	ROM_LOAD( "02.rom2",  0x020000, 0x20000, CRC(7ee2974e) SHA1(36a91b690f1228cbf66b5b3733823056632e9ef3) )
@@ -580,4 +580,4 @@ void pzlestar_state::init_pzlestar()
 
 GAME( 1991, pzlestar,  0,        pzlestar, pzlestar, pzlestar_state, init_pzlestar, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, sexyboom,  0,        sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Sexy Boom", 0 )
-GAME( 1991, superstar, sexyboom, sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Super Star (Sang Ho Soft)", 0 )
+GAME( 1991, sprpuzzle, sexyboom, sexyboom, sexyboom, sexyboom_state, empty_init,    ROT270, "Sang Ho Soft", "Super Puzzle (Sang Ho Soft)", 0 )
