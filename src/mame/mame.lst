@@ -36491,7 +36491,8 @@ spcforc2                        // bootleg
 spcforce                        // (c) 1980 Venture Line
 
 @source:spdheat.cpp
-spdheat                         // (c) 1985 Taito
+spdheat                         // A55 (c) 1985 Taito Corporation (World)
+spdheatj                        // A55 (c) 1985 Taito Corporation (Japan)
 
 @source:spdodgeb.cpp
 nkdodge                         // TA-0022 (c) 1987 (Japan)
