@@ -10,8 +10,9 @@
 #include "pfmtlog.h"
 #include "pstrutil.h"
 #include "putil.h"
+#include "pmath.h"
+#include "pstonum.h"
 
-#include <cmath>
 #include <stack>
 
 namespace plib {

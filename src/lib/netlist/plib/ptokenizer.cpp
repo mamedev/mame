@@ -8,6 +8,7 @@
 #include "ptokenizer.h"
 #include "palloc.h"
 #include "putil.h"
+#include "pstonum.h"
 
 namespace plib {
 

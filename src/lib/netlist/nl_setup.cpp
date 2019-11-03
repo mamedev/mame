@@ -17,8 +17,6 @@
 #include "plib/putil.h"
 #include "solver/nld_solver.h"
 
-#include <cmath>
-
 namespace netlist
 {
 	// ----------------------------------------------------------------------------------------

@@ -16,8 +16,6 @@
 #include "plib/putil.h"
 #include "plib/vector_ops.h"
 
-#include <cmath>
-
 namespace netlist
 {
 namespace solver

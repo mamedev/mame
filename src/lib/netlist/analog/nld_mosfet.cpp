@@ -22,8 +22,6 @@
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
-#include <cmath>
-
 #define BODY_CONNECTED_TO_SOURCE    (1)
 
 namespace netlist

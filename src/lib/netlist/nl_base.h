@@ -22,6 +22,7 @@
 #include "plib/pstate.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
+#include "plib/pstonum.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
