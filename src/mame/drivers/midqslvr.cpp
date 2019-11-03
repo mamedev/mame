@@ -177,8 +177,6 @@ Notes:
     U22: HC04 Hex Inverter
     Y1: Crystal/XTAL 6.000 MHz
 
-YOU CAN'T HAVE IT
-
 (Incomplete)
 MIDWAY GAMES INC.
 SUBSTITUTE MAGICBUS
@@ -241,14 +239,6 @@ Notes:
 	U22-24: ULN2064B Darlington Transistor
     U25: Not known yet
     Y2: FS14.74 Crystal/Oscilator
-
-AT LEAST I'LL GET MY WASHING DONE
-
-Misc Info (HT and OT):
-Both I/O boards could functionwise be very similar. Both video cards are CPLD protected and has their signal converted to EGA resolution.
-The boot sequence for the two involves the custom OS taking CPLD data from the video card and then sending it to its respective I/O board.
-You can read a more detailed description of this here: https://forums.arcade-museum.com/showthread.php?p=3215996#post3215996
-
 	
 ***************************************************************************/
 
@@ -671,8 +661,8 @@ ROM_START( hydrthnd )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* Diego board CY7C63513-PVC MCU code */
-	ROM_LOAD( "diego.u8", 0x000000, 0x040000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Diego board CY7C63513-PVC MCU code */
+	ROM_LOAD( "diego.u8", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "hydro", 0,  SHA1(d481d178782943c066b41764628a419cd55f676d) )
@@ -682,8 +672,8 @@ ROM_START( offrthnd )
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* Magicbus board CY7C63513-PVC MCU code */
-	ROM_LOAD( "magicbus.u18", 0x000000, 0x040000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Magicbus board CY7C63513-PVC MCU code */
+	ROM_LOAD( "magicbus.u18", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "offrthnd", 0, SHA1(d88f1c5b75361a1e310565a8a5a09c674a4a1a22) )
@@ -693,8 +683,8 @@ ROM_START( arctthnd )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
-	ROM_LOAD( "substitute.u20", 0x000000, 0x040000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
+	ROM_LOAD( "substitute.u20", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "arctthnd", 0,  SHA1(f4373e57c3f453ac09c735b5d8d99ff811416a23) )
@@ -704,21 +694,22 @@ ROM_START( ultarctc )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
-	ROM_LOAD( "substitute.u20", 0x000000, 0x040000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
+	ROM_LOAD( "substitute.u20", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
 ROM_END
 
-// this is an update CD. This CD is supposed to update regular Arctic Thunder to Ultimate.
-// Ultimate Arctic Thunder requires a dongle to work. If the dongle isn't detected, the game will load regular Arctic Thunder.
+/* This is an update CD. This CD along with a dongle was released as a kit to update a normal Arctic Thunder to Ultimate.
+Ultimate Arctic Thunder requires a dongle to work. If the dongle isn't detected both during and after installation,
+the game will revert back to normal Arctic Thunder. */
 ROM_START( ultarctcup )
 	ROM_REGION32_LE(0x80000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "m29f002bt.u6", 0x040000, 0x040000, CRC(012c9290) SHA1(cdee6f19d5e5ea5bb1dd6a5ec397ac70b3452790) )
 
-	ROM_REGION( 0x40000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
-	ROM_LOAD( "substitute.u20", 0x000000, 0x040000, NO_DUMP ) // 8KB internal EPROM
+	ROM_REGION( 0x2000, "iocpu", 0 )   /* Substitute board P87C51/2 MCU code */
+	ROM_LOAD( "substitute.u20", 0x0000, 0x2000, NO_DUMP ) // 8KB internal EPROM
 
 	DISK_REGION( "ide:0:hdd:image" )
 	DISK_IMAGE( "uarctict", 0, SHA1(8557a1d7ae8dc41c879350cb1c228f4c27a0dd09) )
