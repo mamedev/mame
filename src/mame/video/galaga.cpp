@@ -242,12 +242,10 @@ WRITE_LINE_MEMBER(galaga_state::screen_vblank_galaga)
 	// falling edge
 	if (!state)
 	{
-		uint8_t speed_index_X, speed_index_Y;
-
 		// Galaga only scrolls in X direction - the SCROLL_Y pins
 		// of the 05XX chip are tied to ground.
-		speed_index_X = (m_videolatch->q2_r()<<2) | (m_videolatch->q1_r()<<1) | (m_videolatch->q0_r()<<0);
-		speed_index_Y = 0;
+		const uint8_t speed_index_X = (m_videolatch->q2_r()<<2) | (m_videolatch->q1_r()<<1) | (m_videolatch->q0_r()<<0);
+		const uint8_t speed_index_Y = 0;
 		m_starfield->set_scroll_speed(speed_index_X,speed_index_Y);
 
 		m_starfield->set_active_starfield_sets(m_videolatch->q3_r(), m_videolatch->q4_r() | 2);

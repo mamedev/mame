@@ -3516,4 +3516,3 @@ GAME( 1982, battles,   xevious, battles, xevious,  battles_state, driver_init,  
 GAME( 1982, battles2,  xevious, xevious, xevious,  xevious_state, init_xevios,  ROT90,  "bootleg", "Battles (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, dzigzag,   digdug,  dzigzag, digdug,   digdug_state,  empty_init,   ROT90,  "bootleg", "Zig Zag (Dig Dug hardware)", MACHINE_SUPPORTS_SAVE )
-

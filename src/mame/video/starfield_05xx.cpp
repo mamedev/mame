@@ -2,10 +2,6 @@
 // copyright-holders:Robert Hildinger
 
 
-
-
-
-
 /***************************************************************************
 
   Starfield generator documentation
@@ -283,13 +279,14 @@
            MAME-suitable C++ implementation by Jindřich Makovička.
 
            Both of these implementations used the Galois form of the Fibonacci
-           LFSR described above (and thus the samne taps). The Galois form  is
+           LFSR described above (and thus the same taps). The Galois form is
            slightly more efficient to implement than the Fibonacci form, and
            produces the same output bit stream. However, the internal state
            sequence of the Galois form is different, and therefore requires
            a different set of hit and decode logic. It was found that the
-           logic required for the Galois from was much more complicated than
-           the Fibonacci form, which why the latter is used in this implementation.
+           logic required for the Galois form was much more complicated than
+           the Fibonacci form, which is why the latter is used in this 
+           implementation.
 
           ---------------------------------------------------------------------------
 
@@ -532,11 +529,11 @@ starfield_05xx_device::starfield_05xx_device(machine_config const &mconfig, char
 	, m_lfsr(LFSR_SEED)
 	, m_pre_vis_cycle_count(0)
 	, m_post_vis_cycle_count(0)
-	, m_starfield_set_a(0)
-	, m_starfield_set_b(0)
-	, m_starfield_offset_X(0)
-	, m_starfield_offset_Y(0)
-	, m_starfield_limit_X(0)
+	, m_set_a(0)
+	, m_set_b(0)
+	, m_offset_x(0)
+	, m_offset_y(0)
+	, m_limit_x(0)
 
 {
 }
@@ -552,35 +549,35 @@ void starfield_05xx_device::enable_starfield(uint8_t on)
 
 
 
-void starfield_05xx_device::set_scroll_speed(uint8_t index_X, uint8_t index_Y)
+void starfield_05xx_device::set_scroll_speed(uint8_t index_x, uint8_t index_y)
 {
 	// Set initial pre- and post- visible cycle counts based on vertical 
 	// scroll registers
-	m_pre_vis_cycle_count = pre_vis_cycle_count_values[index_Y];
-	m_post_vis_cycle_count = post_vis_cycle_count_values[index_Y];
+	m_pre_vis_cycle_count = pre_vis_cycle_count_values[index_y];
+	m_post_vis_cycle_count = post_vis_cycle_count_values[index_y];
 	
 	// X scrolling occurs during pre-visible portion, so adjust 
 	// pre-visible cycle count to based on horizontal scroll registers
-	m_pre_vis_cycle_count += speed_X_cycle_count_offset[index_X];
+	m_pre_vis_cycle_count += speed_X_cycle_count_offset[index_x];
 }
 
 
 void starfield_05xx_device::set_active_starfield_sets(uint8_t set_a, uint8_t set_b)
 {
 	// Set active starfield sets based on starfield select registers
-	m_starfield_set_a = set_a;
-	m_starfield_set_b = set_b;
+	m_set_a = set_a;
+	m_set_b = set_b;
 }
 
 
-void starfield_05xx_device::set_starfield_config(uint16_t off_X, uint16_t off_Y, uint16_t lim_X)
+void starfield_05xx_device::set_starfield_config(uint16_t off_x, uint16_t off_y, uint16_t lim_x)
 {
 	// Set X and Y starfield position offsets
-	m_starfield_offset_X = off_X;
-	m_starfield_offset_Y = off_Y;
+	m_offset_x = off_x;
+	m_offset_y = off_y;
 	
 	// Set X range limit
-	m_starfield_limit_X = lim_X;
+	m_limit_x = lim_x;
 }
 
 
@@ -603,7 +600,7 @@ void starfield_05xx_device::draw_starfield(bitmap_ind16 &bitmap, const rectangle
 	uint16_t pre_vis_cycle_count = m_pre_vis_cycle_count;
 	uint16_t post_vis_cycle_count = m_post_vis_cycle_count;
 
-	if ( m_enable )
+	if (m_enable)
 	{
 		int x,y;
 
@@ -611,19 +608,19 @@ void starfield_05xx_device::draw_starfield(bitmap_ind16 &bitmap, const rectangle
 		do { m_lfsr = get_next_lfsr_state(m_lfsr); } while (--pre_vis_cycle_count);
 
 		// Now we are in visible portion of the frame - Output all LFSR hits here
-		for (y = m_starfield_offset_Y; y < VISIBLE_LINES + m_starfield_offset_Y; y++)
+		for (y = m_offset_y; y < VISIBLE_LINES + m_offset_y; y++)
 		{
-			for (x = m_starfield_offset_X; x < STARFIELD_PIXEL_WIDTH + m_starfield_offset_X; x++)
+			for (x = m_offset_x; x < STARFIELD_PIXEL_WIDTH + m_offset_x; x++)
 			{
 				// Check lfsr for hit
 				if ((m_lfsr&LFSR_HIT_MASK) == LFSR_HIT_VALUE)
 				{
-					uint8_t star_set = ((m_lfsr>>9)&0x2) | ((m_lfsr>>8)&0x1);
+					uint8_t star_set = bitswap<2>(m_lfsr, 10, 8);
 
-					if ((m_starfield_set_a == star_set) || (m_starfield_set_b == star_set))
+					if ((m_set_a == star_set) || (m_set_b == star_set))
 					{
 						// don't draw the stars that are beyond the X limit
-						if (x < m_starfield_limit_X)
+						if (x < m_limit_x)
 						{
 							int dx = x;
 
@@ -662,12 +659,12 @@ void starfield_05xx_device::device_start()
 	save_item(NAME(m_lfsr));
 	save_item(NAME(m_pre_vis_cycle_count));
 	save_item(NAME(m_post_vis_cycle_count));
-	save_item(NAME(m_starfield_set_a));
-	save_item(NAME(m_starfield_set_b));
+	save_item(NAME(m_set_a));
+	save_item(NAME(m_set_b));
 
-	save_item(NAME(m_starfield_offset_X));
-	save_item(NAME(m_starfield_offset_Y));
-	save_item(NAME(m_starfield_limit_X));
+	save_item(NAME(m_offset_x));
+	save_item(NAME(m_offset_y));
+	save_item(NAME(m_limit_x));
 }
 
 
@@ -678,6 +675,6 @@ void starfield_05xx_device::device_reset()
 	m_lfsr = LFSR_SEED;
 	m_pre_vis_cycle_count = 0;
 	m_post_vis_cycle_count = 0;
-	m_starfield_set_a = 0;
-	m_starfield_set_b = 0;
+	m_set_a = 0;
+	m_set_b = 0;
 }

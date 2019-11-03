@@ -269,11 +269,9 @@ WRITE_LINE_MEMBER(bosco_state::screen_vblank_bosco)
 	// falling edge
 	if (!state)
 	{
-		uint8_t speed_index_X, speed_index_Y;
-
 		// Bosconian scrolls in X and Y directions
-		speed_index_X = m_bosco_starcontrol[0] & 0x07;
-		speed_index_Y = (m_bosco_starcontrol[0] & 0x38) >> 3;
+		const uint8_t speed_index_X = m_bosco_starcontrol[0] & 0x07;
+		const uint8_t speed_index_Y = (m_bosco_starcontrol[0] & 0x38) >> 3;
 		m_starfield->set_scroll_speed(speed_index_X,speed_index_Y);
 
 		m_starfield->set_active_starfield_sets(m_videolatch->q4_r(), m_videolatch->q5_r() | 2);
