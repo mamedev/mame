@@ -28,7 +28,7 @@
 			<feature name="ic2" value="MPR=17352-F" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-17351-f.ic1" size="2097152" crc="e0ef6ebc" sha1="30258efdcacb6c49873ef7de466c1b393e27b79d" />
+				<rom name="mpr-17351-f.ic1" size="2097152" crc="e0ef6ebc" sha1="30258efdcacb6c49873ef7de466c1b393e27b79d" offset="0x000000" />
 				<rom name="mpr-17352-f.ic2" size="1048576" crc="c7079709" sha1="0f22e68e3013fa7e4110cddbe989986d2639833b" offset="0x200000" />
 			</dataarea>
 		</part>
@@ -72,8 +72,8 @@
 			<feature name="ic2" value="MPR-17350-S" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="2621440">
-				<rom name="mpr-17349 w79.ic1" size="2097152" crc="f1f7f657" sha1="5ab5bd1e9cd6d8d43e7cf78c3619b087c1d931c2" />
-				<rom name="mpr-17350-s.ic2" size="524288" crc="55931049" sha1="3edd15d2e53b1a126559414290b8da23a7cbed5d" offset="0x200000" />
+				<rom name="mpr-17349 w79.ic1" size="2097152" crc="f1f7f657" sha1="5ab5bd1e9cd6d8d43e7cf78c3619b087c1d931c2" offset="0x000000" />
+				<rom name="mpr-17350-s.ic2"   size="524288"  crc="55931049" sha1="3edd15d2e53b1a126559414290b8da23a7cbed5d" offset="0x200000" />
 			</dataarea>
 		</part>
 	</software>
@@ -89,7 +89,7 @@
 			<feature name="ic2" value="MPR-17927-MX" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="4194304">
-				<rom name="mpr-17926-mx.ic1" size="2097152" crc="543d310f" sha1="c8510d61dfca6bcf3949ad13cef33d92118688d9" />
+				<rom name="mpr-17926-mx.ic1" size="2097152" crc="543d310f" sha1="c8510d61dfca6bcf3949ad13cef33d92118688d9" offset="0x000000" />
 				<rom name="mpr-17927-mx.ic2" size="2097152" crc="ecfef9e6" sha1="85a5859688742ab59ff16a8b67c872a2d2dbe076" offset="0x200000" />
 			</dataarea>
 		</part>
@@ -106,7 +106,7 @@
 			<feature name="ic2" value="MPR-17348 T34" />
 			<feature name="ic3" value="74HC139N" />
 			<dataarea name="rom" size="3145728">
-				<rom name="mpr-17347 w72.ic1" size="2097152" crc="99e83be0" sha1="2b3e364494f6bdcae686e1535e51adee2aabca16" />
+				<rom name="mpr-17347 w72.ic1" size="2097152" crc="99e83be0" sha1="2b3e364494f6bdcae686e1535e51adee2aabca16" offset="0x000000" />
 				<rom name="mpr-17348 t34.ic2" size="1048576" crc="aa2f8743" sha1="db85888bf3743195c0bf41e0b3d65486c328b197" offset="0x200000" />
 			</dataarea>
 		</part>
