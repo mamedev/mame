@@ -15,13 +15,13 @@
     * Serial peripheral interface
     * UART (built-in BRG; RS-232 and IrDA modes)
     * USB 1.1 (separate control and bulk transfer endpoint buffers)
-    * Direct memory access
+    * Direct memory access (2 channels, optional XOR/OR/AND logic)
     * NAND/AND Flash memory interface (includes ECC generator)
     * Power down modes (WAI-0, WAI-1, STP)
     * Watchdog timer
     * Real time clock (seconds, minutes, hours with alarm interrupts)
     * Low voltage detector with reset
-    * 512K ROM (may be disabled)
+    * 16K OTP ROM (may be disabled)
     * 32K SRAM
 
     One important difference between the ST2205U and almost every
