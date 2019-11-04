@@ -90,6 +90,7 @@ slampic: no sound. A priority problem between sprites and crowd.
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "sound/ym2151.h"
@@ -538,6 +539,10 @@ WRITE16_MEMBER(cps_state::slampic_layer_w)
 		m_cps_a_regs[0x04/2] = data << 4;
 		break;
 	}
+	
+	m_cps_b_regs[0x02/2] = 0x0fff;
+	m_cps_b_regs[0x28/2] = 0x7f00;
+	m_cps_b_regs[0x2a/2] = 0x7fff;
 }
 
 
@@ -606,7 +611,7 @@ void cps_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bitmap
 	switch (layer)
 	{
 		case 0:
-			fcrash_render_sprites(screen, bitmap, cliprect);
+			(this->*bootleg_sprite_renderer)(screen, bitmap, cliprect);
 			break;
 		case 1:
 		case 2:
@@ -3345,6 +3350,503 @@ ROM_START( varthb )
 	ROM_LOAD_OPTIONAL( "varth6.bin",    0x00a00, 0x157, NO_DUMP ) // Registered
 ROM_END
 
+// ************************************************************************* SLAMPIC2
+
+/*
+	CPU
+	1x  MC68000P10           main cpu
+	
+	GFX
+	1x  Custom QFP 160-pin   "PLUS-B A37558.6 9325"
+	
+	RAM
+	2x  NEC D431000ACZ-70L   main ram   1Mbit (128Kx8) SRAM 70ns
+	2x  SRM20256LM12         gfx?       256Kbit (32Kx8) SRAM 120ns SOP28   (mounted on tiny SOP->DIP adapter pcbs)
+	6x  T6116S45L            gfx?       16Kbit (2Kx8) SRAM 45ns
+	4x  T6116S35L            gfx?       16Kbit (2Kx8) SRAM 35ns
+	
+	ROMS
+	4x   27C040-15 EPROM      main rom   4Mbit (512Kx8)
+	16x  MX27C4000PC-15 OTP   gfx        4Mbit (512Kx8)
+	1x   27C020-15 EPROM      sound      2Mbit (256Kx8)
+	2x   MX27C4000PC-15 OTP   sound      4Mbit (512Kx8)
+	1x   AM27512DC EPROM      ?          512Kbit (64kx8)  1983!
+	
+	PLD
+	1x   TPC1020AFN-084C
+	14x  PALCE16V8H-25PC/4
+	4x   PALCE20V8H-25PC/4
+	1x   PALCE22V10H-25PC/4
+	
+	SOUND
+	1x  PIC16C57-XT/P     sound cpu
+	1x  TD735             sample player  (Oki MSM6295 clone)
+	1x  NEC uPC1242H      power amp
+	1x  LM324N            op amp
+	
+	MISC
+	1x  16MHz xtal
+	1x  10MHz xtal
+	1x  PST518A             reset generator
+	3x  8 pos dipswitch
+	2x  10-pin connectors   player 3 & 4 inputs
+	No eeprom!
+	
+	INPUTS
+	CN3: Player 3
+	CN4: Player 4
+	
+	1   gnd
+	2   nc
+	3   right
+	4   left
+	5   down
+	6   up
+	7   btn 1
+	8   btn 2
+	9   coin
+	10  start
+	
+	player 3 btn 3: jamma 25  (non-std, player 1 btn 4/neogeo btn D)
+	player 4 btn 4: jamma ac  (non-std, player 2 btn 4/neogeo btn D)
+	
+	
+	h/w issues compared to original game (slammast)
+	-----------------------------------------------
+	these are present on the real board so are not emulation issues:
+	
+	* On the title screen, the blue crystal-like effect behind the main "slammasters" logo is missing.
+	* The bottom and side crowd animations have missing frames.
+	* The centre parts of the foreground ropes (of the wrestling ring) are drawn on scroll2 layer instead of with sprites,
+		they glitch a lot and don't always line up properly with the end sections, sometimes are drawn underneath wrestler sprites instead of over top.
+	* Player 3/4 inputs don't work in test menu (except both btn 3), seems test menu code hasn't been hacked to use the different ports.
+	* Sound is generally very poor quality and the background music consists of short pre-recorded clips which loop continuously.
+		(sound currently unemulated as the PIC is secured against reading)
+	* No eeprom on the board, has dipswitches instead.
+	* Crashes if "memory test" is attempted in test menu.
+	* Flip screen dipswitch does nothing (but change is shown in test menu).
+*/
+
+#define DRAWSPRITE(CODE, COLOR, FLIPX, FLIPY, SX, SY)																								\
+{																																					\
+	if (flip_screen())																																\
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, !(FLIPX), !(FLIPY), 512-16-(SX), 256-16-(SY), screen.priority(), 2, 15);	\
+	else																																			\
+		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, FLIPX, FLIPY, SX, SY, screen.priority(), 2, 15);							\
+}
+
+void cps_state::slampic2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int i, j = 0;
+	int last_sprite_offset = 0;
+	uint16_t tileno, colour, xpos, ypos;
+	uint16_t obj_base = m_cps_a_regs[0];
+	uint16_t *sprite_ram = m_bootleg_sprite_ram.get();
+	
+	switch (obj_base)
+	{
+	case 0x9000:
+		sprite_ram += m_sprite_base;  // ff2000
+		break;
+	case 0x9040:
+		sprite_ram += m_sprite_base + 0x800;  // ff3000
+		break;
+	default:
+		logerror("Unknown sprite table location: %04x\n", obj_base);
+		sprite_ram += m_sprite_base;  // ff2000
+	}
+	
+	while (last_sprite_offset < m_obj_size / 2)
+	{
+		if (sprite_ram[last_sprite_offset + 3] == m_sprite_list_end_marker)
+			break;
+		last_sprite_offset += 4;
+	}
+	
+	for (i = last_sprite_offset; i > 0; i -= 4)
+	{
+		xpos   = sprite_ram[j];
+		ypos   = sprite_ram[j + 1];
+		tileno = sprite_ram[j + 2];
+		colour = sprite_ram[j + 3];
+
+		if (colour & 0xff00 )  // block sprite
+		{
+			int nx = (colour & 0x0f00) >> 8;
+			int ny = (colour & 0xf000) >> 12;
+			int nxs, nys, sx, sy;
+			nx++;
+			ny++;
+
+			if (colour & 0x40)  // y flip
+			{
+				if (colour & 0x20)  // x flip
+				{
+					for (nys = 0; nys < ny; nys++)
+					{
+						for (nxs = 0; nxs < nx; nxs++)
+						{
+							sx = (xpos + nxs * 16) & 0x1ff;
+							sy = (ypos + nys * 16) & 0x1ff;
+							DRAWSPRITE((tileno & ~0xf) + ((tileno + (nx - 1) - nxs) & 0xf) + 0x10 * (ny - 1 - nys), (colour & 0x1f), 1, 1, sx, sy);
+						}
+					}
+				}
+				else  // no x flip
+				{
+					for (nys = 0; nys < ny; nys++)
+					{
+						for (nxs = 0; nxs < nx; nxs++)
+						{
+							sx = (xpos + nxs * 16) & 0x1ff;
+							sy = (ypos + nys * 16) & 0x1ff;
+							DRAWSPRITE((tileno & ~0xf) + ((tileno + nxs) & 0xf) + 0x10 * (ny - 1 - nys), (colour & 0x1f), 0, 1, sx, sy);
+						}
+					}
+				}
+			}
+			else  // no y flip
+			{
+				if (colour & 0x20)  // x flip
+				{
+					for (nys = 0; nys < ny; nys++)
+					{
+						for (nxs = 0; nxs<nx; nxs++)
+						{
+							sx = (xpos + nxs * 16) & 0x1ff;
+							sy = (ypos + nys * 16) & 0x1ff;
+							DRAWSPRITE((tileno & ~0xf) + ((tileno + (nx - 1) - nxs) & 0xf) + 0x10 * nys, (colour & 0x1f), 1, 0, sx, sy);
+						}
+					}
+				}
+				else  // no x flip
+				{
+					for (nys = 0; nys < ny; nys++)
+					{
+						for (nxs = 0; nxs < nx; nxs++)
+						{
+							sx = (xpos + nxs * 16) & 0x1ff;
+							sy = (ypos + nys * 16) & 0x1ff;
+							DRAWSPRITE((tileno & ~0xf) + ((tileno + nxs) & 0xf) + 0x10 * nys, (colour & 0x1f), 0, 0, sx, sy);
+						}
+					}
+				}
+			}
+		}
+		else
+			DRAWSPRITE(tileno, (colour & 0x1f), (colour & 0x20), (colour & 0x40), (xpos & 0x1ff), (ypos & 0x1ff));
+		
+		j += 4;
+	}
+}
+
+void cps_state::slampic2(machine_config &config)
+{
+	M68000(config, m_maincpu, 10000000);  // measured
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::slampic2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
+	
+	PIC16C57(config, m_audiocpu, 4000000);  // measured
+	//m_audiocpu->set_disable();
+
+	MCFG_MACHINE_START_OVERRIDE(cps_state, slampic2)
+	
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	//m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
+	
+	SPEAKER(config, "mono").front_center();
+	//GENERIC_LATCH_8(config, m_soundlatch);
+	//GENERIC_LATCH_8(config, m_soundlatch2);
+	OKIM6295(config, m_oki, 1000000, okim6295_device::PIN7_LOW);  // measured & pin 7 verified
+	//m_oki->set_addrmap(0, &cps_state::slampic2_oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.80);
+}
+
+void cps_state::slampic2_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x800001).portr("IN1");
+	map(0x800002, 0x800003).portr("IN2"); // player 3 + 4 inputs
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));
+	map(0x800030, 0x800031).nopw();  // coin ctrl
+	map(0x800100, 0x80013f).ram().r(FUNC(cps_state::slampic2_cps_a_r)).share("cps_a_regs");
+	map(0x800140, 0x80017f).ram().share("cps_b_regs");
+	map(0x800180, 0x800181).w(FUNC(cps_state::slampic2_sound_w));   // sound
+	map(0x800188, 0x800189).w(FUNC(cps_state::slampic2_sound2_w));  // sound
+	map(0x8ffff8, 0x8fffff).nopw();  // ?
+	map(0x900000, 0x92ffff).ram().mirror(0x6c0000).w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	//  0x930000, 0x933fff  spriteram mirror?
+	//  0xf00000, 0xf3ffff  workram
+	//  0xfc0000, 0xfeffff  gfxram
+	//  0xff0000, 0xff3fff  spriteram
+	map(0xff4000, 0xffffff).ram().share("mainram");
+	
+	/*
+	                  slammast        slampic2
+	sprite table 1    900000-9007ff   ff2000-ff27ff
+	                                  ff2800-ff2fff  ?
+	sprite table 2    904000-9047ff   ff3000-ff37ff
+	                                  ff3800-ff3fff  ?
+									  
+	gfxram            900000-91bfff   900000-91bfff
+	                  91c000-92ffff   fdc000-feffff
+	
+	test menu reads 3p + 4p controls at original ports f1c000-f1c003
+	start-up check tests f00000-f40000 region
+	start-up check tests 930000-934000 region but ignores any failure found, mirrored with sprite table region?
+	*/
+}
+
+void cps_state::init_slampic2()
+{
+	bootleg_sprite_renderer = &cps_state::slampic2_render_sprites;
+	
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x930000, 0x933fff, m_bootleg_sprite_ram.get());
+	m_maincpu->space(AS_PROGRAM).install_ram(0xff0000, 0xff3fff, m_bootleg_sprite_ram.get());
+	
+	m_bootleg_work_ram = std::make_unique<uint16_t[]>(0x20000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0xf00000, 0xf3ffff, m_bootleg_work_ram.get());
+	
+	init_cps1();
+}
+
+MACHINE_START_MEMBER(cps_state, slampic2)
+{
+	m_layer_enable_reg = 0x16;
+	m_layer_mask_reg[1] = 0x02;
+	m_layer_mask_reg[2] = 0x28;
+	m_layer_mask_reg[3] = 0x2a;
+	m_layer_scroll1x_offset = 12;  // y offset 1px too low
+	m_layer_scroll2x_offset = 14;  // y offset 1px too low
+	m_layer_scroll3x_offset = 15;  // y offset 1px too low
+	m_sprite_base = 0x1000;
+	m_sprite_list_end_marker = 0xff00;
+	m_sprite_x_offset = 0;
+}
+
+READ16_MEMBER(cps_state::slampic2_cps_a_r)
+{
+	// checks bit 0 of 800132
+	// no sound codes are sent unless this returns true, ready signal from the sound PIC?
+	if (offset == 0x32 / 2)
+		return 0xffff;
+	else
+		logerror("Read from cps-a register %02x\n", offset * 2);
+	return 0;
+}
+
+WRITE16_MEMBER(cps_state::slampic2_sound_w)
+{
+	logerror("Sound command: %04x\n", data);
+}
+
+WRITE16_MEMBER(cps_state::slampic2_sound2_w)
+{
+	logerror("Sound2 command: %04x\n", data);
+}
+
+static INPUT_PORTS_START( slampic2 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	//PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW(A):1,2,3")
+	PORT_DIPSETTING( 0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x06, DEF_STR( 1C_2C ) )  // A:cccxxx0x C:xx0xxxxx = coinage (freeplay + "2 coins start" must be off)
+	PORT_DIPSETTING( 0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING( 0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING( 0x03, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING( 0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING( 0x01, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(A):4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW(A):5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW(A):6" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW(A):7")
+	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, "2 Coins Start" )  // A:000xxx1x C:xx0xxxxx = 2 coins start (other coinage + freeplay must be off)
+	PORT_DIPNAME( 0x80, 0x80, "Chuter" ) PORT_DIPLOCATION("SW(A):8")
+	PORT_DIPSETTING( 0x80, "Single Chuter" )
+	PORT_DIPSETTING( 0x00, "Multi Chuters" )
+	
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x04, "Game Difficulty" ) PORT_DIPLOCATION("SW(B):1,2,3")
+	PORT_DIPSETTING( 0x07, "(0) Extra Easy" )
+	PORT_DIPSETTING( 0x06, "(1) Very Easy" )
+	PORT_DIPSETTING( 0x05, "(2) Easy" )
+	PORT_DIPSETTING( 0x04, "(3) Normal" )
+	PORT_DIPSETTING( 0x03, "(4) Hard" )
+	PORT_DIPSETTING( 0x02, "(5) Very Hard" )
+	PORT_DIPSETTING( 0x01, "(6) Extra Hard" )
+	PORT_DIPSETTING( 0x00, "(7) Hardest" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW(B):4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW(B):5" )
+	PORT_DIPNAME( 0x20, 0x20, "Join In") PORT_DIPLOCATION("SW(B):6")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Cabinet" ) PORT_DIPLOCATION("SW(B):7,8")
+	PORT_DIPSETTING( 0xc0, "2 Players Cabinet" )
+	//PORT_DIPSETTING( 0x80, "Invalid" )              // only coin 1 works, credits both player 1 and 2
+	PORT_DIPSETTING( 0x40, "4 Players Cabinet" )
+	PORT_DIPSETTING( 0x00, "2x2 Players Cabinet" )  // only coins 1,3 work, 1 credits 1+2, 2 credits 3+4
+	
+	PORT_START("DSWC")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )
+	PORT_DIPNAME( 0x02, 0x02, "Game Mode" ) PORT_DIPLOCATION("SW(C):2")
+	PORT_DIPSETTING( 0x02, "For Business" )
+	PORT_DIPSETTING( 0x00, "For Photographing" )  // doesn't seem to do anything?
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW(C):3")
+	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )  // A:000xxx0x C:xx1xxxxx = freeplay (other coinage + "2 coins start" must be off)
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" ) PORT_DIPLOCATION("SW(C):4")
+	PORT_DIPSETTING( 0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW(C):5")  // doesn't work
+	PORT_DIPSETTING( 0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW(C):6")
+	PORT_DIPSETTING( 0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW(C):7")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x40, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(C):8" )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
+	
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START3 )
+INPUT_PORTS_END
+
+ROM_START( slampic2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x80000, CRC(105cfefd) SHA1(83a34bc83782ae04be1665a91b44625d24f99466) )
+	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x80000, CRC(6026c95e) SHA1(8503587941ad14a757ad337dc36591fedcddaa41) )
+	ROM_LOAD16_BYTE( "3.bin", 0x100000, 0x80000, CRC(0effa84a) SHA1(03342bd4cb1de8652bab874c11cb1ecb69a339c7) )
+	ROM_LOAD16_BYTE( "1.bin", 0x100001, 0x80000, CRC(8fcb683a) SHA1(4648656bed010a0c27748df4a78c73c5cae07442) )
+
+	ROM_REGION( 0x600000, "gfx", 0 )  // overall just 2 bytes diff vs official set (slammast)
+	ROM_LOAD64_BYTE( "rom7.bin",  0x000000, 0x40000, CRC(b5669ad3) SHA1(ceb3d2a6d6c1443a40d37c8f2ba5f3cf03315908) )  // ~ slampic 9.bin  [1/2] 99.914551% [2/2] IDENTICAL
+	ROM_CONTINUE(                 0x000004, 0x40000)
+	ROM_LOAD64_BYTE( "rom8.bin",  0x000001, 0x40000, CRC(f07a6085) SHA1(68795a0f5151a45f053059bc2fe4a622d5e10d8a) )  // ~ slampic 8.bin  [1/2] 99.999237% [2/2] IDENTICAL  2 bytes diff
+	ROM_CONTINUE(                 0x000005, 0x40000)
+	ROM_LOAD64_BYTE( "rom5.bin",  0x000002, 0x40000, CRC(5321f759) SHA1(7538a6587cf1077921b938070185e0a0ce5ca922) )  // = slampic 7.bin
+	ROM_CONTINUE(                 0x000006, 0x40000)
+	ROM_LOAD64_BYTE( "rom6.bin",  0x000003, 0x40000, CRC(c8eb5f76) SHA1(a361d2d2dfe71789736666b744ae5f1e4bf7e1b2) )  // = slampic 6.bin
+	ROM_CONTINUE(                 0x000007, 0x40000)
+	ROM_LOAD64_BYTE( "rom11.bin", 0x200000, 0x40000, CRC(21652214) SHA1(039335251f6553c4f36e2d33e8b43fb5726e833e) )  // = slampic 17.bin
+	ROM_CONTINUE(                 0x200004, 0x40000)
+	ROM_LOAD64_BYTE( "rom12.bin", 0x200001, 0x40000, CRC(d49d2eb0) SHA1(1af01575340730166975be93bae438e2b0492f98) )  // = slampic 16.bin
+	ROM_CONTINUE(                 0x200005, 0x40000)
+	ROM_LOAD64_BYTE( "rom9.bin",  0x200002, 0x40000, CRC(0d98bfd6) SHA1(c11fbf555880a933a4cbf6faa517f59f8443304f) )  // = slampic 15.bin
+	ROM_CONTINUE(                 0x200006, 0x40000)
+	ROM_LOAD64_BYTE( "rom10.bin", 0x200003, 0x40000, CRC(807284f1) SHA1(c747c3eaade31c2633fb0a0682dbea900bf2b092) )  // = slampic 14.bin
+	ROM_CONTINUE(                 0x200007, 0x40000)
+	ROM_LOAD64_BYTE( "rom15.bin", 0x400000, 0x40000, CRC(293579c5) SHA1(9adafe29664b20834365b339f7ae379cdb9ee138) )  // = slampic 13.bin
+	ROM_CONTINUE(                 0x400004, 0x40000)
+	ROM_LOAD64_BYTE( "rom16.bin", 0x400001, 0x40000, CRC(c3727ce7) SHA1(c4abc2c59152c59a45f85393e9525505bc2c9e6e) )  // = slampic 12.bin
+	ROM_CONTINUE(                 0x400005, 0x40000)
+	ROM_LOAD64_BYTE( "rom13.bin", 0x400002, 0x40000, CRC(2919883b) SHA1(44ad979daae673c77b3157d2b352797d4ad0ec24) )  // = slampic 11.bin
+	ROM_CONTINUE(                 0x400006, 0x40000)
+	ROM_LOAD64_BYTE( "rom14.bin", 0x400003, 0x40000, CRC(f538e620) SHA1(354cd0548b067dfc8782bbe13b0a9c2083dbd290) )  // = slampic 10.bin
+	ROM_CONTINUE(                 0x400007, 0x40000)
+	
+	// this region contains first 0x40000 bytes of 1st 0x200000 region (rom7/8/5/6.bin)
+	//   then,              last 0x1c0000 bytes of 3rd 0x200000 region (rom15/16/13/14.bin)
+	// game doesn't seem to need it ???
+	// ROM_LOAD64_BYTE( "rom1.bin",  0x600000, 0x40000, CRC(8f2c41a4) SHA1(097edfbe9c14f299727fe53e4b83a674f7501561) )  // ~ 15.bin
+	// ROM_CONTINUE(                 0x600004, 0x40000)
+	// ROM_LOAD64_BYTE( "rom2.bin",  0x600001, 0x40000, CRC(65f3dc43) SHA1(01d9ec3ef913ae235bd98ee6921c366f34547d36) )  // ~ 16.bin
+	// ROM_CONTINUE(                 0x600005, 0x40000)
+	// ROM_LOAD64_BYTE( "rom3.bin",  0x600002, 0x40000, CRC(3cd830e3) SHA1(ac1f055c9516efd01bc66b18313cb315705bd2b0) )  // ~ 13.bin
+	// ROM_CONTINUE(                 0x600006, 0x40000)
+	// ROM_LOAD64_BYTE( "rom4.bin",  0x600003, 0x40000, CRC(9683dd30) SHA1(8b258b386baff5e06a9b7f176c49507f7e531b95) )  // ~ 14.bin
+	// ROM_CONTINUE(                 0x600007, 0x40000)
+
+	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_LOAD( "pic_u33.bin", 0x0000, 0x1007, BAD_DUMP CRC(6dba4094) SHA1(ca3362de83205fc6563d16a59b8e6e4bb7ebf4a6) )
+	
+	ROM_REGION( 0x140000, "oki", 0 )
+	ROM_LOAD( "v1.bin", 0x000000, 0x40000,  CRC(8962b469) SHA1(91dc12610a0b780ee2b314cd346182d97279c175) )  // 27c020 w/ sticker "7"
+	ROM_LOAD( "v2.bin", 0x040000, 0x80000,  CRC(6687df38) SHA1(d1015ae089fab5c5b4d1ab51b20f3aa6b77ed348) )  // 27c4000
+	ROM_LOAD( "v3.bin", 0x0c0000, 0x80000,  CRC(5782baee) SHA1(c01f8cd08d0c7b78c010ce3f1567383b7435de9f) )  // 27c4000
+	
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "24.bin", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // = various sf2 bootlegs (sf2ebbl etc.) "unknown (bootleg priority?)"
+	
+	/* pld devices:
+	#1    P7    palce16V8        todo...
+	#2    P1    palce16V8        secured, bruteforce ok
+	#3    P18   palce16V8        todo...
+	#4    P17   palce16V8        todo...
+	#5    P15   palce16V8        todo...
+	#6    P4    palce16V8        todo...
+	#7    P5    palce16V8        todo...
+	#8    P6    palce16V8        todo...
+	#9    P10   palce20V8        todo...
+	#10   P8    palce20V8        secured
+	#11   P14   palce20V8        todo...
+	#12   P9    palce16V8        todo...
+	#13   P11   palce16V8        todo...
+	#14   P16   palce16V8        todo...
+	#15   P2    palce16V8        todo...
+	#16   P21   palce16V8        todo...
+	#17   P3    palce16V8        todo...
+	#18   P12   palce20V8        todo...
+	#19   P13   palce22V10       todo...
+	#20   U14   tpc1020afn-084c  unattempted
+	*/
+	ROM_REGION( 0x0200, "plds", 0 )  // sound
+	ROM_LOAD( "2_gal16v8.p1", 0x0000, 0x0117, CRC(a944ff96) SHA1(2871a1c70b91fcd8628e63497afa1275f3a27f93) )
+ROM_END
+
 
 // ************************************************************************* DRIVER MACROS
 
@@ -3380,6 +3882,7 @@ GAME( 1992, sf2b2,     sf2,      sf2b,      sf2mdt,   cps_state, init_sf2mdtb,  
 GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
 GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
+GAME( 1993, slampic2,  0,        slampic2,  slampic2, cps_state, init_slampic2, ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )                       // 930713 ETC
 
 GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, init_cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, init_wofabl,   ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy graphics glitches - 921005 - Sangokushi 2
