@@ -97,7 +97,7 @@ TF-104    nws  SM510   Tropical Fish
 YM-105    nws  SM511   Super Mario Bros.
 DR-106    nws  SM511   Climber
 BF-107    nws  SM511   Balloon Fight
-MJ-108    nws  SM511   Mario The Juggler
+MB-108    nws  SM511   Mario The Juggler
 BU-201    sc   SM510   Spitball Sparky
 UD-202*   sc   SM510?  Crab Grab
 BX-301    mvs  SM511   Boxing (aka Punch Out)
