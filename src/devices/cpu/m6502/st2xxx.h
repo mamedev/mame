@@ -66,7 +66,6 @@ protected:
 	virtual void device_resolve_objects() override;
 	virtual void device_reset() override;
 
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;
 

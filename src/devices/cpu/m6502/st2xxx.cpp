@@ -12,15 +12,21 @@
     clock generators, power management and PSG channels for speaker
     output. Each MCU also has numerous pins dedicated to LCD segment
     drivers, an external bus addressing several MB of off-chip
-    memory using multiple chip select signals, or both. Program ROM,
-    whether internal or external, is banked to a greater or lesser
-    extent except on the smallest single-chip ST20XX models.
+    memory using multiple chip select signals, or both.
+
+    On all ST2XXX MCUs but the smallest single-chip ST20XX models,
+    4000–7FFF (nominally program memory) and 8000–FFFF (nominally
+    data memory) are bankswitched over all internal and external ROM,
+    and interrupt vectors are read from 7Fxx rather than FFxx. The
+    ST22XX and ST26XX series use a separate, auto-incrementing bank
+    register for DMA reads from the 8000–FFFF area, and will also
+    switch 4000–7FFF to a different bank during interrupt service if
+    the IRREN bit in the SYS register is set.
 
 **********************************************************************/
 
 #include "emu.h"
 #include "st2xxx.h"
-#include "r65c02d.h"
 
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, u16 ireq_mask)
 	: r65c02_device(mconfig, type, tag, owner, clock)
@@ -82,11 +88,6 @@ void st2xxx_device::device_reset()
 	m_lvpw = 0;
 	m_lxmax = 0;
 	m_lymax = 0;
-}
-
-std::unique_ptr<util::disasm_interface> st2xxx_device::create_disassembler()
-{
-	return std::make_unique<r65c02_disassembler>();
 }
 
 u8 st2xxx_device::acknowledge_irq()
