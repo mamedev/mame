@@ -13,7 +13,7 @@
     * LCD controller (320x240 B/W or 240x160 4-gray)
     * Serial peripheral interface
     * UART (built-in BRG; RS-232 and IrDA modes)
-    * Direct memory access
+    * Direct memory access (1 channel)
     * Power down modes (WAI-0, WAI-1, STP)
     * Watchdog timer
     * Low voltage detector
