@@ -112,9 +112,6 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	int m_custom_irq;
-	uint16_t m_custom_irq_vector;
-
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
