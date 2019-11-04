@@ -4,24 +4,24 @@
 #include "emu.h"
 #include "elan_eu3a05gpio.h"
 
-DEFINE_DEVICE_TYPE(RADICA6502_GPIO, radica6502_gpio_device, "radica6502gpio", "Elan EU3A05 GPIO")
+DEFINE_DEVICE_TYPE(ELAN_EU3A05_GPIO, elan_eu3a05gpio_device, "elan_eu3a05gpio", "Elan EU3A05 GPIO")
 
-radica6502_gpio_device::radica6502_gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RADICA6502_GPIO, tag, owner, clock)
+elan_eu3a05gpio_device::elan_eu3a05gpio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ELAN_EU3A05_GPIO, tag, owner, clock)
 	, m_space_read0_cb(*this)
 	, m_space_read1_cb(*this)
 	, m_space_read2_cb(*this)
 {
 }
 
-void radica6502_gpio_device::device_start()
+void elan_eu3a05gpio_device::device_start()
 {
 	m_space_read0_cb.resolve_safe(0xff);
 	m_space_read1_cb.resolve_safe(0xff);
 	m_space_read2_cb.resolve_safe(0xff);
 }
 
-void radica6502_gpio_device::device_reset()
+void elan_eu3a05gpio_device::device_reset()
 {
 	for (int i = 0; i < 3; i++)
 	{
@@ -30,7 +30,7 @@ void radica6502_gpio_device::device_reset()
 	}
 }
 
-uint8_t radica6502_gpio_device::read_port_data(int which)
+uint8_t elan_eu3a05gpio_device::read_port_data(int which)
 {
 	//todo, actually use the direction registers
 	switch (which)
@@ -43,12 +43,12 @@ uint8_t radica6502_gpio_device::read_port_data(int which)
 	return 0xff;
 }
 
-uint8_t radica6502_gpio_device::read_direction(int which)
+uint8_t elan_eu3a05gpio_device::read_direction(int which)
 {
 	return m_ddr[which];
 }
 
-READ8_MEMBER(radica6502_gpio_device::gpio_r)
+READ8_MEMBER(elan_eu3a05gpio_device::gpio_r)
 {
 
 	int port = offset/2;
@@ -56,19 +56,19 @@ READ8_MEMBER(radica6502_gpio_device::gpio_r)
 	else return read_port_data(port);
 }
 
-void radica6502_gpio_device::write_port_data(int which, uint8_t data)
+void elan_eu3a05gpio_device::write_port_data(int which, uint8_t data)
 {
 	//todo, actually use the direction registers
 	logerror("%s: write_port_data (port %d) %02x (direction register %02x)\n", machine().describe_context(), which, data, m_ddr[which]);
 }
 
-void radica6502_gpio_device::write_direction(int which, uint8_t data)
+void elan_eu3a05gpio_device::write_direction(int which, uint8_t data)
 {
 	logerror("%s: write_direction (port %d) %02x\n", machine().describe_context(), which, data);
 	m_ddr[which] = data;
 }
 
-WRITE8_MEMBER(radica6502_gpio_device::gpio_w)
+WRITE8_MEMBER(elan_eu3a05gpio_device::gpio_w)
 {
 
 	int port = offset/2;
@@ -76,7 +76,7 @@ WRITE8_MEMBER(radica6502_gpio_device::gpio_w)
 	else return write_port_data(port, data);
 }
 
-WRITE8_MEMBER(radica6502_gpio_device::gpio_unk_w)
+WRITE8_MEMBER(elan_eu3a05gpio_device::gpio_unk_w)
 {
 	logerror("%s: gpio_unk_w (port %d) %02x (direction register %02x)\n", machine().describe_context(), offset, data, m_ddr[offset]);
 }
