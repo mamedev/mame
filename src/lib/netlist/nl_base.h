@@ -161,7 +161,7 @@ class NETLIB_NAME(name) : public device_t
 //============================================================
 
 #if defined(MAME_DEBUG) || (NL_DEBUG == true)
-#define nl_assert(x)    do { if (1) if (!(x)) throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
+#define nl_assert(x)    do { if (1) if (!(x)) plib::pthrow<nl_exception>(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); } while (0)
 #define NL_NOEXCEPT
 #else
 #define nl_assert(x)    do { if (0) if (!(x)) { /*throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); */} } while (0)

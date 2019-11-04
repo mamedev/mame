@@ -82,7 +82,7 @@ namespace plib {
 		{
 			if ((SIZE < 0 && size > SIZEABS())
 				|| (SIZE > 0 && size != SIZEABS()))
-				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+				pthrow<pexception>("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
 		}
 
 		template <int X = SIZE >
@@ -91,7 +91,7 @@ namespace plib {
 		{
 			if ((SIZE < 0 && size > SIZEABS())
 				|| (SIZE > 0 && size != SIZEABS()))
-				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+				pthrow<plib::pexception>("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
 			m_a.fill(val);
 		}
 

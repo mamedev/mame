@@ -902,11 +902,11 @@ void models_t::register_model(const pstring &model_in)
 {
 	auto pos = model_in.find(' ');
 	if (pos == pstring::npos)
-		throw nl_exception(MF_UNABLE_TO_PARSE_MODEL_1(model_in));
+		plib::pthrow<nl_exception>(MF_UNABLE_TO_PARSE_MODEL_1(model_in));
 	pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
 	pstring def = plib::trim(model_in.substr(pos + 1));
 	if (!m_models.insert({model, def}).second)
-		throw nl_exception(MF_MODEL_ALREADY_EXISTS_1(model_in));
+		plib::pthrow<nl_exception>(MF_MODEL_ALREADY_EXISTS_1(model_in));
 }
 
 void models_t::model_parse(const pstring &model_in, model_map_t &map)
@@ -923,7 +923,7 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
-			throw nl_exception(MF_MODEL_NOT_FOUND(model));
+			plib::pthrow<nl_exception>(MF_MODEL_NOT_FOUND(model));
 		model = i->second;
 	}
 	pstring xmodel = plib::left(model, pos);
@@ -936,12 +936,12 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 		if (i != m_models.end())
 			model_parse(xmodel, map);
 		else
-			throw nl_exception(MF_MODEL_NOT_FOUND(model_in));
+			plib::pthrow<nl_exception>(MF_MODEL_NOT_FOUND(model_in));
 	}
 
 	pstring remainder = plib::trim(model.substr(pos + 1));
 	if (!plib::endsWith(remainder, ")"))
-		throw nl_exception(MF_MODEL_ERROR_1(model));
+		plib::pthrow<nl_exception>(MF_MODEL_ERROR_1(model));
 	// FIMXE: Not optimal
 	remainder = plib::left(remainder, remainder.size() - 1);
 
@@ -950,7 +950,7 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 	{
 		auto pose = pe.find('=');
 		if (pose == pstring::npos)
-			throw nl_exception(MF_MODEL_ERROR_ON_PAIR_1(model));
+			plib::pthrow<nl_exception>(MF_MODEL_ERROR_ON_PAIR_1(model));
 		map[plib::ucase(plib::left(pe, pose))] = pe.substr(pose + 1);
 	}
 }
@@ -975,9 +975,9 @@ pstring models_t::value_str(const pstring &model, const pstring &entity)
 	pstring ret;
 
 	if (entity != plib::ucase(entity))
-		throw nl_exception(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2(entity, model_string(map)));
+		plib::pthrow<nl_exception>(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2(entity, model_string(map)));
 	if (map.find(entity) == map.end())
-		throw nl_exception(MF_ENTITY_1_NOT_FOUND_IN_MODEL_2(entity, model_string(map)));
+		plib::pthrow<nl_exception>(MF_ENTITY_1_NOT_FOUND_IN_MODEL_2(entity, model_string(map)));
 	else
 		ret = map[entity];
 
@@ -1008,7 +1008,7 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 		case 'a': factor = nlconst::magic(1e-18); break;
 		default:
 			if (*p < '0' || *p > '9')
-				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
+				plib::pthrow<nl_exception>(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
 	}
 	if (factor != nlconst::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
@@ -1017,7 +1017,7 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	bool err(false);
 	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
 	if (err)
-		throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
+		plib::pthrow<nl_exception>(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
 	return val * factor;
 }
 

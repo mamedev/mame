@@ -20,7 +20,6 @@ void parser_t::verror(const pstring &msg)
 {
 	m_setup.log().fatal("{1}", msg);
 	plib::pthrow<nl_exception>(plib::pfmt("{1}")(msg));
-	//throw error;
 }
 
 bool parser_t::parse(const pstring &nlname)

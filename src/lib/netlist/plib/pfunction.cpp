@@ -79,16 +79,16 @@ namespace plib {
 					bool err(false);
 					rc.m_param = plib::pstonum_ne<decltype(rc.m_param)>(cmd, err);
 					if (err)
-						throw plib::pexception(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
+						pthrow<pexception>(plib::pfmt("pfunction: unknown/misformatted token <{1}> in <{2}>")(cmd)(expr));
 					stk += 1;
 				}
 			}
 			if (stk < 1)
-				throw plib::pexception(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
+				pthrow<pexception>(plib::pfmt("pfunction: stack underflow on token <{1}> in <{2}>")(cmd)(expr));
 			m_precompiled.push_back(rc);
 		}
 		if (stk != 1)
-			throw plib::pexception(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
+			pthrow<pexception>(plib::pfmt("pfunction: stack count different to one on <{2}>")(expr));
 	}
 
 	static int get_prio(const pstring &v)
@@ -110,7 +110,7 @@ namespace plib {
 	static pstring pop_check(std::stack<pstring> &stk, const pstring &expr)
 	{
 		if (stk.size() == 0)
-			throw plib::pexception(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
+			pthrow<pexception>(plib::pfmt("pfunction: stack underflow during infix parsing of: <{1}>")(expr));
 		pstring res = stk.top();
 		stk.pop();
 		return res;

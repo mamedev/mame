@@ -61,7 +61,7 @@ namespace netlist
 		COPYASSIGNMOVE(callbacks_t, default)
 
 		/* logging callback */
-		virtual void vlog(const plib::plog_level &l, const pstring &ls) const = 0;
+		virtual void vlog(const plib::plog_level &l, const pstring &ls) const noexcept = 0;
 
 	};
 

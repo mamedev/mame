@@ -106,11 +106,11 @@ namespace plib
 			//&& (ret == T(0) || plib::abs(ret) >= std::numeric_limits<T>::min() ))
 		{
 			if (cstr[idx] != 0)
-				throw pexception(pstring("Continuation after numeric value ends: ") + pstring(cstr));
+				pthrow<pexception>(pstring("Continuation after numeric value ends: ") + pstring(cstr));
 		}
 		else
 		{
-			throw pexception(pstring("Out of range: ") + pstring(cstr));
+			pthrow<pexception>(pstring("Out of range: ") + pstring(cstr));
 		}
 		return static_cast<T>(ret);
 	}

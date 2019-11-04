@@ -67,7 +67,7 @@ namespace plib {
 			s = trail + plib::pfmt("{1}:{2}:0\n")(m_stack.back().m_name, m_stack.back().m_lineno) + s;
 			m_stack.pop_back();
 		}
-		throw pexception("\n" + s + e + " " + m_line + "\n");
+		pthrow<pexception>("\n" + s + e + " " + m_line + "\n");
 	}
 
 	template <typename PP, typename L = ppreprocessor::string_list>
