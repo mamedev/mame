@@ -258,62 +258,112 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 }
 void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
 {
-	/* this doesn't handle 8x8 4bpp, haven't seen it used
-	   nor is there support for horizontal scrolling etc.
-	   for the same reasons
+	/* 
+		this doesn't handle 8x8 4bpp (not used by anything yet)
 	*/
 
 	int scroll = (m_tile_scroll[1] << 8) | m_tile_scroll[0];
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
+	// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
+
+	int totalyrow;
+	int totalxcol;
+	int mapyrowsbase;
+	int tileysize;
+	int tilexsize;
+	int startrow;
+
 	if (m_vidctrl & 0x40) // 16x16 tiles
 	{
-		int startrow = (scroll >> 4) & 0x1f;
+		totalyrow = 16;
+		totalxcol = 16;
+		mapyrowsbase = 14;
+		tileysize = 16;
+		tilexsize = 16;
+		startrow = (scroll >> 4) & 0x1f;
+	}
+	else
+	{
+		totalyrow = 32;
+		totalxcol = 32;
+		mapyrowsbase = 28;
+		tileysize = 8;
+		tilexsize = 8;
+		startrow = (scroll >> 3) & 0x3f;
+	}
 
-		for (int y = 0; y < 16; y++)
+	for (int y = 0; y < totalyrow; y++)
+	{
+		for (int x = 0; x < totalxcol * 2; x++)
 		{
-			for (int x = 0; x < 16; x++)
+			int realstartrow = (startrow + y);
+
+			int yrows;
+
+			if (m_vidctrl & 0x01)
+				yrows = mapyrowsbase;
+			else
+				yrows = mapyrowsbase * 2;
+
+			if (realstartrow >= yrows)
+				realstartrow -= yrows;
+
+			// in double width & double height mode the page addressing needs adjusting
+			if (!(m_vidctrl & 0x02))
 			{
-				int realstartrow = (startrow + y);
-
-				int yrows;
-
-				if (m_vidctrl & 0x01)
-					yrows = 14;
-				else
-					yrows = 28;
-
-				if (realstartrow >= yrows)
-					realstartrow -= yrows;
-
-				// in double width & double height mode the page addressing needs adjusting
-				if (!(m_vidctrl & 0x02))
+				if (!(m_vidctrl & 0x01))
 				{
-					if (!(m_vidctrl & 0x01))
+					if (realstartrow >= (yrows / 2))
 					{
-						if (realstartrow >= (yrows / 2))
-						{
-							realstartrow += yrows / 2;
-						}
+						realstartrow += yrows / 2;
 					}
 				}
+			}
 
-				for (int i = 0; i < 16; i++)
+			for (int i = 0; i < tileysize; i++)
+			{
+				int drawline = (y * tileysize) + i;
+				drawline -= scroll & (tileysize - 1);
+
+				if ((drawline >= 0) && (drawline < 256))
 				{
-					int drawline = (y * 16) + i;
-					drawline -= scroll & 0xf;
+					int scrollx;
 
-					if ((drawline >= 0) && (drawline < 256))
+					// split can be probably configured in more ways than this
+					if (drawline > m_splitpos)
+						scrollx = get_xscroll(1);
+					else
+						scrollx = get_xscroll(0);
+
+					int base;
+
+					if (m_vidctrl & 0x40) // 16x16 tiles
 					{
-						int base = (((realstartrow + y) & 0x3f) * 8) + x;
+						base = (((realstartrow + y) & 0x3f) * 8) + x;
+					}
+					else
+					{
+						base = (((realstartrow) & 0x7f) * totalxcol) + (x & (totalxcol - 1));
+					}
 
-						int tile, attr, unk2;
+					if (!(m_vidctrl & 0x02))
+					{
+						if (x & totalxcol)
+						{
+							base += totalxcol * mapyrowsbase;
+						}
+					}
 
-						if (!get_tile_data(base, drawpri, tile, attr, unk2))
-							continue;
+					int tile, attr, unk2;
 
-						int colour = attr & 0xf0;
+					if (!get_tile_data(base, drawpri, tile, attr, unk2))
+						continue;
 
+					int colour = attr & 0xf0;
+
+					if (m_vidctrl & 0x40) // 16x16 tiles
+					{
 						if (m_vidctrl & 0x20) // 4bpp mode
 						{
 							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
@@ -326,115 +376,78 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 						}
-
-						uint16_t* row = &bitmap.pix16(drawline);
-
+					}
+					else
+					{
 						if (m_vidctrl & 0x20) // 4bpp
 						{
-							for (int xx = 0; xx < 16; xx += 2)
+							// TODO
+							tile = 0x0000;//machine().rand() & 0x1ff;
+						}
+						else
+						{
+							tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
+							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+						}
+					}
+
+					uint16_t* row = &bitmap.pix16(drawline);
+
+					if (m_vidctrl & 0x40) // 16x16 tiles
+					{
+						if (m_vidctrl & 0x20) // 4bpp
+						{
+							for (int xx = 0; xx < tilexsize; xx += 2)
 							{
 								int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
 								uint8_t pix = fullbankspace.read_byte(realaddr);
-								row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4) + colour;
-								row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0) + colour;
+
+								int drawxpos;
+
+								drawxpos = x * 16 + xx + 0;
+								drawxpos &= 0x1ff;
+								if ((drawxpos >= 0) && (drawxpos < 256))
+									row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
+
+								drawxpos = x * 16 + xx + 1;
+								drawxpos &= 0x1ff;
+								if ((drawxpos >= 0) && (drawxpos < 256))
+									row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
 							}
 						}
 						else // 8bpp
 						{
-							for (int xx = 0; xx < 16; xx++)
+							for (int xx = 0; xx < tilexsize; xx++)
 							{
 								int realaddr = ((tile + i * 32) << 3) + xx;
 								uint8_t pix = fullbankspace.read_byte(realaddr);
-								row[x * 16 + xx] = (pix + ((colour & 0x70) << 1)) & 0xff;
+
+								int drawxpos = x * 16 + xx;
+								drawxpos &= 0x1ff;
+								if ((drawxpos >= 0) && (drawxpos < 256))
+									row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 							}
 						}
-
 					}
-				}
-			}
-		}
-	}
-	else // 8x8 tiles
-	{
-		// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
-
-		int startrow = (scroll >> 3) & 0x3f;
-
-		for (int y = 0; y < 32; y++)
-		{
-			for (int x = 0; x < 32 * 2; x++)
-			{
-				int realstartrow = (startrow + y);
-
-				int yrows;
-
-				if (m_vidctrl & 0x01)
-					yrows = 28;
-				else
-					yrows = 56;
-
-				if (realstartrow >= yrows)
-					realstartrow -= yrows;
-
-				// in double width & double height mode the page addressing needs adjusting
-				if (!(m_vidctrl & 0x02))
-				{
-					if (!(m_vidctrl & 0x01))
+					else // 8x8 tiles
 					{
-						if (realstartrow >= (yrows / 2))
+						if (m_vidctrl & 0x20) // 4bpp
 						{
-							realstartrow += yrows / 2;
+							// TODO
 						}
-					}
-				}
-
-				for (int i = 0; i < 8; i++)
-				{
-					int drawline = (y * 8) + i;
-					drawline -= scroll & 0x7;
-
-					if ((drawline >= 0) && (drawline < 256))
-					{
-						int scrollx;
-
-						// split can be probably configured in more ways than this
-						if (drawline > m_splitpos)
-							scrollx = get_xscroll(1);
 						else
-							scrollx = get_xscroll(0);
-
-						int base = (((realstartrow) & 0x7f) * 32) + (x & (32 - 1));
-
-						if (!(m_vidctrl & 0x02))
 						{
-							if (x & 32)
+							for (int xx = 0; xx < tilexsize; xx++)
 							{
-								base += 32 * 28;
+								const int realaddr = ((tile + i * 32) << 3) + xx;
+								const uint8_t pix = fullbankspace.read_byte(realaddr);
+
+								int drawxpos = x * tilexsize + xx - scrollx;
+								drawxpos &= 0x1ff;
+
+								if ((drawxpos >= 0) && (drawxpos < 256))
+									row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 							}
-						}
-
-						int tile, attr, unk2;
-
-						if (!get_tile_data(base, drawpri, tile, attr, unk2))
-							continue;
-
-						int colour = attr & 0xf0;
-
-						tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-						tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-
-						uint16_t* row = &bitmap.pix16(drawline);
-
-						for (int xx = 0; xx < 8; xx++)
-						{
-							const int realaddr = ((tile + i * 32) << 3) + xx;
-							const uint8_t pix = fullbankspace.read_byte(realaddr);
-
-							int drawxpos = x * 8 + xx - scrollx;
-							drawxpos &= 0x1ff;
-
-							if ((drawxpos >= 0) && (drawxpos < 256))
-								row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 						}
 					}
 				}
