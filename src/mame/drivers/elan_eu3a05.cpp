@@ -243,7 +243,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w)); // tilebase (spr?)
 	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w)); // tilebase (spr?)
 	map(0x502d, 0x502d).ram();
-	map(0x502e, 0x502e).ram();
+	map(0x502e, 0x502e).rw(m_vid, FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w)); // split position
 	map(0x502f, 0x502f).ram();
 
 	map(0x5030, 0x5030).ram();

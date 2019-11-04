@@ -26,6 +26,7 @@ void elan_eu3a05vid_device::device_start()
 	save_item(NAME(m_sprite_gfxbase_lo_data));
 	save_item(NAME(m_sprite_gfxbase_hi_data));
 	save_item(NAME(m_tile_scroll));
+	save_item(NAME(m_splitpos));
 }
 
 void elan_eu3a05vid_device::device_reset()
@@ -45,6 +46,8 @@ void elan_eu3a05vid_device::device_reset()
 
 	m_sprite_gfxbase_lo_data = 0x00;
 	m_sprite_gfxbase_hi_data = 0x00;
+
+	m_splitpos = 0x00;
 }
 
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
@@ -253,7 +256,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 
 	return true;
 }
-void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri)
+void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
 {
 	/* this doesn't handle 8x8 4bpp, haven't seen it used
 	   nor is there support for horizontal scrolling etc.
@@ -295,28 +298,6 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 					}
 				}
 
-				int base = (((realstartrow + y) & 0x3f) * 8) + x;
-
-				int tile,attr,unk2;
-
-				if (!get_tile_data(base, drawpri, tile,attr,unk2))
-					continue;
-
-				int colour = attr & 0xf0;
-
-				if (m_vidctrl & 0x20) // 4bpp mode
-				{
-					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-				}
-				else
-				{
-					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile <<= 1;
-
-					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-				}
-
 				for (int i = 0; i < 16; i++)
 				{
 					int drawline = (y * 16) + i;
@@ -324,6 +305,28 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 
 					if ((drawline >= 0) && (drawline < 256))
 					{
+						int base = (((realstartrow + y) & 0x3f) * 8) + x;
+
+						int tile, attr, unk2;
+
+						if (!get_tile_data(base, drawpri, tile, attr, unk2))
+							continue;
+
+						int colour = attr & 0xf0;
+
+						if (m_vidctrl & 0x20) // 4bpp mode
+						{
+							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+						}
+						else
+						{
+							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
+							tile <<= 1;
+
+							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+						}
+
 						uint16_t* row = &bitmap.pix16(drawline);
 
 						if (m_vidctrl & 0x20) // 4bpp
@@ -359,7 +362,7 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 
 		for (int y = 0; y < 32; y++)
 		{
-			for (int x = 0; x < 32; x++)
+			for (int x = 0; x < 32 * 2; x++)
 			{
 				int realstartrow = (startrow + y);
 
@@ -385,18 +388,6 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 					}
 				}
 
-				int base = (((realstartrow) & 0x7f) * 32) + x;
-
-				int tile,attr,unk2;
-
-				if (!get_tile_data(base, drawpri, tile,attr,unk2))
-					continue;
-
-				int colour = attr & 0xf0;
-
-				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-
 				for (int i = 0; i < 8; i++)
 				{
 					int drawline = (y * 8) + i;
@@ -404,13 +395,46 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device &screen, bitmap_ind16 &b
 
 					if ((drawline >= 0) && (drawline < 256))
 					{
+						int scrollx;
+
+						// split can be probably configured in more ways than this
+						if (drawline > m_splitpos)
+							scrollx = get_xscroll(1);
+						else
+							scrollx = get_xscroll(0);
+
+						int base = (((realstartrow) & 0x7f) * 32) + (x & (32 - 1));
+
+						if (!(m_vidctrl & 0x02))
+						{
+							if (x & 32)
+							{
+								base += 32 * 28;
+							}
+						}
+
+						int tile, attr, unk2;
+
+						if (!get_tile_data(base, drawpri, tile, attr, unk2))
+							continue;
+
+						int colour = attr & 0xf0;
+
+						tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
+						tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
+
 						uint16_t* row = &bitmap.pix16(drawline);
 
 						for (int xx = 0; xx < 8; xx++)
 						{
-							int realaddr = ((tile + i * 32) << 3) + xx;
-							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 8 + xx] = (pix + ((colour & 0x70) << 1)) & 0xff;
+							const int realaddr = ((tile + i * 32) << 3) + xx;
+							const uint8_t pix = fullbankspace.read_byte(realaddr);
+
+							int drawxpos = x * 8 + xx - scrollx;
+							drawxpos &= 0x1ff;
+
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 						}
 					}
 				}
@@ -506,7 +530,26 @@ WRITE8_MEMBER(elan_eu3a05vid_device::tile_xscroll_w)
 	m_tile_xscroll[offset] = data;
 }
 
+READ8_MEMBER(elan_eu3a05vid_device::splitpos_r)
+{
+	return m_splitpos;
+}
 
+WRITE8_MEMBER(elan_eu3a05vid_device::splitpos_w)
+{
+	m_splitpos = data;
+}
+
+uint16_t elan_eu3a05vid_device::get_xscroll(int which)
+{
+	switch (which)
+	{
+	case 0x0: return (m_tile_xscroll[1] << 8) | (m_tile_xscroll[0]);
+	case 0x1: return (m_tile_xscroll[3] << 8) | (m_tile_xscroll[2]);
+	}
+	
+	return 0x0000;
+}
 
 READ8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r)
 {
