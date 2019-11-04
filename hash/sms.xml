@@ -6076,8 +6076,8 @@
 		</part>
 	</software>
 
-	<!-- Notes: Sega of Japan labels -->
-	<software name="sonicc630" cloneof="sonicc">
+	<!-- Notes: Sega of Japan labels, unfortunately crashes after title screen -->
+	<software name="sonicc630" cloneof="sonicc" supported="no">
 		<description>Sonic the Hedgehog Chaos (Euro, "Ver 0.20", Prototype 19930630)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
