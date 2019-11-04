@@ -18,7 +18,10 @@ class st2204_device : public st2xxx_device
 public:
 	enum {
 		ST_BTEN = ST_LYMAX + 1,
-		ST_BTSR
+		ST_BTSR,
+		ST_DMS,
+		ST_DMD,
+		ST_DMR
 	};
 
 	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -33,6 +36,7 @@ private:
 		virtual u8 read(u16 adr) override;
 		virtual u8 read_sync(u16 adr) override;
 		virtual u8 read_arg(u16 adr) override;
+		u8 read_dma(u16 adr);
 		virtual u8 read_vector(u16 adr) override;
 		virtual void write(u16 adr, u8 val) override;
 
@@ -47,6 +51,7 @@ private:
 		u8 irr;
 		u16 prr;
 		u16 drr;
+		u16 dmr;
 	};
 
 	template<int N> TIMER_CALLBACK_MEMBER(bt_interrupt);
@@ -69,6 +74,20 @@ private:
 	void bten_w(u8 data);
 	u8 btsr_r();
 	void btsr_w(u8 data);
+	u8 dmsl_r();
+	void dmsl_w(u8 data);
+	u8 dmsh_r();
+	void dmsh_w(u8 data);
+	u8 dmdl_r();
+	void dmdl_w(u8 data);
+	u8 dmdh_r();
+	void dmdh_w(u8 data);
+	void dcntl_w(u8 data);
+	void dcnth_w(u8 data);
+	u8 dmrl_r();
+	void dmrl_w(u8 data);
+	u8 dmrh_r();
+	void dmrh_w(u8 data);
 
 	u8 pmem_r(offs_t offset);
 	void pmem_w(offs_t offset, u8 data);
@@ -80,6 +99,10 @@ private:
 	u8 m_bten;
 	u8 m_btsr;
 	emu_timer *m_base_timer[5];
+
+	u16 m_dms;
+	u16 m_dmd;
+	u8 m_dcnth;
 };
 
 DECLARE_DEVICE_TYPE(ST2204, st2204_device)
