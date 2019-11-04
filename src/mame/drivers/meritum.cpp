@@ -2,22 +2,34 @@
 // copyright-holders:Robbbert
 /***************************************************************************
 
-Mera-Elzab Meritum II (Poland)
+Mera-Elzab Meritum (Poland)
 
-Meritum I was a basic unit with no expansion, expensive, and so very rare.
-Meritum II had all the standard TRS80 expansions, but the i/o is different
-and thus not compatible.
-Meritum III was planned, but seems to have been cancelled before release.
+Meritum I model 1 was a basic unit
+Meritum II = Meritum I model 2 and + floppy disk unit
+Meritum III hires graphic mode added; only preproduction units were made
 
 Split from trs80.cpp on 2018-07-15
 
-It is quite similar to the TRS80 Model 1 Level II, however the extra chips
-are quite different, being Intel ones (i8251, i8253, i8255, i8272, etc).
+It is quite similar to the TRS80 Model 1 Level II. Instead of External Interface
+Intel peripheral chips were added 8255, 8251, 8253 and 2 KiB of ROM for
+new subroutines.
+Model 2 got additional 8255 for communication with floppy disk unit and RAM
+was expanded to 32 or 48 KiB.
+Many variants of ROM existed:
+- initial one without Polish characters
+- with Polish characters in char table
+- translated MEMORY SIZE to ROZMIAR PAO
+- experimental network version made by Silesian University of Technology
+- 8 KiB version with bootstrap code to load program from floppy
+and others
 
 There's no lowercase, so the shift key will select Polish characters if
 available, as well as the usual standard punctuation.
 The control key appears to do nothing.
 There's also a Reset key, a NMI key, and 2 blank ones.
+Serial printer (@1200bps) is supported by default after power-up by all variants.
+If parallel printer (centronics) is to be used press P while system starts (e.g. P and F3 to reset).
+This does not work for model 1 (no parallel printer support in ROM).
 
 Status:
 - Starts up, runs Basic. Cassette works. Quickload mostly works.
@@ -30,9 +42,10 @@ Status:
 - Add Reset key and 2 blank keys.
 - Need software specific to test the hardware.
 - Need boot disks (MER-DOS, CP/M 2.2)
+- On model 1 monitor program is available at address 12288dec
+  see https://pl.wikipedia.org/wiki/Monitor_(Meritum_I)
 
-Depending on which website you read, the following might be for II, or
-perhaps III:
+For Model III:
 - Add 4-colour mode, 4 shades of grey mode, and 512x192 monochrome.
 
 ****************************************************************************/
@@ -50,26 +63,39 @@ perhaps III:
 #include "screen.h"
 #include "speaker.h"
 #include "emupal.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/centronics/comxpl80.h"
+#include "bus/centronics/epson_ex800.h"
+#include "bus/centronics/epson_lx800.h"
+#include "bus/centronics/epson_lx810l.h"
+#include "bus/centronics/printer.h"
+#include "bus/centronics/digiblst.h"
 
 class meritum_state : public driver_device
 {
 public:
 	meritum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_model(2)
 		, m_maincpu(*this, "maincpu")
 		, m_p_chargen(*this, "chargen")
 		, m_p_videoram(*this, "videoram")
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_io_keyboard(*this, "LINE%u", 0)
+		, m_centronics(*this, "centronics")
+		, m_nmigate(*this, "nmigate")
 	{ }
 
 	void meritum(machine_config &config);
+	void meritum_m1(machine_config &config);
 
 private:
 	DECLARE_WRITE8_MEMBER(port_ff_w);
 	DECLARE_READ8_MEMBER(port_ff_r);
 	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(mainppi_portb_w);
+	DECLARE_WRITE8_MEMBER(mainppi_portc_w);
 
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -81,6 +107,7 @@ private:
 	bool m_mode;
 	bool m_size_store;
 	bool m_cassette_data;
+	uint8_t m_model; // 1=Meritum I, 2=Meritum II (Meritum I model 2)
 	emu_timer *m_cassette_data_timer;
 	double m_old_cassette_val;
 	virtual void machine_start() override;
@@ -91,6 +118,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_ioport_array<8> m_io_keyboard;
+	optional_device<centronics_device> m_centronics;
+	required_device<input_merger_device> m_nmigate;
 };
 
 void meritum_state::mem_map(address_map &map)
@@ -98,7 +127,8 @@ void meritum_state::mem_map(address_map &map)
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x38ff).mirror(0x300).r(FUNC(meritum_state::keyboard_r));
 	map(0x3c00, 0x3fff).ram().share(m_p_videoram);
-	map(0x4000, 0xffff).ram();
+	// Model 1 got 16 (or 17) KiB of RAM, Model 2: 32 or 48 KiB
+	map(0x4000, 1 == m_model ? 0x7fff /*16 KiB*/: 0xffff /*48 KiB*/).ram();
 }
 
 void meritum_state::io_map(address_map &map)
@@ -106,14 +136,16 @@ void meritum_state::io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 	map(0x00, 0x03).rw("audiopit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xf0, 0xf3).rw("flopppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	if( m_model > 1 )
+	{
+		map(0xf0, 0xf3).rw("flopppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	}
 	map(0xf4, 0xf7).rw("mainppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xf8, 0xfb).rw("mainpit", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xfc, 0xfd).rw("usart", FUNC(i8251_device::read), FUNC(i8251_device::write));
 	// map(0xfe, 0xfe) audio interface
 	map(0xff, 0xff).rw(FUNC(meritum_state::port_ff_r), FUNC(meritum_state::port_ff_w));
 }
-
 
 static INPUT_PORTS_START( meritum )
 	PORT_START("LINE0")
@@ -215,8 +247,35 @@ uint32_t meritum_state::screen_update_meritum(screen_device &screen, bitmap_ind1
 			{
 				chr = m_p_videoram[x];
 
-				/* get pattern of pixels for that character scanline */
-				gfx = m_p_chargen[(chr<<4) | ra];
+				if( 1 == m_model )
+				{
+					if( chr & 0x80 ) // semigraphics
+						chr = (chr & 0x3F) | 0x40;
+					else if( 0x40 == (chr & 0x60) ) // upper case
+						chr = (chr & 0x3F);
+					else if( 0x60 == (chr & 0x60) ) // lower case
+						chr = (chr & 0x1F ); //use upper
+
+					// shift down comma and semicolon
+					// not sure Meritum I got the circuit for this (like TRS80)
+					// but position of ';' suggests most likely yes
+					if ((chr==',')||(chr==';'))
+					{
+						if ((ra < 10) && (ra > 1))
+							gfx = m_p_chargen[(chr<<4) | (ra-2) ];
+						else
+							gfx = 0;
+					}
+					else
+					{
+						gfx = m_p_chargen[ (chr << 4) | ra ];
+					}
+				}
+				else // Model 2
+				{
+					/* get pattern of pixels for that character scanline */
+					gfx = m_p_chargen[(chr<<4) | ra];
+				}
 
 				/* Display a scanline of a character (6 pixels) */
 				*p++ = BIT(gfx, 5);
@@ -390,7 +449,23 @@ static GFXDECODE_START(gfx_meritum)
 	GFXDECODE_ENTRY( "chargen", 0, meritum_charlayout, 0, 1 )
 GFXDECODE_END
 
+WRITE8_MEMBER(meritum_state::mainppi_portc_w)
+{
+	m_nmigate->in_w<0>(!BIT(data, 7)); // negated PC7 => NMI
+	m_centronics->write_strobe(BIT(data, 1)); // PC1 = STROBE (centronics)
+}
 
+WRITE8_MEMBER(meritum_state::mainppi_portb_w)
+{
+	m_centronics->write_data0(BIT(data, 0));
+	m_centronics->write_data1(BIT(data, 1));
+	m_centronics->write_data2(BIT(data, 2));
+	m_centronics->write_data3(BIT(data, 3));
+	m_centronics->write_data4(BIT(data, 4));
+	m_centronics->write_data5(BIT(data, 5));
+	m_centronics->write_data6(BIT(data, 6));
+	m_centronics->write_data7(BIT(data, 7));
+}
 
 void meritum_state::meritum(machine_config &config)
 {
@@ -418,9 +493,13 @@ void meritum_state::meritum(machine_config &config)
 	pit.out_handler<2>().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	i8255_device &mainppi(I8255(config, "mainppi")); // parallel interface
-	mainppi.out_pc_callback().set("nmigate", FUNC(input_merger_device::in_w<0>)).bit(7).invert();
+	mainppi.out_pc_callback().set(FUNC(meritum_state::mainppi_portc_w));
+	mainppi.out_pb_callback().set(FUNC(meritum_state::mainppi_portb_w));
 
-	I8255(config, "flopppi", 0); // floppy disk interface
+	if( m_model > 1)
+	{
+		I8255(config, "flopppi", 0); // floppy disk interface
+	}
 	PIT8253(config, "audiopit", 0); // optional audio interface
 
 	/* video hardware */
@@ -441,6 +520,21 @@ void meritum_state::meritum(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	QUICKLOAD(config, "quickload", "cmd", attotime::from_seconds(1)).set_load_callback(FUNC(meritum_state::quickload_cb));
+    
+	/* parallel printer */
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_data_input_buffer("cent_data_in");
+	m_centronics->ack_handler().set("mainppi", FUNC(i8255_device::pc2_w));
+
+	INPUT_BUFFER(config, "cent_data_in");
+	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
+	m_centronics->set_output_latch(cent_data_out);
+}
+
+void meritum_state::meritum_m1(machine_config &config)
+{
+	m_model = 1;
+	meritum(config);
 }
 
 /***************************************************************************
@@ -478,7 +572,21 @@ ROM_START( meritum_net )
 	ROM_LOAD( "char.bin", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
 
+ROM_START( meritum_m1 )
+	ROM_REGION(0x3800, "maincpu",0)
+	ROM_LOAD( "rom_0.bin", 0x0000, 0x0800, CRC(1ecf7205) SHA1(e91cedfe2ce7636d37d5b765e5bbc8168deaba77))
+	ROM_LOAD( "rom_1.bin", 0x0800, 0x0800, CRC(ac297d99) SHA1(ccf31d3f9d02c3b68a0ee3be4984424df0e83ab0))
+	ROM_LOAD( "rom_2.bin", 0x1000, 0x0800, CRC(a21d0d62) SHA1(6dfdf3806ed2b6502e09a1b6922f21494134cc05))
+	ROM_LOAD( "rom_3.bin", 0x1800, 0x0800, CRC(3a5ea239) SHA1(8c489670977892d7f2bfb098f5df0b4dfa8fbba6))
+	ROM_LOAD( "rom_4.bin", 0x2000, 0x0800, CRC(2ba025d7) SHA1(232efbe23c3f5c2c6655466ebc0a51cf3697be9b))
+	ROM_LOAD( "rom_5.bin", 0x2800, 0x0800, CRC(ed547445) SHA1(20102de89a3ee4a65366bc2d62be94da984a156b))
+	ROM_LOAD( "rom_6.bin", 0x3000, 0x0800, CRC(650c0f47) SHA1(05f67fed3c3f69ad210823460bacf40166cbf06e))
+
+	ROM_REGION(0x1000, "chargen", ROMREGION_INVERT)
+	ROM_LOAD( "char_gen.bin", 0x0000, 0x800-4/*no last 4 bytes dumped (ff ff ff ff)*/, CRC(685f2541) SHA1(18b6ef330b48bd9429eb78efcdfaca3cb2b23d3f))
+ROM_END
 
 //    YEAR  NAME         PARENT    COMPAT    MACHINE   INPUT      CLASS          INIT             COMPANY              FULLNAME                FLAGS
-COMP( 1985, meritum,     0,        trs80l2,  meritum,  meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2)",             0 )
-COMP( 1985, meritum_net, meritum,  0,        meritum,  meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2) (network)",   0 )
+COMP( 1985, meritum,     0,        trs80l2,  meritum,    meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2)",             0 )
+COMP( 1985, meritum_net, meritum,  0,        meritum,    meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 2) (network)",   0 )
+COMP( 1983, meritum_m1,  meritum,  0,        meritum_m1, meritum,   meritum_state, empty_init,  "Mera-Elzab", "Meritum I (Model 1)",   0 )

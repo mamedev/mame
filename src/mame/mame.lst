@@ -21850,6 +21850,7 @@ spitboss                        // (c) 1988 Merit
 @source:meritum.cpp
 meritum                         //
 meritum_net                     //
+meritum_m1
 
 @source:mermaid.cpp
 mermaid                         // (c) 1982 Rock-ola,  made by Sanritsu
