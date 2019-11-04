@@ -242,13 +242,8 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x502a, 0x502a).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w)); // tilebase
 	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w)); // tilebase (spr?)
 	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w)); // tilebase (spr?)
-	map(0x502d, 0x502d).ram();
-	map(0x502e, 0x502e).rw(m_vid, FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w)); // split position
-	map(0x502f, 0x502f).ram();
-
-	map(0x5030, 0x5030).ram();
-	map(0x5031, 0x5032).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w));
-	map(0x5033, 0x5036).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_xscroll_r), FUNC(elan_eu3a05vid_device::tile_xscroll_w)); // there are 2 scroll values in here, air blaster 3d stages uses split scrolling like huntin'3 on eu3a14
+	map(0x502d, 0x502e).rw(m_vid, FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w)); // split position
+	map(0x502f, 0x5036).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w)); // there are 4 scroll values in here, x scroll, y scroll, xscroll1 for split, xscroll2 for split (eu3a14 can do split too)
 	// 5037
 	map(0x5038, 0x5038).ram();
 
@@ -444,20 +439,26 @@ INTERRUPT_GEN_MEMBER(elan_eu3a05_state::interrupt)
 }
 
 
-// Tetris (PAL version)      has XTAL of 21.281370
-// Air Blaster (PAL version) has XTAL of 21.2813
-// what are the NTSC clocks?
+/* Tetris (PAL version)      has XTAL of 21.281370
+   Air Blaster (PAL version) has XTAL of 21.2813
+   what are the NTSC clocks?
 
-// not confirmed on Space Invaders, actual CPU clock unknown.
-// 21281370 is the same value as a PAL SNES
-// game speed in Air Blaster appears to be limited entirely by CPU speed (and therefore needs to be around 2mhz at most to match hardware)
-// low clock speed also helps with the badly programmed controls in Tetris
+   not confirmed on Space Invaders, actual CPU clock unknown.
+   21281370 is the same value as a PAL SNES
 
+   game logic speed (but not level scroll speed) in Air Blaster appears to be limited entirely by CPU speed (and therefore needs to be around 2-3mhz
+   at most to match hardware) - a divider of 8 gives something close to original hardware
+   it is unclear exactly what limits the clock speed (maybe video / sound causes waitstates? - dma in progress could also slow / stop the CPU
+   and is not going to be 'instant' on hardware)
+  
+   using a low clock speed also helps with the badly programmed controls in Tetris as that likewise seems to run the game logic 'as fast as possible'
+   there don't appear to be any kind of blanking bits being checked.
+*/
 
 void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(21'281'370)/12); // wrong, this is the PAL clock
+	M6502(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_eu3a05_map);
 	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
 
