@@ -258,7 +258,7 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 }
 void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
 {
-	/* 
+	/*
 		this doesn't handle 8x8 4bpp (not used by anything yet)
 	*/
 
@@ -362,92 +362,62 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 					int colour = attr & 0xf0;
 
-					if (m_vidctrl & 0x40) // 16x16 tiles
-					{
-						if (m_vidctrl & 0x20) // 4bpp mode
-						{
-							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						}
-						else
-						{
-							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-							tile <<= 1;
+					/* 'tiles' are organized / extracted from 'texture' lines that form a 'page' the length of the rom
+					   each texture line in 8bpp mode is 256 bytes
+					   each texture line in 4bpp mode is 128 bytes
+					   in 8x8 mode these pages are 32 tiles wide
+					   in 16x16 mode these pages are 16 tiles wide
+					   tiles can start on any line
+					  
+					   it is unclear what the behavior is if the tile starts at the far edge of a line (wrap around on line?)
 
-							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						}
-					}
-					else
-					{
-						if (m_vidctrl & 0x20) // 4bpp
-						{
-							// TODO
-							tile = 0x0000;//machine().rand() & 0x1ff;
-						}
-						else
-						{
-							tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						}
-					}
+					   this is eu3a05 specific, eu3a14 uses a more traditional approach
+					*/
+
+					const int tilespersrcline = 256 / tilexsize;
+					const int tilespersrcline_mask = tilespersrcline - 1;
+
+					tile = (tile & tilespersrcline_mask) + ((tile & ~tilespersrcline_mask) * tilexsize);
+					tile <<= 1;
+
+					if (!(m_vidctrl & 0x40)) // 8*8 tiles
+						tile >>= 1;
+
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 
 					uint16_t* row = &bitmap.pix16(drawline);
 
-					if (m_vidctrl & 0x40) // 16x16 tiles
+					if (m_vidctrl & 0x20) // 4bpp
 					{
-						if (m_vidctrl & 0x20) // 4bpp
+						for (int xx = 0; xx < tilexsize; xx += 2)
 						{
-							for (int xx = 0; xx < tilexsize; xx += 2)
-							{
-								int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
-								uint8_t pix = fullbankspace.read_byte(realaddr);
+							const int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
+							const uint8_t pix = fullbankspace.read_byte(realaddr);
 
-								int drawxpos;
+							int drawxpos;
 
-								drawxpos = x * 16 + xx + 0;
-								drawxpos &= 0x1ff;
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
+							drawxpos = x * tilexsize + xx + 0 - scrollx;
+							drawxpos &= 0x1ff;
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
 
-								drawxpos = x * 16 + xx + 1;
-								drawxpos &= 0x1ff;
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
-							}
-						}
-						else // 8bpp
-						{
-							for (int xx = 0; xx < tilexsize; xx++)
-							{
-								int realaddr = ((tile + i * 32) << 3) + xx;
-								uint8_t pix = fullbankspace.read_byte(realaddr);
-
-								int drawxpos = x * 16 + xx;
-								drawxpos &= 0x1ff;
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
-							}
+							drawxpos = x * tilexsize + xx + 1 - scrollx;
+							drawxpos &= 0x1ff;
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
 						}
 					}
-					else // 8x8 tiles
+					else // 8bpp
 					{
-						if (m_vidctrl & 0x20) // 4bpp
+						for (int xx = 0; xx < tilexsize; xx++)
 						{
-							// TODO
-						}
-						else
-						{
-							for (int xx = 0; xx < tilexsize; xx++)
-							{
-								const int realaddr = ((tile + i * 32) << 3) + xx;
-								const uint8_t pix = fullbankspace.read_byte(realaddr);
+							const int realaddr = ((tile + i * 32) << 3) + xx;
+							const uint8_t pix = fullbankspace.read_byte(realaddr);
 
-								int drawxpos = x * tilexsize + xx - scrollx;
-								drawxpos &= 0x1ff;
-
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
-							}
+							int drawxpos = x * tilexsize + xx - scrollx;
+							drawxpos &= 0x1ff;
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 						}
 					}
 				}
