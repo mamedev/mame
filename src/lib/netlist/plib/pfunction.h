@@ -8,10 +8,10 @@
 #ifndef PFUNCTION_H_
 #define PFUNCTION_H_
 
+#include "pmath.h"
 #include "pstate.h"
 #include "pstring.h"
 #include "putil.h"
-#include "pmath.h"
 
 #include <vector>
 

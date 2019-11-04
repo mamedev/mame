@@ -9,9 +9,9 @@
 #define POPTIONS_H_
 
 #include "plists.h"
+#include "pstonum.h"
 #include "pstring.h"
 #include "putil.h"
-#include "pstonum.h"
 
 namespace plib {
 /***************************************************************************
@@ -63,10 +63,10 @@ public:
 
 	/* no_argument options will be called with "" argument */
 
-	pstring short_opt() { return m_short; }
-	pstring long_opt() { return m_long; }
-	bool has_argument() { return m_has_argument ; }
-	bool was_specified() { return m_specified; }
+	pstring short_opt() const { return m_short; }
+	pstring long_opt() const { return m_long; }
+	bool has_argument() const { return m_has_argument ; }
+	bool was_specified() const { return m_specified; }
 
 	int do_parse(const pstring &argument)
 	{

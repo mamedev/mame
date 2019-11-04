@@ -31,7 +31,7 @@ namespace plib {
 			define_t(const pstring &name, const pstring &replace)
 			: m_name(name), m_replace(replace), m_has_params(false)
 			{}
-			define_t(const pstring &name)
+			explicit define_t(const pstring &name)
 			: m_name(name), m_replace(""), m_has_params(false)
 			{}
 			pstring m_name;
@@ -54,9 +54,11 @@ namespace plib {
 		, m_expr_sep(std::move(s.m_expr_sep))
 		, m_if_flag(s.m_if_flag)
 		, m_if_level(s.m_if_level)
+        , m_stack(std::move(s.m_stack))
 		, m_outbuf(std::move(s.m_outbuf))
 		, m_pos(s.m_pos)
 		, m_state(s.m_state)
+		, m_line(std::move(s.m_line))
 		, m_comment(s.m_comment)
 		, m_debug_out(s.m_debug_out)
 		{
@@ -82,7 +84,8 @@ namespace plib {
 		class readbuffer : public std::streambuf
 		{
 		public:
-			readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf() { setg(nullptr, nullptr, nullptr); }
+			explicit readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf() 
+			{ setg(nullptr, nullptr, nullptr); }
 			readbuffer(readbuffer &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
 			COPYASSIGN(readbuffer, delete)
 			readbuffer &operator=(readbuffer &&src) = delete;

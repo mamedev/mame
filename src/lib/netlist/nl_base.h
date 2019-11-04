@@ -20,9 +20,9 @@
 #include "plib/pmempool.h"
 #include "plib/ppmf.h"
 #include "plib/pstate.h"
+#include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
-#include "plib/pstonum.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
@@ -167,7 +167,7 @@ class NETLIB_NAME(name) : public device_t
 #define nl_assert(x)    do { if (0) if (!(x)) { /*throw nl_exception(plib::pfmt("assert: {1}:{2}: {3}")(__FILE__)(__LINE__)(#x) ); */} } while (0)
 #define NL_NOEXCEPT    noexcept
 #endif
-#define nl_assert_always(x, msg)    do { if (!(x)) throw nl_exception("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}", msg, __FILE__, __LINE__, #x); } while (0)
+#define nl_assert_always(x, msg)    do { if (!(x)) plib::pthrow<nl_exception>("Fatal error: {1}\nCaused by assert: {2}:{3}: {4}", msg, __FILE__, __LINE__, #x); } while (0)
 
 //============================================================
 // Namespace starts
@@ -562,7 +562,7 @@ namespace netlist
 			/*! The object type.
 			 * \returns type of the object
 			 */
-			terminal_type type() const;
+			terminal_type type() const noexcept(false);
 			/*! Checks if object is of specified type.
 			 * \param atype type to check object against.
 			 * \returns true if object is of specified type else false.
@@ -587,7 +587,7 @@ namespace netlist
 			state_e terminal_state() const noexcept { return m_state; }
 			void set_state(state_e astate) noexcept { m_state = astate; }
 
-			void reset() noexcept { set_state(is_type(OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
+			void reset() noexcept { set_state(is_type(terminal_type::OUTPUT) ? STATE_OUT : STATE_INP_ACTIVE); }
 
 			nldelegate m_delegate;
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
@@ -658,8 +658,8 @@ namespace netlist
 
 			/* setup stuff */
 
-			void add_terminal(core_terminal_t &terminal) NL_NOEXCEPT;
-			void remove_terminal(core_terminal_t &terminal) NL_NOEXCEPT;
+			void add_terminal(core_terminal_t &terminal) noexcept(false);
+			void remove_terminal(core_terminal_t &terminal) noexcept(false);
 
 			bool is_logic() const noexcept;
 			bool is_analog() const noexcept;
@@ -763,17 +763,17 @@ namespace netlist
 
 		nl_fptype operator ()() const  noexcept;
 
-		void set_conductivity(const nl_fptype G) noexcept
+		void set_conductivity(const nl_fptype G) const noexcept
 		{
 			set_go_gt_I(-G, G, nlconst::zero());
 		}
 
-		void set_go_gt(const nl_fptype GO, const nl_fptype GT)  noexcept
+		void set_go_gt(const nl_fptype GO, const nl_fptype GT) const noexcept
 		{
 			set_go_gt_I(GO, GT, nlconst::zero());
 		}
 
-		void set_go_gt_I(const nl_fptype GO, const nl_fptype GT, const nl_fptype I)  noexcept
+		void set_go_gt_I(const nl_fptype GO, const nl_fptype GT, const nl_fptype I) const noexcept
 		{
 			if (m_go1 != nullptr)
 			{
@@ -786,7 +786,7 @@ namespace netlist
 		void solve_now();
 		void schedule_solve_after(const netlist_time after);
 
-		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept;
+		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
 		terminal_t *connected_terminal() const noexcept { return m_connected_terminal; }
 	private:
@@ -833,7 +833,7 @@ namespace netlist
 		logic_input_t(core_device_t &dev, const pstring &aname,
 				nldelegate delegate = nldelegate());
 
-		netlist_sig_t operator()() const noexcept
+		netlist_sig_t operator()() const NL_NOEXCEPT
 		{
 			return Q();
 		}
@@ -973,7 +973,7 @@ namespace netlist
 
 		COPYASSIGNMOVE(param_t, delete)
 
-		param_type_t param_type() const;
+		param_type_t param_type() const noexcept(false);
 
 	protected:
 		virtual ~param_t() noexcept = default; /* not intended to be destroyed */
@@ -1309,7 +1309,7 @@ namespace netlist
 			using base_queue = timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>;
 			using entry_t = plib::pqentry_t<net_t *, netlist_time>;
 			explicit queue_t(netlist_state_t &nl);
-			virtual ~queue_t() noexcept = default;
+			virtual ~queue_t() noexcept override = default;
 
 			queue_t(const queue_t &) = delete;
 			queue_t(queue_t &&) = delete;
@@ -1328,7 +1328,7 @@ namespace netlist
 			std::vector<std::size_t> m_net_ids;
 		};
 
-	}
+	} // namespace detail
 
 	// -----------------------------------------------------------------------------
 	// netlist_state__t
@@ -1452,13 +1452,14 @@ namespace netlist
 		 * @param dev Device to be registered
 		 */
 		template <typename T>
-		void register_device(const pstring &name, owned_pool_ptr<T> &&dev)
+		void register_device(const pstring &name, owned_pool_ptr<T> &&dev) noexcept(false)
 		{
 			for (auto & d : m_devices)
 				if (d.first == name)
 				{
 					dev.release();
 					log().fatal(MF_DUPLICATE_NAME_DEVICE_LIST(name));
+					plib::pthrow<nl_exception>(MF_DUPLICATE_NAME_DEVICE_LIST(name));
 				}
 			//m_devices.push_back(std::move(dev));
 			m_devices.insert(m_devices.end(), { name, std::move(dev) });
@@ -1680,7 +1681,10 @@ namespace netlist
 			bool err = false;
 			auto vald = plib::pstonum_ne<T>(p, err);
 			if (err)
+			{
 				device.state().log().fatal(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
+				plib::pthrow<nl_exception>(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
+			}
 			m_param = vald;
 		}
 		else
@@ -1700,7 +1704,10 @@ namespace netlist
 			T temp(val);
 			bool ok = temp.set_from_string(p);
 			if (!ok)
+			{
 				device.state().log().fatal(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+				plib::pthrow<nl_exception>(MF_INVALID_ENUM_CONVERSION_1_2(name, p));
+			}
 			m_param = temp;
 		}
 
@@ -1825,10 +1832,13 @@ namespace netlist
 
 	inline nl_fptype terminal_t::operator ()() const noexcept { return net().Q_Analog(); }
 
-	inline void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept
+	inline void terminal_t::set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false)
 	{
 		if (!(gt && go && Idr) && (gt || go || Idr))
+		{
 			state().log().fatal("Inconsistent nullptrs for terminal {}", name());
+			plib::pthrow<nl_exception>("Inconsistent nullptrs for terminal {}", name());
+		}
 		else
 		{
 			m_gt1 = gt;

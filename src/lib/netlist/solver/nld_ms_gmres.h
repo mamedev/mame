@@ -109,7 +109,7 @@ namespace solver
 			this->m_new_V[k] = this->m_terms[k].template getV<float_type>();
 		}
 
-		const float_type accuracy = static_cast<float_type>(this->m_params.m_accuracy);
+		const auto accuracy(static_cast<float_type>(this->m_params.m_accuracy));
 
 		auto iter = std::max(plib::constants<std::size_t>::one(), this->m_params.m_gs_loops());
 		auto gsl = m_gmres.solve(m_ops, this->m_new_V, this->m_RHS, iter, accuracy);

@@ -27,8 +27,8 @@ int pstring_t<F>::compare(const pstring_t &right) const
 	auto ri = right.begin();
 	while (si != this->end() && ri != right.end() && *si == *ri)
 	{
-		ri++;
-		si++;
+		++ri;
+		++si;
 	}
 
 	if (si != this->end() && ri != right.end())

@@ -114,7 +114,10 @@ namespace netlist
 		{
 			m_type = static_cast<int>(m_model.m_TYPE);
 			if (m_type < 1 || m_type > 3)
+			{
 				log().fatal(MF_OPAMP_UNKNOWN_TYPE(m_type));
+				plib::pthrow<nl_exception>(MF_OPAMP_UNKNOWN_TYPE(m_type));
+			}
 
 			if (m_type == 1)
 			{

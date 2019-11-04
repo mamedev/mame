@@ -435,7 +435,7 @@ namespace devices
 	class nld_power_pins
 	{
 	public:
-		nld_power_pins(device_t &owner, const pstring &sVCC = "VCC",
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC = "VCC",
 			const pstring &sGND = "GND", bool force_analog_input = false)
 		{
 			if (owner.state().setup().is_extended_validation() || force_analog_input)

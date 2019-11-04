@@ -93,7 +93,7 @@ namespace solver
 		template <typename T1, typename T2>
 		float_ext_type &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
 		template <typename T1>
-		float_ext_type &RHS(const T1 &r) { return m_RHS[r]; }
+		float_ext_type &RHS(const T1 &r) { return this->m_RHS[r]; }
 
 
 		template <typename T1, typename T2>
@@ -107,7 +107,6 @@ namespace solver
 		array2D<float_ext_type, storage_N, m_pitch> m_A;
 		array2D<float_ext_type, storage_N, m_pitch> m_Ainv;
 		array2D<float_ext_type, storage_N, m_pitch> m_W;
-		std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
 		array2D<float_ext_type, storage_N, m_pitch> m_lA;
 

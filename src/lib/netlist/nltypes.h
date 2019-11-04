@@ -104,7 +104,7 @@ namespace netlist
 	namespace detail {
 
 		/*! Enum specifying the type of object */
-		enum terminal_type {
+		enum class terminal_type {
 			TERMINAL = 0, /*!< object is an analog terminal */
 			INPUT    = 1, /*!< object is an input */
 			OUTPUT   = 2, /*!< object is an output */

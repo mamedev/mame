@@ -13,11 +13,11 @@
 #include "palloc.h"
 #include "parray.h"
 #include "pconfig.h"
+#include "pmath.h"
 #include "pomp.h"
 #include "pstate.h"
 #include "ptypes.h"
 #include "putil.h"
-#include "pmath.h"
 
 #include <algorithm>
 #include <array>
@@ -178,7 +178,7 @@ namespace plib
 
 		/* throws error if P(source)>P(destination) */
 		template <typename LUMAT>
-		void slim_copy_from(LUMAT & src) noexcept
+		void slim_copy_from(LUMAT & src)
 		{
 			for (std::size_t r=0; r<src.size(); r++)
 			{

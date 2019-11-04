@@ -150,7 +150,7 @@ NETLIST_END()
 class netlist_data_folder_t : public netlist::source_data_t
 {
 public:
-	netlist_data_folder_t(const pstring &folder)
+	explicit netlist_data_folder_t(const pstring &folder)
 	: netlist::source_data_t()
 	, m_folder(folder)
 	{
@@ -176,7 +176,7 @@ private:
 class netlist_tool_callbacks_t : public netlist::callbacks_t
 {
 public:
-	netlist_tool_callbacks_t(tool_app_t &app)
+	explicit netlist_tool_callbacks_t(tool_app_t &app)
 	: netlist::callbacks_t()
 	, m_app(app)
 	{ }
@@ -193,10 +193,6 @@ public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &aname)
 	: netlist::netlist_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app))
-	{
-	}
-
-	void init()
 	{
 	}
 
@@ -384,7 +380,6 @@ void tool_app_t::run()
 		//plib::perftime_t<plib::exact_ticks> t;
 
 		nt.enable_stats(opt_stats());
-		nt.init();
 
 		if (!opt_verb())
 			nt.log().verbose.set_enabled(false);
@@ -470,7 +465,6 @@ void tool_app_t::run()
 
 void tool_app_t::validate()
 {
-	std::vector<input_t> inps;
 	netlist_tool_t nt(*this, "netlist");
 
 	if (!opt_verb())
@@ -485,8 +479,6 @@ void tool_app_t::validate()
 
 	try
 	{
-		nt.init();
-
 		nt.read_netlist(opt_file(), opt_name(),
 				opt_logs(),
 				m_defines, opt_rfolders(), opt_includes());
@@ -514,8 +506,6 @@ void tool_app_t::static_compile()
 		throw netlist::nl_exception("--dir option needs to be specified");
 
 	netlist_tool_t nt(*this, "netlist");
-
-	nt.init();
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -623,8 +613,6 @@ void tool_app_t::create_header()
 {
 	netlist_tool_t nt(*this, "netlist");
 
-	nt.init();
-
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
 
@@ -666,8 +654,6 @@ void tool_app_t::create_header()
 void tool_app_t::create_docheader()
 {
 	netlist_tool_t nt(*this, "netlist");
-
-	nt.init();
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -716,7 +702,6 @@ void tool_app_t::create_docheader()
 void tool_app_t::listdevices()
 {
 	netlist_tool_t nt(*this, "netlist");
-	nt.init();
 
 	nt.log().verbose.set_enabled(false);
 	nt.log().info.set_enabled(false);
@@ -726,8 +711,6 @@ void tool_app_t::listdevices()
 
 	nt.setup().register_source(plib::make_unique<netlist::source_proc_t>("dummy", &netlist_dummy));
 	nt.setup().include("dummy");
-
-
 	nt.setup().prepare_to_run();
 
 	std::vector<netlist::unique_pool_ptr<netlist::core_device_t>> devs;

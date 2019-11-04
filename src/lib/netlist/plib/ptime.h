@@ -8,8 +8,8 @@
 #define PTIME_H_
 
 #include "pconfig.h"
-#include "ptypes.h"
 #include "pmath.h" // std::floor
+#include "ptypes.h"
 
 // ----------------------------------------------------------------------------------------
 // netlist_time
@@ -42,8 +42,8 @@ namespace plib
 		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (RES / den)) { }
 
-		C14CONSTEXPR ptime &operator+=(const ptime rhs) noexcept { m_time += rhs.m_time; return *this; }
-		C14CONSTEXPR ptime &operator-=(const ptime rhs) noexcept { m_time -= rhs.m_time; return *this; }
+		C14CONSTEXPR ptime &operator+=(const ptime &rhs) noexcept { m_time += rhs.m_time; return *this; }
+		C14CONSTEXPR ptime &operator-=(const ptime &rhs) noexcept { m_time -= rhs.m_time; return *this; }
 		C14CONSTEXPR ptime &operator*=(const mult_type factor) noexcept { m_time *= static_cast<internal_type>(factor); return *this; }
 
 		friend constexpr const ptime operator-(ptime lhs, const ptime rhs) noexcept

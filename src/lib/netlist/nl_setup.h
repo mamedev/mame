@@ -358,7 +358,7 @@ namespace netlist
 	public:
 
 		explicit setup_t(netlist_state_t &nlstate);
-		~setup_t() noexcept;
+		~setup_t() noexcept = default;
 
 		COPYASSIGNMOVE(setup_t, delete)
 
@@ -369,9 +369,9 @@ namespace netlist
 
 		pstring get_initial_param_val(const pstring &name, const pstring &def) const;
 
-		void register_term(detail::core_terminal_t &obj);
+		void register_term(detail::core_terminal_t &term);
 
-		void remove_connections(const pstring &attach);
+		void remove_connections(const pstring &pin);
 
 		bool connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 
@@ -400,7 +400,7 @@ namespace netlist
 
 		/* needed by proxy */
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true) const;
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true) const;
+		detail::core_terminal_t *find_terminal(const pstring &terminal_in, bool required = true) const;
 
 		/* core net handling */
 
@@ -425,7 +425,7 @@ namespace netlist
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 
-		void connect_terminals(detail::core_terminal_t &in, detail::core_terminal_t &out);
+		void connect_terminals(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 		void connect_input_output(detail::core_terminal_t &in, detail::core_terminal_t &out);
 		void connect_terminal_output(terminal_t &in, detail::core_terminal_t &out);
 		void connect_terminal_input(terminal_t &term, detail::core_terminal_t &inp);
@@ -455,7 +455,7 @@ namespace netlist
 	{
 	public:
 
-		source_string_t(const pstring &source)
+		explicit source_string_t(const pstring &source)
 		: source_netlist_t(), m_str(source)
 		{
 		}
@@ -471,7 +471,7 @@ namespace netlist
 	{
 	public:
 
-		source_file_t(const pstring &filename)
+		explicit source_file_t(const pstring &filename)
 		: source_netlist_t(), m_filename(filename)
 		{
 		}
@@ -486,7 +486,7 @@ namespace netlist
 	class source_mem_t : public source_netlist_t
 	{
 	public:
-		source_mem_t(const char *mem)
+		explicit source_mem_t(const char *mem)
 		: source_netlist_t(), m_str(mem)
 		{
 		}

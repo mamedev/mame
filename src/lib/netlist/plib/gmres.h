@@ -218,7 +218,7 @@ namespace plib
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
-		gmres_t(std::size_t size)
+		explicit gmres_t(std::size_t size)
 			: residual(size)
 			, Ax(size)
 			, m_ht(RESTART +1, RESTART)

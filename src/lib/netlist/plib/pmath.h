@@ -11,8 +11,8 @@
 #include "pconfig.h"
 
 #include <algorithm>
-#include <type_traits>
 #include <cmath>
+#include <type_traits>
 
 #if (PUSE_FLOAT128)
 #include <quadmath.h>

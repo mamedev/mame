@@ -35,7 +35,7 @@ namespace netlist
 		sbitset &reset(const std::size_t bit) { m_bs &= ~(static_cast<T>(1) << bit); return *this; }
 
 		sbitset invert() const { return sbitset(~m_bs); }
-		std::size_t count()
+		std::size_t count() const
 		{
 			std::size_t ret = 0;
 			for (T v = m_bs; v != 0; v = v >> 1)
@@ -153,13 +153,13 @@ namespace netlist
 		{
 		}
 
-		void parse(const std::vector<pstring> &desc);
+		void parse(const std::vector<pstring> &truthtable);
 
 	private:
 		void parseline(unsigned cur, std::vector<pstring> list,
 				tt_bitset state, uint_least64_t val, std::vector<uint_least8_t> &timing_index);
 
-		tt_bitset calculate_ignored_inputs(tt_bitset i);
+		tt_bitset calculate_ignored_inputs(tt_bitset i) const;
 
 		unsigned m_NO;
 		unsigned m_NI;
@@ -252,7 +252,7 @@ namespace netlist
 		unique_pool_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
 	};
 
-	tt_bitset truthtable_parser::calculate_ignored_inputs(tt_bitset state)
+	tt_bitset truthtable_parser::calculate_ignored_inputs(tt_bitset state) const
 	{
 		// Determine all inputs which may be ignored ...
 		tt_bitset ignore = 0;

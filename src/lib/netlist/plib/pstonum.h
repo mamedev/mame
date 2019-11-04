@@ -10,8 +10,8 @@
 
 #include "pconfig.h"
 #include "pexception.h"
-#include "pstring.h"
 #include "pmath.h" // for pstonum
+#include "pstring.h"
 
 #include <algorithm>
 #include <initializer_list>

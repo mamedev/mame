@@ -205,7 +205,7 @@ namespace solver
 
 	public:
 		int get_net_idx(const analog_net_t *net) const noexcept;
-		std::pair<int, int> get_left_right_of_diag(std::size_t row, std::size_t diag);
+		std::pair<int, int> get_left_right_of_diag(std::size_t irow, std::size_t idiag);
 		nl_fptype get_weight_around_diag(std::size_t row, std::size_t diag);
 
 		virtual void log_stats();
@@ -231,7 +231,7 @@ namespace solver
 		virtual unsigned vsolve_non_dynamic(const bool newton_raphson) = 0;
 		virtual netlist_time compute_next_timestep(const nl_fptype cur_ts) = 0;
 
-		void  add_term(std::size_t net_idx, terminal_t *term);
+		void add_term(std::size_t net_idx, terminal_t *term);
 
 		std::size_t max_railstart() const noexcept
 		{
