@@ -72,7 +72,7 @@ WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 		m_irqAen = data & 0x20;
 
 		/* other bits unknown */
-	//logerror("%s: write %04x to c0000\n",machine().describe_context(),data);
+		//logerror("%s: write %04x to c0000\n",machine().describe_context(),data);
 	}
 }
 
@@ -266,8 +266,7 @@ void gradius3_state::gradius3(machine_config &config)
 	M68000(config, m_subcpu, XTAL(10'000'000));
 	m_subcpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_map2);
 	TIMER(config, "scantimer").configure_scanline(FUNC(gradius3_state::gradius3_sub_scanline), "screen", 0, 1);
-	/* 4 is triggered by cpu A, the others are unknown but */
-	/* required for the game to run. */
+	/* 4 is triggered by cpu A, the others are unknown but required for the game to run. */
 
 	Z80(config, m_audiocpu, 3579545);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &gradius3_state::gradius3_s_map);
