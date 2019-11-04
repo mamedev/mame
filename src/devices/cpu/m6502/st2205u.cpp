@@ -24,6 +24,10 @@
     * 512K ROM (may be disabled)
     * 32K SRAM
 
+    One important difference between the ST2205U and almost every
+    other ST2XXX MCU is that PRR[0] and IRR[0] are *not* inverted
+    relative to A14.
+
 **********************************************************************/
 
 #include "emu.h"
