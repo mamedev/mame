@@ -360,6 +360,32 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/cart/slot.h,BUSES["BBC_CART"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/cart/slot.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/cart/slot.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/internal/internal.h,BUSES["BBC_INTERNAL"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_INTERNAL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/internal/internal.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/internal.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/exp/exp.h,BUSES["BBC_EXP"] = true
 ---------------------------------------------------
 
@@ -430,6 +456,8 @@ if (BUSES["BBC_ROM"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/rom/rom.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/ram.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/ram.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/nvram.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/nvram.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/genie.cpp",
