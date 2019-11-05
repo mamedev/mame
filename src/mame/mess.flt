@@ -187,6 +187,7 @@ daruma.cpp
 datum.cpp
 dbox.cpp
 dccons.cpp
+dcebridge.cpp
 dct11em.cpp
 debut.cpp
 decstation.cpp
