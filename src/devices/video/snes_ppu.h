@@ -48,7 +48,7 @@ public:
 
 	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline);
 
-	int16_t current_x() const { return screen().hpos() / m_htmult; }
+	int16_t current_x() const { return screen().hpos(); }
 	int16_t current_y() const { return screen().vpos(); }
 	void set_latch_hv(int16_t x, int16_t y);
 
@@ -72,7 +72,7 @@ public:
 		m_interlace = 1;
 		m_obj_interlace = 1;
 	}
-	void set_current_vert(uint16_t value) { m_beam.current_vert = value; }
+    void set_current_vert(uint16_t value);
 	void set_first_sprite() { m_oam.first_sprite = m_oam.priority_rotation ? ((m_oam.address >> 1) & 127) : 0; }
 
 protected:
@@ -152,7 +152,7 @@ protected:
 		uint8_t saved_address_high;
 		uint16_t address;
 		uint16_t priority_rotation;
-		uint8_t next_charmap;
+		uint16_t next_charmap;
 		uint8_t next_size;
 		uint8_t size;
 		uint32_t next_name_select;
@@ -182,8 +182,8 @@ protected:
 		int16_t matrix_d;
 		int16_t origin_x;
 		int16_t origin_y;
-		uint16_t hor_offset;
-		uint16_t ver_offset;
+		int16_t hor_offset;
+		int16_t ver_offset;
 		uint8_t extbg;
 	} m_mode7;
 
@@ -192,6 +192,7 @@ protected:
 		uint16_t tile;
 		int16_t x, y;
 		uint8_t size, vflip, hflip, priority_bits, pal;
+		uint8_t nameselect;
 		int height, width;
 	};
 
@@ -266,14 +267,10 @@ protected:
 
 	inline uint16_t get_bgcolor(uint8_t direct_colors, uint16_t palette, uint8_t color);
 	inline void set_scanline_pixel(int screen, int16_t x, uint16_t color, uint8_t priority, uint8_t layer, int blend);
-	inline void draw_bgtile_lores(uint8_t layer, int16_t ii, uint8_t colour, uint16_t pal, uint8_t direct_colors, uint8_t priority);
-	inline void draw_bgtile_hires(uint8_t layer, int16_t ii, uint8_t colour, uint16_t pal, uint8_t direct_colors, uint8_t priority);
-	inline void draw_oamtile(int16_t ii, uint8_t colour, uint16_t pal, uint8_t priority);
-	inline void draw_tile(uint8_t planes, uint8_t layer, uint32_t tileaddr, int16_t x, uint8_t priority, uint8_t flip, uint8_t direct_colors, uint16_t pal, uint8_t hires);
-	inline uint32_t get_tmap_addr(uint8_t layer, uint8_t hires, uint8_t tile_size, uint32_t base, uint32_t x, uint32_t y);
+	inline void draw_oamtile(uint32_t tileaddr, int16_t tile_x, uint8_t priority, uint8_t flip, uint16_t pal, uint8_t *palbuf, uint8_t *pribuf);
 	inline uint32_t get_tile(uint8_t layer_idx, uint32_t hoffset, uint32_t voffset);
-	inline void update_line(uint16_t curline, uint8_t layer, uint8_t direct_colors);
-	void update_line_mode7(uint16_t curline, uint8_t layer);
+	void update_line(uint16_t curline, uint8_t layer, uint8_t direct_colors);
+	void update_line_mode7(uint16_t curline, uint8_t layer_idx);
 	void update_obsel(void);
 	void oam_list_build(void);
 	int is_sprite_on_scanline(uint16_t curline, uint8_t sprite);
@@ -288,12 +285,15 @@ protected:
 	void update_mode_6(uint16_t curline);
 	void update_mode_7(uint16_t curline);
 	void draw_screens(uint16_t curline);
-	void update_windowmasks(void);
-	void update_offsets(void);
+	void render_window(uint16_t layer_idx, uint8_t enable, uint8_t *output);
+	inline void plot_above(uint16_t x, uint8_t source, uint8_t priority, uint16_t color, int blend_exception = 0);
+	inline void plot_below(uint16_t x, uint8_t source, uint8_t priority, uint16_t color, int blend_exception = 0);
+	void update_color_windowmasks(uint8_t mask, uint8_t *output);
 	void update_video_mode(void);
-	void cache_background(void);
+	void cache_background();
+	uint16_t pixel(uint16_t x, SNES_SCANLINE *above, SNES_SCANLINE *below, uint8_t *window_above, uint8_t *window_below);
 	uint16_t direct_color(uint16_t palette, uint16_t group);
-	inline void draw_blend(uint16_t offset, uint16_t *colour, uint8_t prevent_color_math, uint8_t black_pen_clip, int switch_screens);
+	inline uint16_t blend(uint16_t x, uint16_t y, bool halve);
 
 	void dynamic_res_change();
 	inline uint32_t get_vram_address();
@@ -307,6 +307,7 @@ protected:
 	std::unique_ptr<uint16_t[]> m_oam_ram;     /* Object Attribute Memory */
 	std::unique_ptr<uint16_t[]> m_cgram;   /* Palette RAM */
 	std::unique_ptr<uint8_t[]> m_vram;    /* Video RAM (TODO: Should be 16-bit, but it's easier this way) */
+	std::unique_ptr<std::unique_ptr<uint16_t[]>[]> m_light_table; /* Luma ramp */
 
 	// device-level overrides
 	virtual void device_start() override;
