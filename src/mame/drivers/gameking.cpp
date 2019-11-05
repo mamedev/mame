@@ -47,7 +47,6 @@ public:
 
 protected:
 	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 private:
 	void gameking_palette(palette_device &palette) const;
@@ -61,13 +60,13 @@ private:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void gameking_mem(address_map &map);
+	void gameking3_mem(address_map &map);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
 	required_device<palette_device> m_palette;
 
-	memory_region *m_cart_rom;
 	emu_timer *timer1;
 	emu_timer *timer2;
 
@@ -95,7 +94,14 @@ uint8_t gameking_state::input2_r()
 
 void gameking_state::gameking_mem(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom().region("maincpu", 0x10000);
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+}
+
+void gameking_state::gameking3_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom().region("maincpu", 0);
+	map(0x800000, 0x802fff).ram();
+	map(0x804800, 0x8048ff).ram();
 }
 
 
@@ -189,13 +195,9 @@ DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 void gameking_state::machine_start()
 {
 	std::string region_tag;
-	m_cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
-	if (m_cart_rom)
-		m_maincpu->space(AS_DATA).install_rom(0x400000, 0x400000 + m_cart_rom->bytes() - 1, m_cart_rom->base());
-}
-
-void gameking_state::machine_reset()
-{
+	memory_region *cart_rom = memregion(region_tag.assign(m_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
+	if (cart_rom)
+		m_maincpu->space(AS_DATA).install_rom(0x400000, 0x400000 + cart_rom->bytes() - 1, cart_rom->base()); // FIXME: gamekin3 wants Flash cartridges, not plain ROM
 }
 
 
@@ -232,20 +234,20 @@ void gameking_state::gameking1(machine_config &config)
 void gameking_state::gameking3(machine_config &config)
 {
 	gameking(config);
+	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking3_mem);
 	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
 	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
 }
 
 
 ROM_START(gameking)
-	ROM_REGION(0x10000+0x80000, "maincpu", ROMREGION_ERASE00)
-//  ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(8f52a928) SHA1(2e791fc7b642440d36820d2c53e1bb732375eb6e) ) // a14 inversed
-	ROM_LOAD("gm218.bin", 0x10000, 0x80000, CRC(5a1ade3d) SHA1(e0d056f8ebfdf52ef6796d0375eba7fcc4a6a9d3) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("gm218.bin", 0x00000, 0x80000, CRC(5a1ade3d) SHA1(e0d056f8ebfdf52ef6796d0375eba7fcc4a6a9d3) )
 ROM_END
 
 ROM_START(gamekin3)
-	ROM_REGION(0x10000+0x80000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD("gm220.bin", 0x10000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("gm220.bin", 0x00000, 0x80000, CRC(1dc43bd5) SHA1(f9dcd3cb76bb7cb10565a1acb070ab375c082b4c) )
 ROM_END
 
 CONS( 2003, gameking, 0, 0, gameking1, gameking, gameking_state, init_gameking, "TimeTop", "GameKing GM-218", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
