@@ -198,7 +198,6 @@ WRITE16_MEMBER(cps_state::dinopic_layer_w)
 		break;
 	default:
 		logerror("%s: Unknown layer cmd %X %X\n",machine().describe_context(),offset<<1,data);
-
 	}
 }
 
@@ -539,10 +538,20 @@ WRITE16_MEMBER(cps_state::slampic_layer_w)
 		m_cps_a_regs[0x04/2] = data << 4;
 		break;
 	}
+}
+
+WRITE16_MEMBER(cps_state::slampic_layer2_w)
+{
+	COMBINE_DATA(&m_cps_a_regs[offset]);
 	
-	m_cps_b_regs[0x02/2] = 0x0fff;
-	m_cps_b_regs[0x28/2] = 0x7f00;
-	m_cps_b_regs[0x2a/2] = 0x7fff;
+	if (offset == 0x22 / 2)
+	{
+		// doesn't seem to write anywhere outside mainram?
+		m_cps_b_regs[m_layer_enable_reg / 2] = m_mainram[0x8d72 / 2];
+		m_cps_b_regs[m_layer_mask_reg[1] / 2] = m_mainram[0x8d74 / 2];
+		m_cps_b_regs[m_layer_mask_reg[2] / 2] = m_mainram[0x8d76 / 2];
+		m_cps_b_regs[m_layer_mask_reg[3] / 2] = m_mainram[0x8d78 / 2];
+	}
 }
 
 
@@ -572,7 +581,7 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 	int base = m_sprite_base / 2;
 	int num_sprites = m_gfxdecode->gfx(2)->elements();
 	int last_sprite_offset = 0x1ffc;
-	uint16_t *sprite_ram = m_gfxram;
+	uint16_t *sprite_ram = m_sprite_ram; //m_gfxram;
 	uint16_t tileno,colour,xpos,ypos;
 	bool flipx, flipy;
 
@@ -919,17 +928,20 @@ void cps_state::slampic_map(address_map &map)
 	map(0x800000, 0x800007).portr("IN1");            /* Player input ports */
 	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));            /* System input ports / Dip Switches */
 	map(0x800030, 0x800037).w(FUNC(cps_state::cps1_coinctrl_w));
-	map(0x800100, 0x80013f).w(FUNC(cps_state::cps1_cps_a_w)).share("cps_a_regs");  /* CPS-A custom */
-	map(0x800140, 0x80017f).rw(FUNC(cps_state::cps1_cps_b_r), FUNC(cps_state::cps1_cps_b_w)).share("cps_b_regs");
+	map(0x800100, 0x80013f).ram().w(FUNC(cps_state::slampic_layer2_w)).share("cps_a_regs");  /* CPS-A custom */
+	map(0x800140, 0x80017f).ram().share("cps_b_regs");
 	map(0x880000, 0x880001).nopw(); //.w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98000d).w(FUNC(cps_state::slampic_layer_w));
+	
+	map(0x990000, 0x993fff).ram().share("spriteram");
+	
 	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
 	map(0xf18000, 0xf19fff).ram();
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
 	map(0xf1c004, 0xf1c005).w(FUNC(cps_state::cpsq_coinctrl2_w));     /* Coin control2 (later games) */
 	map(0xf1c006, 0xf1c007).portr("EEPROMIN").portw("EEPROMOUT");
-	map(0xf1f000, 0xf1ffff).noprw(); // writes 0 to range, then reads F1F6EC
+	map(0xf1f000, 0xf1ffff).noprw(); // writes 0 to range, then reads F1F6EC, occasionally writes 0d5f->f1f6f0
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -1571,6 +1583,31 @@ static INPUT_PORTS_START( wofabl )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW(B):6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW(B):7" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW(B):8" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( slampic )
+	PORT_INCLUDE(slammast)
+	
+	PORT_MODIFY("IN2")  // players 3 + 4  (player 4 doesn't work in test menu but ok in game)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
+	
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 MACHINE_START_MEMBER(cps_state,fcrash)
@@ -2443,8 +2480,8 @@ ROM_END
 
 void cps_state::init_dinopic()
 {
-	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
-	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
+	//m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
+	//m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	init_cps1();
 }
 
@@ -3108,8 +3145,6 @@ void cps_state::init_sf2mdt()
 	init_sf2mdta();
 }
 
-
-
 void cps_state::init_sf2mdtb()
 {
 	/* bootleg sprite ram */
@@ -3119,7 +3154,6 @@ void cps_state::init_sf2mdtb()
 
 	init_wofabl();
 }
-
 
 void cps_state::init_sf2mdta()
 {
@@ -3417,8 +3451,9 @@ ROM_END
 	
 	* On the title screen, the blue crystal-like effect behind the main "slammasters" logo is missing.
 	* The bottom and side crowd animations have missing frames.
-	* The centre parts of the foreground ropes (of the wrestling ring) are drawn on scroll2 layer instead of with sprites,
-		they glitch a lot and don't always line up properly with the end sections, sometimes are drawn underneath wrestler sprites instead of over top.
+	* The foreground ropes of the wrestling ring are glitchy and don't always line up properly with the end sections,
+	    the original game draws all 3 ropes on scroll2 instead of with sprites when 4 players are on screen,
+		this bootleg draws the top red rope on scroll2 even with 2 players on screen.
 	* Player 3/4 inputs don't work in test menu (except both btn 3), seems test menu code hasn't been hacked to use the different ports.
 	* Sound is generally very poor quality and the background music consists of short pre-recorded clips which loop continuously.
 		(sound currently unemulated as the PIC is secured against reading)
@@ -3881,7 +3916,7 @@ GAME( 1992, sf2b2,     sf2,      sf2b,      sf2mdt,   cps_state, init_sf2mdtb,  
 
 GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
-GAME( 1993, slampic,   slammast, slampic,   slammast, cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
+GAME( 1993, slampic,   slammast, slampic,   slampic,  cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
 GAME( 1993, slampic2,  0,        slampic2,  slampic2, cps_state, init_slampic2, ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )                       // 930713 ETC
 
 GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, init_cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2

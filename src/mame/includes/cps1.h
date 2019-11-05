@@ -130,6 +130,8 @@ protected:
 		, m_region_stars(*this, "stars")
 		, m_led_cboard(*this, "led_cboard%u", 0U)
 		, bootleg_sprite_renderer(fcrash_render_sprites)
+		
+		, m_sprite_ram(*this, "spriteram")
 	{ }
 
 public:
@@ -243,6 +245,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
+	DECLARE_WRITE16_MEMBER(slampic_layer2_w);
 	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
 	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
 	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
@@ -419,6 +422,7 @@ protected:
 	
 	// fcrash
 	void (cps_state::*bootleg_sprite_renderer)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	optional_shared_ptr<uint16_t> m_sprite_ram;
 };
 
 class cps2_state : public cps_state
