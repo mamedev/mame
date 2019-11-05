@@ -153,16 +153,62 @@ void bbc_internal_slot_device::latch_fe60_w(uint8_t data)
 
 
 // slot devices
+#include "aries.h"
+#include "atpl.h"
+#include "cumana68k.h"
+#include "integrab.h"
+#include "morleyaa.h"
+#include "overlay.h"
+#include "peartree.h"
+#include "ramamp.h"
+#include "raven20.h"
+//#include "replaym.h"
+#include "romex.h"
+#include "stlswr.h"
+#include "stl2m128.h"
+#include "stl4m32.h"
+//#include "stl4m256.h"
+#include "werom.h"
+#include "weromram.h"
+#include "we32kram.h"
 
 
 void bbcb_internal_devices(device_slot_interface &device)
 {
+	device.option_add("ariesb12", BBC_ARIESB12);        /* Aries-B12 ROM expansion */
+	device.option_add("ariesb20", BBC_ARIESB20);        /* Aries-B20 RAM expansion */
+	device.option_add("ariesb32", BBC_ARIESB32);        /* Aries-B32 RAM expansion */
+	device.option_add("atplsw", BBC_ATPLSW);            /* ATPL Sidewise ROM/RAM expansion */
+	device.option_add("cumana68k", BBC_CUMANA68K);      /* Cumana 68008 2nd Processor */
+	device.option_add("integrab", BBC_INTEGRAB);        /* Computech Integra-B */
+	device.option_add("mr3000", BBC_MR3000);            /* Peartree MR3000 ROM board */
+	device.option_add("mr4200", BBC_MR4200);            /* Peartree MR4200 RAM board */
+	device.option_add("mr4300", BBC_MR4300);            /* Peartree MR4300 ROM/RAM board */
+	device.option_add("mr4800", BBC_MR4800);            /* Peartree MR4800 RAM board */
+	device.option_add("ramamp", BBC_RAMAMP);            /* Ramamp Sideways RAM/ROM board */
+	device.option_add("raven20", BBC_RAVEN20);          /* Raven-20 RAM expansion */
+	device.option_add("romex13", BBC_ROMEX13);          /* GCC Romex13 ROM expansion */
+	device.option_add("swr16", BBC_STLSWR16);           /* Solidisk SWR16 */
+	device.option_add("swr32", BBC_STLSWR32);           /* Solidisk SWR32 */
+	device.option_add("swr64", BBC_STLSWR64);           /* Solidisk SWR64 */
+	device.option_add("swr128", BBC_STLSWR128);         /* Solidisk SWR128 */
+	device.option_add("2m128", BBC_STL2M128);           /* Solidisk Twomeg 128 */
+	device.option_add("4m32", BBC_STL4M32);             /* Solidisk Fourmeg 32 */
+	//device.option_add("4m256", BBC_STL4M256);           /* Solidisk Fourmeg 256 */
+	device.option_add("we12rom", BBC_WE12ROM);          /* Watford Electronics 12 ROM board */
+	device.option_add("we13rom", BBC_WE13ROM);          /* Watford Electronics 13 ROM board */
+	device.option_add("weromram", BBC_WEROMRAM);        /* Watford Electronics RAM/ROM board */
+	device.option_add("we32kram", BBC_WE32KRAM);        /* Watford Electronics 32K Shadow RAM */
 }
 
 void bbcbp_internal_devices(device_slot_interface &device)
 {
+	device.option_add("atplswp", BBC_ATPLSWP);          /* ATPL Sidewise+ ROM expansion */
 }
 
 void bbcm_internal_devices(device_slot_interface &device)
 {
+	device.option_add("morleyaa", BBC_MORLEYAA);        /* Morley Master Board 'AA' */
+	device.option_add("overlay", BBC_OVERLAY);          /* Vine Micros OS Overlay Board */
+	//device.option_add("replaym", BBC_REPLAYM);          /* Vine Micros Master Replay */
 }
