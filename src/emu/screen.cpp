@@ -72,7 +72,7 @@ private:
 	NSVGimage *m_image;
 	NSVGrasterizer *m_rasterizer;
 	std::vector<bool> m_key_state;
-	std::vector<std::list<NSVGshape *>> m_keyed_shapes;
+	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
 	std::unordered_map<std::string, int> m_key_ids;
 	int m_key_count;
 
@@ -95,29 +95,29 @@ private:
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
 	// nanosvg makes assumptions about the global locale
-	char *s = new char[region->bytes()+1];
-	memcpy(s, region->base(), region->bytes());
-	s[region->bytes()] = 0;
-	const char *const lcctype(std::setlocale(LC_CTYPE, nullptr));
-	const char *const lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
-	std::setlocale(LC_CTYPE, "C");
-	std::setlocale(LC_NUMERIC, "C");
-	m_image = nsvgParse(s, "px", 72);
-	std::setlocale(LC_CTYPE, lcctype);
-	std::setlocale(LC_NUMERIC, lcnumeric);
-	delete[] s;
+	{
+		const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
+		memcpy(s.get(), region->base(), region->bytes());
+		s[region->bytes()] = 0;
+		const std::string lcctype(std::setlocale(LC_CTYPE, nullptr));
+		const std::string lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
+		std::setlocale(LC_CTYPE, "C");
+		std::setlocale(LC_NUMERIC, "C");
+		m_image = nsvgParse(s.get(), "px", 72);
+		std::setlocale(LC_CTYPE, lcctype.c_str());
+		std::setlocale(LC_NUMERIC, lcnumeric.c_str());
+	}
 	m_rasterizer = nsvgCreateRasterizer();
 
 	m_key_count = 0;
 
-	for (NSVGshape *shape = m_image->shapes; shape != nullptr; shape = shape->next)
+	for (NSVGshape *shape = m_image->shapes; shape; shape = shape->next)
 		if(shape->title[0]) {
-			auto it = m_key_ids.find(shape->title);
+			const auto it = m_key_ids.find(shape->title);
 			if(it != m_key_ids.end())
 				m_keyed_shapes[it->second].push_back(shape);
 			else {
-				int id = m_key_count;
-				m_key_count++;
+				const int id = m_key_count++;
 				m_keyed_shapes.resize(m_key_count);
 				m_keyed_shapes[id].push_back(shape);
 				m_key_ids[shape->title] = id;
