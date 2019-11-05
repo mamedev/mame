@@ -3708,7 +3708,7 @@ ROM_START( fanzonem )
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
-	ROM_LOAD16_WORD_SWAP( "epr-21440a.ic13",  0x0000000, 0x0080000, CRC(28457d58) SHA1(1c7c3153eae1faa6c09595dc01906fe05702352d) )
+	ROM_LOAD16_WORD_SWAP( "epr-21440a.ic13",  0x0000000, 0x0080000, CRC(28457d58) SHA1(1c7c3153eae1faa6c09595dc01906fe05702352d) ) // ST M27C4002-12F1
 	ROM_LOAD16_WORD_SWAP( "mpr-21441.ic2",    0x0400000, 0x0400000, CRC(b69133a5) SHA1(63fb8b23cf216a84a2f2458b14a1648b22ae6256) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21445.ic1",    0x0800000, 0x0400000, CRC(c02ffbd3) SHA1(284fb6ff25b0621b7c1406a78308da522beaaaf7) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21442.ic4",    0x0c00000, 0x0400000, CRC(d4d3575f) SHA1(a3f50f2c932e5b9b9d7e0acf04e8aec41f252147) )
@@ -3737,7 +3737,7 @@ GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,  
 GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   init_dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, elandore,  stvbios, stv_5881, stv6b,    stv_state,   init_elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (J 990202 V1.000)", MACHINE_NOT_WORKING )
+GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game) (J 990202 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fhboxers,  stvbios, stv,      stv,      stv_state,   init_fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
