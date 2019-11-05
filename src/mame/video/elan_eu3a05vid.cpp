@@ -35,11 +35,8 @@ void elan_eu3a05vid_device::device_reset()
 
 	m_vidctrl = 0x00; // need to default to an 8x8 mode for Space Invaders test mode at least
 
-	for (int i=0;i<2;i++)
+	for (int i=0;i<4*2;i++)
 		m_tile_scroll[i] = 0x00;
-
-	for (int i=0;i<2;i++)
-		m_tile_xscroll[i] = 0x00;
 
 	m_tile_gfxbase_lo_data = 0x00;
 	m_tile_gfxbase_hi_data = 0x00;
@@ -47,7 +44,8 @@ void elan_eu3a05vid_device::device_reset()
 	m_sprite_gfxbase_lo_data = 0x00;
 	m_sprite_gfxbase_hi_data = 0x00;
 
-	m_splitpos = 0x00;
+	for (int i=0;i<2;i++)
+		m_splitpos[i] = 0x00;
 }
 
 uint8_t elan_eu3a05vid_device::read_spriteram(int offset)
@@ -258,11 +256,11 @@ bool elan_eu3a05vid_device::get_tile_data(int base, int drawpri, int& tile, int 
 }
 void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int drawpri)
 {
-	/* 
+	/*
 		this doesn't handle 8x8 4bpp (not used by anything yet)
 	*/
 
-	int scroll = (m_tile_scroll[1] << 8) | m_tile_scroll[0];
+	int scroll = get_scroll(1);
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 
 	// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
@@ -331,10 +329,20 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 					int scrollx;
 
 					// split can be probably configured in more ways than this
-					if (drawline > m_splitpos)
-						scrollx = get_xscroll(1);
+					// exact enable conditions unclear
+					int splitpos = (m_splitpos[0] << 8) | m_splitpos[1];
+
+					if (splitpos != 0xffff)
+					{
+						if (drawline > splitpos)
+							scrollx = get_scroll(3);
+						else
+							scrollx = get_scroll(2);
+					}
 					else
-						scrollx = get_xscroll(0);
+					{
+						scrollx = get_scroll(0);
+					}
 
 					int base;
 
@@ -362,92 +370,64 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 					int colour = attr & 0xf0;
 
-					if (m_vidctrl & 0x40) // 16x16 tiles
-					{
-						if (m_vidctrl & 0x20) // 4bpp mode
-						{
-							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						}
-						else
-						{
-							tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-							tile <<= 1;
+					/* 'tiles' are organized / extracted from 'texture' lines that form a 'page' the length of the rom
+					   each texture line in 8bpp mode is 256 bytes
+					   each texture line in 4bpp mode is 128 bytes
+					   in 8x8 mode these pages are 32 tiles wide
+					   in 16x16 mode these pages are 16 tiles wide
+					   tiles can start on any line
 
-							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						}
-					}
-					else
-					{
-						if (m_vidctrl & 0x20) // 4bpp
-						{
-							// TODO
-							tile = 0x0000;//machine().rand() & 0x1ff;
-						}
-						else
-						{
-							tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-							tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-						}
-					}
+					   it is unclear what the behavior is if the tile starts at the far edge of a line (wrap around on line?)
+
+					   this is eu3a05 specific, eu3a14 uses a more traditional approach
+					*/
+
+					const int tilespersrcline = 256 / tilexsize;
+					const int tilespersrcline_mask = tilespersrcline - 1;
+
+					tile = (tile & tilespersrcline_mask) + ((tile & ~tilespersrcline_mask) * tilexsize);
+
+					if (!(m_vidctrl & 0x20)) // 8bpp
+						tile <<= 1;
+
+					if (!(m_vidctrl & 0x40)) // 8*8 tiles
+						tile >>= 1;
+
+					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
 
 					uint16_t* row = &bitmap.pix16(drawline);
 
-					if (m_vidctrl & 0x40) // 16x16 tiles
+					if (m_vidctrl & 0x20) // 4bpp
 					{
-						if (m_vidctrl & 0x20) // 4bpp
+						for (int xx = 0; xx < tilexsize; xx += 2)
 						{
-							for (int xx = 0; xx < tilexsize; xx += 2)
-							{
-								int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
-								uint8_t pix = fullbankspace.read_byte(realaddr);
+							int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
+							uint8_t pix = fullbankspace.read_byte(realaddr);
 
-								int drawxpos;
+							int drawxpos;
 
-								drawxpos = x * 16 + xx + 0;
-								drawxpos &= 0x1ff;
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
+							drawxpos = x * tilexsize + xx + 0 - scrollx;
+							drawxpos &= 0x1ff;
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = ((pix & 0xf0) >> 4) + colour;
 
-								drawxpos = x * 16 + xx + 1;
-								drawxpos &= 0x1ff;
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
-							}
-						}
-						else // 8bpp
-						{
-							for (int xx = 0; xx < tilexsize; xx++)
-							{
-								int realaddr = ((tile + i * 32) << 3) + xx;
-								uint8_t pix = fullbankspace.read_byte(realaddr);
-
-								int drawxpos = x * 16 + xx;
-								drawxpos &= 0x1ff;
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
-							}
+							drawxpos = x * tilexsize + xx + 1 - scrollx;
+							drawxpos &= 0x1ff;
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = ((pix & 0x0f) >> 0) + colour;
 						}
 					}
-					else // 8x8 tiles
+					else // 8bpp
 					{
-						if (m_vidctrl & 0x20) // 4bpp
+						for (int xx = 0; xx < tilexsize; xx++)
 						{
-							// TODO
-						}
-						else
-						{
-							for (int xx = 0; xx < tilexsize; xx++)
-							{
-								const int realaddr = ((tile + i * 32) << 3) + xx;
-								const uint8_t pix = fullbankspace.read_byte(realaddr);
+							int realaddr = ((tile + i * 32) << 3) + xx;
+							uint8_t pix = fullbankspace.read_byte(realaddr);
 
-								int drawxpos = x * tilexsize + xx - scrollx;
-								drawxpos &= 0x1ff;
-
-								if ((drawxpos >= 0) && (drawxpos < 256))
-									row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
-							}
+							int drawxpos = x * tilexsize + xx - scrollx;
+							drawxpos &= 0x1ff;
+							if ((drawxpos >= 0) && (drawxpos < 256))
+								row[drawxpos] = (pix + ((colour & 0x70) << 1)) & 0xff;
 						}
 					}
 				}
@@ -533,34 +513,26 @@ WRITE8_MEMBER(elan_eu3a05vid_device::tile_scroll_w)
 	m_tile_scroll[offset] = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::tile_xscroll_r)
-{
-	return m_tile_xscroll[offset];
-}
-
-WRITE8_MEMBER(elan_eu3a05vid_device::tile_xscroll_w)
-{
-	m_tile_xscroll[offset] = data;
-}
-
 READ8_MEMBER(elan_eu3a05vid_device::splitpos_r)
 {
-	return m_splitpos;
+	return m_splitpos[offset];
 }
 
 WRITE8_MEMBER(elan_eu3a05vid_device::splitpos_w)
 {
-	m_splitpos = data;
+	m_splitpos[offset] = data;
 }
 
-uint16_t elan_eu3a05vid_device::get_xscroll(int which)
+uint16_t elan_eu3a05vid_device::get_scroll(int which)
 {
 	switch (which)
 	{
-	case 0x0: return (m_tile_xscroll[1] << 8) | (m_tile_xscroll[0]);
-	case 0x1: return (m_tile_xscroll[3] << 8) | (m_tile_xscroll[2]);
+	case 0x0: return (m_tile_scroll[1] << 8) | (m_tile_scroll[0]); // xscroll
+	case 0x1: return (m_tile_scroll[3] << 8) | (m_tile_scroll[2]); // yscroll
+	case 0x2: return (m_tile_scroll[5] << 8) | (m_tile_scroll[4]); // xsplit 1 scroll
+	case 0x3: return (m_tile_scroll[7] << 8) | (m_tile_scroll[6]); // scplit 2 scroll
 	}
-	
+
 	return 0x0000;
 }
 
