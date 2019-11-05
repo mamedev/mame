@@ -26,9 +26,11 @@ public:
 	auto out_int_callback() { return m_out_int_cb.bind(); }
 	auto out_out1_callback() { return m_out_out1_cb.bind(); }
 	auto out_out2_callback() { return m_out_out2_cb.bind(); }
+	auto out_baudout_callback() { return m_out_baudout_cb.bind(); }
 
 	void ins8250_w(offs_t offset, u8 data);
 	u8 ins8250_r(offs_t offset);
+	void set_baud_rate(uint16_t rate);
 
 	DECLARE_WRITE_LINE_MEMBER(dcd_w);
 	DECLARE_WRITE_LINE_MEMBER(dsr_w);
@@ -86,6 +88,7 @@ private:
 	devcb_write_line    m_out_int_cb;
 	devcb_write_line    m_out_out1_cb;
 	devcb_write_line    m_out_out2_cb;
+	devcb_write16    m_out_baudout_cb;
 
 	void update_interrupt();
 	void update_msr();
