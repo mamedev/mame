@@ -13,7 +13,7 @@ Arctic Thunder:  Graphite system and Substitute I/O board
 All of the games communicate with their I/O boards serially.
 
 Quicksilver II hardware:
-- Main CPU: Intel Celeron 333/366MHz
+- Main CPU: Intel Celeron (Pentium II) 333/366MHz
 - Motherboard: Intel SE440BX-2
 - RAM: 64MB PC100-222-620 non-ecc
 - Sound: Integrated YMF740G
@@ -21,31 +21,33 @@ Quicksilver II hardware:
 - Video Card: Quantum Obsidian 3DFX Voodoo 2 (CPLD protected)
 - Storage: Hard Drive
 - OS: TNT Embedded Kernel
-	
+
+Chipsets (440BX AGPset):
+- 82443BX Northbridge
+- 82371EB PIIX4 PCI-ISA Southbridge
+
 Note: This was once claimed to run on Windows 95 or 98 but has been proven (mostly) false. The TNT Kernel was a "DOS Extender"
 that allows core Windows NT functions to work on MS DOS. It's also possible it runs on a custom made OS as both games do not display
-anything DOS related. Both games also have their video signals from their respective I/O boards, EGA res, as opposed to the video card itself.
+anything DOS related.
 	
 Graphite hardware:
 - Main CPU: Intel Pentium III 733MHz
-- Motherboard: Intel SE440BX-2 (maybe different)
-- RAM: 128MB PC100-222-620 non-ecc (maybe different)
-- Sound: Integrated YMF740G
+- Motherboard: BCM GT694VP
+- RAM: 128MB PC100/133
+- Sound: Integrated AC97 Controller on VT82C686A Southbridge
+    -or ES1373/CT5880 Audio Chip
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
 - Video Card: 3DFX Voodoo 3
 - Storage: Hard Drive (copy protected)
 - OS: Windows 2000 Professional
+
+Chipsets (VIA Pro133A):
+- VT82C694X Northbridge
+- VT82C686A Southbridge
 	
 Note: Not only a beefed up Quicksilver II but acts like a normal PC. You get the normal bios startup, a Windows 2000 startup sequence and
-then the game launcher starts. Video signal is fed directly through the video card at VGA resolution. The last difference is the storage
-device has a copy protection scheme that "locks" the storage device to the motherboard serial number. If a drive doesn't match the 
-motherboard serial number, the game launcher will give an error.
-
-Chipsets (440BX AGPset):
-- 82371EB PCI-ISA bridge
-- 82371EB Power Management Controller
-- 82371AB/EB Universal Host Controller (USB UHCI)
-- 82371AB/EB PCI Bus Master IDE Controller
+then the game launcher starts. Another difference is the storage device has a copy protection scheme that "locks" the storage device to the
+motherboard's serial number. If a drive doesn't match the motherboard's serial number, the game launcher will give an error.
 	
 I/O boards:
 	
@@ -77,7 +79,7 @@ Notes:
     J1: Video connector from/to video card
     J2/J3: USB ports (not used)
     JP1: Alternate video connector from/to video card
-    JP2: Video output signal to monitor, EGA resolution
+    JP2: Video output signal to monitor
     JP3: 3 pin jumper: Blue video level, *Open: high, 1-2: low, 2-3: high
     JP4: 3 pin jumper: Green video level, *Open: high, 1-2: low, 2-3: high
     JP5: 3 pin jumper: Red video level, *Open: high, 1-2: low, 2-3: high
@@ -142,7 +144,7 @@ Notes:
     JP3: 3 pin jumper: Red video level, *Open: high, 1-2: low, 2-3: high
     JP4: 3 pin jumper: Video sync polarity, Open: pos, *1-2: neg, 2-3: pos
     JP5: Alternate video connector from/to video card
-    JP6: Video output signal to monitor, EGA resolution
+    JP6: Video output signal to monitor
     JP9: Power connector
     JP10: 20 pin ribbon cable connector to wheel driver board
     JP11: 20 pin ribbon cable connector, not used
@@ -208,7 +210,7 @@ Notes:
     J1/JP5: Video connector from/to video card, not used
     J2: USB port, not used
     JP1-4: Video signal jumpers, not used
-    JP6: EGA resolution video port, not used
+    JP6: Video output signal to monitor, not used
     JP9: Power connector
     JP10: 20 pin ribbon cable connector to wheel driver board
     JP11: 20 pin ribbon cable connector, not used
@@ -260,6 +262,7 @@ public:
 	}
 
 	void midqslvr(machine_config &config);
+	void graphite(machine_config &config);
 
 private:
 	std::unique_ptr<uint32_t[]> m_bios_ram;
@@ -638,7 +641,27 @@ void midqslvr_state::machine_reset()
 
 void midqslvr_state::midqslvr(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 333000000); // actually Celeron 333
+	PENTIUM2(config, m_maincpu, 333000000); //Verified this Celeron to be Pentium II based.
+	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
+	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
+	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+
+	pcat_common(config);
+
+	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
+	pcibus.set_device( 0, FUNC(midqslvr_state::intel82439tx_pci_r), FUNC(midqslvr_state::intel82439tx_pci_w));
+	pcibus.set_device(31, FUNC(midqslvr_state::intel82371ab_pci_r), FUNC(midqslvr_state::intel82371ab_pci_w));
+
+	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));
+	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+
+	/* video hardware */
+	pcvideo_vga(config);
+}
+
+void midqslvr_state::graphite(machine_config &config) //Todo: The entire Pro133A chipset :).
+{
+	PENTIUM3(config, m_maincpu, 733000000); //Verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &midqslvr_state::midqslvr_map);
 	m_maincpu->set_addrmap(AS_IO, &midqslvr_state::midqslvr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
@@ -727,7 +750,7 @@ GAME(1999, hydrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_i
 
 GAME(2000, offrthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Offroad Thunder", MACHINE_IS_SKELETON)
 
-GAME(2001, arctthnd,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
+GAME(2001, arctthnd,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Arctic Thunder (v1.002)", MACHINE_IS_SKELETON)
 
-GAME(2001, ultarctc,    0,        midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
-GAME(2004, ultarctcup,  ultarctc, midqslvr, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
+GAME(2001, ultarctc,    0,        graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder", MACHINE_IS_SKELETON)
+GAME(2004, ultarctcup,  ultarctc, graphite, at_keyboard, midqslvr_state, empty_init, ROT0, "Midway Games", "Ultimate Arctic Thunder Update CD ver 1.950 (5/3/04)", MACHINE_IS_SKELETON)
