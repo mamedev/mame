@@ -1342,8 +1342,8 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	if (relpc >= 0 && relpc < m_dev->netlist().queue().size())
 	{
 		int dpc = m_dev->netlist().queue().size() - relpc - 1;
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].m_object->name().c_str(),
-				m_dev->netlist().queue()[dpc].m_exec_time.as_double());
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].object()->name().c_str(),
+				m_dev->netlist().queue()[dpc].exec_time().as_double());
 	}
 
 	pc+=1;

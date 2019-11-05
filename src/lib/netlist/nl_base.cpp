@@ -127,8 +127,8 @@ namespace netlist
 		m_qsize = this->size();
 		for (std::size_t i = 0; i < m_qsize; i++ )
 		{
-			m_times[i] =  this->listptr()[i].m_exec_time.as_raw();
-			m_net_ids[i] = state().find_net_id(this->listptr()[i].m_object);
+			m_times[i] =  this->listptr()[i].exec_time().as_raw();
+			m_net_ids[i] = state().find_net_id(this->listptr()[i].object());
 		}
 	}
 
@@ -663,7 +663,7 @@ namespace netlist
 	}
 
 
-	void detail::net_t::reset()
+	void detail::net_t::reset() noexcept
 	{
 		m_next_scheduled_time = netlist_time::zero();
 		m_in_queue = queue_status::DELIVERED;
@@ -796,7 +796,7 @@ namespace netlist
 				net().solver()->update_forced();
 	}
 
-	void terminal_t::schedule_solve_after(const netlist_time after)
+	void terminal_t::schedule_solve_after(netlist_time after)
 	{
 		// Nets may belong to railnets which do not have a solver attached
 		if (this->has_net())
@@ -826,7 +826,7 @@ namespace netlist
 		state().setup().register_term(*this);
 	}
 
-	void logic_output_t::initial(const netlist_sig_t val)
+	void logic_output_t::initial(const netlist_sig_t val) noexcept
 	{
 		if (has_net())
 			net().initial(val);
@@ -858,7 +858,7 @@ namespace netlist
 		state().setup().register_term(*this);
 	}
 
-	void analog_output_t::initial(const nl_fptype val)
+	void analog_output_t::initial(const nl_fptype val) noexcept
 	{
 		net().set_Q_Analog(val);
 	}
@@ -928,7 +928,7 @@ namespace netlist
 		m_param = device.state().setup().get_initial_param_val(this->name(),val);
 	}
 
-	void param_str_t::changed()
+	void param_str_t::changed() noexcept
 	{
 	}
 
@@ -939,10 +939,8 @@ namespace netlist
 		//netlist().save(*this, m_param, "m_param");
 	}
 
-	void param_model_t::changed()
+	void param_model_t::changed() noexcept
 	{
-		// FIXME: should we really throw here ?
-		plib::pthrow<nl_exception>(MF_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME(name()));
 	}
 
 	const pstring param_model_t::value_str(const pstring &entity)

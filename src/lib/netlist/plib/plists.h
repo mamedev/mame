@@ -285,6 +285,9 @@ namespace plib {
 
 		inline static constexpr pqentry_t never() noexcept { return pqentry_t(Time::never(), nullptr); }
 
+		Time exec_time() const noexcept { return m_exec_time; }
+		Element object() const noexcept { return m_object; }
+	private:
 		Time m_exec_time;
 		Element m_object;
 	};

@@ -284,8 +284,8 @@ namespace netlist
 		logic_family_t() : m_logic_family(nullptr) {}
 		COPYASSIGNMOVE(logic_family_t, delete)
 
-		const logic_family_desc_t *logic_family() const { return m_logic_family; }
-		void set_logic_family(const logic_family_desc_t *fam) { m_logic_family = fam; }
+		const logic_family_desc_t *logic_family() const noexcept { return m_logic_family; }
+		void set_logic_family(const logic_family_desc_t *fam) noexcept { m_logic_family = fam; }
 
 	protected:
 		~logic_family_t() noexcept = default; // prohibit polymorphic destruction
@@ -629,7 +629,7 @@ namespace netlist
 
 			virtual ~net_t() noexcept = default;
 
-			void reset();
+			void reset() noexcept;
 
 			void toggle_new_Q() noexcept { m_new_Q = (m_cur_Q ^ 1);   }
 
@@ -763,28 +763,29 @@ namespace netlist
 
 		nl_fptype operator ()() const  noexcept;
 
-		void set_conductivity(const nl_fptype G) const noexcept
+		void set_conductivity(nl_fptype G) const noexcept
 		{
 			set_go_gt_I(-G, G, nlconst::zero());
 		}
 
-		void set_go_gt(const nl_fptype GO, const nl_fptype GT) const noexcept
+		void set_go_gt(nl_fptype GO, nl_fptype GT) const noexcept
 		{
 			set_go_gt_I(GO, GT, nlconst::zero());
 		}
 
-		void set_go_gt_I(const nl_fptype GO, const nl_fptype GT, const nl_fptype I) const noexcept
+		void set_go_gt_I(nl_fptype GO, nl_fptype GT, nl_fptype I) const noexcept
 		{
+			// FIXME: is this check still needed?
 			if (m_go1 != nullptr)
 			{
-				if (*m_Idr1 != I) *m_Idr1 = I;
-				if (*m_go1 != GO) *m_go1 = GO;
-				if (*m_gt1 != GT) *m_gt1 = GT;
+				*m_Idr1 = I;
+				*m_go1 = GO;
+				*m_gt1 = GT;
 			}
 		}
 
 		void solve_now();
-		void schedule_solve_after(const netlist_time after);
+		void schedule_solve_after(netlist_time after);
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
@@ -924,7 +925,7 @@ namespace netlist
 
 		logic_output_t(core_device_t &dev, const pstring &aname);
 
-		void initial(netlist_sig_t val);
+		void initial(netlist_sig_t val) noexcept;
 
 		void push(netlist_sig_t newQ, netlist_time delay) noexcept
 		{
@@ -946,7 +947,7 @@ namespace netlist
 		analog_output_t(core_device_t &dev, const pstring &aname);
 
 		void push(const nl_fptype val) noexcept { set_Q(val); }
-		void initial(const nl_fptype val);
+		void initial(const nl_fptype val) noexcept;
 
 	private:
 		void set_Q(const nl_fptype newQ) noexcept;
@@ -1064,7 +1065,7 @@ namespace netlist
 			}
 		}
 	protected:
-		virtual void changed();
+		virtual void changed() noexcept;
 		const pstring &str() const noexcept { return m_param; }
 	private:
 		PALIGNAS_CACHELINE()
@@ -1107,7 +1108,7 @@ namespace netlist
 		/* hide this */
 		void setTo(const pstring &param) = delete;
 	protected:
-		void changed() override;
+		void changed() noexcept override;
 	private:
 };
 
@@ -1125,7 +1126,7 @@ namespace netlist
 
 		plib::unique_ptr<std::istream> stream();
 	protected:
-		void changed() override { }
+		void changed() noexcept override { }
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1141,7 +1142,7 @@ namespace netlist
 
 		ST operator[] (std::size_t n) const noexcept { return m_data[n]; }
 	protected:
-		void changed() override
+		void changed() noexcept override
 		{
 			stream()->read(reinterpret_cast<std::istream::char_type *>(&m_data[0]),1<<AW);
 		}
@@ -1987,14 +1988,14 @@ namespace netlist
 		if (m_mainclock == nullptr)
 		{
 			detail::queue_t::entry_t e(m_queue.pop());
-			m_time = e.m_exec_time;
-			while (e.m_object != nullptr)
+			m_time = e.exec_time();
+			while (e.object() != nullptr)
 			{
-				e.m_object->template update_devs<KEEP_STATS>();
+				e.object()->template update_devs<KEEP_STATS>();
 				if (KEEP_STATS)
 					m_perf_out_processed.inc();
 				e = m_queue.pop();
-				m_time = e.m_exec_time;
+				m_time = e.exec_time();
 			}
 		}
 		else
@@ -2005,7 +2006,7 @@ namespace netlist
 
 			do
 			{
-				while (m_queue.top().m_exec_time > mc_time)
+				while (m_queue.top().exec_time() > mc_time)
 				{
 					m_time = mc_time;
 					mc_net.toggle_new_Q();
@@ -2014,10 +2015,10 @@ namespace netlist
 				}
 
 				detail::queue_t::entry_t e(m_queue.pop());
-				m_time = e.m_exec_time;
-				if (e.m_object != nullptr)
+				m_time = e.exec_time();
+				if (e.object() != nullptr)
 				{
-					e.m_object->template update_devs<KEEP_STATS>();
+					e.object()->template update_devs<KEEP_STATS>();
 					if (KEEP_STATS)
 						m_perf_out_processed.inc();
 				}
