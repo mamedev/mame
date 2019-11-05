@@ -637,18 +637,37 @@ void screen_device::allocate_scan_bitmaps()
     {
         const bool screen16 = !m_screen_update_ind16.isnull();
         s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
+        const s32 old_height = (s32)m_scan_widths.size();
         s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
-        for (int i = 0; i < effheight; i++)
+        if (old_height < effheight)
         {
-            for (int j = 0; j < 2; j++)
-            {
-                if (screen16)
-                    m_scan_bitmaps[j].push_back(new bitmap_ind16(effwidth, 1));
-                else
-                    m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
-            }
-            m_scan_widths.push_back(m_width);
-        }
+			for (int i = old_height; i < effheight; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					if (screen16)
+						m_scan_bitmaps[j].push_back(new bitmap_ind16(effwidth, 1));
+					else
+						m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
+				}
+				m_scan_widths.push_back(m_width);
+			}
+		}
+		else
+		{
+			for (int i = effheight; i < old_height; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					if (screen16)
+						delete (bitmap_ind16 *)m_scan_bitmaps[j][i];
+					else
+						delete (bitmap_rgb32 *)m_scan_bitmaps[j][i];
+					m_scan_bitmaps[j].erase(m_scan_bitmaps[j].begin() + i);
+				}
+				m_scan_widths.erase(m_scan_widths.begin() + i);
+			}
+		}
     }
 }
 
@@ -1003,6 +1022,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 	// reallocate bitmap(s) if necessary
     realloc_screen_bitmaps();
+    if (machine().input().code_pressed(KEYCODE_E)) printf("CONFIGURE\n");
 
 	// compute timing parameters
 	m_frame_period = frame_period;
@@ -1118,7 +1138,6 @@ void screen_device::realloc_screen_bitmaps()
 	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
 	m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
 
-    destroy_scan_bitmaps();
     allocate_scan_bitmaps();
 }
 
