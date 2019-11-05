@@ -1532,7 +1532,7 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 {
 	nes_vt_base(config);
 
-	if (0)	// the dumped ABL Pinball unit is PAL, although Asian ones are likely NTSC.  PAL NES emulation seems more broken at the moment, probably timing issues in the PPU
+	if (0)	// the dumped ABL Pinball unit is PAL (26.6017 XTAL) although Asian ones are likely NTSC.  PAL NES emulation seems more broken at the moment, probably timing issues in the PPU
 	{
 		m_maincpu->set_clock(PAL_APU_CLOCK);
 
