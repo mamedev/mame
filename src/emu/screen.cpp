@@ -15,7 +15,10 @@
 
 #include <nanosvg/src/nanosvg.h>
 #include <nanosvg/src/nanosvgrast.h>
+
+#include <clocale>
 #include <set>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -91,10 +94,17 @@ private:
 
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
+	// nanosvg makes assumptions about the global locale
 	char *s = new char[region->bytes()+1];
 	memcpy(s, region->base(), region->bytes());
 	s[region->bytes()] = 0;
+	const char *const lcctype(std::setlocale(LC_CTYPE, nullptr));
+	const char *const lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
+	std::setlocale(LC_CTYPE, "C");
+	std::setlocale(LC_NUMERIC, "C");
 	m_image = nsvgParse(s, "px", 72);
+	std::setlocale(LC_CTYPE, lcctype);
+	std::setlocale(LC_NUMERIC, lcnumeric);
 	delete[] s;
 	m_rasterizer = nsvgCreateRasterizer();
 
