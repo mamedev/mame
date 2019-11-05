@@ -123,6 +123,9 @@ public:
 	void nes_vt_fp(machine_config &config);
 	void nes_vt_fa(machine_config &config);
 
+protected:
+	void nes_vt_map(address_map &map);
+
 private:
 	/* APU handling */
 	DECLARE_WRITE_LINE_MEMBER(apu_irq);
@@ -195,7 +198,6 @@ private:
 	void nes_vt_cy_map(address_map &map);
 	void nes_vt_dg_map(address_map &map);
 	void nes_vt_hh_map(address_map &map);
-	void nes_vt_map(address_map &map);
 	void nes_vt_xx_map(address_map &map);
 	void nes_vt_fa_map(address_map &map);
 	void nes_vt_fp_map(address_map &map);
@@ -250,6 +252,26 @@ private:
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool broken);
 };
+
+class nes_vt_ablpinb_state : public nes_vt_state
+{
+public:
+	nes_vt_ablpinb_state(const machine_config &mconfig, device_type type, const char *tag)
+		: nes_vt_state(mconfig, type, tag)
+		{ }
+
+	void nes_vt_ablpinb(machine_config &config);
+
+private:
+	DECLARE_READ8_MEMBER(ablpinb_in0_r);
+	DECLARE_READ8_MEMBER(ablpinb_in1_r);
+	DECLARE_WRITE8_MEMBER(ablpinb_in0_w);
+
+	void nes_vt_ablpinb_map(address_map& map);
+};
+
+
+
 
 uint32_t nes_vt_state::get_banks(uint8_t bnk)
 {
@@ -507,12 +529,18 @@ WRITE8_MEMBER(nes_vt_state::vtfa_412c_w)
 
 READ8_MEMBER(nes_vt_state::vtfa_412c_r)
 {
-	return m_csel->read();
+	if (m_csel)
+		return m_csel->read();
+	else
+		return 0;
 }
 
 READ8_MEMBER(nes_vt_state::vtfp_412d_r)
 {
-	return m_csel->read();
+	if (m_csel)
+		return m_csel->read();
+	else
+		return 0;
 }
 
 READ8_MEMBER(nes_vt_state::vtfp_4119_r)
@@ -750,7 +778,11 @@ void nes_vt_state::machine_reset()
 	m_411d = 0x00;
 	m_4242 = 0x00;
 
-	m_ahigh = (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	if (m_csel)
+		m_ahigh = (m_csel->read() == 0x01) ? (1 << 25) : 0x0;
+	else
+		m_ahigh = 0;
+
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
 	m_timer_val = 0;
@@ -1180,6 +1212,22 @@ WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
 	m_vdma_ctrl = data;
 }
 
+READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
+{
+	return machine().rand();
+}
+
+READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in1_r)
+{
+	return machine().rand();
+}
+
+WRITE8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_w)
+{
+	logerror("ablpinb_in0_w %02x\n", data);
+}
+
+
 void nes_vt_state::nes_vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();
@@ -1199,6 +1247,19 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
 	map(0x6000, 0x7fff).ram();
 }
+
+
+
+void nes_vt_ablpinb_state::nes_vt_ablpinb_map(address_map& map)
+{
+	nes_vt_map(map);
+
+	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
+	map(0x4016, 0x4016).rw(FUNC(nes_vt_ablpinb_state::ablpinb_in0_r), FUNC(nes_vt_ablpinb_state::ablpinb_in0_w));
+	map(0x4017, 0x4017).r(FUNC(nes_vt_ablpinb_state::ablpinb_in1_r));
+}
+
+
 
 
 /* Some later VT models have more RAM */
@@ -1417,6 +1478,13 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
+{
+	nes_vt_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablpinb_state::nes_vt_ablpinb_map);
+}
+
 void nes_vt_state::nes_vt(machine_config &config)
 {
 	nes_vt_base(config);
@@ -1554,6 +1622,12 @@ static INPUT_PORTS_START( nes_vt_fa )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ablpinb )
+	PORT_START("UNIT")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Pause")
+INPUT_PORTS_END
+
+
 ROM_START( vdogdeme )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "vdog.bin", 0x00000, 0x100000, CRC(29dae36d) SHA1(e7192c5b16f3e658b0802e5c50fab244e974d9c2) )
@@ -1572,6 +1646,11 @@ ROM_END
 ROM_START( vtpinball )
 	ROM_REGION( 0x80000, "mainrom", 0 )
 	ROM_LOAD( "rom.bin", 0x00000, 0x80000, CRC(62e52c23) SHA1(b83b82c928b9fe82abfaa915196322153787c8ce) )
+ROM_END
+
+ROM_START( ablpinb )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "abl_pinball.bin", 0x00000, 0x200000, CRC(b2ce20fb) SHA1(f2af7f26fcdce6f26db5c71727ab380240f44f74) )
 ROM_END
 
 ROM_START( vtsndtest )
@@ -1877,6 +1956,10 @@ CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT
 
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
 CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
+
+// clearly started off as 'vtpinball'  050329 (29th March 2005) date on PCB
+CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_NOT_WORKING )
+
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
