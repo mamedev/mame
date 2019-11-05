@@ -293,7 +293,7 @@ u8 st2204_device::prrh_r()
 void st2204_device::prrh_w(u8 data)
 {
 	u16 &prr = downcast<mi_st2204 &>(*mintf).prr;
-	prr = (data & 0x0f) << 16 | (prr & 0x00ff);
+	prr = u16(data & 0x0f) << 8 | (prr & 0x00ff);
 }
 
 u8 st2204_device::drrl_r()
@@ -315,7 +315,7 @@ u8 st2204_device::drrh_r()
 void st2204_device::drrh_w(u8 data)
 {
 	u16 &drr = downcast<mi_st2204 &>(*mintf).drr;
-	drr = (data & 0x07) << 16 | (drr & 0x00ff);
+	drr = u16(data & 0x07) << 8 | (drr & 0x00ff);
 }
 
 u8 st2204_device::dmsl_r()
@@ -407,7 +407,7 @@ u8 st2204_device::dmrh_r()
 void st2204_device::dmrh_w(u8 data)
 {
 	u16 &dmr = downcast<mi_st2204 &>(*mintf).dmr;
-	dmr = (data & 0x07) << 16 | (dmr & 0x00ff);
+	dmr = (data & 0x07) << 8 | (dmr & 0x00ff);
 }
 
 u8 st2204_device::pmem_r(offs_t offset)
@@ -434,7 +434,7 @@ void st2204_device::int_map(address_map &map)
 {
 	map(0x0000, 0x0004).rw(FUNC(st2204_device::pdata_r), FUNC(st2204_device::pdata_w));
 	map(0x0005, 0x0005).rw(FUNC(st2204_device::psc_r), FUNC(st2204_device::psc_w));
-	map(0x0008, 0x000c).rw(FUNC(st2204_device::pdata_r), FUNC(st2204_device::pdata_w));
+	map(0x0008, 0x000c).rw(FUNC(st2204_device::pctrl_r), FUNC(st2204_device::pctrl_w));
 	map(0x000d, 0x000d).rw(FUNC(st2204_device::pfc_r), FUNC(st2204_device::pfc_w));
 	map(0x000e, 0x000e).rw(FUNC(st2204_device::pfd_r), FUNC(st2204_device::pfd_w));
 	map(0x000f, 0x000f).rw(FUNC(st2204_device::pmcr_r), FUNC(st2204_device::pmcr_w));

@@ -4,9 +4,6 @@
 
     VTech Intelligence Advance E/R Lerncomputer
 
-    TODO: dyndesk writes to low memory go to external RAM instead? It also
-    eventually runs off into nonexistent memory.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -39,7 +36,8 @@ void inteladv_state::inteladv_map(address_map &map)
 
 void inteladv_state::dyndesk_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom().region("maincpu", 0).nopw();
+	map(0x000000, 0x1fffff).rom().region("maincpu", 0).mirror(0x400000); // why mirrored?
+	map(0x800000, 0x807fff).ram();
 }
 
 static INPUT_PORTS_START( inteladv )

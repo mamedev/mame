@@ -271,7 +271,7 @@ u8 st2205u_device::irrh_r()
 void st2205u_device::irrh_w(u8 data)
 {
 	u16 &irr = downcast<mi_st2205u &>(*mintf).irr;
-	irr = (data & 0x8f) << 16 | (irr & 0x00ff);
+	irr = (data & 0x8f) << 8 | (irr & 0x00ff);
 }
 
 u8 st2205u_device::prrl_r()
@@ -293,7 +293,7 @@ u8 st2205u_device::prrh_r()
 void st2205u_device::prrh_w(u8 data)
 {
 	u16 &prr = downcast<mi_st2205u &>(*mintf).prr;
-	prr = (data & 0x8f) << 16 | (prr & 0x00ff);
+	prr = (data & 0x8f) << 8 | (prr & 0x00ff);
 }
 
 u8 st2205u_device::drrl_r()
@@ -315,7 +315,7 @@ u8 st2205u_device::drrh_r()
 void st2205u_device::drrh_w(u8 data)
 {
 	u16 &drr = downcast<mi_st2205u &>(*mintf).drr;
-	drr = (data & 0x87) << 16 | (drr & 0x00ff);
+	drr = (data & 0x87) << 8 | (drr & 0x00ff);
 }
 
 u8 st2205u_device::brrl_r()
@@ -337,7 +337,7 @@ u8 st2205u_device::brrh_r()
 void st2205u_device::brrh_w(u8 data)
 {
 	u16 &brr = downcast<mi_st2205u &>(*mintf).brr;
-	brr = (data & 0x9f) << 16 | (brr & 0x00ff);
+	brr = (data & 0x9f) << 8 | (brr & 0x00ff);
 }
 
 u8 st2205u_device::pmcr_r()
