@@ -24,6 +24,7 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/neo_zmc.h"
 #include "machine/nvram.h"
 #include "machine/upd1990a.h"
 #include "sound/2610intf.h"
@@ -84,6 +85,7 @@ private:
 	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void neoprint_audio_banked_map(address_map &map);
 	void neoprint_audio_io_map(address_map &map);
 	void neoprint_audio_map(address_map &map);
 	void neoprint_map(address_map &map);
@@ -356,14 +358,15 @@ void neoprint_state::nprsp_map(address_map &map)
 
 void neoprint_state::neoprint_audio_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom();//.bankr(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK);
-//  map(0x8000, 0xbfff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3);
-//  map(0xc000, 0xdfff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2);
-//  map(0xe000, 0xefff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1);
-//  map(0xf000, 0xf7ff).bankr(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0);
+	map(0x0000, 0xf7ff).r("neo_zmc", FUNC(neo_zmc_device::banked_space_r));
 	map(0xf800, 0xffff).ram();
 }
 
+void neoprint_state::neoprint_audio_banked_map(address_map &map)
+{
+	map(0x00000, 0x1ffff).mirror(0x60000).rom().region("audiocpu", 0);
+	//map(0x00000, 0x1ffff).mirror(0x3e0000).rom().region("audiocpu", 0);
+}
 
 
 /*************************************
@@ -378,10 +381,7 @@ void neoprint_state::neoprint_audio_io_map(address_map &map)
 	map(0x00, 0x00).mirror(0xff00).r(FUNC(neoprint_state::audio_command_r)).nopw();
 	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
 //  map(0x08, 0x08).mirror(0xff00); /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-//  map(0x08, 0x08).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_f000_f7ff_r));
-//  map(0x09, 0x09).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_e000_efff_r));
-//  map(0x0a, 0x0a).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_c000_dfff_r));
-//  map(0x0b, 0x0b).select(0xfff0).r(FUNC(neoprint_state::audio_cpu_bank_select_8000_bfff_r));
+	map(0x08, 0x0b).mirror(0x00f0).w("neo_zmc", FUNC(neo_zmc_device::set_bank_r)).select(0xff00);
 	map(0x0c, 0x0c).mirror(0xff00).w(FUNC(neoprint_state::audio_result_w));
 //  map(0x18, 0x18).mirror(0xff00); /* write - NMI disable? (the data written doesn't matter) */
 }
@@ -515,6 +515,8 @@ void neoprint_state::neoprint(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::neoprint_audio_io_map);
 
+	NEO_ZMC(config, "neo_zmc").set_addrmap(0, &neoprint_state::neoprint_audio_banked_map); // neo-zmc on cartridge
+
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -558,6 +560,8 @@ void neoprint_state::nprsp(machine_config &config)
 	Z80(config, m_audiocpu, 4000000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_audio_map);
 	m_audiocpu->set_addrmap(AS_IO, &neoprint_state::neoprint_audio_io_map);
+
+	NEO_ZMC(config, "neo_zmc").set_addrmap(0, &neoprint_state::neoprint_audio_banked_map); // neo-zmc on cartridge
 
 	UPD4990A(config, m_upd4990a);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
