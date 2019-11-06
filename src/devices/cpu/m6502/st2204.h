@@ -2,6 +2,7 @@
 // copyright-holders:AJR
 /**********************************************************************
 
+    Sitronix ST2202 8-Bit Integrated Microcontroller
     Sitronix ST2204 8-Bit Integrated Microcontroller
 
 **********************************************************************/
@@ -17,13 +18,19 @@ class st2204_device : public st2xxx_device
 {
 public:
 	enum {
-		ST_DMS = ST_LYMAX + 1,
+		ST_T0M = ST_LPWM + 1,
+		ST_T0C,
+		ST_T1M,
+		ST_T1C,
+		ST_DMS,
 		ST_DMD
 	};
 
 	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -31,7 +38,14 @@ protected:
 	virtual const char *st2xxx_irq_name(int i) const override;
 	virtual unsigned st2xxx_bt_divider(int n) const override;
 	virtual u8 st2xxx_sys_mask() const override { return 0xff; }
+	virtual u8 st2xxx_misc_mask() const override { return 0x1f; }
 	virtual bool st2xxx_has_dma() const override { return true; }
+	virtual u8 st2xxx_lpan_mask() const override { return 0x07; }
+	virtual u8 st2xxx_lctr_mask() const override { return 0xff; }
+	virtual u8 st2xxx_lckr_mask() const override { return 0x1f; }
+	virtual u8 st2xxx_lpwm_mask() const override { return 0x3f; }
+
+	void common_map(address_map &map);
 
 private:
 	class mi_st2204 : public mi_st2xxx {
@@ -53,6 +67,14 @@ private:
 
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
+	u8 t0m_r();
+	void t0m_w(u8 data);
+	u8 t0c_r();
+	void t0c_w(u8 data);
+	u8 t1m_r();
+	void t1m_w(u8 data);
+	u8 t1c_r();
+	void t1c_w(u8 data);
 	u8 dmsl_r();
 	void dmsl_w(u8 data);
 	u8 dmsh_r();
@@ -71,11 +93,27 @@ private:
 
 	void int_map(address_map &map);
 
+	u8 m_tmode[2];
+	u8 m_tcntr[2];
 	u16 m_dms;
 	u16 m_dmd;
 	u8 m_dcnth;
 };
 
+class st2202_device : public st2204_device
+{
+public:
+	st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual u8 st2xxx_misc_mask() const override { return 0x0f; }
+	virtual u8 st2xxx_lctr_mask() const override { return 0xe0; }
+
+private:
+	void int_map(address_map &map);
+};
+
+DECLARE_DEVICE_TYPE(ST2202, st2202_device)
 DECLARE_DEVICE_TYPE(ST2204, st2204_device)
 
 #endif // MAME_MACHINE_M6502_ST2204_H

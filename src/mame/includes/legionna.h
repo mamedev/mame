@@ -15,7 +15,7 @@
 
 #include <algorithm>
 
-class legionna_state : public driver_device, protected seibu_sound_common
+class legionna_state : public driver_device, public seibu_sound_common
 {
 public:
 	legionna_state(const machine_config &mconfig, device_type type, const char *tag)

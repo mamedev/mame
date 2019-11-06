@@ -157,12 +157,16 @@ public:
 	virtual uint8_t read(offs_t offset, int infc, int infd, int romqa, int oe, int oe2);
 	virtual void write(offs_t offset, uint8_t data, int infc, int infd, int romqa, int oe, int oe2);
 
+	virtual bool present() { return is_loaded() || loaded_through_softlist(); }
+
 	DECLARE_WRITE_LINE_MEMBER(irq_w) { m_irq_handler(state); }
 	DECLARE_WRITE_LINE_MEMBER(nmi_w) { m_nmi_handler(state); }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
+	electron_cartslot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	device_electron_cart_interface *m_cart;
 

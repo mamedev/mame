@@ -42,14 +42,12 @@
 #include "bus/bbc/fdc/fdc.h"
 #include "bus/bbc/analogue/analogue.h"
 #include "bus/bbc/1mhzbus/1mhzbus.h"
-//#include "bus/bbc/internal/internal.h"
+#include "bus/bbc/internal/internal.h"
 #include "bus/bbc/tube/tube.h"
 #include "bus/bbc/userport/userport.h"
 #include "bus/bbc/exp/exp.h"
 #include "bus/bbc/joyport/joyport.h"
-
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
+#include "bus/bbc/cart/slot.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -87,7 +85,7 @@ public:
 		, m_extube(*this, "extube")
 		, m_1mhzbus(*this, "1mhzbus")
 		, m_userport(*this, "userport")
-//      , m_internal(*this, "internal")
+		, m_internal(*this, "internal")
 		, m_exp(*this, "exp")
 		, m_rtc(*this, "rtc")
 		, m_i2cmem(*this, "i2cmem")
@@ -101,7 +99,6 @@ public:
 		, m_region_swr(*this, "swr")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
 		, m_bankdev(*this, "bankdev")
 		, m_bbcconfig(*this, "BBCCONFIG")
 	{ }
@@ -116,9 +113,18 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
+	DECLARE_READ8_MEMBER(bbc_ram_r);
+	DECLARE_WRITE8_MEMBER(bbc_ram_w);
+	DECLARE_READ8_MEMBER(bbc_romsel_r);
 	DECLARE_WRITE8_MEMBER(bbc_romsel_w);
 	DECLARE_READ8_MEMBER(bbc_paged_r);
 	DECLARE_WRITE8_MEMBER(bbc_paged_w);
+	DECLARE_READ8_MEMBER(bbc_mos_r);
+	DECLARE_WRITE8_MEMBER(bbc_mos_w);
+	DECLARE_READ8_MEMBER(bbc_fred_r);
+	DECLARE_WRITE8_MEMBER(bbc_fred_w);
+	DECLARE_READ8_MEMBER(bbc_jim_r);
+	DECLARE_WRITE8_MEMBER(bbc_jim_w);
 	DECLARE_READ8_MEMBER(bbcbp_fetch_r);
 	DECLARE_WRITE8_MEMBER(bbcbp_romsel_w);
 	DECLARE_READ8_MEMBER(bbcbp_paged_r);
@@ -133,6 +139,8 @@ public:
 	DECLARE_WRITE8_MEMBER(bbcm_hazel_w);
 	DECLARE_READ8_MEMBER(bbcm_tube_r);
 	DECLARE_WRITE8_MEMBER(bbcm_tube_w);
+	DECLARE_READ8_MEMBER(bbcmc_paged_r);
+	DECLARE_WRITE8_MEMBER(bbcmc_paged_w);
 	DECLARE_WRITE8_MEMBER(bbcbp_drive_control_w);
 	DECLARE_WRITE8_MEMBER(bbcm_drive_control_w);
 	DECLARE_WRITE8_MEMBER(bbcmc_drive_control_w);
@@ -187,19 +195,12 @@ public:
 	void insert_device_rom(memory_region *rom);
 	void setup_device_roms();
 
-	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart1_load) { return load_cart(image, m_cart[0]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart2_load) { return load_cart(image, m_cart[1]); }
-
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void bbca(machine_config &config);
 	void bbcb(machine_config &config);
 	void bbcb_de(machine_config &config);
 	void bbcb_us(machine_config &config);
-	void torchf(machine_config &config);
-	void torchh21(machine_config &config);
-	void torchh10(machine_config &config);
 
 	void bbca_mem(address_map &map);
 	void bbc_base(address_map &map);
@@ -207,7 +208,6 @@ public:
 	void bbcb_nofdc_mem(address_map &map);
 
 	void init_bbc();
-	void init_bbcm();
 	void init_ltmp();
 	void init_cfa();
 
@@ -219,14 +219,14 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	required_device<hd6845s_device> m_hd6845;
+	required_device<mc6845_device> m_hd6845;
 	required_device<screen_device> m_screen;
 	required_device<input_merger_device> m_irqs;
 	required_device<palette_device> m_palette;
 	optional_device<mc6854_device> m_adlc;
 	optional_device<sn76489a_device> m_sn;
 	optional_device<samples_device> m_samples;
-	required_ioport_array<13> m_keyboard;
+	required_ioport_array<16> m_keyboard;
 	optional_device<saa5050_device> m_trom;
 	optional_device<tms5220_device> m_tms;
 	optional_device<cassette_image_device> m_cassette;
@@ -244,7 +244,7 @@ protected:
 	optional_device<bbc_tube_slot_device> m_extube;
 	optional_device<bbc_1mhzbus_slot_device> m_1mhzbus;
 	optional_device<bbc_userport_slot_device> m_userport;
-	//optional_device<bbc_internal_slot_device> m_internal;
+	optional_device<bbc_internal_slot_device> m_internal;
 	optional_device<bbc_exp_slot_device> m_exp;
 	optional_device<mc146818_device> m_rtc;
 	optional_device<i2cmem_device> m_i2cmem;
@@ -253,23 +253,19 @@ protected:
 	optional_device<wd1770_device> m_wd1770;
 	optional_device<wd1772_device> m_wd1772;
 	optional_device_array<bbc_romslot_device, 16> m_rom;
-	optional_device_array<generic_slot_device, 2> m_cart;
+	optional_device_array<bbc_cartslot_device, 2> m_cart;
 
 	required_memory_region m_region_mos;
 	required_memory_region m_region_swr;
-	required_memory_bank m_bank1; // bbca bbcb bbcbp bbcbp128 bbcm
+	optional_memory_bank m_bank1; //           bbcbp bbcbp128 bbcm
 	optional_memory_bank m_bank2; //           bbcbp bbcbp128 bbcm
-	optional_memory_bank m_bank3; // bbca bbcb
 	optional_device<address_map_bank_device> m_bankdev; //    bbcm
 	optional_ioport m_bbcconfig;
 
 	int m_monitortype;      // monitor type (colour, green, amber)
-	int m_swramtype;        // this stores the setting for the SWRAM type being used
-	int m_swrbank;          // This is the latch that holds the sideways ROM bank to read
+	int m_romsel;           // This is the latch that holds the sideways ROM bank to read
 	int m_paged_ram;        // BBC B+ memory handling
 	int m_vdusel;           // BBC B+ memory handling
-	bool m_lk18_ic41_paged_rom;  // BBC Master Paged ROM/RAM select IC41
-	bool m_lk19_ic37_paged_rom;  // BBC Master Paged ROM/RAM select IC37
 
 	/*
 	    ACCCON
@@ -380,6 +376,7 @@ protected:
 
 	void setvideoshadow(int vdusel);
 	void set_pixel_lookup();
+	uint8_t bus_video_data();
 	int bbc_keyboard(int data);
 
 	void mc6850_receive_clock(int new_clock);
@@ -397,6 +394,10 @@ class torch_state : public bbc_state
 public:
 	using bbc_state::bbc_state;
 	static constexpr feature_type imperfect_features() { return feature::KEYBOARD; }
+
+	void torchf(machine_config &config);
+	void torchh21(machine_config &config);
+	void torchh10(machine_config &config);
 };
 
 
@@ -435,6 +436,7 @@ public:
 	void bbcm512(machine_config &config);
 	void bbcmarm(machine_config &config);
 	void cfa3000(machine_config &config);
+	void daisy(machine_config &config);
 	void discmon(machine_config &config);
 	void discmate(machine_config &config);
 	void bbcmc(machine_config &config);
@@ -448,7 +450,9 @@ protected:
 	void bbcm_mem(address_map &map);
 	void bbcm_bankdev(address_map &map);
 	void bbcmet_bankdev(address_map &map);
+	void bbcmc_mem(address_map &map);
 	void bbcmc_bankdev(address_map &map);
+	void autoc15_bankdev(address_map &map);
 	void bbcm_fetch(address_map &map);
 };
 
