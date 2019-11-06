@@ -180,7 +180,7 @@ DEVICE_IMAGE_LOAD_MEMBER(gameking_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
-	if (size > 0x80000)
+	if (size > 0x100000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return image_init_result::FAIL;
