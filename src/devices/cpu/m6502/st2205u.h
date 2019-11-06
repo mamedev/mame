@@ -17,9 +17,13 @@ class st2205u_device : public st2xxx_device
 {
 public:
 	enum {
-		ST_BTEN = ST_LYMAX + 1,
-		ST_BTREQ,
-		ST_BTC,
+		ST_BTC = ST_LPWM + 1,
+		ST_T0C,
+		ST_T1C,
+		ST_T2C,
+		ST_T3C,
+		ST_T4C,
+		ST_TIEN,
 		ST_BRR,
 		ST_LVCTR
 	};
@@ -29,6 +33,18 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual u16 st2xxx_ireq_mask() const override { return 0xdfff; }
+	virtual const char *st2xxx_irq_name(int i) const override;
+	virtual unsigned st2xxx_bt_divider(int n) const override;
+	virtual u8 st2xxx_sys_mask() const override { return 0xfe; }
+	virtual u8 st2xxx_misc_mask() const override { return 0x0f; }
+	virtual bool st2xxx_wdten_on_reset() const override { return true; }
+	virtual bool st2xxx_has_dma() const override { return true; }
+	virtual u8 st2xxx_lpan_mask() const override { return 0x0f; }
+	virtual u8 st2xxx_lctr_mask() const override { return 0xef; }
+	virtual u8 st2xxx_lckr_mask() const override { return 0x3f; }
+	virtual u8 st2xxx_lpwm_mask() const override { return 0xff; }
 
 private:
 	class mi_st2205u : public mi_st2xxx {
@@ -49,10 +65,6 @@ private:
 		u8 breadc(u16 adr);
 		void bwrite(u16 adr, u8 val);
 
-		bool irr_enable;
-		u16 irr;
-		u16 prr;
-		u16 drr;
 		u16 brr;
 
 		std::unique_ptr<u8[]> ram;
@@ -60,32 +72,20 @@ private:
 
 	template<int N> TIMER_CALLBACK_MEMBER(bt_interrupt);
 
-	u8 irrl_r();
-	void irrl_w(u8 data);
-	u8 irrh_r();
-	void irrh_w(u8 data);
-	u8 prrl_r();
-	void prrl_w(u8 data);
-	u8 prrh_r();
-	void prrh_w(u8 data);
-	u8 drrl_r();
-	void drrl_w(u8 data);
-	u8 drrh_r();
-	void drrh_w(u8 data);
 	u8 brrl_r();
 	void brrl_w(u8 data);
 	u8 brrh_r();
 	void brrh_w(u8 data);
-	u8 sys_r();
-	void sys_w(u8 data);
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
-	u8 bten_r();
-	void bten_w(u8 data);
-	u8 btreq_r();
-	void btclr_w(u8 data);
 	u8 btc_r();
 	void btc_w(u8 data);
+	u8 tc_12bit_r(offs_t offset);
+	void tc_12bit_w(offs_t offset, u8 data);
+	u8 t4c_r();
+	void t4c_w(u8 data);
+	u8 tien_r();
+	void tien_w(u8 data);
 	u8 lvctr_r();
 	void lvctr_w(u8 data);
 
@@ -100,10 +100,10 @@ private:
 
 	void int_map(address_map &map);
 
-	u8 m_bten;
-	u8 m_btreq;
 	u8 m_btc;
-	emu_timer *m_base_timer[8];
+	u16 m_tc_12bit[4];
+	u8 m_t4c;
+	u8 m_tien;
 	u8 m_lvctr;
 };
 

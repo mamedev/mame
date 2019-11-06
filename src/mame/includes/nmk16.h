@@ -16,7 +16,7 @@
 #include "screen.h"
 #include "tilemap.h"
 
-class nmk16_state : public driver_device, protected seibu_sound_common
+class nmk16_state : public driver_device, public seibu_sound_common
 {
 public:
 	nmk16_state(const machine_config &mconfig, device_type type, const char *tag) :

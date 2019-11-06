@@ -72,6 +72,7 @@ void device_bbc_rom_interface::ram_alloc(uint32_t size)
 void device_bbc_rom_interface::nvram_alloc(uint32_t size)
 {
 	m_nvram.resize(size);
+	device().save_item(NAME(m_nvram));
 }
 
 //**************************************************************************
@@ -206,10 +207,10 @@ void bbc_romslot_device::write(offs_t offset, uint8_t data)
 
 #include "rom.h"
 #include "ram.h"
+#include "nvram.h"
 #include "dfs.h"
 #include "genie.h"
 #include "pal.h"
-//#include "replay.h"
 #include "rtc.h"
 
 
@@ -217,6 +218,7 @@ void bbc_rom_devices(device_slot_interface &device)
 {
 	device.option_add_internal("rom", BBC_ROM);
 	device.option_add_internal("ram", BBC_RAM);
+	device.option_add_internal("nvram", BBC_NVRAM);
 	device.option_add_internal("cciword", BBC_CCIWORD);
 	device.option_add_internal("ccibase", BBC_CCIBASE);
 	device.option_add_internal("ccispell", BBC_CCISPELL);
@@ -228,7 +230,6 @@ void bbc_rom_devices(device_slot_interface &device)
 	device.option_add_internal("palmo2", BBC_PALMO2);
 	device.option_add_internal("genie", BBC_PMSGENIE);
 	device.option_add_internal("mrme00", BBC_MRME00);
-	//device.option_add_internal("replay", BBC_REPLAY);
 	device.option_add_internal("stlrtc",  BBC_STLRTC);
 	device.option_add_internal("pmsrtc", BBC_PMSRTC);
 }

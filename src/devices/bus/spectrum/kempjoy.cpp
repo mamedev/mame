@@ -73,7 +73,7 @@ uint8_t spectrum_kempjoy_device::iorq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
-	if (offset == 0x1f)
+	if ((offset & 0x00ff) == 0x1f)
 	{
 		data = m_joy->read() & 0x1f;
 	}

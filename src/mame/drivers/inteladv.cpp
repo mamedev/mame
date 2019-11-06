@@ -45,13 +45,13 @@ INPUT_PORTS_END
 
 void inteladv_state::inteladv(machine_config &config)
 {
-	ST2205U(config, m_maincpu, 32768 * 122);
+	ST2205U(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_DATA, &inteladv_state::inteladv_map);
 }
 
 void inteladv_state::dyndesk(machine_config &config)
 {
-	ST2204(config, m_maincpu, 32768 * 122);
+	ST2202(config, m_maincpu, 4000000);
 	m_maincpu->set_addrmap(AS_DATA, &inteladv_state::dyndesk_map);
 }
 

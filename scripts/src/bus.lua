@@ -360,6 +360,72 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/cart/slot.h,BUSES["BBC_CART"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_CART"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/cart/slot.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/cart/slot.h",
+		MAME_DIR .. "src/devices/bus/bbc/cart/click.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/cart/click.h",
+		MAME_DIR .. "src/devices/bus/bbc/cart/mega256.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/cart/mega256.h",
+		MAME_DIR .. "src/devices/bus/bbc/cart/mr8000.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/cart/mr8000.h",
+		MAME_DIR .. "src/devices/bus/bbc/cart/msc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/cart/msc.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/internal/internal.h,BUSES["BBC_INTERNAL"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_INTERNAL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/internal/internal.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/internal.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/aries.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/aries.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/atpl.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/atpl.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/cumana68k.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/cumana68k.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/integrab.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/integrab.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/morleyaa.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/morleyaa.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/overlay.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/overlay.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/peartree.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/peartree.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/ramamp.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/ramamp.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/raven20.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/raven20.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/romex.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/romex.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/stlswr.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/stlswr.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/stl2m128.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/stl2m128.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/stl4m32.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/stl4m32.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/werom.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/werom.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/weromram.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/weromram.h",
+		MAME_DIR .. "src/devices/bus/bbc/internal/we32kram.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/internal/we32kram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/exp/exp.h,BUSES["BBC_EXP"] = true
 ---------------------------------------------------
 
@@ -430,6 +496,8 @@ if (BUSES["BBC_ROM"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/rom/rom.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/ram.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/ram.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/nvram.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/nvram.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/genie.cpp",
@@ -920,6 +988,8 @@ if (BUSES["ELECTRON"]~=null) then
 		MAME_DIR .. "src/devices/bus/electron/rombox.h",
 		MAME_DIR .. "src/devices/bus/electron/romboxp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/romboxp.h",
+		MAME_DIR .. "src/devices/bus/electron/sidewndr.cpp",
+		MAME_DIR .. "src/devices/bus/electron/sidewndr.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}

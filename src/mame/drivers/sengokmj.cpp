@@ -67,7 +67,7 @@ RSSENGO2.72   chr.
 #include "tilemap.h"
 
 
-class sengokmj_state : public driver_device, protected seibu_sound_common
+class sengokmj_state : public driver_device, public seibu_sound_common
 {
 public:
 	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag) :

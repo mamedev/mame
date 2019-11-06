@@ -83,7 +83,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "tilemap.h"
 
 
-class goodejan_state : public driver_device, protected seibu_sound_common
+class goodejan_state : public driver_device, public seibu_sound_common
 {
 public:
 	goodejan_state(const machine_config &mconfig, device_type type, const char *tag) :

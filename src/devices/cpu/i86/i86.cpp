@@ -2531,6 +2531,7 @@ bool i8086_common_cpu_device::common_op(uint8_t op)
 					CLKM(PUSH_R16,PUSH_M16);
 					break;
 				default:
+					m_icount -= 10;
 					logerror("%06x: FF Pre with unimplemented mod\n", m_pc);
 					break;
 				}
