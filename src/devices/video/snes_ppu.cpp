@@ -1267,8 +1267,6 @@ void snes_ppu_device::update_objects_rto( uint16_t curline )
  * Update an entire line of sprites.
  *********************************************/
 
-static int s_tile_to_draw = -1;
-
 void snes_ppu_device::update_objects( uint8_t priority_oam0, uint8_t priority_oam1, uint8_t priority_oam2, uint8_t priority_oam3 )
 {
 	uint8_t pri, priority[4];
