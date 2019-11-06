@@ -39,21 +39,10 @@ st2205u_device::st2205u_device(const machine_config &mconfig, const char *tag, d
 	: st2xxx_device(mconfig, ST2205U, tag, owner, clock,
 					address_map_constructor(FUNC(st2205u_device::int_map), this),
 					26, // logical; only 23 address lines are brought out
-					0xdfff)
-	, m_bten(0)
-	, m_btreq(0)
+					true)
 	, m_btc(0)
-	, m_base_timer{0}
 	, m_lvctr(0)
 {
-}
-
-template<int N>
-TIMER_CALLBACK_MEMBER(st2205u_device::bt_interrupt)
-{
-	m_btreq |= 1 << N;
-	m_ireq |= 0x0020;
-	update_irq_state();
 }
 
 void st2205u_device::device_start()
@@ -67,51 +56,24 @@ void st2205u_device::device_start()
 	intf->drr = 0;
 	intf->brr = 0;
 	intf->irq_service = false;
-
-	m_base_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<0>), this));
-	m_base_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<1>), this));
-	m_base_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<2>), this));
-	m_base_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<3>), this));
-	m_base_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<4>), this));
-	m_base_timer[5] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<5>), this));
-	m_base_timer[6] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<6>), this));
-	m_base_timer[7] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2205u_device::bt_interrupt<7>), this));
-
 	intf->ram = make_unique_clear<u8[]>(0x8000);
 
-	save_item(NAME(m_pdata));
-	save_item(NAME(m_pctrl));
-	save_item(NAME(m_psel));
-	save_item(NAME(m_pfun));
-	save_item(NAME(m_bten));
-	save_item(NAME(m_btreq));
+	init_base_timer(0x0040);
+
 	save_item(NAME(m_btc));
-	save_item(NAME(m_sys));
-	save_item(NAME(m_pmcr));
-	save_item(NAME(m_ireq));
-	save_item(NAME(m_iena));
-	save_item(NAME(m_lssa));
-	save_item(NAME(m_lvpw));
-	save_item(NAME(m_lxmax));
-	save_item(NAME(m_lymax));
-	save_item(NAME(m_lvctr));
-	save_item(NAME(intf->irr_enable));
-	save_item(NAME(intf->irr));
-	save_item(NAME(intf->prr));
-	save_item(NAME(intf->drr));
 	save_item(NAME(intf->brr));
-	save_item(NAME(intf->irq_service));
 	save_pointer(NAME(intf->ram), 0x8000);
 
 	mintf = std::move(intf);
+	save_common_registers();
 	init();
 
 	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x87ff);
 	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x87ff);
 	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x8fff);
 	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*mintf).brr).mask(0x9fff);
-	state_add<u8>(ST_IREQ, "IREQ", [this]() { return m_ireq; }, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(m_ireq_mask);
-	state_add<u8>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(m_ireq_mask);
+	state_add<u16>(ST_IREQ, "IREQ", [this]() { return m_ireq; }, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
+	state_add<u16>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
 		state_add(ST_PDA + i, string_format("PD%c", 'A' + i).c_str(), m_pdata[i]);
@@ -126,7 +88,7 @@ void st2205u_device::device_start()
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); }).mask(0xfe);
 	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); });
-	state_add(ST_BTREQ, "BTREQ", m_btreq);
+	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
 	state_add(ST_LSSA, "LSSA", m_lssa);
 	state_add(ST_LVPW, "LVPW", m_lvpw);
@@ -139,22 +101,39 @@ void st2205u_device::device_reset()
 {
 	st2xxx_device::device_reset();
 
-	mi_st2205u &m = downcast<mi_st2205u &>(*mintf);
-	m.irr_enable = false;
-	m.irr = 0;
-	m.prr = 0;
-	m.drr = 0;
+	downcast<mi_st2205u &>(*mintf).brr = 0;
 
-	bten_w(0);
-	m_btreq = 0;
 	m_btc = 0;
 
 	m_lvctr = 0;
 }
 
+const char *st2205u_device::st2xxx_irq_name(int i) const
+{
+	switch (i)
+	{
+	case 0: return "PE0/1/2 edge";
+	case 1: return "Timer 0";
+	case 2: return "Timer 1";
+	case 3: return "Timer 2";
+	case 4: return "Timer 3";
+	case 5: return "PA transition";
+	case 6: return "Base timer";
+	case 7: return "LCD buffer";
+	case 8: return "SPI TX empty";
+	case 9: return "SPI RX ready";
+	case 10: return "UART TX";
+	case 11: return "UART RX";
+	case 12: return "USB";
+	case 14: return "PCM";
+	case 15: return "RTC";
+	default: return "Reserved";
+	}
+}
+
 u8 st2205u_device::mi_st2205u::pread(u16 adr)
 {
-	u16 bank = irq_service ? irr : prr;
+	u16 bank = irq_service && irr_enable ? irr : prr;
 	if (BIT(bank, 15))
 		return ram[0x4000 | (adr & 0x3fff)];
 	else
@@ -163,7 +142,7 @@ u8 st2205u_device::mi_st2205u::pread(u16 adr)
 
 u8 st2205u_device::mi_st2205u::preadc(u16 adr)
 {
-	u16 bank = irq_service ? irr : prr;
+	u16 bank = irq_service && irr_enable ? irr : prr;
 	if (BIT(bank, 15))
 		return ram[0x4000 | (adr & 0x3fff)];
 	else
@@ -172,7 +151,7 @@ u8 st2205u_device::mi_st2205u::preadc(u16 adr)
 
 void st2205u_device::mi_st2205u::pwrite(u16 adr, u8 val)
 {
-	u16 bank = irq_service ? irr : prr;
+	u16 bank = irq_service && irr_enable ? irr : prr;
 	if (BIT(bank, 15))
 		ram[0x4000 | (adr & 0x3fff)] = val;
 	else
@@ -252,72 +231,6 @@ void st2205u_device::mi_st2205u::write(u16 adr, u8 val)
 	program->write_byte(adr, val);
 }
 
-u8 st2205u_device::irrl_r()
-{
-	return downcast<mi_st2205u &>(*mintf).irr & 0xff;
-}
-
-void st2205u_device::irrl_w(u8 data)
-{
-	u16 &irr = downcast<mi_st2205u &>(*mintf).irr;
-	irr = data | (irr & 0x8f00);
-}
-
-u8 st2205u_device::irrh_r()
-{
-	return downcast<mi_st2205u &>(*mintf).irr >> 8;
-}
-
-void st2205u_device::irrh_w(u8 data)
-{
-	u16 &irr = downcast<mi_st2205u &>(*mintf).irr;
-	irr = (data & 0x8f) << 8 | (irr & 0x00ff);
-}
-
-u8 st2205u_device::prrl_r()
-{
-	return downcast<mi_st2205u &>(*mintf).prr & 0xff;
-}
-
-void st2205u_device::prrl_w(u8 data)
-{
-	u16 &prr = downcast<mi_st2205u &>(*mintf).prr;
-	prr = data | (prr & 0x8f00);
-}
-
-u8 st2205u_device::prrh_r()
-{
-	return downcast<mi_st2205u &>(*mintf).prr >> 8;
-}
-
-void st2205u_device::prrh_w(u8 data)
-{
-	u16 &prr = downcast<mi_st2205u &>(*mintf).prr;
-	prr = (data & 0x8f) << 8 | (prr & 0x00ff);
-}
-
-u8 st2205u_device::drrl_r()
-{
-	return downcast<mi_st2205u &>(*mintf).drr & 0xff;
-}
-
-void st2205u_device::drrl_w(u8 data)
-{
-	u16 &drr = downcast<mi_st2205u &>(*mintf).drr;
-	drr = data | (drr & 0x8700);
-}
-
-u8 st2205u_device::drrh_r()
-{
-	return downcast<mi_st2205u &>(*mintf).drr >> 8;
-}
-
-void st2205u_device::drrh_w(u8 data)
-{
-	u16 &drr = downcast<mi_st2205u &>(*mintf).drr;
-	drr = (data & 0x87) << 8 | (drr & 0x00ff);
-}
-
 u8 st2205u_device::brrl_r()
 {
 	return downcast<mi_st2205u &>(*mintf).brr & 0xff;
@@ -350,61 +263,23 @@ void st2205u_device::pmcr_w(u8 data)
 	m_pmcr = data;
 }
 
-u8 st2205u_device::sys_r()
+unsigned st2205u_device::st2xxx_bt_divider(int n) const
 {
-	return m_sys;
-}
+	// 2 Hz
+	if (n == 0)
+		return 16384;
 
-void st2205u_device::sys_w(u8 data)
-{
-	m_sys = data & 0xfe;
-	downcast<mi_st2205u &>(*mintf).irr_enable = BIT(data, 1);
-}
+	// 32 Hz, 64 Hz, 128 Hz, 256 Hz, 512 Hz
+	if (n <= 5)
+		return 2048 >> n;
 
-u8 st2205u_device::bten_r()
-{
-	return m_bten;
-}
+	// 2048 Hz
+	if (n == 6)
+		return 16;
 
-void st2205u_device::bten_w(u8 data)
-{
-	if (BIT(data, 0) && !BIT(m_bten, 0))
-		m_base_timer[0]->adjust(attotime::from_hz(2), 0, attotime::from_hz(2));
-	else if (!BIT(data, 0) && BIT(m_bten, 0))
-		m_base_timer[0]->adjust(attotime::never);
-
-	for (int n = 1; n <= 5; n++)
-	{
-		if (BIT(data, n) && !BIT(m_bten, n))
-			m_base_timer[n]->adjust(attotime::from_hz(16 << n), 0, attotime::from_hz(16 << n));
-		else if (!BIT(data, n) && BIT(m_bten, n))
-			m_base_timer[n]->adjust(attotime::never);
-	}
-
-	if (BIT(data, 6) && !BIT(m_bten, 6))
-		m_base_timer[6]->adjust(attotime::from_hz(2048), 0, attotime::from_hz(2048));
-	else if (!BIT(data, 6) && BIT(m_bten, 6))
-		m_base_timer[6]->adjust(attotime::never);
-
-	if (BIT(data, 7) && !BIT(m_bten, 7))
-	{
-		attotime period = attotime::from_hz(8192) * (m_btc ? m_btc : 256);
-		m_base_timer[7]->adjust(period, 0, period);
-	}
-	else if (!BIT(data, 7) && BIT(m_bten, 7))
-		m_base_timer[7]->adjust(attotime::never);
-
-	m_bten = data;
-}
-
-u8 st2205u_device::btreq_r()
-{
-	return m_btreq;
-}
-
-void st2205u_device::btclr_w(u8 data)
-{
-	m_btreq &= ~data;
+	// 8192 Hz / BTC
+	assert(n == 7);
+	return 4 * (m_btc != 0 ? m_btc : 256);
 }
 
 u8 st2205u_device::btc_r()
@@ -476,7 +351,7 @@ void st2205u_device::int_map(address_map &map)
 	map(0x000e, 0x000e).rw(FUNC(st2205u_device::pfc_r), FUNC(st2205u_device::pfc_w));
 	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
 	map(0x002a, 0x002a).rw(FUNC(st2205u_device::bten_r), FUNC(st2205u_device::bten_w));
-	map(0x002b, 0x002b).rw(FUNC(st2205u_device::btreq_r), FUNC(st2205u_device::btclr_w));
+	map(0x002b, 0x002b).rw(FUNC(st2205u_device::btsr_r), FUNC(st2205u_device::btclr_w));
 	map(0x002c, 0x002c).rw(FUNC(st2205u_device::btc_r), FUNC(st2205u_device::btc_w));
 	map(0x0030, 0x0030).rw(FUNC(st2205u_device::irrl_r), FUNC(st2205u_device::irrl_w));
 	map(0x0031, 0x0031).rw(FUNC(st2205u_device::irrh_r), FUNC(st2205u_device::irrh_w));
@@ -500,6 +375,8 @@ void st2205u_device::int_map(address_map &map)
 	map(0x004e, 0x004e).rw(FUNC(st2205u_device::pl_r), FUNC(st2205u_device::pl_w));
 	map(0x004f, 0x004f).rw(FUNC(st2205u_device::pcl_r), FUNC(st2205u_device::pcl_w));
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));
+	map(0x005a, 0x005a).rw(FUNC(st2205u_device::dmrl_r), FUNC(st2205u_device::dmrl_w));
+	map(0x005b, 0x005b).rw(FUNC(st2205u_device::dmrh_r), FUNC(st2205u_device::dmrh_w));
 	map(0x0080, 0x1fff).rw(FUNC(st2205u_device::ram_r), FUNC(st2205u_device::ram_w)); // assumed to be shared with banked RAM
 	map(0x2000, 0x3fff).rw(FUNC(st2205u_device::bmem_r), FUNC(st2205u_device::bmem_w));
 	map(0x4000, 0x7fff).rw(FUNC(st2205u_device::pmem_r), FUNC(st2205u_device::pmem_w));
