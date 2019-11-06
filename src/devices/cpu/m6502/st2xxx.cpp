@@ -85,7 +85,7 @@ TIMER_CALLBACK_MEMBER(st2xxx_device::bt_interrupt)
 
 	unsigned div = st2xxx_bt_divider(param);
 	assert(div != 0);
-	m_base_timer[param]->adjust(attotime::from_ticks(32768, div), param);
+	m_base_timer[param]->adjust(attotime::from_ticks(div, 32768), param);
 
 	if (interrupt)
 	{
@@ -320,7 +320,7 @@ void st2xxx_device::bten_w(u8 data)
 			unsigned div = st2xxx_bt_divider(n);
 			assert(div != 0);
 			assert(m_base_timer[n] != nullptr);
-			m_base_timer[n]->adjust(attotime::from_ticks(32768, div), n);
+			m_base_timer[n]->adjust(attotime::from_ticks(div, 32768), n);
 			LOGMASKED(LOG_BT, "Base timer %d enabled at %.1f Hz (PC = $%04X)\n", n, 32768.0 / div, PPC);
 		}
 		else if (!BIT(data, n) && BIT(m_bten, n))

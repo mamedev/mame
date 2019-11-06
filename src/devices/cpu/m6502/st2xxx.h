@@ -73,7 +73,7 @@ protected:
 	virtual void do_exec_partial() override;
 
 	virtual u16 st2xxx_ireq_mask() const = 0;
-	virtual const char *st2xxx_irq_name(int i) const = 0;	
+	virtual const char *st2xxx_irq_name(int i) const = 0;
 	virtual unsigned st2xxx_bt_divider(int n) const = 0;
 	virtual u8 st2xxx_sys_mask() const = 0;
 	virtual bool st2xxx_has_dma() const { return false; }
