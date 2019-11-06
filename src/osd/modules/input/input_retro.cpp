@@ -151,43 +151,35 @@ kt_table ktable[]={
 
 const char *Buttons_Name[RETRO_MAX_BUTTONS]=
 {
-   "B",		//0
-   "Y",		//1
-   "SELECT",	//2
-   "START",	//3
-   "Pad UP",	//4
-   "Pad DOWN",	//5
-   "Pad LEFT",	//6
-   "Pad RIGHT",	//7
-   "A",		//8
-   "X",		//9
-   "L",		//10
-   "R",		//11
-   "L2",		//12
-   "R2",		//13
-   "L3",		//14
-   "R3",		//15
-};
-
-input_item_id PAD_DIR[4][4]=
-{
-   {ITEM_ID_UP,ITEM_ID_DOWN,ITEM_ID_LEFT,ITEM_ID_RIGHT },
-   {ITEM_ID_R ,ITEM_ID_F   ,ITEM_ID_D   ,ITEM_ID_G     },
-   {ITEM_ID_I,ITEM_ID_K,ITEM_ID_J,ITEM_ID_L },
-   {ITEM_ID_8_PAD ,ITEM_ID_2_PAD   ,ITEM_ID_4_PAD   ,ITEM_ID_6_PAD }
+	"B",           //0
+	"Y",           //1
+	"SELECT",      //2
+	"START",       //3
+	"D-Pad Up",    //4
+	"D-Pad Down",  //5
+	"D-Pad Left",  //6
+	"D-Pad Right", //7
+	"A",           //8
+	"X",           //9
+	"L1",          //10
+	"R1",          //11
+	"L2",          //12
+	"R2",          //13
+	"L3",          //14
+	"R3",          //15
 };
 
 //    Default : A ->B1 | B ->B2 | X ->B3 | Y ->B4 | L ->B5 | R ->B6
-int   Buttons_mapping[6]={RETROPAD_A,RETROPAD_B,RETROPAD_X,RETROPAD_Y,RETROPAD_L,RETROPAD_R};
+int Buttons_mapping[]={RETROPAD_A,RETROPAD_B,RETROPAD_X,RETROPAD_Y,RETROPAD_L,RETROPAD_R};
 
 void Input_Binding(running_machine &machine)
 {
-   fprintf(stderr, "SOURCE FILE: %s\n", machine.system().type.source());
-   fprintf(stderr, "PARENT: %s\n", machine.system().parent);
-   fprintf(stderr, "NAME: %s\n", machine.system().name);
-   fprintf(stderr, "DESCRIPTION: %s\n", machine.system().type.fullname());
-   fprintf(stderr, "YEAR: %s\n", machine.system().year);
-   fprintf(stderr, "MANUFACTURER: %s\n", machine.system().manufacturer);
+   log_cb(RETRO_LOG_INFO, "SOURCE FILE: %s\n", machine.system().type.source());
+   log_cb(RETRO_LOG_INFO, "PARENT: %s\n", machine.system().parent);
+   log_cb(RETRO_LOG_INFO, "NAME: %s\n", machine.system().name);
+   log_cb(RETRO_LOG_INFO, "DESCRIPTION: %s\n", machine.system().type.fullname());
+   log_cb(RETRO_LOG_INFO, "YEAR: %s\n", machine.system().year);
+   log_cb(RETRO_LOG_INFO, "MANUFACTURER: %s\n", machine.system().manufacturer);
 
    Buttons_mapping[0]=RETROPAD_A;
    Buttons_mapping[1]=RETROPAD_B;
@@ -640,7 +632,7 @@ ovmy=vmy;
 	//FIXME doubleclick
 	if (window != nullptr && window->renderer().xy_to_render_target(vmx, vmy, &cx, &cy))
 		machine.ui_input().push_mouse_down_event(window->target(), cx, cy);
-	
+
 
    }
    else if(mbL==1 && !mouse_l)
@@ -652,7 +644,7 @@ ovmy=vmy;
 	auto window = osd_common_t::s_window_list.front();
 	if (window != nullptr && window->renderer().xy_to_render_target(vmx, vmy, &cx, &cy))
 		machine.ui_input().push_mouse_up_event(window->target(), cx, cy);
-	
+
    }
 
    if(mbR==0 && mouse_r)
@@ -665,7 +657,7 @@ ovmy=vmy;
 
 	if (window != nullptr && window->renderer().xy_to_render_target(vmx, vmy, &cx, &cy))
 		machine.ui_input().push_mouse_rdown_event(window->target(), cx, cy);
-	
+
 
    }
    else if(mbR==1 && !mouse_r)
@@ -677,7 +669,7 @@ ovmy=vmy;
 	auto window = osd_common_t::s_window_list.front();
 	if (window != nullptr && window->renderer().xy_to_render_target(vmx, vmy, &cx, &cy))
 		machine.ui_input().push_mouse_rup_event(window->target(), cx, cy);
-	
+
    }
 
 	//printf("vm(%d,%d) mc(%d,%d) mr(%d,%d)\n",vmx,vmy,mouse_x,mouse_y,mouseLX,mouseLY);
@@ -767,7 +759,7 @@ public:
 	virtual void input_init(running_machine &machine) override
 	{
 		retro_keyboard_device *devinfo = devicelist()->create_device<retro_keyboard_device>(machine, "Retro Keyboard 1", "Retro Keyboard 1", *this);
-		
+
 		int i;
    		for(i = 0; i < RETROK_LAST; i++){
 		      retrokbd_state[i]=0;
@@ -824,7 +816,7 @@ event_based_device::poll();
 		mouseLY=fb_height/2;
 
 		int i;
-   		for(i = 0; i < 4; i++)mouseBUT[i]=0;   		
+   		for(i = 0; i < 4; i++)mouseBUT[i]=0;
 	}
 
 protected:
@@ -915,22 +907,16 @@ public:
 	void poll() override
 	{
 		event_based_device::poll();
-
 	}
 
 	void reset() override
 	{
-		int i,j;
-
-		for(i = 0; i < 4; i++)
-			for(j=0;j<RETRO_MAX_BUTTONS;j++)
-				joystate[i].button[j] = 0;	
+		memset(&joystate, 0, sizeof(joystate));
 	}
 
 protected:
 	void process_event(KeyPressEventArgs &args) /*override*/
 	{
-//		printf("here\n");
 	}
 };
 
@@ -959,7 +945,7 @@ public:
 
 		for (i = 0; i < 4; i++)
 		{
- 			sprintf(defname, "Retro Joy%d", i);
+ 			sprintf(defname, "RetroPad%d", i);
 
 			retro_joystick_device *devinfo;
 
@@ -970,31 +956,30 @@ public:
 			if (devinfo == nullptr)
 				continue;
 
-	      		// add the axes
-
+			// add the axes
 			devinfo->device()->add_item(
-				"LX",
+				"LSX",
 				static_cast<input_item_id>(ITEM_ID_XAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a1[0]);
 			devinfo->device()->add_item(
-				"LY",
+				"LSY",
 				static_cast<input_item_id>(ITEM_ID_YAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a1[1]);
 
 			devinfo->device()->add_item(
-				"RX",
+				"RSX",
 				static_cast<input_item_id>(ITEM_ID_RXAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a2[0]);
 			devinfo->device()->add_item(
-				"RY",
+				"RSY",
 				static_cast<input_item_id>(ITEM_ID_RYAXIS),
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a2[1]);
-            
-         devinfo->device()->add_item(
+
+			devinfo->device()->add_item(
 				"L2",
 				static_cast<input_item_id>(ITEM_ID_RZAXIS),
 				generic_axis_get_state<std::int32_t>,
@@ -1006,47 +991,36 @@ public:
 				generic_axis_get_state<std::int32_t>,
 				&joystate[i].a3[1]);
 
-			//add the buttons
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_START], ITEM_ID_START,
+				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_START]);
 
-      			for(j=0;j<RETRO_MAX_BUTTONS;j++)joystate[i].button[j] = 0;
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_SELECT], ITEM_ID_SELECT,
+				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_SELECT]);
 
-
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_START],ITEM_ID_START,\
-				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_START]);
-
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_SELECT],ITEM_ID_SELECT,\
-				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_SELECT]);
-
-			for(j=0;j<6;j++)
-				devinfo->device()->add_item(Buttons_Name[Buttons_mapping[j]],\
-					 (input_item_id)(ITEM_ID_BUTTON1+j),\
-					 generic_button_get_state<std::int32_t>,\
+			for(j = 0; j < 6; j++)
+				devinfo->device()->add_item(Buttons_Name[Buttons_mapping[j]],
+					 (input_item_id)(ITEM_ID_BUTTON1+j),
+					 generic_button_get_state<std::int32_t>,
 					  &joystate[i].button[Buttons_mapping[j]]);
-/* Replaced with analog triggers and fallback to digital
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_L2],ITEM_ID_BUTTON7,\
-				generic_button_get_state<std::uint8_t>,&joystate[i].button[RETROPAD_L2]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_R2],ITEM_ID_BUTTON8,\
-				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_R2]);
-*/
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_L3],ITEM_ID_BUTTON9,\
-				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_L3]);
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_L3], ITEM_ID_BUTTON9,
+				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_L3]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_R3],ITEM_ID_BUTTON10,\
-				generic_button_get_state<std::int32_t>,&joystate[i].button[RETROPAD_R3]);
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_R3], ITEM_ID_BUTTON10,
+				generic_button_get_state<std::int32_t>, &joystate[i].button[RETROPAD_R3]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_UP],ITEM_ID_BUTTON11,\
-				generic_button_get_state<std::uint8_t>,&joystate[i].button[RETROPAD_PAD_UP]);
+			// D-Pad
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_UP], static_cast<input_item_id>(ITEM_ID_HAT1UP+i*4),
+				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_UP]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_DOWN],ITEM_ID_BUTTON12,\
-				generic_button_get_state<std::uint8_t>,&joystate[i].button[RETROPAD_PAD_DOWN]);
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_DOWN], static_cast<input_item_id>(ITEM_ID_HAT1DOWN+i*4),
+				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_DOWN]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_LEFT],ITEM_ID_BUTTON13,\
-				generic_button_get_state<std::uint8_t>,&joystate[i].button[RETROPAD_PAD_LEFT]);
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_LEFT], static_cast<input_item_id>(ITEM_ID_HAT1LEFT+i*4),
+				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_LEFT]);
 
-			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_RIGHT],ITEM_ID_BUTTON14,\
-				generic_button_get_state<std::uint8_t>,&joystate[i].button[RETROPAD_PAD_RIGHT]);
-
+			devinfo->device()->add_item(Buttons_Name[RETROPAD_PAD_RIGHT], static_cast<input_item_id>(ITEM_ID_HAT1RIGHT+i*4),
+				generic_button_get_state<std::uint8_t>, &joystate[i].button[RETROPAD_PAD_RIGHT]);
 		}
 
 		m_global_inputs_enabled = true;
