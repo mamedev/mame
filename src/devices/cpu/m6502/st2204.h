@@ -2,6 +2,7 @@
 // copyright-holders:AJR
 /**********************************************************************
 
+    Sitronix ST2202 8-Bit Integrated Microcontroller
     Sitronix ST2204 8-Bit Integrated Microcontroller
 
 **********************************************************************/
@@ -28,6 +29,8 @@ public:
 	st2204_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	st2204_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor int_map);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
@@ -41,6 +44,8 @@ protected:
 	virtual u8 st2xxx_lctr_mask() const override { return 0xff; }
 	virtual u8 st2xxx_lckr_mask() const override { return 0x1f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0x3f; }
+
+	void common_map(address_map &map);
 
 private:
 	class mi_st2204 : public mi_st2xxx {
@@ -95,6 +100,20 @@ private:
 	u8 m_dcnth;
 };
 
+class st2202_device : public st2204_device
+{
+public:
+	st2202_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual u8 st2xxx_misc_mask() const override { return 0x0f; }
+	virtual u8 st2xxx_lctr_mask() const override { return 0xe0; }
+
+private:
+	void int_map(address_map &map);
+};
+
+DECLARE_DEVICE_TYPE(ST2202, st2202_device)
 DECLARE_DEVICE_TYPE(ST2204, st2204_device)
 
 #endif // MAME_MACHINE_M6502_ST2204_H
