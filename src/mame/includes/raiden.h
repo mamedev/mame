@@ -56,7 +56,8 @@ protected:
 
 	DECLARE_WRITE16_MEMBER(raiden_text_w);
 
-private:
+	void common_video_start();
+
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
