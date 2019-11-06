@@ -25,8 +25,8 @@ enum vtxx_pal_mode {
 
 class ppu_vt03_device : public ppu2c0x_device {
 public:
-	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
@@ -87,7 +87,7 @@ private:
 
 class ppu_vt03pal_device : public ppu_vt03_device {
 public:
-	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock = 0);
+	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 };
 
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)

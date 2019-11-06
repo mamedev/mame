@@ -1507,7 +1507,7 @@ void nes_vt_state::nes_vt_base(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", "ppu", vt03_gfx_helper);
 
-	PPU_VT03(config, m_ppu);
+	PPU_VT03(config, m_ppu, N2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
@@ -1532,24 +1532,21 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb(machine_config &config)
 {
 	nes_vt_base(config);
 
-	if (0)	// the dumped ABL Pinball unit is PAL (26.6017 XTAL) although Asian ones are likely NTSC.  PAL NES emulation seems more broken at the moment, probably timing issues in the PPU
-	{
-		m_maincpu->set_clock(PALC_APU_CLOCK);
+	m_maincpu->set_clock(PALC_APU_CLOCK);
 
-		PPU_VT03PAL(config.replace(), m_ppu);
-		m_ppu->set_cpu_tag(m_maincpu);
-		m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-		m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
-		m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
+	PPU_VT03PAL(config.replace(), m_ppu, N2A03_PAL_XTAL);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->read_bg().set(FUNC(nes_vt_state::chr_r));
+	m_ppu->read_sp().set(FUNC(nes_vt_state::spr_r));
 
-		/* video hardware */
-		m_screen->set_refresh_hz(50.0070);
-		m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
-			(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
-		m_screen->set_size(32 * 8, 312);
-		m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
-	}
-
+	/* video hardware */
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
+		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
+	m_screen->set_size(32 * 8, 312);
+	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
+	
 	// override for controllers
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablpinb_state::nes_vt_ablpinb_map);
 }

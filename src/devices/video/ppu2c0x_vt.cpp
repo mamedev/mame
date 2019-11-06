@@ -19,8 +19,8 @@
 DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
-ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ppu2c0x_device(mconfig, type, tag, owner, clock),
+ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)	:
+	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
@@ -28,8 +28,8 @@ ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type
 		m_2012_2017_descramble[i] = 2 + i;
 }
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
-	: ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
 {
 }
 
