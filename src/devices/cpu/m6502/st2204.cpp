@@ -418,8 +418,10 @@ void st2204_device::common_map(address_map &map)
 }
 
 void st2202_device::int_map(address_map &map)
-{	common_map(map);
-	map(0x0080, 0x0fff).ram();}
+{
+	common_map(map);
+	map(0x0080, 0x0fff).ram();
+}
 
 void st2204_device::int_map(address_map &map)
 {
