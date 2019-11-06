@@ -70,11 +70,11 @@ protected:
 		TIMER_ID_SEEK
 	};
 
+	required_device_array<legacy_floppy_image_device, 2> m_floppy_image;
 	required_device<i8255_device> m_d14;
 	required_device<i8255_device> m_d15;
 
 private:
-	legacy_floppy_image_device *floppy_image(int drive);
 	legacy_floppy_image_device *m_floppy;
 	bool m_side;
 

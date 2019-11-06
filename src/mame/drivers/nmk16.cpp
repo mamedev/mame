@@ -452,7 +452,7 @@ void nmk16_tomagic_state::tomagic_sound_map(address_map &map)
 void nmk16_tomagic_state::tomagic_sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).w(FUNC(nmk16_state::macross2_sound_bank_w));
+	map(0x00, 0x00).w(FUNC(nmk16_tomagic_state::macross2_sound_bank_w));
 	map(0x02, 0x03).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
@@ -4217,7 +4217,7 @@ void nmk16_state::mustangb(machine_config &config)
 	set_hacky_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, 14318180/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &seibu_sound_common::seibu_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	/* video hardware */
@@ -4394,7 +4394,7 @@ void nmk16_state::tdragonb(machine_config &config)    /* bootleg using Raiden so
 	set_hacky_interrupt_timing(config);
 
 	Z80(config, m_audiocpu, 14318180/4);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &seibu_sound_common::seibu_sound_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
 	/* video hardware */
@@ -4973,11 +4973,11 @@ void nmk16_tomagic_state::tomagic(machine_config &config)
 	/* video hardware */
 	set_hacky_screen_hires(config);
 	m_spritegen->set_colpri_callback(FUNC(nmk16_tomagic_state::get_colour_4bit));
-	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
+	m_screen->set_screen_update(FUNC(nmk16_tomagic_state::screen_update_macross));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_macross);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 1024);
-	MCFG_VIDEO_START_OVERRIDE(nmk16_state,gunnail)
+	MCFG_VIDEO_START_OVERRIDE(nmk16_tomagic_state,gunnail)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

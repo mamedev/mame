@@ -113,6 +113,7 @@ public:
 	pstring_t(C (&string)[N]) // NOLINT(cppcoreguidelines-avoid-c-arrays, modernize-avoid-c-arrays)
 	{
 		static_assert(N > 0,"pstring from array of length 0");
+		// need std::exception since pexception depends on pstring
 		if (string[N-1] != 0)
 			throw std::exception();
 		m_str.assign(string, N - 1);

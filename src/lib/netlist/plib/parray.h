@@ -42,7 +42,7 @@ namespace plib {
 	 * Passing SIZE > 0 has the same functionality as a std::array.
 	 * SIZE = 0 is pure dynamic allocation, the actual array size is passed to the
 	 * constructor.
-	 * SIZE < 0 reserves std::abs(SIZE) elements statically in place allocated. The
+	 * SIZE < 0 reserves abs(SIZE) elements statically in place allocated. The
 	 * actual size is passed in by the constructor.
 	 * This array is purely intended for HPC application where depending on the
 	 * architecture a preference dynamic/static has to be made.
@@ -82,7 +82,7 @@ namespace plib {
 		{
 			if ((SIZE < 0 && size > SIZEABS())
 				|| (SIZE > 0 && size != SIZEABS()))
-				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+				pthrow<pexception>("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
 		}
 
 		template <int X = SIZE >
@@ -91,7 +91,7 @@ namespace plib {
 		{
 			if ((SIZE < 0 && size > SIZEABS())
 				|| (SIZE > 0 && size != SIZEABS()))
-				throw plib::pexception("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
+				pthrow<plib::pexception>("parray: size error " + plib::to_string(size) + ">" + plib::to_string(SIZE));
 			m_a.fill(val);
 		}
 

@@ -17,7 +17,8 @@ class st2205u_device : public st2xxx_device
 {
 public:
 	enum {
-		ST_BRR = ST_IENA + 1,
+		ST_BTC = ST_LYMAX + 1,
+		ST_BRR,
 		ST_LVCTR
 	};
 
@@ -26,6 +27,12 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	virtual u16 st2xxx_ireq_mask() const override { return 0xdfff; }
+	virtual const char *st2xxx_irq_name(int i) const override;
+	virtual unsigned st2xxx_bt_divider(int n) const override;
+	virtual u8 st2xxx_sys_mask() const override { return 0xfe; }
+	virtual bool st2xxx_has_dma() const override { return true; }
 
 private:
 	class mi_st2205u : public mi_st2xxx {
@@ -46,35 +53,21 @@ private:
 		u8 breadc(u16 adr);
 		void bwrite(u16 adr, u8 val);
 
-		bool irr_enable;
-		u16 irr;
-		u16 prr;
-		u16 drr;
 		u16 brr;
 
 		std::unique_ptr<u8[]> ram;
 	};
 
-	u8 irrl_r();
-	void irrl_w(u8 data);
-	u8 irrh_r();
-	void irrh_w(u8 data);
-	u8 prrl_r();
-	void prrl_w(u8 data);
-	u8 prrh_r();
-	void prrh_w(u8 data);
-	u8 drrl_r();
-	void drrl_w(u8 data);
-	u8 drrh_r();
-	void drrh_w(u8 data);
+	template<int N> TIMER_CALLBACK_MEMBER(bt_interrupt);
+
 	u8 brrl_r();
 	void brrl_w(u8 data);
 	u8 brrh_r();
 	void brrh_w(u8 data);
-	u8 sys_r();
-	void sys_w(u8 data);
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
+	u8 btc_r();
+	void btc_w(u8 data);
 	u8 lvctr_r();
 	void lvctr_w(u8 data);
 
@@ -89,6 +82,7 @@ private:
 
 	void int_map(address_map &map);
 
+	u8 m_btc;
 	u8 m_lvctr;
 };
 

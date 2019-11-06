@@ -58,7 +58,7 @@ public:
 		virtual void on_post_load(state_manager_t &manager) = 0;
 	protected:
 		callback_t() = default;
-		~callback_t() = default;
+		virtual ~callback_t() = default;
 		COPYASSIGNMOVE(callback_t, default)
 	};
 

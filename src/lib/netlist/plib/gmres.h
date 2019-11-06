@@ -14,8 +14,6 @@
 #include "vector_ops.h"
 
 #include <algorithm>
-#include <cmath>
-
 
 namespace plib
 {
@@ -150,12 +148,12 @@ namespace plib
 				// works halfway, i.e. Mame perforamnce 50%
 				// 151%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
-					v += std::abs(m_mat.A[j]);
+					v += plib::abs(m_mat.A[j]);
 				m_diag[i] =  reciprocal(v);
 #else
 				// 124%
 				for (std::size_t j = m_mat.row_idx[i]; j< m_mat.row_idx[i+1]; j++)
-					v = std::max(v, std::abs(m_mat.A[j]));
+					v = std::max(v, plib::abs(m_mat.A[j]));
 				m_diag[i] = reciprocal(v);
 #endif
 				//m_diag[i] = reciprocal(m_mat.A[m_mat.diag[i]]);
@@ -220,7 +218,7 @@ namespace plib
 		// FIXME: dirty hack to make this compile
 		static constexpr const std::size_t storage_N = plib::sizeabs<FT, SIZE>::ABS();
 
-		gmres_t(std::size_t size)
+		explicit gmres_t(std::size_t size)
 			: residual(size)
 			, Ax(size)
 			, m_ht(RESTART +1, RESTART)

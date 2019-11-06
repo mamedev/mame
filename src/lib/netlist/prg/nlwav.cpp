@@ -53,8 +53,8 @@ public:
 		}
 	}
 
-	std::size_t channels() { return m_fmt.channels; }
-	std::size_t sample_rate() { return m_fmt.sample_rate; }
+	std::size_t channels() const { return m_fmt.channels; }
+	std::size_t sample_rate() const { return m_fmt.sample_rate; }
 
 	template <typename T>
 	void write(const T &val)
@@ -101,7 +101,7 @@ private:
 
 	struct riff_data_t
 	{
-		riff_data_t(uint32_t alen) : len(alen) {}
+		explicit riff_data_t(uint32_t alen) : len(alen) {}
 		std::array<uint8_t, 4> signature = {{'d','a','t','a'}};
 		uint32_t    len;
 		// data follows
@@ -533,7 +533,7 @@ int nlwav_app::execute()
 	{
 		auto outstrm(std::ofstream(plib::filesystem::u8path(opt_out())));
 		if (outstrm.fail())
-			throw plib::file_open_e(opt_out());
+			plib::pthrow<plib::file_open_e>(opt_out());
 		outstrm.imbue(std::locale::classic());
 		convert(outstrm);
 	}

@@ -28,9 +28,12 @@ P_ENUM(plog_level,
 template <typename T>
 struct ptype_traits_base
 {
-	static constexpr const T cast(const T &x) { return x; }
 	static constexpr const bool is_signed = std::numeric_limits<T>::is_signed;
 	static char32_t fmt_spec() { return 'u'; }
+	static inline void streamify(std::ostream &s, const T &v)
+	{
+		s << v;
+	}
 };
 
 #if (PUSE_FLOAT128)
@@ -38,19 +41,14 @@ template <>
 struct ptype_traits_base<__float128>
 {
 	// FIXME: need native support at some time
-	static constexpr const long double cast(const __float128 &x) { return static_cast<long double>(x); }
 	static constexpr const bool is_signed = true;
 	static char32_t fmt_spec() { return 'f'; }
+	static inline void streamify(std::ostream &s, const __float128 &v)
+	{
+		s << static_cast<long double>(v);
+	}
 };
 #endif
-
-template <>
-struct ptype_traits_base<bool>
-{
-	static unsigned int cast(const bool &x) { return static_cast<unsigned int>(x); }
-	static const bool is_signed = std::numeric_limits<bool>::is_signed;
-	static char32_t fmt_spec() { return 'u'; }
-};
 
 template <typename T>
 struct ptype_traits;
@@ -155,15 +153,25 @@ struct ptype_traits<__float128> : ptype_traits_base<__float128>
 template<>
 struct ptype_traits<char *> : ptype_traits_base<char *>
 {
-	static const char *cast(const char *x) { return x; }
 	static char32_t fmt_spec() { return 's'; }
 };
 
 template<>
-struct ptype_traits<std::string> : ptype_traits_base<char *>
+struct ptype_traits<const char *> : ptype_traits_base<const char *>
 {
-	static const char *cast(const std::string &x) { return x.c_str(); }
 	static char32_t fmt_spec() { return 's'; }
+};
+
+template<>
+struct ptype_traits<std::string> : ptype_traits_base<std::string>
+{
+	static char32_t fmt_spec() { return 's'; }
+};
+
+template<>
+struct ptype_traits<const void *> : ptype_traits_base<const void *>
+{
+	static char32_t fmt_spec() { return 'p'; }
 };
 
 class pfmt
@@ -193,7 +201,7 @@ public:
 	e(const T &x) {return format_element('e', x);  }
 
 #if PUSE_FLOAT128
-	// FIXME: not what we want
+	// FIXME: should use quadmath_snprintf
 	pfmt & e(const __float128 &x) {return format_element('e', static_cast<long double>(x));  }
 #endif
 
@@ -207,13 +215,13 @@ public:
 	template<typename T>
 	pfmt &operator ()(const T &x)
 	{
-		return format_element(ptype_traits<T>::fmt_spec(), ptype_traits<T>::cast(x));
+		return format_element(x);
 	}
 
 	template<typename T>
 	pfmt &operator ()(const T *x)
 	{
-		return format_element(ptype_traits<T *>::fmt_spec(), ptype_traits<T *>::cast(x));
+		return format_element(x);
 	}
 
 	pfmt &operator ()()
@@ -251,18 +259,21 @@ protected:
 
 	struct rtype
 	{
-		rtype() : ret(0), p(0), sl(0), pend(0), width(0) {}
+		rtype() : ret(0), p(0), sl(0) {}
 		int ret;
 		pstring::size_type p;
 		pstring::size_type sl;
-		char32_t pend;
-		int width;
-
 	};
 	rtype setfmt(std::stringstream &strm, char32_t cfmt_spec);
 
 	template <typename T>
-	pfmt &format_element(const char32_t cfmt_spec, T &&val)
+	pfmt &format_element(T &&v)
+	{
+		return format_element(ptype_traits<typename std::decay<T>::type>::fmt_spec(), std::forward<T>(v));
+	}
+
+	template <typename T>
+	pfmt &format_element(const char32_t cfmt_spec, T &&v)
 	{
 		rtype ret;
 
@@ -274,17 +285,9 @@ protected:
 			ret = setfmt(strm, cfmt_spec);
 			if (ret.ret>=0)
 			{
-				strm << std::forward<T>(val);
+				ptype_traits<typename std::decay<T>::type>::streamify(strm, std::forward<T>(v));
 				const pstring ps(strm.str());
-				pstring pad("");
-				auto aw(static_cast<std::size_t>(std::abs(ret.width)));
-				if (aw > ps.length())
-					pad = pstring(aw - ps.length(), ' ');
-
-				if (ret.width > 0)
-					m_str = m_str.substr(0, ret.p) + pad + ps + m_str.substr(ret.p + ret.sl);
-				else
-					m_str = m_str.substr(0, ret.p) + ps + pad + m_str.substr(ret.p + ret.sl);
+				m_str = m_str.substr(0, ret.p) + ps + m_str.substr(ret.p + ret.sl);
 			}
 		} while (ret.ret == 1);
 
@@ -309,7 +312,7 @@ public:
 
 	/* runtime enable */
 	template<bool enabled, typename... Args>
-	void log(const pstring & fmt, Args&&... args) const
+	void log(const pstring & fmt, Args&&... args) const noexcept
 	{
 		if (build_enabled && enabled && m_enabled)
 		{
@@ -319,7 +322,7 @@ public:
 	}
 
 	template<typename... Args>
-	void operator ()(const pstring &fmt, Args&&... args) const
+	void operator ()(const pstring &fmt, Args&&... args) const noexcept
 	{
 		if (build_enabled && m_enabled)
 		{
@@ -363,7 +366,7 @@ public:
 	~plog_channel() noexcept = default;
 
 protected:
-	void vdowrite(const pstring &ls) const
+	void vdowrite(const pstring &ls) const noexcept
 	{
 		m_base.vlog(L, ls);
 	}

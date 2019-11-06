@@ -11,8 +11,6 @@
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
 
-#include <cmath>
-
 namespace netlist
 {
 namespace analog
@@ -45,7 +43,7 @@ namespace analog
 		{
 		}
 
-		capacitor_e type() const { return capacitor_e::VARIABLE_CAPACITY; }
+		static capacitor_e type() { return capacitor_e::VARIABLE_CAPACITY; }
 
 		// Circuit Simulation, page 284, 5.360
 		// q(un+1) - q(un) = int(un, un+1, C(U)) = (C0+C1)/2 * (un+1-un)
@@ -97,7 +95,7 @@ namespace analog
 		{
 		}
 
-		capacitor_e type() const { return capacitor_e::CONSTANT_CAPACITY; }
+		static capacitor_e type() { return capacitor_e::CONSTANT_CAPACITY; }
 		nl_fptype G(nl_fptype cap) const { return cap * m_h +  m_gmin; }
 		nl_fptype Ieq(nl_fptype cap, nl_fptype v) const
 		{

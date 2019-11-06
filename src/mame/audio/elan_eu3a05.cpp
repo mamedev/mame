@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "elan_eu3a05.h"
 
-DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound", "Elan EU3A05 / EU3A14 Sound")
+DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05sound", "Elan EU3A05 / EU3A14 Sound")
 
 #define LOG_AUDIO       (1U << 0)
 
@@ -16,21 +16,21 @@ DEFINE_DEVICE_TYPE(RADICA6502_SOUND, radica6502_sound_device, "radica6502sound",
 #include "logmacro.h"
 
 
-radica6502_sound_device::radica6502_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, RADICA6502_SOUND, tag, owner, clock)
+elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_space_read_cb(*this)
 {
 }
 
-void radica6502_sound_device::device_start()
+void elan_eu3a05_sound_device::device_start()
 {
 	m_space_read_cb.resolve_safe(0);
 	m_stream = stream_alloc(0, 1, 8000);
 }
 
-void radica6502_sound_device::device_reset()
+void elan_eu3a05_sound_device::device_reset()
 {
 	for (int i = 0; i < 6; i++)
 	{
@@ -46,7 +46,7 @@ void radica6502_sound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
@@ -95,7 +95,7 @@ void radica6502_sound_device::sound_stream_update(sound_stream &stream, stream_s
 }
 
 
-void radica6502_sound_device::handle_sound_addr_w(int which, int offset, uint8_t data)
+void elan_eu3a05_sound_device::handle_sound_addr_w(int which, int offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -116,7 +116,7 @@ void radica6502_sound_device::handle_sound_addr_w(int which, int offset, uint8_t
 	}
 }
 
-uint8_t radica6502_sound_device::handle_sound_addr_r(int which, int offset)
+uint8_t elan_eu3a05_sound_device::handle_sound_addr_r(int which, int offset)
 {
 	switch (offset)
 	{
@@ -136,19 +136,19 @@ uint8_t radica6502_sound_device::handle_sound_addr_r(int which, int offset)
 	return 0x00;
 }
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_addr_w)
+WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w)
 {
 	m_stream->update();
 	handle_sound_addr_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_addr_r)
+READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r)
 {
 	m_stream->update();
 	return handle_sound_addr_r(offset / 3, offset % 3);
 }
 
-void radica6502_sound_device::handle_sound_size_w(int which, int offset, uint8_t data)
+void elan_eu3a05_sound_device::handle_sound_size_w(int which, int offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -169,7 +169,7 @@ void radica6502_sound_device::handle_sound_size_w(int which, int offset, uint8_t
 	}
 }
 
-uint8_t radica6502_sound_device::handle_sound_size_r(int which, int offset)
+uint8_t elan_eu3a05_sound_device::handle_sound_size_r(int which, int offset)
 {
 	switch (offset)
 	{
@@ -189,19 +189,19 @@ uint8_t radica6502_sound_device::handle_sound_size_r(int which, int offset)
 	return 0x00;
 }
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_size_w)
+WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w)
 {
 	m_stream->update();
 	handle_sound_size_w(offset / 3, offset % 3, data);
 }
 
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_size_r)
+READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r)
 {
 	m_stream->update();
 	return handle_sound_size_r(offset / 3, offset % 3);
 }
 
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_r)
+READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r)
 {
 	m_stream->update();
 
@@ -210,7 +210,7 @@ READ8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_r)
 }
 
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
+WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w)
 {
 	m_stream->update();
 
@@ -231,16 +231,16 @@ WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_trigger_w)
 
 /* this is read/written with the same individual bits for each channel as the trigger
    maybe related to interrupts? */
-READ8_MEMBER(radica6502_sound_device::radicasi_sound_unk_r)
+READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r)
 {
-	LOGMASKED( LOG_AUDIO, "%s: radicasi_sound_unk_r\n", machine().describe_context());
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_unk_r\n", machine().describe_context());
 	// don't think this reads back what was written probably a status of something instead?
 	return 0x00; //m_sound_unk;
 }
 
-WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
+WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w)
 {
-	LOGMASKED( LOG_AUDIO, "%s: radicasi_sound_unk_w %02x\n", machine().describe_context(), data);
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_sound_unk_w %02x\n", machine().describe_context(), data);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -256,7 +256,7 @@ WRITE8_MEMBER(radica6502_sound_device::radicasi_sound_unk_w)
 		LOGMASKED( LOG_AUDIO, "  UNEXPECTED BITS SET");
 }
 
-void radica6502_sound_device::handle_sound_trigger(int which)
+void elan_eu3a05_sound_device::handle_sound_trigger(int which)
 {
 	LOGMASKED( LOG_AUDIO, "Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_byte_address[which], m_sound_byte_len[which]);
 
@@ -265,10 +265,10 @@ void radica6502_sound_device::handle_sound_trigger(int which)
 }
 
 
-READ8_MEMBER(radica6502_sound_device::radicasi_50a8_r)
+READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)
 {
 	m_stream->update();
 
-	LOGMASKED( LOG_AUDIO, "%s: radicasi_50a8_r\n", machine().describe_context());
+	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_50a8_r\n", machine().describe_context());
 	return m_isstopped;
 }

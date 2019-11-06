@@ -23,7 +23,7 @@ namespace netlist
 		, m_writer(&m_strm)
 		{
 			if (m_strm.fail())
-				throw plib::file_open_e(plib::pfmt("{1}.log")(this->name()));
+				plib::pthrow<plib::file_open_e>(plib::pfmt("{1}.log")(this->name()));
 
 			m_strm.imbue(std::locale::classic());
 		}

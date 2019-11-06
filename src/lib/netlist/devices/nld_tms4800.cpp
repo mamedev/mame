@@ -71,10 +71,9 @@ namespace netlist
 	};
 
 	// FIXME: timing!
+	// FIXME: CS: The code looks odd, looks like m_last_data should be pushed out.
 	NETLIB_UPDATE(TMS4800)
 	{
-		unsigned d = 0x00;
-
 		netlist_time delay = NLTIME_FROM_NS(450);
 		if (m_AR())
 		{
@@ -86,6 +85,7 @@ namespace netlist
 		}
 		else
 		{
+    		unsigned d = 0x00;
 			for (std::size_t i=0; i<4; i++)
 			{
 				if (m_OE1())

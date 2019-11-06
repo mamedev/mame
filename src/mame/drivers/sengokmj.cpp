@@ -67,7 +67,7 @@ RSSENGO2.72   chr.
 #include "tilemap.h"
 
 
-class sengokmj_state : public driver_device, public seibu_sound_common
+class sengokmj_state : public driver_device, protected seibu_sound_common
 {
 public:
 	sengokmj_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -83,6 +83,10 @@ public:
 	{ }
 
 	void sengokmj(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -122,9 +126,6 @@ private:
 	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
 
 	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-
-	virtual void machine_start() override;
-	virtual void video_start() override;
 
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

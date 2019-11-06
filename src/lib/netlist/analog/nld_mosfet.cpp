@@ -22,8 +22,6 @@
 #include "netlist/nl_setup.h"
 #include "nlid_twoterm.h"
 
-#include <cmath>
-
 #define BODY_CONNECTED_TO_SOURCE    (1)
 
 namespace netlist
@@ -220,7 +218,7 @@ namespace analog
 			connect(m_DG.m_P, m_SD.m_N);
 
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = qtype() == nlconst::magic(FET_NMOS ? 1.0 : -1.0);
+			m_polarity = qtype() == nlconst::magic((FET_NMOS ? 1.0 : -1.0));
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
@@ -418,8 +416,8 @@ namespace analog
 				else
 				{
 					// linear
-					const nl_fptype Sqr1 = static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2));
-					const nl_fptype Sqr2 = static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2));
+					const auto Sqr1(static_cast<nl_fptype>(plib::pow(Vdsat - Vds, 2)));
+					const auto Sqr2(static_cast<nl_fptype>(plib::pow(nlconst::two() * Vdsat - Vds, 2)));
 					Cgb = 0;
 					Cgs = m_CoxWL * (nlconst::one() - Sqr1 / Sqr2) * nlconst::magic(2.0 / 3.0);
 					Cgd = m_CoxWL * (nlconst::one() - Vdsat * Vdsat / Sqr2) * nlconst::magic(2.0 / 3.0);

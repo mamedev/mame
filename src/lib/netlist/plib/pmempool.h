@@ -15,7 +15,6 @@
 #include "putil.h"
 
 #include <algorithm>
-//#include <cstddef>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -226,7 +225,7 @@ namespace plib {
 			}
 		}
 
-		bool operator ==(const mempool &rhs) noexcept { return this == &rhs; }
+		bool operator ==(const mempool &rhs) const noexcept { return this == &rhs; }
 
 	};
 

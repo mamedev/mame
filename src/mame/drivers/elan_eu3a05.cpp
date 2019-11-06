@@ -19,144 +19,23 @@
 
     Tetris
     Space Invaders
-
-    Possible other games on this hardawre
-
-    ConnecTV Football (aka ConnecTV International Football)
-     - Soccer game, not the same as Play TV Football, or Play TV Soccer
-       (it has the same XTAL etc. as this driver at least)
+	ABL Air-Blaster Joystick
 
     ---
-    The XaviX ones seem to have a XaviX logo on the external packaging while the
-    ones for this driver don't seem to have any specific marking.
-
+    XaviX plug and play units almost always have a XaviX logo on the external packaging
+	while the ones for this driver (and SunPlus etc.) don't seem to have any specific
+	markings.
 
     Notes:
-    To access internal test on Tetris hold P1 Down + P1 Anticlockwise (Button 2) on boot
-    There appears to be a similar mode for Invaders but I don't know if it's accessible
+    
+	Tetris - RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if
+	between certain values? probably read via serial (or ADC abuse?)
 
-
-    RAM 0xa0 and 0xa1 contain the ACD0 and AD1 values and player 2 controls if between
-    certain values? probably read via serial??
-
-	-----------------------
-    Custom Interrupt purposes
-	-----------------------
-
-    TETRIS
-
-    ffb0
-    nothing of note?
-
-    ffb4
-    stuff with 500e, 500c and 500d
-
-    ffb8
-    stuff with 50a4 / 50a5 / 50a6  and memory address e2
-
-    ffbc
-    stuff with 50a4 / 50a5 / 50a6  and memory address e2 (similar to above, different bits)
-
-    ffc0 - doesn't exist
-    ffc4 - doesn't exist
-    ffc8 - doesn't exist
-    ffd0 - doesn't exist
-
-    ffd4
-    main irq?
-
-    ffd8
-    jumps straight to an rti
-
-    ffdc
-    accesses 501d / 501b
-
-	-----------------------
-
-    SPACE INVADERS
-
-    ffb0
-    rti
-
-    ffb4
-    rti
-
-    ffb8
-    rti
-
-    ffbc
-    decreases 301  bit 02
-    stuff wit 50a5
-
-    ffc0
-    decreases 302
-    stuff with 50a5 bit 04
-
-    ffc4
-    decreases 303
-    stuff with 50a5  bit 08
-
-    ffc8
-    decreases 304
-    stuff with 50a5  bit 10
-
-    ffcc
-    uses 307
-    stuff with 50a5  bit 20
-
-    ffd0
-    dead loop
-
-    ffd4
-    main interrupt
-
-    ffd8
-    dead loop
-
-    ffdc
-    dead loop
-
-    ffe0
-    dead loop
-
-    ffe4
-    rti
-
-    ffe8
-    dead loop
-
-    ffec
-    dead loop
-
-	-----------------------
+	Internal Test Menus:
 	
-	AIR BLASTER JOYSTICK
-
-	all these 60xx jumps expect bank 00 or 0e or 3a or 7d to be active, so IRQs must be masked
-
-	ffb0: jmp to 6000  (ends up jumping to pointer from RAM)
-	ffb4: jmp to e08e  (stuff with 500c/500d/506e etc.)
-	ffb8: jmp to 601c  (stub handler) (has function in bank 0e - writes 00 then 01 to 50a5)
-	ffbc: jmp to 602a  (stub handler)
-	ffc0: jmp to 6038  (stub handler)
-	ffc4: jmp to 6046  (stub handler)
-	ffc8: jmp to 6054  (stub handler)
-	ffcc: jmp to 6062  (stub handler)
-	ffd0: jmp to 6070  (stub handler)
-	ffd4: jmp to 607e  (valid code - main IRQ?)
-	ffd8: jmp to 608c  (stub handler)
-	ffdc: jmp to 609a  (stub handler)
-	ffe0: jmp to 60a8  (stub handler)
-	ffe4: jmp to 60b6  (stub handler)
-	ffe8: jmp to 60c4  (stub handler)
-	ffec: jmp to 60d2  (stub handler)
-
-	fff0: 7d
-
-	fffa: e0 60 (60e0 vector) (stub handler)
-	fffc: 88 e1 (e188 startup vector)
-	fffe: 02 e0 (e002 vector)
-
+	Tetris - hold P1 Down + P1 Anticlockwise (Button 2) on boot
+    Space Invaders - hold P1 Down + P1 Button 1 on boot
+	ABL Air-Blaster - none?
 
 	----
 
@@ -195,28 +74,28 @@
 #include "machine/bankdev.h"
 #include "audio/elan_eu3a05.h"
 #include "machine/elan_eu3a05gpio.h"
+#include "machine/elan_eu3a05sys.h"
+#include "video/elan_eu3a05vid.h"
 
-class radica_eu3a05_state : public driver_device
+class elan_eu3a05_state : public driver_device
 {
 public:
-	radica_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
+	elan_eu3a05_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_ram(*this, "ram"),
-		m_vram(*this, "vram"),
-		m_spriteram(*this, "spriteram"),
-		m_palram(*this, "palram"),
-		m_unk5007(*this, "unk5007"),
-		m_unk5008(*this, "unk5008"),
 		m_gpio(*this, "gpio"),
+		m_sys(*this, "sys"),
+		m_sound(*this, "eu3a05sound"),
+		m_vid(*this, "vid"),
 		m_pixram(*this, "pixram"),
 		m_bank(*this, "bank"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
-	void radicasi(machine_config &config);
+	void elan_eu3a05(machine_config &config);
 	void airblsjs(machine_config& config);
 
 private:
@@ -224,61 +103,21 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// system
-	DECLARE_READ8_MEMBER(radicasi_5003_r);
-	DECLARE_READ8_MEMBER(radicasi_pal_ntsc_r);
-	DECLARE_READ8_MEMBER(radicasi_rombank_lo_r);
-	DECLARE_WRITE8_MEMBER(radicasi_rombank_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_rombank_hi_w);
-
-	// DMA
-	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_md_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasrc_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_dmasrc_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_dmasrc_md_r);
-	DECLARE_READ8_MEMBER(radicasi_dmasrc_hi_r);
-	DECLARE_WRITE8_MEMBER(radicasi_dmadst_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmadst_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_dmadst_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_dmadst_hi_r);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasize_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_dmasize_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_dmasize_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_dmasize_hi_r);
-	DECLARE_READ8_MEMBER(radicasi_dmatrg_r);
-	DECLARE_WRITE8_MEMBER(radicasi_dmatrg_w);
-
-	// VIDEO
-	// tile bases
-	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_tile_gfxbase_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_tile_gfxbase_hi_r);
-	// sprite tile bases
-	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_lo_w);
-	DECLARE_WRITE8_MEMBER(radicasi_sprite_gfxbase_hi_w);
-	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_lo_r);
-	DECLARE_READ8_MEMBER(radicasi_sprite_gfxbase_hi_r);
-
-	DECLARE_WRITE8_MEMBER(radicasi_vidctrl_w);
-
-	DECLARE_READ8_MEMBER(radicasi_sprite_bg_scroll_r);
-	DECLARE_WRITE8_MEMBER(radicasi_sprite_bg_scroll_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
 
 	// more sound regs?
-	DECLARE_READ8_MEMBER(radicasi_50a9_r);
-	DECLARE_WRITE8_MEMBER(radicasi_50a9_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_50a9_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_50a9_w);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
-
-	DECLARE_READ8_MEMBER(radicasi_nmi_vector_r);
-	DECLARE_READ8_MEMBER(radicasi_irq_vector_r);
 
 	// for callback
 	DECLARE_READ8_MEMBER(read_full_space);
 
-	void radicasi_bank_map(address_map &map);
-	void radicasi_map(address_map &map);
+	void elan_eu3a05_bank_map(address_map &map);
+	void elan_eu3a05_map(address_map &map);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -289,426 +128,40 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_shared_ptr<uint8_t> m_ram;
-	required_shared_ptr<uint8_t> m_vram;
-	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_palram;
-	required_shared_ptr<uint8_t> m_unk5007;
-	required_shared_ptr<uint8_t> m_unk5008;
-	required_device<radica6502_gpio_device> m_gpio;
+	required_device<elan_eu3a05gpio_device> m_gpio;
+	required_device<elan_eu3a05sys_device> m_sys;
+	required_device<elan_eu3a05_sound_device> m_sound;
+	required_device<elan_eu3a05vid_device> m_vid;
 	required_shared_ptr<uint8_t> m_pixram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_rombank_hi;
-	uint8_t m_rombank_lo;
-	uint8_t m_vidctrl;
 	uint8_t m_50a9_data;
-
-	uint8_t m_dmasrc_lo_data;
-	uint8_t m_dmasrc_md_data;
-	uint8_t m_dmasrc_hi_data;
-	uint8_t m_dmadst_lo_data;
-	uint8_t m_dmadst_hi_data;
-	uint8_t m_dmasize_lo_data;
-	uint8_t m_dmasize_hi_data;
-
-	uint8_t m_tile_gfxbase_lo_data;
-	uint8_t m_tile_gfxbase_hi_data;
-
-	uint8_t m_sprite_gfxbase_lo_data;
-	uint8_t m_sprite_gfxbase_hi_data;
-
-	uint8_t m_bg_scroll[2];
-
-	int m_custom_irq;
-	int m_custom_nmi;
-	uint16_t m_custom_irq_vector;
-	uint16_t m_custom_nmi_vector;
-
-	bool get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2);
-	void draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-void radica_eu3a05_state::video_start()
+void elan_eu3a05_state::video_start()
 {
 }
 
-/* (m_tile_gfxbase_lo_data | (m_tile_gfxbase_hi_data << 8)) * 0x100
-   gives you the actual rom address, everything references the 3MByte - 4MByte region, like the banking so
-   the system can probably have up to a 4MByte rom, all games we have so far just use the upper 1MByte of
-   that space (Tetris seems to rely on mirroring? as it sets all addresses up for the lower 1MB instead)
-*/
 
-void radica_eu3a05_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-
-	/*
-	    Sprites
-	    AA yy xx cc XX YY aa bb
-
-	    yy = y position
-	    xx = x position
-	    XX = texture x start
-	    YY = texture y start
-	    aa = same as unk2 on tiles
-	    bb = sometimes set in invaders
-	    cc = same as attr on tiles (colour / priority?)
-
-	    AA = attributes
-	    e--- fFsS
-	    e = enable
-	    S = SizeX
-	    s = SizeY
-	    F = FlipX
-	    f = FlipY (assumed, not seen)
-
-	*/
-
-	for (int i = 0; i < 512; i += 8)
-	{
-		uint8_t x = m_spriteram[i + 2];
-		uint8_t y = m_spriteram[i + 1];
-
-		/*
-		   Space Invaders draws the player base with this specific y value before the start of each life
-		   and expects it to NOT wrap around.  There are no high priority tiles or anything else to hide
-		   and it doesn't appear on real hardware.
-
-		   it's possible sprites don't wrap around at all (but then you couldn't have smooth entry at the
-		   top of the screen - there are no extra y co-ordinate bits.  However there would have been easier
-		   ways to hide this tho as there are a bunch of unseen lines at the bottom of the screen anyway!
-
-		   needs further investigation.
-		*/
-		if (y==255)
-			continue;
-
-		uint8_t tex_x = m_spriteram[i + 4];
-		uint8_t tex_y = m_spriteram[i + 5];
-
-		uint8_t flags = m_spriteram[i + 0];
-		uint8_t attr = m_spriteram[i + 3];
-		uint8_t unk2 = m_spriteram[i + 6];
-
-
-		//int priority = attr & 0x0f;
-		int colour = attr & 0xf0;
-
-		// ? game select has this set to 0xff, but clearly doesn't want the palette to change!
-		// while in Space Invaders this has to be palette for the UFO to be red.
-		if (colour & 0x80)
-			colour = 0;
-
-		int transpen = 0;
-
-		 /* HACK - how is this calculated
-		   phoenix and the game select need it like this
-		   it isn't a simple case of unk2 being transpen either because Qix has some elements set to 0x07
-		   where the transpen needs to be 0x00 and Space Invaders has it set to 0x04
-		   it could be a global register rather than something in the spritelist?
-		*/
-		if ((attr == 0xff) && (unk2 == 0xff))
-			transpen = 0xff;
-
-
-		if (!(flags & 0x80))
-			continue;
-
-		int sizex = 8;
-		int sizey = 8;
-
-		if (flags & 0x01)
-		{
-			sizex = 16;
-		}
-
-		if (flags & 0x02)
-		{
-			sizey = 16;
-		}
-
-		int base = (m_sprite_gfxbase_lo_data | (m_sprite_gfxbase_hi_data << 8)) * 0x100;
-
-		for (int yy = 0; yy < sizey; yy++)
-		{
-			uint16_t* row;
-
-			if (flags & 0x08) // guess flipy
-			{
-				row = &bitmap.pix16((y + (sizey - 1 - yy)) & 0xff);
-			}
-			else
-			{
-				row = &bitmap.pix16((y + yy) & 0xff);
-			}
-
-			for (int xx = 0; xx < sizex; xx++)
-			{
-				int realaddr = base + ((tex_x + xx) & 0xff);
-				realaddr += ((tex_y + yy) & 0xff) * 256;
-
-				uint8_t pix = fullbankspace.read_byte(realaddr);
-
-				if (pix != transpen)
-				{
-					if (flags & 0x04) // flipx
-					{
-						row[(x + (sizex - 1 - xx)) & 0xff] = (pix + ((colour & 0x70) << 1)) & 0xff;
-					}
-					else
-					{
-						row[(x + xx) & 0xff] = (pix + ((colour & 0x70) << 1)) & 0xff;
-					}
-				}
-			}
-		}
-	}
-}
-
-double hue2rgb(double p, double q, double t)
-{
-	if (t < 0) t += 1;
-	if (t > 1) t -= 1;
-	if (t < 1 / 6.0f) return p + (q - p) * 6 * t;
-	if (t < 1 / 2.0f) return q;
-	if (t < 2 / 3.0f) return p + (q - p) * (2 / 3.0f - t) * 6;
-	return p;
-}
-
-// a hacky mess for now
-bool radica_eu3a05_state::get_tile_data(int base, int drawpri, int& tile, int &attr, int &unk2)
-{
-	tile = m_vram[base * 4] + (m_vram[(base * 4) + 1] << 8);
-
-	// these seem to be the basically the same as attr/unk2 in the sprites, which also make
-	// very little sense.
-	attr = m_vram[(base * 4) + 2];
-	unk2 = m_vram[(base * 4) + 3];
-
-	/* hack for phoenix title screens.. the have attr set to 0x3f which change the colour bank in ways we don't want
-	   and also by our interpretation of 0x0f bits sets the tiles to priority over sprites (although in this case
-	   that might tbe ok, because it looks like the sprites also have that set */
-	if (unk2 == 0x07)
-		attr = 0;
-
-	int priority = attr & 0x0f;
-
-	// likely wrong
-	if ((drawpri == 0 && priority == 0x0f) || (drawpri == 1 && priority != 0x0f))
-		return false;
-
-	return true;
-}
-void radica_eu3a05_state::draw_tilemaps(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int drawpri)
-{
-	/* this doesn't handle 8x8 4bpp, haven't seen it used
-	   nor is there support for horizontal scrolling etc.
-	   for the same reasons
-	*/
-
-	int scroll = (m_bg_scroll[1] << 8) | m_bg_scroll[0];
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-
-	if (m_vidctrl & 0x40) // 16x16 tiles
-	{
-		int startrow = (scroll >> 4) & 0x1f;
-
-		for (int y = 0; y < 16; y++)
-		{
-			for (int x = 0; x < 16; x++)
-			{
-				int realstartrow = (startrow + y);
-
-				if (realstartrow >= 28)
-					realstartrow -= 28;
-
-				int base = (((realstartrow + y) & 0x1f) * 8) + x;
-
-				int tile,attr,unk2;
-
-				if (!get_tile_data(base, drawpri, tile,attr,unk2))
-					continue;
-
-				int colour = attr & 0xf0;
-
-				if (m_vidctrl & 0x20) // 4bpp mode
-				{
-					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-				}
-				else
-				{
-					tile = (tile & 0xf) + ((tile & ~0xf) * 16);
-					tile <<= 1;
-
-					tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-				}
-
-				for (int i = 0; i < 16; i++)
-				{
-					int drawline = (y * 16) + i;
-					drawline -= scroll & 0xf;
-
-					if ((drawline >= 0) && (drawline < 256))
-					{
-						uint16_t* row = &bitmap.pix16(drawline);
-
-						if (m_vidctrl & 0x20) // 4bpp
-						{
-							for (int xx = 0; xx < 16; xx += 2)
-							{
-								int realaddr = ((tile + i * 16) << 3) + (xx >> 1);
-								uint8_t pix = fullbankspace.read_byte(realaddr);
-								row[x * 16 + xx + 0] = ((pix & 0xf0) >> 4) + colour;
-								row[x * 16 + xx + 1] = ((pix & 0x0f) >> 0) + colour;
-							}
-						}
-						else // 8bpp
-						{
-							for (int xx = 0; xx < 16; xx++)
-							{
-								int realaddr = ((tile + i * 32) << 3) + xx;
-								uint8_t pix = fullbankspace.read_byte(realaddr);
-								row[x * 16 + xx] = (pix + ((colour & 0x70) << 1)) & 0xff;
-							}
-						}
-
-					}
-				}
-			}
-		}
-	}
-	else // 8x8 tiles
-	{
-		// Phoenix scrolling actually skips a pixel, jumping from 0x001 to 0x1bf, scroll 0x000 isn't used, maybe it has other meanings?
-
-		int startrow = (scroll >> 3) & 0x3f;
-
-		for (int y = 0; y < 32; y++)
-		{
-			for (int x = 0; x < 32; x++)
-			{
-				int realstartrow = (startrow + y);
-
-				if (realstartrow >= 56)
-					realstartrow -= 56;
-
-				int base = (((realstartrow) & 0x3f) * 32) + x;
-
-				int tile,attr,unk2;
-
-				if (!get_tile_data(base, drawpri, tile,attr,unk2))
-					continue;
-
-				int colour = attr & 0xf0;
-
-				tile = (tile & 0x1f) + ((tile & ~0x1f) * 8);
-				tile += ((m_tile_gfxbase_lo_data | m_tile_gfxbase_hi_data << 8) << 5);
-
-				for (int i = 0; i < 8; i++)
-				{
-					int drawline = (y * 8) + i;
-					drawline -= scroll & 0x7;
-
-					if ((drawline >= 0) && (drawline < 256))
-					{
-						uint16_t* row = &bitmap.pix16(drawline);
-
-						for (int xx = 0; xx < 8; xx++)
-						{
-							int realaddr = ((tile + i * 32) << 3) + xx;
-							uint8_t pix = fullbankspace.read_byte(realaddr);
-							row[x * 8 + xx] = (pix + ((colour & 0x70) << 1)) & 0xff;
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-uint32_t radica_eu3a05_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	bitmap.fill(0, cliprect);
-
-	// Palette
-	int offs = 0;
-	for (int index = 0;index < 256; index++)
-	{
-		uint16_t dat = m_palram[offs++] << 8;
-		dat |= m_palram[offs++];
-
-		// llll lsss ---h hhhh
-		int l_raw = (dat & 0xf800) >> 11;
-		int sl_raw = (dat & 0x0700) >> 8;
-		int h_raw = (dat & 0x001f) >> 0;
-
-		double l = (double)l_raw / 31.0f;
-		double s = (double)sl_raw / 7.0f;
-		double h = (double)h_raw / 24.0f;
-
-		double r, g, b;
-
-		if (s == 0) {
-			r = g = b = l; // greyscale
-		} else {
-			double q = l < 0.5f ? l * (1 + s) : l + s - l * s;
-			double p = 2 * l - q;
-			r = hue2rgb(p, q, h + 1/3.0f);
-			g = hue2rgb(p, q, h);
-			b = hue2rgb(p, q, h - 1/3.0f);
-		}
-
-		int r_real = r * 255.0f;
-		int g_real = g * 255.0f;
-		int b_real = b * 255.0f;
-
-		m_palette->set_pen_color(index, r_real, g_real, b_real);
-	}
-
-
-	draw_tilemaps(screen,bitmap,cliprect,0);
-	draw_sprites(screen,bitmap,cliprect);
-	draw_tilemaps(screen,bitmap,cliprect,1);
-
-	return 0;
+	return m_vid->screen_update(screen, bitmap, cliprect);
 }
 
 // System control
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_hi_w)
-{
-	// written with the banking?
-	//logerror("%s: radicasi_rombank_hi_w (set ROM bank) %02x\n", machine().describe_context(), data);
-	m_rombank_hi = data;
-
-	m_bank->set_bank(m_rombank_lo | (m_rombank_hi << 8));
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_rombank_lo_w)
-{
-	//logerror("%s: radicasi_rombank_lo_w (select ROM bank) %02x\n", machine().describe_context(), data);
-	m_rombank_lo = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_rombank_lo_r)
-{
-	return m_rombank_lo;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_pal_ntsc_r)
+READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r)
 {
 	// how best to handle this, we probably need to run the PAL machine at 50hz
 	// the text under the radica logo differs between regions
-	logerror("%s: radicasi_pal_ntsc_r (region + more?)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
 	return 0xff; // NTSC
 	//return 0x00; // PAL
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
+READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_5003_r)
 {
 	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
 
@@ -720,306 +173,109 @@ READ8_MEMBER(radica_eu3a05_state::radicasi_5003_r)
 
 	*/
 
-	logerror("%s: radicasi_5003_r (RNG?)\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_5003_r (RNG?)\n", machine().describe_context());
 
 	return machine().rand();
 }
 
 
-// Video device
-
-// Tile bases
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)
-{
-	//logerror("%s: radicasi_tile_gfxbase_lo_w (select GFX base lower) %02x\n", machine().describe_context(), data);
-	m_tile_gfxbase_lo_data = data;
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)
-{
-	//logerror("%s: radicasi_tile_gfxbase_hi_w (select GFX base upper) %02x\n", machine().describe_context(), data);
-	m_tile_gfxbase_hi_data = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r)
-{
-	//logerror("%s: radicasi_tile_gfxbase_lo_r (GFX base lower)\n", machine().describe_context());
-	return m_tile_gfxbase_lo_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r)
-{
-	//logerror("%s: radicasi_tile_gfxbase_hi_r (GFX base upper)\n", machine().describe_context());
-	return m_tile_gfxbase_hi_data;
-}
-
-// Sprite Tile bases
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)
-{
-	//logerror("%s: radicasi_sprite_gfxbase_lo_w (select Sprite GFX base lower) %02x\n", machine().describe_context(), data);
-	m_sprite_gfxbase_lo_data = data;
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)
-{
-	//logerror("%s: radicasi_sprite_gfxbase_hi_w (select Sprite GFX base upper) %02x\n", machine().describe_context(), data);
-	m_sprite_gfxbase_hi_data = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r)
-{
-	//logerror("%s: radicasi_sprite_gfxbase_lo_r (Sprite GFX base lower)\n", machine().describe_context());
-	return m_sprite_gfxbase_lo_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r)
-{
-	//logerror("%s: radicasi_sprite_gfxbase_hi_r (Sprite GFX base upper)\n", machine().describe_context());
-	return m_sprite_gfxbase_hi_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_sprite_bg_scroll_r)
-{
-	return m_bg_scroll[offset];
-
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_sprite_bg_scroll_w)
-{
-	m_bg_scroll[offset] = data;
-}
-
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_vidctrl_w)
-{
-	logerror("%s: radicasi_vidctrl_w %02x (video control?)\n", machine().describe_context(), data);
-	/*
-	    c3  8bpp 16x16         1100 0011
-	    e3  4bpp 16x16         1110 0011
-	    83  8bpp 8x8           1000 0011
-	    02  8bpp 8x8 (phoenix) 0000 0010
-	*/
-	m_vidctrl = data;
-}
-
-// DMA device
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_lo_w)
-{
-	logerror("%s: radicasi_dmasrc_lo_w (select DMA source low) %02x\n", machine().describe_context(), data);
-	m_dmasrc_lo_data = data;
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_md_w)
-{
-	logerror("%s: radicasi_dmasrc_md_w (select DMA source middle) %02x\n", machine().describe_context(), data);
-	m_dmasrc_md_data = data;
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_w)
-{
-	logerror("%s: radicasi_dmasrc_hi_w (select DMA source upper) %02x\n", machine().describe_context(), data);
-	m_dmasrc_hi_data = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_lo_r)
-{
-	logerror("%s: radicasi_dmasrc_lo_r (DMA source low)\n", machine().describe_context());
-	return m_dmasrc_lo_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_md_r)
-{
-	logerror("%s: radicasi_dmasrc_md_r (DMA source middle)\n", machine().describe_context());
-	return m_dmasrc_md_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasrc_hi_r)
-{
-	logerror("%s: radicasi_dmasrc_hi_r (DMA source upper)\n", machine().describe_context());
-	return m_dmasrc_hi_data;
-}
-
-
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmadst_lo_w)
-{
-	logerror("%s: radicasi_dmadst_lo_w (select DMA Dest lower) %02x\n", machine().describe_context(), data);
-	m_dmadst_lo_data = data;
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmadst_hi_w)
-{
-	logerror("%s: radicasi_dmadst_hi_w (select DMA Dest upper) %02x\n", machine().describe_context(), data);
-	m_dmadst_hi_data = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmadst_lo_r)
-{
-	logerror("%s: radicasi_dmadst_lo_r (DMA Dest lower)\n", machine().describe_context());
-	return m_dmadst_lo_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmadst_hi_r)
-{
-	logerror("%s: radicasi_dmadst_hi_r (DMA Dest upper)\n", machine().describe_context());
-	return m_dmadst_hi_data;
-}
-
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasize_lo_w)
-{
-	logerror("%s: radicasi_dmasize_lo_w (select DMA Size lower) %02x\n", machine().describe_context(), data);
-	m_dmasize_lo_data = data;
-}
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmasize_hi_w)
-{
-	logerror("%s: radicasi_dmasize_hi_w (select DMA Size upper) %02x\n", machine().describe_context(), data);
-	m_dmasize_hi_data = data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasize_lo_r)
-{
-	logerror("%s: radicasi_dmasize_lo_r (DMA Size lower)\n", machine().describe_context());
-	return m_dmasize_lo_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmasize_hi_r)
-{
-	logerror("%s: radicasi_dmasize_hi_r (DMA Size upper)\n", machine().describe_context());
-	return m_dmasize_hi_data;
-}
-
-READ8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_r)
-{
-	logerror("%s: radicasi_dmatrg_r (DMA operation state?)\n", machine().describe_context());
-	return 0x00;//m_dmatrg_data;
-}
-
-
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_dmatrg_w)
-{
-	logerror("%s: radicasi_dmatrg_w (trigger DMA operation) %02x\n", machine().describe_context(), data);
-	//m_dmatrg_data = data;
-
-	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-	address_space& destspace = m_maincpu->space(AS_PROGRAM);
-
-	if (data)
-	{
-		int src = (m_dmasrc_lo_data << 0) | (m_dmasrc_md_data << 8) | (m_dmasrc_hi_data << 16);
-		uint16_t dest = (m_dmadst_lo_data | (m_dmadst_hi_data << 8));
-		uint16_t size = (m_dmasize_lo_data | (m_dmasize_hi_data << 8));
-
-		logerror(" Doing DMA %06x to %04x size %04x\n", src, dest, size);
-
-		for (int i = 0; i < size; i++)
-		{
-			uint8_t dat = fullbankspace.read_byte(src + i);
-			destspace.write_byte(dest + i, dat);
-		}
-	}
-}
-
-
-
 
 // probably also sound device, maybe for forcing channels to stop?
-READ8_MEMBER(radica_eu3a05_state::radicasi_50a9_r)
+READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_50a9_r)
 {
-	logerror("%s: radicasi_50a9_r\n", machine().describe_context());
+	logerror("%s: elan_eu3a05_50a9_r\n", machine().describe_context());
 	return m_50a9_data;
 }
 
-WRITE8_MEMBER(radica_eu3a05_state::radicasi_50a9_w)
+WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_50a9_w)
 {
-	logerror("%s: radicasi_50a9_w %02x\n", machine().describe_context(), data);
+	logerror("%s: elan_eu3a05_50a9_w %02x\n", machine().describe_context(), data);
 	m_50a9_data = data;
 }
 
+WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_500b_unk_w)
+{
+	// this is the PAL / NTSC flag when read, so what are writes?
+	logerror("%s: elan_eu3a05_500b_unk_w %02x\n", machine().describe_context(), data);
+}
+
 // sound callback
-READ8_MEMBER(radica_eu3a05_state::read_full_space)
+READ8_MEMBER(elan_eu3a05_state::read_full_space)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);
 }
 
-void radica_eu3a05_state::radicasi_map(address_map &map)
+// code at 8bc6 in Air Blaster makes unwanted reads, why, bug in code, flow issue?
+//[:maincpu] ':maincpu' (8BC6): unmapped program memory read from 5972 & FF
+
+
+void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 {
 	// can the addresses move around?
-	map(0x0000, 0x05ff).ram().share("ram");
-	map(0x0600, 0x3dff).ram().share("vram");
-	map(0x3e00, 0x3fff).ram().share("spriteram");
-	map(0x4800, 0x49ff).ram().share("palram");
+	map(0x0000, 0x3fff).ram().share("ram");
+	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
 	// 500x system regs?
-	map(0x5003, 0x5003).r(FUNC(radica_eu3a05_state::radicasi_5003_r));
-
-	map(0x5007, 0x5007).ram().share("unk5007"); // main NMI?IRQ? mask on 0x02
-	map(0x5008, 0x5008).ram().share("unk5008"); // timer IRQ masks or enables?
-
-
-	map(0x500b, 0x500b).r(FUNC(radica_eu3a05_state::radicasi_pal_ntsc_r)); // PAL / NTSC flag at least
-	map(0x500c, 0x500c).w(FUNC(radica_eu3a05_state::radicasi_rombank_hi_w));
-	map(0x500d, 0x500d).rw(FUNC(radica_eu3a05_state::radicasi_rombank_lo_r), FUNC(radica_eu3a05_state::radicasi_rombank_lo_w));
+	map(0x5000, 0x5000).ram();
+	map(0x5001, 0x5001).ram();
+	// 5002
+	map(0x5003, 0x5003).r(FUNC(elan_eu3a05_state::elan_eu3a05_5003_r));
+	map(0x5004, 0x5004).ram();
+	// 5005
+	map(0x5006, 0x5006).ram();
+	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
+	map(0x5009, 0x5009).ram();
+	map(0x500a, 0x500a).ram();
+	map(0x500b, 0x500b).rw(FUNC(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r), FUNC(elan_eu3a05_state::elan_eu3a05_500b_unk_w)); // PAL / NTSC flag at least
+	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
 
 	// 501x DMA controller
-	map(0x500F, 0x500F).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_lo_w));
-	map(0x5010, 0x5010).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_md_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_md_w));
-	map(0x5011, 0x5011).rw(FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasrc_hi_w));
-
-	map(0x5012, 0x5012).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_lo_r), FUNC(radica_eu3a05_state::radicasi_dmadst_lo_w));
-	map(0x5013, 0x5013).rw(FUNC(radica_eu3a05_state::radicasi_dmadst_hi_r), FUNC(radica_eu3a05_state::radicasi_dmadst_hi_w));
-
-	map(0x5014, 0x5014).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_lo_r), FUNC(radica_eu3a05_state::radicasi_dmasize_lo_w));
-	map(0x5015, 0x5015).rw(FUNC(radica_eu3a05_state::radicasi_dmasize_hi_r), FUNC(radica_eu3a05_state::radicasi_dmasize_hi_w));
-
-	map(0x5016, 0x5016).rw(FUNC(radica_eu3a05_state::radicasi_dmatrg_r), FUNC(radica_eu3a05_state::radicasi_dmatrg_w));
+	map(0x500f, 0x5015).rw(m_sys, FUNC(elan_eu3a05sys_device::dma_param_r), FUNC(elan_eu3a05sys_device::dma_param_w));
+	map(0x5016, 0x5016).rw(m_sys, FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_r), FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_w));
 
 	// 502x - 503x video regs area?
 	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).w(FUNC(radica_eu3a05_state::radicasi_vidctrl_w));
-
-	map(0x5029, 0x5029).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_tile_gfxbase_hi_w)); // tilebase
-
-	map(0x502b, 0x502b).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_r), FUNC(radica_eu3a05_state::radicasi_sprite_gfxbase_hi_w)); // tilebase (spr?)
-
-	map(0x5031, 0x5032).rw(FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_r), FUNC(radica_eu3a05_state::radicasi_sprite_bg_scroll_w));
-
+	map(0x5027, 0x5027).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
+	map(0x5028, 0x5028).ram();
+	map(0x5029, 0x5029).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_w)); // tilebase
+	map(0x502a, 0x502a).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w)); // tilebase
+	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w)); // tilebase (spr?)
+	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w)); // tilebase (spr?)
+	map(0x502d, 0x502e).rw(m_vid, FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w)); // split position
+	map(0x502f, 0x5036).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w)); // there are 4 scroll values in here, x scroll, y scroll, xscroll1 for split, xscroll2 for split (eu3a14 can do split too)
+	// 5037
+	map(0x5038, 0x5038).ram();
 
 	// 504x GPIO area?
-	map(0x5040, 0x5046).rw("gpio", FUNC(radica6502_gpio_device::gpio_r), FUNC(radica6502_gpio_device::gpio_w));
-	map(0x5048, 0x504a).w("gpio", FUNC(radica6502_gpio_device::gpio_unk_w));
+	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
+	// 5047
+	map(0x5048, 0x504a).w(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_unk_w));
 
 	// 506x unknown
 	map(0x5060, 0x506d).ram(); // read/written by tetris
 
 	// 508x sound
-	map(0x5080, 0x5091).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_addr_r), FUNC(radica6502_sound_device::radicasi_sound_addr_w));
-	map(0x5092, 0x50a3).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_size_r), FUNC(radica6502_sound_device::radicasi_sound_size_w));
-	map(0x50a4, 0x50a4).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_unk_r), FUNC(radica6502_sound_device::radicasi_sound_unk_w));
-	map(0x50a5, 0x50a5).rw("6ch_sound", FUNC(radica6502_sound_device::radicasi_sound_trigger_r), FUNC(radica6502_sound_device::radicasi_sound_trigger_w));
-
-	map(0x50a8, 0x50a8).r("6ch_sound", FUNC(radica6502_sound_device::radicasi_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
-
-	map(0x50a9, 0x50a9).rw(FUNC(radica_eu3a05_state::radicasi_50a9_r), FUNC(radica_eu3a05_state::radicasi_50a9_w));
+	map(0x5080, 0x5091).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w));
+	map(0x5092, 0x50a3).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w));
+	map(0x50a4, 0x50a4).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w));
+	map(0x50a5, 0x50a5).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
+	map(0x50a6, 0x50a6).ram();
+	map(0x50a7, 0x50a7).ram();
+	map(0x50a8, 0x50a8).r(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
+	map(0x50a9, 0x50a9).rw(FUNC(elan_eu3a05_state::elan_eu3a05_50a9_r), FUNC(elan_eu3a05_state::elan_eu3a05_50a9_w));
 
 	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x3f8000);
 	// not sure how these work, might be a modified 6502 core instead.
-	map(0xfffa, 0xfffb).r(FUNC(radica_eu3a05_state::radicasi_nmi_vector_r));
-	map(0xfffe, 0xffff).r(FUNC(radica_eu3a05_state::radicasi_irq_vector_r));
+	map(0xfffa, 0xfffb).r(m_sys, FUNC(elan_eu3a05commonsys_device::nmi_vector_r)); // custom vectors handled with NMI for now
+	//map(0xfffe, 0xffff).r(m_sys, FUNC(elan_eu3a05commonsys_device::irq_vector_r));  // allow normal IRQ for brk
 }
 
 
-void radica_eu3a05_state::radicasi_bank_map(address_map &map)
+void elan_eu3a05_state::elan_eu3a05_bank_map(address_map &map)
 {
 	map(0x000000, 0xffffff).noprw(); // shut up any logging when video params are invalid
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
@@ -1089,54 +345,13 @@ static INPUT_PORTS_START( airblsjs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Missile")
 INPUT_PORTS_END
 
-/* both NMI and IRQ vectors just point to RTI
-    there is a table of jumps just before that, those appear to be the real interrupt functions?
 
-    patch the main IRQ to be the one that decreases an address the code is waiting for
-    the others look like they might be timer service routines
-*/
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_nmi_vector_r)
+void elan_eu3a05_state::machine_start()
 {
-	if (m_custom_nmi)
-	{
-		return m_custom_nmi_vector >> (offset*8);
-	}
-	else
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		return rom[0x3f9ffa + offset];
-	}
 }
 
-READ8_MEMBER(radica_eu3a05_state::radicasi_irq_vector_r)
-{
-	if (m_custom_irq)
-	{
-		return m_custom_irq_vector >> (offset*8);
-	}
-	else
-	{
-		uint8_t *rom = memregion("maincpu")->base();
-		return rom[0x3f9ffe + offset];
-	}
-}
-
-void radica_eu3a05_state::machine_start()
-{
-	m_custom_irq = 0;
-	m_custom_irq_vector = 0x0000;
-
-	m_custom_nmi = 0;
-	m_custom_nmi_vector = 0x0000;
-
-	m_bank->set_bank(0x7f);
-
-	save_item(NAME(m_rombank_lo));
-	save_item(NAME(m_rombank_hi)); 
-}
-
-void radica_eu3a05_state::machine_reset()
+void elan_eu3a05_state::machine_reset()
 {
 	/* the 6502 core sets the default stack value to 0x01bd
 	   and Tetris does not initialize it to anything else
@@ -1209,84 +424,84 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
-static GFXDECODE_START( gfx_radicasi_fake )
+static GFXDECODE_START( gfx_elan_eu3a05_fake )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, helper_8bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "maincpu", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(radica_eu3a05_state::interrupt)
+
+
+INTERRUPT_GEN_MEMBER(elan_eu3a05_state::interrupt)
 {
-	// Air Blaster uses brk in the code, which is problematic for custom IRQs
-	//	m_custom_irq = 1;
-	//	m_custom_irq_vector = 0xffd4;
-	//	m_maincpu->set_input_line(INPUT_LINE_IRQ0,HOLD_LINE);
-	
-	// 5007        5008
-	// ---- --v-   ---- -2-0
-	//
-	// vector = 0xffb0 + 4 * bit position from right
-
-	// each bit seems to relate to an IRQ level
-	// v = vblank bit (vector 0xffd4)
-	// 0 = used for object movement (enemies / bullets) on air blaster chase levels (vector 0xffb0) needs to be frequent, timer? or hbl?
-	// 2 = used for ? on air blaster 2d levels (`vector 0xffb8)
-
-	m_custom_nmi = 1;
-	m_custom_nmi_vector = 0xffd4;
-
-	if (m_unk5007[0] & 0x02) // seems to be correct otherwise Air Blaster will crash / give random mid-level Game Over messages
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	m_sys->generate_custom_interrupt(9);
 }
 
 
-// Tetris (PAL version)      has XTAL of 21.281370
-// Air Blaster (PAL version) has XTAL of 21.2813
-// what are the NTSC clocks?
+/* Tetris (PAL version)      has XTAL of 21.281370
+   Air Blaster (PAL version) has XTAL of 21.2813
+   what are the NTSC clocks?
 
-// not confirmed on Space Invaders, actual CPU clock unknown.
-// 21281370 is the same value as a PAL SNES
-// game speed in Air Blaster appears to be limited entirely by CPU speed (and therefore needs to be around 2mhz at most to match hardware)
-// low clock speed also helps with the badly programmed controls in Tetris
+   not confirmed on Space Invaders, actual CPU clock unknown.
+   21281370 is the same value as a PAL SNES
 
+   game logic speed (but not level scroll speed) in Air Blaster appears to be limited entirely by CPU speed (and therefore needs to be around 2-3mhz
+   at most to match hardware) - a divider of 8 gives something close to original hardware
+   it is unclear exactly what limits the clock speed (maybe video / sound causes waitstates? - dma in progress could also slow / stop the CPU
+   and is not going to be 'instant' on hardware)
+  
+   using a low clock speed also helps with the badly programmed controls in Tetris as that likewise seems to run the game logic 'as fast as possible'
+   there don't appear to be any kind of blanking bits being checked.
+*/
 
-void radica_eu3a05_state::radicasi(machine_config &config)
+void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, XTAL(21'281'370)/12); // wrong, this is the PAL clock
-	m_maincpu->set_addrmap(AS_PROGRAM, &radica_eu3a05_state::radicasi_map);
-	m_maincpu->set_vblank_int("screen", FUNC(radica_eu3a05_state::interrupt));
+	M6502(config, m_maincpu, XTAL(21'281'370)/8); // wrong, this is the PAL clock
+	m_maincpu->set_addrmap(AS_PROGRAM, &elan_eu3a05_state::elan_eu3a05_map);
+	m_maincpu->set_vblank_int("screen", FUNC(elan_eu3a05_state::interrupt));
 
-	ADDRESS_MAP_BANK(config, "bank").set_map(&radica_eu3a05_state::radicasi_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
+	ADDRESS_MAP_BANK(config, "bank").set_map(&elan_eu3a05_state::elan_eu3a05_bank_map).set_options(ENDIANNESS_LITTLE, 8, 24, 0x8000);
 
 	PALETTE(config, m_palette).set_entries(256);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_screen_update(FUNC(radica_eu3a05_state::screen_update));
+	m_screen->set_screen_update(FUNC(elan_eu3a05_state::screen_update));
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_radicasi_fake);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_elan_eu3a05_fake);
 
-	RADICA6502_GPIO(config, m_gpio, 0);
+	ELAN_EU3A05_GPIO(config, m_gpio, 0);
 	m_gpio->read_0_callback().set_ioport("IN0");
 	m_gpio->read_1_callback().set_ioport("IN1");
 	m_gpio->read_2_callback().set_ioport("IN2");
 
+	ELAN_EU3A05_SYS(config, m_sys, 0);
+	m_sys->set_cpu("maincpu");
+	m_sys->set_addrbank("bank");
+
+	ELAN_EU3A05_VID(config, m_vid, 0);
+	m_vid->set_cpu("maincpu");
+	m_vid->set_addrbank("bank");
+	m_vid->set_palette("palette");
+	m_vid->set_entries(256);
+
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	radica6502_sound_device &sound(RADICA6502_SOUND(config, "6ch_sound", 8000));
-	sound.space_read_callback().set(FUNC(radica_eu3a05_state::read_full_space));
-	sound.add_route(ALL_OUTPUTS, "mono", 1.0);
+
+	ELAN_EU3A05_SOUND(config, m_sound, 8000);
+	m_sound->space_read_callback().set(FUNC(elan_eu3a05_state::read_full_space));
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void radica_eu3a05_state::airblsjs(machine_config& config)
+void elan_eu3a05_state::airblsjs(machine_config& config)
 {
-	radicasi(config);
+	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
 }
 
@@ -1313,9 +528,9 @@ ROM_START( airblsjs )
 ROM_END
 
 
-CONS( 2004, rad_sinv, 0, 0, radicasi, rad_sinv, radica_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
+CONS( 2004, rad_sinv, 0, 0, elan_eu3a05, rad_sinv, elan_eu3a05_state, empty_init, "Radica (licensed from Taito)",                      "Space Invaders [Lunar Rescue, Colony 7, Qix, Phoenix] (Radica, Arcade Legends TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // "5 Taito games in 1"
 
-CONS( 2004, rad_tetr, 0, 0, radicasi, rad_tetr, radica_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
+CONS( 2004, rad_tetr, 0, 0, elan_eu3a05, rad_tetr, elan_eu3a05_state, empty_init, "Radica (licensed from Elorg / The Tetris Company)", "Tetris (Radica, Arcade Legends TV Game)", MACHINE_NOT_WORKING ) // "5 Tetris games in 1"
 
 // ROM contains the string "Credit:XiAn Hummer Software Studio(CHINA) Tel:86-29-84270600 Email:HummerSoft@126.com"  PCB has datecode of "050423" (23rd April 2005)
-CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, radica_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )
+CONS( 2005, airblsjs, 0, 0, airblsjs, airblsjs, elan_eu3a05_state, empty_init, "Advance Bright Ltd", "Air-Blaster Joystick (AB1500, PAL)", MACHINE_NOT_WORKING )

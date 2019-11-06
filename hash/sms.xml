@@ -124,7 +124,7 @@
 
 	<!-- Notes: optional SK-1100 keyboard support -->
 	<software name="actionfg0" cloneof="actionfg">
-		<description>Action Fighter (v0, prototype)</description>
+		<description>Action Fighter (v0, Prototype)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="アクションファイター" />
@@ -6072,6 +6072,36 @@
 			<feature name="ic1" value="MPR-15926-F" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-15926-f.ic1" size="524288" crc="aedf3bdf" sha1="f64c8eea26a103582f09831c3e02c6045a6aff94" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: Sega of Japan labels, unfortunately crashes after title screen -->
+	<software name="sonicc630" cloneof="sonicc" supported="no">
+		<description>Sonic the Hedgehog Chaos (Euro, "Ver 0.20", Prototype 19930630)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="ms sonic 3 0.bin" size="131072" crc="538ef990" sha1="0eee07db9d64813ab343c7d2ebd70bb2a1c6b589" offset="0x00000" />
+				<rom name="ms sonic 3 1.bin" size="131072" crc="4cec61fe" sha1="c6ff6f80e9f71965fca1927fe9c49c355d633f64" offset="0x20000" />
+				<rom name="ms sonic 3 2.bin" size="131072" crc="95f3c5b5" sha1="08a918b028a2e646b280637dd81217feae5d435c" offset="0x40000" />
+				<rom name="ms sonic 3 3.bin" size="131072" crc="803893e6" sha1="138c4fb7c0e80d1d06b1ebc949a139594d876693" offset="0x60000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Notes: Sega UK labels, mistakenly marked GG; internal version has not changed since sonicc630 and therefore is not ideal for reference -->
+	<software name="sonicc713" cloneof="sonicc">
+		<description>Sonic the Hedgehog Chaos (Euro, Prototype 19930713)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic chaos 0 gg 13-7 1m.bin" size="131072" crc="d8fae464" sha1="1873efcc4937c7e7c4b3c622f855615193229846" offset="0x00000" />
+				<rom name="sonic chaos 1 gg 13-7 1m.bin" size="131072" crc="b13ab99a" sha1="9e9575e50dba386917862c45f7af3acdf0e54e8e" offset="0x20000" />
+				<rom name="sonic chaos 2 gg 13-7 1m.bin" size="131072" crc="62625015" sha1="4cba6035f0b8e4ee2da372d9cdd0126af3807ddb" offset="0x40000" />
+				<rom name="sonic chaos 3 gg 13-7 1m.bin" size="131072" crc="fbd1c349" sha1="43c301b1439a83e57c6ab900a2838ea27fac7d25" offset="0x60000" />
 			</dataarea>
 		</part>
 	</software>

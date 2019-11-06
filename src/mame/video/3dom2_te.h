@@ -190,7 +190,6 @@ private:
 	void load_texture();
 
 	m2_bda_device       *m_bda;
-	const address_space_config  m_space_config; // TODO: Why is this still here?
 
 	devcb_write_line    m_general_int_handler;
 	devcb_write_line    m_dfinstr_int_handler;

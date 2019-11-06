@@ -46,7 +46,6 @@
 #include "plib/pomp.h"
 
 #include <algorithm>
-#include <cmath>
 
 namespace netlist
 {

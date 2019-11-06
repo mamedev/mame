@@ -23,7 +23,7 @@ namespace plib {
 	{
 	public:
 		template <typename T>
-		ptokenizer(T &&strm) // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
+		explicit ptokenizer(T &&strm) // NOLINT(misc-forwarding-reference-overload, bugprone-forwarding-reference-overload)
 		: m_strm(std::forward<T>(strm))
 		, m_cur_line("")
 		, m_px(m_cur_line.begin())
@@ -139,7 +139,7 @@ namespace plib {
 		pstring::value_type getc();
 		void ungetc(pstring::value_type c);
 
-		bool eof() { return m_strm.eof(); }
+		bool eof() const { return m_strm.eof(); }
 
 		putf8_reader m_strm;
 

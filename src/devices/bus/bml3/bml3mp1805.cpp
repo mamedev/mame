@@ -59,8 +59,11 @@ ROM_END
 void bml3bus_mp1805_device::device_add_mconfig(machine_config &config)
 {
 	MC6843(config, m_mc6843, 0);
+	m_mc6843->set_floppy_drives(m_floppy[0], m_floppy[1], m_floppy[2], m_floppy[3]);
 	m_mc6843->irq().set(FUNC(bml3bus_mp1805_device::bml3_mc6843_intrq_w));
-	legacy_floppy_image_device::add_4drives(config, &bml3_mp1805_floppy_interface);
+
+	for (auto &floppy : m_floppy)
+		LEGACY_FLOPPY(config, floppy, 0, &bml3_mp1805_floppy_interface);
 }
 
 //-------------------------------------------------
@@ -90,7 +93,6 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 	// TODO: MESS UI for flipping disk? Note that D88 images are double-sided, but the physical drive is single-sided
 	int side = 0;
 	int motor = BIT(data, 7);
-	const char *floppy_name = nullptr;
 	switch (drive_select) {
 	case 1:
 		drive = 0;
@@ -109,24 +111,9 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 		drive = 0;
 		break;
 	}
-	switch (drive) {
-	case 0:
-		floppy_name = FLOPPY_0;
-		break;
-	case 1:
-		floppy_name = FLOPPY_1;
-		break;
-	case 2:
-		floppy_name = FLOPPY_2;
-		break;
-	case 3:
-		floppy_name = FLOPPY_3;
-		break;
-	}
-	legacy_floppy_image_device *floppy = subdevice<legacy_floppy_image_device>(floppy_name);
 	m_mc6843->set_drive(drive);
-	floppy->floppy_mon_w(motor);
-	floppy->floppy_drive_set_ready_state(ASSERT_LINE, 0);
+	m_floppy[drive]->floppy_mon_w(motor);
+	m_floppy[drive]->floppy_drive_set_ready_state(ASSERT_LINE, 0);
 	m_mc6843->set_side(side);
 }
 
@@ -138,6 +125,7 @@ WRITE8_MEMBER( bml3bus_mp1805_device::bml3_mp1805_w)
 bml3bus_mp1805_device::bml3bus_mp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, BML3BUS_MP1805, tag, owner, clock),
 	device_bml3bus_card_interface(mconfig, *this),
+	m_floppy(*this, "floppy%u", 0U),
 	m_mc6843(*this, "mc6843"), m_rom(nullptr)
 {
 }

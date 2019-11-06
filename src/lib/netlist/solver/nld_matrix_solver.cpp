@@ -8,8 +8,6 @@
 #include "nld_matrix_solver.h"
 #include "plib/putil.h"
 
-#include <cmath>  // <<= needed by windows build
-
 namespace netlist
 {
 namespace solver
@@ -79,7 +77,7 @@ namespace solver
 		{
 			analog_net_t *net = nets[k];
 
-			log().debug("setting up net\n");
+			log().debug("adding net with {1} populated connections\n", net->core_terms().size());
 
 			net->set_solver(this);
 
@@ -127,10 +125,9 @@ namespace solver
 						break;
 					case detail::terminal_type::OUTPUT:
 						log().fatal(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
-						break;
+						plib::pthrow<nl_exception>(MF_UNHANDLED_ELEMENT_1_FOUND(p->name()));
 				}
 			}
-			log().debug("added net with {1} populated connections\n", net->core_terms().size());
 		}
 	}
 
@@ -403,7 +400,7 @@ namespace solver
 
 	void matrix_solver_t::step(const netlist_time &delta)
 	{
-		const nl_fptype dd = delta.as_fp<nl_fptype>();
+		const auto dd(delta.as_fp<nl_fptype>());
 		for (auto &d : m_step_devices)
 			d->timestep(dd);
 	}
@@ -523,24 +520,25 @@ namespace solver
 		}
 	}
 
-	void matrix_solver_t::add_term(std::size_t k, terminal_t *term)
+	void matrix_solver_t::add_term(std::size_t net_idx, terminal_t *term)
 	{
 		if (term->connected_terminal()->net().isRailNet())
 		{
-			m_rails_temp[k].add_terminal(term, -1, false);
+			m_rails_temp[net_idx].add_terminal(term, -1, false);
 		}
 		else
 		{
 			int ot = get_net_idx(&term->connected_terminal()->net());
 			if (ot>=0)
 			{
-				m_terms[k].add_terminal(term, ot, true);
+				m_terms[net_idx].add_terminal(term, ot, true);
 			}
 			/* Should this be allowed ? */
 			else // if (ot<0)
 			{
-				m_rails_temp[k].add_terminal(term, ot, true);
+				m_rails_temp[net_idx].add_terminal(term, ot, true);
 				log().fatal(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
+				plib::pthrow<nl_exception>(MF_FOUND_TERM_WITH_MISSING_OTHERNET(term->name()));
 			}
 		}
 	}

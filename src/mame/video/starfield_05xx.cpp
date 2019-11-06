@@ -288,6 +288,16 @@
            the Fibonacci form, which is why the latter is used in this 
            implementation.
 
+           The LFSR used by Wolfgang and Jindřich had taps at 15, 12, 10 and 5.
+           With the same seed values, the following holds true:
+
+           Decode_W(lfsr[t-4]) = Decode_J(lfsr[t])
+
+           The two decoding algorithm (Wolfgang, Jindřich) thus delivered the
+           same results but with a 4 clock difference.
+
+           Jindřich: Seed Value 0x70cc
+           Wolfgang: Seed Value 0xe7bf
           ---------------------------------------------------------------------------
 
 

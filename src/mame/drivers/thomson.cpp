@@ -680,6 +680,7 @@ void thomson_state::to7_base(machine_config &config)
 	m_thmfc->floppy_active_cb().set(FUNC(thomson_state::thom_floppy_active));
 
 	MC6843(config, m_mc6843, 16_MHz_XTAL / 16 / 2);
+	m_mc6843->set_floppy_drives(m_floppy_image[0], m_floppy_image[1], m_floppy_image[2], m_floppy_image[3]);
 
 	LEGACY_FLOPPY(config, m_floppy_image[0], 0, &thomson_floppy_interface);
 	m_floppy_image[0]->out_idx_cb().set(FUNC(thomson_state::fdc_index_0_w));

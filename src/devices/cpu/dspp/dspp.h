@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_CPU_DSPP_DSPP_H
+#define MAME_CPU_DSPP_DSPP_H
 
-#ifndef DEVICES_CPU_DSPP_DSPP_H
-#define DEVICES_CPU_DSPP_DSPP_H
+#pragma once
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -392,4 +392,4 @@ public: // TODO
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
 
 
-#endif // DEVICES_CPU_DSPP_DSPP_H
+#endif // MAME_CPU_DSPP_DSPP_H

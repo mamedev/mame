@@ -6,8 +6,7 @@
     Neo-Geo CD hardware
 
     Thanks to:
-        * The FBA team (Barry Harris) for much of the CDC / CDD code and system details.
-          ( http://www.barryharris.me.uk/ )
+        * Jan Klaassen (of the former FBA team) for much of the CDC / CDD code and system details.
         * Mirko Buffoni for a commented disassembly of the NeoCD bios rom.
 
     Current status:

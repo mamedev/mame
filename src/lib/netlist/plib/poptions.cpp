@@ -82,7 +82,7 @@ namespace plib {
 					{
 						if (m_other_args != nullptr)
 						{
-							throw pexception("other args can only be specified once!");
+							pthrow<pexception>("other args can only be specified once!");
 						}
 						else
 						{
@@ -90,7 +90,7 @@ namespace plib {
 						}
 					}
 					else
-						throw pexception("found option with neither short or long tag!" );
+						pthrow<pexception>("found option with neither short or long tag!" );
 				}
 			}
 		}

@@ -72,6 +72,7 @@ DEFINE_DEVICE_TYPE(MC6843, mc6843_device, "mc5843", "Motorola MC6843 FDC")
 
 mc6843_device::mc6843_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC6843, tag, owner, clock),
+	m_floppy(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}),
 	m_write_irq(*this),
 	m_CTAR(0),
 	m_CMR(0),
@@ -131,16 +132,17 @@ void mc6843_device::device_start()
 
 void mc6843_device::device_reset()
 {
-	int i;
 	LOG (( "mc6843 reset\n" ));
 
 	/* setup/reset floppy drive */
-	for ( i = 0; i < 4; i++ )
+	for (auto &img : m_floppy)
 	{
-		legacy_floppy_image_device * img = floppy_image( i );
-		img->floppy_mon_w(CLEAR_LINE);
-		img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0 );
-		img->floppy_drive_set_rpm( 300. );
+		if (img.found())
+		{
+			img->floppy_mon_w(CLEAR_LINE);
+			img->floppy_drive_set_ready_state(FLOPPY_DRIVE_READY, 0 );
+			img->floppy_drive_set_rpm( 300. );
+		}
 	}
 
 	/* reset registers */
@@ -160,35 +162,10 @@ void mc6843_device::device_reset()
 
 
 
-legacy_floppy_image_device* mc6843_device::floppy_image( uint8_t drive )
-{
-	legacy_floppy_image_device *img = floppy_get_device( machine(), drive );
-	if (!img && owner()) {
-		// For slot devices, drives are typically attached to the slot rather than the machine
-		const char *floppy_name = nullptr;
-		switch (drive) {
-		case 0:
-			floppy_name = FLOPPY_0;
-			break;
-		case 1:
-			floppy_name = FLOPPY_1;
-			break;
-		case 2:
-			floppy_name = FLOPPY_2;
-			break;
-		case 3:
-			floppy_name = FLOPPY_3;
-			break;
-		}
-		img = owner()->subdevice<legacy_floppy_image_device>(floppy_name);
-	}
-	return img;
-}
-
-
 legacy_floppy_image_device* mc6843_device::floppy_image( )
 {
-	return floppy_image( m_drive );
+	assert(m_floppy[m_drive].found());
+	return m_floppy[m_drive].target();
 }
 
 

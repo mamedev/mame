@@ -13,7 +13,7 @@
     * LCD controller (320x240 B/W or 240x160 4-gray)
     * Serial peripheral interface
     * UART (built-in BRG; RS-232 and IrDA modes)
-    * Direct memory access
+    * Direct memory access (1 channel)
     * Power down modes (WAI-0, WAI-1, STP)
     * Watchdog timer
     * Low voltage detector
@@ -22,6 +22,9 @@
 
     Emulation is largely based on documentation for the ST2202, which
     has similar though somewhat lesser capabilities.
+
+    Reverse-engineered documentation for SS2204's internal registers:
+    http://blog.kevtris.org/blogfiles/Game%20King%20Inside.txt
 
 **********************************************************************/
 
@@ -34,7 +37,10 @@ st2204_device::st2204_device(const machine_config &mconfig, const char *tag, dev
 	: st2xxx_device(mconfig, ST2204, tag, owner, clock,
 					address_map_constructor(FUNC(st2204_device::int_map), this),
 					26, // logical; only 23 address lines are brought out
-					0x0f7f)
+					false)
+	, m_dms(0)
+	, m_dmd(0)
+	, m_dcnth(0)
 {
 }
 
@@ -47,30 +53,24 @@ void st2204_device::device_start()
 	intf->irr = 0;
 	intf->prr = 0;
 	intf->drr = 0;
+	intf->dmr = 0;
 	intf->irq_service = false;
 
-	save_item(NAME(m_pdata));
-	save_item(NAME(m_pctrl));
-	save_item(NAME(m_psel));
-	save_item(NAME(m_pfun));
-	save_item(NAME(m_sys));
-	save_item(NAME(m_pmcr));
-	save_item(NAME(m_ireq));
-	save_item(NAME(m_iena));
-	save_item(NAME(intf->irr_enable));
-	save_item(NAME(intf->irr));
-	save_item(NAME(intf->prr));
-	save_item(NAME(intf->drr));
-	save_item(NAME(intf->irq_service));
+	init_base_timer(0x0020);
+
+	save_item(NAME(m_dms));
+	save_item(NAME(m_dmd));
+	save_item(NAME(m_dcnth));
 
 	mintf = std::move(intf);
+	save_common_registers();
 	init();
 
 	state_add(ST_IRR, "IRR", downcast<mi_st2204 &>(*mintf).irr).mask(0xff);
 	state_add(ST_PRR, "PRR", downcast<mi_st2204 &>(*mintf).prr).mask(0xfff);
 	state_add(ST_DRR, "DRR", downcast<mi_st2204 &>(*mintf).drr).mask(0x7ff);
-	state_add<u8>(ST_IREQ, "IREQ", [this]() { return m_ireq; }, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(m_ireq_mask);
-	state_add<u8>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(m_ireq_mask);
+	state_add<u16>(ST_IREQ, "IREQ", [this]() { return m_ireq; }, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
+	state_add<u16>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 5; i++)
 	{
 		state_add(ST_PDA + i, string_format("PD%c", 'A' + i).c_str(), m_pdata[i]);
@@ -83,18 +83,40 @@ void st2204_device::device_start()
 	state_add(ST_PDL, "PDL", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
+	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); }).mask(0x1f);
+	state_add(ST_BTSR, "BTSR", m_btsr).mask(0x1f);
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); });
+	state_add(ST_LSSA, "LSSA", m_lssa);
+	state_add(ST_LVPW, "LVPW", m_lvpw);
+	state_add(ST_LXMAX, "LXMAX", m_lxmax);
+	state_add(ST_LYMAX, "LYMAX", m_lymax);
+	state_add(ST_DMS, "DMS", m_dms);
+	state_add(ST_DMR, "DMR", downcast<mi_st2204 &>(*mintf).dmr).mask(0x7ff);
+	state_add(ST_DMD, "DMD", m_dmd);
 }
 
 void st2204_device::device_reset()
 {
 	st2xxx_device::device_reset();
+}
 
-	mi_st2204 &m = downcast<mi_st2204 &>(*mintf);
-	m.irr_enable = false;
-	m.irr = 0;
-	m.prr = 0;
-	m.drr = 0;
+const char *st2204_device::st2xxx_irq_name(int i) const
+{
+	switch (i)
+	{
+	case 0: return "PC0 edge";
+	case 1: return "DAC reload";
+	case 2: return "Timer 0";
+	case 3: return "Timer 1";
+	case 4: return "PA transition";
+	case 5: return "Base timer";
+	case 6: return "LCD frame";
+	case 8: return "SPI TX empty";
+	case 9: return "SPI RX ready";
+	case 10: return "UART TX";
+	case 11: return "UART RX";
+	default: return "Reserved";
+	}
 }
 
 u8 st2204_device::mi_st2204::pread(u16 adr)
@@ -145,6 +167,14 @@ u8 st2204_device::mi_st2204::read_arg(u16 adr)
 	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cache->read_byte(adr);
 }
 
+u8 st2204_device::mi_st2204::read_dma(u16 adr)
+{
+	if (BIT(adr, 15))
+		return dcache->read_byte(u32(dmr) << 15 | (adr & 0x7fff));
+	else
+		return read(adr);
+}
+
 u8 st2204_device::mi_st2204::read_vector(u16 adr)
 {
 	return pread(adr);
@@ -165,69 +195,83 @@ void st2204_device::pmcr_w(u8 data)
 	m_pmcr = data;
 }
 
-u8 st2204_device::sys_r()
+unsigned st2204_device::st2xxx_bt_divider(int n) const
 {
-	return m_sys | 0x01;
+	// 2 Hz, 8 Hz, 64 Hz, 256 Hz, 2048 Hz
+	if (n < 5)
+		return 16384 >> ((n & 1) * 2 + (n >> 1) * 5);
+	else
+		return 0;
 }
 
-void st2204_device::sys_w(u8 data)
+u8 st2204_device::dmsl_r()
 {
-	m_sys = data;
-	downcast<mi_st2204 &>(*mintf).irr_enable = BIT(data, 2);
+	return m_dms & 0xff;
 }
 
-u8 st2204_device::irr_r()
+void st2204_device::dmsl_w(u8 data)
 {
-	return downcast<mi_st2204 &>(*mintf).irr;
+	m_dms = (m_dms & 0xff00) | data;
 }
 
-void st2204_device::irr_w(u8 data)
+u8 st2204_device::dmsh_r()
 {
-	downcast<mi_st2204 &>(*mintf).irr = data;
+	return m_dms >> 8;
 }
 
-u8 st2204_device::prrl_r()
+void st2204_device::dmsh_w(u8 data)
 {
-	return downcast<mi_st2204 &>(*mintf).prr & 0xff;
+	m_dms = (m_dms & 0x00ff) | u16(data) << 8;
 }
 
-void st2204_device::prrl_w(u8 data)
+u8 st2204_device::dmdl_r()
 {
-	u16 &prr = downcast<mi_st2204 &>(*mintf).prr;
-	prr = data | (prr & 0x0f00);
+	return m_dmd & 0xff;
 }
 
-u8 st2204_device::prrh_r()
+void st2204_device::dmdl_w(u8 data)
 {
-	return downcast<mi_st2204 &>(*mintf).prr >> 8;
+	m_dmd = (m_dmd & 0xff00) | data;
 }
 
-void st2204_device::prrh_w(u8 data)
+u8 st2204_device::dmdh_r()
 {
-	u16 &prr = downcast<mi_st2204 &>(*mintf).prr;
-	prr = (data & 0x0f) << 16 | (prr & 0x00ff);
+	return m_dmd >> 8;
 }
 
-u8 st2204_device::drrl_r()
+void st2204_device::dmdh_w(u8 data)
 {
-	return downcast<mi_st2204 &>(*mintf).drr & 0xff;
+	m_dmd = (m_dmd & 0x00ff) | u16(data) << 8;
 }
 
-void st2204_device::drrl_w(u8 data)
+void st2204_device::dcntl_w(u8 data)
 {
-	u16 &drr = downcast<mi_st2204 &>(*mintf).drr;
-	drr = data | (drr & 0x0700);
+	u16 count = data | u16(m_dcnth & 0x0f) << 8;
+
+	// FIXME: not instantaneous (obviously), but takes 2 cycles per transfer while CPU is halted
+	mi_st2204 &intf = downcast<mi_st2204 &>(*mintf);
+	while (count != 0xffff)
+	{
+		intf.write(m_dmd, intf.read_dma(m_dms));
+
+		if (m_dms++ == 0xffff)
+		{
+			// DMR bank increments automatically when source is in data memory
+			m_dms = 0x8000;
+			intf.dmr = (intf.dmr + 1) & 0x7ff;
+		}
+
+		// DMAM inhibits destination increment
+		if (!BIT(m_dcnth, 4))
+			m_dmd++;
+
+		count--;
+	}
 }
 
-u8 st2204_device::drrh_r()
+void st2204_device::dcnth_w(u8 data)
 {
-	return downcast<mi_st2204 &>(*mintf).drr >> 8;
-}
-
-void st2204_device::drrh_w(u8 data)
-{
-	u16 &drr = downcast<mi_st2204 &>(*mintf).drr;
-	drr = (data & 0x07) << 16 | (drr & 0x00ff);
+	m_dcnth = data & 0x1f;
 }
 
 u8 st2204_device::pmem_r(offs_t offset)
@@ -254,23 +298,39 @@ void st2204_device::int_map(address_map &map)
 {
 	map(0x0000, 0x0004).rw(FUNC(st2204_device::pdata_r), FUNC(st2204_device::pdata_w));
 	map(0x0005, 0x0005).rw(FUNC(st2204_device::psc_r), FUNC(st2204_device::psc_w));
-	map(0x0008, 0x000c).rw(FUNC(st2204_device::pdata_r), FUNC(st2204_device::pdata_w));
+	map(0x0008, 0x000c).rw(FUNC(st2204_device::pctrl_r), FUNC(st2204_device::pctrl_w));
 	map(0x000d, 0x000d).rw(FUNC(st2204_device::pfc_r), FUNC(st2204_device::pfc_w));
 	map(0x000e, 0x000e).rw(FUNC(st2204_device::pfd_r), FUNC(st2204_device::pfd_w));
 	map(0x000f, 0x000f).rw(FUNC(st2204_device::pmcr_r), FUNC(st2204_device::pmcr_w));
+	map(0x0020, 0x0020).rw(FUNC(st2204_device::bten_r), FUNC(st2204_device::bten_w));
+	map(0x0021, 0x0021).rw(FUNC(st2204_device::btsr_r), FUNC(st2204_device::btclr_all_w));
+	// Source/destination registers are not readable on ST2202, but may be readable here (count register isn't)
+	map(0x0028, 0x0028).rw(FUNC(st2204_device::dmsl_r), FUNC(st2204_device::dmsl_w));
+	map(0x0029, 0x0029).rw(FUNC(st2204_device::dmsh_r), FUNC(st2204_device::dmsh_w));
+	map(0x002a, 0x002a).rw(FUNC(st2204_device::dmdl_r), FUNC(st2204_device::dmdl_w));
+	map(0x002b, 0x002b).rw(FUNC(st2204_device::dmdh_r), FUNC(st2204_device::dmdh_w));
+	map(0x002c, 0x002c).w(FUNC(st2204_device::dcntl_w));
+	map(0x002d, 0x002d).w(FUNC(st2204_device::dcnth_w));
 	map(0x0030, 0x0030).rw(FUNC(st2204_device::sys_r), FUNC(st2204_device::sys_w));
-	map(0x0031, 0x0031).rw(FUNC(st2204_device::irr_r), FUNC(st2204_device::irr_w));
+	map(0x0031, 0x0031).rw(FUNC(st2204_device::irrl_r), FUNC(st2204_device::irrl_w));
 	map(0x0032, 0x0032).rw(FUNC(st2204_device::prrl_r), FUNC(st2204_device::prrl_w));
 	map(0x0033, 0x0033).rw(FUNC(st2204_device::prrh_r), FUNC(st2204_device::prrh_w));
 	map(0x0034, 0x0034).rw(FUNC(st2204_device::drrl_r), FUNC(st2204_device::drrl_w));
 	map(0x0035, 0x0035).rw(FUNC(st2204_device::drrh_r), FUNC(st2204_device::drrh_w));
+	map(0x0036, 0x0036).rw(FUNC(st2204_device::dmrl_r), FUNC(st2204_device::dmrl_w));
+	map(0x0037, 0x0037).rw(FUNC(st2204_device::dmrh_r), FUNC(st2204_device::dmrh_w));
 	map(0x003c, 0x003c).rw(FUNC(st2204_device::ireql_r), FUNC(st2204_device::ireql_w));
 	map(0x003d, 0x003d).rw(FUNC(st2204_device::ireqh_r), FUNC(st2204_device::ireqh_w));
 	map(0x003e, 0x003e).rw(FUNC(st2204_device::ienal_r), FUNC(st2204_device::ienal_w));
 	map(0x003f, 0x003f).rw(FUNC(st2204_device::ienah_r), FUNC(st2204_device::ienah_w));
+	map(0x0040, 0x0040).w(FUNC(st2204_device::lssal_w));
+	map(0x0041, 0x0041).w(FUNC(st2204_device::lssah_w));
+	map(0x0042, 0x0042).w(FUNC(st2204_device::lvpw_w));
+	map(0x0043, 0x0043).rw(FUNC(st2204_device::lxmax_r), FUNC(st2204_device::lxmax_w));
+	map(0x0044, 0x0044).rw(FUNC(st2204_device::lymax_r), FUNC(st2204_device::lymax_w));
 	map(0x004c, 0x004c).rw(FUNC(st2204_device::pl_r), FUNC(st2204_device::pl_w));
 	map(0x004e, 0x004e).w(FUNC(st2204_device::pcl_w));
-	map(0x0080, 0x27ff).ram(); // 10K internal SRAM; extent of mapping guessed
+	map(0x0080, 0x287f).ram(); // 2800-287F possibly not present in earlier versions
 	map(0x4000, 0x7fff).rw(FUNC(st2204_device::pmem_r), FUNC(st2204_device::pmem_w));
 	map(0x8000, 0xffff).rw(FUNC(st2204_device::dmem_r), FUNC(st2204_device::dmem_w));
 }

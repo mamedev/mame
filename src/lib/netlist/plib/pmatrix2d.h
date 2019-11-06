@@ -13,8 +13,6 @@
 #include "palloc.h"
 
 #include <algorithm>
-#include <cmath>
-//#include <cstdlib>
 #include <type_traits>
 #include <vector>
 

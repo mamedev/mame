@@ -15,7 +15,10 @@
 
 #include <nanosvg/src/nanosvg.h>
 #include <nanosvg/src/nanosvgrast.h>
+
+#include <clocale>
 #include <set>
+
 
 //**************************************************************************
 //  DEBUGGING
@@ -69,7 +72,7 @@ private:
 	NSVGimage *m_image;
 	NSVGrasterizer *m_rasterizer;
 	std::vector<bool> m_key_state;
-	std::vector<std::list<NSVGshape *>> m_keyed_shapes;
+	std::vector<std::vector<NSVGshape *>> m_keyed_shapes;
 	std::unordered_map<std::string, int> m_key_ids;
 	int m_key_count;
 
@@ -91,23 +94,30 @@ private:
 
 screen_device::svg_renderer::svg_renderer(memory_region *region)
 {
-	char *s = new char[region->bytes()+1];
-	memcpy(s, region->base(), region->bytes());
-	s[region->bytes()] = 0;
-	m_image = nsvgParse(s, "px", 72);
-	delete[] s;
+	// nanosvg makes assumptions about the global locale
+	{
+		const std::unique_ptr<char []> s(new char[region->bytes() + 1]);
+		memcpy(s.get(), region->base(), region->bytes());
+		s[region->bytes()] = 0;
+		const std::string lcctype(std::setlocale(LC_CTYPE, nullptr));
+		const std::string lcnumeric(std::setlocale(LC_NUMERIC, nullptr));
+		std::setlocale(LC_CTYPE, "C");
+		std::setlocale(LC_NUMERIC, "C");
+		m_image = nsvgParse(s.get(), "px", 72);
+		std::setlocale(LC_CTYPE, lcctype.c_str());
+		std::setlocale(LC_NUMERIC, lcnumeric.c_str());
+	}
 	m_rasterizer = nsvgCreateRasterizer();
 
 	m_key_count = 0;
 
-	for (NSVGshape *shape = m_image->shapes; shape != nullptr; shape = shape->next)
+	for (NSVGshape *shape = m_image->shapes; shape; shape = shape->next)
 		if(shape->title[0]) {
-			auto it = m_key_ids.find(shape->title);
+			const auto it = m_key_ids.find(shape->title);
 			if(it != m_key_ids.end())
 				m_keyed_shapes[it->second].push_back(shape);
 			else {
-				int id = m_key_count;
-				m_key_count++;
+				const int id = m_key_count++;
 				m_keyed_shapes.resize(m_key_count);
 				m_keyed_shapes[id].push_back(shape);
 				m_key_ids[shape->title] = id;
@@ -627,18 +637,37 @@ void screen_device::allocate_scan_bitmaps()
     {
         const bool screen16 = !m_screen_update_ind16.isnull();
         s32 effwidth = std::max(m_max_width, m_visarea.right() + 1);
+        const s32 old_height = (s32)m_scan_widths.size();
         s32 effheight = std::max(m_height, m_visarea.bottom() + 1);
-        for (int i = 0; i < effheight; i++)
+        if (old_height < effheight)
         {
-            for (int j = 0; j < 2; j++)
-            {
-                if (screen16)
-                    m_scan_bitmaps[j].push_back(new bitmap_ind16(effwidth, 1));
-                else
-                    m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
-            }
-            m_scan_widths.push_back(m_width);
-        }
+			for (int i = old_height; i < effheight; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					if (screen16)
+						m_scan_bitmaps[j].push_back(new bitmap_ind16(effwidth, 1));
+					else
+						m_scan_bitmaps[j].push_back(new bitmap_rgb32(effwidth, 1));
+				}
+				m_scan_widths.push_back(m_width);
+			}
+		}
+		else
+		{
+			for (int i = effheight; i < old_height; i++)
+			{
+				for (int j = 0; j < 2; j++)
+				{
+					if (screen16)
+						delete (bitmap_ind16 *)m_scan_bitmaps[j][i];
+					else
+						delete (bitmap_rgb32 *)m_scan_bitmaps[j][i];
+					m_scan_bitmaps[j].erase(m_scan_bitmaps[j].begin() + i);
+				}
+				m_scan_widths.erase(m_scan_widths.begin() + i);
+			}
+		}
     }
 }
 
@@ -993,6 +1022,7 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 	// reallocate bitmap(s) if necessary
     realloc_screen_bitmaps();
+    if (machine().input().code_pressed(KEYCODE_E)) printf("CONFIGURE\n");
 
 	// compute timing parameters
 	m_frame_period = frame_period;
@@ -1108,7 +1138,6 @@ void screen_device::realloc_screen_bitmaps()
 	m_texture[0]->set_bitmap(m_bitmap[0], m_visarea, m_bitmap[0].texformat());
 	m_texture[1]->set_bitmap(m_bitmap[1], m_visarea, m_bitmap[1].texformat());
 
-    destroy_scan_bitmaps();
     allocate_scan_bitmaps();
 }
 

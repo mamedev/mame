@@ -19,8 +19,6 @@
 
 #include "nl_errstr.h"
 
-#include <cmath>
-//#include <cstring>
 #include <limits>
 
 namespace netlist
@@ -129,8 +127,8 @@ namespace netlist
 		m_qsize = this->size();
 		for (std::size_t i = 0; i < m_qsize; i++ )
 		{
-			m_times[i] =  this->listptr()[i].m_exec_time.as_raw();
-			m_net_ids[i] = state().find_net_id(this->listptr()[i].m_object);
+			m_times[i] =  this->listptr()[i].exec_time().as_raw();
+			m_net_ids[i] = state().find_net_id(this->listptr()[i].object());
 		}
 	}
 
@@ -163,7 +161,7 @@ namespace netlist
 	{
 	}
 
-	detail::terminal_type detail::core_terminal_t::type() const
+	detail::terminal_type detail::core_terminal_t::type() const noexcept(false)
 	{
 		if (dynamic_cast<const terminal_t *>(this) != nullptr)
 			return terminal_type::TERMINAL;
@@ -176,7 +174,8 @@ namespace netlist
 		else
 		{
 			state().log().fatal(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
-			return terminal_type::TERMINAL; // please compiler
+			plib::pthrow<nl_exception>(MF_UNKNOWN_TYPE_FOR_OBJECT(name()));
+			//return terminal_type::TERMINAL; // please compiler
 		}
 	}
 
@@ -496,7 +495,10 @@ namespace netlist
 			if (cc(d.second.get()))
 			{
 				if (ret != nullptr)
+				{
 					m_log.fatal(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
+					plib::pthrow<nl_exception>(MF_MORE_THAN_ONE_1_DEVICE_FOUND(classname));
+				}
 				else
 					ret = d.second.get();
 			}
@@ -606,7 +608,10 @@ namespace netlist
 	void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 	{
 		if (!state().setup().connect(t1, t2))
+		{
 			log().fatal(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
+			plib::pthrow<nl_exception>(MF_ERROR_CONNECTING_1_TO_2(t1.name(), t2.name()));
+		}
 	}
 
 
@@ -658,7 +663,7 @@ namespace netlist
 	}
 
 
-	void detail::net_t::reset()
+	void detail::net_t::reset() noexcept
 	{
 		m_next_scheduled_time = netlist_time::zero();
 		m_in_queue = queue_status::DELIVERED;
@@ -683,18 +688,21 @@ namespace netlist
 		}
 	}
 
-	void detail::net_t::add_terminal(detail::core_terminal_t &terminal) NL_NOEXCEPT
+	void detail::net_t::add_terminal(detail::core_terminal_t &terminal) noexcept(false)
 	{
 		for (auto &t : m_core_terms)
 			if (t == &terminal)
+			{
 				state().log().fatal(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
+				plib::pthrow<nl_exception>(MF_NET_1_DUPLICATE_TERMINAL_2(name(), t->name()));
+			}
 
 		terminal.set_net(this);
 
 		m_core_terms.push_back(&terminal);
 	}
 
-	void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) NL_NOEXCEPT
+	void detail::net_t::remove_terminal(detail::core_terminal_t &terminal) noexcept(false)
 	{
 		if (plib::container::contains(m_core_terms, &terminal))
 		{
@@ -702,7 +710,10 @@ namespace netlist
 			plib::container::remove(m_core_terms, &terminal);
 		}
 		else
+		{
 			state().log().fatal(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
+			plib::pthrow<nl_exception>(MF_REMOVE_TERMINAL_1_FROM_NET_2(terminal.name(), this->name()));
+		}
 	}
 
 	void detail::net_t::move_connections(detail::net_t &dest_net)
@@ -785,7 +796,7 @@ namespace netlist
 				net().solver()->update_forced();
 	}
 
-	void terminal_t::schedule_solve_after(const netlist_time after)
+	void terminal_t::schedule_solve_after(netlist_time after)
 	{
 		// Nets may belong to railnets which do not have a solver attached
 		if (this->has_net())
@@ -815,7 +826,7 @@ namespace netlist
 		state().setup().register_term(*this);
 	}
 
-	void logic_output_t::initial(const netlist_sig_t val)
+	void logic_output_t::initial(const netlist_sig_t val) noexcept
 	{
 		if (has_net())
 			net().initial(val);
@@ -847,7 +858,7 @@ namespace netlist
 		state().setup().register_term(*this);
 	}
 
-	void analog_output_t::initial(const nl_fptype val)
+	void analog_output_t::initial(const nl_fptype val) noexcept
 	{
 		net().set_Q_Analog(val);
 	}
@@ -874,7 +885,7 @@ namespace netlist
 		device.state().setup().register_param_t(this->name(), *this);
 	}
 
-	param_t::param_type_t param_t::param_type() const
+	param_t::param_type_t param_t::param_type() const noexcept(false)
 	{
 		if (dynamic_cast<const param_str_t *>(this) != nullptr)
 			return STRING;
@@ -889,7 +900,7 @@ namespace netlist
 		else
 		{
 			state().log().fatal(MF_UNKNOWN_PARAM_TYPE(name()));
-			return POINTER; /* Please compiler */
+			plib::pthrow<nl_exception>(MF_UNKNOWN_PARAM_TYPE(name()));
 		}
 	}
 
@@ -917,7 +928,7 @@ namespace netlist
 		m_param = device.state().setup().get_initial_param_val(this->name(),val);
 	}
 
-	void param_str_t::changed()
+	void param_str_t::changed() noexcept
 	{
 	}
 
@@ -928,9 +939,8 @@ namespace netlist
 		//netlist().save(*this, m_param, "m_param");
 	}
 
-	void param_model_t::changed()
+	void param_model_t::changed() noexcept
 	{
-		state().log().fatal(MF_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME(name()));
 	}
 
 	const pstring param_model_t::value_str(const pstring &entity)

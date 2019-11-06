@@ -134,16 +134,16 @@ namespace solver
 			for (int k = 0; k < iN; k++)
 			{
 		#if 0
-				float_type akk = std::abs(this->m_A[k][k]);
+				float_type akk = plib::abs(this->m_A[k][k]);
 				if ( akk > lambdaN)
 					lambdaN = akk;
 				if (akk < lambda1)
 					lambda1 = akk;
 		#else
-				float_type akk = std::abs(this->m_A[k][k]);
+				float_type akk = plib::abs(this->m_A[k][k]);
 				float_type s = 0.0;
 				for (int i=0; i<iN; i++)
-					s = s + std::abs(this->m_A[k][i]);
+					s = s + plib::abs(this->m_A[k][i]);
 				akk = s / akk - 1.0;
 				if ( akk > lambdaN)
 					lambdaN = akk;

@@ -117,13 +117,13 @@ private:
 template <>
 struct constructor_helper<putf8_reader>
 {
-	plib::unique_ptr<std::istream> operator()(putf8_reader &&s) { return std::move(s.m_strm); }
+	plib::unique_ptr<std::istream> operator()(putf8_reader &&s) const { return std::move(s.m_strm); }
 };
 
 template <>
 struct constructor_helper<plib::unique_ptr<std::istream>>
 {
-	plib::unique_ptr<std::istream> operator()(plib::unique_ptr<std::istream> &&s) { return std::move(s); }
+	plib::unique_ptr<std::istream> operator()(plib::unique_ptr<std::istream> &&s) const { return std::move(s); }
 };
 
 

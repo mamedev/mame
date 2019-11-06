@@ -28,8 +28,6 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 #include "devices/net_lib.h"
 #include "analog/nld_twoterm.h"
 
-#include <cmath>
-
 #endif
 
 
@@ -204,7 +202,7 @@ inline int CAPACITOR_tc_hl(const double c, const double r)
 	 * Vt = (VH-VL)*exp(-t/RC)
 	 * ln(Vt/(VH-VL))*RC = -t
 	 */
-	static const double TIME_CONSTANT = -std::log(0.8 / (4.0-0.1));
+	static const double TIME_CONSTANT = -plib::log(0.8 / (4.0-0.1));
 	int ret = (int) (TIME_CONSTANT * (1.0 + r) * c * 1e9);
 	return ret;
 }
@@ -215,7 +213,7 @@ inline int CAPACITOR_tc_lh(const double c, const double r)
 	 * Vt = (VH-VL)*(1-exp(-t/RC))
 	 * -t=ln(1-Vt/(VH-VL))*RC
 	 */
-	static const double TIME_CONSTANT = -std::log(1.0 - 2.0 / (4.0-0.1));
+	static const double TIME_CONSTANT = -plib::log(1.0 - 2.0 / (4.0-0.1));
 	int ret = (int) (TIME_CONSTANT * (130.0 + r) * c * 1e9);
 	return ret;
 }

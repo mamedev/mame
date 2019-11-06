@@ -39,8 +39,6 @@
 #include "nld_generic_models.h"
 #include "plib/pfunction.h"
 
-#include <cmath>
-
 // -----------------------------------------------------------------------------
 // Implementation
 // -----------------------------------------------------------------------------
@@ -65,7 +63,7 @@ namespace analog
 	{
 		plib::unused_var(d1);
 		if (b)
-			throw nl_exception("bselect with netlist and b==true");
+			plib::pthrow<nl_exception>("bselect with netlist and b==true");
 		return d2;
 	}
 
@@ -91,20 +89,20 @@ namespace analog
 
 		void solve_later(netlist_time delay = netlist_time::quantum());
 
-		void set_G_V_I(const nl_fptype G, const nl_fptype V, const nl_fptype I)
+		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept
 		{
 			/*      GO, GT, I                */
 			m_P.set_go_gt_I( -G,  G, (  V) * G - I);
 			m_N.set_go_gt_I( -G,  G, ( -V) * G + I);
 		}
 
-		nl_fptype deltaV() const
+		nl_fptype deltaV() const noexcept
 		{
 			return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 		}
 
-		void set_mat(const nl_fptype a11, const nl_fptype a12, const nl_fptype rhs1,
-					 const nl_fptype a21, const nl_fptype a22, const nl_fptype rhs2)
+		void set_mat(nl_fptype a11, nl_fptype a12, nl_fptype rhs1,
+					 nl_fptype a21, nl_fptype a22, nl_fptype rhs2) const noexcept
 		{
 			/*      GO, GT, I                */
 			m_P.set_go_gt_I(a12, a11, rhs1);

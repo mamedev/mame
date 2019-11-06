@@ -708,7 +708,7 @@ ROM_START( eeekk )
 	ROM_LOAD( "u11_e12063.u11", 0x7000, 0x0800, CRC(417faff0) SHA1(7965155ee32694ea9a10245db73d8beef229408c) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "74s288.u66", 0x0000, 0x0020, CRC(da9952f2) SHA1(b3cf8c6941b1e190290932fe19cb00fb6713978a) )
+	ROM_LOAD( "74s288.u66", 0x0000, 0x0020, CRC(f2078c38) SHA1(7bfd49932a6fd8840514b7af93a64cedb248122d) )
 ROM_END
 
 
@@ -859,7 +859,7 @@ GAME( 1983, theglob,  suprglob, epos,   suprglob, epos_state, empty_init, ROT270
 GAME( 1983, theglob2, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, epos_state, empty_init, ROT270, "Epos Corporation", "The Glob (set 3)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1984, igmo,     0,        epos,   igmo,     epos_state, empty_init, ROT270, "Epos Corporation", "IGMO",               MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1983, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // colors don't match reference (pic available)
+GAME( 1983, eeekk,    0,        epos,   eeekk,    epos_state, empty_init, ROT270, "Epos Corporation", "Eeekk!",             MACHINE_SUPPORTS_SAVE )
 
 /* EPOS TRISTAR 9000 PCB based */
 GAME( 1984, dealer,   0,        dealer, dealer,   epos_state, init_dealer, ROT270, "Epos Corporation", "The Dealer",           MACHINE_SUPPORTS_SAVE )

@@ -491,6 +491,14 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 					m_screen_palettes.push_back(palette);
 				}
 			}
+			else
+			{
+				m_screen_textures[screen] = texture;
+				if (palette)
+				{
+					m_screen_palettes[screen] = palette;
+				}
+			}
 		}
 		else
 		{

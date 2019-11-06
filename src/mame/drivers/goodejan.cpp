@@ -83,7 +83,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "tilemap.h"
 
 
-class goodejan_state : public driver_device, public seibu_sound_common
+class goodejan_state : public driver_device, protected seibu_sound_common
 {
 public:
 	goodejan_state(const machine_config &mconfig, device_type type, const char *tag) :
@@ -101,6 +101,9 @@ public:
 
 	void totmejan(machine_config &config);
 	void goodejan(machine_config &config);
+
+protected:
+	virtual void video_start() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -143,8 +146,8 @@ private:
 
 	void seibucrtc_sc0bank_w(uint16_t data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	void common_io_map(address_map &map);
 	void goodejan_io_map(address_map &map);
 	void goodejan_map(address_map &map);

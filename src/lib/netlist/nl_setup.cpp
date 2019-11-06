@@ -17,8 +17,6 @@
 #include "plib/putil.h"
 #include "solver/nld_solver.h"
 
-#include <cmath>
-
 namespace netlist
 {
 	// ----------------------------------------------------------------------------------------
@@ -43,7 +41,10 @@ namespace netlist
 	{
 		std::vector<pstring> list(plib::psplit(terms,", "));
 		if (list.size() == 0 || (list.size() % 2) == 1)
+		{
 			log().fatal(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1(build_fqn("")));
+			plib::pthrow<nl_exception>(MF_DIP_PINS_MUST_BE_AN_EQUAL_NUMBER_OF_PINS_1(build_fqn("")));
+		}
 		std::size_t n = list.size();
 		for (std::size_t i = 0; i < n / 2; i++)
 		{
@@ -56,14 +57,20 @@ namespace netlist
 	{
 		auto f = m_factory.factory_by_name(classname);
 		if (f == nullptr)
+		{
 			log().fatal(MF_CLASS_1_NOT_FOUND(classname));
+			plib::pthrow<nl_exception>(MF_CLASS_1_NOT_FOUND(classname));
+		}
 		else
 		{
 			/* make sure we parse macro library entries */
 			f->macro_actions(*this, name);
 			pstring key = build_fqn(name);
 			if (device_exists(key))
+			{
 				log().fatal(MF_DEVICE_ALREADY_EXISTS_1(name));
+				plib::pthrow<nl_exception>(MF_DEVICE_ALREADY_EXISTS_1(name));
+			}
 			else
 				m_device_factory.insert(m_device_factory.end(), {key, f});
 		}
@@ -78,7 +85,10 @@ namespace netlist
 	{
 		std::vector<pstring> list(plib::psplit(terms,", "));
 		if (list.size() < 2)
+		{
 			log().fatal(MF_NET_C_NEEDS_AT_LEAST_2_TERMINAL());
+			plib::pthrow<nl_exception>(MF_NET_C_NEEDS_AT_LEAST_2_TERMINAL());
+		}
 		for (std::size_t i = 1; i < list.size(); i++)
 		{
 			register_link(list[0], list[i]);
@@ -87,21 +97,13 @@ namespace netlist
 
 	void nlparse_t::include(const pstring &netlist_name)
 	{
-#if 0
-		for (auto &base : m_sources)
-		{
-			auto source(dynamic_cast<source_netlist_t *>(base.get()));
-			if (source && source->parse(*this, netlist_name))
-				return;
-		}
-		log().fatal(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
-#endif
 		if (m_sources.for_all<source_netlist_t>([this, &netlist_name] (source_netlist_t *src)
 			{
 				return src->parse(*this, netlist_name);
 			}))
 			return;
 		log().fatal(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
+		plib::pthrow<nl_exception>(MF_NOT_FOUND_IN_SOURCE_COLLECTION(netlist_name));
 	}
 
 
@@ -136,7 +138,10 @@ namespace netlist
 		if (idx == m_param_values.end())
 		{
 			if (!m_param_values.insert({fqn, value}).second)
+			{
 				log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
+				plib::pthrow<nl_exception>(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(param));
+			}
 		}
 		else
 		{
@@ -176,7 +181,10 @@ namespace netlist
 			}
 		}
 		if (!found)
+		{
 			log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(attach));
+			plib::pthrow<nl_exception>(MF_FOUND_NO_OCCURRENCE_OF_1(attach));
+		}
 		register_link(attach, frontier_name + ".Q");
 	}
 
@@ -198,7 +206,11 @@ namespace netlist
 	void nlparse_t::register_alias_nofqn(const pstring &alias, const pstring &out)
 	{
 		if (!m_alias.insert({alias, out}).second)
+		{
 			log().fatal(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
+			plib::pthrow<nl_exception>(MF_ADDING_ALI1_TO_ALIAS_LIST(alias));
+		}
+
 	}
 
 	void nlparse_t::register_link_fqn(const pstring &sin, const pstring &sout)
@@ -247,10 +259,6 @@ setup_t::setup_t(netlist_state_t &nlstate)
 {
 }
 
-setup_t::~setup_t() noexcept
-{
-}
-
 pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 {
 	switch (in.type())
@@ -262,8 +270,9 @@ pstring setup_t::termtype_as_str(detail::core_terminal_t &in) const
 		case detail::terminal_type::OUTPUT:
 			return "OUTPUT";
 	}
-	log().fatal(MF_UNKNOWN_OBJECT_TYPE_1(static_cast<unsigned>(in.type())));
-	return "Error";
+	// FIXME: in.type() will have thrown already
+	// log().fatal(MF_UNKNOWN_OBJECT_TYPE_1(static_cast<unsigned>(in.type())));
+	return "Error"; // Tease gcc
 }
 
 pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) const
@@ -277,11 +286,12 @@ pstring setup_t::get_initial_param_val(const pstring &name, const pstring &def) 
 
 void setup_t::register_term(detail::core_terminal_t &term)
 {
+	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 	if (!m_terminals.insert({term.name(), &term}).second)
 	{
 		log().fatal(MF_ADDING_1_2_TO_TERMINAL_LIST(termtype_as_str(term), term.name()));
+		plib::pthrow<nl_exception>(MF_ADDING_1_2_TO_TERMINAL_LIST(termtype_as_str(term), term.name()));
 	}
-	log().debug("{1} {2}\n", termtype_as_str(term), term.name());
 }
 
 void setup_t::remove_connections(const pstring &pin)
@@ -301,13 +311,19 @@ void setup_t::remove_connections(const pstring &pin)
 			link++;
 	}
 	if (!found)
+	{
 		log().fatal(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
+		plib::pthrow<nl_exception>(MF_FOUND_NO_OCCURRENCE_OF_1(pin));
+	}
 }
 
 void setup_t::register_param_t(const pstring &name, param_t &param)
 {
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
+	{
 		log().fatal(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(name));
+		plib::pthrow<nl_exception>(MF_ADDING_PARAMETER_1_TO_PARAMETER_LIST(name));
+	}
 }
 
 pstring setup_t::resolve_alias(const pstring &name) const
@@ -400,7 +416,10 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 	detail::core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term == nullptr && required)
+	{
 		log().fatal(MF_TERMINAL_1_2_NOT_FOUND(terminal_in, tname));
+		plib::pthrow<nl_exception>(MF_TERMINAL_1_2_NOT_FOUND(terminal_in, tname));
+	}
 	if (term != nullptr)
 		log().debug("Found input {1}\n", tname);
 	return term;
@@ -418,14 +437,19 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
 		ret = m_terminals.find(tname + ".Q");
 	}
 	if (ret == m_terminals.end() && required)
+	{
 		log().fatal(MF_TERMINAL_1_2_NOT_FOUND(terminal_in, tname));
-
+		plib::pthrow<nl_exception>(MF_TERMINAL_1_2_NOT_FOUND(terminal_in, tname));
+	}
 	detail::core_terminal_t *term = (ret == m_terminals.end() ? nullptr : ret->second);
 
 	if (term != nullptr && term->type() != atype)
 	{
 		if (required)
+		{
 			log().fatal(MF_OBJECT_1_2_WRONG_TYPE(terminal_in, tname));
+			plib::pthrow<nl_exception>(MF_OBJECT_1_2_WRONG_TYPE(terminal_in, tname));
+		}
 		else
 			term = nullptr;
 	}
@@ -442,7 +466,10 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	const pstring &outname = resolve_alias(param_in_fqn);
 	auto ret = m_params.find(outname);
 	if (ret == m_params.end() && required)
+	{
 		log().fatal(MF_PARAMETER_1_2_NOT_FOUND(param_in_fqn, outname));
+		plib::pthrow<nl_exception>(MF_PARAMETER_1_2_NOT_FOUND(param_in_fqn, outname));
+	}
 	if (ret != m_params.end())
 		log().debug("Found parameter {1}\n", outname);
 	return (ret == m_params.end() ? nullptr : &ret->second.m_param);
@@ -468,8 +495,12 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		{
 			p->clear_net(); // de-link from all nets ...
 			if (!connect(new_proxy->proxy_term(), *p))
+			{
 				log().fatal(MF_CONNECTING_1_TO_2(
 						new_proxy->proxy_term().name(), (*p).name()));
+				plib::pthrow<nl_exception>(MF_CONNECTING_1_TO_2(
+						new_proxy->proxy_term().name(), (*p).name()));
+			}
 		}
 		out.net().core_terms().clear(); // clear the list
 
@@ -511,8 +542,13 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 			{
 				p->clear_net(); // de-link from all nets ...
 				if (!connect(ret->proxy_term(), *p))
+				{
 					log().fatal(MF_CONNECTING_1_TO_2(
 							ret->proxy_term().name(), (*p).name()));
+					plib::pthrow<nl_exception>(MF_CONNECTING_1_TO_2(
+							ret->proxy_term().name(), (*p).name()));
+
+				}
 			}
 			inp.net().core_terms().clear(); // clear the list
 		}
@@ -532,7 +568,10 @@ void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 	}
 
 	if (thisnet.isRailNet() && othernet.isRailNet())
+	{
 		log().fatal(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
+		plib::pthrow<nl_exception>(MF_MERGE_RAIL_NETS_1_AND_2(thisnet.name(), othernet.name()));
+	}
 
 	if (othernet.isRailNet())
 	{
@@ -591,6 +630,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	else
 	{
 		log().fatal(MF_OBJECT_INPUT_TYPE_1(inp.name()));
+		plib::pthrow<nl_exception>(MF_OBJECT_INPUT_TYPE_1(inp.name()));
 	}
 }
 
@@ -615,6 +655,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 	else
 	{
 		log().fatal(MF_OBJECT_OUTPUT_TYPE_1(out.name()));
+		plib::pthrow<nl_exception>(MF_OBJECT_OUTPUT_TYPE_1(out.name()));
 	}
 }
 
@@ -705,13 +746,19 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::INPUT))
 	{
 		if (t2.has_net() && t2.net().isRailNet())
+		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
+			plib::pthrow<nl_exception>(MF_INPUT_1_ALREADY_CONNECTED(t2.name()));
+		}
 		connect_input_output(t2, t1);
 	}
 	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
 		if (t1.has_net()  && t1.net().isRailNet())
+		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
+			plib::pthrow<nl_exception>(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
+		}
 		connect_input_output(t1, t2);
 	}
 	else if (t1.is_type(detail::terminal_type::OUTPUT) && t2.is_type(detail::terminal_type::TERMINAL))
@@ -776,6 +823,7 @@ void setup_t::resolve_inputs()
 			log().warning(MF_CONNECTING_1_TO_2(setup().de_alias(link.first), setup().de_alias(link.second)));
 
 		log().fatal(MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
+		plib::pthrow<nl_exception>(MF_LINK_TRIES_EXCEEDED(m_netlist_params->m_max_link_loops()));
 	}
 
 	log().verbose("deleting empty nets ...");
@@ -810,7 +858,10 @@ void setup_t::resolve_inputs()
 		}
 	}
 	if (err)
+	{
 		log().fatal(MF_TERMINALS_WITHOUT_NET());
+		plib::pthrow<nl_exception>(MF_TERMINALS_WITHOUT_NET());
+	}
 
 }
 
@@ -851,11 +902,11 @@ void models_t::register_model(const pstring &model_in)
 {
 	auto pos = model_in.find(' ');
 	if (pos == pstring::npos)
-		throw nl_exception(MF_UNABLE_TO_PARSE_MODEL_1(model_in));
+		plib::pthrow<nl_exception>(MF_UNABLE_TO_PARSE_MODEL_1(model_in));
 	pstring model = plib::ucase(plib::trim(plib::left(model_in, pos)));
 	pstring def = plib::trim(model_in.substr(pos + 1));
 	if (!m_models.insert({model, def}).second)
-		throw nl_exception(MF_MODEL_ALREADY_EXISTS_1(model_in));
+		plib::pthrow<nl_exception>(MF_MODEL_ALREADY_EXISTS_1(model_in));
 }
 
 void models_t::model_parse(const pstring &model_in, model_map_t &map)
@@ -872,7 +923,7 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 		key = plib::ucase(model);
 		auto i = m_models.find(key);
 		if (i == m_models.end())
-			throw nl_exception(MF_MODEL_NOT_FOUND(model));
+			plib::pthrow<nl_exception>(MF_MODEL_NOT_FOUND(model));
 		model = i->second;
 	}
 	pstring xmodel = plib::left(model, pos);
@@ -885,12 +936,12 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 		if (i != m_models.end())
 			model_parse(xmodel, map);
 		else
-			throw nl_exception(MF_MODEL_NOT_FOUND(model_in));
+			plib::pthrow<nl_exception>(MF_MODEL_NOT_FOUND(model_in));
 	}
 
 	pstring remainder = plib::trim(model.substr(pos + 1));
 	if (!plib::endsWith(remainder, ")"))
-		throw nl_exception(MF_MODEL_ERROR_1(model));
+		plib::pthrow<nl_exception>(MF_MODEL_ERROR_1(model));
 	// FIMXE: Not optimal
 	remainder = plib::left(remainder, remainder.size() - 1);
 
@@ -899,7 +950,7 @@ void models_t::model_parse(const pstring &model_in, model_map_t &map)
 	{
 		auto pose = pe.find('=');
 		if (pose == pstring::npos)
-			throw nl_exception(MF_MODEL_ERROR_ON_PAIR_1(model));
+			plib::pthrow<nl_exception>(MF_MODEL_ERROR_ON_PAIR_1(model));
 		map[plib::ucase(plib::left(pe, pose))] = pe.substr(pose + 1);
 	}
 }
@@ -924,9 +975,9 @@ pstring models_t::value_str(const pstring &model, const pstring &entity)
 	pstring ret;
 
 	if (entity != plib::ucase(entity))
-		throw nl_exception(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2(entity, model_string(map)));
+		plib::pthrow<nl_exception>(MF_MODEL_PARAMETERS_NOT_UPPERCASE_1_2(entity, model_string(map)));
 	if (map.find(entity) == map.end())
-		throw nl_exception(MF_ENTITY_1_NOT_FOUND_IN_MODEL_2(entity, model_string(map)));
+		plib::pthrow<nl_exception>(MF_ENTITY_1_NOT_FOUND_IN_MODEL_2(entity, model_string(map)));
 	else
 		ret = map[entity];
 
@@ -957,7 +1008,7 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 		case 'a': factor = nlconst::magic(1e-18); break;
 		default:
 			if (*p < '0' || *p > '9')
-				throw nl_exception(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
+				plib::pthrow<nl_exception>(MF_UNKNOWN_NUMBER_FACTOR_IN_1(entity));
 	}
 	if (factor != nlconst::one())
 		tmp = plib::left(tmp, tmp.size() - 1);
@@ -966,7 +1017,7 @@ nl_fptype models_t::value(const pstring &model, const pstring &entity)
 	bool err(false);
 	auto val = plib::pstonum_ne<nl_fptype>(tmp, err);
 	if (err)
-		throw nl_exception(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
+		plib::pthrow<nl_exception>(MF_MODEL_NUMBER_CONVERSION_ERROR(entity, tmp, "double", model));
 	return val * factor;
 }
 
@@ -1127,7 +1178,10 @@ void setup_t::prepare_to_run()
 				bool err(false);
 				auto v = plib::pstonum_ne<nl_fptype>(p->second, err);
 				if (err || plib::abs(v - plib::floor(v)) > nlconst::magic(1e-6) )
+				{
 					log().fatal(MF_HND_VAL_NOT_SUPPORTED(p->second));
+					plib::pthrow<nl_exception>(MF_HND_VAL_NOT_SUPPORTED(p->second));
+				}
 				// FIXME comparison with zero
 				d.second->set_hint_deactivate(v == nlconst::zero());
 			}
@@ -1166,7 +1220,10 @@ void setup_t::prepare_to_run()
 	{
 		for (auto &p : m_nlstate.nets())
 			if (p->is_analog())
+			{
 				log().fatal(MF_NO_SOLVER());
+				plib::pthrow<nl_exception>(MF_NO_SOLVER());
+			}
 	}
 	else
 		solver->post_start();

@@ -11,10 +11,10 @@
 #define PLIB_VECTOR_OPS_H_
 
 #include "pconfig.h"
+#include "pmath.h"
 
 #include <algorithm>
 #include <array>
-#include <cmath>
 #include <type_traits>
 
 #if !defined(__clang__) && !defined(_MSC_VER) && (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 6))
@@ -137,7 +137,7 @@ namespace plib
 	{
 		T ret = 0.0;
 		for ( std::size_t i = 0; i < n; i++ )
-			ret = std::max(ret, std::abs(v[i]));
+			ret = std::max(ret, plib::abs(v[i]));
 
 		return ret;
 	}

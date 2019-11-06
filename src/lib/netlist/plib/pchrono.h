@@ -12,7 +12,6 @@
 #include "ptypes.h"
 
 #include <chrono>
-//#include <cstdint>
 
 namespace plib {
 	namespace chrono {
@@ -196,7 +195,7 @@ namespace plib {
 			struct guard_t
 			{
 				guard_t() = delete;
-				guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
+				explicit guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
 				~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
 
 				COPYASSIGNMOVE(guard_t, default)

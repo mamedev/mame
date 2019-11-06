@@ -69,7 +69,7 @@ public:
 	}
 
 protected:
-	void vlog(const plib::plog_level &l, const pstring &ls) const override
+	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override
 	{
 		switch (l)
 		{
@@ -89,7 +89,9 @@ protected:
 			m_parent.logerror("netlist ERROR: %s\n", ls.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
+			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
+			m_parent.logerror("netlist FATAL: %s\n", ls.c_str());
+			break;
 		}
 	}
 
@@ -107,7 +109,7 @@ public:
 	}
 
 protected:
-	void vlog(const plib::plog_level &l, const pstring &ls) const override
+	void vlog(const plib::plog_level &l, const pstring &ls) const noexcept override
 	{
 		switch (l)
 		{
@@ -125,7 +127,9 @@ protected:
 			osd_printf_error("netlist ERROR: %s\n", ls);
 			break;
 		case plib::plog_level::FATAL:
-			throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
+			osd_printf_error("netlist FATAL: %s\n", ls);
+			break;
+			//throw emu_fatalerror(1, "netlist FATAL: %s\n", ls.c_str());
 		}
 	}
 
@@ -1338,8 +1342,8 @@ offs_t netlist_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 	if (relpc >= 0 && relpc < m_dev->netlist().queue().size())
 	{
 		int dpc = m_dev->netlist().queue().size() - relpc - 1;
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].m_object->name().c_str(),
-				m_dev->netlist().queue()[dpc].m_exec_time.as_double());
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', m_dev->netlist().queue()[dpc].object()->name().c_str(),
+				m_dev->netlist().queue()[dpc].exec_time().as_double());
 	}
 
 	pc+=1;
