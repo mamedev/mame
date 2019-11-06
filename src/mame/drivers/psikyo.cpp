@@ -38,6 +38,9 @@ To Do:
   Given the above, all games are marked with MACHINE_IMPERFECT_TIMING until
   somebody provides accurate H/Vsync signals for at least one game of this 
   driver.
+- tengai / tengaij: "For use in Japan" screen is supposed to output the 
+  typical blue Psikyo backdrop gradient instead of being pure black as it is 
+  now;
 - Flip Screen support
 
 NOTE: Despite being mentioned in the manual Strikers 1945 doesn't seem to
