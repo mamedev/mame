@@ -38,6 +38,7 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config &mconfig, const char
 	ppu_vt03_device(mconfig, PPU_VT03PAL, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
 }
 
 
