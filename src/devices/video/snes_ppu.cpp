@@ -1303,7 +1303,6 @@ void snes_ppu_device::update_objects( uint8_t priority_oam0, uint8_t priority_oa
 	for (ii = 0; ii < 34; ii++)
 	{
 		int tile = ii;
-		if (s_tile_to_draw != -1 && tile != s_tile_to_draw) continue;
 
 #if SNES_LAYER_DEBUG
 		if (m_debug_options.sprite_reversed)
