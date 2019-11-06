@@ -328,6 +328,14 @@ void bbcm_state::bbcmc_bankdev(address_map &map)
 }
 
 
+void bbcm_state::autoc15_bankdev(address_map &map)
+{
+	bbcmc_bankdev(map);
+	map(0x0200, 0x0200).mirror(0x406).rw(m_hd6845, FUNC(hd6345_device::status_r), FUNC(hd6345_device::address_w));                    //    fe00-fe07  6345 CRTC      Video controller
+	map(0x0201, 0x0201).mirror(0x406).rw(m_hd6845, FUNC(hd6345_device::register_r), FUNC(hd6345_device::register_w));
+}
+
+
 INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
@@ -1757,6 +1765,21 @@ void bbcm_state::pro128s(machine_config &config)
 void bbcm_state::autoc15(machine_config &config)
 {
 	bbcmc(config);
+
+	m_bankdev->set_map(&bbcm_state::autoc15_bankdev).set_options(ENDIANNESS_LITTLE, 8, 16, 0x0400);
+
+	/* crtc - replaces HD6845 to support smooth scrolling */
+	HD6345(config.replace(), m_hd6845, 16_MHz_XTAL / 8);
+	m_hd6845->set_screen("screen");
+	m_hd6845->set_show_border_area(false);
+	m_hd6845->set_char_width(12);
+	//m_hd6845->set_begin_update_callback(FUNC(bbc_state::crtc_begin_update));
+	m_hd6845->set_update_row_callback(FUNC(bbc_state::crtc_update_row));
+	//m_hd6845->set_reconfigure_callback(FUNC(bbc_state::crtc_reconfig));
+	m_hd6845->out_de_callback().set(FUNC(bbc_state::bbc_de_changed));
+	m_hd6845->out_hsync_callback().set(FUNC(bbc_state::bbc_hsync_changed));
+	m_hd6845->out_vsync_callback().set(FUNC(bbc_state::bbc_vsync_changed));
+
 	/* Autocue RAM disc */
 	//m_exp->set_default_option("autocue");
 	//m_exp->set_fixed(true);

@@ -451,6 +451,7 @@ protected:
 	void bbcmet_bankdev(address_map &map);
 	void bbcmc_mem(address_map &map);
 	void bbcmc_bankdev(address_map &map);
+	void autoc15_bankdev(address_map &map);
 	void bbcm_fetch(address_map &map);
 };
 
