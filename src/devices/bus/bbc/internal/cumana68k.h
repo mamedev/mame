@@ -80,8 +80,6 @@ private:
 	void cumana68k_mem(address_map &map);
 
 	bool m_bEnabled;
-	int m_fdc_ie;
-	int m_fdc_drq;
 	uint8_t m_pia_sasi_pb;
 };
 
