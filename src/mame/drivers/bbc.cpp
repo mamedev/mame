@@ -1611,6 +1611,21 @@ void bbcm_state::bbcmarm(machine_config &config)
 }
 
 
+void bbcm_state::daisy(machine_config &config)
+{
+	bbcm(config);
+	/* Acorn 65C102 co-processor */
+	m_intube->set_default_option("65c102");
+	m_intube->set_fixed(true);
+
+	/* lk18 and lk19 are set to enable rom, disabling ram */
+	m_rom[0x04]->set_default_option(nullptr);
+	m_rom[0x04]->set_fixed_ram(false);
+	m_rom[0x06]->set_default_option(nullptr);
+	m_rom[0x06]->set_fixed_ram(false);
+}
+
+
 void bbcm_state::discmon(machine_config &config)
 {
 	bbcm(config);
@@ -2343,6 +2358,42 @@ ROM_START(autoc15)
 ROM_END
 
 
+ROM_START(daisy)
+	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
+	ROM_DEFAULT_BIOS("mos320")
+	ROM_SYSTEM_BIOS(0, "mos320", "Original MOS 3.20")
+	ROMX_LOAD("mos320.ic24", 0x20000, 0x20000, CRC(0f747ebe) SHA1(eacacbec3892dc4809ad5800e6c8299ff9eb528f), ROM_BIOS(0))
+	ROM_COPY("swr", 0x20000, 0x40000, 0x4000) // Move loaded roms into place
+	ROM_FILL(0x20000, 0x4000, 0xff)
+	/* 00000 rom 0   SK3 Rear Cartridge bottom 16K */
+	/* 04000 rom 1   SK3 Rear Cartridge top 16K */
+	/* 08000 rom 2   SK4 Front Cartridge bottom 16K */
+	/* 0c000 rom 3   SK4 Front Cartridge top 16K */
+	/* 10000 rom 4   IC41 SIMDIST */
+	/* 14000 rom 5   IC41 DHRFDSY */
+	/* 18000 rom 6   IC37 IRFDSY */
+	/* 1c000 rom 7   IC37 DAISY */
+	/* 20000 rom 8   IC27 HiBASIC3 */
+	/* 24000 rom 9   IC24 DFS + SRAM */
+	/* 28000 rom 10  IC24 Viewsheet */
+	/* 2c000 rom 11  IC24 Edit */
+	/* 30000 rom 12  IC24 BASIC */
+	/* 34000 rom 13  IC24 ADFS */
+	/* 38000 rom 14  IC24 View + MOS code */
+	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
+	ROM_LOAD("simdist_2_22-2-89_dhrfdsy.rom", 0x10000, 0x8000, CRC(8a9d9c4a) SHA1(278c5c63e06359601cdf972f55e98f5a7442a713))
+	ROM_LOAD("daisy_irfdsy_vr4_5-1-89.rom", 0x18000, 0x8000, CRC(9662d779) SHA1(99234b55fde57680e4217b72ef4ccb8fc56edeff))
+	ROM_LOAD("hibas03_a063.rom", 0x20000, 0x4000, CRC(6ea7affc) SHA1(99234b55fde57680e4217b72ef4ccb8fc56edeff))
+
+	ROM_REGION(0x4000, "mos", 0)
+	ROM_COPY("swr", 0x40000, 0, 0x4000)
+
+	ROM_REGION(0x40, "rtc", 0) /* mc146818 */
+	/* Factory defaulted CMOS RAM, sets default language ROM, etc. */
+	ROMX_LOAD("mos320.cmos", 0x00, 0x40, CRC(c7f9e85a) SHA1(f24cc9db0525910689219f7204bf8b864033ee94), ROM_BIOS(0))
+ROM_END
+
+
 ROM_START(discmon)
 	ROM_REGION(0x44000, "swr", ROMREGION_ERASEFF) /* Sideways ROMs */
 	ROM_DEFAULT_BIOS("mos320")
@@ -2472,6 +2523,7 @@ COMP ( 1986, bbcmet,   bbcm,   0,     bbcmet,   bbcm,   bbcm_state,  init_bbc,  
 COMP ( 1986, bbcm512,  bbcm,   0,     bbcm512,  bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master 512",                     MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmarm,  bbcm,   0,     bbcmarm,  bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master (ARM Evaluation)",        MACHINE_NOT_WORKING)
 COMP ( 1986, ltmpm,    bbcm,   0,     bbcm,     ltmpm,  bbcm_state,  init_ltmp, "Lawrie T&M Ltd.", "LTM Portable (Master)",              MACHINE_IMPERFECT_GRAPHICS)
+COMP ( 1987, daisy,    bbcm,   0,     daisy,    bbcm,   bbcm_state,  init_bbc,  "Comus Instruments Ltd.", "Comus Daisy",                 MACHINE_NOT_WORKING)
 COMP ( 1986, bbcmc,    0,      bbcm,  bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact",                 MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1986, bbcmc_ar, bbcmc,  0,     bbcmc,    bbcm,   bbcm_state,  init_bbc,  "Acorn Computers", "BBC Master Compact (Arabic)",        MACHINE_IMPERFECT_GRAPHICS)
 COMP ( 1987, pro128s,  bbcmc,  0,     pro128s,  bbcm,   bbcm_state,  init_bbc,  "Olivetti",        "Prodest PC 128S",                    MACHINE_IMPERFECT_GRAPHICS)

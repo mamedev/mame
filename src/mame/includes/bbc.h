@@ -436,6 +436,7 @@ public:
 	void bbcm512(machine_config &config);
 	void bbcmarm(machine_config &config);
 	void cfa3000(machine_config &config);
+	void daisy(machine_config &config);
 	void discmon(machine_config &config);
 	void discmate(machine_config &config);
 	void bbcmc(machine_config &config);
