@@ -50,12 +50,19 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_bt_mask(0)
 	, m_bt_ireq(0)
 	, m_sys(0)
+	, m_misc(0)
 	, m_ireq(0)
 	, m_iena(0)
 	, m_lssa(0)
 	, m_lvpw(0)
 	, m_lxmax(0)
 	, m_lymax(0)
+	, m_lpan(0)
+	, m_lctr(0)
+	, m_lckr(0)
+	, m_lfra(0)
+	, m_lac(0)
+	, m_lpwm(0)
 {
 	program_config.m_internal_map = std::move(internal_map);
 }
@@ -143,12 +150,21 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_btsr));
 	}
 	save_item(NAME(m_sys));
+	if (st2xxx_misc_mask() != 0)
+		save_item(NAME(m_misc));
 	save_item(NAME(m_ireq));
 	save_item(NAME(m_iena));
 	save_item(NAME(m_lssa));
 	save_item(NAME(m_lvpw));
 	save_item(NAME(m_lxmax));
 	save_item(NAME(m_lymax));
+	if (st2xxx_lpan_mask() != 0)
+		save_item(NAME(m_lpan));
+	save_item(NAME(m_lctr));
+	save_item(NAME(m_lckr));
+	save_item(NAME(m_lfra));
+	save_item(NAME(m_lac));
+	save_item(NAME(m_lpwm));
 }
 
 void st2xxx_device::device_reset()
@@ -183,12 +199,19 @@ void st2xxx_device::device_reset()
 
 	// reset miscellaneous registers
 	m_sys = 0;
+	m_misc = st2xxx_wdten_on_reset() ? 0x0c : 0;
 
 	// reset LCDC registers
 	m_lssa = 0;
 	m_lvpw = 0;
 	m_lxmax = 0;
 	m_lymax = 0;
+	m_lpan = 0;
+	m_lctr = 0x80;
+	m_lckr = 0;
+	m_lfra = 0;
+	m_lac = 0;
+	m_lpwm = 0;
 }
 
 u8 st2xxx_device::acknowledge_irq()
@@ -362,6 +385,16 @@ void st2xxx_device::sys_w(u8 data)
 	m_sys = data & mask;
 	if (BIT(mask, 1))
 		downcast<mi_st2xxx &>(*mintf).irr_enable = BIT(data, 1);
+}
+
+u8 st2xxx_device::misc_r()
+{
+	return m_misc;
+}
+
+void st2xxx_device::misc_w(u8 data)
+{
+	m_misc = data & st2xxx_misc_mask();
 }
 
 u8 st2xxx_device::irrl_r()
@@ -569,6 +602,56 @@ u8 st2xxx_device::lymax_r()
 void st2xxx_device::lymax_w(u8 data)
 {
 	m_lymax = data;
+}
+
+u8 st2xxx_device::lpan_r()
+{
+	return m_lpan;
+}
+
+void st2xxx_device::lpan_w(u8 data)
+{
+	m_lpan = data & st2xxx_lpan_mask();
+}
+
+u8 st2xxx_device::lctr_r()
+{
+	return m_lctr;
+}
+
+void st2xxx_device::lctr_w(u8 data)
+{
+	m_lctr = data & st2xxx_lctr_mask();
+}
+
+void st2xxx_device::lckr_w(u8 data)
+{
+	m_lckr = data & st2xxx_lckr_mask();
+}
+
+void st2xxx_device::lfra_w(u8 data)
+{
+	m_lfra = data & 0x3f;
+}
+
+u8 st2xxx_device::lac_r()
+{
+	return m_lac;
+}
+
+void st2xxx_device::lac_w(u8 data)
+{
+	m_lac = data & 0x1f;
+}
+
+u8 st2xxx_device::lpwm_r()
+{
+	return m_lpwm;
+}
+
+void st2xxx_device::lpwm_w(u8 data)
+{
+	m_lpwm = data & st2xxx_lpwm_mask();
 }
 
 #include "cpu/m6502/st2xxx.hxx"

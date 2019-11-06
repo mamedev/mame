@@ -39,12 +39,19 @@ public:
 		ST_PRR,
 		ST_DRR,
 		ST_DMR,
+		ST_MISC,
 		ST_IREQ,
 		ST_IENA,
 		ST_LSSA,
 		ST_LVPW,
 		ST_LXMAX,
-		ST_LYMAX
+		ST_LYMAX,
+		ST_LPAN,
+		ST_LCTR,
+		ST_LCKR,
+		ST_LFRA,
+		ST_LAC,
+		ST_LPWM
 	};
 
 	auto in_pa_callback() { return m_in_port_cb[0].bind(); }
@@ -76,7 +83,13 @@ protected:
 	virtual const char *st2xxx_irq_name(int i) const = 0;
 	virtual unsigned st2xxx_bt_divider(int n) const = 0;
 	virtual u8 st2xxx_sys_mask() const = 0;
+	virtual u8 st2xxx_misc_mask() const = 0;
+	virtual bool st2xxx_wdten_on_reset() const { return false; }
 	virtual bool st2xxx_has_dma() const { return false; }
+	virtual u8 st2xxx_lpan_mask() const = 0;
+	virtual u8 st2xxx_lctr_mask() const = 0;
+	virtual u8 st2xxx_lckr_mask() const = 0;
+	virtual u8 st2xxx_lpwm_mask() const = 0;
 
 	class mi_st2xxx : public memory_interface {
 	public:
@@ -123,6 +136,8 @@ protected:
 
 	u8 sys_r();
 	void sys_w(u8 data);
+	u8 misc_r();
+	void misc_w(u8 data);
 
 	u8 irrl_r();
 	void irrl_w(u8 data);
@@ -163,6 +178,16 @@ protected:
 	void lxmax_w(u8 data);
 	u8 lymax_r();
 	void lymax_w(u8 data);
+	u8 lpan_r();
+	void lpan_w(u8 data);
+	u8 lctr_r();
+	void lctr_w(u8 data);
+	void lckr_w(u8 data);
+	void lfra_w(u8 data);
+	u8 lac_r();
+	void lac_w(u8 data);
+	u8 lpwm_r();
+	void lpwm_w(u8 data);
 
 #define O(o) void o ## _full(); void o ## _partial()
 
@@ -185,18 +210,29 @@ protected:
 	u8 m_psel[7];
 	u8 m_pfun[2];
 	u8 m_pmcr;
+
 	u8 m_bten;
 	u8 m_btsr;
 	emu_timer *m_base_timer[8];
 	u8 m_bt_mask;
 	u16 m_bt_ireq;
+
 	u8 m_sys;
+	u8 m_misc;
+
 	u16 m_ireq;
 	u16 m_iena;
+
 	u16 m_lssa;
 	u8 m_lvpw;
 	u8 m_lxmax;
 	u8 m_lymax;
+	u8 m_lpan;
+	u8 m_lctr;
+	u8 m_lckr;
+	u8 m_lfra;
+	u8 m_lac;
+	u8 m_lpwm;
 };
 
 #endif // MAME_CPU_M6502_ST2XXX_H
