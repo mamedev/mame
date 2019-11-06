@@ -16,17 +16,31 @@
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 
 // devices
-DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU")
+DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
+DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
-
-ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ppu2c0x_device(mconfig, PPU_VT03, tag, owner, clock),
+ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)	:
+	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
 	for(int i = 0; i < 6; i++)
 		m_2012_2017_descramble[i] = 2 + i;
 }
+
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
+{
+}
+
+
+ppu_vt03pal_device::ppu_vt03pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ppu_vt03_device(mconfig, PPU_VT03PAL, tag, owner, clock)
+{
+	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
+}
+
 
 READ8_MEMBER(ppu_vt03_device::palette_read)
 {
