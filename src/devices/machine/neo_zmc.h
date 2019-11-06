@@ -26,9 +26,11 @@ public:
 	neo_zmc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// I/O operations
+	void banked_space_w(offs_t offset, u8 data);
 	u8 banked_space_r(offs_t offset);
 	u8 set_bank_r(offs_t offset);
 
+	void banked_map(address_map &map);
 protected:
 	// device-level overrides
 	//virtual void device_validity_check(validity_checker &valid) const override;

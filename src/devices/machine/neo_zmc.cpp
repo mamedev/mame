@@ -16,9 +16,13 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+void neo_zmc_device::banked_map(address_map &map)
+{
+	map(0x0000, 0xf7ff).rw(FUNC(neo_zmc_device::banked_space_r), FUNC(neo_zmc_device::banked_space_w));
+}
+
 // device type definition
 DEFINE_DEVICE_TYPE(NEO_ZMC, neo_zmc_device, "neo_zmc", "SNK NEO-ZMC Memory controller")
-
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -99,6 +103,31 @@ u8 neo_zmc_device::banked_space_r(offs_t offset)
 	}
 	// 0x0000-0x7fff (fixed)
 	return m_cache->read_byte(offset);
+}
+
+void neo_zmc_device::banked_space_w(offs_t offset, u8 data)
+{
+	if (offset & 0x8000) // SDA15(0x8000-0xf7ff)
+	{
+		if (offset & 0x4000) // SDA14(0xc000-0xf7ff)
+		{
+			if (offset & 0x2000) // SDA13(0xe000-0xf7ff)
+			{
+				if (offset & 0x1000) // SDA12(0xf000-0xf7ff)
+				{
+					m_data->write_byte((m_bank[0] << 11) | (offset & 0x7ff), data);
+				}
+				// 0xe000-0xefff
+				m_data->write_byte((m_bank[1] << 12) | (offset & 0xfff), data);
+			}
+			// 0xc000-dfff
+			m_data->write_byte((m_bank[2] << 13) | (offset & 0x1fff), data);
+		}
+		// 0x8000-0xbfff
+		m_data->write_byte((m_bank[3] << 14) | (offset & 0x3fff), data);
+	}
+	// 0x0000-0x7fff (fixed)
+	m_data->write_byte(offset, data);
 }
 
 u8 neo_zmc_device::set_bank_r(offs_t offset)

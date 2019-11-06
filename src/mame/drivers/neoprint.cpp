@@ -358,7 +358,7 @@ void neoprint_state::nprsp_map(address_map &map)
 
 void neoprint_state::neoprint_audio_map(address_map &map)
 {
-	map(0x0000, 0xf7ff).r("neo_zmc", FUNC(neo_zmc_device::banked_space_r));
+	map(0x0000, 0xf7ff).m("neo_zmc", FUNC(neo_zmc_device::banked_map));
 	map(0xf800, 0xffff).ram();
 }
 
