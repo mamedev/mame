@@ -43,7 +43,7 @@
 #include "machine/timer.h"
 #include "machine/hp9825_tape.h"
 #include "machine/hp98x5_io_sys.h"
-#include "bus/hp9825_optroms/hp9825_optrom.h"
+#include "machine/hp9825_optrom.h"
 #include "bus/hp9845_io/hp9845_io.h"
 #include "imagedev/bitbngr.h"
 #include "speaker.h"
@@ -128,7 +128,7 @@ protected:
 	virtual void machine_reset() override;
 
 	required_device<hp_09825_67907_cpu_device> m_cpu;
-	required_device_array<hp9825_optrom_slot_device , 4> m_rom_drawers;
+	required_device_array<hp9825_optrom_device , 4> m_rom_drawers;
 
 private:
 	required_device<hp98x5_io_sys_device> m_io_sys;
@@ -681,7 +681,7 @@ void hp9825_state::hp9825_base(machine_config &config)
 
 	// Optional ROM slots
 	for (auto& finder : m_rom_drawers) {
-		HP9825_OPTROM_SLOT(config , finder);
+		HP9825_OPTROM(config , finder);
 	}
 
 	config.set_default_layout(layout_hp9825);

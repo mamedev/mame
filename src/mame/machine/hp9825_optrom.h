@@ -7,42 +7,22 @@
     Optional ROMs for HP9825 systems
 
 *********************************************************************/
-#ifndef MAME_BUS_HP9825_OPTROMS_HP9825_OPTROM_H
-#define MAME_BUS_HP9825_OPTROMS_HP9825_OPTROM_H
+#ifndef MAME_MACHINE_HP9825_OPTROM_H
+#define MAME_MACHINE_HP9825_OPTROM_H
 
 #pragma once
 
 #include "machine/bankdev.h"
 #include "softlist_dev.h"
 
-class device_hp9825_optrom_interface : public device_interface
-{
-public:
-	device_hp9825_optrom_interface(const machine_config &mconfig, device_t &device);
-};
-
-class hp9825_optrom_cart_device : public device_t, public device_hp9825_optrom_interface
+class hp9825_optrom_device : public device_t,
+							 public device_image_interface
 {
 public:
 	// construction/destruction
-	hp9825_optrom_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-protected:
-	hp9825_optrom_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	// device-level overrides
-	virtual void device_start() override { }
-};
-
-class hp9825_optrom_slot_device : public device_t,
-								  public device_image_interface,
-								  public device_single_card_slot_interface<device_hp9825_optrom_interface>
-{
-public:
-	// construction/destruction
-	hp9825_optrom_slot_device(machine_config const &mconfig, char const *tag, device_t *owner);
-	hp9825_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~hp9825_optrom_slot_device();
+	hp9825_optrom_device(machine_config const &mconfig, char const *tag, device_t *owner);
+	hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~hp9825_optrom_device();
 
 	void set_rom_limit(offs_t rom_limit) { m_rom_limit = rom_limit; }
 
@@ -67,10 +47,6 @@ protected:
 	virtual const char *image_interface() const override { return "hp9825_rom"; }
 	virtual const char *file_extensions() const override { return "bin"; }
 
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
-
-	device_hp9825_optrom_interface *m_cart;
 	offs_t m_rom_limit;
 	unsigned m_loaded_regions;
 	address_space *m_space_r;
@@ -78,7 +54,6 @@ protected:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(HP9825_OPTROM_SLOT, hp9825_optrom_slot_device)
-DECLARE_DEVICE_TYPE(HP9825_OPTROM_CART, hp9825_optrom_cart_device)
+DECLARE_DEVICE_TYPE(HP9825_OPTROM, hp9825_optrom_device)
 
-#endif /* MAME_BUS_HP9825_OPTROMS_HP9825_OPTROM_H */
+#endif /* MAME_MACHINE_HP9825_OPTROM_H */
