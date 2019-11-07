@@ -943,7 +943,7 @@ namespace netlist
 	{
 	}
 
-	const pstring param_model_t::value_str(const pstring &entity)
+	pstring param_model_t::value_str(const pstring &entity)
 	{
 		return state().setup().models().value_str(str(), entity);
 	}

@@ -179,10 +179,10 @@ namespace netlist
 
 		analog::NETLIB_SUB(R_base) m_RP;
 		analog::NETLIB_SUB(VCCS) m_G1;
-		NETLIB_SUBXX(analog, C) m_CP;
-		NETLIB_SUBXX(analog, VCVS) m_EBUF;
-		NETLIB_SUBXX(analog, D) m_DP;
-		NETLIB_SUBXX(analog, D) m_DN;
+		NETLIB_SUB_UPTR(analog, C) m_CP;
+		NETLIB_SUB_UPTR(analog, VCVS) m_EBUF;
+		NETLIB_SUB_UPTR(analog, D) m_DP;
+		NETLIB_SUB_UPTR(analog, D) m_DN;
 
 		analog_input_t m_VCC;
 		analog_input_t m_GND;

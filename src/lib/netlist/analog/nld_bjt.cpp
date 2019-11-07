@@ -270,8 +270,8 @@ namespace analog
 		nl_fptype m_alpha_f;
 		nl_fptype m_alpha_r;
 
-		NETLIB_SUBXX(analog, C) m_CJE;
-		NETLIB_SUBXX(analog, C) m_CJC;
+		NETLIB_SUB_UPTR(analog, C) m_CJE;
+		NETLIB_SUB_UPTR(analog, C) m_CJC;
 	};
 
 

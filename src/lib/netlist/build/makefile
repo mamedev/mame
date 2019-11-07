@@ -58,7 +58,7 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-DOXYGEN = @doxygen
+DOXYGEN = @./doxygen
 CLANG_TIDY = clang-tidy-9
 
 TARGETS = nltool nlwav

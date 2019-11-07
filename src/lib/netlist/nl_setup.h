@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlsetup.h
- *
- */
+
+///
+/// \file nl_setup.h
+///
 
 #ifndef NLSETUP_H_
 #define NLSETUP_H_

@@ -59,38 +59,38 @@ namespace analog
 	 * |     |Cbd   | Zero-bias B-D junction capacitance                                    |F|0|20f|
 	 * |     |Cbs   | Zero-bias B-S junction capacitance                                    |F|0|20f|
 	 * |  Y  |Is    | Bulk junction saturation current                                      |A|0.00000000000001|1E-015|
-	 * |  Y  |N     | Bulk diode emission coefficient                                       |-|1|*
-	 * |     |Pb    | Bulk junction potential                                               |V|0.8|0.87|8|
+	 * |  Y  |N     | Bulk diode emission coefficient                                       |-|1|*|
+	 * |     |Pb    | Bulk junction potential                                               |V|0.8|0.87|
 	 * |  Y  |Cgso  | Gate-source overlap capacitance per meter channel width               |F/m|0|0.00000000004|
-	 * |  Y  |Cgdo  | Gate-drain overlap capacitance per meter channel width                |F/m|0|0.00000000004|*
-	 * |  Y  |Cgbo  | Gate-bulk overlap capacitance per meter channel width                 |F/m|0|0.0000000002|*
-	 * |     |Rsh   | Drain and source diffusion sheet resistance                           |W|0|10|*
-	 * |     |Cj    | Zero-bias bulk junction bottom capacitance per square meter of junction area|F/m²|0|0.0002|*
-	 * |     |Mj    | Bulk junction bottom grading coefficient                              |-|0.5|0.5|*
-	 * |     |Cjsw  | Zero-bias bulk junction sidewall capacitance per meter of junction perimeter|F/m|0|1p|*
+	 * |  Y  |Cgdo  | Gate-drain overlap capacitance per meter channel width                |F/m|0|0.00000000004*|
+	 * |  Y  |Cgbo  | Gate-bulk overlap capacitance per meter channel width                 |F/m|0|0.0000000002*|
+	 * |     |Rsh   | Drain and source diffusion sheet resistance                           |W|0|10*|
+	 * |     |Cj    | Zero-bias bulk junction bottom capacitance per square meter of junction area|F/m²|0|0.0002*|
+	 * |     |Mj    | Bulk junction bottom grading coefficient                              |-|0.5|0.5*|
+	 * |     |Cjsw  | Zero-bias bulk junction sidewall capacitance per meter of junction perimeter|F/m|0|1p*|
 	 * |     |Mjsw  | Bulk junction sidewall grading coefficient                            |-|.50 level 1  .33 level 2,3||
 	 * |     |Js    | Bulk junction saturation current per square-meter of junction area|A/m|0|0.00000001|
 	 * |  Y  |Tox   | Oxide thickness                                                       |m|0.0000001|0.0000001|
 	 * |  Y  |Nsub  | Substrate doping                                                      |1/cm³|0|4000000000000000|
 	 * |     |Nss   | Surface state density                                                 |1/cm²|0|10000000000|
-	 * |     |Nfs   | Fast surface state                                                    |1/cm²|0|10000000000|*
-	 * |     |TPG   | Type of gate material:  +1 opp. to substrate -1 same as substrate     0 Al gate|-|1|
-	 * |     |Xj    | Metallurgical junction depth                                          |m|0|1µ|*
+	 * |     |Nfs   | Fast surface state                                                    |1/cm²|0|10000000000*|
+	 * |     |TPG   | Type of gate material:  +1 opp. to substrate -1 same as substrate     |Al gate|-|1|
+	 * |     |Xj    | Metallurgical junction depth                                          |m|0|1µ*|
 	 * |  Y  |Ld    | Lateral diffusion                                                     |m|0|0.8µ|
 	 * |  Y  |Uo    | Surface mobility                                                      |cm²/V/s|600|700|
 	 * |     |Ucrit | Critical field for mobility degradation (level 2 only)                |V/cm|10000|10000|
 	 * |     |Uexp  | Critical field exponent in mobility degradation (level 2 only)        |-|0|0.1|
-	 * |     |Utra  | Transverse field coefficient (level 2 only)                           |-|0|0.3|*
+	 * |     |Utra  | Transverse field coefficient (level 2 only)                           |-|0|0.3*|
 	 * |     |Vmax  | Maximum carrier drift velocity (levels 2 & 3 only)                    |m/s|0|50000|
 	 * |     |Neff  | Total channel-charge exponent (level 2 only)                          |-|1|5|
 	 * |     |Kf    | Flicker noise coefficient                                             |-|0|1E-026|
 	 * |     |Af    | Flicker noise exponent                                                |-|1|1.2|
-	 * |     |Fc    | Coefficient for forward-bias depletion capacitance formula            |-|0.5|
+	 * |     |Fc    | Coefficient for forward-bias depletion capacitance formula            |-|0.5||
 	 * |     |Delta | Width effect on threshold voltage(levels 2 and 3)                     |-|0|1|
 	 * |     |Theta | Mobility modulation (level 3 only)                                    |-|0|0.1|
 	 * |     |Eta   | Static feedback (level 3 only)                                        |-|0|1|
-	 * |     |Kappa | Saturation field (level 3 only)                                       |0.2|0.5|
-	 * |     |Tnom  | Parameter measurement temperature                                     |ºC|27|50||
+	 * |     |Kappa | Saturation field (level 3 only)                                       |-|0.2|0.5|
+	 * |     |Tnom  | Parameter measurement temperature                                     |ºC|27|50|
 	 * |  Y  |L     | Length scaling                                                        |-|100e-6||
 	 * |  Y  |W     | Width scaling                                                         |-|100e-6||
 	 * */

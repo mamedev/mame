@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 #include "netlist/plib/pmain.h"
+#include "netlist/plib/pstrutil.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/nl_parser.h"
@@ -113,6 +114,18 @@ public:
 
 	int execute() override;
 	pstring usage() override;
+
+	template<typename... ARGS>
+	void poutprefix(pstring prefix, pstring fmt, ARGS&&... args)
+	{
+		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
+		auto lines(plib::psplit(res, "\n", false));
+		if (lines.size() == 0)
+			pout(prefix + "\n");
+		else
+			for (auto &l : lines)
+				pout(prefix + l + "\n");
+	}
 
 	int m_warnings;
 	int m_errors;
@@ -529,6 +542,103 @@ void tool_app_t::static_compile()
 
 }
 
+
+
+/* "Description: The Swiss army knife for timing purposes\n"
+* "    which has a ton of applications.\n"
+* "DipAlias: GND,TRIG,OUT,RESET,VCC,DISCH,THRES,CONT\n"
+* "Package: DIP\n"
+* "NamingConvention: Naming conventions follow Texas Instruments datasheet\n"
+* "Limitations: Internal resistor network currently fixed to 5k\n"
+* "     more limitations\n"
+* "FunctionTable:\n"
+*/
+
+struct doc_ext
+{
+	pstring id;
+	pstring title;
+	pstring description;
+	std::vector<pstring> pinalias;
+	pstring package;
+	pstring namingconventions;
+	pstring limitations;
+	pstring functiontable;
+	std::vector<pstring> example;
+};
+
+static doc_ext read_docsrc(const pstring &fname, const pstring &id)
+{
+	//printf("file %s\n", fname.c_str());
+	plib::putf8_reader r = plib::putf8_reader(std::ifstream(plib::filesystem::u8path(fname)));
+	if (r.stream().fail())
+		plib::pthrow<netlist::nl_exception>(netlist::MF_FILE_OPEN_ERROR(fname));
+	r.stream().imbue(std::locale::classic());
+	doc_ext ret;
+
+	pstring l;
+	if (!r.readline(l))
+		return ret;
+	do
+	{
+		l = plib::trim(l);
+		if (plib::startsWith(l, "//-"))
+		{
+			l = plib::trim(l.substr(3));
+			if (l != "")
+			{
+				auto a(plib::psplit(l, ":", true));
+				if ((a.size() < 1) || (a.size() > 2))
+					plib::pthrow<netlist::nl_exception>(l+" size mismatch");
+				pstring n(plib::trim(a[0]));
+				pstring v(a.size() < 2 ? "" : plib::trim(a[1]));
+				if (n == "Identifier")
+				{
+					ret.id = v;
+					if (!r.readline(l))
+						return (ret.id == id ? ret : doc_ext());
+				}
+				else
+				{
+					while (r.readline(l))
+					{
+						l = plib::ltrim(l);
+						if (!(plib::startsWith(l, "//-  ") || plib::startsWith(l, "//-\t"))
+							&& !(plib::rtrim(l) == "//-"))
+							break;
+						v = v + "\n" + l.substr(3);
+					}
+					if (n == "Title")
+						ret.title = plib::trim(v);
+					else if (n == "Pinalias")
+						ret.pinalias = plib::psplit(plib::trim(v),",",true);
+					else if (n == "Description")
+						ret.description = v;
+					else if (n == "Package")
+						ret.package = plib::trim(v);
+					else if (n == "NamingConvention")
+						ret.namingconventions = v;
+					else if (n == "Limitations")
+						ret.limitations = v;
+					else if (n == "FunctionTable")
+						ret.functiontable = v;
+					else if (n == "Example")
+					{
+						ret.example = plib::psplit(plib::trim(v),",",true);
+						if (ret.example.size() != 2 && ret.example.size() != 0)
+							plib::pthrow<netlist::nl_exception>("Example requires 2 parameters, but found {1}", ret.example.size());
+					}
+					else
+						plib::pthrow<netlist::nl_exception>(n);
+				}
+			}
+		}
+		else if (!r.readline(l))
+			return (ret.id == id ? ret : doc_ext());
+	} while (true);
+	//return ret;
+}
+
 void tool_app_t::mac_out(const pstring &s, const bool cont)
 {
 	if (cont)
@@ -674,9 +784,9 @@ void tool_app_t::create_docheader()
 	pout(" *\n");
 
 	for (auto &s : devs)
-		pout(" *         - \\subpage {1}\n", s);
+		pout(" * - @subpage {1}\n", s);
 
-	pout(" *\n");
+	pout(" */\n");
 
 	for (auto &e : nt.setup().factory())
 	{
@@ -686,6 +796,78 @@ void tool_app_t::create_docheader()
 		pout("//! [{1} synopsis]\n", e->name());
 		mac(e.get());
 		pout("//! [{1} synopsis]\n", e->name());
+	}
+
+	poutprefix("", "");
+	poutprefix("///", "");
+	//poutprefix("///", " @file ");
+	poutprefix("///", " @page '' "); // FIXME: snippets and pages need to be separate files
+	poutprefix("", "");
+
+	for (auto &e : nt.setup().factory())
+	{
+		auto d(read_docsrc(e->sourcefile(), e->name()));
+
+		if (d.id != "")
+		{
+
+			poutprefix("///", "");
+			//poutprefix("///", "  @file {}", e->sourcefile());
+			poutprefix("///", "");
+			poutprefix("///", "  @page {} {}", d.id, d.title);
+			poutprefix("///", "");
+			poutprefix("///", "  {}", d.description);
+			poutprefix("///", "");
+			poutprefix("///", "  @section {}_1 Synopsis", d.id);
+			poutprefix("///", "");
+			poutprefix("///", "  @snippet devsyn.dox.h {} synopsis", d.id);
+			poutprefix("///", "");
+			poutprefix("///", "  @section {}_11 C Synopsis", d.id);
+			poutprefix("///", "");
+			poutprefix("///", "  @snippet devsyn.dox.h {} csynopsis", d.id);
+			poutprefix("///", "");
+			poutprefix("///", "  @section {}_2 Connection Diagram", d.id);
+			poutprefix("///", "");
+
+			if (d.pinalias.size() > 0)
+			{
+				poutprefix("///", "  <pre>");
+				if (d.package == "DIP")
+				{
+					auto & pins = d.pinalias;
+					//const int w = 8;
+					poutprefix("///", " {1:10} +--------+", " ");
+					for (std::size_t i=0; i<pins.size()/2; i++)
+					{
+						poutprefix("///", " {1:10} |{2:-2}    {3:2}| {4:-10}",
+							pins[i], i+1, pins.size()-i, pins[pins.size()-i-1]);
+					}
+					poutprefix("///", " {1:10} +--------+", " ");
+				}
+				poutprefix("///", "  </pre>");
+			}
+			poutprefix("///", "");
+			poutprefix("///", "  {}", d.namingconventions);
+			poutprefix("///", "");
+			poutprefix("///", "  @section {}_3 Function Table", d.id);
+			poutprefix("///", "");
+			if (d.functiontable == "")
+				poutprefix("///", "  Please refer to the datasheet.");
+			else
+				poutprefix("///", "  {}", d.functiontable);
+			poutprefix("///", "");
+			poutprefix("///", "  @section {}_4 Limitations", d.id);
+			poutprefix("///", "");
+			poutprefix("///", "  {}", d.limitations);
+			if (d.example.size() > 0)
+			{
+				poutprefix("///", "");
+				poutprefix("///", "  @section {}_5 Example", d.id);
+				poutprefix("///", "  @snippet {1} {2}", d.example[0], d.example[1]);
+				poutprefix("///", "");
+				poutprefix("", "");
+			}
+		}
 	}
 	nt.stop();
 }
