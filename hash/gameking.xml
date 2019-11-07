@@ -5,7 +5,7 @@
 
 <!-- Cartridge Pinout
 
-               -------
+               _______
          VCC = |01   31| = GND
           NC - |02   32| - NC
           NC - |03   33| - NC
@@ -36,7 +36,7 @@
           A3 = |28   58| = A2
           A1 = |29   59| = A0
          GND = |30   60| = VCC
-                -------
+                _______
 
 For Dumping:
 S2: to VCC (most likely WE)
