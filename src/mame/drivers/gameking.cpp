@@ -303,6 +303,7 @@ void gameking3_state::gameking3(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(80, 27);
 	m_screen->set_visarea_full();
+	m_screen->set_physical_aspect(4, 3);
 	m_screen->set_screen_update(FUNC(gameking3_state::screen_update_gameking3));
 
 	/* cartridge */
