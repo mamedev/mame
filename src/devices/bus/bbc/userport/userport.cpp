@@ -130,5 +130,5 @@ void bbc_userport_devices(device_slot_interface &device)
 	//device.option_add("vci",        BBC_VCI);             /* Video Camera Interface (Data Harvest) */
 	device.option_add("voicebox",   BBC_VOICEBOX);        /* Robin Voice Box */
 	//device.option_add("music4000",  BBC_MUSIC4000);       /* Hybrid Music 4000 Keyboard */
-	device.option_add("cfa3000kbd", CFA3000_KBD);         /* Henson CFA 3000 Keyboard */
+	device.option_add_internal("cfa3000kbd", CFA3000_KBD);/* Henson CFA 3000 Keyboard */
 }
