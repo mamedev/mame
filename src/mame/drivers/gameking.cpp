@@ -57,6 +57,7 @@ private:
 	TIMER_CALLBACK_MEMBER(gameking_timer2);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gameking3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	void gameking_mem(address_map &map);
@@ -65,7 +66,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_ioport m_io_joy;
-	required_device<palette_device> m_palette;
+	optional_device<palette_device> m_palette;
 
 	emu_timer *timer1;
 	emu_timer *timer2;
@@ -153,6 +154,76 @@ uint32_t gameking_state::screen_update_gameking(screen_device &screen, bitmap_in
 }
 
 
+static constexpr uint8_t gameking3_intensities[] =
+{
+	0,
+	127,
+	191,
+	255
+};
+
+uint32_t gameking_state::screen_update_gameking3(screen_device& screen, bitmap_rgb32 &bitmap, const rectangle& cliprect)
+{
+	address_space* maincpu_ram = &m_maincpu->space(AS_PROGRAM);
+	offs_t lssa = m_maincpu->state_int(st2xxx_device::ST_LSSA);
+	if (lssa < 0x0080)
+		return 0;
+
+	for (int y = 0, i = 0; i < 80; y += 2, i++)
+	{
+		for (int x = 0, j = 0; j < 40; x += 4, j++)
+		{
+			uint8_t data=maincpu_ram->read_byte(lssa+j+i*40);
+
+			// apply SPRD-C color filter
+			switch (i % 3)
+			{
+			case 0:
+				bitmap.pix32(y, x + 3) = rgb_t(0, gameking3_intensities[data&3], 0);
+				bitmap.pix32(y + 1, x + 2) = rgb_t(gameking3_intensities[(data>>2)&3], 0, 0);
+				bitmap.pix32(y, x + 1) = rgb_t(0, gameking3_intensities[(data>>4)&3], 0);
+				bitmap.pix32(y + 1, x) = rgb_t(gameking3_intensities[(data>>6)&3], 0, 0);
+				break;
+
+			case 1:
+				bitmap.pix32(y, x + 3) = rgb_t(0, 0, gameking3_intensities[data&3]);
+				bitmap.pix32(y + 1, x+2) = rgb_t(0, gameking3_intensities[(data>>2)&3], 0);
+				bitmap.pix32(y, x + 1) = rgb_t(0, 0, gameking3_intensities[(data>>4)&3]);
+				bitmap.pix32(y + 1, x) = rgb_t(0, gameking3_intensities[(data>>6)&3], 0);
+				break;
+
+			case 2:
+				bitmap.pix32(y, x + 3) = rgb_t(gameking3_intensities[data&3], 0, 0);
+				bitmap.pix32(y + 1, x+2) = rgb_t(0, 0, gameking3_intensities[(data>>2)&3]);
+				bitmap.pix32(y, x + 1) = rgb_t(gameking3_intensities[(data>>4)&3], 0, 0);
+				bitmap.pix32(y + 1, x) = rgb_t(0, 0, gameking3_intensities[(data>>6)&3]);
+				break;
+			}
+		}
+	}
+
+	// interpolate values for dots in between
+	for (int y = 0; y < 160; y++)
+	{
+		for (int x = y & 1; x < 160; x += 2)
+		{
+			rgb_t l = rgb_t(x == 0 ? 0 : bitmap.pix32(y, x - 1));
+			rgb_t r = rgb_t(x == 159 ? 0 : bitmap.pix32(y, x + 1));
+			rgb_t u = rgb_t(y == 0 ? 0 : bitmap.pix32(y - 1, x));
+			rgb_t d = rgb_t(y == 159 ? 0 : bitmap.pix32(y + 1, x));
+
+			bitmap.pix32(y, x) = rgb_t(
+				((u.r() + d.r()) * 2 + l.r() + r.r()) / 3,
+				((u.g() + d.g()) * 2 + l.g() + r.g()) / 3,
+				((u.b() + d.b()) * 2 + l.b() + r.b()) / 3
+			);
+		}
+	}
+
+	return 0;
+}
+
+
 void gameking_state::init_gameking()
 {
 	timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer), this));
@@ -235,6 +306,15 @@ void gameking_state::gameking3(machine_config &config)
 {
 	gameking(config);
 	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking3_mem);
+
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(160, 160);
+	screen.set_visarea_full();
+	screen.set_physical_aspect(3, 2);
+	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking3));
+	screen.set_palette(finder_base::DUMMY_TAG);
+	config.device_remove("palette");
+
 	SOFTWARE_LIST(config, "cart_list").set_original("gameking");
 	SOFTWARE_LIST(config, "cart_list_3").set_original("gameking3");
 }
