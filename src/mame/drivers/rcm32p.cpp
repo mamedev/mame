@@ -12,16 +12,32 @@
 Notes:
 - When booting, it does a basic check by writing values 0..0xFF to 0x108A.
   It then expects (value & 0x03) to be read back from 0x1080 and (value) to be read back from 0x1081/0x1082.
-  If there is any unexpected results, it goes into Test Mode. (jump to 0x46D4)
-  Booting normally means it finally ends up at 0x4801.
   The routine for doing the check begins at 0x4686.
-- When in test mode, the firmware gets stuck in the loop at 0xBB06, waiting for Interrupt #5 (calls 0x4014/0x4030) to fire.
+  Succeeding means it ends up at 0x4801.
+- When in test mode, the firmware gets stuck in the loop at 0xBB06, waiting for Interrupt #5 (calls 0x4014) to fire.
   It gets there by calling function 0xBBBB, which writes text (address w@0x40, num characters b@0x43) to the LCD screen.
   This can be worked around by setting b@BB2D = 03.
+- The firmware gets also stuck in the loop at 0x7D70, waiting for Interrupt #8 (calls 0x4020).
+  This might be related to finding the best free voice?
+  You can exit the loop by setting b@7D80 = 00.
+- Test Mode shows the results of 4 checks:
+    1. SRAM check
+    2. MIDI IN/OUT check
+    3. PCM ROM and card check
+    4. RCC-CPU check
+  Errors in check 2 and 3 are "not abnormal".
+  In order to make check 2 pass successfully, you need to connect MIDI Out with MIDI In, creating a loopback.
+  Check 3 requires the SN-U110-04 PCM card ("Electric Grand & Clavi") to be inserted in order to succeed.
+- In order to access the built-in PCM ROM (IC18), the CPU asks the sound chip to read offsets 0x000000 .. 0x07FFFF.
+  The PCM card is accessed via offsets 0x080000 .. 0x0FFFFF.
+  The additional PCM ROMs are mapped to 0x100000 .. 0x17FFFF (IC19) and 0x200000 .. 0x27FFFF according to the sample table in IC18.
+- The sound chip has 32 voices. Voice 0 is reserved by the firmware for reading data from the PCM ROM.
+  The firmware allocates voices from back to front, i.e. voice 31 first.
 
-  It then gets stuck at 0x6718, trying to read a "mode" value (0 to 7) from 0x1300.
-  The byte at 0x1300 contains the bit mask of the pressed test switches. (see service notes, page 10/11)
-  Modes are selected by checking the first unset bit in order 0..7.
+
+TODO:
+- actual sound emulation
+- add PCM card support
 
 
 PCB Layout
@@ -100,10 +116,64 @@ Parts:
 |-----------------------------------------------------------------------|
 
 
+PCM ROM Tables
+--------------
+Sample Table (address: 0x00100)
+------------
+Pos Len Description
+00  02  start offset, bits 0-15 (Little Endian)
+02  01  start offset, bits 16-18 (bits 0-2)
+        PCM card select (bit 3): set for sounds on PCM cards
+        ROM bank (bits 4-5):
+            0 = IC18
+            1 = IC19
+            2 = IC20
+        loop mode (bits 6-7):
+            0 = normal loop
+            1 = no loop
+            2 = ping-pong (forwards, backwards, forwards, backwards, ...)
+03  02  last sample (sample length = last sample + 1)
+05  02  loop length (loop start = sample length - loop length)
+07  01  ??
+08  01  reference note (when played back at 32000 Hz)
+09  01  ??
+-> 0Ah bytes per entry
+
+Tone List (address: 0x01000)
+---------
+Pos Len Description
+00  0A  sample name
+0A  01  tone type
+            00 - single
+            01 - dual
+            02 - detune
+            03 - velocity mix
+            04 - velocity switch
+            05..07 - invalid
+            08..0F/10..17/.../78..7F - same as 00..07
+            80..FF - rhythm?
+0B  01  ??
+0C  02  ??
+0E  01  ??
+0F  01  ??
+10  0B  some note IDs (padded with FF)
+1B  0C  sample IDs (always one more than number of note IDs, padded with FF)
+27  09  ??
+30  0B  some note IDs (padded with FF)
+3B  0C  sample IDs (always one more than number of note IDs, padded with FF)
+47  09  ??
+-> 50h bytes per entry
+
+Note: Section 30..4F is only used with tone types 01, 03, 04
+
+
 CM-32P Firmware Work RAM Layout
 -------------------------------
+2100..22FF - MIDI data receive buffer
+
 2344..23C1 - Part 1..6 "Patch temporary area" (see manual page 21, 0x15 bytes per partial)
 23C4..23D4 - "System area" settings (see manual page 22, master volume, reverb setting, channel assignments)
+  23CE-23D3 - Part 1..6 MIDI channel
 23D6..25B5 - Part 1..6 instrument data (0x50 bytes per partial, from PCM ROM at 0x1000/0x1050/0x10A0/...)
 25B8..2B57 - Part 1..6 sample table data (0xF0 bytes per partial, from PCM ROM at 0x0100/0x010A/0x0114/...)
 
@@ -121,17 +191,35 @@ CM-32P Firmware Work RAM Layout
 351E - Reverb Mode
 351F - Reverb Time
 3521 - ?? (initialized with 1)
+352A..3889 - voice memory (32 bytes per block)
+ 35AA..35C9 - some jump table index for interrupt #8
+38DE..394D - more voice memory (32 bytes per block)
+
+397E..3??? - state of playing notes
+  3986 - current panning volume, left speaker (00..1F)
+  39A6 - current panning volume, right speaker (00..1F)
+  39C6 - target panning volume, left speaker (00..1F)
+  39E6 - target panning volume, right speaker (00..1F)
+
+3D7C..3E84 - SysEx receive data buffer
 
 Some routine locations
 ----------------------
-0x45CB	Initialization (memory clear + checks), external memory is checked from 0x4679 on
-0x5024	decide whether or not Test Mode is entered (normal boot == jump to 0x502A)
-0x50F5	MIDI handling code
-0x65E8	PCM ROM instrument check
-0x6650	PCM card instrument check (Note: requires the SN-U110-04 PCM card to be inserted to succeed)
-0xB027	read instrument data from PCM ROM
-0xB316	PCM ROM signature check
-0xBBBB	write text to LCD
+0x4014  LCD related interrupt handler
+0x401C  serial input (MIDI data) interrupt handler
+0x4020  some interrupt handler required while playing notes
+0x45CB  Initialization (memory clear + checks), external memory is checked from 0x4679 on
+0x5024  decide whether or not Test Mode is entered (normal boot == jump to 0x502A)
+0x50F5  MIDI handling code
+0x65E8  PCM ROM instrument check
+0x6650  PCM card instrument check (Note: assumes that the SN-U110-04 PCM card is inserted)
+0x6EA4  play a note (parameters: 0040 - part, 0041 = note pitch, 0042 - velocity)
+0xB027  load instrument data from PCM ROM (writes to 23D6 + 50*i)
+0xB12B  load instrument sample data from PCM ROM (reads sample IDs from 23D6+1B + 50*i, writes to 25B8 + F0*i)
+0xB1A0  load secondary instrument sample data from PCM ROM (reads sample IDs from 23D6+3B + 50h*i, writes to 25B8+50 + F0*i)
+0xB1E8  load 1 sample table entry from PCM ROM
+0xB316  PCM ROM signature check
+0xBBBB  write text to LCD
 
 */
 
@@ -160,18 +248,18 @@ static INPUT_PORTS_START( cm32p )
 	PORT_BIT(0x03ff, 0x0000, IPT_DIAL) PORT_NAME("Knob") PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CODE_DEC(KEYCODE_DOWN) PORT_CODE_INC(KEYCODE_UP)
 
 	PORT_START("SERVICE")	// connected to Port 0 of the P8098 CPU.
-	PORT_SERVICE(0x80, IP_ACTIVE_LOW)	// SW A (checked during boot)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Check/Tune") PORT_CODE(KEYCODE_B)	// SW B
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test Switch") PORT_TOGGLE PORT_CODE(KEYCODE_F2)	// SW A (checked during boot)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: Check/Tune") PORT_CODE(KEYCODE_B)	// SW B
 
 	PORT_START("SW")	// test switches, accessed by reading from address 0x1300
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("MSB Adj.") PORT_CODE(KEYCODE_1)	// SW 1
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("THD Check") PORT_CODE(KEYCODE_2)	// SW 2
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: String 1") PORT_CODE(KEYCODE_3)	// SW 3
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM Out: Sax 1") PORT_CODE(KEYCODE_4)	// SW 4
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Long Reverb") PORT_CODE(KEYCODE_5)	// SW 5
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("PCM + Short Reverb") PORT_CODE(KEYCODE_6)	// SW 6
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Down Check") PORT_CODE(KEYCODE_7)	// SW 7
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("VCA Up Check") PORT_CODE(KEYCODE_8)	// SW 8
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: MSB Adj.") PORT_CODE(KEYCODE_1)	// SW 1
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: THD Check") PORT_CODE(KEYCODE_2)	// SW 2
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM Out: String 1") PORT_CODE(KEYCODE_3)	// SW 3
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM Out: Sax 1") PORT_CODE(KEYCODE_4)	// SW 4
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM + Long Reverb") PORT_CODE(KEYCODE_5)	// SW 5
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: PCM + Short Reverb") PORT_CODE(KEYCODE_6)	// SW 6
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: VCA Down Check") PORT_CODE(KEYCODE_7)	// SW 7
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Test: VCA Up Check") PORT_CODE(KEYCODE_8)	// SW 8
 INPUT_PORTS_END
 
 class cm32p_state : public driver_device
@@ -204,8 +292,8 @@ private:
 	DECLARE_WRITE8_MEMBER(lcd_data_w);
 	DECLARE_READ16_MEMBER(port0_r);
 	DECLARE_READ8_MEMBER(pcmrom_r);
-	DECLARE_READ8_MEMBER(some_io_r);
-	DECLARE_WRITE8_MEMBER(some_io_w);
+	DECLARE_READ8_MEMBER(dsp_io_r);
+	DECLARE_WRITE8_MEMBER(dsp_io_w);
 	DECLARE_READ8_MEMBER(snd_io_r);
 	DECLARE_WRITE8_MEMBER(snd_io_w);
 	DECLARE_READ8_MEMBER(test_sw_r);
@@ -219,7 +307,7 @@ private:
 	int midi_pos;
 	u8 port0;
 	u8 sound_io_buffer[0x100];
-	u8 some_io_buffer[0x80];
+	u8 dsp_io_buffer[0x80];
 };
 
 cm32p_state::cm32p_state(const machine_config &mconfig, device_type type, const char *tag)
@@ -268,10 +356,14 @@ uint32_t cm32p_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void cm32p_state::machine_start()
 {
+	u8 *rom = memregion("maincpu")->base();
+
 	// TODO: The IC8 gate array has an "LCD INT" line that needs to be emulated. Then, the hack can be removed.
 	// Note: The hack is not necessary when *not* using test mode.
-	u8 *rom = memregion("maincpu")->base();
 	rom[0xBB2D] = 0x03;	// hack to make test mode not freeze when displaying the LCD text
+
+	// TODO: remove this hack
+	rom[0x7D80] = 0x00;	// hack to exit some loop waiting for interrupt #8
 }
 
 void cm32p_state::machine_reset()
@@ -326,14 +418,14 @@ READ8_MEMBER(cm32p_state::pcmrom_r)
 	return UNSCRAMBLE_DATA(pcm_rom[romOfs]);
 }
 
-READ8_MEMBER(cm32p_state::some_io_r)
+READ8_MEMBER(cm32p_state::dsp_io_r)
 {
-	return some_io_buffer[offset];
+	return dsp_io_buffer[offset];
 }
 
-WRITE8_MEMBER(cm32p_state::some_io_w)
+WRITE8_MEMBER(cm32p_state::dsp_io_w)
 {
-	some_io_buffer[offset] = data;
+	dsp_io_buffer[offset] = data;
 	// do read/write to some external memory, makes the RCC-CPU check pass. (routine at 0x4679)
 	switch(offset)
 	{
@@ -344,18 +436,18 @@ WRITE8_MEMBER(cm32p_state::some_io_w)
 		{
 			u8* ram = some_ram->pointer();
 			offs_t ofs = data;
-			ram[0x000 | ofs] = some_io_buffer[0x00] & 0x03;
-			ram[0x100 | ofs] = some_io_buffer[0x01];
-			ram[0x200 | ofs] = some_io_buffer[0x02];
+			ram[0x000 | ofs] = dsp_io_buffer[0x00] & 0x03;
+			ram[0x100 | ofs] = dsp_io_buffer[0x01];
+			ram[0x200 | ofs] = dsp_io_buffer[0x02];
 		}
 		break;
 	case 0x0A:
 		{
 			const u8* ram = some_ram->pointer();
 			offs_t ofs = data;
-			some_io_buffer[0x00] = ram[0x000 | ofs];
-			some_io_buffer[0x01] = ram[0x100 | ofs];
-			some_io_buffer[0x02] = ram[0x200 | ofs];
+			dsp_io_buffer[0x00] = ram[0x000 | ofs];
+			dsp_io_buffer[0x01] = ram[0x100 | ofs];
+			dsp_io_buffer[0x02] = ram[0x200 | ofs];
 		}
 		break;
 	}
@@ -366,7 +458,7 @@ READ8_MEMBER(cm32p_state::snd_io_r)
 	if (offset == 0x01)
 	{
 		// code for reading from the PCM sample table is at 0xB027
-		// The code at 0xB0AC writes to 1411/1F (??), then 1403/02 (bank), then 1409/08/0B/140A (address).
+		// The code at 0xB0AC writes to 1411/1F (??), then 1403/02 (bank), then 1409/08/0B/0A (address).
 		// It waits a few cycles and at 0xB0F7 it reads the resulting data from 1401.
 		offs_t bank = sound_io_buffer[0x03];
 		offs_t addr = (sound_io_buffer[0x09] << 0) | (sound_io_buffer[0x0A] << 8) | (sound_io_buffer[0x0B] << 16);
@@ -384,6 +476,20 @@ READ8_MEMBER(cm32p_state::snd_io_r)
 
 WRITE8_MEMBER(cm32p_state::snd_io_w)
 {
+	// register map
+	// ------------
+	// Note: 16-bit words are Little Endian, the firmware writes the odd byte is first
+	//  00/01 - ??
+	//  02/03 - ROM bank (only bits 11-13 are used, bit 11 = PCM card, bits 12-13 select between IC18/19/20)
+	//  04/05 - frequency (2.14 fixed point, 0x4000 = 32000 Hz)
+	//  06/07 - volume
+	//  08/09 - sample start address, fraction (2.14 fixed point, i.e. 1 byte = 0x4000)
+	//  0A/0B - sample start address (high word, i.e. address bits 2..17)
+	//  0C/0D - sample end address (high word)
+	//  0E/0F - sample loop address (high word)
+	//  11/13/15/17 - voice enable mask (11 = least significant 8 bits, 17 = most significant 8 bits)
+	//  1A - ??
+	//  1F - voice select
 	sound_io_buffer[offset] = data;
 }
 
@@ -405,13 +511,13 @@ void cm32p_state::mt32_palette(palette_device &palette) const
 
 void cm32p_state::cm32p_map(address_map &map)
 {
-	map(0x1080, 0x10ff).rw(FUNC(cm32p_state::some_io_r), FUNC(cm32p_state::some_io_w));	// I/O ?? (writes to 1080..82/86/8C/8D)
+	map(0x1080, 0x10ff).rw(FUNC(cm32p_state::dsp_io_r), FUNC(cm32p_state::dsp_io_w));	// DSP area (writes to 1080..82/86/8C/8D)
 	map(0x1100, 0x1100).rw(FUNC(cm32p_state::lcd_ctrl_r), FUNC(cm32p_state::lcd_ctrl_w));
 	map(0x1102, 0x1102).w(FUNC(cm32p_state::lcd_data_w));
 	map(0x1300, 0x1300).r(FUNC(cm32p_state::test_sw_r));	// test switch state
-	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));	// sound chip area? (writes to 1400..1F, reads 1401)
+	map(0x1400, 0x14ff).rw(FUNC(cm32p_state::snd_io_r), FUNC(cm32p_state::snd_io_w));	// sound chip area
 	map(0x2000, 0x20ff).rom().region("maincpu", 0x2000);	// init vector @ 2080
-	map(0x2100, 0x3fff).ram();	// the program clears region 2100..3EFF at init and sets SP=3FFE
+	map(0x2100, 0x3fff).ram();	// main RAM
 	map(0x4000, 0xbfff).rom().region("maincpu", 0x4000);
 	map(0xc000, 0xffff).r(FUNC(cm32p_state::pcmrom_r));	// show descrambled PCM ROM (for debugging)
 }
@@ -446,10 +552,11 @@ ROM_START( cm32p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cm-32p-ic9.bin",  0x000000, 0x10000, CRC(6f2f6dfd) SHA1(689f77c1d56f923ef1dab7d993a124c47736bc56) )
 
-	ROM_REGION( 0x200000, "pcm32", 0 )
+	ROM_REGION( 0x400000, "pcm32", 0 )
 	ROM_LOAD( "cm-32p-ic18.bin", 0x000000, 0x80000, CRC(8e53b2a3) SHA1(4872530870d5079776e80e477febe425dc0ec1df) )
-	ROM_LOAD( "cm-32p-ic19.bin", 0x080000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d) )
-	ROM_LOAD( "cm-32p-ic20.bin", 0x100000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) )
+	// 0x080000 .. 0x0FFFFF is reserved for the PCM card
+	ROM_LOAD( "cm-32p-ic19.bin", 0x100000, 0x80000, CRC(c8220761) SHA1(49e55fa672020f95fd9c858ceaae94d6db93df7d) )
+	ROM_LOAD( "cm-32p-ic20.bin", 0x200000, 0x80000, CRC(733c4054) SHA1(9b6b59ab74e5bf838702abb087c408aaa85b7b1f) )
 ROM_END
 
 CONS( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, empty_init, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
