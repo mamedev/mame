@@ -108,7 +108,7 @@ void bbc_cumana68k_device::device_add_mconfig(machine_config &config)
 	m_rtc->irq().set(m_pia_rtc, FUNC(pia6821_device::ca1_w));
 
 	/* software lists */
-	SOFTWARE_LIST(config, "flop_ls_68008").set_original("bbc_flop_68008");
+	//SOFTWARE_LIST(config, "flop_ls_68008").set_original("bbc_flop_68008");
 }
 
 //-------------------------------------------------
