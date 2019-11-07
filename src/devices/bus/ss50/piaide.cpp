@@ -60,7 +60,7 @@ public:
 protected:
 	// device-specific overrides
 	virtual void device_add_mconfig(machine_config &config) override;
-	virtual void device_start() override { }
+	virtual void device_start() override;
 
 	// interface-specific overrides
 	virtual uint8_t register_read(offs_t offset) override;
@@ -79,6 +79,12 @@ private:
 	DECLARE_WRITE8_MEMBER(pia_b_w);
 
 };
+
+void ss50_piaide_device::device_start()
+{
+	save_item(NAME(m_pia_porta));
+	save_item(NAME(m_pia_portb));
+}
 
 //-------------------------------------------------
 //  device_add_mconfig - add device-specific
