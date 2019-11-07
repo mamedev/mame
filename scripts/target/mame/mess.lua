@@ -806,7 +806,6 @@ BUSES["IQ151"] = true
 BUSES["ISA"] = true
 BUSES["ISBX"] = true
 BUSES["JAKKS_GAMEKEY"] = true
-BUSES["HP_OPTROM"] = true
 BUSES["HP80_IO"] = true
 BUSES["HP9845_IO"] = true
 BUSES["KC"] = true
@@ -2403,6 +2402,8 @@ files {
 	MAME_DIR .. "src/mame/machine/hp9825_optrom.h",
 	MAME_DIR .. "src/mame/machine/hp9825_tape.cpp",
 	MAME_DIR .. "src/mame/machine/hp9825_tape.h",
+	MAME_DIR .. "src/mame/machine/hp9845_optrom.cpp",
+	MAME_DIR .. "src/mame/machine/hp9845_optrom.h",
 	MAME_DIR .. "src/mame/machine/hp9845_printer.cpp",
 	MAME_DIR .. "src/mame/machine/hp9845_printer.h",
 	MAME_DIR .. "src/mame/machine/hp98x5_io_sys.cpp",
