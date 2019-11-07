@@ -29,9 +29,9 @@ DEFINE_DEVICE_TYPE(BBC_RAVEN20, bbc_raven20_device, "bbc_raven20", "Raven-20 RAM
 ROM_START(raven20)
 	ROM_REGION(0x2000, "exp_rom", 0)
 	ROM_SYSTEM_BIOS(0, "106", "Raven-20 1.06")
-	ROMX_LOAD("raven20_1.06.rom", 0x0000, 0x2000, CRC(7efb0ab3) SHA1(e4f2acc07969e10c082355c82d8d1cbc1c08ee2e), ROM_BIOS(0))
+	ROMX_LOAD("raven20_1.06.rom", 0x0000, 0x2000, CRC(7efb0ab3) SHA1(d395199ef8f51579fe74e3d7d8dab1de6e0b30e2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "100", "Raven-20 1.00")
-	ROMX_LOAD("raven20_1.00.rom", 0x0000, 0x2000, CRC(e8c8f9d5) SHA1(0f5b2a5bee23808b34eab2f027f7c1e77395c782), ROM_BIOS(1))
+	ROMX_LOAD("raven20_1.00.rom", 0x0000, 0x2000, CRC(e8c8f9d5) SHA1(e4f2acc07969e10c082355c82d8d1cbc1c08ee2e), ROM_BIOS(1))
 ROM_END
 
 //-------------------------------------------------
