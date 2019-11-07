@@ -168,6 +168,7 @@ protected:
 	void btclr_all_w(u8 data);
 
 	u32 tclk_pres_div(u8 mode) const;
+	u16 pres_count() const;
 	u8 prs_r();
 	void prs_w(u8 data);
 

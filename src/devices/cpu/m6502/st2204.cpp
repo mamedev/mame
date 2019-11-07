@@ -264,6 +264,12 @@ TIMER_CALLBACK_MEMBER(st2204_device::t0_interrupt)
 	m_t0_timer->adjust(cycles_to_attotime((256 - m_tcntr[0]) * tclk_pres_div(m_tmode[0] & 0x07)));
 }
 
+void st2204_device::t0_start()
+{
+	u32 div = tclk_pres_div(m_tmode[0] & 0x07);
+	m_t0_timer->adjust(cycles_to_attotime((255 - m_tcntr[0]) * div + div - (pres_count() & (div - 1))));
+}
+
 u8 st2204_device::t0m_r()
 {
 	return m_tmode[0];
@@ -271,20 +277,18 @@ u8 st2204_device::t0m_r()
 
 void st2204_device::t0m_w(u8 data)
 {
-	if ((data & 0x27) != (m_tmode[0] & 0x27) && (m_prs & 0x60) == 0x40)
+	u8 t0m_old = std::exchange(m_tmode[0], data & 0x37);
+
+	if ((data & 0x27) != (t0m_old & 0x27) && (m_prs & 0x60) == 0x40)
 	{
 		// forced update
 		m_tcntr[0] = t0c_r();
+
 		if (BIT(data, 5))
-		{
-			u32 div = tclk_pres_div(data & 0x07);
-			m_t0_timer->adjust(cycles_to_attotime((255 - m_tcntr[0]) * div) + cycles_to_attotime(div - (m_pres_base & (div - 1))));
-		}
-		else if (BIT(m_tmode[0], 5))
+			t0_start();
+		else if (BIT(t0m_old, 5))
 			m_t0_timer->adjust(attotime::never);
 	}
-
-	m_tmode[0] = data & 0x37;
 }
 
 u8 st2204_device::t0c_r()
@@ -294,7 +298,7 @@ u8 st2204_device::t0c_r()
 	else
 	{
 		u32 div = tclk_pres_div(m_tmode[0] & 0x07);
-		return 256 - std::max((attotime_to_cycles(m_t0_timer->remaining()) + div - 1) / div, u64(1));
+		return 255 - u8(attotime_to_cycles(m_t0_timer->remaining()) / div);
 	}
 }
 
@@ -302,7 +306,7 @@ void st2204_device::t0c_w(u8 data)
 {
 	m_tcntr[0] = m_tload[0] = data;
 	if ((m_prs & 0x60) == 0x40 && BIT(m_tmode[0], 5))
-		m_t0_timer->adjust(cycles_to_attotime((256 - data) * tclk_pres_div(m_tmode[0] & 0x07)));
+		t0_start();
 }
 
 u8 st2204_device::t1m_r()
@@ -327,8 +331,8 @@ void st2204_device::t1c_w(u8 data)
 
 void st2204_device::st2xxx_tclk_start()
 {
-	u32 div = tclk_pres_div(m_tmode[0] & 0x07);
-	m_t0_timer->adjust(cycles_to_attotime((255 - m_tcntr[0]) * div) + cycles_to_attotime(div - (m_pres_base & (div - 1))));
+	if (BIT(m_tmode[0], 5))
+		t0_start();
 }
 
 void st2204_device::st2xxx_tclk_stop()

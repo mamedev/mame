@@ -73,6 +73,7 @@ private:
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
 	TIMER_CALLBACK_MEMBER(t0_interrupt);
+	void t0_start();
 	u8 t0m_r();
 	void t0m_w(u8 data);
 	u8 t0c_r();

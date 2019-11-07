@@ -396,9 +396,14 @@ u32 st2xxx_device::tclk_pres_div(u8 mode) const
 		return 0x8000 >> (mode * 2);
 }
 
+u16 st2xxx_device::pres_count() const
+{
+	return (m_pres_base + ((m_prs & 0x60) == 0x40 ? attotime_to_cycles(machine().time() - m_pres_started) : 0));
+}
+
 u8 st2xxx_device::prs_r()
 {
-	return (m_pres_base + ((m_prs & 0x60) == 0x40 ? attotime_to_cycles(machine().time() - m_pres_started) : 0)) & 0xff;
+	return pres_count() & 0xff;
 }
 
 void st2xxx_device::prs_w(u8 data)
