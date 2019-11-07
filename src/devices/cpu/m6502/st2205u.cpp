@@ -95,6 +95,7 @@ void st2205u_device::device_start()
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); }).mask(0xfe);
+	state_add<u8>(ST_PRS, "PRS", [this]() { return m_prs; }, [this](u8 data) { prs_w(data); }).mask(0x40);
 	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); });
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
@@ -347,6 +348,14 @@ void st2205u_device::tien_w(u8 data)
 	m_tien = data;
 }
 
+void st2205u_device::st2xxx_tclk_start()
+{
+}
+
+void st2205u_device::st2xxx_tclk_stop()
+{
+}
+
 u8 st2205u_device::lvctr_r()
 {
 	return m_lvctr | 0x01;
@@ -407,6 +416,7 @@ void st2205u_device::int_map(address_map &map)
 	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
 	map(0x0020, 0x0027).rw(FUNC(st2205u_device::tc_12bit_r), FUNC(st2205u_device::tc_12bit_w));
 	map(0x0028, 0x0028).rw(FUNC(st2205u_device::tien_r), FUNC(st2205u_device::tien_w));
+	map(0x0029, 0x0029).rw(FUNC(st2205u_device::prs_r), FUNC(st2205u_device::prs_w));
 	map(0x002a, 0x002a).rw(FUNC(st2205u_device::bten_r), FUNC(st2205u_device::bten_w));
 	map(0x002b, 0x002b).rw(FUNC(st2205u_device::btsr_r), FUNC(st2205u_device::btclr_w));
 	map(0x002c, 0x002c).rw(FUNC(st2205u_device::btc_r), FUNC(st2205u_device::btc_w));

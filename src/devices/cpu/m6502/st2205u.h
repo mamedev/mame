@@ -37,6 +37,9 @@ protected:
 	virtual u16 st2xxx_ireq_mask() const override { return 0xdfff; }
 	virtual const char *st2xxx_irq_name(int i) const override;
 	virtual unsigned st2xxx_bt_divider(int n) const override;
+	virtual u8 st2xxx_prs_mask() const override { return 0xc0; }
+	virtual void st2xxx_tclk_start() override;
+	virtual void st2xxx_tclk_stop() override;
 	virtual u8 st2xxx_sys_mask() const override { return 0xfe; }
 	virtual u8 st2xxx_misc_mask() const override { return 0x0f; }
 	virtual bool st2xxx_wdten_on_reset() const override { return true; }

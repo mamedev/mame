@@ -39,6 +39,9 @@ protected:
 	virtual u16 st2xxx_ireq_mask() const override { return 0x0f7f; }
 	virtual const char *st2xxx_irq_name(int i) const override;
 	virtual unsigned st2xxx_bt_divider(int n) const override;
+	virtual u8 st2xxx_prs_mask() const override { return 0xe0; }
+	virtual void st2xxx_tclk_start() override;
+	virtual void st2xxx_tclk_stop() override;
 	virtual u8 st2xxx_sys_mask() const override { return 0xff; }
 	virtual u8 st2xxx_misc_mask() const override { return 0x1f; }
 	virtual bool st2xxx_has_dma() const override { return true; }
@@ -69,6 +72,7 @@ private:
 
 	u8 pmcr_r();
 	void pmcr_w(u8 data);
+	TIMER_CALLBACK_MEMBER(t0_interrupt);
 	u8 t0m_r();
 	void t0m_w(u8 data);
 	u8 t0c_r();
@@ -100,6 +104,8 @@ private:
 
 	u8 m_tmode[2];
 	u8 m_tcntr[2];
+	u8 m_tload[2];
+	emu_timer *m_t0_timer;
 	u16 m_psg[2];
 	u8 m_psgc;
 	u16 m_dms;

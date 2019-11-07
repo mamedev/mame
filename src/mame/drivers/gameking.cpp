@@ -239,7 +239,7 @@ void gameking_state::init_gameking()
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 {
 	m_maincpu->set_state_int(st2xxx_device::ST_IREQ,
-		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x016 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
+		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x052 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
 	timer1->enable(false);
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));

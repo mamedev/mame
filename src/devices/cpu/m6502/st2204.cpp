@@ -44,6 +44,8 @@ st2204_device::st2204_device(const machine_config &mconfig, device_type type, co
 	: st2xxx_device(mconfig, type, tag, owner, clock, map, 26, false) // logical; only 23 address lines are brought out
 	, m_tmode{0}
 	, m_tcntr{0}
+	, m_tload{0}
+	, m_t0_timer(nullptr)
 	, m_psg{0}
 	, m_psgc(0)
 	, m_dms(0)
@@ -76,8 +78,11 @@ void st2204_device::device_start()
 
 	init_base_timer(0x0020);
 
+	m_t0_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t0_interrupt), this));
+
 	save_item(NAME(m_tmode));
 	save_item(NAME(m_tcntr));
+	save_item(NAME(m_tload));
 	save_item(NAME(m_psg));
 	save_item(NAME(m_psgc));
 	save_item(NAME(m_dms));
@@ -105,12 +110,13 @@ void st2204_device::device_start()
 	state_add(ST_PDL, "PDL", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
+	state_add<u8>(ST_PRS, "PRS", [this]() { return m_prs; }, [this](u8 data) { prs_w(data); }).mask(0x60);
 	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); }).mask(0x1f);
 	state_add(ST_BTSR, "BTSR", m_btsr).mask(0x1f);
 	state_add(ST_T0M, "T0M", m_tmode[0]).mask(0x37);
-	state_add(ST_T0C, "T0C", m_tcntr[0]);
+	state_add(ST_T0C, "T0C", m_tload[0]);
 	state_add(ST_T1M, "T1M", m_tmode[1]).mask(0x1f);
-	state_add(ST_T1C, "T1C", m_tcntr[1]);
+	state_add(ST_T1C, "T1C", m_tload[1]);
 	state_add(ST_PSG0, "PSG0", m_psg[0]).mask(0xfff);
 	state_add(ST_PSG1, "PSG1", m_psg[1]).mask(0xfff);
 	state_add(ST_PSGC, "PSGC", m_psgc).mask(0x7f);
@@ -137,6 +143,9 @@ void st2204_device::device_reset()
 
 	m_tmode[0] = m_tmode[1] = 0;
 	m_tcntr[0] = m_tcntr[1] = 0;
+	m_tload[0] = m_tload[1] = 0;
+	m_t0_timer->adjust(attotime::never);
+
 	m_psg[0] = m_psg[1] = 0;
 	m_psgc = 0;
 }
@@ -245,6 +254,16 @@ unsigned st2204_device::st2xxx_bt_divider(int n) const
 		return 0;
 }
 
+TIMER_CALLBACK_MEMBER(st2204_device::t0_interrupt)
+{
+	m_ireq |= 0x004;
+	update_irq_state();
+
+	// Bit 4 allows auto-reload
+	m_tcntr[0] = BIT(m_tmode[0], 4) ? m_tload[0] : 0;
+	m_t0_timer->adjust(cycles_to_attotime((256 - m_tcntr[0]) * tclk_pres_div(m_tmode[0] & 0x07)));
+}
+
 u8 st2204_device::t0m_r()
 {
 	return m_tmode[0];
@@ -252,17 +271,38 @@ u8 st2204_device::t0m_r()
 
 void st2204_device::t0m_w(u8 data)
 {
+	if ((data & 0x27) != (m_tmode[0] & 0x27) && (m_prs & 0x60) == 0x40)
+	{
+		// forced update
+		m_tcntr[0] = t0c_r();
+		if (BIT(data, 5))
+		{
+			u32 div = tclk_pres_div(data & 0x07);
+			m_t0_timer->adjust(cycles_to_attotime((255 - m_tcntr[0]) * div) + cycles_to_attotime(div - (m_pres_base & (div - 1))));
+		}
+		else if (BIT(m_tmode[0], 5))
+			m_t0_timer->adjust(attotime::never);
+	}
+
 	m_tmode[0] = data & 0x37;
 }
 
 u8 st2204_device::t0c_r()
 {
-	return m_tcntr[0];
+	if ((m_prs & 0x60) != 0x40 || !BIT(m_tmode[0], 5))
+		return m_tcntr[0];
+	else
+	{
+		u32 div = tclk_pres_div(m_tmode[0] & 0x07);
+		return 256 - std::max((attotime_to_cycles(m_t0_timer->remaining()) + div - 1) / div, u64(1));
+	}
 }
 
 void st2204_device::t0c_w(u8 data)
 {
-	m_tcntr[0] = data;
+	m_tcntr[0] = m_tload[0] = data;
+	if ((m_prs & 0x60) == 0x40 && BIT(m_tmode[0], 5))
+		m_t0_timer->adjust(cycles_to_attotime((256 - data) * tclk_pres_div(m_tmode[0] & 0x07)));
 }
 
 u8 st2204_device::t1m_r()
@@ -282,7 +322,19 @@ u8 st2204_device::t1c_r()
 
 void st2204_device::t1c_w(u8 data)
 {
-	m_tcntr[1] = data;
+	m_tcntr[1] = m_tload[1] = data;
+}
+
+void st2204_device::st2xxx_tclk_start()
+{
+	u32 div = tclk_pres_div(m_tmode[0] & 0x07);
+	m_t0_timer->adjust(cycles_to_attotime((255 - m_tcntr[0]) * div) + cycles_to_attotime(div - (m_pres_base & (div - 1))));
+}
+
+void st2204_device::st2xxx_tclk_stop()
+{
+	m_tcntr[0] = t0c_r();
+	m_t0_timer->adjust(attotime::never);
 }
 
 void st2204_device::psg_w(offs_t offset, u8 data)
@@ -406,6 +458,7 @@ void st2204_device::common_map(address_map &map)
 	map(0x0016, 0x0016).w(FUNC(st2204_device::psgc_w));
 	map(0x0020, 0x0020).rw(FUNC(st2204_device::bten_r), FUNC(st2204_device::bten_w));
 	map(0x0021, 0x0021).rw(FUNC(st2204_device::btsr_r), FUNC(st2204_device::btclr_all_w));
+	map(0x0023, 0x0023).rw(FUNC(st2204_device::prs_r), FUNC(st2204_device::prs_w));
 	map(0x0024, 0x0024).rw(FUNC(st2204_device::t0m_r), FUNC(st2204_device::t0m_w));
 	map(0x0025, 0x0025).rw(FUNC(st2204_device::t0c_r), FUNC(st2204_device::t0c_w));
 	map(0x0026, 0x0026).rw(FUNC(st2204_device::t1m_r), FUNC(st2204_device::t1m_w));
