@@ -512,9 +512,9 @@ void epc_state::machine_reset()
 
 void epc_state::init_epc()
 {
-	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider ( 15 (74ls161) * 4 (74ls393.1) * 16 (74ls393) ) */
+	/* Keyboard UART Rxc/Txc is 19.2 kHz from x96 divider */
 	m_kbdclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epc_state::rxtxclk_w), this));
-	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
+	m_kbdclk_timer->adjust(attotime::from_hz((XTAL(18'432'000) / 96) / 5));
 }
 
 TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
@@ -522,7 +522,7 @@ TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
 	m_kbd8251->write_rxc(m_rxtx_clk_state);
 	m_kbd8251->write_txc(m_rxtx_clk_state);
 	m_rxtx_clk_state ^= 0x01;
-	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
+	m_kbdclk_timer->adjust(attotime::from_hz((XTAL(18'432'000) / 96) / 5));
 }
 
 
@@ -821,8 +821,6 @@ void epc_state::epc(machine_config &config)
 	m_kbd8251->dtr_handler().set([this](bool state) // Controls RCLK for INS8250, either 19.2KHz or INS8250 BAUDOUT
 	{
 		LOGKBD("KBD DTR: %d\n", state ? 1 : 0); // TODO: Implement clock selection mux, need to check what state does what
-		m_kbd8251->write_dsr(state);
-		//m_8251_dtr = state;
 	});
 
 	// Interrupt Controller
@@ -915,7 +913,6 @@ void epc_state::epc(machine_config &config)
 		if ((m_io_j10->read() & 0x30) == 0x20) { LOGIRQ("UART IRQ4: %d\n", state); m_pic8259->ir4_w(state); } // Factory setting
 		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGIRQ("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
 	});
-	m_uart->out_baudout_callback().set([this](uint16_t rate){ m_uart->set_baud_rate(rate); });
 
 	rs232_port_device &rs232(RS232_PORT(config, "uart", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));

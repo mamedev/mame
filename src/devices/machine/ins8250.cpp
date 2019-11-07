@@ -117,7 +117,6 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 	, m_out_int_cb(*this)
 	, m_out_out1_cb(*this)
 	, m_out_out2_cb(*this)
-	, m_out_baudout_cb(*this)
 	, m_rxd(1)
 	, m_dcd(1)
 	, m_dsr(1)
@@ -249,21 +248,9 @@ READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
 // Baud rate generator is reset after writing to either byte of divisor latch
 void ins8250_uart_device::update_baud_rate()
 {
-	if (m_out_baudout_cb.isnull())
-	{
-		set_baud_rate((clock() && m_regs.dl) ? (clock() / m_regs.dl / 16) : 0);
-	}
-	else
-	{	// Must call set_baud_rate() in return with right baud rate in case of external circuitry
-		m_out_baudout_cb((clock() && m_regs.dl) ? (clock() / m_regs.dl / 16) : 0);
-	}
-}
+	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
+	set_rate(clock(), m_regs.dl * 16);
 
-void ins8250_uart_device::set_baud_rate(uint16_t rate)
-{
-	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl), m_regs.dl);
-	set_rate(rate);
-		
 	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
 	// If the transmitter is still running at this time and we don't flush it, the shift register will never be emptied!
 	if (!(m_regs.lsr & INS8250_LSR_TSRE))
@@ -657,7 +644,6 @@ void ins8250_uart_device::device_start()
 	m_out_int_cb.resolve_safe();
 	m_out_out1_cb.resolve_safe();
 	m_out_out2_cb.resolve_safe();
-	m_out_baudout_cb.resolve_safe();
 	set_tra_rate(0);
 	set_rcv_rate(0);
 
