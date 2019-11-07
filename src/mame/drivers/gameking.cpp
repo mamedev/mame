@@ -311,6 +311,7 @@ void gameking_state::gameking1(machine_config &config)
 void gameking_state::gameking3(machine_config &config)
 {
 	gameking(config);
+	m_maincpu->set_clock(8000000);
 	m_maincpu->set_addrmap(AS_DATA, &gameking_state::gameking3_mem);
 
 	screen_device &screen(*subdevice<screen_device>("screen"));
