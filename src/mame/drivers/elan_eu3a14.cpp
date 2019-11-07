@@ -179,6 +179,13 @@ private:
 	void draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette);
 	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int pal, int flipx, int pri, int xpos, int ypos, int bpp);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end2) { m_sys->generate_custom_interrupt(4); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
 };
 
 
@@ -1649,6 +1656,12 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	ELAN_EU3A05_SOUND(config, m_sound, 8000);
 	m_sound->space_read_callback().set(FUNC(elan_eu3a14_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_sound->sound_end_cb<0>().set(FUNC(elan_eu3a14_state::sound_end0));
+	m_sound->sound_end_cb<1>().set(FUNC(elan_eu3a14_state::sound_end1));
+	m_sound->sound_end_cb<2>().set(FUNC(elan_eu3a14_state::sound_end2));
+	m_sound->sound_end_cb<3>().set(FUNC(elan_eu3a14_state::sound_end3));
+	m_sound->sound_end_cb<4>().set(FUNC(elan_eu3a14_state::sound_end4));
+	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a14_state::sound_end5));
 }
 
 void elan_eu3a14_state::radica_eu3a14_adc(machine_config &config)

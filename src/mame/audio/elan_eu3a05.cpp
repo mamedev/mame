@@ -16,11 +16,12 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05soun
 #include "logmacro.h"
 
 
-elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_stream(nullptr)
-	, m_space_read_cb(*this)
+elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_space_read_cb(*this),
+	m_sound_end_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 {
 }
 
@@ -28,6 +29,9 @@ void elan_eu3a05_sound_device::device_start()
 {
 	m_space_read_cb.resolve_safe(0);
 	m_stream = stream_alloc(0, 1, 8000);
+
+	for (devcb_write_line &cb : m_sound_end_cb)
+		cb.resolve_safe();
 }
 
 void elan_eu3a05_sound_device::device_reset()
@@ -81,8 +85,7 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 					m_sound_current_nib_pos[channel] = 0;
 					m_isstopped |= (1 << channel);
 
-					// maybe should generate an interrupt with vector
-					// ffb8, ffbc, ffc0, ffc4, ffc8, or ffcc depending on which channel finished??
+					m_sound_end_cb[channel](1); // generate interrupt based on which channel just stopped?
 				}
 			}
 			else
@@ -260,8 +263,11 @@ void elan_eu3a05_sound_device::handle_sound_trigger(int which)
 {
 	LOGMASKED( LOG_AUDIO, "Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_byte_address[which], m_sound_byte_len[which]);
 
-	m_sound_current_nib_pos[which] = 0;
-	m_isstopped &= ~(1 << which);
+	if (m_isstopped & (1 << which)) // golden tee will repeatedly try to start the music on the title screen (although could depend on a status read first?)
+	{
+		m_sound_current_nib_pos[which] = 0;
+		m_isstopped &= ~(1 << which);
+	}
 }
 
 

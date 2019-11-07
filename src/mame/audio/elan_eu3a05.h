@@ -18,6 +18,8 @@ public:
 
 	auto space_read_callback() { return m_space_read_cb.bind(); }
 
+	template <unsigned N> auto sound_end_cb() { return m_sound_end_cb[N].bind(); }
+
 	DECLARE_WRITE8_MEMBER(elan_eu3a05_sound_addr_w);
 	DECLARE_READ8_MEMBER(elan_eu3a05_sound_addr_r);
 	DECLARE_WRITE8_MEMBER(elan_eu3a05_sound_size_w);
@@ -55,6 +57,8 @@ private:
 	uint8_t handle_sound_addr_r(int which, int offset);
 	void handle_sound_size_w(int which, int offset, uint8_t data);
 	uint8_t handle_sound_size_r(int which, int offset);
+
+	devcb_write_line m_sound_end_cb[6];
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device)
