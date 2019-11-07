@@ -22,6 +22,8 @@ public:
 		ST_T0C,
 		ST_T1M,
 		ST_T1C,
+		ST_PSG0,
+		ST_PSG1,
 		ST_DMS,
 		ST_DMD
 	};
@@ -75,6 +77,9 @@ private:
 	void t1m_w(u8 data);
 	u8 t1c_r();
 	void t1c_w(u8 data);
+	void psg_w(offs_t offset, u8 data);
+	void psgc_w(u8 data);
+	void dac_w(u8 data);
 	u8 dmsl_r();
 	void dmsl_w(u8 data);
 	u8 dmsh_r();
@@ -95,6 +100,8 @@ private:
 
 	u8 m_tmode[2];
 	u8 m_tcntr[2];
+	u16 m_psg[2];
+	u8 m_psgc;
 	u16 m_dms;
 	u16 m_dmd;
 	u8 m_dcnth;

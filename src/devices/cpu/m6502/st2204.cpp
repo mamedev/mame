@@ -44,6 +44,8 @@ st2204_device::st2204_device(const machine_config &mconfig, device_type type, co
 	: st2xxx_device(mconfig, type, tag, owner, clock, map, 26, false) // logical; only 23 address lines are brought out
 	, m_tmode{0}
 	, m_tcntr{0}
+	, m_psg{0}
+	, m_psgc(0)
 	, m_dms(0)
 	, m_dmd(0)
 	, m_dcnth(0)
@@ -76,6 +78,8 @@ void st2204_device::device_start()
 
 	save_item(NAME(m_tmode));
 	save_item(NAME(m_tcntr));
+	save_item(NAME(m_psg));
+	save_item(NAME(m_psgc));
 	save_item(NAME(m_dms));
 	save_item(NAME(m_dmd));
 	save_item(NAME(m_dcnth));
@@ -107,6 +111,9 @@ void st2204_device::device_start()
 	state_add(ST_T0C, "T0C", m_tcntr[0]);
 	state_add(ST_T1M, "T1M", m_tmode[1]).mask(0x1f);
 	state_add(ST_T1C, "T1C", m_tcntr[1]);
+	state_add(ST_PSG0, "PSG0", m_psg[0]).mask(0xfff);
+	state_add(ST_PSG1, "PSG1", m_psg[1]).mask(0xfff);
+	state_add(ST_PSGC, "PSGC", m_psgc).mask(0x7f);
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); });
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
 	state_add(ST_LSSA, "LSSA", m_lssa);
@@ -130,6 +137,8 @@ void st2204_device::device_reset()
 
 	m_tmode[0] = m_tmode[1] = 0;
 	m_tcntr[0] = m_tcntr[1] = 0;
+	m_psg[0] = m_psg[1] = 0;
+	m_psgc = 0;
 }
 
 const char *st2204_device::st2xxx_irq_name(int i) const
@@ -276,6 +285,24 @@ void st2204_device::t1c_w(u8 data)
 	m_tcntr[1] = data;
 }
 
+void st2204_device::psg_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		m_psg[offset >> 1] = u16(data << 8) | (m_psg[offset >> 1] & 0x0ff);
+	else
+		m_psg[offset >> 1] = data | (m_psg[offset >> 1] & 0xf00);
+}
+
+void st2204_device::psgc_w(u8 data)
+{
+	m_psgc = data & 0x7f;
+}
+
+void st2204_device::dac_w(u8 data)
+{
+	// TODO
+}
+
 u8 st2204_device::dmsl_r()
 {
 	return m_dms & 0xff;
@@ -374,6 +401,9 @@ void st2204_device::common_map(address_map &map)
 	map(0x000d, 0x000d).rw(FUNC(st2204_device::pfc_r), FUNC(st2204_device::pfc_w));
 	map(0x000e, 0x000e).rw(FUNC(st2204_device::pfd_r), FUNC(st2204_device::pfd_w));
 	map(0x000f, 0x000f).rw(FUNC(st2204_device::pmcr_r), FUNC(st2204_device::pmcr_w));
+	map(0x0010, 0x0013).w(FUNC(st2204_device::psg_w));
+	map(0x0014, 0x0014).w(FUNC(st2204_device::dac_w));
+	map(0x0016, 0x0016).w(FUNC(st2204_device::psgc_w));
 	map(0x0020, 0x0020).rw(FUNC(st2204_device::bten_r), FUNC(st2204_device::bten_w));
 	map(0x0021, 0x0021).rw(FUNC(st2204_device::btsr_r), FUNC(st2204_device::btclr_all_w));
 	map(0x0024, 0x0024).rw(FUNC(st2204_device::t0m_r), FUNC(st2204_device::t0m_w));
