@@ -149,12 +149,12 @@ void bbc_exp_slot_device::pb_w(uint8_t data)
 
 
 // slot devices
-//#include "autocue.h"
+#include "autocue.h"
 #include "mertec.h"
 
 
 void bbc_exp_devices(device_slot_interface &device)
 {
-	//device.option_add("autocue", BBC_AUTOCUE);       /* Autocue RAM disk board */
-	device.option_add("mertec",  BBC_MERTEC);        /* Mertec Compact Companion */
+	device.option_add_internal("autocue", BBC_AUTOCUE); /* Autocue RAM disk board */
+	device.option_add("mertec",  BBC_MERTEC);           /* Mertec Compact Companion */
 }
