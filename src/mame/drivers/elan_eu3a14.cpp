@@ -1006,14 +1006,7 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// 5060 - 506e  r/w during startup on foot
 
 	// sound appears to be the same as eu3a05
-	map(0x5080, 0x5091).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w));
-	map(0x5092, 0x50a3).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w));
-	map(0x50a4, 0x50a4).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w)); // read frequently on this
-	map(0x50a5, 0x50a5).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
-	map(0x50a6, 0x50a6).nopw(); // startup
-	map(0x50a7, 0x50a7).nopw(); // startup
-	map(0x50a8, 0x50a8).r(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r));
-	map(0x50a9, 0x50a9).nopw(); // startup, read foot
+	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
 
 	// video regs are in the 51xx range
 
