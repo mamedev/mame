@@ -32,6 +32,7 @@ public:
 		ST_PFC,
 		ST_PFD,
 		ST_PMCR,
+		ST_PSGC,
 		ST_BTEN,
 		ST_BTSR,
 		ST_SYS,
