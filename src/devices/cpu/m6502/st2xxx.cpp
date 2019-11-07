@@ -49,6 +49,9 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_btsr(0)
 	, m_bt_mask(0)
 	, m_bt_ireq(0)
+	, m_pres_base(0)
+	, m_pres_started(attotime::zero)
+	, m_prs(0)
 	, m_sys(0)
 	, m_misc(0)
 	, m_ireq(0)
@@ -149,6 +152,9 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_bten));
 		save_item(NAME(m_btsr));
 	}
+	save_item(NAME(m_pres_base));
+	save_item(NAME(m_pres_started));
+	save_item(NAME(m_prs));
 	save_item(NAME(m_sys));
 	if (st2xxx_misc_mask() != 0)
 		save_item(NAME(m_misc));
@@ -196,6 +202,9 @@ void st2xxx_device::device_reset()
 	// reset base timer
 	bten_w(0);
 	m_btsr = 0;
+
+	// reset prescaler
+	prs_w(0x80);
 
 	// reset miscellaneous registers
 	m_sys = 0;
@@ -372,6 +381,56 @@ void st2xxx_device::btclr_all_w(u8 data)
 	// Only bit 7 has any effect
 	if (BIT(data, 7))
 		m_btsr = 0;
+}
+
+u32 st2xxx_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 8);
+	if (mode == 0)
+		return 0x10000;
+	else if (mode < 4)
+		return 0x20000 >> (mode * 2);
+	else if (mode == 4)
+		return 0x100;
+	else
+		return 0x8000 >> (mode * 2);
+}
+
+u8 st2xxx_device::prs_r()
+{
+	return (m_pres_base + ((m_prs & 0x60) == 0x40 ? attotime_to_cycles(machine().time() - m_pres_started) : 0)) & 0xff;
+}
+
+void st2xxx_device::prs_w(u8 data)
+{
+	data &= st2xxx_prs_mask();
+
+	// Bit 7 produces prescaler reset pulse
+	if (BIT(data, 7))
+	{
+		st2xxx_tclk_stop();
+		m_pres_base = 0;
+		if ((m_prs & 0x60) == 0x40)
+		{
+			m_pres_started = machine().time();
+			st2xxx_tclk_start();
+		}
+		data &= 0x7f;
+	}
+
+	// Bit 6 enables prescaler; bit 5 selects clock source
+	if ((data & 0x60) == 0x40 && (m_prs & 0x60) != 0x40)
+	{
+		m_pres_started = machine().time();
+		st2xxx_tclk_start();
+	}
+	else if ((data & 0x60) == 0x40 && (m_prs & 0x60) != 0x40)
+	{
+		st2xxx_tclk_stop();
+		m_pres_base += attotime_to_cycles(machine().time() - m_pres_started);
+	}
+
+	m_prs = data;
 }
 
 u8 st2xxx_device::sys_r()

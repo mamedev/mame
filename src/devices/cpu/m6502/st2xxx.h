@@ -35,6 +35,7 @@ public:
 		ST_PSGC,
 		ST_BTEN,
 		ST_BTSR,
+		ST_PRS,
 		ST_SYS,
 		ST_IRR,
 		ST_PRR,
@@ -83,6 +84,9 @@ protected:
 	virtual u16 st2xxx_ireq_mask() const = 0;
 	virtual const char *st2xxx_irq_name(int i) const = 0;
 	virtual unsigned st2xxx_bt_divider(int n) const = 0;
+	virtual u8 st2xxx_prs_mask() const = 0;
+	virtual void st2xxx_tclk_start() { }
+	virtual void st2xxx_tclk_stop() { }
 	virtual u8 st2xxx_sys_mask() const = 0;
 	virtual u8 st2xxx_misc_mask() const = 0;
 	virtual bool st2xxx_wdten_on_reset() const { return false; }
@@ -163,6 +167,10 @@ protected:
 	void btclr_w(u8 data);
 	void btclr_all_w(u8 data);
 
+	u32 tclk_pres_div(u8 mode) const;
+	u8 prs_r();
+	void prs_w(u8 data);
+
 	u8 ireql_r();
 	void ireql_w(u8 data);
 	u8 ireqh_r();
@@ -217,6 +225,10 @@ protected:
 	emu_timer *m_base_timer[8];
 	u8 m_bt_mask;
 	u16 m_bt_ireq;
+
+	u16 m_pres_base;
+	attotime m_pres_started;
+	u8 m_prs;
 
 	u8 m_sys;
 	u8 m_misc;
