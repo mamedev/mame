@@ -36,7 +36,9 @@ sega_315_5649_device::sega_315_5649_device(const machine_config &mconfig, const 
 	m_out_port_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_an_port_cb{ {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this}, {*this} },
 	m_serial_rd_cb{ {*this}, {*this} }, m_serial_wr_cb{ {*this}, {*this} },
+	m_cnt_cb{ {*this}, {*this}, {*this}, {*this} },
 	m_port_config(0),
+	m_mode(0),
 	m_analog_channel(0)
 {
 	std::fill(std::begin(m_port_value), std::end(m_port_value), 0xff);
@@ -60,14 +62,20 @@ void sega_315_5649_device::device_start()
 
 	for (unsigned i = 0; i < 2; i++)
 	{
-		m_serial_rd_cb[i].resolve_safe(0xff);
+		m_serial_rd_cb[i].resolve_safe(0);
 		m_serial_wr_cb[i].resolve_safe();
+	}
+
+	for (unsigned i = 0; i < 4; i++)
+	{
+		m_cnt_cb[i].resolve_safe(0);
 	}
 
 	// register for save states
 	save_pointer(NAME(m_port_value), 7);
 	save_item(NAME(m_port_config));
 	save_item(NAME(m_analog_channel));
+	save_item(NAME(m_mode));
 }
 
 //-------------------------------------------------
@@ -78,6 +86,7 @@ void sega_315_5649_device::device_reset()
 {
 	// set all ports to input on reset
 	m_port_config = 0xff;
+	m_mode = 0;
 }
 
 
@@ -92,13 +101,20 @@ READ8_MEMBER( sega_315_5649_device::read )
 	switch (offset)
 	{
 	// port a to g
+	case 0x06:
+		if (m_mode & 0x80) // port G counter mode - 4x 16bit counters, auto-increments
+		{
+			data = m_cnt_cb[(m_port_value[6] >> 1) & 3](0) >> (((m_port_value[6] & 1) ^ 1) * 8);
+			if (!machine().side_effects_disabled())
+				m_port_value[6] = (m_port_value[6] & 0xf8) | ((m_port_value[6] + 1) & 7);
+			break;
+		}
 	case 0x00:
 	case 0x01:
 	case 0x02:
 	case 0x03:
 	case 0x04:
 	case 0x05:
-	case 0x06:
 		if (BIT(m_port_config, offset))
 			data = m_in_port_cb[offset](0);
 		else
@@ -109,8 +125,8 @@ READ8_MEMBER( sega_315_5649_device::read )
 	case 0x0b: data = m_serial_rd_cb[0](0); break;
 	case 0x0c: data = m_serial_rd_cb[1](0); break;
 
-	// status
-	case 0x0d: break;
+	// serial status
+	case 0x0d: data = 0; break; // not implemented
 
 	// analog input, auto-increments
 	case 0x0f:
@@ -138,7 +154,7 @@ WRITE8_MEMBER( sega_315_5649_device::write )
 	case 0x03:
 	case 0x04:
 	case 0x05:
-	case 0x06:
+	case 0x06:	// when in counter mode, bit 7 - 0 reset counters (not implemented)
 		m_port_value[offset] = data;
 		m_out_port_cb[offset](data);
 		break;
@@ -151,7 +167,9 @@ WRITE8_MEMBER( sega_315_5649_device::write )
 	case 0x0a: m_serial_wr_cb[1](data); break;
 
 	// mode register
-	case 0x0e: break;
+	case 0x0e:
+		m_mode = data;
+		break;
 
 	// analog mux select
 	case 0x0f:
