@@ -3,6 +3,48 @@
 
 <!-- see https://www.obsoleteworlds.com/gameking.html for some images of GameKing carts running on both an original unit, and a GameKing 3 with added colour -->
 
+<!-- Cartridge Pinout
+
+               _______
+         VCC = |01   31| = GND
+          NC - |02   32| - NC
+          NC - |03   33| - NC
+          NC - |04   34| - NC
+          NC - |05   35| - NC
+          NC - |06   36| - NC
+          NC - |07   37| - NC
+          NC - |08   38| - NC
+          NC - |09   39| - NC
+          S1 = |10   40| = GND
+          D7 = |11   41| = D6
+          D5 = |12   42| = D4
+          D3 = |13   43| = D2
+          D1 = |14   44| = D0
+          S2 = |15   45| - NC
+          NC - |16   46| = S3
+          NC - |17   47| - NC
+         /CE = |18   48| - NC
+          NC - |19   49| - NC
+         A19 - |20   50| - A18
+         A17 - |21   51| = A16
+         A15 = |22   52| = A14
+         A13 = |23   53| = A12
+         A11 = |24   54| = A10
+          A9 = |25   55| = A8
+          A7 = |26   56| = A6
+          A5 = |27   57| = A4
+          A3 = |28   58| = A2
+          A1 = |29   59| = A0
+         GND = |30   60| = VCC
+                _______
+
+For Dumping:
+S2: to VCC (most likely WE)
+S3: to GND (most likely OE)
+S1: is on some carts directly connected to VCC
+
+-->
+
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">
 
 	<!-- Single-game carts -->
@@ -395,17 +437,28 @@
 		</part>
 	</software>
 
-	<software name="mc_4v19" supported="no">
-		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform</description>
-		<year>200?</year>
+	<software name="mc_4v19" supported="partial">
+		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform ('APR 23 05', 512KB cartridge)</description>
+		<year>2005</year>
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="0x080000">
-				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform.bin" status="baddump" size="0x080000" crc="18fe216b" sha1="f9c0215b031120d1868d7e825e3774898e452ba9"/> <!-- half size -->
+				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform (apr 23 05).bin" size="0x080000" crc="1a673940" sha1="564941836fe82baa4e1534dd373b169a47a62a06"/>
 			</dataarea>
 		</part>
 	</software>
-	
+
+	<software name="mc_4v19a" cloneof="mc_4v19" supported="no">
+		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform ('JUN 16 05', 1MB cartridge)</description>
+		<year>2005</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="0x080000">
+				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform (jun 16 05).bin" status="baddump" size="0x080000" crc="18fe216b" sha1="f9c0215b031120d1868d7e825e3774898e452ba9"/> <!-- half size -->
+			</dataarea>
+		</part>
+	</software>
+		
 	<software name="mc_4szlh" supported="partial"> <!-- no specific Volume # marked -->
 		<description>4 in 1 - S.Z.L.H + Colo + F1-2004 + Popper</description>
 		<year>200?</year>
