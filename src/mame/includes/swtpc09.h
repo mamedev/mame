@@ -44,14 +44,14 @@ public:
 		, m_via_cb2(*this, "via_cb2")
 		, m_dat(*this, "dat")
 		, m_bankdev(*this, "bankdev")
-		, m_maincpu_clock(*this, "maincpu_clock")
-		, m_fdc_clock(*this, "fdc_clock")
-		, m_baud_rate_high(*this, "baud_rate_high")
-		, m_floppy_expected_density(*this, "floppy_expected_density")
-		, m_floppy_expected_sectors(*this, "floppy_expected_sectors")
-		, m_floppy_track_zero_expected_sectors(*this, "floppy_track_zero_expected_sectors")
-		, m_sbug_double_density(*this, "sbug_double_density")
-		, m_piaide_flex_boot_cd00(*this, "piaide_flex_boot_cd00")
+		, m_maincpu_clock(*this, "MAINCPU_CLOCK")
+		, m_fdc_clock(*this, "FDC_CLOCK")
+		, m_baud_rate_high(*this, "BAUD_RATE_HIGH")
+		, m_floppy_expected_density(*this, "FLOPPY_EXPECTED_DENSITY")
+		, m_floppy_expected_sectors(*this, "FLOPPY_EXPECTED_SECTORS")
+		, m_floppy_track_zero_expected_sectors(*this, "FLOPPY_TRACK_ZERO_EXPECTED_SECTORS")
+		, m_sbug_double_density(*this, "SBUG_DOUBLE_DENSITY")
+		, m_piaide_flex_boot_cd00(*this, "PIAIDE_FLEX_BOOT_CD00")
 	{ }
 
 	void swtpc09_base(machine_config &config);
@@ -64,6 +64,10 @@ public:
 	void init_swtpc09i();
 	void init_swtpc09u();
 	void init_swtpc09d3();
+
+	DECLARE_INPUT_CHANGED_MEMBER(maincpu_clock_change);
+	DECLARE_INPUT_CHANGED_MEMBER(fdc_clock_change);
+	DECLARE_INPUT_CHANGED_MEMBER(baud_rate_high_change);
 
 private:
 	DECLARE_FLOPPY_FORMATS(floppy_flex_formats);
