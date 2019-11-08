@@ -2639,6 +2639,11 @@ ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
 ms4144                          // MSI MS-4144 motherboard (486)
 pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
 ochipdca2                       // Octek Hippo DCA2 motherboard (486)
+as496                           // Arstoria AS496 motherboard (486)
+hot307h                         // Shuttle HOT-307H motherboard (486)
+mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
+gc10a                           // EAGLEN486 GC10A motherboard (486)
+hot419                          // Shuttle HOT-419 motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -31828,6 +31833,7 @@ ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
+nms9100                         // Philips NMS 9100 series
 
 @source:pc100.cpp
 pc100                           //
