@@ -17,16 +17,44 @@ elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, cons
 void elan_eu3a14vid_device::device_start()
 {
 	elan_eu3a05commonvid_device::device_start();
+
+	save_item(NAME(m_scrollregs));
+	save_item(NAME(m_tilecfg));
+	save_item(NAME(m_rowscrollregs));
+	save_item(NAME(m_rowscrollsplit));
+	save_item(NAME(m_rowscrollcfg));
+	save_item(NAME(m_ramtilecfg));
+	save_item(NAME(m_spriteaddr));
+	save_item(NAME(m_spritebase));
 }
 
 void elan_eu3a14vid_device::device_reset()
 {
 	elan_eu3a05commonvid_device::device_reset();
 
+	for (int i = 0; i < 4; i++)
+		m_scrollregs[i] = 0x00;
+
+	for (int i = 0; i < 6; i++)
+		m_tilecfg[i] = 0x00;
+
+	for (int i = 0; i < 8; i++)
+		m_rowscrollregs[i] = 0x00;
+
+	for (int i = 0; i < 5; i++)
+		m_rowscrollsplit[i] = 0x00;
+
+	for (int i = 0; i < 2; i++)
+		m_rowscrollcfg[i] = 0x00;
+
+	for (int i = 0; i < 6; i++)
+		m_ramtilecfg[i] = 0x00;
+
+	for (int i = 0; i < 2; i++)
+		m_spritebase[i] = 0x00;
+
 	m_spriteaddr = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
 }
-
-
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
 {
@@ -654,8 +682,6 @@ void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_ind16
 
 void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
-	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
 	for (int i = m_spriterambase; i < m_spriterambase + 0x800; i += 8)
 	{
 		/*
