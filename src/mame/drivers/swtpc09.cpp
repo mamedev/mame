@@ -206,8 +206,8 @@ static INPUT_PORTS_START( swtpc09 )
 	// Run the 6809 at 2MHz (an 8MHz XTAL) so that manual polling of FDC can
 	// keep up with higher rate operation. The MPU09 did have the option of
 	// 1MHz or 2MHz operation.
-	PORT_START("maincpu_clock")
-	PORT_CONFNAME(0xffffff, 2000000, "CPU clock")
+	PORT_START("MAINCPU_CLOCK")
+	PORT_CONFNAME(0xffffff, 2000000, "CPU clock") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc09_state, maincpu_clock_change, 0)
 	PORT_CONFSETTING(1000000, "1.0 MHz")
 	PORT_CONFSETTING(2000000, "2.0 MHz")
 	PORT_CONFSETTING(4000000, "4.0 MHz")
@@ -219,20 +219,20 @@ static INPUT_PORTS_START( swtpc09 )
 	// 'standard' 3.5"  -  1.2MHz
 	// 3.5" hd  -  2.0MHz
 	// 8" 360rpm  -  2.4MHz
-	PORT_START("fdc_clock")
-	PORT_DIPNAME(0xffffff, 2000000, "DMAF2/3 FDC clock")
-	PORT_DIPSETTING(1000000, "1.0 MHz")
-	PORT_DIPSETTING(1200000, "1.2 MHz")
-	PORT_DIPSETTING(2000000, "2.0 MHz")
-	PORT_DIPSETTING(2400000, "2.4 MHz")
+	PORT_START("FDC_CLOCK")
+	PORT_CONFNAME(0xffffff, 2000000, "DMAF2/3 FDC clock") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc09_state, fdc_clock_change, 0)
+	PORT_CONFSETTING(1000000, "1.0 MHz")
+	PORT_CONFSETTING(1200000, "1.2 MHz")
+	PORT_CONFSETTING(2000000, "2.0 MHz")
+	PORT_CONFSETTING(2400000, "2.4 MHz")
 
 	// The MP-ID board has jumpers to vary the baud rates generated. The
 	// most useful is the Low/High rate jumper that provide a four times
 	// rate increase.
-	PORT_START("baud_rate_high")
-	PORT_DIPNAME(0x1, 0, "High baud rate")
-	PORT_DIPSETTING(0, "Low (x1)")
-	PORT_DIPSETTING(1, "High (x4)")
+	PORT_START("BAUD_RATE_HIGH")
+	PORT_CONFNAME(0x1, 0, "High baud rate") PORT_CHANGED_MEMBER(DEVICE_SELF, swtpc09_state, baud_rate_high_change, 0)
+	PORT_CONFSETTING(0, "Low (x1)")
+	PORT_CONFSETTING(1, "High (x4)")
 
 	// Debug aid to hard code the density. The FLEX format uses single
 	// density for track zero. Many virtual disks 'fix' the format to be
@@ -240,7 +240,7 @@ static INPUT_PORTS_START( swtpc09 )
 	// driver support for that. This setting is an aid to report
 	// unexpected usage, and it attempts to correct that. It is possible
 	// to patch the software to work with these pure double density disks.
-	PORT_START("floppy_expected_density")
+	PORT_START("FLOPPY_EXPECTED_DENSITY")
 	PORT_CONFNAME(0xff, 0, "DMAF2/3 expected density")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(1, "single density")
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( swtpc09 )
 	// the head based track zero being single density. This aid is not
 	// intended to be a substitute for fixing the drivers but it does help
 	// work through the issues while patching the disks.
-	PORT_START("floppy_expected_sectors")
+	PORT_START("FLOPPY_EXPECTED_SECTORS")
 	PORT_CONFNAME(0xff, 0, "DMAF2/3 expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( swtpc09 )
 	// 6800 disks did format track zero in single density and if the
 	// driver sticks to that and if using a double density disk then set a
 	// single density size here.
-	PORT_START("floppy_track_zero_expected_sectors")
+	PORT_START("FLOPPY_TRACK_ZERO_EXPECTED_SECTORS")
 	PORT_CONFNAME(0xff, 0, "DMAF2/3 track zero expected sectors per side")
 	PORT_CONFSETTING(0, "-")
 	PORT_CONFSETTING(10, "10") // 5 1/4" single density 256B
@@ -280,7 +280,7 @@ static INPUT_PORTS_START( swtpc09 )
 	PORT_CONFSETTING(26, "26") // 8" double density 256B
 	PORT_CONFSETTING(36, "36") // 3.5" 1.4M QD 256B
 
-	PORT_START("sbug_double_density")
+	PORT_START("SBUG_DOUBLE_DENSITY")
 	PORT_CONFNAME(0x1, 0, "SBUG patch for double density (SSO) disk boot")
 	PORT_CONFSETTING(0, "No - single density")
 	PORT_CONFSETTING(1, "Yes - double density")
@@ -289,7 +289,7 @@ static INPUT_PORTS_START( swtpc09 )
 	// after the disk boot code has loaded FLEX, and then it jumps to
 	// 0xc850 to cold start FLEX. Have seen 0xcd00 being the cold start
 	// address, so add an option to patch the PROM for that.
-	PORT_START("piaide_flex_boot_cd00")
+	PORT_START("PIAIDE_FLEX_BOOT_CD00")
 	PORT_CONFNAME(0x1, 0, "PIA IDE PROM patch FLEX entry to 0xcd00")
 	PORT_CONFSETTING(0, "No - FLEX entry 0xc850")
 	PORT_CONFSETTING(1, "Yes - FLEX entry 0xcd00")
