@@ -58,7 +58,7 @@ control codes when loading and 'punching' a tape. TODO perhaps these could
 be detected and serial I/O diverted to a cassette.
  Code 0x11 DC1 - Tape playback on
  Code 0x12 DC2 - Tape record on.
- Code 0x13 DC4 - Tape playback off.
+ Code 0x13 DC3 - Tape playback off.
  Code 0x14 DC4 - Tape record off.
 
 The serial bit rate is controlled by a MC14536 timer and is variable. Common
@@ -104,9 +104,9 @@ public:
 		, m_acia(*this, "acia")
 		, m_brg(*this, "brg")
 		, m_rs232(*this, "rs232")
-		, m_baud_rate(*this, "baud_rate")
-		, m_stop_bits(*this, "stop_bits")
-		, m_acia_baud_rate(*this, "acia_baud_rate")
+		, m_baud_rate(*this, "BAUD_RATE")
+		, m_stop_bits(*this, "STOP_BITS")
+		, m_acia_baud_rate(*this, "ACIA_BAUD_RATE")
 	{ }
 
 	void mekd1(machine_config &config);
@@ -186,7 +186,7 @@ void mekd1_state::mem_map(address_map &map)
 
 static INPUT_PORTS_START( mekd1 )
 
-	PORT_START("baud_rate")
+	PORT_START("BAUD_RATE")
 	PORT_CONFNAME(0x3fff, 416, "RS232 Baud Rate")
 	PORT_CONFSETTING(9091, "110")
 	PORT_CONFSETTING(3333, "300")
@@ -197,12 +197,12 @@ static INPUT_PORTS_START( mekd1 )
 	PORT_CONFSETTING( 139, "7200")
 	PORT_CONFSETTING( 104, "9600")
 
-	PORT_START("stop_bits")
+	PORT_START("STOP_BITS")
 	PORT_CONFNAME(0x01, 0, "Stop bits")
 	PORT_CONFSETTING(0x00, "1")
 	PORT_CONFSETTING(0x01, "2")
 
-	PORT_START("acia_baud_rate")
+	PORT_START("ACIA_BAUD_RATE")
 	PORT_CONFNAME(0xf, 1, "ACIA Baud Rate")
 	PORT_CONFSETTING(13, "110")
 	PORT_CONFSETTING(11, "150")
@@ -441,8 +441,8 @@ void mekd1_state::mekd1(machine_config &config)
 	m_pia1->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 
 	// User ACIA. Available at P2.
-	// /CTS is pulled low.
-	// /DCD is pulled low.
+	// /CTS is pulled low, but may be driven.
+	// /DCD is pulled low, but may be driven.
 	ACIA6850(config, m_acia, 0);
 	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
