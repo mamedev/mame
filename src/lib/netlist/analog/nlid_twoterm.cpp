@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_twoterm.c
- *
- */
 
 #include "netlist/solver/nld_solver.h"
 
@@ -21,7 +17,7 @@ namespace netlist
 
 void NETLIB_NAME(twoterm)::solve_now()
 {
-	/* we only need to call the non-rail terminal */
+	// we only need to call the non-rail terminal
 	if (m_P.has_net() && !m_P.net().isRailNet())
 		m_P.solve_now();
 	else if (m_N.has_net() && !m_N.net().isRailNet())
@@ -30,7 +26,7 @@ void NETLIB_NAME(twoterm)::solve_now()
 
 void NETLIB_NAME(twoterm)::solve_later(netlist_time delay)
 {
-	/* we only need to call the non-rail terminal */
+	// we only need to call the non-rail terminal
 	if (m_P.has_net() && !m_P.net().isRailNet())
 		m_P.schedule_solve_after(delay);
 	else if (m_N.has_net() && !m_N.net().isRailNet())
@@ -40,7 +36,7 @@ void NETLIB_NAME(twoterm)::solve_later(netlist_time delay)
 
 NETLIB_UPDATE(twoterm)
 {
-	/* only called if connected to a rail net ==> notify the solver to recalculate */
+	// only called if connected to a rail net ==> notify the solver to recalculate
 	solve_now();
 }
 
@@ -132,12 +128,11 @@ NETLIB_UPDATE_PARAM(L)
 
 NETLIB_TIMESTEP(L)
 {
-	/* Gpar should support convergence */
+	// Gpar should support convergence
 	m_I += m_I + m_G * deltaV();
 	m_G = step / m_L() + m_gmin;
 	set_mat( m_G, -m_G, -m_I,
 			-m_G,  m_G,  m_I);
-	//set(m_G, 0.0, m_I);
 }
 
 // ----------------------------------------------------------------------------------------

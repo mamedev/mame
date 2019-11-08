@@ -1,12 +1,10 @@
-/*
- * Documentation settings
- */
+//
+// Documentation settings
+//
 
-/*!
- *
- * \mainpage Netlist
-
-
+///
+/// \mainpage Netlist
+///
 
 ##Netlist
 

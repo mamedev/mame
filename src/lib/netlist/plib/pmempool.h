@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmempool.h
- *
- */
 
 #ifndef PMEMPOOL_H_
 #define PMEMPOOL_H_
+
+///
+/// \file pmempool.h
+///
 
 #include "palloc.h"
 #include "pstream.h"
@@ -231,4 +231,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PMEMPOOL_H_ */
+#endif // PMEMPOOL_H_

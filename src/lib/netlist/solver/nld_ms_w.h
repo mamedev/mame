@@ -1,44 +1,44 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct.h
- *
- *
- * Woodbury Solver
- *
- * Computes the updated solution of A given that the change in A is
- *
- * A <- A + (U x transpose(V))   U,V matrices
- *
- * The approach is describes in "Numerical Recipes in C", Second edition, Page 75ff
- *
- * Whilst the book proposes to invert the matrix R=(I+transpose(V)*Z) we define
- *
- *       w = transpose(V)*y
- *       a = R^-1 * w
- *
- * and consequently
- *
- *       R * a = w
- *
- * And solve for a using Gaussian elimination. This is a lot faster.
- *
- * One fact omitted in the book is the fact that actually the matrix Z which contains
- * in it's columns the solutions of
- *
- *      A * zk = uk
- *
- * for uk being unit vectors for full rank (max(k) == n) is identical to the
- * inverse of A.
- *
- * The approach performs relatively well for matrices up to n ~ 40 (kidniki using frontiers).
- * Kidniki without frontiers has n==88. Here, the average number of Newton-Raphson
- * loops increase to 20. It looks like that the approach for larger matrices
- * introduces numerical instability.
- */
 
 #ifndef NLD_MS_W_H_
 #define NLD_MS_W_H_
+
+///
+/// \file nld_ms_direct.h
+///
+/// Woodbury Solver
+///
+/// Computes the updated solution of A given that the change in A is
+///
+/// A <- A + (U x transpose(V))   U,V matrices
+///
+/// The approach is describes in "Numerical Recipes in C", Second edition, Page 75ff
+///
+/// Whilst the book proposes to invert the matrix R=(I+transpose(V)*Z) we define
+///
+///       w = transpose(V)*y
+///       a = R^-1 * w
+///
+/// and consequently
+///
+///       R * a = w
+///
+/// And solve for a using Gaussian elimination. This is a lot faster.
+///
+/// One fact omitted in the book is the fact that actually the matrix Z which contains
+/// in it's columns the solutions of
+///
+///      A * zk = uk
+///
+/// for uk being unit vectors for full rank (max(k) == n) is identical to the
+/// inverse of A.
+///
+/// The approach performs relatively well for matrices up to n ~ 40 (kidniki using frontiers).
+/// Kidniki without frontiers has n==88. Here, the average number of Newton-Raphson
+/// loops increase to 20. It looks like that the approach for larger matrices
+/// introduces numerical instability.
+///
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
@@ -89,7 +89,7 @@ namespace solver
 		template <typename T1, typename T2>
 		float_ext_type &W(const T1 &r, const T2 &c) { return m_W[r][c]; }
 
-		/* access to Ainv for fixed columns over row, there store transposed */
+		// access to Ainv for fixed columns over row, there store transposed
 		template <typename T1, typename T2>
 		float_ext_type &Ainv(const T1 &r, const T2 &c) { return m_Ainv[c][r]; }
 		template <typename T1>
@@ -110,7 +110,7 @@ namespace solver
 
 		array2D<float_ext_type, storage_N, m_pitch> m_lA;
 
-		/* temporary */
+		// temporary
 		array2D<float_ext_type, storage_N, m_pitch> H;
 		std::array<unsigned, storage_N> rows;
 		array2D<unsigned, storage_N, m_pitch> cols;
@@ -137,15 +137,15 @@ namespace solver
 			}
 			Ainv(i,i) = plib::constants<FT>::one();
 		}
-		/* down */
+		// down
 		for (std::size_t i = 0; i < kN; i++)
 		{
-			/* FIXME: Singular matrix? */
+			// FIXME: Singular matrix?
 			const float_type f = plib::reciprocal(W(i,i));
 			const auto * const p = this->m_terms[i].m_nzrd.data();
 			const size_t e = this->m_terms[i].m_nzrd.size();
 
-			/* Eliminate column i from row j */
+			// Eliminate column i from row j
 
 			const auto * const pb = this->m_terms[i].m_nzbd.data();
 			const size_t eb = this->m_terms[i].m_nzbd.size();
@@ -163,10 +163,10 @@ namespace solver
 				}
 			}
 		}
-		/* up */
+		// up
 		for (std::size_t i = kN; i-- > 0; )
 		{
-			/* FIXME: Singular matrix? */
+			// FIXME: Singular matrix?
 			const float_type f = plib::reciprocal(W(i,i));
 			for (std::size_t j = i; j-- > 0; )
 			{
@@ -219,16 +219,16 @@ namespace solver
 
 		if ((m_cnt % 50) == 0)
 		{
-			/* complete calculation */
+			// complete calculation
 			this->LE_invert();
 			this->LE_compute_x(this->m_new_V);
 		}
 		else
 		{
-			/* Solve Ay = b for y */
+			// Solve Ay = b for y
 			this->LE_compute_x(this->m_new_V);
 
-			/* determine changed rows */
+			// determine changed rows
 
 			unsigned rowcount=0;
 			#define VT(r,c) (A(r,c) - lA(r,c))
@@ -250,9 +250,9 @@ namespace solver
 			}
 			if (rowcount > 0)
 			{
-				/* construct w = transform(V) * y
-				 * dim: rowcount x iN
-				 * */
+				// construct w = transform(V) * y
+				// dim: rowcount x iN
+				//
 				for (unsigned i = 0; i < rowcount; i++)
 				{
 					const unsigned r = rows[i];
@@ -268,7 +268,7 @@ namespace solver
 
 				for (unsigned i = 0; i < rowcount; i++)
 					H[i][i] = plib::constants<FT>::one();
-				/* Construct H = (I + VT*Z) */
+				// Construct H = (I + VT*Z)
 				for (unsigned i = 0; i < rowcount; i++)
 					for (unsigned k=0; k< colcount[i]; k++)
 					{
@@ -280,7 +280,7 @@ namespace solver
 								H[i][j] += f * Ainv(col,rows[j]);
 					}
 
-				/* Gaussian elimination of H */
+				// Gaussian elimination of H
 				for (unsigned i = 0; i < rowcount; i++)
 				{
 					// FIXME: comparison to zero
@@ -303,7 +303,7 @@ namespace solver
 						}
 					}
 				}
-				/* Back substitution */
+				// Back substitution
 				//inv(H) w = t     w = H t
 				for (unsigned j = rowcount; j-- > 0; )
 				{
@@ -316,7 +316,7 @@ namespace solver
 					t[j] = (w[j] - tmp) / H[j][j];
 				}
 
-				/* x = y - Zt */
+				// x = y - Zt
 				for (unsigned i=0; i<iN; i++)
 				{
 					float_type tmp = plib::constants<FT>::zero();
@@ -363,4 +363,4 @@ namespace solver
 } // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_DIRECT_H_ */
+#endif // NLD_MS_DIRECT_H_

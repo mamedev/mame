@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_gmres.h
- *
- */
 
 #ifndef NLD_MS_GMRES_H_
 #define NLD_MS_GMRES_H_
+
+///
+/// \file nld_ms_gmres.h
+///
 
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
@@ -29,10 +29,10 @@ namespace solver
 
 		using float_type = FT;
 
-		/* Sort rows in ascending order. This should minimize fill-in and thus
-		 * maximize the efficiency of the incomplete LUT.
-		 * This is already preconditioning.
-		 */
+		// Sort rows in ascending order. This should minimize fill-in and thus
+		// maximize the efficiency of the incomplete LUT.
+		// This is already preconditioning.
+
 		matrix_solver_GMRES_t(netlist_state_t &anetlist, const pstring &name,
 			analog_net_t::list_t &nets,
 			const solver_parameters_t *params,
@@ -58,7 +58,7 @@ namespace solver
 			m_ops.build(fill);
 			this->log_fill(fill, m_ops.m_mat);
 
-			/* build pointers into the compressed row format matrix for each terminal */
+			// build pointers into the compressed row format matrix for each terminal
 
 			for (std::size_t k=0; k<iN; k++)
 			{
@@ -101,7 +101,7 @@ namespace solver
 
 		m_ops.m_mat.set_scalar(plib::constants<FT>::zero());
 
-		/* populate matrix and V for first estimate */
+		// populate matrix and V for first estimate
 		this->fill_matrix_and_rhs();
 
 		for (std::size_t k = 0; k < iN; k++)
@@ -136,4 +136,4 @@ namespace solver
 } // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_GMRES_H_ */
+#endif // NLD_MS_GMRES_H_

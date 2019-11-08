@@ -1,13 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pomp.h
- *
- * Wrap all OPENMP stuff here in a hopefully c++ compliant way.
- */
 
 #ifndef POMP_H_
 #define POMP_H_
+
+///
+/// \file pomp.h
+///
+/// Wrap all OPENMP stuff here in a hopefully c++ compliant way.
+///
 
 #include "pconfig.h"
 #include "ptypes.h"
@@ -81,4 +82,4 @@ inline std::size_t get_max_threads() noexcept
 } // namespace omp
 } // namespace plib
 
-#endif /* PSTRING_H_ */
+#endif // PSTRING_H_

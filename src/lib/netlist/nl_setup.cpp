@@ -184,9 +184,9 @@ namespace netlist
 		register_link(attach, frontier_name + ".Q");
 	}
 
-	void nlparse_t::tt_factory_create(tt_desc &desc, const pstring &sourcefile)
+	void nlparse_t::truthtable_create(tt_desc &desc, const pstring &sourcefile)
 	{
-		auto fac = devices::tt_factory_create(desc, sourcefile);
+		auto fac = factory::truthtable_create(desc, sourcefile);
 		m_factory.register_device(std::move(fac));
 	}
 

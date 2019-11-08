@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_generic_models.h
- *
- */
 
 #ifndef NLD_GENERIC_MODELS_H_
 #define NLD_GENERIC_MODELS_H_
+
+///
+/// \file nl_generic_models.h
+///
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
@@ -188,7 +188,7 @@ namespace analog
 					m_G = m_Is * m_VtInv + m_gmin;
 					m_Id = m_G * m_Vd;
 				}
-				else /* log stepping should already be done in mosfet */
+				else // log stepping should already be done in mosfet
 				{
 					m_Vd = nVd;
 					IseVDVt = plib::exp(std::min(+fp_constants<nl_fptype>::DIODE_MAXVOLT(), m_logIs + m_Vd * m_VtInv));
@@ -220,7 +220,7 @@ namespace analog
 		nl_fptype Ieq() const noexcept  { return (m_Id - m_Vd * m_G); }
 		nl_fptype Vd() const noexcept  { return m_Vd; }
 
-		/* owning object must save those ... */
+		// owning object must save those ...
 
 	private:
 		state_var<nl_fptype> m_Vd;
@@ -244,4 +244,4 @@ namespace analog
 } // namespace analog
 } // namespace netlist
 
-#endif /* NLD_GENERIC_MODELS_H_ */
+#endif // NLD_GENERIC_MODELS_H_

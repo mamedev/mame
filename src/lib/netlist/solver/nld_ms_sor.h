@@ -1,16 +1,16 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_sor.h
- *
- * Generic successive over relaxation solver.
- *
- * Fow w==1 we will do the classic Gauss-Seidel approach
- *
- */
 
 #ifndef NLD_MS_SOR_H_
 #define NLD_MS_SOR_H_
+
+///
+/// \file nld_ms_sor.h
+///
+/// Generic successive over relaxation solver.
+///
+/// Fow w==1 we will do the classic Gauss-Seidel approach.
+///
 
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
@@ -58,13 +58,13 @@ namespace solver
 		bool resched = false;
 		unsigned resched_cnt = 0;
 
-		/* ideally, we could get an estimate for the spectral radius of
-		 * Inv(D - L) * U
-		 *
-		 * and estimate using
-		 *
-		 * omega = 2.0 / (1.0 + std::sqrt(1-rho))
-		 */
+		// ideally, we could get an estimate for the spectral radius of
+		// Inv(D - L) * U
+		//
+		// and estimate using
+		//
+		// omega = 2.0 / (1.0 + std::sqrt(1-rho))
+		//
 
 		const auto ws(static_cast<float_type>(this->m_params.m_gs_sor));
 
@@ -164,4 +164,4 @@ namespace solver
 } // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_SOR_H_ */
+#endif // NLD_MS_SOR_H_

@@ -65,6 +65,7 @@
 #define NETLIST_START(name)                                                    \
 void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 {
+
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
@@ -109,7 +110,7 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 		desc.family = x;
 
 #define TRUTHTABLE_END() \
-		setup.tt_factory_create(desc, __FILE__);       \
+		setup.truthtable_create(desc, __FILE__);       \
 	}
 
 namespace netlist
@@ -270,7 +271,7 @@ namespace netlist
 			m_sources.add_source(std::move(src));
 		}
 
-		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+		void truthtable_create(tt_desc &desc, const pstring &sourcefile);
 
 		// handle namespace
 

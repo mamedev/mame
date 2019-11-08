@@ -13,6 +13,8 @@
 #include "netlist/nl_setup.h"
 #include "plib/putil.h"
 
+#define USE_TT_ALTERNATIVE (0)
+
 namespace netlist
 {
 namespace devices
@@ -65,6 +67,9 @@ namespace devices
 				truthtable_t &ttp, const std::vector<pstring> &desc)
 		: device_t(owner, name)
 		, m_fam(*this, fam)
+#if USE_TT_ALTERNATIVE
+		, m_state(*this, "m_state", 0)
+#endif
 		, m_ign(*this, "m_ign", 0)
 		, m_ttp(ttp)
 		/* FIXME: the family should provide the names of the power-terminals! */
@@ -79,18 +84,44 @@ namespace devices
 		{
 			int active_outputs = 0;
 			m_ign = 0;
-			for (auto &i : m_I)
-				i.activate();
+#if USE_TT_ALTERNATIVE
+			m_state = 0;
+#endif
+			for (std::size_t i = 0; i < m_NI; ++i)
+			{
+				m_I[i].activate();
+#if USE_TT_ALTERNATIVE
+				m_state |= (m_I[i]() << i);
+#endif
+			}
 			for (auto &q : m_Q)
 				if (q.has_net() && q.net().num_cons() > 0)
 					active_outputs++;
 			set_active_outputs(active_outputs);
 		}
 
+		// update is only called during startup here ...
 		NETLIB_UPDATEI()
 		{
+#if USE_TT_ALTERNATIVE
+			m_state = 0;
+			for (std::size_t i = 0; i < m_NI; ++i)
+			{
+				m_state |= (m_I[i]() << i);
+			}
+#endif
 			process<true>();
 		}
+
+#if USE_TT_ALTERNATIVE
+		template <std::size_t N>
+		void update_N() noexcept
+		{
+			m_state &= ~(1<<N);
+			m_state |= (m_I[N]() << N);
+			process<true>();
+		}
+#endif
 
 		void inc_active() noexcept override
 		{
@@ -104,9 +135,6 @@ namespace devices
 			m_ign = (1<<m_NI)-1;
 		}
 
-		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
-		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
-
 	protected:
 
 	private:
@@ -115,17 +143,29 @@ namespace devices
 		void process() noexcept
 		{
 			netlist_time mt(netlist_time::zero());
-
 			type_t nstate(0);
 			type_t ign(m_ign);
 
 			if (doOUT)
 			{
+#if !USE_TT_ALTERNATIVE
 				for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
 					if (ign & 1)
 						I->activate();
 				for (std::size_t i = 0; i < m_NI; i++)
 					nstate |= (m_I[i]() << i);
+#else
+				nstate = m_state;
+				for (std::size_t i = 0; ign != 0; ign >>= 1, ++i)
+				{
+					if (ign & 1)
+					{
+						nstate &= ~(1 << i);
+						m_I[i].activate();
+						nstate |= (m_I[i]() << i);
+					}
+				}
+#endif
 			}
 			else
 				for (std::size_t i = 0; i < m_NI; i++)
@@ -155,19 +195,32 @@ namespace devices
 			for (auto I = m_I.begin(); ign != 0; ign >>= 1, ++I)
 				if (ign & 1)
 					I->inactivate();
+#if USE_TT_ALTERNATIVE
+			m_state = nstate;
+#endif
 		}
 
+		plib::uninitialised_array_t<logic_input_t, m_NI> m_I;
+		plib::uninitialised_array_t<logic_output_t, m_NO> m_Q;
+
 		/* FIXME: check width */
+#if USE_TT_ALTERNATIVE
+		state_var<type_t>   m_state;
+#endif
 		state_var<type_t>   m_ign;
 		const truthtable_t &m_ttp;
 		/* FIXME: the family should provide the names of the power-terminals! */
 		nld_power_pins m_power_pins;
 	};
 
-	class netlist_base_factory_truthtable_t : public factory::element_t
+} // namespace devices
+
+namespace factory
+{
+	class truthtable_base_element_t : public factory::element_t
 	{
 	public:
-		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
+		truthtable_base_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param, const pstring &sourcefile);
 
 		std::vector<pstring> m_desc;
@@ -175,12 +228,12 @@ namespace devices
 		const logic_family_desc_t *m_family_desc;
 	};
 
-	/* the returned element is still missing a pointer to the family ... */
-	plib::unique_ptr<netlist_base_factory_truthtable_t> tt_factory_create(tt_desc &desc, const pstring &sourcefile);
+	// FIXME: the returned element is missing a pointer to the family ...
+	plib::unique_ptr<truthtable_base_element_t> truthtable_create(tt_desc &desc, const pstring &sourcefile);
 
-} //namespace devices
+} // namespace factory
 } // namespace netlist
 
 
 
-#endif /* NLID_TRUTHTABLE_H_ */
+#endif // NLID_TRUTHTABLE_H_

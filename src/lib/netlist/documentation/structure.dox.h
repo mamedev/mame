@@ -12,17 +12,30 @@
 ///
 /// The define statements below thus show the default value.
 ///
-///@{
-///@}
+///\{
+///\}
 
 /// \brief The netlist namespace.
 /// All netlist related code is contained in the netlist namespace
-
 namespace netlist
 {
 	/// \brief The netlist::devices namespace.
 	/// All netlist devices are contained in the netlist::devices namespace.
 	namespace devices
+	{
+	}
+
+	/// \brief The netlist::analog namespace.
+	/// Netlist analog devices and related code are contained in the
+	/// netlist::analog namespace.
+	namespace analog
+	{
+	}
+
+	/// \brief The netlist::solver namespace.
+	/// All linear equation solving code and related code is contained in the
+	/// netlist::solver namespace.
+	namespace solver
 	{
 	}
 

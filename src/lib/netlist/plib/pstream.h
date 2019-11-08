@@ -1,12 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstream.h
- */
+
 
 #ifndef PSTREAM_H_
 #define PSTREAM_H_
 
+///
+/// \file pstream.h
+///
 
 #include "palloc.h"
 #include "pconfig.h"
@@ -25,19 +26,17 @@
 
 namespace plib {
 
-// -----------------------------------------------------------------------------
-// putf8reader_t: reader on top of istream
-// -----------------------------------------------------------------------------
-
-/* this digests linux & dos/windows text files */
-
-
 template <typename T>
 struct constructor_helper
 {
 	plib::unique_ptr<std::istream> operator()(T &&s) { return std::move(plib::make_unique<T>(std::move(s))); }
 };
 
+///
+/// \brief: putf8reader_t: reader on top of istream.
+///
+/// putf8reader_t digests linux & dos/windows text files
+///
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 class putf8_reader
 {
@@ -70,7 +69,7 @@ public:
 		{
 			if (c == 10)
 				break;
-			else if (c != 13) /* ignore CR */
+			else if (c != 13) // ignore CR
 				m_linebuf += putf8string(1, c);
 			if (!this->readcode(c))
 				break;
@@ -303,8 +302,11 @@ private:
 
 namespace filesystem
 {
+
+	// FIXME: u8path should return a path object (c++17)
+
 	template< class Source >
-	pstring /*path */ u8path( const Source& source )
+	pstring u8path( const Source& source )
 	{
 		return source;
 	}
@@ -313,4 +315,4 @@ namespace filesystem
 
 } // namespace plib
 
-#endif /* PSTREAM_H_ */
+#endif // PSTREAM_H_

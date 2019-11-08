@@ -1,11 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * ptime.h
- */
 
 #ifndef PTIME_H_
 #define PTIME_H_
+
+///
+/// \file ptime.h
+///
 
 #include "pconfig.h"
 #include "pmath.h" // std::floor
@@ -164,4 +165,4 @@ namespace plib
 } // namespace plib
 
 
-#endif /* PTIME_H_ */
+#endif // PTIME_H_

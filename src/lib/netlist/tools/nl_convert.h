@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_convert.h
- *
- */
 
 #ifndef NL_CONVERT_H_
 #define NL_CONVERT_H_
+
+///
+/// \file nl_convert.h
+///
 
 #include "plib/plists.h"
 #include "plib/pstring.h"
@@ -15,9 +15,9 @@
 
 #include <memory>
 
-/*-------------------------------------------------
-    convert - convert a spice netlist
--------------------------------------------------*/
+// -------------------------------------------------
+//  convert - convert a spice netlist
+// -------------------------------------------------
 
 class nl_convert_base_t
 {
@@ -236,4 +236,4 @@ private:
 
 };
 
-#endif /* NL_CONVERT_H_ */
+#endif // NL_CONVERT_H_

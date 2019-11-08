@@ -1,15 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
-
-    net_lib.h
-
-    Discrete netlist implementation.
-
-****************************************************************************/
 
 #ifndef NET_LIB_H
 #define NET_LIB_H
+
+///
+/// \file net_lib.h
+///
+/// Discrete netlist implementation.
+///
 
 #include "netlist/nl_setup.h"
 

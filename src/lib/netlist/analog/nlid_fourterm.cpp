@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_fourterm.c
- *
- */
 
 #include "netlist/solver/nld_solver.h"
 #include "netlist/nl_factory.h"
@@ -36,7 +32,7 @@ NETLIB_RESET(VCCS)
 
 NETLIB_UPDATE(VCCS)
 {
-	/* only called if connected to a rail net ==> notify the solver to recalculate */
+	// only called if connected to a rail net ==> notify the solver to recalculate
 	if (!m_IP.net().isRailNet())
 		m_IP.solve_now();
 	else if (!m_IN.net().isRailNet())

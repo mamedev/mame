@@ -45,57 +45,56 @@ namespace analog
 	// nld_Q - Base classes
 	// -----------------------------------------------------------------------------
 
-	/*! Class representing the bjt model parameters.
-	 *
-	 *  This is the model representation of the bjt model. Typically, SPICE uses
-	 *  the following parameters. A "Y" in the first column indicates that the
-	 *  parameter is actually used in netlist.
-	 *
-	 * | NL? | name | parameter                                                             | units |  default |         example | area |
-	 * |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|:----:|
-	 * |  Y  | IS   | transport saturation current                                          | A     |   1E-016 |          1E-015 |   *  |
-	 * |  Y  | BF   | ideal maximum forward beta                                            | -     |      100 |             100 |      |
-	 * |  Y  | NF   | forward current emission coefficient                                  | -     |        1 |               1 |      |
-	 * |     | VAF  | forward Early voltage                                                 | V     | infinite |             200 |      |
-	 * |     | IKF  | corner for forward beta high current roll-off                         | A     | infinite |            0.01 |   *  |
-	 * |     | ISE  | B-E leakage saturation current                                        | A     |        0 | 0.0000000000001 |   *  |
-	 * |     | NE   | B-E leakage emission coefficient                                      | -     |      1.5 |               2 |      |
-	 * |  Y  | BR   | ideal maximum reverse beta                                            | -     |        1 |             0.1 |      |
-	 * |  Y  | NR   | reverse current emission coefficient                                  | -     |        1 |               1 |      |
-	 * |     | VAR  | reverse Early voltage                                                 | V     | infinite |             200 |      |
-	 * |     | IKR  | corner for reverse beta high current roll-off                         | A     | infinite |            0.01 |   *  |
-	 * |     | ISC  | leakage saturation current                                            | A     |        0 |               8 |      |
-	 * |     | NC   | leakage emission coefficient                                          | -     |        2 |             1.5 |      |
-	 * |     | RB   | zero bias base resistance                                             |       |        0 |             100 |   *  |
-	 * |     | IRB  | current where base resistance falls halfway to its min value          | A     | infinite |             0.1 |   *  |
-	 * |     | RBM  | minimum base resistance at high currents                              |       |       RB |              10 |   *  |
-	 * |     | RE   | emitter resistance                                                    |       |        0 |               1 |   *  |
-	 * |     | RC   | collector resistance                                                  |       |        0 |              10 |   *  |
-	 * |  Y  | CJE  | B-E zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
-	 * |     | VJE  | B-E built-in potential                                                | V     |     0.75 |             0.6 |      |
-	 * |     | MJE  | B-E junction exponential factor                                       | -     |     0.33 |            0.33 |      |
-	 * |     | TF   | ideal forward transit time                                            | sec   |        0 |           0.1ns |      |
-	 * |     | XTF  | coefficient for bias dependence of TF                                 | -     |        0 |                 |      |
-	 * |     | VTF  | voltage describing VBC  dependence of TF                              | V     | infinite |                 |      |
-	 * |     | ITF  | high-current parameter  for effect on TF                              | A     |        0 |                 |   *  |
-	 * |     | PTF  | excess phase at freq=1.0/(TF*2PI) Hz                                  | deg   |        0 |                 |      |
-	 * |  Y  | CJC  | B-C zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
-	 * |     | VJC  | B-C built-in potential                                                | V     |     0.75 |             0.5 |      |
-	 * |     | MJC  | B-C junction exponential factor                                       | -     |     0.33 |             0.5 |      |
-	 * |     | XCJC | fraction of B-C depletion capacitance connected to internal base node | -     |        1 |                 |      |
-	 * |     | TR   | ideal reverse transit time                                            | sec   |        0 |            10ns |      |
-	 * |     | CJS  | zero-bias collector-substrate capacitance                             | F     |        0 |             2pF |   *  |
-	 * |     | VJS  | substrate junction built-in potential                                 | V     |     0.75 |                 |      |
-	 * |     | MJS  | substrate junction exponential factor                                 | -     |        0 |             0.5 |      |
-	 * |     | XTB  | forward and reverse beta temperature exponent                         | -     |        0 |                 |      |
-	 * |     | EG   | energy gap for temperature effect on IS                               | eV    |     1.11 |                 |      |
-	 * |     | XTI  | temperature exponent for effect on IS                                 | -     |        3 |                 |      |
-	 * |     | KF   | flicker-noise coefficient                                             | -     |        0 |                 |      |
-	 * |     | AF   | flicker-noise exponent                                                | -     |        1 |                 |      |
-	 * |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
-	 * |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |
-	 * */
-
+	/// \brief Class representing the bjt model parameters.
+	///
+	///  This is the model representation of the bjt model. Typically, SPICE uses
+	///  the following parameters. A "Y" in the first column indicates that the
+	///  parameter is actually used in netlist.
+	///
+	/// | NL? | name | parameter                                                             | units |  default |         example | area |
+	/// |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|:----:|
+	/// |  Y  | IS   | transport saturation current                                          | A     |   1E-016 |          1E-015 |   *  |
+	/// |  Y  | BF   | ideal maximum forward beta                                            | -     |      100 |             100 |      |
+	/// | Y  | NF   | forward current emission coefficient                                  | -     |        1 |               1 |      |
+	/// |     | VAF  | forward Early voltage                                                 | V     | infinite |             200 |      |
+	/// |     | IKF  | corner for forward beta high current roll-off                         | A     | infinite |            0.01 |   *  |
+	/// |     | ISE  | B-E leakage saturation current                                        | A     |        0 | 0.0000000000001 |   *  |
+	/// |     | NE   | B-E leakage emission coefficient                                      | -     |      1.5 |               2 |      |
+	/// |  Y  | BR   | ideal maximum reverse beta                                            | -     |        1 |             0.1 |      |
+	/// |  Y  | NR   | reverse current emission coefficient                                  | -     |        1 |               1 |      |
+	/// |     | VAR  | reverse Early voltage                                                 | V     | infinite |             200 |      |
+	/// |     | IKR  | corner for reverse beta high current roll-off                         | A     | infinite |            0.01 |   *  |
+	/// |     | ISC  | leakage saturation current                                            | A     |        0 |               8 |      |
+	/// |     | NC   | leakage emission coefficient                                          | -     |        2 |             1.5 |      |
+	/// |     | RB   | zero bias base resistance                                             |       |        0 |             100 |   *  |
+	/// |     | IRB  | current where base resistance falls halfway to its min value          | A     | infinite |             0.1 |   *  |
+	/// |     | RBM  | minimum base resistance at high currents                              |       |       RB |              10 |   *  |
+	/// |     | RE   | emitter resistance                                                    |       |        0 |               1 |   *  |
+	/// |     | RC   | collector resistance                                                  |       |        0 |              10 |   *  |
+	/// |  Y  | CJE  | B-E zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
+	/// |     | VJE  | B-E built-in potential                                                | V     |     0.75 |             0.6 |      |
+	/// |     | MJE  | B-E junction exponential factor                                       | -     |     0.33 |            0.33 |      |
+	/// |     | TF   | ideal forward transit time                                            | sec   |        0 |           0.1ns |      |
+	/// |     | XTF  | coefficient for bias dependence of TF                                 | -     |        0 |                 |      |
+	/// |     | VTF  | voltage describing VBC  dependence of TF                              | V     | infinite |                 |      |
+	/// |     | ITF  | high-current parameter  for effect on TF                              | A     |        0 |                 |   *  |
+	/// |     | PTF  | excess phase at freq=1.0/(TF*2PI) Hz                                  | deg   |        0 |                 |      |
+	/// |  Y  | CJC  | B-C zero-bias depletion capacitance                                   | F     |        0 |             2pF |   *  |
+	/// |     | VJC  | B-C built-in potential                                                | V     |     0.75 |             0.5 |      |
+	/// |     | MJC  | B-C junction exponential factor                                       | -     |     0.33 |             0.5 |      |
+	/// |     | XCJC | fraction of B-C depletion capacitance connected to internal base node | -     |        1 |                 |      |
+	/// |     | TR   | ideal reverse transit time                                            | sec   |        0 |            10ns |      |
+	/// |     | CJS  | zero-bias collector-substrate capacitance                             | F     |        0 |             2pF |   *  |
+	/// |     | VJS  | substrate junction built-in potential                                 | V     |     0.75 |                 |      |
+	/// |     | MJS  | substrate junction exponential factor                                 | -     |        0 |             0.5 |      |
+	/// |     | XTB  | forward and reverse beta temperature exponent                         | -     |        0 |                 |      |
+	/// |     | EG   | energy gap for temperature effect on IS                               | eV    |     1.11 |                 |      |
+	/// |     | XTI  | temperature exponent for effect on IS                                 | -     |        3 |                 |      |
+	/// |     | KF   | flicker-noise coefficient                                             | -     |        0 |                 |      |
+	/// |     | AF   | flicker-noise exponent                                                | -     |        1 |                 |      |
+	/// |     | FC   | coefficient for forward-bias depletion capacitance formula            | -     |      0.5 |                 |      |
+	/// |     | TNOM | Parameter measurement temperature                                     | C     |       27 |              50 |      |
+	///
 	class bjt_model_t : public param_model_t
 	{
 	public:
@@ -156,18 +155,18 @@ namespace analog
 	// -----------------------------------------------------------------------------
 
 
-	/*
-	 *         + -              C
-	 *   B ----VVV----+         |
-	 *                |         |
-	 *                Rb        Rc
-	 *                Rb        Rc
-	 *                Rb        Rc
-	 *                |         |
-	 *                +----+----+
-	 *                     |
-	 *                     E
-	 */
+	//
+	//         + -              C
+	//   B ----VVV----+         |
+	//                |         |
+	//                Rb        Rc
+	//                Rb        Rc
+	//                Rb        Rc
+	//                |         |
+	//                +----+----+
+	//                     |
+	//                     E
+	//
 
 	NETLIB_OBJECT_DERIVED(QBJT_switch, QBJT)
 	{
@@ -329,8 +328,8 @@ namespace analog
 		const auto cc(nlconst::magic(0.005));
 		m_V = d.V(cc / alpha);
 
-		/* Base current is 0.005 / beta
-		 * as a rough estimate, we just scale the conductance down */
+		// Base current is 0.005 / beta
+		// as a rough estimate, we just scale the conductance down
 
 		m_gB = plib::reciprocal((m_V/(cc / BF)));
 

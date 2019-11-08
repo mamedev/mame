@@ -185,7 +185,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			m_setup.tt_factory_create(desc, nlname);
+			m_setup.truthtable_create(desc, nlname);
 			return;
 		}
 	}

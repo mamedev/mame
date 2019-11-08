@@ -1,22 +1,22 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_mosfet.cpp
- *
- * Formulas in here based on the following Sources:
- *
- * https://www.imperial.ac.uk/pls/portallive/docs/1/7292573.PDF
- * http://www3.imperial.ac.uk/pls/portallive/docs/1/56133736.PDF
- * https://people.rit.edu/lffeee/SPICE_MOSFET_Model_Intro.pdf
- * https://people.rit.edu/lffeee/SPICE.pdf
- * http://web.mit.edu/course/6/6.012/SPR98/www/lectures/S98_Lecture10.pdf
- * http://homepages.rpi.edu/~sawyes/Models_review.pdf
- * http://jaco.ec.t.kanazawa-u.ac.jp/edu/mix/pdf/3.pdf
- *
- * Farid N. Naim, Circuit Simulation (Wiley-IEEE Press, 2010).
- * Stefan Jahn, Michael Margraf, Vincent Habchi and Raimund Jacob, "Qucs Technical Papers" (2007)
- *
- */
+
+//
+// nld_mosfet.cpp
+//
+// Formulas in here based on the following Sources:
+//
+// https://www.imperial.ac.uk/pls/portallive/docs/1/7292573.PDF
+// http://www3.imperial.ac.uk/pls/portallive/docs/1/56133736.PDF
+// https://people.rit.edu/lffeee/SPICE_MOSFET_Model_Intro.pdf
+// https://people.rit.edu/lffeee/SPICE.pdf
+// http://web.mit.edu/course/6/6.012/SPR98/www/lectures/S98_Lecture10.pdf
+// http://homepages.rpi.edu/~sawyes/Models_review.pdf
+// http://jaco.ec.t.kanazawa-u.ac.jp/edu/mix/pdf/3.pdf
+//
+// Farid N. Naim, Circuit Simulation (Wiley-IEEE Press, 2010).
+// Stefan Jahn, Michael Margraf, Vincent Habchi and Raimund Jacob, "Qucs Technical Papers" (2007)
+//
 
 #include "netlist/solver/nld_solver.h"
 #include "netlist/nl_setup.h"
@@ -35,65 +35,65 @@ namespace analog
 	// nld_FET - Base classes
 	// -----------------------------------------------------------------------------
 
-	/*! Class representing the nmos/pmos model paramers.
-	 *
-	 *  This is the model representation of the nmos model.
-	 *
-	 *  Netlist has an additional parameter caller CAPMOD:
-	 *
-	 *  CAPMOD=0: Capacitance model disabled
-	 *  CAPMOD=2: Meyer capacitance model
-	 *
-	 *  Typically, SPICE uses the following parameters. A "Y" in the first
-	 *  column indicates that the parameter is actually used in netlist.
-	 *
-	 * | NL? |Name  |                                                            Description|Units  |Default   |Example          |
-	 * |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|
-	 * |  Y  |Vto   | Zero-bias threshold voltage                                           | V     | 0        | 1               |
-	 * |  Y  |Kp    | Transconductance parameter                                            | A/V²  | 0.00002  | 0.00003         |
-	 * |  Y  |Gamma | Bulk threshold parameter                                              | V^½   | 0        | 0.37            |
-	 * |  Y  |Phi   | Surface inversion potential                                           | V     | 0.6      | 0.65            |
-	 * |  Y  |Lambda| Channel-length modulation (level 1 and 2 only)                        | 1/V   | 0        | 0.02            |
-	 * |     |Rd    | Drain ohmic resistance                                                |W|0|1|
-	 * |     |Rs    | Source ohmic resistance                                               |W|0|1|
-	 * |     |Cbd   | Zero-bias B-D junction capacitance                                    |F|0|20f|
-	 * |     |Cbs   | Zero-bias B-S junction capacitance                                    |F|0|20f|
-	 * |  Y  |Is    | Bulk junction saturation current                                      |A|0.00000000000001|1E-015|
-	 * |  Y  |N     | Bulk diode emission coefficient                                       |-|1|*|
-	 * |     |Pb    | Bulk junction potential                                               |V|0.8|0.87|
-	 * |  Y  |Cgso  | Gate-source overlap capacitance per meter channel width               |F/m|0|0.00000000004|
-	 * |  Y  |Cgdo  | Gate-drain overlap capacitance per meter channel width                |F/m|0|0.00000000004*|
-	 * |  Y  |Cgbo  | Gate-bulk overlap capacitance per meter channel width                 |F/m|0|0.0000000002*|
-	 * |     |Rsh   | Drain and source diffusion sheet resistance                           |W|0|10*|
-	 * |     |Cj    | Zero-bias bulk junction bottom capacitance per square meter of junction area|F/m²|0|0.0002*|
-	 * |     |Mj    | Bulk junction bottom grading coefficient                              |-|0.5|0.5*|
-	 * |     |Cjsw  | Zero-bias bulk junction sidewall capacitance per meter of junction perimeter|F/m|0|1p*|
-	 * |     |Mjsw  | Bulk junction sidewall grading coefficient                            |-|.50 level 1  .33 level 2,3||
-	 * |     |Js    | Bulk junction saturation current per square-meter of junction area|A/m|0|0.00000001|
-	 * |  Y  |Tox   | Oxide thickness                                                       |m|0.0000001|0.0000001|
-	 * |  Y  |Nsub  | Substrate doping                                                      |1/cm³|0|4000000000000000|
-	 * |     |Nss   | Surface state density                                                 |1/cm²|0|10000000000|
-	 * |     |Nfs   | Fast surface state                                                    |1/cm²|0|10000000000*|
-	 * |     |TPG   | Type of gate material:  +1 opp. to substrate -1 same as substrate     |Al gate|-|1|
-	 * |     |Xj    | Metallurgical junction depth                                          |m|0|1µ*|
-	 * |  Y  |Ld    | Lateral diffusion                                                     |m|0|0.8µ|
-	 * |  Y  |Uo    | Surface mobility                                                      |cm²/V/s|600|700|
-	 * |     |Ucrit | Critical field for mobility degradation (level 2 only)                |V/cm|10000|10000|
-	 * |     |Uexp  | Critical field exponent in mobility degradation (level 2 only)        |-|0|0.1|
-	 * |     |Utra  | Transverse field coefficient (level 2 only)                           |-|0|0.3*|
-	 * |     |Vmax  | Maximum carrier drift velocity (levels 2 & 3 only)                    |m/s|0|50000|
-	 * |     |Neff  | Total channel-charge exponent (level 2 only)                          |-|1|5|
-	 * |     |Kf    | Flicker noise coefficient                                             |-|0|1E-026|
-	 * |     |Af    | Flicker noise exponent                                                |-|1|1.2|
-	 * |     |Fc    | Coefficient for forward-bias depletion capacitance formula            |-|0.5||
-	 * |     |Delta | Width effect on threshold voltage(levels 2 and 3)                     |-|0|1|
-	 * |     |Theta | Mobility modulation (level 3 only)                                    |-|0|0.1|
-	 * |     |Eta   | Static feedback (level 3 only)                                        |-|0|1|
-	 * |     |Kappa | Saturation field (level 3 only)                                       |-|0.2|0.5|
-	 * |     |Tnom  | Parameter measurement temperature                                     |ºC|27|50|
-	 * |  Y  |L     | Length scaling                                                        |-|100e-6||
-	 * |  Y  |W     | Width scaling                                                         |-|100e-6||
-	 * */
+	/// \brief Class representing the nmos/pmos model paramers.
+	///
+	///  This is the model representation of the nmos model.
+	///
+	///  Netlist has an additional parameter caller CAPMOD:
+	///
+	///  CAPMOD=0: Capacitance model disabled
+	///  CAPMOD=2: Meyer capacitance model
+	///
+	///  Typically, SPICE uses the following parameters. A "Y" in the first
+	///  column indicates that the parameter is actually used in netlist.
+	///
+	/// | NL? |Name  |                                                            Description|Units  |Default   |Example          |
+	/// |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|
+	/// |  Y  |Vto   | Zero-bias threshold voltage                                           | V     | 0        | 1               |
+	/// |  Y  |Kp    | Transconductance parameter                                            | A/V²  | 0.00002  | 0.00003         |
+	/// |  Y  |Gamma | Bulk threshold parameter                                              | V^½   | 0        | 0.37            |
+	/// |  Y  |Phi   | Surface inversion potential                                           | V     | 0.6      | 0.65            |
+	/// |  Y  |Lambda| Channel-length modulation (level 1 and 2 only)                        | 1/V   | 0        | 0.02            |
+	/// |     |Rd    | Drain ohmic resistance                                                |W|0|1|
+	/// |     |Rs    | Source ohmic resistance                                               |W|0|1|
+	/// |     |Cbd   | Zero-bias B-D junction capacitance                                    |F|0|20f|
+	/// |     |Cbs   | Zero-bias B-S junction capacitance                                    |F|0|20f|
+	/// |  Y  |Is    | Bulk junction saturation current                                      |A|0.00000000000001|1E-015|
+	/// |  Y  |N     | Bulk diode emission coefficient                                       |-|1|*|
+	/// |     |Pb    | Bulk junction potential                                               |V|0.8|0.87|
+	/// |  Y  |Cgso  | Gate-source overlap capacitance per meter channel width               |F/m|0|0.00000000004|
+	/// |  Y  |Cgdo  | Gate-drain overlap capacitance per meter channel width                |F/m|0|0.00000000004*|
+	/// |  Y  |Cgbo  | Gate-bulk overlap capacitance per meter channel width                 |F/m|0|0.0000000002*|
+	/// |     |Rsh   | Drain and source diffusion sheet resistance                           |W|0|10*|
+	/// |     |Cj    | Zero-bias bulk junction bottom capacitance per square meter of junction area|F/m²|0|0.0002*|
+	/// |     |Mj    | Bulk junction bottom grading coefficient                              |-|0.5|0.5*|
+	/// |     |Cjsw  | Zero-bias bulk junction sidewall capacitance per meter of junction perimeter|F/m|0|1p*|
+	/// |     |Mjsw  | Bulk junction sidewall grading coefficient                            |-|.50 level 1  .33 level 2,3||
+	/// |     |Js    | Bulk junction saturation current per square-meter of junction area|A/m|0|0.00000001|
+	/// |  Y  |Tox   | Oxide thickness                                                       |m|0.0000001|0.0000001|
+	/// |  Y  |Nsub  | Substrate doping                                                      |1/cm³|0|4000000000000000|
+	/// |     |Nss   | Surface state density                                                 |1/cm²|0|10000000000|
+	/// |     |Nfs   | Fast surface state                                                    |1/cm²|0|10000000000*|
+	/// |     |TPG   | Type of gate material:  +1 opp. to substrate -1 same as substrate     |Al gate|-|1|
+	/// |     |Xj    | Metallurgical junction depth                                          |m|0|1µ*|
+	/// |  Y  |Ld    | Lateral diffusion                                                     |m|0|0.8µ|
+	/// |  Y  |Uo    | Surface mobility                                                      |cm²/V/s|600|700|
+	/// |     |Ucrit | Critical field for mobility degradation (level 2 only)                |V/cm|10000|10000|
+	/// |     |Uexp  | Critical field exponent in mobility degradation (level 2 only)        |-|0|0.1|
+	/// |     |Utra  | Transverse field coefficient (level 2 only)                           |-|0|0.3*|
+	/// |     |Vmax  | Maximum carrier drift velocity (levels 2 & 3 only)                    |m/s|0|50000|
+	/// |     |Neff  | Total channel-charge exponent (level 2 only)                          |-|1|5|
+	/// |     |Kf    | Flicker noise coefficient                                             |-|0|1E-026|
+	/// |     |Af    | Flicker noise exponent                                                |-|1|1.2|
+	/// |     |Fc    | Coefficient for forward-bias depletion capacitance formula            |-|0.5||
+	/// |     |Delta | Width effect on threshold voltage(levels 2 and 3)                     |-|0|1|
+	/// |     |Theta | Mobility modulation (level 3 only)                                    |-|0|0.1|
+	/// |     |Eta   | Static feedback (level 3 only)                                        |-|0|1|
+	/// |     |Kappa | Saturation field (level 3 only)                                       |-|0.2|0.5|
+	/// |     |Tnom  | Parameter measurement temperature                                     |ºC|27|50|
+	/// |  Y  |L     | Length scaling                                                        |-|100e-6||
+	/// |  Y  |W     | Width scaling                                                         |-|100e-6||
+	///
 
 	class fet_model_t : public param_model_t
 	{
@@ -224,16 +224,15 @@ namespace analog
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
 			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value for " + m_model.name());
 
-			/*
-			 * From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
-			 *
-			 *      VTO, KP, LAMBDA, PHI and GAMMA. These parameters are computed
-			 *      if the process parameters(NSUB, TOX,...) are given, but
-			 *      user-specified values always override.
-			 *
-			 *  But couldn't find a formula for lambda anywhere
-			 *
-			 */
+			//
+			// From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
+			//
+			//      VTO, KP, LAMBDA, PHI and GAMMA. These parameters are computed
+			//      if the process parameters(NSUB, TOX,...) are given, but
+			//      user-specified values always override.
+			//
+			//  But couldn't find a formula for lambda anywhere
+			//
 
 			m_lambda = m_model.m_LAMBDA; // FIXME: m_lambda only set once
 
@@ -284,9 +283,8 @@ namespace analog
 			if(m_vto != nlconst::zero())
 				log().warning(MW_MOSFET_THRESHOLD_VOLTAGE(m_model.name()));
 
-			/* FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
-			 * specify VTO so skip this here.
-			 */
+			// FIXME: VTO if missing may be calculated from TPG, NSS and temperature. Usually models
+			// specify VTO so skip this here.
 
 			m_CoxWL = Cox * m_model.m_W * m_Leff;
 
@@ -350,12 +348,12 @@ namespace analog
 		nl_fptype m_beta;
 		nl_fptype m_lambda;
 
-		/* used in capacitance calculation */
+		// used in capacitance calculation
 		nl_fptype m_Leff;
 		nl_fptype m_CoxWL;
 		nl_fptype m_polarity;
 
-		/* capacitance values */
+		// capacitance values
 
 		nl_fptype m_Cgb;
 		nl_fptype m_Cgs;

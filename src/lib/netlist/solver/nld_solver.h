@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_solver.h
- *
- */
 
 #ifndef NLD_SOLVER_H_
 #define NLD_SOLVER_H_
+
+///
+/// \file nld_solver.h
+///
 
 #include "netlist/nl_base.h"
 #include "nld_matrix_solver.h"
@@ -69,4 +69,4 @@ namespace devices
 } // namespace devices
 } // namespace netlist
 
-#endif /* NLD_SOLVER_H_ */
+#endif // NLD_SOLVER_H_

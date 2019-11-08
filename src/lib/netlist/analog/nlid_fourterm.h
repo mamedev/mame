@@ -1,40 +1,38 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlid_fourterm.h
- *
- */
 
 #ifndef NLID_FOURTERM_H_
 #define NLID_FOURTERM_H_
+
+///
+/// \file nlid_fourterm.h
+///
 
 #include "netlist/nl_base.h"
 #include "plib/putil.h"
 
 namespace netlist {
-	namespace analog {
+namespace analog {
 
 	// ----------------------------------------------------------------------------------------
 	// nld_VCCS
 	// ----------------------------------------------------------------------------------------
 
-	/*
-	 *   Voltage controlled current source
-	 *
-	 *   IP ---+           +------> OP
-	 *         |           |
-	 *         RI          I
-	 *         RI => G =>  I    IOut = (V(IP)-V(IN)) * G
-	 *         RI          I
-	 *         |           |
-	 *   IN ---+           +------< ON
-	 *
-	 *   G=1 ==> 1V ==> 1A
-	 *
-	 *   RI = 1 / NETLIST_GMIN
-	 *
-	 */
-
+	//
+	//   Voltage controlled current source
+	//
+	//   IP ---+           +------> OP
+	//         |           |
+	//         RI          I
+	//         RI => G =>  I    IOut = (V(IP)-V(IN)) * G
+	//         RI          I
+	//         |           |
+	//   IN ---+           +------< ON
+	//
+	//   G=1 ==> 1V ==> 1A
+	//
+	//   RI = 1 / NETLIST_GMIN
+	//
 	NETLIB_OBJECT(VCCS)
 	{
 	public:
@@ -79,7 +77,7 @@ namespace netlist {
 		nl_fptype m_gfac;
 	};
 
-	/* Limited Current source*/
+	// Limited Current source
 
 	NETLIB_OBJECT_DERIVED(LVCCS, VCCS)
 	{
@@ -99,7 +97,7 @@ namespace netlist {
 		NETLIB_UPDATE_TERMINALSI();
 
 	private:
-		param_fp_t m_cur_limit; /* current limit */
+		param_fp_t m_cur_limit; // current limit
 		nl_fptype m_vi;
 	};
 
@@ -107,24 +105,23 @@ namespace netlist {
 	// nld_CCCS
 	// ----------------------------------------------------------------------------------------
 
-	/*
-	 *   Current controlled current source
-	 *
-	 *   IP ---+           +------> OP
-	 *         |           |
-	 *         RI          I
-	 *         RI => G =>  I    IOut = (V(IP)-V(IN)) / RI  * G
-	 *         RI          I
-	 *         |           |
-	 *   IN ---+           +------< ON
-	 *
-	 *   G=1 ==> 1A ==> 1A
-	 *
-	 *   RI = 1
-	 *
-	 *   This needs high levels of accuracy to work with 1 Ohm RI.
-	 *
-	 */
+	//
+	//   Current controlled current source
+	//
+	//   IP ---+           +------> OP
+	//         |           |
+	//         RI          I
+	//         RI => G =>  I    IOut = (V(IP)-V(IN)) / RI  * G
+	//         RI          I
+	//         |           |
+	//   IN ---+           +------< ON
+	//
+	//   G=1 ==> 1A ==> 1A
+	//
+	//   RI = 1
+	//
+	//   This needs high levels of accuracy to work with 1 Ohm RI.
+	//
 
 	NETLIB_OBJECT_DERIVED(CCCS, VCCS)
 	{
@@ -146,29 +143,27 @@ namespace netlist {
 	// nld_VCVS
 	// ----------------------------------------------------------------------------------------
 
-	/*
-	 *   Voltage controlled voltage source
-	 *
-	 *   Parameters:
-	 *     G        Default: 1
-	 *     RO       Default: 1  (would be typically 50 for an op-amp
-	 *
-	 *   IP ---+           +--+---- OP
-	 *         |           |  |
-	 *         RI          I  RO
-	 *         RI => G =>  I  RO              V(OP) - V(ON) = (V(IP)-V(IN)) * G
-	 *         RI          I  RO
-	 *         |           |  |
-	 *   IN ---+           +--+---- ON
-	 *
-	 *   G=1 ==> 1V ==> 1V
-	 *
-	 *   RI = 1 / NETLIST_GMIN
-	 *
-	 *   Internal GI = G / RO
-	 *
-	 */
-
+	//
+	//   Voltage controlled voltage source
+	//
+	//   Parameters:
+	//     G        Default: 1
+	//     RO       Default: 1  (would be typically 50 for an op-amp
+	//
+	//   IP ---+           +--+---- OP
+	//         |           |  |
+	//         RI          I  RO
+	//         RI => G =>  I  RO              V(OP) - V(ON) = (V(IP)-V(IN)) * G
+	//         RI          I  RO
+	//         |           |  |
+	//   IN ---+           +--+---- ON
+	//
+	//   G=1 ==> 1V ==> 1V
+	//
+	//   RI = 1 / NETLIST_GMIN
+	//
+	//   Internal GI = G / RO
+	//
 
 	NETLIB_OBJECT_DERIVED(VCVS, VCCS)
 	{
@@ -196,7 +191,7 @@ namespace netlist {
 
 	};
 
-	} // namespace analog
+} // namespace analog
 } // namespace netlist
 
-#endif /* NLD_FOURTERM_H_ */
+#endif // NLD_FOURTERM_H_

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * parray.h
- *
- */
 
 #ifndef PARRAY_H_
 #define PARRAY_H_
+
+///
+/// \file parray.h
+///
 
 #include "palloc.h"
 #include "pconfig.h"
@@ -36,21 +36,20 @@ namespace plib {
 		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
 
-	/**
-	 * \brief Array with preallocated or dynamic allocation
-	 *
-	 * Passing SIZE > 0 has the same functionality as a std::array.
-	 * SIZE = 0 is pure dynamic allocation, the actual array size is passed to the
-	 * constructor.
-	 * SIZE < 0 reserves abs(SIZE) elements statically in place allocated. The
-	 * actual size is passed in by the constructor.
-	 * This array is purely intended for HPC application where depending on the
-	 * architecture a preference dynamic/static has to be made.
-	 *
-	 * This struct is not intended to be a full replacement to std::array.
-	 * It is a subset to enable switching between dynamic and static allocation.
-	 * I consider > 10% performance difference to be a use case.
-	 */
+	/// \brief Array with preallocated or dynamic allocation.
+	///
+	/// Passing SIZE > 0 has the same functionality as a std::array.
+	/// SIZE = 0 is pure dynamic allocation, the actual array size is passed to the
+	/// constructor.
+	/// SIZE < 0 reserves abs(SIZE) elements statically in place allocated. The
+	/// actual size is passed in by the constructor.
+	/// This array is purely intended for HPC application where depending on the
+	/// architecture a preference dynamic/static has to be made.
+	///
+	/// This struct is not intended to be a full replacement to std::array.
+	/// It is a subset to enable switching between dynamic and static allocation.
+	/// I consider > 10% performance difference to be a use case.
+	///
 
 	template <typename FT, int SIZE>
 	struct parray
@@ -96,7 +95,7 @@ namespace plib {
 		}
 
 
-		/* allow construction in fixed size arrays */
+		// allow construction in fixed size arrays
 		parray()
 		: m_size(SIZEABS())
 		{
@@ -176,4 +175,4 @@ namespace plib {
 
 
 
-#endif /* PARRAY_H_ */
+#endif // PARRAY_H_

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * ptokenizer.h
- *
- */
 
 #ifndef PTOKENIZER_H_
 #define PTOKENIZER_H_
+
+///
+/// \file ptokenizer.h
+///
 
 #include "plists.h"
 #include "pstream.h"
@@ -94,7 +94,7 @@ namespace plib {
 
 		pstring currentline_str();
 
-		/* tokenizer stuff follows ... */
+		// tokenizer stuff follows ...
 
 		token_t get_token();
 		pstring get_string();
@@ -147,7 +147,7 @@ namespace plib {
 		pstring::const_iterator m_px;
 		pstring::value_type m_unget;
 
-		/* tokenizer stuff follows ... */
+		// tokenizer stuff follows ...
 
 		pstring m_identifier_chars;
 		pstring m_number_chars;
@@ -160,11 +160,12 @@ namespace plib {
 		token_id_t m_tok_comment_end;
 		token_id_t m_tok_line_comment;
 
-		/* source locations, vector used as stack because we need to loop through stack */
+		// source locations, vector used as stack because we need to loop through stack
+
 		bool m_support_line_markers;
 		std::vector<plib::source_location> m_source_location;
 	};
 
 } // namespace plib
 
-#endif /* PTOKENIZER_H_ */
+#endif // PTOKENIZER_H_

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstonuml.h
- *
- */
 
 #ifndef PSTONUM_H_
 #define PSTONUM_H_
+
+///
+/// \file pstonum.h
+///
 
 #include "pconfig.h"
 #include "pexception.h"
@@ -145,4 +145,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* PUTIL_H_ */
+#endif // PUTIL_H_

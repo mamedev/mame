@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstring.cpp
- *
- */
 
 #include "pstring.h"
 #include "palloc.h"

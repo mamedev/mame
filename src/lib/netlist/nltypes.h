@@ -25,20 +25,20 @@
 
 namespace netlist
 {
-	/// @brief plib::constants struct specialized for nl_fptype.
+	/// \brief plib::constants struct specialized for nl_fptype.
 	///
 	struct nlconst : public plib::constants<nl_fptype>
 	{
 	};
 
-	/// @brief netlist_sig_t is the type used for logic signals.
+	/// \brief netlist_sig_t is the type used for logic signals.
 	///
-	///  This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
-	///  The choice has little to no impact on performance.
+	/// This may be any of bool, uint8_t, uint16_t, uin32_t and uint64_t.
+	/// The choice has little to no impact on performance.
 	///
 	using netlist_sig_t = std::uint32_t;
 
-	/// @brief Interface definition for netlist callbacks into calling code
+	/// \brief Interface definition for netlist callbacks into calling code
 	///
 	/// A class inheriting from netlist_callbacks_t has to be passed to the netlist_t
 	/// constructor. Netlist does processing during construction and thus needs

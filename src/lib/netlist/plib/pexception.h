@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * palloc.h
- *
- */
 
 #ifndef PEXCEPTION_H_
 #define PEXCEPTION_H_
+
+///
+/// \file: pexception.h
+///
 
 #include "pstring.h"
 #include "ptypes.h"
@@ -15,19 +15,18 @@
 
 namespace plib {
 
-	/*! Terminate the program.
-	 *
-	 * \note could be enhanced by setting a termination handler
-	 */
+	/// \brief Terminate the program.
+	///
+	/// \note could be enhanced by setting a termination handler
+	///
 	[[noreturn]] void terminate(const pstring &msg) noexcept;
 
-
-	///! throw an exception.
+	/// \brief throw an exception.
 	///
 	/// throws an exception E. The purpose is to clearly identify exception
 	/// throwing in the code
 	///
-	/// @tparam E Type of exception to be thrown
+	/// \tparam E Type of exception to be thrown
 	///
 	template<typename E, typename... Args>
 	[[noreturn]] static inline void pthrow(Args&&... args) noexcept(false)
@@ -87,9 +86,9 @@ namespace plib {
 		explicit out_of_mem_e(const pstring &location);
 	};
 
-	/* FIXME: currently only a stub for later use. More use could be added by
-	 * using “-fnon-call-exceptions" and sigaction to enable c++ exception supported.
-	 */
+	// FIXME: currently only a stub for later use. More use could be added by
+	// using “-fnon-call-exceptions" and sigaction to enable c++ exception supported.
+	//
 
 	class fpexception_e : public pexception
 	{
@@ -104,10 +103,8 @@ namespace plib {
 	static constexpr unsigned FP_INVALID = 0x00010;
 	static constexpr unsigned FP_ALL = 0x0001f;
 
-	/*
-	 * Catch SIGFPE on linux for debugging purposes.
-	 */
-
+	/// \brief Catch SIGFPE on linux for debugging purposes.
+	///
 	class fpsignalenabler
 	{
 	public:
@@ -117,9 +114,16 @@ namespace plib {
 
 		~fpsignalenabler();
 
-		/* is the functionality supported ? */
+		/// \brief is the functionality supported.
+		///
+		/// \return current status
+		///
 		static bool supported();
-		/* returns last global enable state */
+		/// \brief get/set global enable status
+		///
+		/// \param enable new status
+		/// \return returns last global enable state
+		///
 		static bool global_enable(bool enable);
 
 	private:
@@ -131,4 +135,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PEXCEPTION_H_ */
+#endif // PEXCEPTION_H_

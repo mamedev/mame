@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pmath.h
- *
- */
 
 #ifndef PMATH_H_
 #define PMATH_H_
+
+///
+/// \file pmath.h
+///
 
 #include "pconfig.h"
 
@@ -21,13 +21,13 @@
 namespace plib
 {
 
-	/*! Holds constants used repeatedly.
-	 *
-	 *  @tparam T floating point type
-	 *
-	 *  Using the structure members we can avoid magic numbers in the code.
-	 *  In addition, this is a typesafe approach.
-	 */
+	/// \brief Holds constants used repeatedly.
+	///
+	///  \tparam T floating point type
+	///
+	///  Using the structure members we can avoid magic numbers in the code.
+	///  In addition, this is a typesafe approach.
+	///
 	template <typename T>
 	struct constants
 	{
@@ -40,51 +40,50 @@ namespace plib
 		static inline constexpr T sqrt2()  noexcept { return static_cast<T>(1.414213562373095048801688724209L); }
 		static inline constexpr T pi()     noexcept { return static_cast<T>(3.14159265358979323846264338327950L); }
 
-		/*!
-		 * \brief Electric constant of vacuum
-		 */
+		/// \brief Electric constant of vacuum
+		///
 		static inline constexpr T eps_0() noexcept { return static_cast<T>(8.854187817e-12); }
-		/*!
-		 * \brief Relative permittivity of Silicon dioxide
-		 */
+
+		// \brief Relative permittivity of Silicon dioxide
+		///
 		static inline constexpr T eps_SiO2() noexcept { return static_cast<T>(3.9); }
-		/*!
-		 * \brief Relative permittivity of Silicon
-		 */
+
+		/// \brief Relative permittivity of Silicon
+		///
 		static inline constexpr T eps_Si() noexcept { return static_cast<T>(11.7); }
-		/*!
-		 * \brief Boltzmann constant
-		 */
+
+		/// \brief Boltzmann constant
+		///
 		static inline constexpr T k_b() noexcept { return static_cast<T>(1.38064852e-23); }
-		/*!
-		 * \brief room temperature (gives VT = 0.02585 at T=300)
-		 */
+
+		/// \brief room temperature (gives VT = 0.02585 at T=300)
+		///
 		static inline constexpr T T0() noexcept { return static_cast<T>(300); }
-		/*!
-		 * \brief Elementary charge
-		 */
+
+		/// \brief Elementary charge
+		///
 		static inline constexpr T Q_e() noexcept { return static_cast<T>(1.6021765314e-19); }
-		/*!
-		 * \brief Intrinsic carrier concentration in 1/m^3 of Silicon
-		 */
+
+		/// \brief Intrinsic carrier concentration in 1/m^3 of Silicon
+		///
 		static inline constexpr T NiSi() noexcept { return static_cast<T>(1.45e16); }
-		/*!
-		 * \brief clearly identify magic numbers in code
-		 *
-		 * Magic numbers should be avoided. The magic member at least clearly
-		 * identifies them and makes it easier to convert them to named constants
-		 * later.
-		 */
+
+		/// \brief clearly identify magic numbers in code
+		///
+		/// Magic numbers should be avoided. The magic member at least clearly
+		/// identifies them and makes it easier to convert them to named constants
+		/// later.
+		///
 		template <typename V>
 		static inline constexpr const T magic(V &&v) noexcept { return static_cast<T>(v); }
 	};
 
-	/*! typesafe reciprocal function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return reciprocal of argument
-	 */
+	/// \brief typesafe reciprocal function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return reciprocal of argument
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	reciprocal(T v) noexcept
@@ -92,12 +91,12 @@ namespace plib
 		return constants<T>::one() / v;
 	}
 
-	/*! abs function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return absolute value of argument
-	 */
+	/// \brief abs function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return absolute value of argument
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	abs(T v) noexcept
@@ -105,12 +104,12 @@ namespace plib
 		return std::abs(v);
 	}
 
-	/*! sqrt function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return absolute value of argument
-	 */
+	/// \brief sqrt function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return absolute value of argument
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	sqrt(T v) noexcept
@@ -118,13 +117,13 @@ namespace plib
 		return std::sqrt(v);
 	}
 
-	/*! hypot function
-	 *
-	 * @tparam T type of the arguments
-	 * @param  v1 first argument
-	 * @param  v2 second argument
-	 * @return sqrt(v1*v1+v2*v2)
-	 */
+	/// \brief hypot function
+	///
+	/// \tparam T type of the arguments
+	/// \param  v1 first argument
+	/// \param  v2 second argument
+	/// \return sqrt(v1*v1+v2*v2)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	hypot(T v1, T v2) noexcept
@@ -132,12 +131,12 @@ namespace plib
 		return std::hypot(v1, v2);
 	}
 
-	/*! exp function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return exp(v)
-	 */
+	/// \brief exp function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return exp(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	exp(T v) noexcept
@@ -145,12 +144,12 @@ namespace plib
 		return std::exp(v);
 	}
 
-	/*! log function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return log(v)
-	 */
+	/// \brief log function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return log(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	log(T v) noexcept
@@ -158,12 +157,12 @@ namespace plib
 		return std::log(v);
 	}
 
-	/*! tanh function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return tanh(v)
-	 */
+	/// \brief tanh function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return tanh(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	tanh(T v) noexcept
@@ -171,12 +170,12 @@ namespace plib
 		return std::tanh(v);
 	}
 
-	/*! floor function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return floor(v)
-	 */
+	/// \brief floor function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return floor(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	floor(T v) noexcept
@@ -184,12 +183,12 @@ namespace plib
 		return std::floor(v);
 	}
 
-	/*! log1p function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return log(1 + v)
-	 */
+	/// \brief log1p function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return log(1 + v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	log1p(T v) noexcept
@@ -197,12 +196,12 @@ namespace plib
 		return std::log1p(v);
 	}
 
-	/*! sin function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return sin(v)
-	 */
+	/// \brief sin function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return sin(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	sin(T v) noexcept
@@ -210,12 +209,12 @@ namespace plib
 		return std::sin(v);
 	}
 
-	/*! cos function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return cos(v)
-	 */
+	/// \brief cos function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return cos(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	cos(T v) noexcept
@@ -223,12 +222,12 @@ namespace plib
 		return std::cos(v);
 	}
 
-	/*! trunc function
-	 *
-	 * @tparam T type of the argument
-	 * @param  v argument
-	 * @return trunc(v)
-	 */
+	/// \brief trunc function
+	///
+	/// \tparam T type of the argument
+	/// \param  v argument
+	/// \return trunc(v)
+	///
 	template <typename T>
 	static inline constexpr typename std::enable_if<std::is_floating_point<T>::value, T>::type
 	trunc(T v) noexcept
@@ -236,16 +235,16 @@ namespace plib
 		return std::trunc(v);
 	}
 
-	/*! pow function
-	 *
-	 * @tparam T1 type of the first argument
-	 * @tparam T2 type of the second argument
-	 * @param  v argument
-	 * @param  p power
-	 * @return v^p
-	 *
-	 * FIXME: limited implementation
-	 */
+	/// \brief pow function
+	///
+	/// \tparam T1 type of the first argument
+	/// \tparam T2 type of the second argument
+	/// \param  v argument
+	/// \param  p power
+	/// \return v^p
+	///
+	/// FIXME: limited implementation
+	///
 	template <typename T1, typename T2>
 	static inline T1
 	pow(T1 v, T2 p) noexcept
@@ -334,4 +333,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* PMATH_H_ */
+#endif // PMATH_H_

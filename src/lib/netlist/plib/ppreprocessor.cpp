@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * ppreprocessor.cpp
- *
- */
 
 #include "ppreprocessor.h"
 #include "palloc.h"
@@ -77,19 +73,18 @@ namespace plib {
 		: m_tokens(tokens), m_parent(parent), m_pos(0)
 		{}
 
-		/**! skip white space in token list
-		 *
-		 */
+		/// \brief skip white space in token list
+		///
 		void skip_ws()
 		{
 			while (m_pos < m_tokens.size() && (m_tokens[m_pos] == " " || m_tokens[m_pos] == "\t"))
 				m_pos++;
 		}
 
-		/**! return next token skipping white space
-		 *
-		 * @return next token
-		 */
+		/// \brief return next token skipping white space
+		///
+		/// \return next token
+		///
 		pstring next()
 		{
 			skip_ws();
@@ -98,10 +93,10 @@ namespace plib {
 			return m_tokens[m_pos++];
 		}
 
-		/**! return next token including white space
-		 *
-		 * @return next token
-		 */
+		/// \brief return next token including white space
+		///
+		/// \return next token
+		///
 		pstring next_ws()
 		{
 			if (m_pos >= m_tokens.size())
@@ -497,7 +492,7 @@ namespace plib {
 					if (startsWith(arg, "\"") && endsWith(arg, "\""))
 					{
 						arg = arg.substr(1, arg.length() - 2);
-						/* first try local context */
+						// first try local context
 						auto l(plib::util::buildpath({m_stack.back().m_local_path, arg}));
 						auto lstrm(m_sources.get_stream<>(l));
 						if (lstrm)

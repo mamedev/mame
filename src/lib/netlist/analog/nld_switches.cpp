@@ -1,16 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_legacy.c
- *
- */
 
 #include "nlid_twoterm.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_factory.h"
 #include "netlist/solver/nld_solver.h"
 
-/* FIXME : convert to parameters */
+// FIXME : convert to parameters
 
 #define R_OFF   (plib::reciprocal(exec().gmin()))
 #define R_ON    nlconst::magic(0.01)

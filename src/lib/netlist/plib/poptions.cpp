@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * poptions.cpp
- *
- */
 
 #include "poptions.h"
 #include "pexception.h"
@@ -11,9 +7,6 @@
 #include "ptypes.h"
 
 namespace plib {
-/***************************************************************************
-    Options
-***************************************************************************/
 
 	option_base::option_base(options &parent, const pstring &help)
 	: m_help(help)

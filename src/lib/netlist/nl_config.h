@@ -10,7 +10,7 @@
 #include "plib/pconfig.h"
 
 /// \addtogroup compiledefine
-/// @{
+/// \{
 
 //============================================================
 //  GENERAL
@@ -107,7 +107,7 @@ static constexpr const auto NETLIST_INTERNAL_RES = 1000000000;
 // FIXME: Belongs into MAME netlist.h
 static constexpr const auto NETLIST_CLOCK = NETLIST_INTERNAL_RES;
 
-///  @}
+///  \}
 
 /// \brief  Floating point types used
 ///
@@ -127,7 +127,7 @@ namespace netlist
 {
 	/// \brief  Specific constants depending on floating type
 	///
-	///  @tparam FT floating point type: double/float
+	/// \tparam FT floating point type: double/float
 	///
 	template <typename FT>
 	struct fp_constants

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * palloc.h
- *
- */
 
 #ifndef PALLOC_H_
 #define PALLOC_H_
+
+///
+/// \file palloc.h
+///
 
 #include "pconfig.h"
 #include "pstring.h"
@@ -59,9 +59,9 @@ namespace plib {
 			   std::enable_if<std::is_convertible< U*, T*>::value>::type>
 		arena_deleter(const arena_deleter<PU, U> &rhs) : m_a(rhs.m_a) { }
 #endif
-		void operator()(T *p) noexcept //const
+		void operator()(T *p) noexcept
 		{
-			/* call destructor */
+			// call destructor
 			p->~T();
 			getref(m_a).deallocate(p);
 		}
@@ -156,9 +156,9 @@ namespace plib {
 			m_ptr = nullptr;
 		}
 
-		/**
-		 * \brief Return @c true if the stored pointer is not null.
-		 */
+		///
+		/// \brief Return \c true if the stored pointer is not null.
+		///
 		explicit operator bool() const noexcept { return m_ptr != nullptr; }
 
 		pointer  release()
@@ -349,7 +349,7 @@ namespace plib {
 	};
 
 	template <typename T, std::size_t ALIGN>
-	/*inline */ C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
+	C14CONSTEXPR T *assume_aligned_ptr(T *p) noexcept
 	{
 		static_assert(ALIGN >= alignof(T), "Alignment must be greater or equal to alignof(T)");
 		static_assert(is_pow2(ALIGN), "Alignment must be a power of 2");
@@ -473,4 +473,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PALLOC_H_ */
+#endif // PALLOC_H_

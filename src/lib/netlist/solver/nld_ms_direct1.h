@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct1.h
- *
- */
 
 #ifndef NLD_MS_DIRECT1_H_
 #define NLD_MS_DIRECT1_H_
+
+///
+/// \file nld_ms_direct1.h
+///
 
 #include "nld_ms_direct.h"
 #include "nld_solver.h"
@@ -52,4 +52,4 @@ namespace solver
 } // namespace netlist
 
 
-#endif /* NLD_MS_DIRECT1_H_ */
+#endif // NLD_MS_DIRECT1_H_

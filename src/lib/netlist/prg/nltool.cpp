@@ -1,12 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
 
-    nltool.c
-
-    Simple tool to debug netlists outside MAME.
-
-****************************************************************************/
+// ***************************************************************************
+//
+//    nltool.cpp
+//
+//    Simple tool to debug netlists outside MAME.
+//
+// ***************************************************************************
 
 #include "netlist/plib/pmain.h"
 #include "netlist/plib/pstrutil.h"
@@ -149,16 +150,16 @@ private:
 };
 
 static NETLIST_START(dummy)
-	/* Standard stuff */
+	// Standard stuff
 
 	CLOCK(clk, 1000) // 1000 Hz
 	SOLVER(Solver, 48000)
 
 NETLIST_END()
 
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
+// **************************************************************************
+//    CORE IMPLEMENTATION
+// **************************************************************************
 
 class netlist_data_folder_t : public netlist::source_data_t
 {
@@ -244,7 +245,6 @@ public:
 		for (auto & log : logs)
 		{
 			pstring name = "log_" + log;
-			/*netlist_device_t *nc = */ setup().register_dev("LOG", name);
 			setup().register_link(name + ".I", log);
 		}
 	}
@@ -544,15 +544,15 @@ void tool_app_t::static_compile()
 
 
 
-/* "Description: The Swiss army knife for timing purposes\n"
-* "    which has a ton of applications.\n"
-* "DipAlias: GND,TRIG,OUT,RESET,VCC,DISCH,THRES,CONT\n"
-* "Package: DIP\n"
-* "NamingConvention: Naming conventions follow Texas Instruments datasheet\n"
-* "Limitations: Internal resistor network currently fixed to 5k\n"
-* "     more limitations\n"
-* "FunctionTable:\n"
-*/
+// "Description: The Swiss army knife for timing purposes\n"
+// "    which has a ton of applications.\n"
+// "DipAlias: GND,TRIG,OUT,RESET,VCC,DISCH,THRES,CONT\n"
+// "Package: DIP\n"
+// "NamingConvention: Naming conventions follow Texas Instruments datasheet\n"
+// "Limitations: Internal resistor network currently fixed to 5k\n"
+// "     more limitations\n"
+// "FunctionTable:\n"
+//
 
 struct doc_ext
 {
@@ -733,9 +733,9 @@ void tool_app_t::create_header()
 	pout("#include \"nl_setup.h\"\n");
 	pout("#ifndef __PLIB_PREPROCESSOR__\n");
 	pout("\n");
-	pout("/* ----------------------------------------------------------------------------\n");
-	pout(" *  Netlist Macros\n");
-	pout(" * ---------------------------------------------------------------------------*/\n");
+	pout("// ----------------------------------------------------------------------------\n");
+	pout("//  Netlist Macros\n");
+	pout("// ---------------------------------------------------------------------------\n");
 	pout("\n");
 
 	pstring last_source("");
@@ -774,19 +774,20 @@ void tool_app_t::create_docheader()
 
 	pout("// license:GPL-2.0+\n");
 	pout("// copyright-holders:Couriersud\n");
-	pout("/* ----------------------------------------------------------------------------\n");
-	pout(" *  Automatically created file. DO NOT MODIFY.\n");
-	pout(" * ---------------------------------------------------------------------------*/\n");
-	pout("/*!\n");
-	pout(" * \\page devices Devices\n");
-	pout(" *\n");
-	pout(" * Below is a list of all the devices currently known to the system ...\n");
-	pout(" *\n");
+	pout("\n");
+	pout("// ----------------------------------------------------------------------------\n");
+	pout("//  Automatically created file. DO NOT MODIFY.\n");
+	pout("// ---------------------------------------------------------------------------\n");
+	pout("///\n");
+	pout("/// \\page devices Devices\n");
+	pout("///\n");
+	pout("/// Below is a list of all the devices currently known to the system ...\n");
+	pout("///\n");
 
 	for (auto &s : devs)
-		pout(" * - @subpage {1}\n", s);
+		pout("/// - @subpage {1}\n", s);
 
-	pout(" */\n");
+	pout("\n");
 
 	for (auto &e : nt.setup().factory())
 	{
@@ -873,9 +874,9 @@ void tool_app_t::create_docheader()
 }
 
 
-/*-------------------------------------------------
-    listdevices - list all known devices
--------------------------------------------------*/
+// -------------------------------------------------
+//    listdevices - list all known devices
+// -------------------------------------------------
 
 void tool_app_t::listdevices()
 {
@@ -924,9 +925,9 @@ void tool_app_t::listdevices()
 	}
 }
 
-/*-------------------------------------------------
-    convert - convert spice et al to netlist
--------------------------------------------------*/
+// -------------------------------------------------
+//    convert - convert spice et al to netlist
+// -------------------------------------------------
 
 void tool_app_t::convert()
 {
@@ -966,13 +967,13 @@ void tool_app_t::convert()
 		c.convert(contents);
 		result = c.result();
 	}
-	/* present result */
+	// present result
 	pout.write(result);
 }
 
-/*-------------------------------------------------
-    main - primary entry point
--------------------------------------------------*/
+// -------------------------------------------------
+//    main - primary entry point
+// -------------------------------------------------
 
 #if 0
 static const pstring pmf_verbose[] =

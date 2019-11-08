@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_opamps.c
- *
- */
 
 #include "nld_opamps.h"
 #include "netlist/nl_base.h"
@@ -15,63 +11,63 @@ namespace netlist
 {
 	namespace analog
 	{
-	/*
-	 * Type = 0: Impedance changer
-	 *        1; Idealized opamp
-	 *        2; opamp with first pole
-	 *        3: opamp with first pole + output limit
-	 *        4: opamp with input stage, first pole + output limit
-	 *
-	 * Type 1 parameters:
-	 *     FPF = frequency of first pole in Hz (ony used for open-loop gain)
-	 *     UGF = unity gain frequency in Hz (only used for open-loop gain)
-	 *     RI = input resistance in Ohms
-	 *     RO = output resistance in Ohms
-	 *
-	 * Type 3 parameters:
-	 *     VLH = high supply rail minus high output swing in V
-	 *     VLL = low output swing minus low supply rail in V
-	 *     FPF = frequency of first pole in Hz
-	 *     UGF = unity gain frequency (transition frequency) in Hz
-	 *     SLEW = unity gain slew rate in V/s
-	 *     RI = input resistance in Ohms
-	 *     RO = output resistance in Ohms
-	 *     DAB = Differential Amp Bias ~ op amp's total quiescent current.
-	 *
-	 * .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
-	 *
-	 * http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
-	 *
-	 * */
 
-	/*! Class representing the opamp model parameters.
-	 *  The opamp model was designed based on designs from
-	 *  http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm.
-	 *  Currently 2 different types are supported: Type 1 and Type 3. Type 1
-	 *  is less complex and should run faster than Type 3.
-	 *
-	 *  This is an extension to the traditional SPICE approach which
-	 *  assumes that you will be using an manufacturer model. These models may
-	 *  have copyrights incompatible with the netlist license. Thus they may not
-	 *  be suitable for certain implementations of netlist.
-	 *
-	 *  For the typical use cases in low frequency (< 100 KHz) applications at
-	 *  which netlist is targeted, this model is certainly suitable. All parameters
-	 *  can be determined from a typical opamp datasheet.
-	 *
-	 *   |Type|name  |parameter                                      |units|default| example|
-	 *   |:--:|:-----|:----------------------------------------------|:----|------:|-------:|
-	 *   |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
-	 *   |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
-	 *   |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
-	 *   |1,3 |RI    |input resistance                               |Ohm  |       |1M      |
-	 *   |1,3 |RO    |output resistance                              |Ohm  |       |50      |
-	 *   |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
-	 *   |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
-	 *   |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
-	 *   |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
-	 */
-
+	/// \brief Class representing the opamp model parameters.
+	///
+	///  The opamp model was designed based on designs from
+	///  http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm.
+	///  Currently 2 different types are supported: Type 1 and Type 3. Type 1
+	///  is less complex and should run faster than Type 3.
+	///
+	///  This is an extension to the traditional SPICE approach which
+	///  assumes that you will be using an manufacturer model. These models may
+	///  have copyrights incompatible with the netlist license. Thus they may not
+	///  be suitable for certain implementations of netlist.
+	///
+	///  For the typical use cases in low frequency (< 100 KHz) applications at
+	///  which netlist is targeted, this model is certainly suitable. All parameters
+	///  can be determined from a typical opamp datasheet.
+	///
+	///   |Type|name  |parameter                                      |units|default| example|
+	///   |:--:|:-----|:----------------------------------------------|:----|------:|-------:|
+	///   |  3 |TYPE  |Model Type, 1 and 3 are supported              |     |       |        |
+	///   |1,3 |FPF   |frequency of first pole                        |Hz   |       |100     |
+	///   |  3 |SLEW  |unity gain slew rate                           |V/s  |       |       1|
+	///   |1,3 |RI    |input resistance                               |Ohm  |       |1M      |
+	///   |1,3 |RO    |output resistance                              |Ohm  |       |50      |
+	///   |1,3 |UGF   |unity gain frequency (transition frequency)    |Hz   |       |1000    |
+	///   |  3 |VLL   |low output swing minus low supply rail         |V    |       |1.5     |
+	///   |  3 |VLH   |high supply rail minus high output swing       |V    |       |1.5     |
+	///   |  3 |DAB   |Differential Amp Bias - total quiescent current|A    |       |0.001   |
+	///
+	///
+	/// Type = 0: Impedance changer
+	///        1; Idealized opamp
+	///        2; opamp with first pole
+	///        3: opamp with first pole + output limit
+	///        4: opamp with input stage, first pole + output limit
+	///
+	/// Type 1 parameters:
+	///     FPF = frequency of first pole in Hz (ony used for open-loop gain)
+	///     UGF = unity gain frequency in Hz (only used for open-loop gain)
+	///     RI = input resistance in Ohms
+	///     RO = output resistance in Ohms
+	///
+	/// Type 3 parameters:
+	///     VLH = high supply rail minus high output swing in V
+	///     VLL = low output swing minus low supply rail in V
+	///     FPF = frequency of first pole in Hz
+	///     UGF = unity gain frequency (transition frequency) in Hz
+	///     SLEW = unity gain slew rate in V/s
+	///     RI = input resistance in Ohms
+	///     RO = output resistance in Ohms
+	///     DAB = Differential Amp Bias ~ op amp's total quiescent current.
+	///
+	/// .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
+	///
+	/// http://www.ecircuitcenter.com/Circuits/opmodel1/opmodel1.htm
+	///
+	///
 	class opamp_model_t : public param_model_t
 	{
 	public:
@@ -192,7 +188,7 @@ namespace netlist
 		analog_output_t m_VL;
 		analog_output_t m_VREF;
 
-		/* state */
+		// state
 		int m_type;
 	};
 

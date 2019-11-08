@@ -1,16 +1,16 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_sor.h
- *
- * Generic successive over relaxation solver.
- *
- * Fow w==1 we will do the classic Gauss-Seidel approach
- *
- */
 
 #ifndef NLD_MS_SOR_MAT_H_
 #define NLD_MS_SOR_MAT_H_
+
+///
+/// \file nld_ms_sor.h
+///
+/// Generic successive over relaxation solver.
+///
+/// For w==1 we will do the classic Gauss-Seidel approach
+///
 
 #include "nld_matrix_solver.h"
 #include "nld_ms_direct.h"
@@ -62,9 +62,9 @@ namespace solver
 	template <unsigned m_N, unsigned storage_N>
 	float_type matrix_solver_SOR_mat_t<m_N, storage_N>::vsolve()
 	{
-		/*
-		 * enable linear prediction on first newton pass
-		 */
+		//
+		// enable linear prediction on first newton pass
+		//
 
 		if (this->m_params->use_linear_prediction)
 			for (unsigned k = 0; k < this->size(); k++)
@@ -109,10 +109,9 @@ namespace solver
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_SOR_mat_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
-		/* The matrix based code looks a lot nicer but actually is 30% slower than
-		 * the optimized code which works directly on the data structures.
-		 * Need something like that for gaussian elimination as well.
-		 */
+		// The matrix based code looks a lot nicer but actually is 30% slower than
+		// the optimized code which works directly on the data structures.
+		// Need something like that for gaussian elimination as well.
 
 		const std::size_t iN = this->size();
 
@@ -220,4 +219,4 @@ namespace solver
 } // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_GAUSS_SEIDEL_H_ */
+#endif // NLD_MS_SOR_MAT_

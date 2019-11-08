@@ -1,12 +1,13 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
 
-    netlib.c
-
-    Discrete netlist implementation.
-
-****************************************************************************/
+// ***************************************************************************
+//
+//    netlib.c
+//
+//    Discrete netlist implementation.
+//
+// ***************************************************************************
 
 #include "net_lib.h"
 #include "netlist/nl_factory.h"
@@ -134,7 +135,7 @@ namespace devices
 		LIB_ENTRY(CD4316_GATE)
 		LIB_ENTRY(4538_dip)
 		LIB_ENTRY(schmitt_trigger)
-		/* entries with suffix WI are legacy only */
+		// entries with suffix WI are legacy only
 		//ENTRY(4066,                 CD_4066,              "+A,B")
 		LIB_ENTRY(NE555)
 		LIB_ENTRY(NE555_dip)
