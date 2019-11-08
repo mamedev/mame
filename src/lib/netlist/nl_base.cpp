@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlbase.c
- *
- */
 
 #include "solver/nld_matrix_solver.h"
 #include "solver/nld_solver.h"
@@ -339,10 +335,9 @@ namespace netlist
 			dev.second->update_param();
 
 		// Step all devices once !
-		/*
-		 * INFO: The order here affects power up of e.g. breakout. However, such
-		 * variations are explicitly stated in the breakout manual.
-		 */
+		//
+		// INFO: The order here affects power up of e.g. breakout. However, such
+		// variations are explicitly stated in the breakout manual.
 
 		auto *netlist_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
@@ -401,7 +396,7 @@ namespace netlist
 		}
 
 	#if 1
-		/* the above may screw up m_active and the list */
+		// the above may screw up m_active and the list
 		rebuild_lists();
 	#endif
 	}
@@ -442,8 +437,8 @@ namespace netlist
 			const auto clang_workaround_unreachable_code = NL_USE_QUEUE_STATS;
 			if (clang_workaround_unreachable_code)
 			{
-				/* Only one serialization should be counted in total time */
-				/* But two are contained in m_stat_mainloop */
+				// Only one serialization should be counted in total time
+				// But two are contained in m_stat_mainloop
 				plib::pperftime_t<true> overhead;
 				plib::pperftime_t<true> test;
 				{
@@ -602,9 +597,8 @@ namespace netlist
 		state().setup().register_link_fqn(name() + "." + t1, name() + "." + t2);
 	}
 
-	/* FIXME: this is only used by solver code since matrix solvers are started in
-	 *        post_start.
-	 */
+	// FIXME: this is only used by solver code since matrix solvers are started in
+	//        post_start.
 	void device_t::connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 	{
 		if (!state().setup().connect(t1, t2))
@@ -651,7 +645,7 @@ namespace netlist
 
 	void detail::net_t::rebuild_list()
 	{
-		/* rebuild m_list */
+		// rebuild m_list
 
 		m_list_active.clear();
 		for (auto & term : m_core_terms)
@@ -676,7 +670,7 @@ namespace netlist
 		if (p != nullptr)
 			p->m_cur_Analog = nlconst::zero();
 
-		/* rebuild m_list and reset terminals to active or analog out state */
+		// rebuild m_list and reset terminals to active or analog out state
 
 		m_list_active.clear();
 		for (core_terminal_t *ct : m_core_terms)

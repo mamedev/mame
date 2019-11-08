@@ -38,7 +38,7 @@
 #define DIPPINS(pin1, ...)                                                     \
 		setup.register_dippins_arr( # pin1 ", " # __VA_ARGS__);
 
-/* to be used to reference new library truthtable devices */
+// to be used to reference new library truthtable devices
 #define NET_REGISTER_DEV(type, name)                                           \
 		setup.register_dev(# type, # name);
 
@@ -80,7 +80,6 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 #define SUBMODEL(model, name)                                                  \
 		setup.namespace_push(# name);                                          \
 		setup.include(# model);                                                \
-		/*NETLIST_NAME(model)(setup);*/                                        \
 		setup.namespace_pop();
 
 #define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
@@ -208,7 +207,7 @@ namespace netlist
 	{
 	public:
 		void register_model(const pstring &model_in);
-		/* model / family related */
+		// model / family related
 
 		pstring value_str(const pstring &model, const pstring &entity);
 
@@ -265,7 +264,7 @@ namespace netlist
 		void register_lib_entry(const pstring &name, const pstring &sourcefile);
 		void register_frontier(const pstring &attach, const nl_fptype r_IN, const nl_fptype r_OUT);
 
-		/* register a source */
+		// register a source
 		void register_source(plib::unique_ptr<plib::psource_t> &&src)
 		{
 			m_sources.add_source(std::move(src));
@@ -273,25 +272,25 @@ namespace netlist
 
 		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
 
-		/* handle namespace */
+		// handle namespace
 
 		void namespace_push(const pstring &aname);
 		void namespace_pop();
 
-		/* include other files */
+		// include other files
 
 		void include(const pstring &netlist_name);
 
 		pstring build_fqn(const pstring &obj_name) const;
 		void register_alias_nofqn(const pstring &alias, const pstring &out);
 
-		/* also called from devices for latebinding connected terminals */
+		// also called from devices for latebinding connected terminals
 		void register_link_fqn(const pstring &sin, const pstring &sout);
 
-		/* used from netlist.cpp (mame) */
+		// used from netlist.cpp (mame)
 		bool device_exists(const pstring &name) const;
 
-		/* FIXME: used by source_t - need a different approach at some time */
+		// FIXME: used by source_t - need a different approach at some time
 		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
 
 		void add_include(plib::unique_ptr<plib::psource_t> &&inc)
@@ -312,13 +311,13 @@ namespace netlist
 		log_type &log() { return m_log; }
 		const log_type &log() const { return m_log; }
 
-		/* FIXME: sources may need access to the netlist parent type
-		 * since they may be created in a context in which they don't
-		 * have access to their environment.
-		 * Example is the MAME memregion source.
-		 * We thus need a better approach to creating netlists in a context
-		 * other than static procedures.
-		 */
+		// FIXME: sources may need access to the netlist parent type
+		// since they may be created in a context in which they don't
+		// have access to their environment.
+		// Example is the MAME memregion source.
+		// We thus need a better approach to creating netlists in a context
+		// other than static procedures.
+
 		setup_t &setup() { return m_setup; }
 		const setup_t &setup() const { return m_setup; }
 
@@ -336,7 +335,7 @@ namespace netlist
 
 		factory::list_t                             m_factory;
 
-		/* need to preserve order of device creation ... */
+		// need to preserve order of device creation ...
 		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 
 
@@ -377,7 +376,7 @@ namespace netlist
 
 		param_t *find_param(const pstring &param_in, bool required = true) const;
 
-		/* get family */
+		// get family
 		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		void register_dynamic_log_devices();
@@ -388,38 +387,44 @@ namespace netlist
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
 
-		/* helper - also used by nltool */
+		// helper - also used by nltool
 		pstring resolve_alias(const pstring &name) const;
 		pstring de_alias(const pstring &alias) const;
 
-		/* needed by nltool */
+		// needed by nltool
 		std::vector<pstring> get_terminals_for_device_name(const pstring &devname) const;
 
 		log_type &log();
 		const log_type &log() const;
 
-		/* needed by proxy */
+		// needed by proxy
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, const detail::terminal_type atype, bool required = true) const;
 		detail::core_terminal_t *find_terminal(const pstring &terminal_in, bool required = true) const;
 
-		/* core net handling */
+		// core net handling
 
 		void delete_empty_nets();
 
-		/* run preparation */
+		// run preparation
 
 		void prepare_to_run();
 
-		/* validation */
-
-		/* The extended validation mode is not intended for running.
-		 * The intention is to identify power pins which are not properly
-		 * connected. The downside is that this mode creates a netlist which
-		 * is different (and not able to run).
-		 *
-		 * Extended validation is supported by nltool validate option.
-		 */
+		/// \brief set extended validation mode.
+		///
+		/// The extended validation mode is not intended for running.
+		/// The intention is to identify power pins which are not properly
+		/// connected. The downside is that this mode creates a netlist which
+		/// is different (and not able to run).
+		///
+		/// Extended validation is supported by nltool validate option.
+		///
+		/// \param val Boolean value enabling/disabling extended validation mode
 		void set_extended_validation(bool val) { m_validation = val; }
+
+		/// \brief State of extended validation mode.
+		///
+		/// \returns boolean value indicating if extended validation mode is
+		/// turned on.
 		bool is_extended_validation() const { return m_validation; }
 	private:
 
@@ -525,4 +530,4 @@ namespace netlist
 } // namespace netlist
 
 
-#endif /* NLSETUP_H_ */
+#endif // NLSETUP_H_

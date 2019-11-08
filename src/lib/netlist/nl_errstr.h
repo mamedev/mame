@@ -1,10 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*!
- *
- * \file nl_errstr.h
- *
- */
+
+///
+/// \file nl_errstr.h
+///
 
 #ifndef NL_ERRSTR_H_
 #define NL_ERRSTR_H_
@@ -151,4 +150,4 @@ namespace netlist
 } // namespace netlist
 
 
-#endif /* NL_ERRSTR_H_ */
+#endif // NL_ERRSTR_H_

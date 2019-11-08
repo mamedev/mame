@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlsetup.c
- *
- */
 
 #include "plib/palloc.h"
 #include "analog/nld_twoterm.h"
@@ -63,7 +59,7 @@ namespace netlist
 		}
 		else
 		{
-			/* make sure we parse macro library entries */
+			// make sure we parse macro library entries
 			f->macro_actions(*this, name);
 			pstring key = build_fqn(name);
 			if (device_exists(key))
@@ -331,7 +327,7 @@ pstring setup_t::resolve_alias(const pstring &name) const
 	pstring temp = name;
 	pstring ret;
 
-	/* FIXME: Detect endless loop */
+	// FIXME: Detect endless loop
 	do {
 		ret = temp;
 		auto p = m_alias.find(ret);
@@ -347,7 +343,7 @@ pstring setup_t::de_alias(const pstring &alias) const
 	pstring temp = alias;
 	pstring ret;
 
-	/* FIXME: Detect endless loop */
+	// FIXME: Detect endless loop
 	do {
 		ret = temp;
 		temp = "";
@@ -406,10 +402,10 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
-	/* look for default */
+	// look for default
 	if (ret == m_terminals.end())
 	{
-		/* look for ".Q" std output */
+		// look for ".Q" std output
 		ret = m_terminals.find(tname + ".Q");
 	}
 
@@ -430,10 +426,10 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in,
 {
 	const pstring &tname = resolve_alias(terminal_in);
 	auto ret = m_terminals.find(tname);
-	/* look for default */
+	// look for default
 	if (ret == m_terminals.end() && atype == detail::terminal_type::OUTPUT)
 	{
-		/* look for ".Q" std output */
+		// look for ".Q" std output
 		ret = m_terminals.find(tname + ".Q");
 	}
 	if (ret == m_terminals.end() && required)
@@ -489,7 +485,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		auto new_proxy =
 				out_cast.logic_family()->create_d_a_proxy(m_nlstate, x, &out_cast);
 		m_proxy_cnt++;
-		/* connect all existing terminals to new net */
+		// connect all existing terminals to new net
 
 		for (auto & p : out.net().core_terms())
 		{
@@ -534,7 +530,7 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 
 		auto ret = new_proxy.get();
 
-		/* connect all existing terminals to new net */
+		// connect all existing terminals to new net
 
 		if (inp.has_net())
 		{
@@ -639,7 +635,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 	if (out.is_analog())
 	{
 		log().debug("connect_terminal_output: {1} {2}\n", in.name(), out.name());
-		/* no proxy needed, just merge existing terminal net */
+		// no proxy needed, just merge existing terminal net
 		if (in.has_net())
 			merge_nets(out.net(), in.net());
 		else
@@ -794,10 +790,10 @@ void setup_t::resolve_inputs()
 {
 	log().verbose("Resolving inputs ...");
 
-	/* Netlist can directly connect input to input.
-	 * We therefore first park connecting inputs and retry
-	 * after all other terminals were connected.
-	 */
+	// Netlist can directly connect input to input.
+	// We therefore first park connecting inputs and retry
+	// after all other terminals were connected.
+
 	unsigned tries = m_netlist_params->m_max_link_loops();
 	while (m_links.size() > 0 && tries >  0)
 	{
@@ -1113,7 +1109,7 @@ void setup_t::prepare_to_run()
 {
 	register_dynamic_log_devices();
 
-	/* make sure the solver and parameters are started first! */
+	// make sure the solver and parameters are started first!
 
 	for (auto & e : m_device_factory)
 	{
@@ -1129,12 +1125,12 @@ void setup_t::prepare_to_run()
 	auto solver = m_nlstate.get_single_device<devices::NETLIB_NAME(solver)>("solver");
 	m_netlist_params = m_nlstate.get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
-	/* set default model parameters */
+	// set default model parameters
 
 	m_models.register_model(plib::pfmt("NMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
 	m_models.register_model(plib::pfmt("PMOS_DEFAULT _(CAPMOD={1})")(m_netlist_params->m_mos_capmodel()));
 
-	/* create devices */
+	// create devices
 
 	log().debug("Creating devices ...\n");
 	for (auto & e : m_device_factory)
@@ -1190,7 +1186,7 @@ void setup_t::prepare_to_run()
 			d.second->set_hint_deactivate(false);
 	}
 
-	/* resolve inputs */
+	// resolve inputs
 	resolve_inputs();
 
 	log().verbose("looking for two terms connected to rail nets ...");

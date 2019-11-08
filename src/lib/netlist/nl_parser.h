@@ -1,9 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_parser.c
- *
- */
+
+///
+/// \file nl_parser.c
+///
 
 #ifndef NL_PARSER_H_
 #define NL_PARSER_H_
@@ -42,9 +42,6 @@ namespace netlist
 		void net_local_source();
 		void net_truthtable_start(const pstring &nlname);
 
-		/* for debugging messages */
-		//netlist_state_t &netlist() { return m_setup.netlist(); }
-
 		void verror(const pstring &msg) override;
 	private:
 
@@ -77,4 +74,4 @@ namespace netlist
 
 } // namespace netlist
 
-#endif /* NL_PARSER_H_ */
+#endif // NL_PARSER_H_

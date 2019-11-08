@@ -1,12 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/***************************************************************************
 
-    nl_factory.c
-
-    Discrete netlist implementation.
-
-****************************************************************************/
+//
+// nl_factory.cpp
+//
 
 #include "nl_factory.h"
 #include "nl_base.h"

@@ -4,6 +4,7 @@
 #ifndef NLBASE_H_
 #define NLBASE_H_
 
+///
 /// \file nl_base.h
 ///
 
@@ -320,7 +321,6 @@ namespace netlist
 	///          ...
 	///          state_var<unsigned> m_var;
 	///      }
-
 	template <typename T>
 	struct state_var
 	{

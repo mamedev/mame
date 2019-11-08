@@ -209,4 +209,4 @@ namespace netlist
 #endif
 } // namespace netlist
 
-#endif /* NLCONFIG_H_ */
+#endif // NLCONFIG_H_

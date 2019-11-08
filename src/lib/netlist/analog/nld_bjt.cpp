@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_bjt.c
- *
- */
 
 #include "netlist/solver/nld_solver.h"
 #include "netlist/nl_setup.h"

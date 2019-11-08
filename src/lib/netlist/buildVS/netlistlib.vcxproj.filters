@@ -30,9 +30,6 @@
     <ClCompile Include="..\plib\pfunction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\plib\pstream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\plib\pmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,19 +45,7 @@
     <ClCompile Include="..\plib\pexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\plib\pstate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\plib\pparser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\plib\putil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\plib\palloc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\plib\pchrono.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\plib\pdynlib.cpp">
@@ -252,6 +237,21 @@
     <ClCompile Include="..\devices\nld_74164.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\plib\ppreprocessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\plib\ptokenizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_7497.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\devices\nld_schmitt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\analog\nld_mosfet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nl_errstr.h">
@@ -260,16 +260,10 @@
     <ClInclude Include="..\nl_dice_compat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\nl_time.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\nl_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\nl_parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\netlist_types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\nl_factory.h">
@@ -387,9 +381,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\solver\nld_ms_direct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\solver\mat_cr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\solver\nld_ms_direct_lu.h">
@@ -577,6 +568,57 @@
     </ClInclude>
     <ClInclude Include="..\devices\nld_74164.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\gmres.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\mat_cr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\parray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\pmath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\pmatrix2d.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\pmempool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\pomp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\ppreprocessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\pstonum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\pstrutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\ptime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\ptokenizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\plib\vector_ops.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\nld_7497.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\devices\nld_schmitt.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\analog\nld_generic_models.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\analog\nld_mosfet.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
