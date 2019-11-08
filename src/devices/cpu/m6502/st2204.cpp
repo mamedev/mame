@@ -77,6 +77,7 @@ void st2204_device::device_start()
 	intf->irq_service = false;
 
 	init_base_timer(0x0020);
+	init_lcd_timer(0x0040);
 
 	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t0_interrupt), this));
 	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2204_device::t1_interrupt), this));
@@ -404,7 +405,7 @@ void st2204_device::st2xxx_tclk_stop()
 void st2204_device::psg_w(offs_t offset, u8 data)
 {
 	if (BIT(offset, 0))
-		m_psg[offset >> 1] = u16(data << 8) | (m_psg[offset >> 1] & 0x0ff);
+		m_psg[offset >> 1] = u16(data & 0x0f) << 8 | (m_psg[offset >> 1] & 0x0ff);
 	else
 		m_psg[offset >> 1] = data | (m_psg[offset >> 1] & 0xf00);
 }
@@ -417,6 +418,17 @@ void st2204_device::psgc_w(u8 data)
 void st2204_device::dac_w(u8 data)
 {
 	// TODO
+}
+
+unsigned st2204_device::st2xxx_lfr_clocks() const
+{
+	// ST2202 datasheet suggests 1/4 as many clocks in 4-bit mode; this seems too fast for GameKing 3 (TODO: double-check this)
+	unsigned lcdcks = ((m_lxmax + m_lfra) * 2 + 3) * 8 * (m_lymax ? m_lymax : 256);
+
+	if (BIT(m_lckr, 4))
+		return lcdcks * std::max((m_lckr & 0x0f) * 2, 1);
+	else
+		return lcdcks * std::max(((m_lckr & 0x0c) >> 2) * 2, 1);
 }
 
 u8 st2204_device::dmsl_r()

@@ -49,6 +49,7 @@ protected:
 	virtual u8 st2xxx_lctr_mask() const override { return 0xef; }
 	virtual u8 st2xxx_lckr_mask() const override { return 0x3f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0xff; }
+	virtual unsigned st2xxx_lfr_clocks() const override;
 	virtual u8 st2xxx_bctr_mask() const override { return 0xb7; }
 
 private:

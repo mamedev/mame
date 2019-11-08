@@ -62,6 +62,7 @@ void st2205u_device::device_start()
 	intf->ram = make_unique_clear<u8[]>(0x8000);
 
 	init_base_timer(0x0040);
+	init_lcd_timer(0x0080);
 
 	save_item(NAME(m_btc));
 	save_item(NAME(m_tc_12bit));
@@ -347,6 +348,16 @@ void st2205u_device::st2xxx_tclk_start()
 
 void st2205u_device::st2xxx_tclk_stop()
 {
+}
+
+unsigned st2205u_device::st2xxx_lfr_clocks() const
+{
+	unsigned lcdcks = ((m_lxmax * 2 + m_lfra * 4) + 5) * (m_lymax ? m_lymax : 256) * ((m_lctr & 0x03) == 0 ? 2 : 4);
+
+	if ((m_lckr & 0x30) == 0x00 || (m_lckr & 0x30) == 0x30)
+		return lcdcks * std::max(((m_lckr & 0x0c) >> 2) * 8, 4);
+	else
+		return lcdcks * std::max((m_lckr & 0x0f) * 2, 1);
 }
 
 u8 st2205u_device::lvctr_r()

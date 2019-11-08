@@ -30,7 +30,8 @@
 
 #define LOG_IRQ (1 << 1U)
 #define LOG_BT (1 << 2U)
-//#define VERBOSE (LOG_IRQ | LOG_BT)
+#define LOG_LCDC (1 << 3U)
+//#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
@@ -66,6 +67,8 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_lfra(0)
 	, m_lac(0)
 	, m_lpwm(0)
+	, m_lcd_ireq(0)
+	, m_lcd_timer(nullptr)
 	, m_bctr(0)
 {
 	program_config.m_internal_map = std::move(internal_map);
@@ -121,6 +124,20 @@ void st2xxx_device::init_base_timer(u16 ireq)
 
 	assert(m_bt_mask != 0);
 	assert(m_bt_ireq != 0);
+}
+
+TIMER_CALLBACK_MEMBER(st2xxx_device::lcd_interrupt)
+{
+	m_ireq |= m_lcd_ireq;
+	update_irq_state();
+}
+
+void st2xxx_device::init_lcd_timer(u16 ireq)
+{
+	m_lcd_ireq = ireq;
+	assert(m_lcd_ireq != 0);
+
+	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2xxx_device::lcd_interrupt), this));
 }
 
 void st2xxx_device::save_common_registers()
@@ -228,6 +245,7 @@ void st2xxx_device::device_reset()
 	m_lfra = 0;
 	m_lac = 0;
 	m_lpwm = 0;
+	m_lcd_timer->adjust(attotime::never);
 
 	// reset UART and BRG
 	m_bctr = 0;
@@ -676,6 +694,7 @@ u8 st2xxx_device::lxmax_r()
 void st2xxx_device::lxmax_w(u8 data)
 {
 	m_lxmax = data;
+	lfr_recalculate_period();
 }
 
 u8 st2xxx_device::lymax_r()
@@ -686,6 +705,7 @@ u8 st2xxx_device::lymax_r()
 void st2xxx_device::lymax_w(u8 data)
 {
 	m_lymax = data;
+	lfr_recalculate_period();
 }
 
 u8 st2xxx_device::lpan_r()
@@ -705,17 +725,37 @@ u8 st2xxx_device::lctr_r()
 
 void st2xxx_device::lctr_w(u8 data)
 {
-	m_lctr = data & st2xxx_lctr_mask();
+	data &= st2xxx_lctr_mask();
+	u8 old_lctr = std::exchange(m_lctr, data);
+
+	if ((old_lctr & 0xbf) != (m_lctr & 0xbf))
+		lfr_recalculate_period();
 }
 
 void st2xxx_device::lckr_w(u8 data)
 {
 	m_lckr = data & st2xxx_lckr_mask();
+	lfr_recalculate_period();
 }
 
 void st2xxx_device::lfra_w(u8 data)
 {
 	m_lfra = data & 0x3f;
+	lfr_recalculate_period();
+}
+
+void st2xxx_device::lfr_recalculate_period()
+{
+	if (!BIT(m_lctr, 7))
+	{
+		unsigned clocks = st2xxx_lfr_clocks();
+		assert(clocks != 0);
+		attotime period = cycles_to_attotime(clocks);
+		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), PPC);
+		m_lcd_timer->adjust(period, 0, period);
+	}
+	else
+		m_lcd_timer->adjust(attotime::never);
 }
 
 u8 st2xxx_device::lac_r()

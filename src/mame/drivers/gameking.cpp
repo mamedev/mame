@@ -239,7 +239,7 @@ void gameking_state::init_gameking()
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 {
 	m_maincpu->set_state_int(st2xxx_device::ST_IREQ,
-		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x052 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
+		m_maincpu->state_int(st2xxx_device::ST_IREQ) | (0x012 & m_maincpu->state_int(st2xxx_device::ST_IENA)));
 	timer1->enable(false);
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
@@ -318,6 +318,7 @@ void gameking_state::gameking3(machine_config &config)
 	screen.set_size(160, 160);
 	screen.set_visarea_full();
 	screen.set_physical_aspect(3, 2);
+	screen.set_refresh_hz(39.308176); // ?
 	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking3));
 	screen.set_palette(finder_base::DUMMY_TAG);
 	config.device_remove("palette");

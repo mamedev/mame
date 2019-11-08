@@ -99,6 +99,7 @@ protected:
 	virtual u8 st2xxx_lctr_mask() const = 0;
 	virtual u8 st2xxx_lckr_mask() const = 0;
 	virtual u8 st2xxx_lpwm_mask() const = 0;
+	virtual unsigned st2xxx_lfr_clocks() const = 0;
 	virtual u8 st2xxx_bctr_mask() const = 0;
 
 	class mi_st2xxx : public memory_interface {
@@ -117,6 +118,7 @@ protected:
 	};
 
 	void init_base_timer(u16 ireq);
+	void init_lcd_timer(u16 ireq);
 	void save_common_registers();
 
 	u8 read_vector(u16 adr) { return downcast<mi_st2xxx &>(*mintf).read_vector(adr); }
@@ -126,6 +128,7 @@ protected:
 	u8 acknowledge_irq();
 
 	TIMER_CALLBACK_MEMBER(bt_interrupt);
+	TIMER_CALLBACK_MEMBER(lcd_interrupt);
 
 	u8 pdata_r(offs_t offset);
 	void pdata_w(offs_t offset, u8 data);
@@ -201,6 +204,7 @@ protected:
 	void lctr_w(u8 data);
 	void lckr_w(u8 data);
 	void lfra_w(u8 data);
+	void lfr_recalculate_period();
 	u8 lac_r();
 	void lac_w(u8 data);
 	u8 lpwm_r();
@@ -260,6 +264,9 @@ protected:
 	u8 m_lfra;
 	u8 m_lac;
 	u8 m_lpwm;
+	u16 m_lcd_ireq;
+	emu_timer *m_lcd_timer;
+
 	u8 m_bctr;
 	u8 m_brs;
 	u8 m_bdiv;
