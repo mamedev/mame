@@ -260,8 +260,8 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// 0x5080 - 50ff = SOUND AREA (same as eu5a03?)
 	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
 
-	// 0x5100 - 51ff = VIDEO AREA
-	map(0x5100, 0x51ff).rw(m_vid, FUNC(elan_eu3a14vid_device::read), FUNC(elan_eu3a14vid_device::write));
+	// 0x5100 - 517f = VIDEO AREA
+	map(0x5100, 0x517f).rw(m_vid, FUNC(elan_eu3a14vid_device::read), FUNC(elan_eu3a14vid_device::write));
 	
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 

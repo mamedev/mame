@@ -223,17 +223,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x5016, 0x5016).rw(m_sys, FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_r), FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_w));
 
 	// 502x - 503x video regs area?
-	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
-	map(0x5028, 0x5028).ram();
-	map(0x5029, 0x5029).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w)); // tilebase
-	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w)); // tilebase (spr?)
-	map(0x502d, 0x502e).rw(m_vid, FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w)); // split position
-	map(0x502f, 0x5036).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w)); // there are 4 scroll values in here, x scroll, y scroll, xscroll1 for split, xscroll2 for split (eu3a14 can do split too)
-	// 5037
-	map(0x5038, 0x5038).ram();
+	map(0x5020, 0x503f).rw(m_vid, FUNC(elan_eu3a05vid_device::read), FUNC(elan_eu3a05vid_device::write));
 
 	// 504x GPIO area?
 	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));

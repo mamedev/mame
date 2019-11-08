@@ -566,3 +566,107 @@ WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 	*/
 	m_vidctrl = data;
 }
+
+READ8_MEMBER(elan_eu3a05vid_device::read)
+{
+	uint8_t ret = 0x00;
+
+	switch (offset)
+	{
+	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
+		// unknown, space invaders sets these to fixed values, tetris has them as 00
+		break;
+
+	case 0x07:
+		ret = elan_eu3a05_vidctrl_r(space, offset - 0x07);
+		break;
+
+	case 0x08:
+		break;
+
+	case 0x09:
+		ret = tile_gfxbase_lo_r(space, offset - 0x09);
+		break;
+
+	case 0x0a:
+		ret = tile_gfxbase_hi_r(space, offset - 0x0a);
+		break;
+
+	case 0x0b:
+		ret = sprite_gfxbase_lo_r(space, offset - 0x0b);
+		break;
+
+	case 0x0c:
+		ret = sprite_gfxbase_hi_r(space, offset - 0x0c);
+		break;
+
+	case 0x0d: case 0x0e:
+		ret = splitpos_r(space, offset - 0x0d);
+		break;
+
+	case 0x0f: case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16:
+		ret = tile_scroll_r(space, offset - 0x0f);
+		break;
+
+	case 0x17:
+		break;
+
+	case 0x18:
+		break;
+
+	default:
+		break;
+	}
+
+	return ret;
+}
+
+WRITE8_MEMBER(elan_eu3a05vid_device::write)
+{
+	switch (offset)
+	{
+	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
+		// unknown, space invaders sets these to fixed values, tetris has them as 00
+		break;
+
+	case 0x07:
+		elan_eu3a05_vidctrl_w(space, offset - 0x07, data);
+		break;
+
+	case 0x08:
+		break;
+
+	case 0x09:
+		tile_gfxbase_lo_w(space, offset - 0x09, data);
+		break;
+
+	case 0x0a:
+		tile_gfxbase_hi_w(space, offset - 0x0a, data);
+		break;
+
+	case 0x0b:
+		sprite_gfxbase_lo_w(space, offset - 0x0b, data);
+		break;
+
+	case 0x0c:
+		sprite_gfxbase_hi_w(space, offset - 0x0c, data);
+		break;
+
+	case 0x0d: case 0x0e:
+		splitpos_w(space, offset - 0x0d, data);
+		break;
+
+	case 0x0f: case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16:
+		tile_scroll_w(space, offset - 0x0f, data);
+		break;
+
+	case 0x17:
+		break;
+
+	case 0x18:
+		break;
+
+	default:
+		break;
+	}
+}
