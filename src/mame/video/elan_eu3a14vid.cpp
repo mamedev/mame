@@ -24,8 +24,13 @@ void elan_eu3a14vid_device::device_start()
 	save_item(NAME(m_rowscrollsplit));
 	save_item(NAME(m_rowscrollcfg));
 	save_item(NAME(m_ramtilecfg));
-	save_item(NAME(m_spriteaddr));
 	save_item(NAME(m_spritebase));
+
+	save_item(NAME(m_5107));
+	save_item(NAME(m_5108));
+	save_item(NAME(m_5109));
+
+	save_item(NAME(m_spriteaddr));
 }
 
 void elan_eu3a14vid_device::device_reset()
@@ -52,6 +57,10 @@ void elan_eu3a14vid_device::device_reset()
 
 	for (int i = 0; i < 2; i++)
 		m_spritebase[i] = 0x00;
+
+	m_5107 = 0x00;
+	m_5108 = 0x00;
+	m_5109 = 0x00;
 
 	m_spriteaddr = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
 }
@@ -770,3 +779,227 @@ void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
+READ8_MEMBER(elan_eu3a14vid_device::read)
+{
+	uint8_t ret = 0x00;
+	switch (offset)
+	{
+	case 0x00: case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:
+		break;
+
+	case 0x07:
+		ret = m_5107;
+		break;
+
+	case 0x08:
+		ret = m_5108;
+		break;
+
+	case 0x09:
+		ret = m_5109;
+		break;
+
+	// 0x0a
+	// 0x0b
+	// 0x0c
+	// 0x0d
+	// 0x0e
+	// 0x0f
+
+	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
+		ret = tilecfg_r(space, offset - 0x10);
+		break;
+
+	case 0x16:case 0x17:
+		ret = rowscrollcfg_r(space, offset - 0x16);
+		break;
+
+	// 0x18
+	// 0x19
+
+	case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:
+		ret = rowscrollsplit_r(space, offset - 0x1a);
+		break;
+
+	// 0x1f
+	// 0x20
+
+	case 0x21: case 0x22: // scroll reg 1
+	case 0x23: case 0x24: // scroll reg 2
+		ret = scrollregs_r(space, offset - 0x21);
+		break;
+
+	case 0x25: case 0x26: // row scroll reg 1
+	case 0x27: case 0x28: // row scroll reg 2
+	case 0x29: case 0x2a: // row scroll reg 3
+	case 0x2b: case 0x2c: // row scroll reg 4
+		ret = rowscrollregs_r(space, offset - 0x25);
+		break;
+
+	// 0x2d
+	// 0x2e
+	// 0x2f
+	// 0x30
+	// 0x31
+	// 0x32
+	// 0x33
+	// 0x34
+	// 0x35
+	// 0x36
+	// 0x37
+	// 0x38
+	// 0x39
+	// 0x3a
+	// 0x3b
+	// 0x3c
+	// 0x3d
+	// 0x3e
+	// 0x3f
+
+	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
+		ret = ramtilecfg_r(space, offset - 0x40);
+		break;
+
+	case 0x48: case 0x49: case 0x4a: case 0x4b:
+		// hnt3 (always 0 tho?)
+		break;
+
+	// 0x4c
+	// 0x4d
+	// 0x4e
+	// 0x4f
+	
+	case 0x50:
+		ret = spriteaddr_r(space, offset - 0x50);
+		break;
+
+	case 0x51: case 0x52:
+		ret = spritebase_r(space, offset - 0x51);
+		break;
+
+	case 0x53:
+		// startup
+		break;
+
+	default:
+		break;
+	}
+	return ret;
+}
+
+WRITE8_MEMBER(elan_eu3a14vid_device::write)
+{
+	switch (offset)
+	{
+	case 0x00: case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:
+	// huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and "Target Range" mode timer??
+	// 5100 - 0x0f when effect is enabled, 0x00 otherwise?
+	// 5101 - 0x0e in both modes
+	// 5102 - 0x86 in both modes
+	// 5103 - 0x0e in tropy room (left?)                                  / 0x2a in "Target Range" mode (left position?)
+	// 5104 - trophy room window / highlight top, move with cursor        / 0xbf in "Target Range" mode (top?)
+	// 5105 - 0x52 in trophy room (right?)                                / counts from 0xa1 to 0x2a in "Target Range" mode (right position?)
+	// 5106 - trophy room window / highlight bottom, move with cursor     / 0xcb in "Target Range" mode (bottom?)
+		break;
+
+	case 0x07:
+	// 5107 - 0x00 // on transitions, maybe layer disables?
+		m_5107 = data;
+		break;
+
+	case 0x08:
+	// 5108 - 0x04 in both modes // hnt3, frequently rewrites same values
+		m_5108 = data;
+		break;
+
+	case 0x09:
+	// 5109 - 0xc2 in both modes // hnt3, frequently rewrites same values
+		m_5109 = data;
+		break;
+
+	// 0x0a
+	// 0x0b
+	// 0x0c
+	// 0x0d
+	// 0x0e
+	// 0x0f
+
+	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
+		tilecfg_w(space, offset - 0x10, data);
+		break;
+
+	case 0x16:case 0x17:
+		rowscrollcfg_w(space, offset - 0x16, data);
+		break;
+
+	// 0x18
+	// 0x19
+
+	case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:
+		rowscrollsplit_w(space, offset - 0x1a, data);
+		break;
+
+	// 0x1f
+	// 0x20
+
+	case 0x21: case 0x22: // scroll reg 1
+	case 0x23: case 0x24: // scroll reg 2
+		scrollregs_w(space, offset - 0x21, data);
+		break;
+
+	case 0x25: case 0x26: // row scroll reg 1
+	case 0x27: case 0x28: // row scroll reg 2
+	case 0x29: case 0x2a: // row scroll reg 3
+	case 0x2b: case 0x2c: // row scroll reg 4
+		rowscrollregs_w(space, offset - 0x25, data);
+		break;
+
+	// 0x2d
+	// 0x2e
+	// 0x2f
+	// 0x30
+	// 0x31
+	// 0x32
+	// 0x33
+	// 0x34
+	// 0x35
+	// 0x36
+	// 0x37
+	// 0x38
+	// 0x39
+	// 0x3a
+	// 0x3b
+	// 0x3c
+	// 0x3d
+	// 0x3e
+	// 0x3f
+
+	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
+		ramtilecfg_w(space, offset - 0x40, data);
+		break;
+
+	case 0x48: case 0x49: case 0x4a: case 0x4b:
+		// hnt3 (always 0 tho?)
+		break;
+
+	// 0x4c
+	// 0x4d
+	// 0x4e
+	// 0x4f
+	
+	case 0x50:
+		spriteaddr_w(space, offset - 0x50, data);
+		break;
+
+	case 0x51: case 0x52:
+		spritebase_w(space, offset - 0x51, data);
+		break;
+
+	case 0x53:
+		// startup
+		break;
+
+	default:
+		break;
+	}
+}
