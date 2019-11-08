@@ -34045,6 +34045,9 @@ nimbus                          // RM Nimbus 186
 cm32l                           //
 mt32                            //
 
+@source:rcm32p.cpp
+cm32p                           //
+
 @source:rockrage.cpp
 rockrage                        // GX620 (c) 1986 (World?)
 rockragea                       // GX620 (c) 1986 (Prototype?)
