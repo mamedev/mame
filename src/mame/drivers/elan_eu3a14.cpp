@@ -69,7 +69,7 @@
 #include "audio/elan_eu3a05.h"
 #include "machine/timer.h"
 #include "machine/elan_eu3a14sys.h"
-#include "video/elan_eu3a05commonvid.h"
+#include "video/elan_eu3a14vid.h"
 
 
 
@@ -81,16 +81,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sys(*this, "sys"),
 		m_sound(*this, "eu3a05sound"),
-		m_commonvid(*this, "commonvid"),
+		m_vid(*this, "commonvid"),
 		m_mainregion(*this, "maincpu"),
-		m_scrollregs(*this, "scrollregs"),
-		m_tilecfg(*this, "tilecfg"),
-		m_rowscrollregs(*this, "rowscrollregs"),
-		m_rowscrollsplit(*this, "rowscrollsplit"),
-		m_rowscrollcfg(*this, "rowscrollcfg"),
-		m_ramtilecfg(*this, "ramtilecfg"),
-		m_spriteaddr(*this, "spriteaddr"),
-		m_spritebase(*this, "spritebase"),
 		m_mainram(*this, "mainram"),
 		m_bank(*this, "bank"),
 		m_palette(*this, "palette"),
@@ -101,12 +93,11 @@ public:
 
 
 	void radica_eu3a14(machine_config &config);
-	void radica_eu3a14_adc(machine_config &config);
 	void radica_eu3a14p(machine_config &config);
 
-	void init_rad_gtg();
-	void init_rad_foot();
-	void init_rad_hnt3();
+	void radica_eu3a14p_altrambase(machine_config &config);
+	void radica_eu3a14_altrambase(machine_config& config);
+	void radica_eu3a14_altrambase_adc(machine_config &config);
 
 private:
 	// screen updates
@@ -116,7 +107,6 @@ private:
 
 	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
 
-
 	DECLARE_WRITE8_MEMBER(porta_dir_w);
 	DECLARE_WRITE8_MEMBER(portb_dir_w);
 	DECLARE_WRITE8_MEMBER(portc_dir_w);
@@ -125,10 +115,7 @@ private:
 	DECLARE_WRITE8_MEMBER(portb_dat_w);
 	DECLARE_WRITE8_MEMBER(portc_dat_w);
 
-
 	DECLARE_READ8_MEMBER(radica_5009_unk_r) { return machine().rand(); };
-
-	DECLARE_READ8_MEMBER(random_r) { return machine().rand(); };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
@@ -147,16 +134,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<elan_eu3a14sys_device> m_sys;
 	required_device<elan_eu3a05_sound_device> m_sound;
-	required_device<elan_eu3a05commonvid_device> m_commonvid;
+	required_device<elan_eu3a14vid_device> m_vid;
 	required_region_ptr<uint8_t> m_mainregion;
-	required_shared_ptr<uint8_t> m_scrollregs;
-	required_shared_ptr<uint8_t> m_tilecfg;
-	required_shared_ptr<uint8_t> m_rowscrollregs;
-	required_shared_ptr<uint8_t> m_rowscrollsplit;
-	required_shared_ptr<uint8_t> m_rowscrollcfg;
-	required_shared_ptr<uint8_t> m_ramtilecfg;
-	required_shared_ptr<uint8_t> m_spriteaddr;
-	required_shared_ptr<uint8_t> m_spritebase;
+
 	required_shared_ptr<uint8_t> m_mainram;
 	required_device<address_map_bank_device> m_bank;
 	required_device<palette_device> m_palette;
@@ -164,21 +144,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_ioport m_tvtype;
 
-	int m_tilerambase;
-	int m_spriterambase;
-
-	bitmap_ind8 m_prioritybitmap;
-
 	uint8_t m_portdir[3];
-
-	void draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
-	int get_xscroll_for_screenypos(int line);
-	void draw_background_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram);
-	void draw_background_page(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth,int pageheight, int bytespertile, int palettepri, int drawfromram);
-	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette);
-	void draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int pal, int flipx, int pri, int xpos, int ypos, int bpp);
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
 	DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
@@ -191,726 +157,13 @@ private:
 
 void elan_eu3a14_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_prioritybitmap);
-}
-
-void elan_eu3a14_state::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
-{
-	int baseaddr = base * 256;
-
-	int xstride = 8;
-
-	if (bpp == 8) // 8bpp selection
-	{
-		if (size == 8)
-		{
-			xstride = size / 1; baseaddr += tileno * 64; // 8x8 8bpp
-		}
-		else
-		{
-			xstride = size / 1; baseaddr += tileno * 256; // 16x16 8bpp
-		}
-
-		palette &= 0x100; // only top bit valid, as there are only 2 palettes?
-	}
-	else if (bpp == 4) // 4bpp selection
-	{
-		if (size == 8)
-		{
-			xstride = size / 2; baseaddr += tileno * 32; // 8x8 4bpp
-		}
-		else
-		{
-			xstride = size / 2; baseaddr += tileno * 128; // 16x16 4bpp
-		}
-	}
-	else if (bpp == 2) // 2bpp?
-	{
-		xstride = size / 4; baseaddr += tileno * 64; // 16x16 2bpp
-	}
-	else
-	{
-		popmessage("draw_background_tile unsupported bpp %d\n", bpp);
-		return;
-	}
-
-
-
-	uint8_t* gfxdata;
-
-	if (drawfromram)
-	{
-		gfxdata = &m_mainram[baseaddr & 0x3fff];
-	}
-	else
-	{
-		gfxdata = &m_mainregion[baseaddr & 0x3fffff];
-	}
-
-
-	int count = 0;
-	for (int y = 0; y < size; y++)
-	{
-		int realy = ypos + y;
-		int xposwithscroll = 0;
-
-		if (!drawfromram)
-		{
-			xposwithscroll = xpos - get_xscroll_for_screenypos(realy);
-		}
-		else
-		{
-			xposwithscroll = xpos;
-			// RAM tile layer has no scrolling? (or we've never seen it used / enabled)
-		}
-
-		uint16_t* dst = &bitmap.pix16(ypos + y);
-		uint8_t* pridst = &m_prioritybitmap.pix8(ypos + y);
-
-		for (int x = 0; x < xstride; x++)
-		{
-			int pix = gfxdata[count];
-
-			if (realy >= cliprect.min_y && realy <= cliprect.max_y)
-			{
-				if (bpp == 8) // 8bpp
-				{
-					int realx = x + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = pix | palette;
-								pridst[realx] = priority;
-							}
-
-						}
-					}
-				}
-				else if (bpp == 7)
-				{
-					popmessage("draw_background_tile bpp == 7");
-				}
-				else if (bpp == 6)
-				{
-					popmessage("draw_background_tile bpp == 6");
-				}
-				else if (bpp == 5)
-				{
-					popmessage("draw_background_tile bpp == 5");
-				}
-				else if (bpp == 4) // 4bpp
-				{
-					int realx = (x * 2) + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0xf0)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0xf0) >> 4) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x0f)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = (pix & 0x0f) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-				}
-				else if (bpp == 3)
-				{
-					popmessage("draw_background_tile bpp == 3");
-				}
-				else if (bpp == 2) // 2bpp (hnt3 ram text)
-				{
-					int realx = (x * 4) + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0xc0)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0xc0) >> 6) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x30)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x30) >> 4) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x0c)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x0c) >> 2) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x03)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x03) >> 0) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-				}
-				else if (bpp == 1)
-				{
-					popmessage("draw_background_tile bpp == 1");
-				}
-			}
-			count++;
-		}
-	}
-}
-
-int elan_eu3a14_state::get_xscroll_for_screenypos(int ydraw)
-{
-	if ((ydraw < 0) || (ydraw >= 224))
-		return 0;
-
-	int xscroll = m_scrollregs[0] | (m_scrollregs[1] << 8);
-
-	if (m_rowscrollcfg[1] == 0x01) // GUESS! could be anything, but this bit is set in Huntin'3
-	{
-		int split0 = m_rowscrollregs[0] | (m_rowscrollregs[1] << 8);
-		int split1 = m_rowscrollregs[2] | (m_rowscrollregs[3] << 8);
-		int split2 = m_rowscrollregs[4] | (m_rowscrollregs[5] << 8);
-		int split3 = m_rowscrollregs[6] | (m_rowscrollregs[7] << 8);
-
-		if (ydraw < m_rowscrollsplit[0])
-		{
-			return xscroll;
-		}
-		else if (ydraw < m_rowscrollsplit[1])
-		{
-			return split0;
-		}
-		else if (ydraw < m_rowscrollsplit[2])
-		{
-			return split1;
-		}
-		else if (ydraw < m_rowscrollsplit[3])
-		{
-			return split2;
-		}
-		else if (ydraw < m_rowscrollsplit[4])
-		{
-			return split3;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-	else
-	{
-		return xscroll;
-	}
+	m_vid->video_start();
 }
 
 
-void elan_eu3a14_state::draw_background_page(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect, int ramstart, int ramend, int xbase, int ybase, int size, int bpp, int base, int pagewidth, int pageheight, int bytespertile, int palettepri, int drawfromram)
+uint32_t elan_eu3a14_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-
-	int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
-	palette = palette << 4;
-	int priority = palettepri & 0x07;
-
-	int xdraw = xbase;
-	int ydraw = ybase;
-	int count = 0;
-
-	for (int i = ramstart; i < ramend; i += bytespertile)
-	{
-		int tile = 0;
-		int realpalette = palette;
-		int realpriority = priority;
-		int realbpp = bpp;
-
-		if (bytespertile == 2)
-		{
-			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);
-		}
-		else if (bytespertile == 4) // rad_foot hidden test mode, rad_hnt3 "Target Range" (not yet correct)
-		{
-			tile = m_mainram[i + 0] | (m_mainram[i + 1] << 8);// | (m_mainram[i + 2] << 16) |  | (m_mainram[i + 3] << 24);
-
-			// m_mainram[i + 3] & 0x04 is set in both seen cases, maybe per-tile bpp?
-			// this would match up with this mode being inline replacements for m_tilecfg[1] (palettepri) and m_tilecfg[2] (bpp);
-
-			int newpalette = ((m_mainram[i + 2] & 0xf0) >> 4) | ((m_mainram[i + 2] & 0x08) << 1);
-			newpalette = newpalette << 4;
-			realpalette = newpalette;
-			realpriority = m_mainram[i + 2] & 0x07;
-			realbpp = m_mainram[i + 3] & 0x07;
-			if (realbpp == 0)
-				realbpp = 8;
-
-		}
-
-
-		draw_background_tile(bitmap, cliprect, realbpp, tile, realpalette, realpriority, 0, 0, xdraw, ydraw, 0, size, base, drawfromram);
-
-		xdraw += size;
-
-		count++;
-		if (((count % pagewidth) == 0))
-		{
-			xdraw -= size * pagewidth;
-			ydraw += size;
-		}
-	}
-}
-
-void elan_eu3a14_state::draw_background_ramlayer(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
-{
-	// this register use is questionable
-	if (m_ramtilecfg[0] & 0x80)
-	{
-		int rtm_size;;
-		int rtm_pagewidth;
-		int rtm_pageheight;
-		int rtm_yscroll;
-		int rtm_bpp;
-		int rtm_bytespertile = 2;
-		uint8_t palettepri = m_ramtilecfg[1];
-
-		rtm_yscroll = 0;
-
-		// this is the gfxbase in ram for all cases seen
-		int rtm_base = (0x2000 - 0x200) / 256;
-
-		// same as regular layer?
-		if (m_ramtilecfg[0] & 0x10)
-		{
-			rtm_size = 8;
-			rtm_pagewidth = 32;
-			rtm_pageheight = 28;
-		}
-		else
-		{
-			rtm_size = 16;
-			rtm_pagewidth = 32 / 2;
-			rtm_pageheight = 28 / 2;
-		}
-
-		rtm_bpp = m_ramtilecfg[2] & 0x07;
-		if (rtm_bpp == 0)
-			rtm_bpp = 8;
-
-		// this is in the same place even when the first tilemap is in 16x16 mode, probably a base register somewhere
-		int ramstart = m_tilerambase + 0x700;
-		int ramend = m_tilerambase + 0x700 + 0x700;
-
-		// hack for "Target Range" mode
-		if (m_ramtilecfg[5] == 0x06)
-		{
-			ramstart = 0x3980-0x200;
-			ramend = 0x3980-0x200 + 0x700;
-		}
-
-		// normal
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-		// wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth), 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-		// wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-		// wrap x+y
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (rtm_size * rtm_pagewidth), (rtm_size * rtm_pageheight) + 0 - rtm_yscroll, rtm_size, rtm_bpp, rtm_base, rtm_pagewidth, rtm_pageheight, rtm_bytespertile, palettepri, 1);
-	}
-}
-
-
-void elan_eu3a14_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int yscroll = m_scrollregs[2] | (m_scrollregs[3] << 8);
-
-	int base = (m_tilecfg[5] << 8) | m_tilecfg[4];
-	uint8_t palettepri = m_tilecfg[1];
-
-	int pagewidth = 1, pageheight = 1;
-	int bytespertile = 2;
-	int size;
-
-	// m_tilecfg[0]   b-as ?-hh    b = bytes per tile  s = tilesize / page size?  a = always set when tilemaps are in use - check? h = related to page positions, when set uses 2x2 pages? ? = used
-	// m_tilecfg[1]   pppp x--?    ? = used foot x = used, huntin3 summary (palette bank?) p = palette (used for different stages in huntin3 and the hidden test modes in others)
-	// m_tilecfg[2]   ---- bbbb    b = bpp mode (0 = 8bpp)
-	// m_tilecfg[3]   ---- ----     (unused or more gfxbase?)
-	// m_tilecfg[4]   gggg gggg     gfxbase (lower bits)
-	// m_tilecfg[5]   gggg gggg     gfxbase (upper bits)
-
-	// ramtilecfg appears to be a similar format, except for the other layer with ram base tiles
-	// however 'a' in m_tilecfg[0] is NOT set
-	// also m_tilecfg[0] has 0x80 set, which would be 4 bytes per tile, but it isn't?
-	// the layer seems to be disabled by setting m_tilecfg[0] to 0?
-
-	if (m_tilecfg[0] & 0x10)
-	{
-		size = 8;
-		pagewidth = 32;
-		pageheight = 28;
-	}
-	else
-	{
-		size = 16;
-		pagewidth = 16;
-		pageheight = 14;
-	}
-
-	if (m_tilecfg[0] & 0x80)
-	{
-		bytespertile = 4;
-	}
-	else
-	{
-		bytespertile = 2;
-	}
-
-	int bpp = (m_tilecfg[2] & 0x07);
-	if (bpp == 0)
-		bpp = 8;
-
-	int ramstart = 0;
-	int ramend = 0;
-
-	int pagesize = pagewidth * pageheight * 2;
-
-	if (bytespertile == 4)
-	{
-		pagesize <<= 1; // shift because we need twice as much ram for this mode
-	}
-
-	if ((m_tilecfg[0] & 0x03) == 0x00) // tilemaps arranged as 2x2 pages?
-	{
-		ramstart = m_tilerambase + pagesize * 0;
-		ramend = m_tilerambase + pagesize * 1;
-
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                        0 - yscroll,                          size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2),   0 - yscroll,                          size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                       (size * pageheight * 2) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2),  (size * pageheight * 2) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
-
-		ramstart = m_tilerambase + pagesize * 1;
-		ramend = m_tilerambase + pagesize * 2;
-
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     0 - yscroll,                           size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), 0 - yscroll,                           size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight * 2) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), (size * pageheight * 2) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
-
-		ramstart = m_tilerambase + pagesize * 2;
-		ramend = m_tilerambase + pagesize * 3;
-
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                      (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2), (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, 0,                      (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 2), (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
-
-		ramstart = m_tilerambase + pagesize * 3;
-		ramend = m_tilerambase + pagesize * 4;
-
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // normal
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), (size * pageheight) - yscroll,     size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth),     (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);// wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart,ramend, (size * pagewidth * 3), (size * pageheight * 3) - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0); // wrap x+y
-	}
-	else if ((m_tilecfg[0] & 0x03) == 0x03) // individual tilemaps? multiple layers?
-	{
-	//  popmessage("m_tilecfg[0] & 0x03 multiple layers config %04x", base);
-		ramstart = m_tilerambase + pagesize * 0;
-		ramend = m_tilerambase + pagesize * 1;
-
-		// normal
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
-		// wrap x
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
-		// wrap y
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, 0, (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
-		// wrap x+y
-		draw_background_page(screen, bitmap, cliprect, ramstart, ramend, (size * pagewidth), (size * pageheight) + 0 - yscroll, size, bpp, base, pagewidth,pageheight, bytespertile, palettepri, 0);
-
-		// RAM based tile layer
-		draw_background_ramlayer(screen, bitmap, cliprect);
-	}
-	else
-	{
-		popmessage("m_tilecfg[0] & 0x03 unknown config");
-	}
-
-}
-
-void elan_eu3a14_state::draw_sprite_pix(const rectangle& cliprect, uint16_t* dst, uint8_t* pridst, int realx, int priority, uint8_t pix, uint8_t mask, uint8_t shift, int palette)
-{
-	if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-	{
-		if (pridst[realx] <= priority)
-		{
-			if (pix & mask)
-			{
-				dst[realx] = ((pix & mask) >> shift) | palette;
-				pridst[realx] = priority;
-			}
-		}
-	}
-}
-
-void elan_eu3a14_state::draw_sprite_line(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int offset, int line, int palette, int flipx, int priority, int xpos, int ypos, int bpp)
-{
-	offset = offset * 2;
-
-	int bppdiv = 0;
-
-	switch (bpp)
-	{
-	default:
-	case 0x8:
-	case 0x7:
-	case 0x6:
-	case 0x5:
-		offset += line * 8;
-		bppdiv = 1;
-		break;
-
-	case 0x4:
-	case 0x3:
-		offset += line * 4;
-		bppdiv = 2;
-		break;
-
-	case 0x2:
-		offset += line * 2;
-		bppdiv = 4;
-		break;
-
-	case 0x1:
-		offset += line * 1;
-		bppdiv = 8;
-		break;
-	}
-
-	uint8_t* gfxdata = &m_mainregion[offset & 0x3fffff];
-
-	if (ypos >= cliprect.min_y && ypos <= cliprect.max_y)
-	{
-		uint16_t* dst = &bitmap.pix16(ypos);
-		uint8_t* pridst = &m_prioritybitmap.pix8(ypos);
-
-		int count = 0;
-		for (int x = 0; x < 8/bppdiv;x++)
-		{
-			if (bpp == 8)
-			{
-				int pix,mask,shift;
-				if (flipx) { pix = gfxdata[7 - count]; } else { pix = gfxdata[count]; }
-				int realx = xpos + x * 1;
-				if (flipx) { mask = 0xff; shift = 0; } else { mask = 0xff; shift = 0; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-			}
-			else if (bpp == 7)
-			{
-				int pix,mask,shift;
-				if (flipx) { pix = gfxdata[7 - count]; } else { pix = gfxdata[count]; }
-				int realx = xpos + x * 1;
-				// stride doesn't change, data isn't packed, just don't use top bit
-				if (flipx) { mask = 0x7f; shift = 0; } else { mask = 0x7f; shift = 0; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-			}
-			else if (bpp == 6)
-			{
-				popmessage("6bpp sprite\n");
-			}
-			else if (bpp == 5)
-			{
-				popmessage("5bpp sprite\n");
-			}
-			else if (bpp == 4)
-			{
-				int pix,mask,shift;
-				if (flipx) { pix = gfxdata[3 - count]; } else { pix = gfxdata[count]; }
-				int realx = xpos + x * 2;
-				if (flipx) { mask = 0x0f; shift = 0; } else { mask = 0xf0; shift = 4; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-				realx++;
-				if (flipx) { mask = 0xf0; shift = 4; } else { mask = 0x0f; shift = 0; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-			}
-			else if (bpp == 3)
-			{
-				popmessage("3bpp sprite\n");
-			}
-			else if (bpp == 2)
-			{
-				int pix,mask,shift;
-				if (flipx) { pix = gfxdata[1 - count]; } else { pix = gfxdata[count]; }
-				int realx = xpos + x * 4;
-				if (flipx) { mask = 0x03; shift = 0; } else { mask = 0xc0; shift = 6; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-				realx++;
-				if (flipx) { mask = 0x0c; shift = 2; } else { mask = 0x30; shift = 4; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-				realx++;
-				if (flipx) { mask = 0x30; shift = 4; } else { mask = 0x0c; shift = 2; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-				realx++;
-				if (flipx) { mask = 0xc0; shift = 6; } else { mask = 0x03; shift = 0; }
-				draw_sprite_pix(cliprect, dst, pridst, realx, priority, pix, mask, shift, palette);
-			}
-			else if (bpp == 1)
-			{
-				popmessage("1bpp sprite\n");
-			}
-
-			count++;
-		}
-	}
-
-}
-
-
-void elan_eu3a14_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
-	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
-	for (int i = m_spriterambase; i < m_spriterambase + 0x800; i += 8)
-	{
-		/*
-		+0  e-ff hhww  flip yx, enable, height, width
-		+1  yyyy yyyy  ypos
-		+2  xxxx xxxx  xpos
-		+3  pppp Pzzz  p = palette, P = upper palette bank, z = priority
-		+4  tttt tttt  tile bits
-		+5  tttt tttt
-		+6  --TT TPPP  TTT = tile bank PPP = bpp select (+more?)
-		+7  ---- ----
-
-		*/
-
-		int attr = m_mainram[i + 0];
-		int y = m_mainram[i + 1];
-		int x = m_mainram[i + 2];
-		int palettepri = m_mainram[i + 3];
-
-		int h = attr & 0x0c;
-		int w = attr & 0x03;
-		int flipx = (attr & 0x10) >> 4;
-		int flipy = (attr & 0x20) >> 5;
-
-		int height = 0;
-		int width = 0;
-
-		int pri = palettepri & 0x07;
-
-		int palette = ((palettepri & 0xf0) >> 4) | ((palettepri & 0x08) << 1);
-		palette = palette << 4;
-
-		switch (h)
-		{
-		case 0x0:height = 2; break;
-		case 0x4:height = 4; break;
-		case 0x8:height = 8; break;
-		case 0xc:height = 16; break;
-		}
-
-		switch (w)
-		{
-		case 0x0:width = 1; break;
-		case 0x1:width = 2; break;
-		case 0x2:width = 4; break;
-		case 0x3:width = 8; break;
-		}
-
-		y -= ((height * 2) - 4);
-
-		x -= ((width * 4) - 4);
-
-		height *= 4;
-
-		x -= 6;
-		y -= 4;
-
-		int offset = ((m_mainram[i + 5] << 8) + (m_mainram[i + 4] << 0));
-		int extra = m_mainram[i + 6];
-
-		int spritebase = (m_spritebase[1] << 8) | m_spritebase[0];
-
-		offset += (extra & 0xf8) << 13;
-		offset += spritebase << 7;
-
-		int bpp = extra & 0x07;
-		if (bpp == 0)
-			bpp = 8;
-
-		if (attr & 0x80)
-		{
-			int count = 0;
-			for (int yy = 0; yy < height; yy++)
-			{
-				int yoff = flipy ? height-1-yy : yy;
-
-				for (int xx = 0; xx < width; xx++)
-				{
-					int xoff = flipx ? (((width - 1) * 8) - (xx * 8)) : (xx * 8);
-
-					draw_sprite_line(screen, bitmap, cliprect, offset, count, palette, flipx, pri, x + xoff, y + yoff, bpp);
-					count++;
-				}
-			}
-		}
-	}
-}
-
-
-
-uint32_t elan_eu3a14_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_spriterambase = (m_spriteaddr[0] * 0x200) - 0x200;
-
-	bitmap.fill(0, cliprect);
-	m_prioritybitmap.fill(0, cliprect);
-
-	draw_background(screen, bitmap, cliprect);
-
-	draw_sprites(screen, bitmap, cliprect);
-
-	return 0;
+	return m_vid->screen_update(screen, bitmap, cliprect);
 }
 
 // sound callback
@@ -971,7 +224,7 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
 
-	map(0x4800, 0x4bff).rw(m_commonvid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
+	map(0x4800, 0x4bff).rw(m_vid, FUNC(elan_eu3a14vid_device::palette_r), FUNC(elan_eu3a14vid_device::palette_w));
 
 	// 5000 - 501f = SYSTEM AREA
 
@@ -1030,10 +283,11 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5108, 0x5109).ram(); // hnt3, frequently rewrites same values, maybe something to do with raster irq?
 
 	// layer specific regs?
-	map(0x5110, 0x5115).ram().share("tilecfg");
-	map(0x5116, 0x5117).ram().share("rowscrollcfg"); // 00 01 in hnt3 (could just be extra tile config bits, purpose guessed)   set to 00 05 in rad_gtg overhead part (no rowscroll)
+	map(0x5110, 0x5115).rw(m_vid, FUNC(elan_eu3a14vid_device::tilecfg_r), FUNC(elan_eu3a14vid_device::tilecfg_w));
+	map(0x5116, 0x5117).rw(m_vid, FUNC(elan_eu3a14vid_device::rowscrollcfg_r), FUNC(elan_eu3a14vid_device::rowscrollcfg_w)); // 00 01 in hnt3 (could just be extra tile config bits, purpose guessed)   set to 00 05 in rad_gtg overhead part (no rowscroll)
 	//  0x5118, 0x5119  not used
-	map(0x511a, 0x511e).ram().share("rowscrollsplit"); // hnt3 (60 68 78 90 b8 - rowscroll position list see note below
+	map(0x511a, 0x511e).rw(m_vid, FUNC(elan_eu3a14vid_device::rowscrollsplit_r), FUNC(elan_eu3a14vid_device::rowscrollsplit_w)); // hnt3 (60 68 78 90 b8 - rowscroll position list see note below
+
 
 	// register value notes for 511a-511e and how they relate to screen
 	// 00-6f normal scroll reg
@@ -1043,17 +297,19 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// 90-b7 is the 4th
 	// b8-ff no scroll?
 
-	map(0x5121, 0x5124).ram().share("scrollregs");
-	map(0x5125, 0x512c).ram().share("rowscrollregs"); // 4 extra x scroll regs
+	map(0x5121, 0x5124).rw(m_vid, FUNC(elan_eu3a14vid_device::scrollregs_r), FUNC(elan_eu3a14vid_device::scrollregs_w));
+	map(0x5125, 0x512c).rw(m_vid, FUNC(elan_eu3a14vid_device::rowscrollregs_r), FUNC(elan_eu3a14vid_device::rowscrollregs_w)); // 4 extra x scroll regs
 
 	// layer specific regs?
-	map(0x5140, 0x5145).ram().share("ramtilecfg"); // hnt3
+	map(0x5140, 0x5145).rw(m_vid, FUNC(elan_eu3a14vid_device::ramtilecfg_r), FUNC(elan_eu3a14vid_device::ramtilecfg_w)); // hnt3
 	map(0x5148, 0x514b).ram(); // hnt3 (always 0 tho?)
 
 	// sprite specific regs?
-	map(0x5150, 0x5150).ram().share("spriteaddr"); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
-	map(0x5151, 0x5152).ram().share("spritebase");
+	map(0x5150, 0x5150).rw(m_vid, FUNC(elan_eu3a14vid_device::spriteaddr_r), FUNC(elan_eu3a14vid_device::spriteaddr_w)); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
+	map(0x5151, 0x5152).rw(m_vid, FUNC(elan_eu3a14vid_device::spritebase_r), FUNC(elan_eu3a14vid_device::spritebase_w));
 	map(0x5153, 0x5153).ram(); // startup
+
+	
 
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
@@ -1526,8 +782,6 @@ void elan_eu3a14_state::machine_reset()
 	m_portdir[0] = 0x00;
 	m_portdir[1] = 0x00;
 	m_portdir[2] = 0x00;
-
-	m_spriteaddr[0] = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
 }
 
 
@@ -1639,9 +893,13 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(512);
 
-	ELAN_EU3A05_COMMONVID(config, m_commonvid, 0);
-	m_commonvid->set_palette("palette");
-	m_commonvid->set_entries(512);
+	ELAN_EU3A14_VID(config, m_vid, 0);
+	m_vid->set_cpu("maincpu");
+	m_vid->set_addrbank("bank");
+	m_vid->set_palette("palette");
+	m_vid->set_screen("screen");
+	m_vid->set_entries(512);
+	m_vid->set_tilerambase(0x0200 - 0x200);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -1657,9 +915,15 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a14_state::sound_end5));
 }
 
-void elan_eu3a14_state::radica_eu3a14_adc(machine_config &config)
+void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config& config)
 {
 	radica_eu3a14(config);
+	m_vid->set_tilerambase(0x0a00 - 0x200);
+}
+
+void elan_eu3a14_state::radica_eu3a14_altrambase_adc(machine_config &config)
+{
+	radica_eu3a14_altrambase(config);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(elan_eu3a14_state::scanline_cb), "screen", 0, 1);
 }
@@ -1672,23 +936,10 @@ void elan_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks d
 	subdevice<screen_device>("screen")->set_refresh_hz(50);
 }
 
-
-void elan_eu3a14_state::init_rad_gtg()
+void elan_eu3a14_state::radica_eu3a14p_altrambase(machine_config& config)
 {
-	// must be registers to control this
-	m_tilerambase = 0x0a00 - 0x200;
-}
-
-void elan_eu3a14_state::init_rad_foot()
-{
-	// must be registers to control this
-	m_tilerambase = 0x0200 - 0x200;
-}
-
-void elan_eu3a14_state::init_rad_hnt3()
-{
-	// must be registers to control this
-	m_tilerambase = 0x0200 - 0x200;
+	radica_eu3a14p(config);
+	m_vid->set_tilerambase(0x0a00 - 0x200);
 }
 
 
@@ -1743,20 +994,20 @@ ROM_START( rad_baskp )
 	ROM_LOAD( "basketball.bin", 0x000000, 0x400000, CRC(7d6ff53c) SHA1(1c75261d55e0107a3b8e8d4c1eb2854750f2d0e8) )
 ROM_END
 
-CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_adc, rad_gtg,       elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
+CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_altrambase_adc, rad_gtg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios (licensed from Incredible Technologies)", "Golden Tee Golf: Home Edition", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_rsg,  0,        0, radica_eu3a14,     rad_rsg,       elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
+CONS( 2005, rad_rsg,  0,        0, radica_eu3a14_altrambase,     rad_rsg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
 // some Connectv branded Real Swing Golf units have a language selection (checksum in test mode confirmed as different on said units)
-CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p,    rad_rsgp,      elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
+CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p_altrambase,    rad_rsgp,      elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
-CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,    radica_foot,   elan_eu3a14_state, init_rad_foot, "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
+CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,               radica_foot,   elan_eu3a14_state, empty_init,  "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_bb3,  0,        0, radica_eu3a14,     radica_bb3,    elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p,    radica_bb3p,   elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3,  0,        0, radica_eu3a14_altrambase,     radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p_altrambase,    radica_bb3p,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,     radica_hnt3,   elan_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,    radica_hnt3p,  elan_eu3a14_state, init_rad_hnt3, "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,                radica_hnt3,   elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3p,  elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_bask, 0,        0, radica_eu3a14,     radica_bask,   elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
-CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14,     radica_baskp,  elan_eu3a14_state, init_rad_gtg,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_baskp,  elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
