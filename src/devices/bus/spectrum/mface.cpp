@@ -26,20 +26,20 @@ DEFINE_DEVICE_TYPE(SPECTRUM_MPRINT, spectrum_mprint_device, "spectrum_mprint", "
 
 INPUT_PORTS_START(mface)
 	PORT_START("BUTTON")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Multiface") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_mface1_device, magic_button, 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Red Button") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_MEMBER(DEVICE_SELF, spectrum_mface_base_device, magic_button, 0)
 INPUT_PORTS_END
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-ioport_constructor spectrum_mface1_device::device_input_ports() const
+ioport_constructor spectrum_mface_base_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(mface);
 }
 
 //-------------------------------------------------
-//  ROM( mface1 )
+//  ROM( mface )
 //-------------------------------------------------
 
 ROM_START(mface1)
@@ -84,7 +84,7 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void spectrum_mface1_device::device_add_mconfig(machine_config &config)
+void spectrum_mface_base_device::device_add_mconfig(machine_config &config)
 {
 	/* passthru */
 	SPECTRUM_EXPANSION_SLOT(config, m_exp, spectrum_expansion_devices, nullptr);
@@ -118,10 +118,10 @@ const tiny_rom_entry *spectrum_mprint_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  spectrum_opus_device - constructor
+//  spectrum_mface_base_device - constructor
 //-------------------------------------------------
 
-spectrum_mface1_device::spectrum_mface1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+spectrum_mface_base_device::spectrum_mface_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_spectrum_expansion_interface(mconfig, *this)
 	, m_rom(*this, "rom")
@@ -130,22 +130,22 @@ spectrum_mface1_device::spectrum_mface1_device(const machine_config &mconfig, de
 }
 
 spectrum_mface1_device::spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spectrum_mface1_device(mconfig, SPECTRUM_MFACE1, tag, owner, clock)
+	: spectrum_mface_base_device(mconfig, SPECTRUM_MFACE1, tag, owner, clock)
 {
 }
 
 spectrum_mface128_device::spectrum_mface128_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spectrum_mface1_device(mconfig, SPECTRUM_MFACE128, tag, owner, clock)
+	: spectrum_mface_base_device(mconfig, SPECTRUM_MFACE128, tag, owner, clock)
 {
 }
 
 spectrum_mface3_device::spectrum_mface3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spectrum_mface1_device(mconfig, SPECTRUM_MFACE3, tag, owner, clock)
+	: spectrum_mface_base_device(mconfig, SPECTRUM_MFACE3, tag, owner, clock)
 {
 }
 
 spectrum_mprint_device::spectrum_mprint_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: spectrum_mface1_device(mconfig, SPECTRUM_MPRINT, tag, owner, clock)
+	: spectrum_mface_base_device(mconfig, SPECTRUM_MPRINT, tag, owner, clock)
 {
 }
 
@@ -153,7 +153,7 @@ spectrum_mprint_device::spectrum_mprint_device(const machine_config &mconfig, co
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void spectrum_mface1_device::device_start()
+void spectrum_mface_base_device::device_start()
 {
 	save_item(NAME(m_romcs));
 }
@@ -162,7 +162,7 @@ void spectrum_mface1_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void spectrum_mface1_device::device_reset()
+void spectrum_mface_base_device::device_reset()
 {
 	m_romcs = 0;
 }
@@ -172,12 +172,12 @@ void spectrum_mface1_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-READ_LINE_MEMBER(spectrum_mface1_device::romcs)
+READ_LINE_MEMBER(spectrum_mface_base_device::romcs)
 {
 	return m_romcs | m_exp->romcs();
 }
 
-void spectrum_mface1_device::pre_opcode_fetch(offs_t offset)
+void spectrum_mface_base_device::pre_opcode_fetch(offs_t offset)
 {
 	m_exp->pre_opcode_fetch(offset);
 
@@ -264,12 +264,12 @@ uint8_t spectrum_mprint_device::iorq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_mface1_device::iorq_w(offs_t offset, uint8_t data)
+void spectrum_mface_base_device::iorq_w(offs_t offset, uint8_t data)
 {
 	m_exp->iorq_w(offset, data);
 }
 
-uint8_t spectrum_mface1_device::mreq_r(offs_t offset)
+uint8_t spectrum_mface_base_device::mreq_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -292,7 +292,7 @@ uint8_t spectrum_mface1_device::mreq_r(offs_t offset)
 	return data;
 }
 
-void spectrum_mface1_device::mreq_w(offs_t offset, uint8_t data)
+void spectrum_mface_base_device::mreq_w(offs_t offset, uint8_t data)
 {
 	if (m_romcs)
 	{
@@ -308,7 +308,7 @@ void spectrum_mface1_device::mreq_w(offs_t offset, uint8_t data)
 		m_exp->mreq_w(offset, data);
 }
 
-INPUT_CHANGED_MEMBER(spectrum_mface1_device::magic_button)
+INPUT_CHANGED_MEMBER(spectrum_mface_base_device::magic_button)
 {
 	if (newval && !oldval)
 	{
