@@ -245,6 +245,8 @@ protected:
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
 	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
+	
+	uint8_t floating_bus_r();
 };
 
 
