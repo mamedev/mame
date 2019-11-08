@@ -17,7 +17,7 @@
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 #include "machine/1ma6.h"
-#include "bus/hp80_optroms/hp80_optrom.h"
+#include "machine/hp80_optrom.h"
 #include "softlist.h"
 #include "machine/bankdev.h"
 #include "bus/hp80_io/hp80_io.h"
@@ -184,7 +184,7 @@ private:
 	required_ioport m_io_key1;
 	required_ioport m_io_key2;
 	required_ioport m_io_modkeys;
-	required_device_array<hp80_optrom_slot_device , 6> m_rom_drawers;
+	required_device_array<hp80_optrom_device , 6> m_rom_drawers;
 	required_device<address_map_bank_device> m_rombank;
 	required_device_array<hp80_io_slot_device , IOP_COUNT> m_io_slots;
 	required_device<bitbanger_device> m_prt_graph_out;
@@ -1365,12 +1365,12 @@ void hp85_state::hp85(machine_config &config)
 	HP_1MA6(config, "tape", 0);
 
 	// Optional ROMs
-	HP80_OPTROM_SLOT(config, m_rom_drawers[0]);
-	HP80_OPTROM_SLOT(config, m_rom_drawers[1]);
-	HP80_OPTROM_SLOT(config, m_rom_drawers[2]);
-	HP80_OPTROM_SLOT(config, m_rom_drawers[3]);
-	HP80_OPTROM_SLOT(config, m_rom_drawers[4]);
-	HP80_OPTROM_SLOT(config, m_rom_drawers[5]);
+	HP80_OPTROM(config, m_rom_drawers[0]);
+	HP80_OPTROM(config, m_rom_drawers[1]);
+	HP80_OPTROM(config, m_rom_drawers[2]);
+	HP80_OPTROM(config, m_rom_drawers[3]);
+	HP80_OPTROM(config, m_rom_drawers[4]);
+	HP80_OPTROM(config, m_rom_drawers[5]);
 
 	// I/O slots
 	HP80_IO_SLOT(config, m_io_slots[0]).set_slot_no(0);

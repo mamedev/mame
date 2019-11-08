@@ -16,8 +16,7 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(HP9825_OPTROM_CART, hp9825_optrom_cart_device, "hp9825_optrom_cart", "HP9825 optional ROM cartridge")
-DEFINE_DEVICE_TYPE(HP9825_OPTROM_SLOT, hp9825_optrom_slot_device, "hp9825_optrom_slot", "HP9825 optional ROM slot")
+DEFINE_DEVICE_TYPE(HP9825_OPTROM, hp9825_optrom_device, "hp9825_optrom", "HP9825 optional ROM")
 
 struct optrom_region {
 	offs_t m_start;
@@ -37,57 +36,29 @@ constexpr std::array<struct optrom_region , 8> region_tab =
 	  { 0x5c00 ,0x2000 , "rom5c00" }
 	}};
 
-// +------------------------------+
-// |device_hp9825_optrom_interface|
-// +------------------------------+
-device_hp9825_optrom_interface::device_hp9825_optrom_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "hp9825optrom")
+// +--------------------+
+// |hp9825_optrom_device|
+// +--------------------+
+hp9825_optrom_device::hp9825_optrom_device(machine_config const &mconfig, char const *tag, device_t *owner)
+	: hp9825_optrom_device(mconfig, tag, owner, (uint32_t)0)
 {
 }
 
-// +-------------------------+
-// |hp9825_optrom_cart_device|
-// +-------------------------+
-hp9825_optrom_cart_device::hp9825_optrom_cart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hp9825_optrom_cart_device(mconfig , HP9825_OPTROM_CART , tag , owner , clock)
-{
-}
-
-hp9825_optrom_cart_device::hp9825_optrom_cart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock)
-	, device_hp9825_optrom_interface(mconfig, *this)
-{
-}
-
-// +-------------------------+
-// |hp9825_optrom_slot_device|
-// +-------------------------+
-hp9825_optrom_slot_device::hp9825_optrom_slot_device(machine_config const &mconfig, char const *tag, device_t *owner)
-	: hp9825_optrom_slot_device(mconfig, tag, owner, (uint32_t)0)
-{
-}
-
-hp9825_optrom_slot_device::hp9825_optrom_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, HP9825_OPTROM_SLOT, tag, owner, clock)
+hp9825_optrom_device::hp9825_optrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, HP9825_OPTROM, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
-	, device_single_card_slot_interface<device_hp9825_optrom_interface>(mconfig, *this)
-	, m_cart(nullptr)
 	, m_rom_limit(0xffffU)
 	, m_loaded_regions(0)
 	, m_space_r(nullptr)
 	, m_bank(*this , "rombank")
 {
-	option_reset();
-	option_add_internal("rom", HP9825_OPTROM_CART);
-	set_default_option(nullptr);
-	set_fixed(false);
 }
 
-hp9825_optrom_slot_device::~hp9825_optrom_slot_device()
+hp9825_optrom_device::~hp9825_optrom_device()
 {
 }
 
-void hp9825_optrom_slot_device::install_rw_handlers(address_space *space_r , address_space *space_w)
+void hp9825_optrom_device::install_rw_handlers(address_space *space_r , address_space *space_w)
 {
 	LOG("limit=%04x\n" , m_rom_limit);
 	m_loaded_regions = 0;
@@ -121,20 +92,19 @@ void hp9825_optrom_slot_device::install_rw_handlers(address_space *space_r , add
 	}
 }
 
-void hp9825_optrom_slot_device::device_add_mconfig(machine_config &config)
+void hp9825_optrom_device::device_add_mconfig(machine_config &config)
 {
 	ADDRESS_MAP_BANK(config, m_bank).set_options(ENDIANNESS_BIG, 16, 13, 0x400).set_shift(-1);
 }
 
-void hp9825_optrom_slot_device::device_start()
+void hp9825_optrom_device::device_start()
 {
-	m_cart = get_card_device();
 }
 
-image_init_result hp9825_optrom_slot_device::call_load()
+image_init_result hp9825_optrom_device::call_load()
 {
 	LOG("hp9825_optrom: call_load\n");
-	if (m_cart == nullptr || !loaded_through_softlist()) {
+	if (!loaded_through_softlist()) {
 		LOG("hp9825_optrom: must be loaded from sw list\n");
 		return image_init_result::FAIL;
 	}
@@ -156,7 +126,7 @@ image_init_result hp9825_optrom_slot_device::call_load()
 	return image_init_result::PASS;
 }
 
-void hp9825_optrom_slot_device::call_unload()
+void hp9825_optrom_device::call_unload()
 {
 	LOG("hp9825_optrom: call_unload\n");
 	if (m_space_r != nullptr && m_loaded_regions) {
@@ -179,9 +149,3 @@ void hp9825_optrom_slot_device::call_unload()
 	}
 	machine().schedule_soft_reset();
 }
-
-std::string hp9825_optrom_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
-{
-	return software_get_default_slot("rom");
-}
-
