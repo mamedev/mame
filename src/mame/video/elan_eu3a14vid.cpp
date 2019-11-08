@@ -65,6 +65,22 @@ uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 	return fullbankspace.read_byte((offset+x) & 0x3fffff);
 }
 
+uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
+{
+	int pix;
+
+	if (drawfromram)
+	{
+		pix = read_vram((baseaddr + count) & 0x3fff);
+	}
+	else
+	{
+		address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+		pix =  fullbankspace.read_byte((baseaddr+count) & 0x3fffff);
+	}
+	return pix;
+}
+
 void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
 {
 	int baseaddr = base * 256;
@@ -105,7 +121,6 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 		return;
 	}
 
-
 	int count = 0;
 	for (int y = 0; y < size; y++)
 	{
@@ -127,18 +142,6 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 
 		for (int x = 0; x < xstride; x++)
 		{
-			int pix;
-
-			if (drawfromram)
-			{
-				pix = read_vram((baseaddr + count) & 0x3fff);
-			}
-			else
-			{
-				address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-				pix =  fullbankspace.read_byte((baseaddr+count) & 0x3fffff);
-			}
-
 			if (realy >= cliprect.min_y && realy <= cliprect.max_y)
 			{
 				if (bpp == 8) // 8bpp
@@ -146,6 +149,8 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 					int realx = x + xposwithscroll;
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
+						uint8_t pix = readpix(baseaddr, count, drawfromram);
+
 						if (pix)
 						{
 							if (pridst[realx] <= priority)
@@ -172,29 +177,30 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 				else if (bpp == 4) // 4bpp
 				{
 					int realx = (x * 2) + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0xf0)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0xf0) >> 4) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
 
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					if (((realx + 1) >= cliprect.min_x) || (realx <= cliprect.max_x))
 					{
-						if (pix & 0x0f)
+						uint8_t pix = readpix(baseaddr, count, drawfromram);
+
+						int mask = 0xf0;
+						int shift = 4;
+
+						for (int i = 0; i < 4; i++)
 						{
-							if (pridst[realx] <= priority)
+							if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 							{
-								dst[realx] = (pix & 0x0f) | palette;
-								pridst[realx] = priority;
+								if (pix & mask)
+								{
+									if (pridst[realx] <= priority)
+									{
+										dst[realx] = ((pix & mask) >> shift) | palette;
+										pridst[realx] = priority;
+									}
+								}
 							}
+							mask >>= 4;
+							shift -= 4;
+							realx++;
 						}
 					}
 				}
@@ -205,57 +211,31 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 				else if (bpp == 2) // 2bpp (hnt3 ram text)
 				{
 					int realx = (x * 4) + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+
+					if (((realx + 3) >= cliprect.min_x) || (realx <= cliprect.max_x))
 					{
-						if (pix & 0xc0)
+						uint8_t pix = readpix(baseaddr, count, drawfromram);
+
+						int mask = 0xc0;
+						int shift = 6;
+
+						for (int i = 0; i < 4; i++)
 						{
-							if (pridst[realx] <= priority)
+							if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 							{
-								dst[realx] = ((pix & 0xc0) >> 6) | palette;
-								pridst[realx] = priority;
+								if (pix & 0xc0)
+								{
+									if (pridst[realx] <= priority)
+									{
+										dst[realx] = ((pix & mask) >> shift) | palette;
+										pridst[realx] = priority;
+									}
+								}
 							}
-						}
-					}
 
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x30)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x30) >> 4) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x0c)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x0c) >> 2) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x03)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x03) >> 0) | palette;
-								pridst[realx] = priority;
-							}
+							realx++;
+							mask >>= 2;
+							shift -= 2;
 						}
 					}
 				}

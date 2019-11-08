@@ -70,9 +70,9 @@ private:
 	required_device<address_map_bank_device> m_bank;
 	required_device<screen_device> m_screen;
 
-	uint8_t read_gfxdata(int offset, int x);
-
-	uint8_t read_vram(int offset);
+	inline uint8_t read_gfxdata(int offset, int x);
+	inline uint8_t read_vram(int offset);
+	inline uint8_t readpix(int baseaddr, int count, int drawfromram);
 
 	uint8_t m_scrollregs[4];
 	uint8_t m_tilecfg[6];
