@@ -16,11 +16,12 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05soun
 #include "logmacro.h"
 
 
-elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock)
-	, device_sound_interface(mconfig, *this)
-	, m_stream(nullptr)
-	, m_space_read_cb(*this)
+elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_stream(nullptr),
+	m_space_read_cb(*this),
+	m_sound_end_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 {
 }
 
@@ -28,6 +29,19 @@ void elan_eu3a05_sound_device::device_start()
 {
 	m_space_read_cb.resolve_safe(0);
 	m_stream = stream_alloc(0, 1, 8000);
+
+	for (devcb_write_line &cb : m_sound_end_cb)
+		cb.resolve_safe();
+
+	save_item(NAME(m_sound_byte_address));
+	save_item(NAME(m_sound_byte_len));
+	save_item(NAME(m_sound_current_nib_pos));
+	save_item(NAME(m_isstopped));
+	save_item(NAME(m_sound_trigger));
+	save_item(NAME(m_sound_unk));
+	save_item(NAME(m_volumes));
+	save_item(NAME(m_5024));
+	save_item(NAME(m_50a9));
 }
 
 void elan_eu3a05_sound_device::device_reset()
@@ -40,6 +54,15 @@ void elan_eu3a05_sound_device::device_reset()
 	}
 
 	m_isstopped = 0x3f;
+
+	m_sound_trigger = 0x00;
+	m_sound_unk = 0x00;
+
+	m_volumes[0] = 0xff;
+	m_volumes[1] = 0x0f;
+
+	m_5024 = 0x00;
+	m_50a9 = 0x00;
 }
 
 //-------------------------------------------------
@@ -81,8 +104,7 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 					m_sound_current_nib_pos[channel] = 0;
 					m_isstopped |= (1 << channel);
 
-					// maybe should generate an interrupt with vector
-					// ffb8, ffbc, ffc0, ffc4, ffc8, or ffcc depending on which channel finished??
+					m_sound_end_cb[channel](1); // generate interrupt based on which channel just stopped?
 				}
 			}
 			else
@@ -93,6 +115,8 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 		outpos++;
 	}
 }
+
+
 
 
 void elan_eu3a05_sound_device::handle_sound_addr_w(int which, int offset, uint8_t data)
@@ -260,8 +284,11 @@ void elan_eu3a05_sound_device::handle_sound_trigger(int which)
 {
 	LOGMASKED( LOG_AUDIO, "Triggering operation on channel (%d) with params %08x %08x\n", which, m_sound_byte_address[which], m_sound_byte_len[which]);
 
-	m_sound_current_nib_pos[which] = 0;
-	m_isstopped &= ~(1 << which);
+	if (m_isstopped & (1 << which)) // golden tee will repeatedly try to start the music on the title screen (although could depend on a status read first?)
+	{
+		m_sound_current_nib_pos[which] = 0;
+		m_isstopped &= ~(1 << which);
+	}
 }
 
 
@@ -271,4 +298,108 @@ READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)
 
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_50a8_r\n", machine().describe_context());
 	return m_isstopped;
+}
+
+READ8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r)
+{
+	return m_volumes[offset];
+}
+
+WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)
+{
+	m_volumes[offset] = data;
+}
+
+WRITE8_MEMBER(elan_eu3a05_sound_device::write)
+{
+	switch (offset)
+	{
+	case 0x00: case 0x01: case 0x02: // channel 0 address
+	case 0x03: case 0x04: case 0x05: // channel 1 address
+	case 0x06: case 0x07: case 0x08: // channel 2 address
+	case 0x09: case 0x0a: case 0x0b: // channel 3 address
+	case 0x0c: case 0x0d: case 0x0e: // channel 4 address
+	case 0x0f: case 0x10: case 0x11: // channel 5 address
+		elan_eu3a05_sound_addr_w(space, offset, data);
+		break;
+
+	case 0x12: case 0x13: case 0x14: // channel 0 length
+	case 0x15: case 0x16: case 0x17: // channel 1 length
+	case 0x18: case 0x19: case 0x1a: // channel 2 length
+	case 0x1b: case 0x1c: case 0x1d: // channel 3 length
+	case 0x1e: case 0x1f: case 0x20: // channel 4 length
+	case 0x21: case 0x22: case 0x23: // channel 5 length
+		elan_eu3a05_sound_size_w(space, offset - 0x12, data);
+		break;
+
+	case 0x24: // unk
+		m_5024 = data;
+		break;
+
+	case 0x25: // trigger
+		elan_eu3a05_sound_trigger_w(space, offset - 0x25, data);
+		break;
+
+	case 0x26: // volume channels 0,1,2,3 ? (lunar rescue sets 0x03 here and 0x00 below and just uses a single channel)
+	case 0x27: // volume channels 5,6 ?
+		elan_eu3a05_sound_volume_w(space, offset - 0x26, data);
+		break;
+
+	case 0x28: // stopped status?
+		LOGMASKED( LOG_AUDIO, "%s: write to stop state register? %02x\n", machine().describe_context(), data);
+		break;
+
+	case 0x29: // interrupt enable? or looping?
+		m_50a9 = data;
+		break;
+	}
+}
+
+READ8_MEMBER(elan_eu3a05_sound_device::read)
+{
+	uint8_t ret = 0x00;
+
+	switch (offset)
+	{
+	case 0x00: case 0x01: case 0x02: // channel 0 address
+	case 0x03: case 0x04: case 0x05: // channel 1 address
+	case 0x06: case 0x07: case 0x08: // channel 2 address
+	case 0x09: case 0x0a: case 0x0b: // channel 3 address
+	case 0x0c: case 0x0d: case 0x0e: // channel 4 address
+	case 0x0f: case 0x10: case 0x11: // channel 5 address
+		ret = elan_eu3a05_sound_addr_r(space, offset);
+		break;
+
+	case 0x12: case 0x13: case 0x14: // channel 0 length
+	case 0x15: case 0x16: case 0x17: // channel 1 length
+	case 0x18: case 0x19: case 0x1a: // channel 2 length
+	case 0x1b: case 0x1c: case 0x1d: // channel 3 length
+	case 0x1e: case 0x1f: case 0x20: // channel 4 length
+	case 0x21: case 0x22: case 0x23: // channel 5 length
+		ret = elan_eu3a05_sound_size_r(space, offset - 0x12);
+		break;
+
+	case 0x24: // unk
+		ret = m_5024;
+		break;
+
+	case 0x25: // trigger
+		ret = elan_eu3a05_sound_trigger_r(space, offset - 0x25);
+		break;
+
+	case 0x26: // volume channels 0,1,2,3 ?
+	case 0x27: // volume channels 5,6 ?
+		ret = elan_eu3a05_sound_volume_r(space, offset - 0x26);
+		break;
+
+	case 0x28: // stopped status?
+		ret = elan_eu3a05_50a8_r(space, offset - 0x28);
+		break;
+
+	case 0x29: // interrupt enable? or looping?
+		ret = m_50a9;
+		break;
+	}
+
+	return ret;
 }
