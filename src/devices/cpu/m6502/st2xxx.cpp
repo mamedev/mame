@@ -66,6 +66,7 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_lfra(0)
 	, m_lac(0)
 	, m_lpwm(0)
+	, m_bctr(0)
 {
 	program_config.m_internal_map = std::move(internal_map);
 }
@@ -171,6 +172,12 @@ void st2xxx_device::save_common_registers()
 	save_item(NAME(m_lfra));
 	save_item(NAME(m_lac));
 	save_item(NAME(m_lpwm));
+	if (st2xxx_bctr_mask() != 0)
+	{
+		save_item(NAME(m_bctr));
+		save_item(NAME(m_brs));
+		save_item(NAME(m_bdiv));
+	}
 }
 
 void st2xxx_device::device_reset()
@@ -221,6 +228,9 @@ void st2xxx_device::device_reset()
 	m_lfra = 0;
 	m_lac = 0;
 	m_lpwm = 0;
+
+	// reset UART and BRG
+	m_bctr = 0;
 }
 
 u8 st2xxx_device::acknowledge_irq()
@@ -334,6 +344,16 @@ u8 st2xxx_device::pcl_r()
 void st2xxx_device::pcl_w(u8 data)
 {
 	pctrl_w(6, data);
+}
+
+u8 st2xxx_device::pmcr_r()
+{
+	return m_pmcr;
+}
+
+void st2xxx_device::pmcr_w(u8 data)
+{
+	m_pmcr = data & st2xxx_pmcr_mask();
 }
 
 u8 st2xxx_device::bten_r()
@@ -716,6 +736,36 @@ u8 st2xxx_device::lpwm_r()
 void st2xxx_device::lpwm_w(u8 data)
 {
 	m_lpwm = data & st2xxx_lpwm_mask();
+}
+
+u8 st2xxx_device::bctr_r()
+{
+	return m_bctr;
+}
+
+void st2xxx_device::bctr_w(u8 data)
+{
+	m_bctr = data & st2xxx_bctr_mask();
+}
+
+u8 st2xxx_device::brs_r()
+{
+	return m_brs;
+}
+
+void st2xxx_device::brs_w(u8 data)
+{
+	m_brs = data;
+}
+
+u8 st2xxx_device::bdiv_r()
+{
+	return m_bdiv;
+}
+
+void st2xxx_device::bdiv_w(u8 data)
+{
+	m_bdiv = data;
 }
 
 #include "cpu/m6502/st2xxx.hxx"

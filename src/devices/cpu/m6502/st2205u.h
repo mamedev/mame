@@ -17,7 +17,7 @@ class st2205u_device : public st2xxx_device
 {
 public:
 	enum {
-		ST_BTC = ST_LPWM + 1,
+		ST_BTC = ST_BDIV + 1,
 		ST_T0C,
 		ST_T1C,
 		ST_T2C,
@@ -36,6 +36,7 @@ protected:
 
 	virtual u16 st2xxx_ireq_mask() const override { return 0xdfff; }
 	virtual const char *st2xxx_irq_name(int i) const override;
+	virtual u8 st2xxx_pmcr_mask() const override { return 0xff; }
 	virtual unsigned st2xxx_bt_divider(int n) const override;
 	virtual u8 st2xxx_prs_mask() const override { return 0xc0; }
 	virtual void st2xxx_tclk_start() override;
@@ -48,6 +49,7 @@ protected:
 	virtual u8 st2xxx_lctr_mask() const override { return 0xef; }
 	virtual u8 st2xxx_lckr_mask() const override { return 0x3f; }
 	virtual u8 st2xxx_lpwm_mask() const override { return 0xff; }
+	virtual u8 st2xxx_bctr_mask() const override { return 0xb7; }
 
 private:
 	class mi_st2205u : public mi_st2xxx {
@@ -79,8 +81,6 @@ private:
 	void brrl_w(u8 data);
 	u8 brrh_r();
 	void brrh_w(u8 data);
-	u8 pmcr_r();
-	void pmcr_w(u8 data);
 	u8 btc_r();
 	void btc_w(u8 data);
 	u8 tc_12bit_r(offs_t offset);
