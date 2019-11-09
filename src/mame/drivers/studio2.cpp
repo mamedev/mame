@@ -247,6 +247,7 @@ protected:
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_a00 );
+	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_READ8_MEMBER( cart_e00 );
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
@@ -522,6 +523,7 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 // trampolines to cartridge
 READ8_MEMBER( studio2_state::cart_400 ) { return m_cart->read_rom(offset); }
 READ8_MEMBER( studio2_state::cart_a00 ) { return m_cart->read_rom(offset + 0x600); }
+READ8_MEMBER( studio2_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
 READ8_MEMBER( studio2_state::cart_e00 ) { return m_cart->read_rom(offset + 0xa00); }
 READ8_MEMBER( mpt02_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
 
@@ -532,6 +534,7 @@ void studio2_state::machine_start()
 		// these have to be installed only if a cart is present, because they partially overlap the built-in game
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0a00, 0x0bff, read8_delegate(*this, FUNC(studio2_state::cart_a00)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0dff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_e00)));
 	}
 
@@ -573,11 +576,11 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 	{
 		if (image.is_filetype("st2"))
 		{
-			uint8_t header[0x100];
-			uint8_t catalogue[10], title[32], pages[64];
+			char header[0x100];
+			uint8_t pages[64];
 			uint8_t blocks;
 
-			if (image.length() <= 0x100)
+			if (image.length() < 0x200)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file");
 				return image_init_result::FAIL;
@@ -593,25 +596,34 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			}
 
 			blocks = header[4];
-			memcpy(&catalogue, &header[16], 10);
-			memcpy(&title, &header[32], 32);
+			if ((blocks < 2) || (blocks > 11))
+			{
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid .ST2 file");
+				return image_init_result::FAIL;
+			}
+
+			if (image.length() != (blocks << 8))
+				logerror("Wrong sized image: Expected 0x%04X; Found 0x%04X",blocks<<8,image.length());
+
+			char* catalogue = &header[16];
+			char* title = &header[32];
 			memcpy(&pages, &header[64], 64);
+
+			logerror("ST2 Catalogue: %s\n", catalogue);
+			logerror("ST2 Title: %s\n", title);
 
 			/* read ST2 cartridge into memory */
 			for (int block = 0; block < (blocks - 1); block++)
 			{
+				u16 offset = pages[block] << 8;
 				if (pages[block] < 4)
-					logerror("ST2 invalid block %u to %04x\n", block, pages[block] << 8);
+					logerror("ST2 invalid block %u to 0x%04x\n", block, offset);
 				else
 				{
-					uint16_t offset = (pages[block] << 8) - 0x400;
-					logerror("ST2 Reading block %u to %04x\n", block, offset);
-					image.fread(m_cart->get_rom_base() + offset, 0x100);
+					logerror("ST2 Reading block %u to 0x%04x\n", block, offset);
+					image.fread(m_cart->get_rom_base() + offset - 0x400, 0x100);
 				}
 			}
-
-			logerror("ST2 Catalogue: %s\n", catalogue);
-			logerror("ST2 Title: %s\n", title);
 		}
 		else
 		{
