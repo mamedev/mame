@@ -15,6 +15,13 @@
 
     Keyboard: D8748D, 6.000MHz Crystal, Beeper
 
+    For the QVT102, the 'Setup' function is entered by typing F11. The 'left'
+    and 'right' arrow keys then move between entries on a line, and the 'up'
+    and 'down' arrow keys move between lines. The space bar cycles through
+    options for an entry. Shift-S saves the values to NVRAM; F11 exits without
+    saving; Shift-D resets to the default values; and Shift-R restores from
+    the saved values.
+
     TODO:
     - Support QVT-102A differences (bidirectional aux, different keyboard)
     - Key click sounds weird
@@ -43,28 +50,28 @@
 class qvt102_state : public driver_device
 {
 public:
-	qvt102_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_irqs(*this, "irqs"),
-		m_kbdmcu(*this, "kbdmcu"),
-		m_keys_p1(*this, "P1_%u", 0U),
-		m_keys_p2(*this, "P2_%u", 0U),
-		m_keys_special(*this, "SPECIAL"),
-		m_jumper(*this, "JUMPER"),
-		m_acia(*this, "acia"),
-		m_host(*this, "host"),
-		m_aux(*this, "aux"),
-		m_ctc(*this, "ctc"),
-		m_crtc(*this, "crtc"),
-		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_speaker(*this, "speaker"),
-		m_vram(*this, "videoram"),
-		m_char_rom(*this, "chargen"),
-		m_latch(0),
-		m_kbd_data(0),
-		m_kbd_bus(0xff), m_kbd_p1(0xff), m_kbd_p2(0xff)
+	qvt102_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_irqs(*this, "irqs")
+		, m_kbdmcu(*this, "kbdmcu")
+		, m_keys_p1(*this, "P1_%u", 0U)
+		, m_keys_p2(*this, "P2_%u", 0U)
+		, m_keys_special(*this, "SPECIAL")
+		, m_jumper(*this, "JUMPER")
+		, m_acia(*this, "acia")
+		, m_host(*this, "host")
+		, m_aux(*this, "aux")
+		, m_ctc(*this, "ctc")
+		, m_crtc(*this, "crtc")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
+		, m_speaker(*this, "speaker")
+		, m_vram(*this, "videoram")
+		, m_char_rom(*this, "chargen")
+		, m_latch(0)
+		, m_kbd_data(0)
+		, m_kbd_bus(0xff), m_kbd_p1(0xff), m_kbd_p2(0xff)
 	{ }
 
 	void qvt102(machine_config &config);
@@ -362,9 +369,14 @@ READ_LINE_MEMBER(qvt102_state::mcu_t0_r)
 {
 	int state = 1;
 
-	if (BIT(m_kbd_bus, 4) == 0) state = BIT(m_keys_special->read(), 0);
-	if (BIT(m_kbd_bus, 5) == 0) state = BIT(m_keys_special->read(), 1);
-	if (BIT(m_kbd_bus, 6) == 0) state = BIT(m_keys_special->read(), 2);
+	// The keyboard firmware also scans for a key at bit 3, and it appears
+	// to be a modifier key and is passed to the host in bit 3 of the
+	// second code, but the terminal firmware appears to ignore it. The
+	// schematics show no sign of a connection.
+
+	if (BIT(m_kbd_bus, 4) == 0) state &= BIT(m_keys_special->read(), 0);
+	if (BIT(m_kbd_bus, 5) == 0) state &= BIT(m_keys_special->read(), 1);
+	if (BIT(m_kbd_bus, 6) == 0) state &= BIT(m_keys_special->read(), 2);
 
 	return state;
 }
@@ -376,9 +388,9 @@ READ_LINE_MEMBER(qvt102_state::mcu_t1_r)
 	for (int i = 0; i < 8; i++)
 	{
 		if (BIT(m_kbd_p1, i) == 0)
-			state = BIT(m_keys_p1[(m_kbd_bus >> 4) & 7]->read(), i);
+			state &= BIT(m_keys_p1[(m_kbd_bus >> 4) & 7]->read(), i);
 		if (BIT(m_kbd_p2, i) == 0)
-			state = BIT(m_keys_p2[(m_kbd_bus >> 4) & 7]->read(), i);
+			state &= BIT(m_keys_p2[(m_kbd_bus >> 4) & 7]->read(), i);
 	}
 
 	return state;
@@ -394,6 +406,23 @@ WRITE8_MEMBER(qvt102_state::mcu_p2_w)
 	m_kbd_p2 = data;
 
 	m_kbd_data = !BIT(data, 7);
+
+	// The keyboard serial data is read by the host using a bit banger in
+	// the IRQ handler and it is a tight loop requiring good
+	// synchronization between the host CPU and keyboard controller.  A
+	// word starts with a raising of the line which (inverted) triggers
+	// the IRQ and the handler then waits and synchronizes to a falling
+	// edge. There is a delay of about 189us before this falling edge. The
+	// IRQ handler then reads the bits in a tight loop, reading the last
+	// after around 332 usec.
+	//
+	// The strategy here is to boost the interleave when the line is
+	// written high, and to hold this boost for 350us. This ensures that
+	// the boost lasts for the critical section of the IRQ handler.
+	//
+	if (m_kbd_data)
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(350));
+
 	m_irqs->in_w<2>(m_kbd_data);
 }
 
@@ -584,6 +613,9 @@ WRITE_LINE_MEMBER(qvt102_state::host_dcd_w)
 
 void qvt102_state::machine_start()
 {
+	m_kbd_data = 0;
+	m_kbd_bus = m_kbd_p1 = m_kbd_p2 = 0xff;
+
 	// register for save states
 	save_item(NAME(m_latch));
 	save_item(NAME(m_kbd_data));
@@ -595,8 +627,6 @@ void qvt102_state::machine_start()
 void qvt102_state::machine_reset()
 {
 	m_latch = 0;
-	m_kbd_data = 0;
-	m_kbd_bus = m_kbd_p1 = m_kbd_p2 = 0xff;
 }
 
 
@@ -608,9 +638,6 @@ void qvt102_state::qvt102(machine_config &config)
 {
 	M6800(config, m_maincpu, 16.6698_MHz_XTAL / 18);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qvt102_state::mem_map);
-
-	// needs a tight sync with the keyboard cpu
-	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6800_IRQ_LINE);
 
