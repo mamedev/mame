@@ -129,7 +129,7 @@ protected:
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_region_stars(*this, "stars")
 		, m_led_cboard(*this, "led_cboard%u", 0U)
-		, bootleg_sprite_renderer(fcrash_render_sprites)
+		, bootleg_sprite_renderer(&cps_state::fcrash_render_sprites)
 	{ }
 
 public:
