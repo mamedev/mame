@@ -3605,7 +3605,45 @@ ROM_START( supgoal )
 	ROM_LOAD( "supgoal.nv", 0x0000, 0x0080, CRC(63806aae) SHA1(b82f0995799e9259a1f071ea8b64a719f9e3c9e9) )
 ROM_END
 
-// 837-13556 REV.A, 837-13247 PCB
+/*
+Fantasy Zone ROM board
+837-13556 REV.A
+837-13247 (C) Sega
+|----------------------------------------------------------|
+|       ----CN3----                     ----CN4----        |
+|                                                          |
+| CN5 ADM202  IC11           IC10           IC9            |
+|                                                          |
+| 74F245N     IC12           IC8            IC7            |
+|                                                          |
+| 74F245N     IC13           IC6            IC5            |
+|                                                          |
+| J J J J J                  IC4            IC3            |
+| P P P P P 315-5930 74F139N                               |
+| 5 4 3 2 1                  IC2            IC1            |
+| 74F245N 74F245N 74F245N                                  |
+|        ----CN1----                    ----CN2----        |
+|----------------------------------------------------------|
+Notes:
+ IC1-IC12 - MaskROMs (DIP42), 8Mb or 16Mb or 32Mb. Not all positions are populated
+     IC13 - EPROM (DIP40), 27C4002
+ 315-5930 - GAL16V8D (DIP20)
+  JP1-JP2 - JUMPERs, ROM size
+                 JP2 JP1
+             8M  2-3 2-3
+             16M 2-3 1-2
+             32M 1-2 1-2
+  JP3-JP4 - JUMPERs
+                    JP4 JP3
+             MODE0  1-2 1-2
+             MODE1  1-2 2-3
+             MODE2  2-3 1-2
+             MODE3  2-3 2-3
+      JP5 - JUMPER, ADDRESS
+             1-2 - 2000000h-39FFFFFh
+             2-3 - 3A00000h-4FFFFFFh
+CN1/2/3/4 - connectors joining to main board
+*/
 ROM_START( fanzonem )
 	STV_BIOS
 
@@ -3639,7 +3677,6 @@ GAME( 1996, diehard,   stvbios, stv,      stv,      stv_state,   init_diehard,  
 GAME( 1996, dnmtdeka,  diehard, stv,      stv,      stv_state,   init_dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, elandore,  stvbios, stv_5881, stv6b,    stv_state,   init_elandore,   ROT0,   "Sai-Mate",                     "Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game) (J 990202 V1.000)", MACHINE_NOT_WORKING )
 GAME( 1999, ffrevng10, ffreveng,stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990714 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, ffreveng,  stvbios, stv_5881, stv6b,    stv_state,   init_ffreveng,   ROT0,   "Capcom",                       "Final Fight Revenge (JUET 990930 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fhboxers,  stvbios, stv,      stv,      stv_state,   init_fhboxers,   ROT0,   "Sega",                         "Funky Head Boxers (JUETBKAL 951218 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -3740,6 +3777,7 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 /* Gives I/O errors */
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
 GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,    "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 /* CD games */
