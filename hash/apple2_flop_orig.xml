@@ -8514,4 +8514,80 @@
 		</part>
 	</software>
 
+	<software name="wrdzappr">
+		<description>Word Zapper</description>
+		<year>1990</year>
+		<publisher>Micrograms Publishing</publisher>
+		<info name="release" value="2019-11-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Beginning"/>
+			<dataarea name="flop" size="235499">
+				<rom name="word zapper disk 1 - beginning.woz" size="235499" crc="1c20054b" sha1="2331dee02b4bdcfc7d93310e7cb8956eafd6e714" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Advanced"/>
+			<dataarea name="flop" size="235498">
+				<rom name="word zapper disk 2 - advanced.woz" size="235498" crc="6faf09df" sha1="b3591e7d5fb1a2cc4f86ec89a75bbc00e1d998b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brplzoom">
+		<description>Buck Rogers: Planet of Zoom</description>
+		<year>1984</year>
+		<publisher>Sega Enterprises</publisher>
+		<info name="release" value="2019-11-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+		<!-- Some emulators may have difficulty emulating this image due to its
+		extreme copy protection methods.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194851">
+				<rom name="buck rogers - planet of zoom.woz" size="194851" crc="436cb456" sha1="a652a9191fd0c6db7e83681fa2153aa14a79e1ce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pharrevg">
+		<description>Pharaoh's Revenge</description>
+		<year>1988</year>
+		<publisher></publisher>
+		<info name="release" value="2019-11-04"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242161">
+				<rom name="pharaoh's revenge side a.woz" size="242161" crc="e6bef238" sha1="2d6d09716f1fc1c24b8c6658ff813d126122a544" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="242161">
+				<rom name="pharaoh's revenge side b (boot).woz" size="242161" crc="9bb62483" sha1="c45c93711ad545687dae142e7505c5bff1c001d8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mchess20">
+		<description>MicroChess (Version 2.0)</description>
+		<year>1978</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-11-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple ][ with 16K.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234771">
+				<rom name="microchess 2.0.woz" size="234771" crc="ee2d1774" sha1="57564599fccacb095d08380f73659ac96d828209" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
