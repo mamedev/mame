@@ -129,7 +129,6 @@ private:
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
 	required_device<palette_device> m_palette;
-	memory_region *m_cart_rom;
 
 	std::unique_ptr<uint16_t[]> m_font;
 	std::unique_ptr<uint16_t[]> m_bgmap;
