@@ -774,6 +774,43 @@
 		<publisher>4AM</publisher>
 		<info name="usage" value="Defective disk image format, but is worked around by MAME's detection." />
 		<info name="release" value="2019-03-11"/>
+		<!--
+		* Initial release supports these games:
+		Beer Run (Sirius)
+		Bug Attack (Cavalier)
+		Choplifter (Broderbund) (*)
+		David's Midnight Magic (Broderbund) (*)
+		Dueling Digits (Broderbund)
+		Eggs-It (Gebelli)
+		Frogger (On-Line Systems) (*)
+		Gamma Goblins (Sirius)
+		Genetic Drift (Broderbund)
+		High Orbit (Gebelli)
+		Horizon V (Gebelli)
+		Jawbreaker ][ (On-Line Systems)
+		Juggler (IDSI)
+		Labyrinth (Broderbund)
+		Lazer Silk (Gebelli)
+		Lunar Leepers (On-Line Systems)
+		Neptune (Gebelli)
+		Orbitron (Sirius)
+		Pest Patrol (On-Line Systems)
+		Phaser Fire (Gebelli)
+		Quadrant 6112 (Sensible Software)
+		Red Alert (Broderbund)
+		Russki Duck (Gebelli)
+		Seafox (Broderbund)
+		Serpentine (Broderbund) (*)
+		Sky Blazer (Broderbund)
+		Space Eggs (Sirius)
+		Space Quarks (Broderbund)
+		Star Blazer (Broderbund)
+		Star Thief (Cavalier)
+		Trick Shot (IDSI)
+		Zenith (Gebelli)
+		(*) later re-released with different copy protection.
+		Only the first release requires Anti-M.
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -788,6 +825,20 @@
 		<publisher>4AM</publisher>
 		<info name="usage" value="Defective disk image format, but is worked around by MAME's detection." />
 		<info name="release" value="2019-03-16"/>
+		<!-- 
+		* Support booting 13-sector disks
+		* Support booting disks on Apple //c and IIgs which would otherwise
+		time out looking for a boot sector (SpiraDisc, some early EA games)
+		* Bypass a peripheral scan in some games that would hang on some
+		peripherals	and crash others and require a hardware power cycle in
+		order to reboot	properly (SpiraDisc)
+		* Support multiple versions of "David's Midnight Magic"
+		* Remove "unsupported game" error, always continue booting
+		* Bypass prompt if launched from hard drive (press the open- or
+		closed-apple key on startup to show the prompt)
+		* Minimum requirements lowered to 48K Apple ][+ (still useful for
+		booting 13-sector disks)
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -802,6 +853,11 @@
 		<publisher>4AM</publisher>
 		<info name="usage" value="Defective disk image format can't be properly detected in MAME due to non-ProDOS bootloader." />
 		<info name="release" value="2019-03-24"/>
+		<!--
+		* Support booting ProDOS on clones
+		* Additional patches for "Star Thief"
+		* Launch Anti-M program faster
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -815,6 +871,10 @@
 		<year>2019</year>
 		<publisher>4AM</publisher>
 		<info name="release" value="2019-04-12"/>
+		<!--
+		* Support booting from drive 2
+		* Fix booting on MAME (See version 1.2 usage tag for details)
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -828,6 +888,12 @@
 		<year>2019</year>
 		<publisher>4AM</publisher>
 		<info name="release" value="2019-05-24"/>
+		<!--
+		* Support "Computer Foosball"
+		* Fix a crash when booting early Spinnaker Software disks
+		(e.g. "Alphabet Zoo," "In Search of The Most Amazing Thing")
+		* Fix booting ProDOS disks from drive 2
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -841,10 +907,30 @@
 		<year>2019</year>
 		<publisher>4AM</publisher>
 		<info name="release" value="2019-05-24"/>
+		<!--
+		* Support "Lady Tut"
+		-->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="anti-m-v1.5-2019-06-11.dsk" size="143360" crc="bacef478" sha1="826df7cb304ce5286cd1c2805fac888356898185" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antim16">
+		<description>Anti-M (version 1.6)</description>
+		<year>2019</year>
+		<publisher>4AM</publisher>
+		<info name="release" value="2019-11-09"/>
+		<!--
+		* Support Personal Software 13-sector disks 
+		("MicroChess 2.0," "Checker King," "Gammon Gambler")
+		-->
+
+		<part name="flop0" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="anti-m-v1.6-2019-11-09.dsk" size="143360" crc="3f604ff3" sha1="6c556f9ade3973069570be1f76560d4730e083b8" />
 			</dataarea>
 		</part>
 	</software>
