@@ -121,12 +121,22 @@ READ8_MEMBER( sega_315_5649_device::read )
 			data = m_port_value[offset];
 		break;
 
-	// serial channel 1/2 input
+	// RS-422 channel 1/2 input
 	case 0x0b: data = m_serial_rd_cb[0](0); break;
 	case 0x0c: data = m_serial_rd_cb[1](0); break;
 
-	// serial status
-	case 0x0d: data = 0; break; // not implemented
+	// RS-422 status
+	// 7--- ----  RX2IE
+	// -6-- ----  RX1IE some I-error ?
+	// --5- ----  RX2FE
+	// ---4 ----  RX1FE framing error ?
+	// ---- 3---  RX2BF
+	// ---- -2--  RX1BF 1 = receive buffer full
+	// ---- --1-  TX2BF
+	// ---- ---0  TX1BF 1 = transmit buffer full
+	case 0x0d:
+		data = 0x0c; // HACK, recv buffers always full, transmit buffers always empty
+		break;
 
 	// analog input, auto-increments
 	case 0x0f:
@@ -162,11 +172,16 @@ WRITE8_MEMBER( sega_315_5649_device::write )
 	// port direction register (0 = output, 1 = input)
 	case 0x08: m_port_config = data; break;
 
-	// serial channel 1/2 output
+	// RS-422 channel 1/2 output
 	case 0x09: m_serial_wr_cb[0](data); break;
 	case 0x0a: m_serial_wr_cb[1](data); break;
 
 	// mode register
+	// 7--- ----  port G counter mode
+	// -6-- ----  ?
+	// --5- ----  RS-422 satellite mode
+	// ---4 ----  RS-422 loopback
+	// ---- 3210  RS-422 satellite N#
 	case 0x0e:
 		m_mode = data;
 		break;
