@@ -219,7 +219,7 @@ void elan_eu3a14_state::bank_map(address_map &map)
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
 }
 
-void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
+void elan_eu3a14_state::radica_eu3a14_map(address_map& map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
@@ -257,12 +257,12 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 
 	// 5060 - 506e  r/w during startup on foot (adc?)
 
-	// 0x5080 - 50ff = SOUND AREA (same as eu5a03?)
-	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
+	// 0x5080 - 50bf = SOUND AREA (same as eu5a03?)
+	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
 
 	// 0x5100 - 517f = VIDEO AREA
-	map(0x5100, 0x517f).rw(m_vid, FUNC(elan_eu3a14vid_device::read), FUNC(elan_eu3a14vid_device::write));
-	
+	map(0x5100, 0x517f).m(m_vid, FUNC(elan_eu3a14vid_device::map));
+
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 
 	map(0xe000, 0xffff).rom().region("maincpu", 0x0000);

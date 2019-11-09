@@ -234,7 +234,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x5060, 0x506d).ram(); // read/written by tetris (ADC?)
 
 	// 508x sound
-	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
+	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
 
 	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));

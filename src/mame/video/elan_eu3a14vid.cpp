@@ -8,10 +8,88 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device, "elan_eu3a14vid", "El
 
 elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_bank(*this, finder_base::DUMMY_TAG),
-	m_screen(*this, finder_base::DUMMY_TAG)
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 7, 0, address_map_constructor(FUNC(elan_eu3a14vid_device::map), this))
 {
+}
+
+device_memory_interface::space_config_vector elan_eu3a14vid_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+/* Windowing mode note
+
+ huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and "Target Range" mode timer??
+ 5100 - 0x0f when effect is enabled, 0x00 otherwise?
+ 5101 - 0x0e in both modes
+ 5102 - 0x86 in both modes
+ 5103 - 0x0e in tropy room (left?)                                  / 0x2a in "Target Range" mode (left position?)
+ 5104 - trophy room window / highlight top, move with cursor        / 0xbf in "Target Range" mode (top?)
+ 5105 - 0x52 in trophy room (right?)                                / counts from 0xa1 to 0x2a in "Target Range" mode (right position?)
+ 5106 - trophy room window / highlight bottom, move with cursor     / 0xcb in "Target Range" mode (bottom?)
+*/
+
+void elan_eu3a14vid_device::map(address_map &map)
+{
+	map(0x00, 0x7f).rw(FUNC(elan_eu3a14vid_device::read_unmapped), FUNC(elan_eu3a14vid_device::write_unmapped));
+
+	map(0x00, 0x06).ram(); // see Windowing note above
+	map(0x07, 0x07).rw(FUNC(elan_eu3a14vid_device::reg5107_r), FUNC(elan_eu3a14vid_device::reg5107_w)); // writes on transitions, maybe layer disables?
+	map(0x08, 0x08).rw(FUNC(elan_eu3a14vid_device::reg5108_r), FUNC(elan_eu3a14vid_device::reg5108_w)); // 0x04 in both modes // hnt3, frequently rewrites same values TODO
+	map(0x09, 0x09).rw(FUNC(elan_eu3a14vid_device::reg5109_r), FUNC(elan_eu3a14vid_device::reg5109_w)); // related to above?
+	// 0x0a
+	// 0x0b
+	// 0x0c
+	// 0x0d
+	// 0x0e
+	// 0x0f
+	map(0x10, 0x15).rw(FUNC(elan_eu3a14vid_device::tilecfg_r), FUNC(elan_eu3a14vid_device::tilecfg_w));
+	map(0x16, 0x17).rw(FUNC(elan_eu3a14vid_device::rowscrollcfg_r), FUNC(elan_eu3a14vid_device::rowscrollcfg_w));
+	// 0x18
+	// 0x19
+	map(0x1a, 0x1e).rw(FUNC(elan_eu3a14vid_device::rowscrollsplit_r), FUNC(elan_eu3a14vid_device::rowscrollsplit_w));
+	// 0x1f
+	// 0x20
+	map(0x21, 0x24).rw(FUNC(elan_eu3a14vid_device::scrollregs_r), FUNC(elan_eu3a14vid_device::scrollregs_w)); 	// 0x21,0x22 = scroll reg 1,  0x23,0x24 = scroll reg 2
+	map(0x25, 0x2c).rw(FUNC(elan_eu3a14vid_device::rowscrollregs_r), FUNC(elan_eu3a14vid_device::rowscrollregs_w)); // 0x25,0x26 = rowscroll reg 1, 0x27,0x28 = rowscroll reg 2, 0x29,0x2a = rowscroll reg 3, 0x2b,0x2c = rowscroll reg 3
+	// 0x2d
+	// 0x2e
+	// 0x2f
+	// 0x30
+	// 0x31
+	// 0x32
+	// 0x33
+	// 0x34
+	// 0x35
+	// 0x36
+	// 0x37
+	// 0x38
+	// 0x39
+	// 0x3a
+	// 0x3b
+	// 0x3c
+	// 0x3d
+	// 0x3e
+	// 0x3f
+	map(0x40, 0x45).rw(FUNC(elan_eu3a14vid_device::ramtilecfg_r), FUNC(elan_eu3a14vid_device::ramtilecfg_w));
+	// 0x46
+	// 0x47
+	map(0x48, 0x4b).ram(); 	// hnt3 (always 0 tho?)
+	// 0x4c
+	// 0x4d
+	// 0x4e
+	// 0x4f
+	map(0x50, 0x50).rw(FUNC(elan_eu3a14vid_device::spriteaddr_r), FUNC(elan_eu3a14vid_device::spriteaddr_w));
+	map(0x51, 0x52).rw(FUNC(elan_eu3a14vid_device::spritebase_r), FUNC(elan_eu3a14vid_device::spritebase_w));
+	map(0x53, 0x53).ram(); // startup
+
+	// nothing else used?
 }
 
 void elan_eu3a14vid_device::device_start()
@@ -778,228 +856,13 @@ void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		}
 	}
 }
-
-READ8_MEMBER(elan_eu3a14vid_device::read)
+READ8_MEMBER(elan_eu3a14vid_device::read_unmapped)
 {
-	uint8_t ret = 0x00;
-	switch (offset)
-	{
-	case 0x00: case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:
-		break;
-
-	case 0x07:
-		ret = m_5107;
-		break;
-
-	case 0x08:
-		ret = m_5108;
-		break;
-
-	case 0x09:
-		ret = m_5109;
-		break;
-
-	// 0x0a
-	// 0x0b
-	// 0x0c
-	// 0x0d
-	// 0x0e
-	// 0x0f
-
-	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
-		ret = tilecfg_r(space, offset - 0x10);
-		break;
-
-	case 0x16:case 0x17:
-		ret = rowscrollcfg_r(space, offset - 0x16);
-		break;
-
-	// 0x18
-	// 0x19
-
-	case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:
-		ret = rowscrollsplit_r(space, offset - 0x1a);
-		break;
-
-	// 0x1f
-	// 0x20
-
-	case 0x21: case 0x22: // scroll reg 1
-	case 0x23: case 0x24: // scroll reg 2
-		ret = scrollregs_r(space, offset - 0x21);
-		break;
-
-	case 0x25: case 0x26: // row scroll reg 1
-	case 0x27: case 0x28: // row scroll reg 2
-	case 0x29: case 0x2a: // row scroll reg 3
-	case 0x2b: case 0x2c: // row scroll reg 4
-		ret = rowscrollregs_r(space, offset - 0x25);
-		break;
-
-	// 0x2d
-	// 0x2e
-	// 0x2f
-	// 0x30
-	// 0x31
-	// 0x32
-	// 0x33
-	// 0x34
-	// 0x35
-	// 0x36
-	// 0x37
-	// 0x38
-	// 0x39
-	// 0x3a
-	// 0x3b
-	// 0x3c
-	// 0x3d
-	// 0x3e
-	// 0x3f
-
-	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
-		ret = ramtilecfg_r(space, offset - 0x40);
-		break;
-
-	case 0x48: case 0x49: case 0x4a: case 0x4b:
-		// hnt3 (always 0 tho?)
-		break;
-
-	// 0x4c
-	// 0x4d
-	// 0x4e
-	// 0x4f
-	
-	case 0x50:
-		ret = spriteaddr_r(space, offset - 0x50);
-		break;
-
-	case 0x51: case 0x52:
-		ret = spritebase_r(space, offset - 0x51);
-		break;
-
-	case 0x53:
-		// startup
-		break;
-
-	default:
-		break;
-	}
-	return ret;
+	logerror("%s: elan_eu3a14vid_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a14vid_device::write)
+WRITE8_MEMBER(elan_eu3a14vid_device::write_unmapped)
 {
-	switch (offset)
-	{
-	case 0x00: case 0x01:case 0x02:case 0x03:case 0x04:case 0x05:case 0x06:
-	// huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and "Target Range" mode timer??
-	// 5100 - 0x0f when effect is enabled, 0x00 otherwise?
-	// 5101 - 0x0e in both modes
-	// 5102 - 0x86 in both modes
-	// 5103 - 0x0e in tropy room (left?)                                  / 0x2a in "Target Range" mode (left position?)
-	// 5104 - trophy room window / highlight top, move with cursor        / 0xbf in "Target Range" mode (top?)
-	// 5105 - 0x52 in trophy room (right?)                                / counts from 0xa1 to 0x2a in "Target Range" mode (right position?)
-	// 5106 - trophy room window / highlight bottom, move with cursor     / 0xcb in "Target Range" mode (bottom?)
-		break;
-
-	case 0x07:
-	// 5107 - 0x00 // on transitions, maybe layer disables?
-		m_5107 = data;
-		break;
-
-	case 0x08:
-	// 5108 - 0x04 in both modes // hnt3, frequently rewrites same values
-		m_5108 = data;
-		break;
-
-	case 0x09:
-	// 5109 - 0xc2 in both modes // hnt3, frequently rewrites same values
-		m_5109 = data;
-		break;
-
-	// 0x0a
-	// 0x0b
-	// 0x0c
-	// 0x0d
-	// 0x0e
-	// 0x0f
-
-	case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15:
-		tilecfg_w(space, offset - 0x10, data);
-		break;
-
-	case 0x16:case 0x17:
-		rowscrollcfg_w(space, offset - 0x16, data);
-		break;
-
-	// 0x18
-	// 0x19
-
-	case 0x1a:case 0x1b:case 0x1c:case 0x1d:case 0x1e:
-		rowscrollsplit_w(space, offset - 0x1a, data);
-		break;
-
-	// 0x1f
-	// 0x20
-
-	case 0x21: case 0x22: // scroll reg 1
-	case 0x23: case 0x24: // scroll reg 2
-		scrollregs_w(space, offset - 0x21, data);
-		break;
-
-	case 0x25: case 0x26: // row scroll reg 1
-	case 0x27: case 0x28: // row scroll reg 2
-	case 0x29: case 0x2a: // row scroll reg 3
-	case 0x2b: case 0x2c: // row scroll reg 4
-		rowscrollregs_w(space, offset - 0x25, data);
-		break;
-
-	// 0x2d
-	// 0x2e
-	// 0x2f
-	// 0x30
-	// 0x31
-	// 0x32
-	// 0x33
-	// 0x34
-	// 0x35
-	// 0x36
-	// 0x37
-	// 0x38
-	// 0x39
-	// 0x3a
-	// 0x3b
-	// 0x3c
-	// 0x3d
-	// 0x3e
-	// 0x3f
-
-	case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
-		ramtilecfg_w(space, offset - 0x40, data);
-		break;
-
-	case 0x48: case 0x49: case 0x4a: case 0x4b:
-		// hnt3 (always 0 tho?)
-		break;
-
-	// 0x4c
-	// 0x4d
-	// 0x4e
-	// 0x4f
-	
-	case 0x50:
-		spriteaddr_w(space, offset - 0x50, data);
-		break;
-
-	case 0x51: case 0x52:
-		spritebase_w(space, offset - 0x51, data);
-		break;
-
-	case 0x53:
-		// startup
-		break;
-
-	default:
-		break;
-	}
+	logerror("%s: elan_eu3a14vid_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }
