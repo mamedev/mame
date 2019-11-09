@@ -237,6 +237,14 @@ template <typename T> constexpr auto DEGREE_TO_RADIAN(T const &x) { return (M_PI
 #define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
+// useful for declaring functions with asserts as conditionally noexcept
+#ifdef NDEBUG
+constexpr bool MAME_NDEBUG = true;
+#else
+constexpr bool MAME_NDEBUG = false;
+#endif
+
+
 //**************************************************************************
 //  EXCEPTION CLASSES
 //**************************************************************************

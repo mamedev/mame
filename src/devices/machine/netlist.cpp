@@ -1290,12 +1290,12 @@ void netlist_mame_cpu_device::nl_register_devices(netlist::setup_t &lsetup) cons
 	lsetup.factory().register_device<nld_analog_callback>( "NETDEV_CALLBACK", "nld_analog_callback", "-");
 }
 
-ATTR_COLD uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const
+ATTR_COLD uint64_t netlist_mame_cpu_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept
 {
 	return clocks;
 }
 
-ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cycles) const
+ATTR_COLD uint64_t netlist_mame_cpu_device::execute_cycles_to_clocks(uint64_t cycles) const noexcept
 {
 	return cycles;
 }

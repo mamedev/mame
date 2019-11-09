@@ -92,7 +92,7 @@ device_execute_interface::~device_execute_interface()
 //  run before we run again
 //-------------------------------------------------
 
-void device_execute_interface::abort_timeslice()
+void device_execute_interface::abort_timeslice() noexcept(MAME_NDEBUG)
 {
 	// ignore if not the executing device
 	if (!executing())
@@ -207,7 +207,7 @@ void device_execute_interface::trigger(int trigid)
 //  for a device
 //-------------------------------------------------
 
-attotime device_execute_interface::local_time() const
+attotime device_execute_interface::local_time() const noexcept(MAME_NDEBUG)
 {
 	// if we're active, add in the time from the current slice
 	if (executing())
@@ -225,7 +225,7 @@ attotime device_execute_interface::local_time() const
 //  cycles executed on this device
 //-------------------------------------------------
 
-u64 device_execute_interface::total_cycles() const
+u64 device_execute_interface::total_cycles() const noexcept(MAME_NDEBUG)
 {
 	if (executing())
 	{
@@ -242,7 +242,7 @@ u64 device_execute_interface::total_cycles() const
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
-u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const
+u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const noexcept
 {
 	return clocks;
 }
@@ -253,7 +253,7 @@ u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const
+u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const noexcept
 {
 	return cycles;
 }
@@ -265,7 +265,7 @@ u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const
 //  operation can take
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_min_cycles() const
+u32 device_execute_interface::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -277,7 +277,7 @@ u32 device_execute_interface::execute_min_cycles() const
 //  operation can take
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_max_cycles() const
+u32 device_execute_interface::execute_max_cycles() const noexcept
 {
 	return 1;
 }
@@ -288,7 +288,7 @@ u32 device_execute_interface::execute_max_cycles() const
 //  of input lines for the device
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_input_lines() const
+u32 device_execute_interface::execute_input_lines() const noexcept
 {
 	return 0;
 }
@@ -299,7 +299,7 @@ u32 device_execute_interface::execute_input_lines() const
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
 
-u32 device_execute_interface::execute_default_irq_vector(int linenum) const
+u32 device_execute_interface::execute_default_irq_vector(int linenum) const noexcept
 {
 	return 0;
 }
@@ -310,7 +310,7 @@ u32 device_execute_interface::execute_default_irq_vector(int linenum) const
 //  the input line has an asynchronous edge trigger
 //-------------------------------------------------
 
-bool device_execute_interface::execute_input_edge_triggered(int linenum) const
+bool device_execute_interface::execute_input_edge_triggered(int linenum) const noexcept
 {
 	return false;
 }

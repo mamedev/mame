@@ -40,9 +40,6 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_add_mconfig(machine_config &config) override;
 
-	virtual uint32_t execute_min_cycles() const override { return 4; }
-	virtual uint32_t execute_max_cycles() const override { return 158; }
-
 	virtual void m68k_reset_peripherals() override;
 
 private:

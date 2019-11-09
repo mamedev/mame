@@ -199,7 +199,7 @@ protected:
 
 	virtual void execute_run() override;
 
-	//virtual uint32_t execute_min_cycles() const { return 114; }
+	//virtual uint32_t execute_min_cycles() const noexcept override { return 114; }
 	// other internal states
 	int m_icount;
 

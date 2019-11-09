@@ -653,7 +653,7 @@ inline uint16_t dspp_device::translate_reg(uint16_t reg)
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dspp_device::execute_min_cycles() const
+uint32_t dspp_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -664,7 +664,7 @@ uint32_t dspp_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t dspp_device::execute_max_cycles() const
+uint32_t dspp_device::execute_max_cycles() const noexcept
 {
 	return 5; // TODO ?
 }
