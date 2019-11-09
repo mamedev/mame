@@ -30,11 +30,11 @@ public:
 
 	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
 
-	virtual bool is_readable()  const noexcept override { return 1; }
-	virtual bool is_writeable() const noexcept override { return 0; }
-	virtual bool is_creatable() const noexcept override { return 0; }
-	virtual bool must_be_loaded() const noexcept override { return 0; }
-	virtual bool is_reset_on_load() const noexcept override { return 1; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
 	virtual const char *image_interface() const noexcept override { return "cpc_rom"; }
 	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 
