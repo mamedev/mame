@@ -193,7 +193,6 @@ public:
 	void non_spg_base(machine_config &config);
 	void lexizeus(machine_config &config);
 	void taikeegr(machine_config &config);
-	void sentx6p(machine_config &config);
 
 	void init_crc();
 	void init_zeus();
@@ -232,7 +231,6 @@ protected:
 	virtual void mem_map_2m(address_map &map);
 	virtual void mem_map_1m(address_map &map);
 
-	void mem_map_2m_texas(address_map &map);
 
 
 	uint32_t m_current_bank;
@@ -281,6 +279,33 @@ private:
 	uint16_t m_outdat;
 	required_ioport m_p4inputs;
 	output_finder<4> m_leds;
+};
+
+class sentx6p_state : public spg2xx_game_state
+{
+public:
+	sentx6p_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0x0000)
+	{ }
+
+	void sentx6p(machine_config &config);
+
+	void mem_map_2m_texas(address_map &map);
+
+protected:
+	READ16_MEMBER(sentx_porta_r);
+	READ16_MEMBER(sentx_portb_r);
+	READ16_MEMBER(sentx_portc_r);
+
+	DECLARE_WRITE16_MEMBER(sentx_porta_w);
+	DECLARE_WRITE16_MEMBER(sentx_portb_w);
+	DECLARE_WRITE16_MEMBER(sentx_portc_w);
+
+private:
+
+	uint16_t m_porta_data;
+
 };
 
 class jakks_gkr_state : public spg2xx_game_state
@@ -777,7 +802,7 @@ void spg2xx_game_state::mem_map_2m(address_map &map)
 	map(0x000000, 0x1fffff).mirror(0x200000).bankr("cartbank");
 }
 
-void spg2xx_game_state::mem_map_2m_texas(address_map &map)
+void sentx6p_state::mem_map_2m_texas(address_map &map)
 {
 	map(0x000000, 0x1fffff).bankr("cartbank");
 	map(0x3f0000, 0x3f7fff).ram();
@@ -1943,9 +1968,9 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Low Battery" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Low Battery" )  // NOT just a battery sensor, actually needs to be high (On) in order for it to attempt to read any controllers on startup, otherwise it will hang after the VS MAXX logo with no way forward.
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("P2")
 	// these must be sense lines
@@ -2786,19 +2811,78 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 }
 
 
-void spg2xx_game_state::sentx6p(machine_config &config)
+READ16_MEMBER(sentx6p_state::sentx_porta_r)
+{
+	int select_bits = (m_porta_data >> 8) & 0x7f;
+	logerror("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context(), select_bits);
+
+	/* 0000 = no controller? (system buttons only?)
+	   0100 = controller 1?
+	   0200 = controller 2?
+	   0400 = controller 3?
+	   0800 = controller 4?
+	   1000 = controller 5?
+	   2000 = controller 6?
+
+	   this is an assumption based on startup, where the port is polled after writing those values
+	*/
+
+
+	uint16_t ret = m_io_p1->read();
+
+	//if (select_bits == 0x00)
+	//	ret |= 0x8000;
+	//else
+	//	ret &= ~0x8000;
+
+	return ret;
+}
+
+READ16_MEMBER(sentx6p_state::sentx_portb_r)
+{
+	return m_io_p2->read();
+}
+
+READ16_MEMBER(sentx6p_state::sentx_portc_r)
+{
+	return m_io_p3->read();
+}
+
+WRITE16_MEMBER(sentx6p_state::sentx_porta_w)
+{
+	logerror("%s: sentx_porta_w %04x\n", machine().describe_context(), data);
+
+	COMBINE_DATA(&m_porta_data);
+}
+
+WRITE16_MEMBER(sentx6p_state::sentx_portb_w)
+{
+	logerror("%s: sentx_portb_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
+{
+	logerror("%s: sentx_portc_w %04x\n", machine().describe_context(), data);
+}
+
+
+void sentx6p_state::sentx6p(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_2m_texas);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sentx6p_state::mem_map_2m_texas);
 	m_maincpu->set_pal(true);
 
 	spg2xx_base(config);
 
 	m_screen->set_refresh_hz(50);
 
-	m_maincpu->porta_in().set_ioport("P1");
-	m_maincpu->portb_in().set_ioport("P2");
-	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->porta_in().set(FUNC(sentx6p_state::sentx_porta_r));
+	m_maincpu->portb_in().set(FUNC(sentx6p_state::sentx_portb_r));
+	m_maincpu->portc_in().set(FUNC(sentx6p_state::sentx_portc_r));
+
+	m_maincpu->porta_out().set(FUNC(sentx6p_state::sentx_porta_w));
+	m_maincpu->portb_out().set(FUNC(sentx6p_state::sentx_portb_w));
+	m_maincpu->portc_out().set(FUNC(sentx6p_state::sentx_portc_w));
 }
 
 
@@ -3014,6 +3098,9 @@ ROM_END
 
 ROM_START( sentx6p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// chksum:05B58350 is @ 0x3000.
+	// This is the correct sum of 0x3010 - 0x1fffff (the first half of the ROM area after the checksum string)
+	// The 2nd half is not summed (and not used by the game?) but definitely exists in ROM (same data on 2 units)
 	ROM_LOAD16_WORD_SWAP( "senario texas holdem.bin", 0x000000, 0x400000, CRC(7c7d2d33) SHA1(71631074ba66e3b0cdeb86ebca3931599f3a911c) )
 ROM_END
 
@@ -3186,4 +3273,4 @@ CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_st
 
 // "go 02d1d0" "do r1 = ff" to get past initial screen
 // a 'deluxe' version of this also exists with extra game modes
-CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, spg2xx_game_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
