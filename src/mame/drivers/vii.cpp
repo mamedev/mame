@@ -2813,7 +2813,7 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
 {
-	int select_bits = (m_porta_data >> 8) & 0x7f;
+	int select_bits = (m_porta_data >> 8) & 0x3f;
 	logerror("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context(), select_bits);
 
 	/* 0000 = no controller? (system buttons only?)
@@ -2827,8 +2827,9 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 	   this is an assumption based on startup, where the port is polled after writing those values
 	*/
 
-
-	uint16_t ret = m_io_p1->read();
+	// the code around 029811 uses a ram value shifted left 8 times as the select bits (select_bits) on write
+	// then does a mask with them on the reads from this port, without shifting, comparing with 0
+	uint16_t ret = (m_io_p1->read() & 0xffc0) | select_bits;
 
 	//if (select_bits == 0x00)
 	//	ret |= 0x8000;
