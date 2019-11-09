@@ -302,6 +302,8 @@ protected:
 	DECLARE_WRITE16_MEMBER(sentx_portb_w);
 	DECLARE_WRITE16_MEMBER(sentx_portc_w);
 
+	DECLARE_WRITE8_MEMBER(sentx_tx_w);
+
 private:
 
 	uint16_t m_porta_data;
@@ -2866,6 +2868,13 @@ WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
 	logerror("%s: sentx_portc_w %04x\n", machine().describe_context(), data);
 }
 
+WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
+{
+	int select_bits = (m_porta_data >> 8) & 0x3f;
+	logerror("%s: sentx_tx_w %02x (with controller select bits %02xx)\n", machine().describe_context(), data, select_bits);
+}
+
+
 
 void sentx6p_state::sentx6p(machine_config &config)
 {
@@ -2884,6 +2893,8 @@ void sentx6p_state::sentx6p(machine_config &config)
 	m_maincpu->porta_out().set(FUNC(sentx6p_state::sentx_porta_w));
 	m_maincpu->portb_out().set(FUNC(sentx6p_state::sentx_portb_w));
 	m_maincpu->portc_out().set(FUNC(sentx6p_state::sentx_portc_w));
+
+	m_maincpu->uart_tx().set(FUNC(sentx6p_state::sentx_tx_w));
 }
 
 
