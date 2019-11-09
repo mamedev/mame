@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// license:GPL-2.0+
+// copyright-holders:byuu
 #ifndef MAME_CPU_SUPERFX_SUPERFX_H
 #define MAME_CPU_SUPERFX_SUPERFX_H
 

@@ -58,7 +58,7 @@ CC = g++
 LD = @g++
 MD = @mkdir
 RM = @rm
-DOXYGEN = @doxygen
+DOXYGEN = @./doxygen
 CLANG_TIDY = clang-tidy-9
 
 TARGETS = nltool nlwav
@@ -261,8 +261,9 @@ tidy_db: compile_commands_prefix $(ALL_TIDY_FILES) compile_commands_postfix
 # -Wno-missing-variable-declarations : Device factory code, on purpose 
 
 mingw:
-	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 -DWIN32_LEAN_AND_MEAN" \
-		LDEXTRAFLAGS="-Wl,--subsystem,console -municode" LIBS= MD=@mkdir.exe SHELL=sh.exe
+	$(MAKE) CEXTRAFLAGS="-DUNICODE -D_UNICODE -D_WIN32_WINNT=0x0501 \
+		-DWIN32_LEAN_AND_MEAN" LDEXTRAFLAGS="-Wl,--subsystem,console \
+		-municode" LIBS= MD=@mkdir.exe SHELL=sh.exe DOXYGEN=doxygen.exe $(PARAMS) 
 
 #
 # FIXME: Unicode
@@ -275,6 +276,9 @@ doc: nltool
 	./nltool -c docheader > ../documentation/devsyn.dox.h
 	$(DOXYGEN) doxygen.conf
 
+docw: 
+	$(DOXYGEN) doxygen.conf
+	
 #-------------------------------------------------
 # depends
 #-------------------------------------------------

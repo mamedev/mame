@@ -1796,8 +1796,8 @@ void bbcm_state::autoc15(machine_config &config)
 	m_hd6845->out_vsync_callback().set(FUNC(bbc_state::bbc_vsync_changed));
 
 	/* Autocue RAM disc */
-	//m_exp->set_default_option("autocue");
-	//m_exp->set_fixed(true);
+	m_exp->set_default_option("autocue");
+	m_exp->set_fixed(true);
 }
 
 
@@ -2382,7 +2382,7 @@ ROM_START(daisy)
 	/* 38000 rom 14  IC24 View + MOS code */
 	/* 3c000 rom 15  IC24 Terminal + Tube host + CFS */
 	ROM_LOAD("simdist_2_22-2-89_dhrfdsy.rom", 0x10000, 0x8000, CRC(8a9d9c4a) SHA1(278c5c63e06359601cdf972f55e98f5a7442a713))
-	ROM_LOAD("daisy_irfdsy_vr4_5-1-89.rom", 0x18000, 0x8000, CRC(9662d779) SHA1(99234b55fde57680e4217b72ef4ccb8fc56edeff))
+	ROM_LOAD("daisy_irfdsy_vr4_5-1-89.rom", 0x18000, 0x8000, CRC(9662d779) SHA1(0841c1fd34c152f3f02ace8633f1fa3f5139069e))
 	ROM_LOAD("hibas03_a063.rom", 0x20000, 0x4000, CRC(6ea7affc) SHA1(99234b55fde57680e4217b72ef4ccb8fc56edeff))
 
 	ROM_REGION(0x4000, "mos", 0)

@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_matrix_solver.cpp
- *
- */
 
 #include "nld_matrix_solver.h"
 #include "plib/putil.h"
@@ -57,7 +53,7 @@ namespace solver
 		connect_post_start(m_fb_sync, m_Q_sync);
 		setup_base(nets);
 
-		/* now setup the matrix */
+		// now setup the matrix
 		setup_matrix();
 	}
 
@@ -133,25 +129,24 @@ namespace solver
 
 	void matrix_solver_t::sort_terms(matrix_sort_type_e sort)
 	{
-		/* Sort in descending order by number of connected matrix voltages.
-		 * The idea is, that for Gauss-Seidel algo the first voltage computed
-		 * depends on the greatest number of previous voltages thus taking into
-		 * account the maximum amout of information.
-		 *
-		 * This actually improves performance on popeye slightly. Average
-		 * GS computations reduce from 2.509 to 2.370
-		 *
-		 * Smallest to largest : 2.613
-		 * Unsorted            : 2.509
-		 * Largest to smallest : 2.370
-		 *
-		 * Sorting as a general matrix pre-conditioning is mentioned in
-		 * literature but I have found no articles about Gauss Seidel.
-		 *
-		 * For Gaussian Elimination however increasing order is better suited.
-		 * NOTE: Even better would be to sort on elements right of the matrix diagonal.
-		 *
-		 */
+		// Sort in descending order by number of connected matrix voltages.
+		// The idea is, that for Gauss-Seidel algo the first voltage computed
+		// depends on the greatest number of previous voltages thus taking into
+		// account the maximum amout of information.
+		//
+		// This actually improves performance on popeye slightly. Average
+		// GS computations reduce from 2.509 to 2.370
+		//
+		// Smallest to largest : 2.613
+		// Unsorted            : 2.509
+		// Largest to smallest : 2.370
+		//
+		// Sorting as a general matrix pre-conditioning is mentioned in
+		// literature but I have found no articles about Gauss Seidel.
+		//
+		// For Gaussian Elimination however increasing order is better suited.
+		// NOTE: Even better would be to sort on elements right of the matrix diagonal.
+		//
 
 		const std::size_t iN = m_terms.size();
 
@@ -209,7 +204,7 @@ namespace solver
 			case matrix_sort_type_e::NOSORT:
 				break;
 		}
-		/* rebuild */
+		// rebuild
 		for (auto &term : m_terms)
 		{
 			int *other = term.m_connected_net_idx.data();
@@ -238,11 +233,11 @@ namespace solver
 
 		this->set_pointers();
 
-		/* create a list of non zero elements. */
+		// create a list of non zero elements.
 		for (unsigned k = 0; k < iN; k++)
 		{
 			terms_for_net_t & t = m_terms[k];
-			/* pretty brutal */
+			// pretty brutal
 			int *other = t.m_connected_net_idx.data();
 
 			t.m_nz.clear();
@@ -253,18 +248,18 @@ namespace solver
 
 			t.m_nz.push_back(k);     // add diagonal
 
-			/* and sort */
+			// and sort
 			std::sort(t.m_nz.begin(), t.m_nz.end());
 		}
 
-		/* create a list of non zero elements right of the diagonal
-		 * These list anticipate the population of array elements by
-		 * Gaussian elimination.
-		 */
+		// create a list of non zero elements right of the diagonal
+		// These list anticipate the population of array elements by
+		// Gaussian elimination.
+
 		for (std::size_t k = 0; k < iN; k++)
 		{
 			terms_for_net_t & t = m_terms[k];
-			/* pretty brutal */
+			// pretty brutal
 			int *other = t.m_connected_net_idx.data();
 
 			if (k==0)
@@ -285,13 +280,12 @@ namespace solver
 				if (!plib::container::contains(t.m_nzrd, static_cast<unsigned>(other[i])) && other[i] >= static_cast<int>(k + 1))
 					t.m_nzrd.push_back(static_cast<unsigned>(other[i]));
 
-			/* and sort */
+			// and sort
 			std::sort(t.m_nzrd.begin(), t.m_nzrd.end());
 		}
 
-		/* create a list of non zero elements below diagonal k
-		 * This should reduce cache misses ...
-		 */
+		// create a list of non zero elements below diagonal k
+		// This should reduce cache misses ...
 
 		std::vector<std::vector<bool>> touched(iN, std::vector<bool>(iN));
 
@@ -334,9 +328,9 @@ namespace solver
 				log().verbose("{1}", line);
 			}
 
-		/*
-		 * save states
-		 */
+		//
+		// save states
+		//
 
 		for (std::size_t k = 0; k < iN; k++)
 		{
@@ -358,7 +352,7 @@ namespace solver
 
 	void matrix_solver_t::update_dynamic()
 	{
-		/* update all non-linear devices  */
+		// update all non-linear devices
 		for (auto &dyn : m_dynamic_devices)
 			dyn->update_terminals();
 	}
@@ -379,12 +373,11 @@ namespace solver
 		}
 	}
 
-	/* update_forced is called from within param_update
-	 *
-	 * this should only occur outside of execution and thus
-	 * using time should be safe.
-	 *
-	 */
+	// update_forced is called from within param_update
+	//
+	// this should only occur outside of execution and thus
+	// using time should be safe.
+
 	void matrix_solver_t::update_forced()
 	{
 		const netlist_time new_timestep = solve(exec().time());
@@ -414,7 +407,7 @@ namespace solver
 		if (delta < netlist_time::quantum())
 			return netlist_time::zero();
 
-		/* update all terminals for new time step */
+		// update all terminals for new time step
 		m_last_step = now;
 		step(delta);
 
@@ -459,10 +452,10 @@ namespace solver
 
 	std::pair<int, int> matrix_solver_t::get_left_right_of_diag(std::size_t irow, std::size_t idiag)
 	{
-		/*
-		 * return the maximum column left of the diagonal (-1 if no cols found)
-		 * return the minimum column right of the diagonal (999999 if no cols found)
-		 */
+		//
+		// return the maximum column left of the diagonal (-1 if no cols found)
+		// return the minimum column right of the diagonal (999999 if no cols found)
+		//
 
 		const auto row = static_cast<int>(irow);
 		const auto diag = static_cast<int>(idiag);
@@ -492,9 +485,9 @@ namespace solver
 	nl_fptype matrix_solver_t::get_weight_around_diag(std::size_t row, std::size_t diag)
 	{
 		{
-			/*
-			 * return average absolute distance
-			 */
+			//
+			// return average absolute distance
+			//
 
 			std::vector<bool> touched(1024, false); // FIXME!
 
@@ -533,7 +526,7 @@ namespace solver
 			{
 				m_terms[net_idx].add_terminal(term, ot, true);
 			}
-			/* Should this be allowed ? */
+			// Should this be allowed ?
 			else // if (ot<0)
 			{
 				m_rails_temp[net_idx].add_terminal(term, ot, true);

@@ -37,7 +37,7 @@ static constexpr XTAL FM_CLOCK      = SOUND_CLOCK / 2;
 
 void spdheat_state::machine_start()
 {
-	save_pointer(NAME(m_sound_data), sizeof(m_sound_data));
+	save_item(NAME(m_sound_data));
 	save_item(NAME(m_sound_status));
 	save_item(NAME(m_sub_data));
 	save_item(NAME(m_sub_status));
@@ -854,5 +854,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (World)", 0 )
-GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (Japan)", 0 )
+GAME( 1985, spdheat,  0,       spdheat, spdheat,  spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, spdheatj, spdheat, spdheat, spdheatj, spdheat_state, empty_init, ROT0, "Taito Corporation", "Super Dead Heat (Japan)", MACHINE_SUPPORTS_SAVE )

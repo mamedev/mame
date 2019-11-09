@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pfm_log.cpp
- *
- */
 
 #include "pfmtlog.h"
 #include "palloc.h"

@@ -854,8 +854,8 @@ GAME( 1990, raidenk,  raiden, raiden,   raiden, raiden_state,  init_raiden,  ROT
 GAME( 1990, raidenkb, raiden, raidenkb, raiden, raiden_state,  init_raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenua, raiden, raidenu,  raiden, raiden_state,  empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2, SEI8904 hardware)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
-GAME( 1990, raidenb,  raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, raidenub, raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenb,  raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu", "Raiden (set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenub, raiden, raidenb,  raiden, raidenb_state, empty_init,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 3, newer hardware)", MACHINE_SUPPORTS_SAVE )

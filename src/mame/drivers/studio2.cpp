@@ -185,7 +185,9 @@ Notes:
     Usage
     - All variants: Boot up, then press F3, then press a letter (Q,W,E,A) to choose an inbuilt game.
     - If using a cart, boot up, press F3, then follow the instructions that came with the cart (usually press Q).
-    - Currently, Visicom cannot run any carts, and has no support for st2 files.
+    - Visicom has no support for st2 files.
+    - Visicom always reserves buttons 1,2,3,4,7(Q,W,E,A,Z) for the internal games, which are always available.
+      The cartridges use 5(S) to start, except gambler1 which uses 9(C).
 
 */
 
@@ -247,6 +249,7 @@ protected:
 	virtual void machine_reset() override;
 
 	DECLARE_READ8_MEMBER( cart_a00 );
+	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_READ8_MEMBER( cart_e00 );
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
@@ -268,9 +271,9 @@ class visicom_state : public studio2_state
 {
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag),
-			m_color0_ram(*this, "color0_ram"),
-			m_color1_ram(*this, "color1_ram")
+		: studio2_state(mconfig, type, tag)
+		, m_color0_ram(*this, "color0_ram")
+		, m_color1_ram(*this, "color1_ram")
 	{ }
 
 	void visicom(machine_config &config);
@@ -281,6 +284,8 @@ private:
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
+	virtual void machine_start() override;
+
 	DECLARE_WRITE8_MEMBER( dma_w );
 	void visicom_io_map(address_map &map);
 	void visicom_map(address_map &map);
@@ -290,9 +295,9 @@ class mpt02_state : public studio2_state
 {
 public:
 	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag),
-			m_cti(*this, CDP1864_TAG),
-			m_color_ram(*this, "color_ram")
+		: studio2_state(mconfig, type, tag)
+		, m_cti(*this, CDP1864_TAG)
+		, m_color_ram(*this, "color_ram")
 	{ }
 
 	void mpt02(machine_config &config);
@@ -522,8 +527,15 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 // trampolines to cartridge
 READ8_MEMBER( studio2_state::cart_400 ) { return m_cart->read_rom(offset); }
 READ8_MEMBER( studio2_state::cart_a00 ) { return m_cart->read_rom(offset + 0x600); }
+READ8_MEMBER( studio2_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
 READ8_MEMBER( studio2_state::cart_e00 ) { return m_cart->read_rom(offset + 0xa00); }
 READ8_MEMBER( mpt02_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
+
+void visicom_state::machine_start()
+{
+	// register for state saving
+	save_item(NAME(m_keylatch));
+}
 
 void studio2_state::machine_start()
 {
@@ -532,6 +544,7 @@ void studio2_state::machine_start()
 		// these have to be installed only if a cart is present, because they partially overlap the built-in game
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0a00, 0x0bff, read8_delegate(*this, FUNC(studio2_state::cart_a00)));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0dff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_e00)));
 	}
 
@@ -573,11 +586,11 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 	{
 		if (image.is_filetype("st2"))
 		{
-			uint8_t header[0x100];
-			uint8_t catalogue[10], title[32], pages[64];
+			char header[0x100];
+			uint8_t pages[64];
 			uint8_t blocks;
 
-			if (image.length() <= 0x100)
+			if (image.length() < 0x200)
 			{
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM file");
 				return image_init_result::FAIL;
@@ -593,25 +606,34 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			}
 
 			blocks = header[4];
-			memcpy(&catalogue, &header[16], 10);
-			memcpy(&title, &header[32], 32);
+			if ((blocks < 2) || (blocks > 11))
+			{
+				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid .ST2 file");
+				return image_init_result::FAIL;
+			}
+
+			if (image.length() != (blocks << 8))
+				logerror("Wrong sized image: Expected 0x%04X; Found 0x%04X",blocks<<8,image.length());
+
+			char* catalogue = &header[16];
+			char* title = &header[32];
 			memcpy(&pages, &header[64], 64);
+
+			logerror("ST2 Catalogue: %s\n", catalogue);
+			logerror("ST2 Title: %s\n", title);
 
 			/* read ST2 cartridge into memory */
 			for (int block = 0; block < (blocks - 1); block++)
 			{
+				u16 offset = pages[block] << 8;
 				if (pages[block] < 4)
-					logerror("ST2 invalid block %u to %04x\n", block, pages[block] << 8);
+					logerror("ST2 invalid block %u to 0x%04x\n", block, offset);
 				else
 				{
-					uint16_t offset = (pages[block] << 8) - 0x400;
-					logerror("ST2 Reading block %u to %04x\n", block, offset);
-					image.fread(m_cart->get_rom_base() + offset, 0x100);
+					logerror("ST2 Reading block %u to 0x%04x\n", block, offset);
+					image.fread(m_cart->get_rom_base() + offset - 0x400, 0x100);
 				}
 			}
-
-			logerror("ST2 Catalogue: %s\n", catalogue);
-			logerror("ST2 Title: %s\n", title);
 		}
 		else
 		{

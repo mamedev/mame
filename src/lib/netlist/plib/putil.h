@@ -1,25 +1,19 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * putil.h
- *
- */
 
 #ifndef PUTIL_H_
 #define PUTIL_H_
+
+///
+/// \file putil.h
+///
 
 #include "palloc.h"
 #include "pexception.h"
 #include "pstring.h"
 
 #include <algorithm>
-//#include <initializer_list>
-//#include <iostream>
-//#include <locale>
-//#include <sstream>
 #include <vector>
-
-// FIXME: pstonum should get an own header
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
@@ -31,13 +25,12 @@
 namespace plib
 {
 
-	/**! Source code locations
-	 *
-	 * The c++20 draft for source locations is based on const char * strings.
-	 * It is thus only suitable for c++ source code and not for programmatic
-	 * parsing of files. This class is a replacement for dynamic use cases.
-	 *
-	 */
+	/// \brief Source code locations.
+	///
+	/// The c++20 draft for source locations is based on const char * strings.
+	/// It is thus only suitable for c++ source code and not for programmatic
+	/// parsing of files. This class is a replacement for dynamic use cases.
+	///
 	struct source_location
 	{
 		source_location() noexcept
@@ -70,13 +63,12 @@ namespace plib
 		unsigned m_col;
 	};
 
-	/**! Base source class
-	 *
-	 * Pure virtual class all other source implementations are based on.
-	 * Sources provide an abstraction to read input from a variety of
-	 * sources, e.g. files, memory, remote locations.
-	 *
-	 */
+	/// \brief Base source class.
+	///
+	/// Pure virtual class all other source implementations are based on.
+	/// Sources provide an abstraction to read input from a variety of
+	/// sources, e.g. files, memory, remote locations.
+	///
 	class psource_t
 	{
 	public:
@@ -93,13 +85,13 @@ namespace plib
 	private:
 	};
 
-	/**! Generic string source
-	 *
-	 * Will return the given string when name matches.
-	 * Is used in preprocessor code to eliminate inclusion of certain files.
-	 *
-	 * @tparam TS base stream class. Default is psource_t
-	 */
+	/// \brief Generic string source.
+	///
+	/// Will return the given string when name matches.
+	/// Is used in preprocessor code to eliminate inclusion of certain files.
+	///
+	/// \tparam TS base stream class. Default is psource_t
+	///
 	template <typename TS = psource_t>
 	class psource_str_t : public TS
 	{
@@ -123,10 +115,10 @@ namespace plib
 		pstring m_str;
 	};
 
-	/**! Generic sources collection
-	 *
-	 * @tparam TS base stream class. Default is psource_t
-	 */
+	/// \brief Generic sources collection.
+	///
+	/// \tparam TS base stream class. Default is psource_t
+	///
 	template <typename TS = psource_t>
 	class psource_collection_t
 	{
@@ -273,4 +265,4 @@ namespace plib
 		} \
 	};
 
-#endif /* PUTIL_H_ */
+#endif // PUTIL_H_

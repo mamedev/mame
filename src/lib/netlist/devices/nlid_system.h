@@ -351,11 +351,11 @@ namespace devices
 		param_fp_t m_p_ROUT;
 	};
 
-	/* -----------------------------------------------------------------------------
-	 * nld_function
-	 *
-	 * FIXME: Currently a proof of concept to get congo bongo working
-	 * ----------------------------------------------------------------------------- */
+	// -----------------------------------------------------------------------------
+	// nld_function
+	//
+	// FIXME: Currently a proof of concept to get congo bongo working
+	// ----------------------------------------------------------------------------- */
 
 	NETLIB_OBJECT(function)
 	{
@@ -378,9 +378,19 @@ namespace devices
 
 	protected:
 
-		NETLIB_RESETI();
-		NETLIB_UPDATEI();
+		NETLIB_RESETI()
+		{
+			//m_Q.initial(0.0);
+		}
 
+		NETLIB_UPDATEI()
+		{
+			for (std::size_t i = 0; i < static_cast<unsigned>(m_N()); i++)
+			{
+				m_vals[i] = (*m_I[i])();
+			}
+			m_Q.push(m_compiled.evaluate(m_vals));
+		}
 	private:
 
 		param_int_t m_N;
@@ -410,9 +420,28 @@ namespace devices
 			register_subalias("2", m_R.m_N);
 		}
 
-		NETLIB_RESETI();
+		NETLIB_RESETI()
+		{
+			m_last_state = 0;
+			m_R.set_R(m_ROFF());
+		}
+
+		NETLIB_UPDATEI()
+		{
+			const netlist_sig_t state = m_I();
+			if (state != m_last_state)
+			{
+				m_last_state = state;
+				const nl_fptype R = state ? m_RON() : m_ROFF();
+
+				// FIXME: We only need to update the net first if this is a time stepping net
+				m_R.update();
+				m_R.set_R(R);
+				m_R.solve_later();
+			}
+		}
+
 		//NETLIB_UPDATE_PARAMI();
-		NETLIB_UPDATEI();
 
 		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
@@ -420,7 +449,6 @@ namespace devices
 		param_fp_t m_ROFF;
 
 	private:
-
 		state_var<netlist_sig_t> m_last_state;
 	};
 
@@ -435,19 +463,19 @@ namespace devices
 	class nld_power_pins
 	{
 	public:
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = "VCC",
-			const pstring &sGND = "GND", bool force_analog_input = false)
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
+			const pstring &sGND = sPowerGND, bool force_analog_input = false)
 		{
 			if (owner.state().setup().is_extended_validation() || force_analog_input)
 			{
-				m_GND = plib::make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
-				m_VCC = plib::make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
+				m_GND = pool().make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
+				m_VCC = pool().make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
 			}
 			else
 			{
 				owner.create_and_register_subdevice(sPowerDevRes, m_RVG);
-				owner.register_subalias(sVCC, "_RVG.1");
-				owner.register_subalias(sGND, "_RVG.2");
+				owner.register_subalias(sVCC, pstring(sPowerDevRes) + ".1");
+				owner.register_subalias(sGND, pstring(sPowerDevRes) + ".2");
 			}
 		}
 
@@ -455,15 +483,15 @@ namespace devices
 		nl_fptype VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
 		nl_fptype GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
 
-		NETLIB_SUBXX(analog, R) m_RVG; // dummy resistor between VCC and GND
-
 	private:
 		void noop() { }
-		plib::unique_ptr<analog_input_t> m_VCC; // only used during validation or force_analog_input
-		plib::unique_ptr<analog_input_t> m_GND; // only used during validation or force_analog_input
+		unique_pool_ptr<analog_input_t> m_VCC; // only used during validation or force_analog_input
+		unique_pool_ptr<analog_input_t> m_GND; // only used during validation or force_analog_input
+
+		NETLIB_SUB_UPTR(analog, R) m_RVG; // dummy resistor between VCC and GND
 	};
 
-} //namespace devices
+} // namespace devices
 } // namespace netlist
 
 #endif /* NLD_SYSTEM_H_ */

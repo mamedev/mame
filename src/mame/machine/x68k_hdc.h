@@ -97,23 +97,25 @@ public:
 	x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_HARDDISK; }
+	virtual iodevice_t image_type() const noexcept override { return IO_HARDDISK; }
 
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return true; }
-	virtual bool is_creatable() const override { return true; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return false; }
-	virtual const char *file_extensions() const override { return "hdf"; }
-	virtual const char *custom_instance_name() const override { return "sasihd"; }
-	virtual const char *custom_brief_instance_name() const override { return "sasi"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "hdf"; }
+	virtual const char *custom_instance_name() const noexcept override { return "sasihd"; }
+	virtual const char *custom_brief_instance_name() const noexcept override { return "sasi"; }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
 	DECLARE_WRITE16_MEMBER( hdc_w );
 	DECLARE_READ16_MEMBER( hdc_r );
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+
 private:
 	TIMER_CALLBACK_MEMBER(req_timer_callback);
 

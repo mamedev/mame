@@ -222,14 +222,11 @@ TILE_GET_INFO_MEMBER(raiden_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-void raiden_state::video_start()
+void raiden_state::common_video_start()
 {
 	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_state::get_back_tile_info)), TILEMAP_SCAN_COLS, 16,16, 32,32);
 	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_state::get_fore_tile_info)), TILEMAP_SCAN_COLS, 16,16, 32,32);
-	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_state::get_text_tile_info)), TILEMAP_SCAN_ROWS,  8, 8, 32,32);
-
 	m_fg_layer->set_transparent_pen(15);
-	m_tx_layer->set_transparent_pen(15);
 
 	save_item(NAME(m_bg_layer_enabled));
 	save_item(NAME(m_fg_layer_enabled));
@@ -238,9 +235,20 @@ void raiden_state::video_start()
 	save_item(NAME(m_flipscreen));
 }
 
+void raiden_state::video_start()
+{
+	common_video_start();
+
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raiden_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32,32);
+	m_tx_layer->set_transparent_pen(15);
+}
+
 void raidenb_state::video_start()
 {
-	raiden_state::video_start();
+	common_video_start();
+
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(raidenb_state::get_text_tile_info)), TILEMAP_SCAN_COLS, 8, 8, 32,32);
+	m_tx_layer->set_transparent_pen(15);
 
 	save_item(NAME(m_raidenb_scroll_ram));
 }

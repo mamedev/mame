@@ -134,8 +134,8 @@ public:
 
 	bbc_cartslot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const char *image_interface() const override { return "bbcm_cart"; }
-	virtual const char *file_extensions() const override { return "rom,bin"; }
+	virtual const char *image_interface() const noexcept override { return "bbcm_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "rom,bin"; }
 };
 
 

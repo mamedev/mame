@@ -31,20 +31,19 @@ public:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual void call_unload() override;
-	virtual iodevice_t image_type() const override { return IO_MAGTAPE; }
+	virtual iodevice_t image_type() const noexcept override { return IO_MAGTAPE; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual bool support_command_line_image_creation() const override { return 1; }
-	virtual const char *image_interface() const override { return "sc499_cass"; }
-	virtual const char *file_extensions() const override { return "act,ct"; }
-	virtual const char *custom_instance_name() const override { return "ctape"; }
-	virtual const char *custom_brief_instance_name() const override { return "ct"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual bool support_command_line_image_creation() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "sc499_cass"; }
+	virtual const char *file_extensions() const noexcept override { return "act,ct"; }
+	virtual const char *custom_instance_name() const noexcept override { return "ctape"; }
+	virtual const char *custom_brief_instance_name() const noexcept override { return "ct"; }
 
 	uint8_t *read_block(int block_num);
 	void write_block(int block_num, uint8_t *ptr);
@@ -53,6 +52,9 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override { }
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	std::vector<uint8_t> m_ctape_data;
 };

@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstate.h
- *
- */
 
 #ifndef PSTATE_H_
 #define PSTATE_H_
+
+///
+/// \file pstate.h
+///
 
 #include "palloc.h"
 #include "pstring.h"
@@ -173,4 +173,4 @@ template<> inline void state_manager_t::save_item(const void *owner, callback_t 
 
 } // namespace plib
 
-#endif /* PSTATE_H_ */
+#endif // PSTATE_H_

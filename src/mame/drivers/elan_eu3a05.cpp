@@ -107,10 +107,6 @@ private:
 	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
 	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
 
-	// more sound regs?
-	DECLARE_READ8_MEMBER(elan_eu3a05_50a9_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_50a9_w);
-
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// for callback
@@ -137,7 +133,12 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	uint8_t m_50a9_data;
+	DECLARE_WRITE_LINE_MEMBER(sound_end0) { m_sys->generate_custom_interrupt(2); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end1) { m_sys->generate_custom_interrupt(3); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end2) { m_sys->generate_custom_interrupt(4); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end3) { m_sys->generate_custom_interrupt(5); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end4) { m_sys->generate_custom_interrupt(6); }
+	DECLARE_WRITE_LINE_MEMBER(sound_end5) { m_sys->generate_custom_interrupt(7); }
 };
 
 void elan_eu3a05_state::video_start()
@@ -179,19 +180,6 @@ READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_5003_r)
 }
 
 
-
-// probably also sound device, maybe for forcing channels to stop?
-READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_50a9_r)
-{
-	logerror("%s: elan_eu3a05_50a9_r\n", machine().describe_context());
-	return m_50a9_data;
-}
-
-WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_50a9_w)
-{
-	logerror("%s: elan_eu3a05_50a9_w %02x\n", machine().describe_context(), data);
-	m_50a9_data = data;
-}
 
 WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_500b_unk_w)
 {
@@ -253,17 +241,10 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x5048, 0x504a).w(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_unk_w));
 
 	// 506x unknown
-	map(0x5060, 0x506d).ram(); // read/written by tetris
+	map(0x5060, 0x506d).ram(); // read/written by tetris (ADC?)
 
 	// 508x sound
-	map(0x5080, 0x5091).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w));
-	map(0x5092, 0x50a3).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w));
-	map(0x50a4, 0x50a4).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_unk_w));
-	map(0x50a5, 0x50a5).rw(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
-	map(0x50a6, 0x50a6).ram();
-	map(0x50a7, 0x50a7).ram();
-	map(0x50a8, 0x50a8).r(m_sound, FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)); // possible 'stopped' status of above channels, waits for it to be 0x3f in places
-	map(0x50a9, 0x50a9).rw(FUNC(elan_eu3a05_state::elan_eu3a05_50a9_r), FUNC(elan_eu3a05_state::elan_eu3a05_50a9_w));
+	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
 
 	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
@@ -497,6 +478,14 @@ void elan_eu3a05_state::elan_eu3a05(machine_config &config)
 	ELAN_EU3A05_SOUND(config, m_sound, 8000);
 	m_sound->space_read_callback().set(FUNC(elan_eu3a05_state::read_full_space));
 	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
+	/* just causes select sound to loop in Tetris for now!
+	m_sound->sound_end_cb<0>().set(FUNC(elan_eu3a05_state::sound_end0));
+	m_sound->sound_end_cb<1>().set(FUNC(elan_eu3a05_state::sound_end1));
+	m_sound->sound_end_cb<2>().set(FUNC(elan_eu3a05_state::sound_end2));
+	m_sound->sound_end_cb<3>().set(FUNC(elan_eu3a05_state::sound_end3));
+	m_sound->sound_end_cb<4>().set(FUNC(elan_eu3a05_state::sound_end4));
+	m_sound->sound_end_cb<5>().set(FUNC(elan_eu3a05_state::sound_end5));
+	*/
 }
 
 void elan_eu3a05_state::airblsjs(machine_config& config)

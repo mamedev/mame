@@ -104,19 +104,18 @@ public:
 	auto out_idx_cb() { return m_out_idx_func.bind(); }
 
 	virtual image_init_result call_load() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
-	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
+	virtual iodevice_t image_type() const noexcept override { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override;
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override;
-	virtual const char *file_extensions() const override { return m_extension_list; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override;
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override;
+	virtual const char *file_extensions() const noexcept override { return m_extension_list; }
 	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide; }
 
 	floppy_image_legacy *flopimg_get_image();
@@ -171,6 +170,9 @@ protected:
 	// device overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 	/* callbacks */
 	devcb_write_line m_out_idx_func;

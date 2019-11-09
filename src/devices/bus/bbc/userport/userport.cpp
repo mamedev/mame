@@ -108,8 +108,11 @@ void bbc_userport_slot_device::pb_w(uint8_t data)
 // slot devices
 #include "beebspch.h"
 //#include "digitiser.h"
+//#include "ev1.h"
 #include "pointer.h"
 #include "usersplit.h"
+//#include "vci.h"
+#include "voicebox.h"
 #include "cfa3000kbd.h"
 
 
@@ -119,9 +122,13 @@ void bbc_userport_devices(device_slot_interface &device)
 	//device.option_add("atr",        BBC_ATR);             /* Advanced Teletext Receiver (GIS) */
 	device.option_add("beebspch",   BBC_BEEBSPCH);        /* Beeb Speech Synthesiser (Watford Electronics) */
 	//device.option_add("beebvdig",   BBC_BEEBVDIG);        /* Beeb Video Digitiser (Watford Electronics) */
+	//device.option_add("ev1",        BBC_EV1);             /* Micro-Robotics EV1 */
+	//device.option_add("hobbit",     BBC_HOBBIT);          /* Hobbit Floppy Tape System (Ikon) */
 	device.option_add("m512mouse",  BBC_M512MOUSE);       /* Acorn Mouse (provided with Master 512) */
 	device.option_add("tracker",    BBC_TRACKER);         /* Marconi RB2 Tracker Ball / Acorn Tracker Ball */
 	device.option_add("usersplit",  BBC_USERSPLIT);       /*User Port Splitter (Watford Electronics) */
+	//device.option_add("vci",        BBC_VCI);             /* Video Camera Interface (Data Harvest) */
+	device.option_add("voicebox",   BBC_VOICEBOX);        /* Robin Voice Box */
 	//device.option_add("music4000",  BBC_MUSIC4000);       /* Hybrid Music 4000 Keyboard */
-	device.option_add("cfa3000kbd", CFA3000_KBD);         /* Henson CFA 3000 Keyboard */
+	device.option_add_internal("cfa3000kbd", CFA3000_KBD);/* Henson CFA 3000 Keyboard */
 }

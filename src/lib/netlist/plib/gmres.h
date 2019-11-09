@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * gmres.h
- *
- */
 
 #ifndef PLIB_GMRES_H_
 #define PLIB_GMRES_H_
+
+///
+/// \file gmres.h
+///
 
 #include "mat_cr.h"
 #include "parray.h"
@@ -206,9 +206,9 @@ namespace plib
 		plib::pmatrix_cr_t<FT, SIZE> m_mat;
 	};
 
-	/* FIXME: hardcoding RESTART to 20 becomes an issue on very large
-	 * systems.
-	 */
+	// FIXME: hardcoding RESTART to 20 becomes an issue on very large
+	// systems.
+
 	template <typename FT, int SIZE, int RESTART = 80>
 	struct gmres_t
 	{
@@ -282,8 +282,8 @@ namespace plib
 
 			if (rho <= rho_delta || k == RESTART-1)
 			{
-				/* Solve the system H * y = g */
-				/* x += m_v[j] * m_y[j]       */
+				// Solve the system H * y = g
+				// x += m_v[j] * m_y[j]
 				for (std::size_t i = k + 1; i-- > 0;)
 				{
 					auto tmp(m_g[i]);
@@ -310,27 +310,27 @@ namespace plib
 		template <typename OPS, typename VT, typename VRHS>
 		std::size_t solve(OPS &ops, VT &x, const VRHS & rhs, const std::size_t itr_max, float_type accuracy)
 		{
-			/*-------------------------------------------------------------------------
-			 * The code below was inspired by code published by John Burkardt under
-			 * the LPGL here:
-			 *
-			 * http://people.sc.fsu.edu/~jburkardt/cpp_src/mgmres/mgmres.html
-			 *
-			 * The code below was completely written from scratch based on the pseudo code
-			 * found here:
-			 *
-			 * http://de.wikipedia.org/wiki/GMRES-Verfahren
-			 *
-			 * The Algorithm itself is described in
-			 *
-			 * Yousef Saad,
-			 * Iterative Methods for Sparse Linear Systems,
-			 * Second Edition,
-			 * SIAM, 20003,
-			 * ISBN: 0898715342,
-			 * LC: QA188.S17.
-			 *
-			 *------------------------------------------------------------------------*/
+			// -------------------------------------------------------------------------
+			// The code below was inspired by code published by John Burkardt under
+			// the LPGL here:
+			//
+			// http://people.sc.fsu.edu/~jburkardt/cpp_src/mgmres/mgmres.html
+			//
+			// The code below was completely written from scratch based on the pseudo code
+			// found here:
+			//
+			// http://de.wikipedia.org/wiki/GMRES-Verfahren
+			//
+			// The Algorithm itself is described in
+			//
+			// Yousef Saad,
+			// Iterative Methods for Sparse Linear Systems,
+			// Second Edition,
+			// SIAM, 20003,
+			// ISBN: 0898715342,
+			// LC: QA188.S17.
+			//
+			//------------------------------------------------------------------------
 
 			std::size_t itr_used = 0;
 			auto rho_delta(plib::constants<float_type>::zero());
@@ -341,16 +341,16 @@ namespace plib
 
 			if (m_use_more_precise_stop_condition)
 			{
-				/* derive residual for a given delta x
-				 *
-				 * LU y = A dx
-				 *
-				 * ==> rho / accuracy = sqrt(y * y)
-				 *
-				 * This approach will approximate the iterative stop condition
-				 * based |xnew - xold| pretty precisely. But it is slow, or expressed
-				 * differently: The invest doesn't pay off.
-				 */
+				// derive residual for a given delta x
+				//
+				// LU y = A dx
+				//
+				// ==> rho / accuracy = sqrt(y * y)
+				//
+				// This approach will approximate the iterative stop condition
+				// based |xnew - xold| pretty precisely. But it is slow, or expressed
+				// differently: The invest doesn't pay off.
+				//
 
 				vec_set_scalar(n, residual, accuracy);
 				ops.calc_rhs(Ax, residual);
@@ -364,18 +364,17 @@ namespace plib
 			else
 				rho_delta = accuracy * plib::sqrt(static_cast<FT>(n));
 
-			/*
-			 * Using
-			 *
-			 * vec_set(n, x, rhs);
-			 * ops.solve_inplace(x);
-			 *
-			 * to get a starting point for x degrades convergence speed compared
-			 * to using the last solution for x.
-			 *
-			 * LU x = b; solve for x;
-			 *
-			 */
+			//
+			// Using
+			//
+			// vec_set(n, x, rhs);
+			// ops.solve_inplace(x);
+			//
+			// to get a starting point for x degrades convergence speed compared
+			// to using the last solution for x.
+			//
+			// LU x = b; solve for x;
+			//
 
 			while (itr_used < itr_max)
 			{
@@ -392,10 +391,10 @@ namespace plib
 				if (rho < rho_delta)
 					return itr_used + 1;
 
-				/* FIXME: The "+" is necessary to avoid link issues
-				 * on some systems / compiler versions. Issue reported by
-				 * AJR, no details known yet.
-				 */
+				// FIXME: The "+" is necessary to avoid link issues
+				// on some systems / compiler versions. Issue reported by
+				// AJR, no details known yet.
+
 				vec_set_scalar(RESTART+1, m_g, +constants<FT>::zero());
 				m_g[0] = rho;
 
@@ -415,14 +414,13 @@ namespace plib
 		plib::parray<float_type, SIZE> residual;
 		plib::parray<float_type, SIZE> Ax;
 
-		plib::parray<float_type, RESTART + 1> m_c;              /* mr + 1 */
-		plib::parray<float_type, RESTART + 1> m_g;              /* mr + 1 */
-		plib::parray2D<float_type, RESTART + 1, RESTART> m_ht;  /* (mr + 1), mr */
-		plib::parray<float_type, RESTART + 1> m_s;              /* mr + 1 */
-		plib::parray<float_type, RESTART + 1> m_y;              /* mr + 1 */
+		plib::parray<float_type, RESTART + 1> m_c;              // mr + 1
+		plib::parray<float_type, RESTART + 1> m_g;              // mr + 1
+		plib::parray2D<float_type, RESTART + 1, RESTART> m_ht;  // (mr + 1), mr
+		plib::parray<float_type, RESTART + 1> m_s;              // mr + 1
+		plib::parray<float_type, RESTART + 1> m_y;              // mr + 1
 
-		//plib::parray<plib::parray<float_type, storage_N>, RESTART + 1> m_v;  /* mr + 1, n */
-		plib::parray2D<float_type, RESTART + 1, SIZE> m_v;  /* mr + 1, n */
+		plib::parray2D<float_type, RESTART + 1, SIZE> m_v;  // mr + 1, n
 
 		std::size_t m_size;
 
@@ -433,12 +431,11 @@ namespace plib
 
 
 #if 0
-	/* Example of a Chebyshev iteration solver. This one doesn't work yet,
-	 * it needs to be extended for non-symmetric matrix operation and
-	 * depends on spectral radius estimates - which we don't have.
-	 *
-	 * Left here as another example.
-	 */
+	// Example of a Chebyshev iteration solver. This one doesn't work yet,
+	// it needs to be extended for non-symmetric matrix operation and
+	// depends on spectral radius estimates - which we don't have.
+	//
+	// Left here as another example.
 
 	template <typename FT, int SIZE>
 	struct ch_t
@@ -464,11 +461,6 @@ namespace plib
 		template <typename OPS, typename VT, typename VRHS>
 		std::size_t solve(OPS &ops, VT &x0, const VRHS & rhs, const std::size_t iter_max, float_type accuracy)
 		{
-			/*-------------------------------------------------------------------------
-			 *
-			 *
-			 *------------------------------------------------------------------------*/
-
 			ops.precondition();
 
 			const FT lmax = 20.0;
@@ -531,4 +523,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* PLIB_GMRES_H_ */
+#endif // PLIB_GMRES_H_

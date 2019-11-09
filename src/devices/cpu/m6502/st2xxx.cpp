@@ -30,7 +30,8 @@
 
 #define LOG_IRQ (1 << 1U)
 #define LOG_BT (1 << 2U)
-//#define VERBOSE (LOG_IRQ | LOG_BT)
+#define LOG_LCDC (1 << 3U)
+//#define VERBOSE (LOG_IRQ | LOG_BT | LOG_LCDC)
 #include "logmacro.h"
 
 st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, address_map_constructor internal_map, int data_bits, bool has_banked_ram)
@@ -49,6 +50,9 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_btsr(0)
 	, m_bt_mask(0)
 	, m_bt_ireq(0)
+	, m_pres_base(0)
+	, m_pres_started(attotime::zero)
+	, m_prs(0)
 	, m_sys(0)
 	, m_misc(0)
 	, m_ireq(0)
@@ -63,6 +67,9 @@ st2xxx_device::st2xxx_device(const machine_config &mconfig, device_type type, co
 	, m_lfra(0)
 	, m_lac(0)
 	, m_lpwm(0)
+	, m_lcd_ireq(0)
+	, m_lcd_timer(nullptr)
+	, m_bctr(0)
 {
 	program_config.m_internal_map = std::move(internal_map);
 }
@@ -119,6 +126,20 @@ void st2xxx_device::init_base_timer(u16 ireq)
 	assert(m_bt_ireq != 0);
 }
 
+TIMER_CALLBACK_MEMBER(st2xxx_device::lcd_interrupt)
+{
+	m_ireq |= m_lcd_ireq;
+	update_irq_state();
+}
+
+void st2xxx_device::init_lcd_timer(u16 ireq)
+{
+	m_lcd_ireq = ireq;
+	assert(m_lcd_ireq != 0);
+
+	m_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st2xxx_device::lcd_interrupt), this));
+}
+
 void st2xxx_device::save_common_registers()
 {
 	mi_st2xxx *intf = downcast<mi_st2xxx *>(mintf.get());
@@ -149,6 +170,9 @@ void st2xxx_device::save_common_registers()
 		save_item(NAME(m_bten));
 		save_item(NAME(m_btsr));
 	}
+	save_item(NAME(m_pres_base));
+	save_item(NAME(m_pres_started));
+	save_item(NAME(m_prs));
 	save_item(NAME(m_sys));
 	if (st2xxx_misc_mask() != 0)
 		save_item(NAME(m_misc));
@@ -165,6 +189,12 @@ void st2xxx_device::save_common_registers()
 	save_item(NAME(m_lfra));
 	save_item(NAME(m_lac));
 	save_item(NAME(m_lpwm));
+	if (st2xxx_bctr_mask() != 0)
+	{
+		save_item(NAME(m_bctr));
+		save_item(NAME(m_brs));
+		save_item(NAME(m_bdiv));
+	}
 }
 
 void st2xxx_device::device_reset()
@@ -197,6 +227,9 @@ void st2xxx_device::device_reset()
 	bten_w(0);
 	m_btsr = 0;
 
+	// reset prescaler
+	prs_w(0x80);
+
 	// reset miscellaneous registers
 	m_sys = 0;
 	m_misc = st2xxx_wdten_on_reset() ? 0x0c : 0;
@@ -212,6 +245,10 @@ void st2xxx_device::device_reset()
 	m_lfra = 0;
 	m_lac = 0;
 	m_lpwm = 0;
+	m_lcd_timer->adjust(attotime::never);
+
+	// reset UART and BRG
+	m_bctr = 0;
 }
 
 u8 st2xxx_device::acknowledge_irq()
@@ -327,6 +364,16 @@ void st2xxx_device::pcl_w(u8 data)
 	pctrl_w(6, data);
 }
 
+u8 st2xxx_device::pmcr_r()
+{
+	return m_pmcr;
+}
+
+void st2xxx_device::pmcr_w(u8 data)
+{
+	m_pmcr = data & st2xxx_pmcr_mask();
+}
+
 u8 st2xxx_device::bten_r()
 {
 	return m_bten;
@@ -372,6 +419,61 @@ void st2xxx_device::btclr_all_w(u8 data)
 	// Only bit 7 has any effect
 	if (BIT(data, 7))
 		m_btsr = 0;
+}
+
+u32 st2xxx_device::tclk_pres_div(u8 mode) const
+{
+	assert(mode < 8);
+	if (mode == 0)
+		return 0x10000;
+	else if (mode < 4)
+		return 0x20000 >> (mode * 2);
+	else if (mode == 4)
+		return 0x100;
+	else
+		return 0x8000 >> (mode * 2);
+}
+
+u16 st2xxx_device::pres_count() const
+{
+	return (m_pres_base + ((m_prs & 0x60) == 0x40 ? attotime_to_cycles(machine().time() - m_pres_started) : 0));
+}
+
+u8 st2xxx_device::prs_r()
+{
+	return pres_count() & 0xff;
+}
+
+void st2xxx_device::prs_w(u8 data)
+{
+	data &= st2xxx_prs_mask();
+
+	// Bit 7 produces prescaler reset pulse
+	if (BIT(data, 7))
+	{
+		st2xxx_tclk_stop();
+		m_pres_base = 0;
+		if ((m_prs & 0x60) == 0x40)
+		{
+			m_pres_started = machine().time();
+			st2xxx_tclk_start();
+		}
+		data &= 0x7f;
+	}
+
+	// Bit 6 enables prescaler; bit 5 selects clock source
+	if ((data & 0x60) == 0x40 && (m_prs & 0x60) != 0x40)
+	{
+		m_pres_started = machine().time();
+		st2xxx_tclk_start();
+	}
+	else if ((data & 0x60) == 0x40 && (m_prs & 0x60) != 0x40)
+	{
+		st2xxx_tclk_stop();
+		m_pres_base += attotime_to_cycles(machine().time() - m_pres_started);
+	}
+
+	m_prs = data;
 }
 
 u8 st2xxx_device::sys_r()
@@ -592,6 +694,7 @@ u8 st2xxx_device::lxmax_r()
 void st2xxx_device::lxmax_w(u8 data)
 {
 	m_lxmax = data;
+	lfr_recalculate_period();
 }
 
 u8 st2xxx_device::lymax_r()
@@ -602,6 +705,7 @@ u8 st2xxx_device::lymax_r()
 void st2xxx_device::lymax_w(u8 data)
 {
 	m_lymax = data;
+	lfr_recalculate_period();
 }
 
 u8 st2xxx_device::lpan_r()
@@ -621,17 +725,37 @@ u8 st2xxx_device::lctr_r()
 
 void st2xxx_device::lctr_w(u8 data)
 {
-	m_lctr = data & st2xxx_lctr_mask();
+	data &= st2xxx_lctr_mask();
+	u8 old_lctr = std::exchange(m_lctr, data);
+
+	if ((old_lctr & 0xbf) != (m_lctr & 0xbf))
+		lfr_recalculate_period();
 }
 
 void st2xxx_device::lckr_w(u8 data)
 {
 	m_lckr = data & st2xxx_lckr_mask();
+	lfr_recalculate_period();
 }
 
 void st2xxx_device::lfra_w(u8 data)
 {
 	m_lfra = data & 0x3f;
+	lfr_recalculate_period();
+}
+
+void st2xxx_device::lfr_recalculate_period()
+{
+	if (!BIT(m_lctr, 7))
+	{
+		unsigned clocks = st2xxx_lfr_clocks();
+		assert(clocks != 0);
+		attotime period = cycles_to_attotime(clocks);
+		LOGMASKED(LOG_LCDC, "LCD frame rate = %f Hz (PC = $%04X)\n", period.as_hz(), PPC);
+		m_lcd_timer->adjust(period, 0, period);
+	}
+	else
+		m_lcd_timer->adjust(attotime::never);
 }
 
 u8 st2xxx_device::lac_r()
@@ -652,6 +776,36 @@ u8 st2xxx_device::lpwm_r()
 void st2xxx_device::lpwm_w(u8 data)
 {
 	m_lpwm = data & st2xxx_lpwm_mask();
+}
+
+u8 st2xxx_device::bctr_r()
+{
+	return m_bctr;
+}
+
+void st2xxx_device::bctr_w(u8 data)
+{
+	m_bctr = data & st2xxx_bctr_mask();
+}
+
+u8 st2xxx_device::brs_r()
+{
+	return m_brs;
+}
+
+void st2xxx_device::brs_w(u8 data)
+{
+	m_brs = data;
+}
+
+u8 st2xxx_device::bdiv_r()
+{
+	return m_bdiv;
+}
+
+void st2xxx_device::bdiv_w(u8 data)
+{
+	m_bdiv = data;
 }
 
 #include "cpu/m6502/st2xxx.hxx"

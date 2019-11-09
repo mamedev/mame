@@ -330,6 +330,8 @@ public:
 	hd6845s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	hd6845s_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual bool check_cursor_visible(uint16_t ra, uint16_t line_addr) override;
@@ -357,7 +359,7 @@ protected:
 
 // HD6345/HD6445 CRTC-II
 // http://bitsavers.informatik.uni-stuttgart.de/pdf/hitachi/_dataBooks/1987_Hitachi_8_16_Bit_Peripheral_LSI_Data_Book.pdf, pp. 99
-class hd6345_device : public mc6845_device
+class hd6345_device : public hd6845s_device
 {
 public:
 	hd6345_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

@@ -20,32 +20,32 @@
 
 // nubus_image_device::messimg_disk_image_device
 
-class nubus_image_device::messimg_disk_image_device :   public device_t,
-								public device_image_interface
+class nubus_image_device::messimg_disk_image_device : public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
 	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
+	virtual iodevice_t image_type() const noexcept override { return IO_QUICKLOAD; }
 
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *file_extensions() const override { return "img"; }
-	virtual const char *custom_instance_name() const override { return "disk"; }
-	virtual const char *custom_brief_instance_name() const override { return "disk"; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *file_extensions() const noexcept override { return "img"; }
+	virtual const char *custom_instance_name() const noexcept override { return "disk"; }
+	virtual const char *custom_brief_instance_name() const noexcept override { return "disk"; }
 
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
-	protected:
+protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
 public:
 	uint32_t m_size;
 	std::unique_ptr<uint8_t[]> m_data;

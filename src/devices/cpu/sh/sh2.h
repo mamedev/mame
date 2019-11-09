@@ -302,6 +302,7 @@ private:
 	int     m_internal_irq_vector;
 
 	emu_timer *m_timer;
+	emu_timer *m_wdtimer;
 	emu_timer *m_dma_current_active_timer[2];
 	int     m_dma_timer_active[2];
 	uint8_t  m_dma_irq[2];
@@ -339,9 +340,12 @@ private:
 	virtual void execute_one_f000(uint16_t opcode) override;
 
 	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
+	TIMER_CALLBACK_MEMBER( sh2_wdtimer_callback );
 	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
 	void sh2_timer_resync();
 	void sh2_timer_activate();
+	void sh2_wtcnt_recalc();
+	void sh2_wdt_activate();
 	void sh2_do_dma(int dmach);
 	virtual void sh2_exception(const char *message, int irqline) override;
 	void sh2_dmac_check(int dma);

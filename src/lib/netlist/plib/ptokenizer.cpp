@@ -1,9 +1,5 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * ptokenizer.cpp
- *
- */
 
 #include "ptokenizer.h"
 #include "palloc.h"
@@ -198,7 +194,7 @@ namespace plib {
 
 	ptokenizer::token_t ptokenizer::get_token_internal()
 	{
-		/* skip ws */
+		// skip ws
 		pstring::value_type c = getc();
 		while (m_whitespace.find(c) != pstring::npos)
 		{
@@ -212,10 +208,8 @@ namespace plib {
 			return token_t(LINEMARKER, "#");
 		else if (m_number_chars_start.find(c) != pstring::npos)
 		{
-			/* read number while we receive number or identifier chars
-			 * treat it as an identifier when there are identifier chars in it
-			 *
-			 */
+			// read number while we receive number or identifier chars
+			// treat it as an identifier when there are identifier chars in it
 			token_type ret = NUMBER;
 			pstring tokstr = "";
 			while (true) {
@@ -231,7 +225,7 @@ namespace plib {
 		}
 		else if (m_identifier_chars.find(c) != pstring::npos)
 		{
-			/* read identifier till non identifier char */
+			// read identifier till non identifier char
 			pstring tokstr = "";
 			while (m_identifier_chars.find(c) != pstring::npos)
 			{
@@ -258,12 +252,12 @@ namespace plib {
 		}
 		else
 		{
-			/* read identifier till first identifier char or ws */
+			// read identifier till first identifier char or ws
 			pstring tokstr = "";
 			while ((m_identifier_chars.find(c) == pstring::npos) && (m_whitespace.find(c) == pstring::npos))
 			{
 				tokstr += c;
-				/* expensive, check for single char tokens */
+				// expensive, check for single char tokens
 				if (tokstr.length() == 1)
 				{
 					auto id = m_tokens.find(tokstr);

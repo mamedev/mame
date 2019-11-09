@@ -221,7 +221,7 @@ void t11_device::t11_check_irqs()
 		PUSH(PC);
 		PCD = new_pc;
 		PSW = new_psw;
-		t11_check_irqs();
+		//t11_check_irqs();
 
 		/* count cycles and clear the WAIT flag */
 		m_icount -= 114;
@@ -409,7 +409,7 @@ void t11_device::execute_run()
 		return;
 	}
 
-	do
+	while (m_icount > 0)
 	{
 		uint16_t op;
 
@@ -419,8 +419,7 @@ void t11_device::execute_run()
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
-
-	} while (m_icount > 0);
+	}
 }
 
 std::unique_ptr<util::disasm_interface> t11_device::create_disassembler()

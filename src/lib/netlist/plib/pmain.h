@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * poptions.h
- *
- */
 
 #ifndef PMAIN_H_
 #define PMAIN_H_
+
+///
+/// \file poptions.h
+///
 
 #include "palloc.h"
 #include "poptions.h"
@@ -27,10 +27,9 @@ int main(int argc, char **argv) { return plib::app::mainrun<appclass, char>(argc
 
 
 namespace plib {
-/***************************************************************************
-    Application
-***************************************************************************/
 
+	/// \brief Application class.
+	///
 	class app : public options
 	{
 	public:
@@ -65,4 +64,4 @@ namespace plib {
 
 
 
-#endif /* PMAIN_H_ */
+#endif // PMAIN_H_

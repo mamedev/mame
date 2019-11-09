@@ -1,10 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*!
- *
- * \file nl_errstr.h
- *
- */
+
+///
+/// \file nl_errstr.h
+///
 
 #ifndef NL_ERRSTR_H_
 #define NL_ERRSTR_H_
@@ -32,6 +31,8 @@ namespace netlist
 
 	static constexpr const char sHINT_NO_DEACTIVATE[] = ".HINT_NO_DEACTIVATE";
 	static constexpr const char sPowerDevRes[] = "_RVG";
+	static constexpr const char sPowerGND[] = "GND";
+	static constexpr const char sPowerVCC[] = "VCC";
 
 	// nl_base.cpp
 
@@ -149,4 +150,4 @@ namespace netlist
 } // namespace netlist
 
 
-#endif /* NL_ERRSTR_H_ */
+#endif // NL_ERRSTR_H_

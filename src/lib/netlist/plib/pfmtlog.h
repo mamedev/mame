@@ -1,8 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pfmtlog.h
- */
+
+///
+/// \file pfmtlog.h
+///
 
 #ifndef PFMT_H_
 #define PFMT_H_
@@ -310,7 +311,7 @@ public:
 
 	COPYASSIGNMOVE(pfmt_writer_t, delete)
 
-	/* runtime enable */
+	// runtime enable
 	template<bool enabled, typename... Args>
 	void log(const pstring & fmt, Args&&... args) const noexcept
 	{
@@ -405,4 +406,4 @@ public:
 template<typename T>
 plib::pfmt& operator<<(plib::pfmt &p, T&& val) { return p(std::forward<T>(val)); }
 
-#endif /* PSTRING_H_ */
+#endif // PSTRING_H_

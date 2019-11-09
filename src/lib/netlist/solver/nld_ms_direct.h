@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_ms_direct.h
- *
- */
 
 #ifndef NLD_MS_DIRECT_H_
 #define NLD_MS_DIRECT_H_
+
+///
+/// \file nld_ms_direct.h
+///
 
 #include "nld_matrix_solver.h"
 #include "nld_solver.h"
@@ -66,7 +66,7 @@ namespace solver
 		{
 			for (std::size_t i = 0; i < kN; i++)
 			{
-				/* FIXME: Singular matrix? */
+				// FIXME: Singular matrix?
 				const FT f = plib::reciprocal(m_A[i][i]);
 				const auto &nzrd = this->m_terms[i].m_nzrd;
 				const auto &nzbd = this->m_terms[i].m_nzbd;
@@ -84,7 +84,7 @@ namespace solver
 		{
 			for (std::size_t i = 0; i < kN; i++)
 			{
-				/* Find the row with the largest first value */
+				// Find the row with the largest first value
 				std::size_t maxrow = i;
 				for (std::size_t j = i + 1; j < kN; j++)
 				{
@@ -95,16 +95,16 @@ namespace solver
 
 				if (maxrow != i)
 				{
-					/* Swap the maxrow and ith row */
+					// Swap the maxrow and ith row
 					for (std::size_t k = 0; k < kN; k++) {
 						std::swap(m_A[i][k], m_A[maxrow][k]);
 					}
 					std::swap(this->m_RHS[i], this->m_RHS[maxrow]);
 				}
-				/* FIXME: Singular matrix? */
+				// FIXME: Singular matrix?
 				const FT f = plib::reciprocal(m_A[i][i]);
 
-				/* Eliminate column i from row j */
+				// Eliminate column i from row j
 
 				for (std::size_t j = i + 1; j < kN; j++)
 				{
@@ -132,7 +132,7 @@ namespace solver
 	{
 		const std::size_t kN = this->size();
 
-		/* back substitution */
+		// back substitution
 		if (this->m_params.m_pivot)
 		{
 			for (std::size_t j = kN; j-- > 0; )
@@ -149,7 +149,7 @@ namespace solver
 			{
 				FT tmp = 0;
 				const auto &nzrd = this->m_terms[j].m_nzrd;
-				const auto e = nzrd.size(); // - 1; /* exclude RHS element */
+				const auto e = nzrd.size(); // - 1; // exclude RHS element
 				for ( std::size_t k = 0; k < e; k++)
 					tmp += m_A[j][nzrd[k]] * x[nzrd[k]];
 				x[j] = (this->m_RHS[j] - tmp) / m_A[j][j];
@@ -173,7 +173,7 @@ namespace solver
 	template <typename FT, int SIZE>
 	unsigned matrix_solver_direct_t<FT, SIZE>::vsolve_non_dynamic(const bool newton_raphson)
 	{
-		/* populate matrix */
+		// populate matrix
 		this->clear_square_mat(m_A);
 		this->fill_matrix_and_rhs();
 
@@ -196,4 +196,4 @@ namespace solver
 } // namespace solver
 } // namespace netlist
 
-#endif /* NLD_MS_DIRECT_H_ */
+#endif // NLD_MS_DIRECT_H_

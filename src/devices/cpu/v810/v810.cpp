@@ -1257,7 +1257,7 @@ void v810_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<2, 0, ENDIANNESS_LITTLE>();
-	m_io = &space(AS_IO);
+	m_io = has_space(AS_IO) ? &space(AS_IO) : m_program;
 
 	m_irq_line = 0;
 	m_irq_state = CLEAR_LINE;

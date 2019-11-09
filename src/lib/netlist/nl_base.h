@@ -1,13 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*!
- *
- * \file nl_base.h
- *
- */
 
 #ifndef NLBASE_H_
 #define NLBASE_H_
+
+///
+/// \file nl_base.h
+///
 
 #ifdef NL_PROHIBIT_BASEH_INCLUDE
 #error "nl_base.h included. Please correct."
@@ -34,24 +33,25 @@
 //  MACROS / New Syntax
 //============================================================
 
-/*! Construct a netlist device name */
+/// Construct a netlist device name
 #define NETLIB_NAME(chip) nld_ ## chip
 
 #define NETLIB_OBJECT_DERIVED(name, pclass)                                   \
 class NETLIB_NAME(name) : public NETLIB_NAME(pclass)
 
-/*! Start a netlist device class.
- *  Used to start defining a netlist device class.
- *  The simplest device without inputs or outputs would look like this:
- *
- *      NETLIB_OBJECT(some_object)
- *      {
- *      public:
- *          NETLIB_CONSTRUCTOR(some_object) { }
- *      };
- *
- *  Also refer to #NETLIB_CONSTRUCTOR.
- */
+/// \brief Start a netlist device class.
+///
+/// Used to start defining a netlist device class.
+/// The simplest device without inputs or outputs would look like this:
+///
+///      NETLIB_OBJECT(some_object)
+///      {
+///      public:
+///          NETLIB_CONSTRUCTOR(some_object) { }
+///      };
+///
+///  Also refer to #NETLIB_CONSTRUCTOR.
+
 #define NETLIB_OBJECT(name)                                                    \
 class NETLIB_NAME(name) : public device_t
 
@@ -65,72 +65,86 @@ class NETLIB_NAME(name) : public device_t
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
 	: NETLIB_NAME(pclass)(owner, name)
 
-/*! Used to define the constructor of a netlist device.
- *  Use this to define the constructor of a netlist device. Please refer to
- *  #NETLIB_OBJECT for an example.
- */
+/// \brief Used to define the constructor of a netlist device.
+///  Use this to define the constructor of a netlist device. Please refer to
+///  #NETLIB_OBJECT for an example.
+
 #define NETLIB_CONSTRUCTOR(cname)                                              \
 	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name) \
 		: device_t(owner, name)
 
-	/*! Used to define the destructor of a netlist device.
-	*  The use of a destructor for netlist device should normally not be necessary.
-	*/
+/// \brief Used to define the destructor of a netlist device.
+/// The use of a destructor for netlist device should normally not be necessary.
+
 #define NETLIB_DESTRUCTOR(name) public: virtual ~NETLIB_NAME(name)() noexcept
 
-	/*! Define an extended constructor and add further parameters to it.
-	*  The macro allows to add further parameters to a device constructor. This is
-	*  normally used for sub-devices and system devices only.
-	*/
+/// \brief Define an extended constructor and add further parameters to it.
+/// The macro allows to add further parameters to a device constructor. This is
+/// normally used for sub-devices and system devices only.
+
 #define NETLIB_CONSTRUCTOR_EX(cname, ...)                                      \
 	private: detail::family_setter_t m_famsetter;                              \
 	public: template <class CLASS> NETLIB_NAME(cname)(CLASS &owner, const pstring &name, __VA_ARGS__) \
 		: device_t(owner, name)
 
-	/*! Add this to a device definition to mark the device as dynamic.
-	 *
-	 *  If NETLIB_IS_DYNAMIC(true) is added to the device definition the device
-	 *  is treated as an analog dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI
-	 *  is called on a each step of the Newton-Raphson step
-	 *  of solving the linear equations.
-	 *
-	 *  You may also use e.g. NETLIB_IS_DYNAMIC(m_func() != "") to only make the
-	 *  device a dynamic device if parameter m_func is set.
-	 */
+/// \brief Add this to a device definition to mark the device as dynamic.
+///
+///  If NETLIB_IS_DYNAMIC(true) is added to the device definition the device
+///  is treated as an analog dynamic device, i.e. \ref NETLIB_UPDATE_TERMINALSI
+///  is called on a each step of the Newton-Raphson step
+///  of solving the linear equations.
+///
+///  You may also use e.g. NETLIB_IS_DYNAMIC(m_func() != "") to only make the
+///  device a dynamic device if parameter m_func is set.
+///
+///  \param expr boolean expression
+///
 #define NETLIB_IS_DYNAMIC(expr)                                                \
 	public: virtual bool is_dynamic() const noexcept override { return expr; }
 
-	/*! Add this to a device definition to mark the device as a time-stepping device.
-	 *
-	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
-	 *  the capacitor and inductor devices uses this.
-	 *
-	 *  You may also use e.g. NETLIB_IS_TIMESTEP(m_func() != "") to only make the
-	 *  device a dynamic device if parameter m_func is set. This is used by the
-	 *  Voltage Source element.
-	 *
-	 *  Example:
-	 *
-	 *   NETLIB_TIMESTEP_IS_TIMESTEP()
-	 *   NETLIB_TIMESTEPI()
-	 *       {
-	 *           // Gpar should support convergence
-	 *           const nl_fptype G = m_C.Value() / step +  m_GParallel;
-	 *           const nl_fptype I = -G * deltaV();
-	 *           set(G, 0.0, I);
-	 *       }
-	 *
-	 */
+/// \brief Add this to a device definition to mark the device as a time-stepping device.
+///
+///  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
+///  the capacitor and inductor devices uses this.
+///
+///  You may also use e.g. NETLIB_IS_TIMESTEP(m_func() != "") to only make the
+///  device a dynamic device if parameter m_func is set. This is used by the
+///  Voltage Source element.
+///
+///  Example:
+///
+///  \code
+///  NETLIB_TIMESTEP_IS_TIMESTEP()
+///  NETLIB_TIMESTEPI()
+///  {
+///      // Gpar should support convergence
+///      const nl_fptype G = m_C.Value() / step +  m_GParallel;
+///      const nl_fptype I = -G/// deltaV();
+///      set(G, 0.0, I);
+///  }
+///  \endcode
+
 #define NETLIB_IS_TIMESTEP(expr)                                               \
 	public: virtual bool is_timestep() const  noexcept override { return expr; }
 
-	/*! Used to implement the time stepping code.
-	 *
-	 * Please see NETLIB_IS_TIMESTEP for an example.
-	 */
+/// \brief Used to implement the time stepping code.
+///
+/// Please see \ref NETLIB_IS_TIMESTEP for an example.
+
 #define NETLIB_TIMESTEPI()                                                     \
 	public: virtual void timestep(const nl_fptype step)  noexcept override
+
+/// \brief Used to implement the body of the time stepping code.
+///
+/// Used when the implementation is outside the class definition
+///
+/// Please see \ref NETLIB_IS_TIMESTEP for an example.
+///
+/// \param cname Name of object as given to \ref NETLIB_OBJECT
+///
+#define NETLIB_TIMESTEP(cname) 												   \
+	void NETLIB_NAME(cname) :: timestep(nl_fptype step) noexcept
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
 
@@ -142,10 +156,8 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override
 #define NETLIB_RESETI() virtual void reset() override
 
-#define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(nl_fptype step) noexcept
-
 #define NETLIB_SUB(chip) nld_ ## chip
-#define NETLIB_SUBXX(ns, chip) unique_pool_ptr< ns :: nld_ ## chip >
+#define NETLIB_SUB_UPTR(ns, chip) unique_pool_ptr< ns :: nld_ ## chip >
 
 #define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() NL_NOEXCEPT
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
@@ -175,9 +187,9 @@ class NETLIB_NAME(name) : public device_t
 
 namespace netlist
 {
-	/*! Delegate type for device notification.
-	 *
-	 */
+	/// \brief Delegate type for device notification.
+	///
+
 	using nldelegate = plib::pmfp<void>;
 
 	// -----------------------------------------------------------------------------
@@ -212,18 +224,21 @@ namespace netlist
 	//  Exceptions
 	//============================================================
 
-	/*! Generic netlist exception.
-	 *  The exception is used in all events which are considered fatal.
-	 */
+	/// \brief Generic netlist exception.
+	///  The exception is used in all events which are considered fatal.
+
 	class nl_exception : public plib::pexception
 	{
 	public:
-		/*! Constructor.
-		 *  Allows a descriptive text to be assed to the exception
-		 */
+		/// \brief Constructor.
+		///  Allows a descriptive text to be assed to the exception
+
 		explicit nl_exception(const pstring &text //!< text to be passed
 				)
 		: plib::pexception(text) { }
+
+		/// \brief Constructor.
+		///  Allows to use \ref plib::pfmt logic to be used in exception
 
 		template<typename... Args>
 		explicit nl_exception(const pstring &fmt //!< format to be used
@@ -232,10 +247,10 @@ namespace netlist
 		: plib::pexception(plib::pfmt(fmt)(std::forward<Args>(args)...)) { }
 	};
 
-	/*! Logic families descriptors are used to create proxy devices.
-	 *  The logic family describes the analog capabilities of logic devices,
-	 *  inputs and outputs.
-	 */
+	/// \brief Logic families descriptors are used to create proxy devices.
+	///  The logic family describes the analog capabilities of logic devices,
+	///  inputs and outputs.
+
 	class logic_family_desc_t
 	{
 	public:
@@ -258,7 +273,7 @@ namespace netlist
 		nl_fptype R_low() const noexcept{ return m_R_low; }
 		nl_fptype R_high() const noexcept{ return m_R_high; }
 
-		nl_fptype m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5. */
+		nl_fptype m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5.
 		nl_fptype m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		nl_fptype m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
 		nl_fptype m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"
@@ -267,17 +282,17 @@ namespace netlist
 		nl_fptype m_R_high;            //!< high output resistance. Value of series resistor used for high output
 	};
 
-	/*! Base class for devices, terminals, outputs and inputs which support
-	 *  logic families.
-	 *  This class is a storage container to store the logic family for a
-	 *  netlist object. You will not directly use it. Please refer to
-	 *  #NETLIB_FAMILY to learn how to define a logic family for a device.
-	 *
-	 * All terminals inherit the family description from the device
-	 * The default is the ttl family, but any device can override the family.
-	 * For individual terminals, the family can be overwritten as well.
-	 *
-	 */
+	/// \brief Base class for devices, terminals, outputs and inputs which support
+	///  logic families.
+	///  This class is a storage container to store the logic family for a
+	///  netlist object. You will not directly use it. Please refer to
+	///  \ref NETLIB_FAMILY to learn how to define a logic family for a device.
+	///
+	/// All terminals inherit the family description from the device
+	/// The default is the ttl family, but any device can override the family.
+	/// For individual terminals, the family can be overwritten as well.
+	///
+
 	class logic_family_t
 	{
 	public:
@@ -292,21 +307,20 @@ namespace netlist
 		const logic_family_desc_t *m_logic_family;
 	};
 
-	const logic_family_desc_t *family_TTL();        //*!< logic family for TTL devices.
-	const logic_family_desc_t *family_CD4XXX();     //*!< logic family for CD4XXX CMOS devices.
+	const logic_family_desc_t *family_TTL();        ///< logic family for TTL devices.
+	const logic_family_desc_t *family_CD4XXX();     ///< logic family for CD4XXX CMOS devices.
 
-	/*! A persistent variable template.
-	 *  Use the state_var template to define a variable whose value is saved.
-	 *  Within a device definition use
-	 *
-	 *      NETLIB_OBJECT(abc)
-	 *      {
-	 *          NETLIB_CONSTRUCTOR(abc)
-	 *          , m_var(*this, "myvar", 0)
-	 *          ...
-	 *          state_var<unsigned> m_var;
-	 *      }
-	 */
+	/// \brief A persistent variable template.
+	///  Use the state_var template to define a variable whose value is saved.
+	///  Within a device definition use
+	///
+	///      NETLIB_OBJECT(abc)
+	///      {
+	///          NETLIB_CONSTRUCTOR(abc)
+	///          , m_var(*this, "myvar", 0)
+	///          ...
+	///          state_var<unsigned> m_var;
+	///      }
 	template <typename T>
 	struct state_var
 	{
@@ -325,28 +339,32 @@ namespace netlist
 		//! Move Constructor.
 		constexpr state_var(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of a state var.
-		C14CONSTEXPR state_var &operator=(const state_var &rhs) /*noexcept*/ = default; // OSX doesn't like noexcept
+		C14CONSTEXPR state_var &operator=(const state_var &rhs) = default; // OSX doesn't like noexcept
 		//! Assignment move operator to assign value of a state var.
 		C14CONSTEXPR state_var &operator=(state_var &&rhs) noexcept = default;
 		//! Assignment operator to assign value of type T.
 		C14CONSTEXPR state_var &operator=(const T &rhs) noexcept { m_value = rhs; return *this; }
 		//! Assignment move operator to assign value of type T.
 		C14CONSTEXPR state_var &operator=(T &&rhs) noexcept { std::swap(m_value, rhs); return *this; }
-		//! Return value of state variable.
+		//! Return non-const value of state variable.
 		C14CONSTEXPR operator T & () noexcept { return m_value; }
 		//! Return const value of state variable.
 		constexpr operator const T & () const noexcept { return m_value; }
+		//! Return pointer to state variable.
 		C14CONSTEXPR T * ptr() noexcept { return &m_value; }
+		//! Return const pointer to state variable.
 		constexpr const T * ptr() const noexcept{ return &m_value; }
 
 	private:
 		T m_value;
 	};
 
-	/*! A persistent array template.
-	 *  Use this state_var template to define an array whose contents are saved.
-	 *  Please refer to \ref state_var.
-	 */
+	/// \brief A persistent array template.
+	///  Use this state_var template to define an array whose contents are saved.
+	///  Please refer to \ref state_var.
+	///
+	///  \tparam C container class to use.
+
 	template <typename C>
 	struct state_container : public C
 	{
@@ -379,16 +397,16 @@ namespace netlist
 	// State variables - predefined and c++11 non-optional
 	// -----------------------------------------------------------------------------
 
-	/*! predefined state variable type for uint8_t */
+	/// \brief predefined state variable type for uint8_t
 	using state_var_u8 = state_var<std::uint8_t>;
-	/*! predefined state variable type for int8_t */
+	/// \brief predefined state variable type for int8_t
 	using state_var_s8 = state_var<std::int8_t>;
 
-	/*! predefined state variable type for uint32_t */
+	/// \brief predefined state variable type for uint32_t
 	using state_var_u32 = state_var<std::uint32_t>;
-	/*! predefined state variable type for int32_t */
+	/// \brief predefined state variable type for int32_t
 	using state_var_s32 = state_var<std::int32_t>;
-	/*! predefined state variable type for sig_t */
+	/// \brief predefined state variable type for sig_t
 	using state_var_sig = state_var<netlist_sig_t>;
 
 	namespace detail {
@@ -423,31 +441,32 @@ namespace netlist
 		// object_t
 		// -----------------------------------------------------------------------------
 
-		/*! The base class for netlist devices, terminals and parameters.
-		 *
-		 *  This class serves as the base class for all device, terminal and
-		 *  objects. It provides new and delete operators to support e.g. pooled
-		 *  memory allocation to enhance locality. Please refer to \ref USE_MEMPOOL as
-		 *  well.
-		 */
+		/// \brief The base class for netlist devices, terminals and parameters.
+		///
+		///  This class serves as the base class for all device, terminal and
+		///  objects. It provides new and delete operators to support e.g. pooled
+		///  memory allocation to enhance locality. Please refer to \ref NL_USE_MEMPOOL as
+		///  well.
+
 		class object_t
 		{
 		public:
 
-			/*! Constructor.
-			 *
-			 *  Every class derived from the object_t class must have a name.
-			 */
-			explicit object_t(const pstring &aname /*!< string containing name of the object */)
+			/// \brief Constructor.
+			/// Every class derived from the object_t class must have a name.
+			///
+			/// \param aname string containing name of the object
+
+			explicit object_t(const pstring &aname)
 			{
 				props::add(this, aname);
 			}
 
 			COPYASSIGNMOVE(object_t, delete)
-			/*! return name of the object
-			 *
-			 *  \returns name of the object.
-			 */
+			/// \brief return name of the object
+			///
+			/// \returns name of the object.
+
 			pstring name() const noexcept
 			{
 				return props::get(this);
@@ -490,30 +509,30 @@ namespace netlist
 		// device_object_t
 		// -----------------------------------------------------------------------------
 
-		/*! Base class for all objects being owned by a device.
-		 *
-		 * Serves as the base class of all objects being owned by a device.
-		 *
-		 */
+		/// \brief Base class for all objects being owned by a device.
+		///
+		/// Serves as the base class of all objects being owned by a device.
+		///
+
 		class device_object_t : public object_t
 		{
 		public:
-			/*! Constructor.
-			 *
-			 * \param dev  device owning the object.
-			 * \param name string holding the name of the device
-			 */
+			/// \brief Constructor.
+			///
+			/// \param dev  device owning the object.
+			/// \param name string holding the name of the device
+
 			device_object_t(core_device_t &dev, const pstring &name);
 
-			/*! returns reference to owning device.
-			 * \returns reference to owning device.
-			 */
+			/// \brief returns reference to owning device.
+			/// \returns reference to owning device.
+
 			core_device_t &device() noexcept { return m_device; }
 			const core_device_t &device() const noexcept { return m_device; }
 
-			/*! The netlist owning the owner of this object.
-			 * \returns reference to netlist object.
-			 */
+			/// \brief The netlist owning the owner of this object.
+			/// \returns reference to netlist object.
+
 			netlist_state_t &state() noexcept;
 			const netlist_state_t &state() const noexcept;
 
@@ -528,11 +547,11 @@ namespace netlist
 		// core_terminal_t
 		// -----------------------------------------------------------------------------
 
-		/*! Base class for all terminals.
-		 *
-		 * All terminals are derived from this class.
-		 *
-		 */
+		/// \brief Base class for all terminals.
+		///
+		/// All terminals are derived from this class.
+		///
+
 
 		class net_t;
 
@@ -559,14 +578,14 @@ namespace netlist
 
 			COPYASSIGNMOVE(core_terminal_t, delete)
 
-			/*! The object type.
-			 * \returns type of the object
-			 */
+			/// \brief The object type.
+			/// \returns type of the object
+
 			terminal_type type() const noexcept(false);
-			/*! Checks if object is of specified type.
-			 * \param atype type to check object against.
-			 * \returns true if object is of specified type else false.
-			 */
+			/// \brief Checks if object is of specified type.
+			/// \param atype type to check object against.
+			/// \returns true if object is of specified type else false.
+
 			bool is_type(const terminal_type atype) const noexcept { return (type() == atype); }
 
 			void set_net(net_t *anet) noexcept { m_net = anet; }
@@ -656,7 +675,7 @@ namespace netlist
 			void add_to_active_list(core_terminal_t &term) noexcept;
 			void remove_from_active_list(core_terminal_t &term) noexcept;
 
-			/* setup stuff */
+			// setup stuff
 
 			void add_terminal(core_terminal_t &terminal) noexcept(false);
 			void remove_terminal(core_terminal_t &terminal) noexcept(false);
@@ -664,7 +683,7 @@ namespace netlist
 			bool is_logic() const noexcept;
 			bool is_analog() const noexcept;
 
-			void rebuild_list();     /* rebuild m_list after a load */
+			void rebuild_list();     // rebuild m_list after a load
 			void move_connections(net_t &dest_net);
 
 			std::vector<core_terminal_t *> &core_terms() noexcept { return m_core_terms; }
@@ -677,23 +696,23 @@ namespace netlist
 	#else
 			void update_inputs() const noexcept
 			{
-				/* nothing needs to be done */
+				// nothing needs to be done
 			}
 	#endif
 
 		protected:
 
-			/* only used for logic nets */
+			// only used for logic nets
 			netlist_sig_t Q() const noexcept { return m_cur_Q; }
 
-			/* only used for logic nets */
+			// only used for logic nets
 			void initial(netlist_sig_t val) noexcept
 			{
 				m_cur_Q = m_new_Q = val;
 				update_inputs();
 			}
 
-			/* only used for logic nets */
+			// only used for logic nets
 			void set_Q_and_push(netlist_sig_t newQ, netlist_time delay) noexcept
 			{
 				if (newQ != m_new_Q)
@@ -703,7 +722,7 @@ namespace netlist
 				}
 			}
 
-			/* only used for logic nets */
+			// only used for logic nets
 			void set_Q_time(netlist_sig_t newQ, netlist_time at) noexcept
 			{
 				if (newQ != m_new_Q)
@@ -715,16 +734,16 @@ namespace netlist
 				update_inputs();
 			}
 
-			/* internal state support
-			 * FIXME: get rid of this and implement export/import in MAME
-			 */
-			/* only used for logic nets */
+			// internal state support
+			// FIXME: get rid of this and implement export/import in MAME
+
+			// only used for logic nets
 			netlist_sig_t *Q_state_ptr() noexcept { return m_cur_Q.ptr(); }
 
 		private:
 			state_var<netlist_sig_t> m_new_Q;
 			state_var<netlist_sig_t> m_cur_Q;
-			state_var<queue_status>  m_in_queue;    /* 0: not in queue, 1: in queue, 2: last was taken */
+			state_var<queue_status>  m_in_queue;    // 0: not in queue, 1: in queue, 2: last was taken
 			state_var<netlist_time>  m_next_scheduled_time;
 
 			core_terminal_t * m_railterminal;
@@ -851,28 +870,28 @@ namespace netlist
 	// analog_input_t
 	// -----------------------------------------------------------------------------
 
-	/*! terminal providing analog input voltage.
-	 *
-	 * This terminal class provides a voltage measurement. The conductance against
-	 * ground is infinite.
-	 */
+	/// \brief terminal providing analog input voltage.
+	///
+	/// This terminal class provides a voltage measurement. The conductance against
+	/// ground is infinite.
+
 	class analog_input_t : public analog_t
 	{
 	public:
-		/*! Constructor */
-		analog_input_t(core_device_t &dev,  /*!< owning device */
-				const pstring &aname,       /*!< name of terminal */
-				nldelegate delegate = nldelegate() /*!< delegate */
+		/// \brief Constructor
+		analog_input_t(core_device_t &dev,  ///< owning device
+				const pstring &aname,       ///< name of terminal
+				nldelegate delegate = nldelegate() ///< delegate
 		);
 
-		/*! returns voltage at terminal.
-		 *  \returns voltage at terminal.
-		 */
+		/// \brief returns voltage at terminal.
+		///  \returns voltage at terminal.
+
 		nl_fptype operator()() const noexcept { return Q_Analog(); }
 
-		/*! returns voltage at terminal.
-		 *  \returns voltage at terminal.
-		 */
+		/// \brief returns voltage at terminal.
+		///  \returns voltage at terminal.
+
 		nl_fptype Q_Analog() const noexcept;
 
 	};
@@ -977,7 +996,7 @@ namespace netlist
 		param_type_t param_type() const noexcept(false);
 
 	protected:
-		virtual ~param_t() noexcept = default; /* not intended to be destroyed */
+		virtual ~param_t() noexcept = default; // not intended to be destroyed
 
 		void update_param() noexcept;
 
@@ -1026,7 +1045,7 @@ namespace netlist
 		int m_param;
 	};
 
-	/* FIXME: these should go as well */
+	// FIXME: these should go as well
 	using param_logic_t = param_num_t<bool>;
 	using param_int_t = param_num_t<int>;
 	using param_fp_t = param_num_t<nl_fptype>;
@@ -1102,10 +1121,10 @@ namespace netlist
 		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
 
-		const pstring value_str(const pstring &entity) /*const*/;
-		nl_fptype value(const pstring &entity) /*const*/;
-		const pstring type() /*const*/;
-		/* hide this */
+		pstring value_str(const pstring &entity);
+		nl_fptype value(const pstring &entity);
+		const pstring type();
+		// hide this
 		void setTo(const pstring &param) = delete;
 	protected:
 		void changed() noexcept override;
@@ -1174,7 +1193,7 @@ namespace netlist
 			{
 				if (++m_active_outputs == 1)
 				{
-					if (m_stats/*NL_KEEP_STATISTICS*/)
+					if (m_stats)
 						m_stats->m_stat_inc_active.inc();
 					inc_active();
 				}
@@ -1192,12 +1211,12 @@ namespace netlist
 
 		void set_hint_deactivate(bool v) noexcept { m_hint_deactivate = v; }
 		bool get_hint_deactivate() const noexcept { return m_hint_deactivate; }
-		/* Has to be set in device reset */
+		// Has to be set in device reset
 		void set_active_outputs(int n) noexcept { m_active_outputs = n; }
 
 		void set_default_delegate(detail::core_terminal_t &term);
 
-		/* stats */
+		// stats
 		struct stats_t
 		{
 			// NL_KEEP_STATISTICS
@@ -1274,9 +1293,6 @@ namespace netlist
 
 		struct family_setter_t
 		{
-			/* clang will complain about an unused private field if
-			 * a defaulted constructor is used
-			 */
 			// NOLINTNEXTLINE(modernize-use-equals-default)
 			family_setter_t();
 			family_setter_t(core_device_t &dev, const pstring &desc);
@@ -1286,9 +1302,9 @@ namespace netlist
 		template <class T, bool TS>
 		using timed_queue = plib::timed_queue_linear<T, TS>;
 
-		/* Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
-		 * This slows down processing by about 25% on a Kaby Lake.
-		 */
+		// Use timed_queue_heap to use stdc++ heap functions instead of linear processing.
+		/// This slows down processing by about 25% on a Kaby Lake.
+
 
 		//template <class T, bool TS>
 		//using timed_queue = timed_queue_heap<T, TS>;
@@ -1297,9 +1313,9 @@ namespace netlist
 		// queue_t
 		// -----------------------------------------------------------------------------
 
-		/* We don't need a thread-safe queue currently. Parallel processing of
-		 * solvers will update inputs after parallel processing.
-		 */
+		// We don't need a thread-safe queue currently. Parallel processing of
+		/// solvers will update inputs after parallel processing.
+
 		class queue_t :
 				//public timed_queue<pqentry_t<net_t *, netlist_time>, false, NL_KEEP_STATISTICS>,
 				public timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>,
@@ -1341,7 +1357,7 @@ namespace netlist
 
 		using nets_collection_type = std::vector<owned_pool_ptr<detail::net_t>>;
 
-		/* need to preserve order of device creation ... */
+		// need to preserve order of device creation ...
 		using devices_collection_type = std::vector<std::pair<pstring, owned_pool_ptr<core_device_t>>>;
 		netlist_state_t(const pstring &aname,
 			netlist_t & anetlist,
@@ -1361,27 +1377,25 @@ namespace netlist
 
 		core_device_t *get_single_device(const pstring &classname, bool (*cc)(core_device_t *)) const;
 
-		/**
-		 * @brief Get single device filtered by class and name
-		 *
-		 * @tparam C Device class for which devices will be returned
-		 * @param  name Name of the device
-		 *
-		 * @return pointers to device
-		 */
+		/// \brief Get single device filtered by class and name
+		///
+		/// \tparam C Device class for which devices will be returned
+		/// \param  name Name of the device
+		///
+		/// \return pointers to device
+
 		template<class C>
 		C *get_single_device(const pstring &name) const
 		{
 			return dynamic_cast<C *>(get_single_device(name, check_class<C>));
 		}
 
-		/**
-		 * @brief Get vector of devices
-		 *
-		 * @tparam C Device class for which devices will be returned
-		 *
-		 * @return vector with pointers to devices
-		 */
+		/// \brief Get vector of devices
+		///
+		/// \tparam C Device class for which devices will be returned
+		///
+		/// \return vector with pointers to devices
+
 		template<class C>
 		inline std::vector<C *> get_device_list()
 		{
@@ -1395,7 +1409,7 @@ namespace netlist
 			return tmp;
 		}
 
-		/* logging and name */
+		// logging and name
 
 		pstring name() const noexcept { return m_name; }
 
@@ -1407,7 +1421,7 @@ namespace netlist
 		netlist_t &exec() { return m_netlist; }
 		const netlist_t &exec() const { return m_netlist; }
 
-		/* state handling */
+		// state handling
 		plib::state_manager_t &run_state_manager() { return m_state; }
 
 		template<typename O, typename C>
@@ -1427,14 +1441,13 @@ namespace netlist
 		template <typename T>
 		void register_net(owned_pool_ptr<T> &&net) { m_nets.push_back(std::move(net)); }
 
-		/**
-		 * @brief Get device pointer by name
-		 *
-		 *
-		 * @param name Name of the device
-		 *
-		 * @return core_device_t pointer if device exists, else nullptr
-		 */
+		/// \brief Get device pointer by name
+		///
+		///
+		/// \param name Name of the device
+		///
+		/// \return core_device_t pointer if device exists, else nullptr
+
 		core_device_t *find_device(const pstring &name)
 		{
 			for (auto & d : m_devices)
@@ -1443,15 +1456,14 @@ namespace netlist
 			return nullptr;
 		}
 
-		/**
-		 * @brief Register device using owned_ptr
-		 *
-		 * Used to register owned devices. These are devices declared as objects
-		 * in another devices.
-		 *
-		 * @param name Name of the device
-		 * @param dev Device to be registered
-		 */
+		/// \brief Register device using owned_ptr
+		///
+		/// Used to register owned devices. These are devices declared as objects
+		/// in another devices.
+		///
+		/// \param name Name of the device
+		/// \param dev Device to be registered
+
 		template <typename T>
 		void register_device(const pstring &name, owned_pool_ptr<T> &&dev) noexcept(false)
 		{
@@ -1466,28 +1478,26 @@ namespace netlist
 			m_devices.insert(m_devices.end(), { name, std::move(dev) });
 		}
 
-		/**
-		 * @brief Register device using unique_ptr
-		 *
-		 * Used to register devices.
-		 *
-		 * @param name Name of the device
-		 * @param dev Device to be registered
-		 */
+		/// \brief Register device using unique_ptr
+		///
+		/// Used to register devices.
+		///
+		/// \param name Name of the device
+		/// \param dev Device to be registered
+
 		template <typename T>
 		void register_device(const pstring &name, unique_pool_ptr<T> &&dev)
 		{
 			register_device(name, owned_pool_ptr<T>(dev.release(), true, dev.get_deleter()));
 		}
 
-		/**
-		 * @brief Remove device
-		 *
-		 * Care needs to be applied if this is called to remove devices with
-		 * sub-devices which may have registered state.
-		 *
-		 * @param dev Device to be removed
-		 */
+		/// \brief Remove device
+		///
+		/// Care needs to be applied if this is called to remove devices with
+		/// sub-devices which may have registered state.
+		///
+		/// \param dev Device to be removed
+
 		void remove_device(core_device_t *dev)
 		{
 			for (auto it = m_devices.begin(); it != m_devices.end(); it++)
@@ -1503,7 +1513,7 @@ namespace netlist
 		const setup_t &setup() const noexcept { return *m_setup; }
 
 		// FIXME: make a postload member and include code there
-		void rebuild_lists(); /* must be called after post_load ! */
+		void rebuild_lists(); // must be called after post_load !
 
 		static void compile_defines(std::vector<std::pair<pstring, pstring>> &defs);
 
@@ -1513,7 +1523,7 @@ namespace netlist
 		devices_collection_type & devices() noexcept { return m_devices; }
 		const devices_collection_type & devices() const noexcept { return m_devices; }
 
-		/* sole use is to manage lifetime of family objects */
+		// sole use is to manage lifetime of family objects
 		std::unordered_map<pstring, plib::unique_ptr<logic_family_desc_t>> m_family_cache;
 
 	private:
@@ -1529,7 +1539,7 @@ namespace netlist
 		plib::unique_ptr<setup_t>           m_setup;
 
 		nets_collection_type                m_nets;
-		/* sole use is to manage lifetime of net objects */
+		// sole use is to manage lifetime of net objects
 		devices_collection_type             m_devices;
 
 
@@ -1550,7 +1560,7 @@ namespace netlist
 
 		virtual ~netlist_t() noexcept = default;
 
-		/* run functions */
+		// run functions
 
 		netlist_time time() const noexcept { return m_time; }
 
@@ -1583,19 +1593,19 @@ namespace netlist
 				m_queue.remove<true>(elem);
 		}
 
-		/* Control functions */
+		// Control functions
 
 		void stop();
 		void reset();
 
-		/* state handling */
+		// state handling
 
 		plib::state_manager_t &run_state_manager() noexcept { return m_state->run_state_manager(); }
 
-		/* only used by nltool to create static c-code */
+		// only used by nltool to create static c-code
 		devices::NETLIB_NAME(solver) *solver() const noexcept { return m_solver; }
 
-		/* force late type resolution */
+		// force late type resolution
 		template <typename X = devices::NETLIB_NAME(solver)>
 		nl_fptype gmin(X *solv = nullptr) const noexcept
 		{
@@ -1622,7 +1632,7 @@ namespace netlist
 		plib::unique_ptr<netlist_state_t>   m_state;
 		devices::NETLIB_NAME(solver) *      m_solver;
 
-		/* mostly rw */
+		// mostly rw
 		PALIGNAS_CACHELINE()
 		netlist_time                        m_time;
 		devices::NETLIB_NAME(mainclock) *   m_mainclock;
@@ -1794,7 +1804,7 @@ namespace netlist
 			{
 				if (m_next_scheduled_time > exec().time())
 				{
-					m_in_queue = queue_status::QUEUED;     /* pending */
+					m_in_queue = queue_status::QUEUED;     // pending
 					exec().qpush(detail::queue_t::entry_t(m_next_scheduled_time, this));
 				}
 				else
@@ -1972,7 +1982,7 @@ namespace netlist
 	{
 		nl_assert(this->isRailNet());
 
-		m_in_queue = queue_status::DELIVERED; /* mark as taken ... */
+		m_in_queue = queue_status::DELIVERED; // mark as taken ...
 		if (m_new_Q ^ m_cur_Q)
 			process<KEEP_STATS>((m_new_Q << core_terminal_t::INP_LH_SHIFT)
 				| (m_cur_Q << core_terminal_t::INP_HL_SHIFT), m_new_Q);
@@ -2042,4 +2052,4 @@ namespace plib
 
 
 
-#endif /* NLBASE_H_ */
+#endif // NLBASE_H_

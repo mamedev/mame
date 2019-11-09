@@ -1089,6 +1089,45 @@
 		</part>
 	</software>
 
+	<software name="ariesb2022" cloneof="ariesb20">
+		<description>Aries-B20 2.2</description>
+		<year>1984</year>
+		<publisher>Aries</publisher>
+		<info name="usage" value="Requires Aries-B20" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Aries-B20-2.2.rom" size="8192" crc="c2f334a9" sha1="d04bfd332d63f6f23dca2ef81a1d2074e3d88ee9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariesb20">
+		<description>Aries-B20 2.4</description>
+		<year>1984</year>
+		<publisher>Aries</publisher>
+		<info name="usage" value="Requires Aries-B20" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Aries-B20-2.4.rom" size="8192" crc="47a43a03" sha1="2590596e0864b97b30050c33b21aa89bb8956204"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ariesb32">
+		<description>Aries-B32 1.0</description>
+		<year>1985</year>
+		<publisher>Aries</publisher>
+		<info name="usage" value="Requires Aries-B32" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="Aries-B32-1.0.rom" size="16384" crc="2cb3443d" sha1="466e3b68f1a8e0287ae095cb3c16dac6afc89dcb"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="artist">
 		<description>Artist</description>
 		<year>1986</year>
@@ -3018,7 +3057,7 @@
 		<publisher>Clwyd Technics</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="Edword-2.00E.rom" size="16384" crc="6e912b4c" sha1="0eaf6e8cd9c6b558ef0d2ff346d00537734eaf04"/>
+				<rom name="Edword2-2.00E.rom" size="16384" crc="6e912b4c" sha1="0eaf6e8cd9c6b558ef0d2ff346d00537734eaf04"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3686,6 +3725,39 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="GINNLanguageChip-2.1.rom" size="16384" crc="e2b56e75" sha1="c991858aca496ba2e108856fd1f07df5694e88fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommc072" cloneof="gommc" supported="no">
+		<description>GoMMC Tools 0.72</description>
+		<year>2005</year>
+		<publisher>John Kortink</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="GoMMCTools-0.72.rom" size="16384" crc="f34a9e00" sha1="6b65aa2c9f366df1c0384aa67ae37d96cc13d3dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommc080" cloneof="gommc" supported="no">
+		<description>GoMMC Tools 0.80</description>
+		<year>2005</year>
+		<publisher>John Kortink</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="GoMMCTools-0.80.rom" size="16384" crc="b8a2b9e6" sha1="9e9d20dde136468bb0df110084898d7443209c96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gommc" supported="no">
+		<description>GoMMC Tools 1.03</description>
+		<year>2007</year>
+		<publisher>John Kortink</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="GoMMCTools-1.03.rom" size="16384" crc="0e040c84" sha1="8e6377916bd6a9c68c87932bf47369234c56101c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5254,6 +5326,17 @@
 		</part>
 	</software>
 
+  <software name="nfs334b" cloneof="nfs334">
+    <description>Acorn NFS 3.34B</description>
+    <year>198?</year>
+    <publisher>Acorn</publisher>
+    <part name="rom1" interface="bbc_rom">
+      <dataarea name="rom" size="8192">
+        <rom name="Acorn-NFS-3.34B.rom" size="8192" crc="9ddc1456" sha1="212cb90ba5e7c96457718ae9d818fb8ece5cc32a"/>
+      </dataarea>
+    </part>
+  </software>
+
 	<software name="nfs360">
 		<description>Acorn NFS 3.60</description>
 		<year>198?</year>
@@ -5657,6 +5740,17 @@
 		</part>
 	</software>
 
+  <software name="prestelt471" cloneof="prestel" supported="no">
+    <description>Prestel Trial 4.71r</description>
+    <year>1984</year>
+    <publisher>Acorn</publisher>
+    <part name="rom1" interface="bbc_rom">
+      <dataarea name="rom" size="8192">
+        <rom name="PrestelTrial-4.71r.rom" size="8192" crc="c6067294" sha1="5702b0b895cfabb30ffdcf9fe2718de2276315ef"/>
+      </dataarea>
+    </part>
+  </software>
+
 	<software name="prestel" supported="no">
 		<description>Prestel 4.8n</description>
 		<year>1984</year>
@@ -5668,13 +5762,24 @@
 		</part>
 	</software>
 
-	<software name="prestelt">
-		<description>Prestel Terminal</description>
+	<software name="prestelt10" cloneof="prestelt">
+		<description>Prestel Terminal 1.00</description>
 		<year>1984</year>
 		<publisher>Watford Electronics</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
 				<rom name="PrestelTerminal-1.00.rom" size="8192" crc="f16e4dec" sha1="b50778d32c6805330ea80f30461433f19e546afc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="prestelt">
+		<description>Prestel Terminal 1.10</description>
+		<year>1984</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="PrestelTerminal-1.10.rom" size="8192" crc="2e9d6b6e" sha1="a45597eed6c1f992312445da1031027d398abd4b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -5872,7 +5977,7 @@
 	<software name="pperform21" cloneof="pperform" supported="no">
 		<description>Pro-Performer 2.1</description>
 		<year>1988</year>
-		<publisher>EMR</publisher>
+		<publisher>Electromusic Research</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="32768">
 				<rom name="Pro-Performer-2.1.rom" size="32768" crc="34a7c0b1" sha1="2c1d46aab4cdaa200d21c276369203a882fd5832"/>
@@ -5883,7 +5988,7 @@
 	<software name="pperform" supported="no">
 		<description>Pro-Performer 2.2</description>
 		<year>1990</year>
-		<publisher>EMR</publisher>
+		<publisher>Electromusic Research</publisher>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Pro-Performer-2.2.rom" size="16384" crc="f0faf02d" sha1="514b43bdd2e7af12b6a0498deb077f1cf02aed47"/>
@@ -6040,10 +6145,37 @@
 		</part>
 	</software>
 
+	<software name="raven20100" cloneof="raven20">
+		<description>Raven-20 1.00</description>
+		<year>1984</year>
+		<publisher>Raven Micro Products</publisher>
+		<info name="usage" value="Requires Raven-20" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Raven-20-1.00.rom" size="8192" crc="e8c8f9d5" sha1="e4f2acc07969e10c082355c82d8d1cbc1c08ee2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raven20">
+		<description>Raven-20 1.06</description>
+		<year>1984</year>
+		<publisher>Raven Micro Products</publisher>
+		<info name="usage" value="Requires Raven-20" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Raven-20-1.06.rom" size="8192" crc="7efb0ab3" sha1="d395199ef8f51579fe74e3d7d8dab1de6e0b30e2"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="replay1770" supported="no">
 		<description>Replay System WD1770 1.01</description>
 		<year>1985</year>
 		<publisher>Vine Micros</publisher>
+		<info name="usage" value="Requires Opus D-DOS(B) 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6056,6 +6188,7 @@
 		<description>Replay System WD1770A 1.17</description>
 		<year>1985</year>
 		<publisher>Vine Micros</publisher>
+		<info name="usage" value="Requires Acorn 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6068,6 +6201,7 @@
 		<description>Replay System 8271 1.00</description>
 		<year>1985</year>
 		<publisher>Vine Micros</publisher>
+		<info name="usage" value="Requires Acorn 8271 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6080,6 +6214,7 @@
 		<description>Replay System 8271 1.10</description>
 		<year>1985</year>
 		<publisher>Vine Micros</publisher>
+		<info name="usage" value="Requires Acorn 8271 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="8192">
@@ -6092,6 +6227,7 @@
 		<description>Replay System Mk2 2.00</description>
 		<year>1988</year>
 		<publisher>Vine Micros</publisher>
+		<info name="usage" value="Requires any 1770 FDC" />
 		<sharedfeat name="compatibility" value="B"/>
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
@@ -6108,7 +6244,7 @@
 		<!-- This is not a normal ROM, it's paged into the MOS region using an Overlay board. -->
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="MasterReplay.rom" size="16384" crc="a9619a78" sha1="2c6a18366568b139f2ec8ba6b31315a921b88c29"/>
+				<rom name="MasterReplay-1.02.rom" size="16384" crc="a9619a78" sha1="2c6a18366568b139f2ec8ba6b31315a921b88c29"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6458,9 +6594,10 @@
 		<description>SideAid128</description>
 		<year>1988</year>
 		<publisher>Computer and Technical Services</publisher>
+		<info name="usage" value="Requires Solidisk TwoMeg128" />
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
-				<rom name="SideAid128-1.03.rom" size="16384" crc="48d1035c" sha1="9fc1952e856f0b08c8623e8502d8560ebecfb0ed"/>
+				<rom name="SideAid128-1.03.rom" size="16384" crc="48d1035c" sha1="9fc1952e856f0b08c8623e8502d8560ebecfb0ed" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6469,6 +6606,7 @@
 		<description>SideAid256</description>
 		<year>1988</year>
 		<publisher>Computer and Technical Services</publisher>
+		<info name="usage" value="Requires Solidisk FourMeg256" />
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="32768">
 				<rom name="SideAid256-1.05.rom" size="32768" crc="4d0b29b9" sha1="6ebfc135586db38090f83e47a158d14c8d5a5f79"/>
@@ -7376,6 +7514,17 @@
 		</part>
 	</software>
 
+	<software name="suprmmc" supported="no">
+		<description>Super MMC</description>
+		<year>2008</year>
+		<publisher>Martin Mather</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="SuperMMC.rom" size="16384" crc="952dfe1e" sha1="8d20afb7e2cbc0094dd02da88b25212e1ca7f254"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suprutil">
 		<description>Super Utility</description>
 		<year>198?</year>
@@ -7608,6 +7757,17 @@
 			</dataarea>
 		</part>
 	</software>
+
+  <software name="tfs031" cloneof="tfs">
+    <description>Acorn TFS 0.31</description>
+    <year>1982</year>
+    <publisher>Acorn</publisher>
+    <part name="rom1" interface="bbc_rom">
+      <dataarea name="rom" size="16384">
+        <rom name="TFS-0.31.rom" size="16384" crc="eb6b9097" sha1="07c54e8afc5fe686a8f86c33d15220327d6c9cc8"/>
+      </dataarea>
+    </part>
+  </software>
 
 	<software name="tfs100" cloneof="tfs">
 		<description>Acorn TFS 1.00</description>
@@ -7909,6 +8069,17 @@
 		</part>
 	</software>
 
+	<software name="turbommc" supported="no">
+		<description>Turbo MMC 0.A1</description>
+		<year>2009</year>
+		<publisher>IFEL</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="TurboMMC-0.A1.rom" size="16384" crc="a82be1bb" sha1="07aec1e9b351a77f6fb75bbf812dc745892bf22f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="turbprom">
 		<description>Turbo-PROM</description>
 		<year>1984</year>
@@ -7938,6 +8109,23 @@
 		<part name="rom1" interface="bbc_rom">
 			<dataarea name="rom" size="16384">
 				<rom name="Ultracalc2-4.00.rom" size="16384" crc="55ab82bb" sha1="561db03a14f0b0fc450cb9677feb489374270a9f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="umi2b" supported="no">
+		<description>UMI-2B 5.01</description>
+		<year>1986</year>
+		<publisher>Umusic</publisher>
+		<info name="usage" value="Requires UMI-2B MIDI Sequencer" />
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="UMI-2B-5.01_1.rom" size="16384" crc="37a845f0" sha1="4f3095c163c5811fdb12a12eb3ebbffefc71e2b9"/>
+			</dataarea>
+		</part>
+		<part name="rom2" interface="bbc_rom">
+			<dataarea name="rom" size="16384">
+				<rom name="UMI-2B-5.01_2.rom" size="16384" crc="10dc5dc9" sha1="26c35f321853813df074e815c5b9f691a8920777"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8609,6 +8797,45 @@
 		</part>
 	</software>
 
+	<software name="weram100" cloneof="weram">
+		<description>Watford Electronics 32K RAM 1.00</description>
+		<year>1984</year>
+		<publisher>Watford Electronics</publisher>
+		<info name="usage" value="Requires Watford 32K Shadow RAM" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Watford_32K_RAM-1.00.rom" size="8192" crc="7962b5db" sha1="1b59a3354cfc704ad8aa60b0ed16e4cd2d815031"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weram200" cloneof="weram">
+		<description>Watford Electronics 32K RAM 2.00</description>
+		<year>1985</year>
+		<publisher>Watford Electronics</publisher>
+		<info name="usage" value="Requires Watford 32K Shadow RAM" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Watford_32K_RAM-2.00.rom" size="8192" crc="1eff9b23" sha1="98a3084b20c92427c2e9def58ade96f42659e20a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weram">
+		<description>Watford Electronics 32K RAM 2.40</description>
+		<year>1985</year>
+		<publisher>Watford Electronics</publisher>
+		<info name="usage" value="Requires Watford 32K Shadow RAM" />
+		<sharedfeat name="compatibility" value="B"/>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Watford_32K_RAM-2.40.rom" size="8192" crc="db9c3a1a" sha1="0a5efb084eb1ae353b9c79c026e9e26cd7695293"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="window25" cloneof="window">
 		<description>Window 1025</description>
 		<year>1985</year>
@@ -8820,6 +9047,17 @@
 			<feature name="slot" value="ccibase" />
 			<dataarea name="rom" size="32768">
 				<rom name="WordwisePlus-2.04.rom" size="32768" crc="1f560e1f" sha1="2ab8fcf340b0c66ab39871a96d8b93cfb54ee41d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="workstat10" cloneof="workstat">
+		<description>Workstation 100</description>
+		<year>1984</year>
+		<publisher>University of Sussex Computing Centre</publisher>
+		<part name="rom1" interface="bbc_rom">
+			<dataarea name="rom" size="8192">
+				<rom name="Workstation-1.0.rom" size="8192" crc="7a44ffef" sha1="60de43339019d633ad378c2c6b338f47d3885492"/>
 			</dataarea>
 		</part>
 	</software>

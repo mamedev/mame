@@ -62,6 +62,7 @@ void st2205u_device::device_start()
 	intf->ram = make_unique_clear<u8[]>(0x8000);
 
 	init_base_timer(0x0040);
+	init_lcd_timer(0x0080);
 
 	save_item(NAME(m_btc));
 	save_item(NAME(m_tc_12bit));
@@ -83,18 +84,19 @@ void st2205u_device::device_start()
 	state_add<u16>(ST_IENA, "IENA", [this]() { return m_iena; }, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
 	{
-		state_add(ST_PDA + i, string_format("PD%c", 'A' + i).c_str(), m_pdata[i]);
+		state_add(ST_PAOUT + i, string_format("P%cOUT", 'A' + i).c_str(), m_pdata[i]);
 		state_add(ST_PCA + i, string_format("PC%c", 'A' + i).c_str(), m_pctrl[i]);
 		if (i == 2 || i == 4)
 			state_add(ST_PSA + i, string_format("PS%c", 'A' + i).c_str(), m_psel[i]);
 		if (i == 2 || i == 3)
 			state_add(ST_PFC + i - 2, string_format("PF%c", 'A' + i).c_str(), m_pfun[i - 2]).mask(i == 2 ? 0xfe : 0xff);
 	}
-	state_add(ST_PDL, "PDL", m_pdata[6]);
+	state_add(ST_PLOUT, "PLOUT", m_pdata[6]);
 	state_add(ST_PCL, "PCL", m_pctrl[6]);
 	state_add(ST_PMCR, "PMCR", m_pmcr);
 	state_add(ST_MISC, "MISC", m_misc).mask(st2xxx_misc_mask());
 	state_add<u8>(ST_SYS, "SYS", [this]() { return m_sys; }, [this](u8 data) { sys_w(data); }).mask(0xfe);
+	state_add<u8>(ST_PRS, "PRS", [this]() { return m_prs; }, [this](u8 data) { prs_w(data); }).mask(0x40);
 	state_add<u8>(ST_BTEN, "BTEN", [this]() { return m_bten; }, [this](u8 data) { bten_w(data); });
 	state_add(ST_BTSR, "BTREQ", m_btsr);
 	state_add(ST_BTC, "BTC", m_btc);
@@ -112,6 +114,9 @@ void st2205u_device::device_start()
 	state_add(ST_LFRA, "LFRA", m_lfra).mask(0x3f);
 	state_add(ST_LAC, "LAC", m_lac).mask(0x1f);
 	state_add(ST_LPWM, "LPWM", m_lpwm).mask(st2xxx_lpwm_mask());
+	state_add(ST_BCTR, "BCTR", m_bctr).mask(0xb7);
+	state_add(ST_BRS, "BRS", m_brs);
+	state_add(ST_BDIV, "BDIV", m_bdiv);
 	state_add(ST_LVCTR, "LVCTR", m_lvctr).mask(0x0f);
 }
 
@@ -275,16 +280,6 @@ void st2205u_device::brrh_w(u8 data)
 	brr = (data & 0x9f) << 8 | (brr & 0x00ff);
 }
 
-u8 st2205u_device::pmcr_r()
-{
-	return m_pmcr;
-}
-
-void st2205u_device::pmcr_w(u8 data)
-{
-	m_pmcr = data;
-}
-
 unsigned st2205u_device::st2xxx_bt_divider(int n) const
 {
 	// 2 Hz
@@ -347,6 +342,24 @@ void st2205u_device::tien_w(u8 data)
 	m_tien = data;
 }
 
+void st2205u_device::st2xxx_tclk_start()
+{
+}
+
+void st2205u_device::st2xxx_tclk_stop()
+{
+}
+
+unsigned st2205u_device::st2xxx_lfr_clocks() const
+{
+	unsigned lcdcks = ((m_lxmax * 2 + m_lfra * 4) + 5) * (m_lymax ? m_lymax : 256) * ((m_lctr & 0x03) == 0 ? 2 : 4);
+
+	if ((m_lckr & 0x30) == 0x00 || (m_lckr & 0x30) == 0x30)
+		return lcdcks * std::max(((m_lckr & 0x0c) >> 2) * 8, 4);
+	else
+		return lcdcks * std::max((m_lckr & 0x0f) * 2, 1);
+}
+
 u8 st2205u_device::lvctr_r()
 {
 	return m_lvctr | 0x01;
@@ -407,6 +420,7 @@ void st2205u_device::int_map(address_map &map)
 	map(0x000f, 0x000f).rw(FUNC(st2205u_device::pfd_r), FUNC(st2205u_device::pfd_w));
 	map(0x0020, 0x0027).rw(FUNC(st2205u_device::tc_12bit_r), FUNC(st2205u_device::tc_12bit_w));
 	map(0x0028, 0x0028).rw(FUNC(st2205u_device::tien_r), FUNC(st2205u_device::tien_w));
+	map(0x0029, 0x0029).rw(FUNC(st2205u_device::prs_r), FUNC(st2205u_device::prs_w));
 	map(0x002a, 0x002a).rw(FUNC(st2205u_device::bten_r), FUNC(st2205u_device::bten_w));
 	map(0x002b, 0x002b).rw(FUNC(st2205u_device::btsr_r), FUNC(st2205u_device::btclr_w));
 	map(0x002c, 0x002c).rw(FUNC(st2205u_device::btc_r), FUNC(st2205u_device::btc_w));
@@ -442,6 +456,9 @@ void st2205u_device::int_map(address_map &map)
 	map(0x0057, 0x0057).rw(FUNC(st2205u_device::lvctr_r), FUNC(st2205u_device::lvctr_w));
 	map(0x005a, 0x005a).rw(FUNC(st2205u_device::dmrl_r), FUNC(st2205u_device::dmrl_w));
 	map(0x005b, 0x005b).rw(FUNC(st2205u_device::dmrh_r), FUNC(st2205u_device::dmrh_w));
+	map(0x0063, 0x0063).rw(FUNC(st2205u_device::bctr_r), FUNC(st2205u_device::bctr_w));
+	map(0x0066, 0x0066).rw(FUNC(st2205u_device::brs_r), FUNC(st2205u_device::brs_w));
+	map(0x0067, 0x0067).rw(FUNC(st2205u_device::bdiv_r), FUNC(st2205u_device::bdiv_w));
 	map(0x0080, 0x1fff).rw(FUNC(st2205u_device::ram_r), FUNC(st2205u_device::ram_w)); // assumed to be shared with banked RAM
 	map(0x2000, 0x3fff).rw(FUNC(st2205u_device::bmem_r), FUNC(st2205u_device::bmem_w));
 	map(0x4000, 0x7fff).rw(FUNC(st2205u_device::pmem_r), FUNC(st2205u_device::pmem_w));

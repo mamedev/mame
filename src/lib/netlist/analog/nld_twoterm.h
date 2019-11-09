@@ -4,6 +4,10 @@
 #ifndef NLD_TWOTERM_H_
 #define NLD_TWOTERM_H_
 
+///
+/// \file nld_twoterm.h
+///
+
 #include "netlist/nl_setup.h"
 
 // -----------------------------------------------------------------------------
@@ -18,7 +22,7 @@
 		NET_REGISTER_DEV(POT, name)                                            \
 		NETDEV_PARAMI(name, R, p_R)
 
-/* Does not have pin 3 connected */
+// Does not have pin 3 connected
 #define POT2(name, p_R)                                                        \
 		NET_REGISTER_DEV(POT2, name)                                           \
 		NETDEV_PARAMI(name, R, p_R)
@@ -32,7 +36,7 @@
 		NET_REGISTER_DEV(IND, name)                                            \
 		NETDEV_PARAMI(name, L, p_L)
 
-/* Generic Diode */
+// Generic Diode
 #define DIODE(name,  model)                                                    \
 		NET_REGISTER_DEV(DIODE, name)                                          \
 		NETDEV_PARAMI(name, MODEL, model)
@@ -64,4 +68,4 @@
 #define IND_P(ind) ((ind) * 1e-12)
 #endif
 
-#endif /* NLD_TWOTERM_H_ */
+#endif // NLD_TWOTERM_H_

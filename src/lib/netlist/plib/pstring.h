@@ -1,11 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pstring.h
- */
 
 #ifndef PSTRING_H_
 #define PSTRING_H_
+
+///
+/// \file pstring.h
+///
 
 #include "ptypes.h"
 
@@ -99,7 +100,7 @@ public:
 	{
 	}
 
-	/* mingw treats string constants as char* instead of char[N] */
+	// mingw treats string constants as char* instead of char[N]
 #if !defined(_WIN32) && !defined(_WIN64)
 	explicit
 #endif
@@ -207,7 +208,7 @@ public:
 
 	static constexpr const size_type npos = static_cast<size_type>(-1);
 
-	/* the following are extensions to <string> */
+	// the following are extensions to <string>
 
 	// FIXME: remove those
 	size_type mem_t_size() const { return m_str.size(); }
@@ -229,7 +230,7 @@ struct pu8_traits
 	static const mem_t *nthcode(const mem_t *p, const std::size_t n) { return &(p[n]); }
 };
 
-/* No checking, this may deliver invalid codes */
+// No checking, this may deliver invalid codes
 struct putf8_traits
 {
 	using mem_t = char;
@@ -269,8 +270,8 @@ struct putf8_traits
 			return 2;
 		else if (c < 0x10000)
 			return 3;
-		else /* U+10000 U+1FFFFF */
-			return 4; /* no checks */
+		else // U+10000 U+1FFFFF
+			return 4; // no checks
 	}
 	static code_t code(const mem_t *p)
 	{
@@ -303,7 +304,7 @@ struct putf8_traits
 			s += static_cast<mem_t>(0x80 | ((c>>6) & 0x3f));
 			s += static_cast<mem_t>(0x80 | (c & 0x3f));
 		}
-		else /* U+10000 U+1FFFFF */
+		else // U+10000 U+1FFFFF
 		{
 			s += static_cast<mem_t>(0xF0 | (c >> 18));
 			s += static_cast<mem_t>(0x80 | ((c>>12) & 0x3f));
@@ -348,7 +349,7 @@ struct putf16_traits
 	{
 		if (c < 0x10000)
 			return 1;
-		else /* U+10000 U+1FFFFF */
+		else // U+10000 U+1FFFFF
 			return 2;
 	}
 	static code_t code(const mem_t *p)
@@ -512,4 +513,4 @@ namespace std
 	};
 } // namespace std
 
-#endif /* PSTRING_H_ */
+#endif // PSTRING_H_

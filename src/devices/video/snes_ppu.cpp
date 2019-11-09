@@ -1,5 +1,5 @@
-// license:BSD-3-Clause
-// copyright-holders:Anthony Kruize, Fabio Priuli
+// license:GPL-2.0+
+// copyright-holders:byuu, Anthony Kruize, Fabio Priuli
 /***************************************************************************
 
   snes.c
@@ -552,14 +552,12 @@ void snes_ppu_device::render_window(uint16_t layer_idx, uint8_t enable, uint8_t 
 	layer_t &self = m_layer[layer_idx];
 	if (!enable || (!self.window1_enabled && !self.window2_enabled))
 	{
-		if (layer_idx == SNES_OAM && machine().input().code_pressed(KEYCODE_L)) printf("WD ");
 		memset(output, 0, 256);
 		return;
 	}
 
 	if (self.window1_enabled && !self.window2_enabled)
 	{
-		if (layer_idx == SNES_OAM && machine().input().code_pressed(KEYCODE_L)) printf("1,%d,%d ", m_window1_left, m_window1_right);
 		const uint8_t set = 1 ^ self.window1_invert;
 		const uint8_t clear = 1 - set;
 		for (uint16_t x = 0; x < 256; x++)
@@ -571,7 +569,6 @@ void snes_ppu_device::render_window(uint16_t layer_idx, uint8_t enable, uint8_t 
 
 	if (self.window2_enabled && !self.window1_enabled)
 	{
-		if (layer_idx == SNES_OAM && machine().input().code_pressed(KEYCODE_L)) printf("2,%d,%d ", m_window2_left, m_window2_right);
 		const uint8_t set = 1 ^ self.window2_invert;
 		const uint8_t clear = 1 - set;
 		for (uint16_t x = 0; x < 256; x++)
@@ -585,7 +582,6 @@ void snes_ppu_device::render_window(uint16_t layer_idx, uint8_t enable, uint8_t 
 	{
 		uint8_t one_mask = ((x >= m_window1_left && x <= m_window1_right) ? 1 : 0) ^ self.window1_invert;
 		uint8_t two_mask = ((x >= m_window2_left && x <= m_window2_right) ? 1 : 0) ^ self.window2_invert;
-		if (layer_idx == SNES_OAM && machine().input().code_pressed(KEYCODE_L)) printf("B,%d,%d,%d ", one_mask, two_mask, self.wlog_mask);
 		switch (self.wlog_mask)
 		{
 			case 0: output[x] = (one_mask | two_mask); break;
@@ -633,7 +629,6 @@ inline void snes_ppu_device::draw_oamtile( uint32_t tileaddr, int16_t tile_x, ui
 					colour |= BIT(plane[jj], 7 - x) ? (1 << jj) : 0;
 			}
 
-			if (machine().input().code_pressed(KEYCODE_L)) printf("tx:%d, p:%02x, c:%02x\n", tile_x, pal, colour);
 			if (colour)
 			{
 				palbuf[tile_x] = pal + colour;
@@ -1272,8 +1267,6 @@ void snes_ppu_device::update_objects_rto( uint16_t curline )
  * Update an entire line of sprites.
  *********************************************/
 
-static int s_tile_to_draw = -1;
-
 void snes_ppu_device::update_objects( uint8_t priority_oam0, uint8_t priority_oam1, uint8_t priority_oam2, uint8_t priority_oam3 )
 {
 	uint8_t pri, priority[4];
@@ -1306,28 +1299,10 @@ void snes_ppu_device::update_objects( uint8_t priority_oam0, uint8_t priority_oa
 	uint8_t palbuf[256] = {};
 	uint8_t pribuf[256] = {};
 
-	if (machine().input().code_pressed_once(KEYCODE_K))
-	{
-		s_tile_to_draw++;
-		if (s_tile_to_draw > 33)
-		{
-			s_tile_to_draw = -1;
-		}
-	}
-	if (machine().input().code_pressed_once(KEYCODE_J))
-	{
-		s_tile_to_draw--;
-		if (s_tile_to_draw < -1)
-		{
-			s_tile_to_draw = 33;
-		}
-	}
-
 	/* finally draw the tiles from the tilelist */
 	for (ii = 0; ii < 34; ii++)
 	{
 		int tile = ii;
-		if (s_tile_to_draw != -1 && tile != s_tile_to_draw) continue;
 
 #if SNES_LAYER_DEBUG
 		if (m_debug_options.sprite_reversed)
@@ -1357,7 +1332,6 @@ void snes_ppu_device::update_objects( uint8_t priority_oam0, uint8_t priority_oa
 		if (pribuf[x] == 0) continue;
 		uint16_t c = m_cgram[palbuf[x]];
 		int blend = (palbuf[x] < 192) ? 1 : 0;
-		if (machine().input().code_pressed(KEYCODE_L)) printf("\nx:%d c:%04x b:%d p:%d wa:%d wb:%d\n", x, c, blend, pribuf[x], window_above[x], window_below[x]);
 		if (m_layer[SNES_OAM].main_bg_enabled && window_above[x] == 0) plot_above(x, SNES_OAM, pribuf[x], c, blend);
 		if (m_layer[SNES_OAM].sub_bg_enabled  && window_below[x] == 0) plot_below(x, SNES_OAM, pribuf[x], c, blend);
 	}

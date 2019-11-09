@@ -2639,6 +2639,11 @@ ec4913                          // Elitegroup UC4913 REV:1.1 motherboard (486)
 ms4144                          // MSI MS-4144 motherboard (486)
 pt432b                          // Pine PT-432b aka SR-M401-A motherboard (486)
 ochipdca2                       // Octek Hippo DCA2 motherboard (486)
+as496                           // Arstoria AS496 motherboard (486)
+hot307h                         // Shuttle HOT-307H motherboard (486)
+mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
+gc10a                           // EAGLEN486 GC10A motherboard (486)
+hot419                          // Shuttle HOT-419 motherboard (486)
 
 @source:atari_s1.cpp
 aavenger                        //
@@ -3183,7 +3188,8 @@ bert                            //
 
 @source:berzerk.cpp
 berzerk                         // (c) 1980
-berzerk1                        // (c) 1980
+berzerka                        // (c) 1980
+berzerkb                        // (c) 1980
 berzerkf                        // (c) 1980 (French speech)
 berzerkg                        // (c) 1980 (German speech)
 berzerks                        // (c) 1980 Sonic license(Spanish speech)
@@ -9904,6 +9910,9 @@ quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
 
+@source:cdsys5.cpp
+minijook                        //
+
 @source:cedar_magnet.cpp
 cedmag
 mag_time
@@ -10416,6 +10425,7 @@ cortex                          //
 cosmica                         // 7910-AII (c) [1979]
 cosmica1                        // 7910-A (c) [1979]
 cosmica2                        // 7910 (c) 1979
+cosmica3                        // 7910-AII (c) [1979]
 cosmicg                         // 7907 (c) 1979
 cosmicgi                        // bootleg (Inder)
 devzone                         // 8022 (c) [1980]
@@ -31828,6 +31838,7 @@ ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
 hstrtpls                        // Vendex HeadStart Plus
+nms9100                         // Philips NMS 9100 series
 
 @source:pc100.cpp
 pc100                           //
@@ -34045,6 +34056,9 @@ nimbus                          // RM Nimbus 186
 cm32l                           //
 mt32                            //
 
+@source:rcm32p.cpp
+cm32p                           //
+
 @source:rockrage.cpp
 rockrage                        // GX620 (c) 1986 (World?)
 rockragea                       // GX620 (c) 1986 (Prototype?)
@@ -36225,6 +36239,9 @@ slivera                         //
 @source:slotcarn.cpp
 slotcarn                        // (c) 1985 Wing Co. Ltd
 spielbud                        // (c) 1985 ADP
+
+@source:slsstars.cpp
+slsstars                        //
 
 @source:sm1800.cpp
 sm1800                          //
@@ -39507,6 +39524,7 @@ icanpian                        //
 tvgogo                          //
 pvmil                           //
 taikeegr                        //
+sentx6p                        //
 
 @source:vsmile.cpp
 vsmile                          //

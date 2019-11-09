@@ -102,5 +102,5 @@ void bbc_analogue_devices(device_slot_interface &device)
 	//device.option_add("micromike",   BBC_MICROMIKE);        /* Micro Mike */
 	device.option_add("voltmace3b",  BBC_VOLTMACE3B);       /* Voltmace Delta 3b "Twin" Joysticks */
 	//device.option_add("quinkey",     BBC_QUINKEY);          /* Microwriter Quinkey */
-	device.option_add("cfa3000a",    CFA3000_ANLG);         /* Hanson CFA 3000 Analogue */
+	device.option_add_internal("cfa3000a", CFA3000_ANLG);   /* Hanson CFA 3000 Analogue */
 }

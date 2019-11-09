@@ -515,6 +515,8 @@ void sh2_device::device_start()
 
 	m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_timer_callback), this));
 	m_timer->adjust(attotime::never);
+	m_wdtimer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_wdtimer_callback), this));
+	m_wdtimer->adjust(attotime::never);
 
 	m_dma_current_active_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sh2_device::sh2_dma_current_active_callback), this));
 	m_dma_current_active_timer[0]->adjust(attotime::never);

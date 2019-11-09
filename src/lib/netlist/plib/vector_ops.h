@@ -1,15 +1,15 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * vector_ops.h
- *
- * Base vector operations
- *
- */
 
 #ifndef PLIB_VECTOR_OPS_H_
 #define PLIB_VECTOR_OPS_H_
 
+///
+/// \file vector_ops.h
+///
+/// Base vector operations
+///
+///
 #include "pconfig.h"
 #include "pmath.h"
 
@@ -149,4 +149,4 @@ namespace plib
 #endif
 #endif
 
-#endif /* PLIB_VECTOR_OPS_H_ */
+#endif // PLIB_VECTOR_OPS_H_

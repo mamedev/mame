@@ -1,14 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nld_solver.c
- *
- */
 
-/* Commented out for now. Relatively low number of terminals / nets make
- * the vectorizations fast-math enables pretty expensive
- */
-
+// Commented out for now. Relatively low number of terminals / nets make
+// the vectorizations fast-math enables pretty expensive
+//
 #if 0
 #pragma GCC optimize "-ftree-vectorize"
 #pragma GCC optimize "-ffast-math"
@@ -74,8 +69,8 @@ namespace devices
 			return;
 
 		netlist_time now(exec().time());
-		/* force solving during start up if there are no time-step devices */
-		/* FIXME: Needs a more elegant solution */
+		// force solving during start up if there are no time-step devices
+		// FIXME: Needs a more elegant solution
 		bool force_solve = (now < netlist_time::from_fp<decltype(m_params.m_max_timestep)>(2 * m_params.m_max_timestep));
 
 		std::size_t nthreads = std::min(static_cast<std::size_t>(m_params.m_parallel()), plib::omp::get_max_threads());
@@ -101,7 +96,7 @@ namespace devices
 		for (auto & solver : solvers)
 			solver->update_inputs();
 
-		/* step circuit */
+		// step circuit
 		if (!m_Q_step.net().is_queued())
 		{
 			m_Q_step.net().toggle_and_push_to_queue(netlist_time::from_fp(m_params.m_max_timestep));
@@ -137,10 +132,10 @@ namespace devices
 			case solver::matrix_type_e::MAT:
 				return create_it<solver::matrix_solver_direct_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::SM:
-				/* Sherman-Morrison Formula */
+				// Sherman-Morrison Formula
 				return create_it<solver::matrix_solver_sm_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::W:
-				/* Woodbury Formula */
+				// Woodbury Formula
 				return create_it<solver::matrix_solver_w_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
 			case solver::matrix_type_e::SOR:
 				return create_it<solver::matrix_solver_SOR_t<FT, SIZE>>(state(), solvername, nets, m_params, size);
@@ -261,10 +256,10 @@ namespace devices
 
 		bool already_processed(const analog_net_t &n) const
 		{
-			/* no need to process rail nets - these are known variables */
+			// no need to process rail nets - these are known variables
 			if (n.isRailNet())
 				return true;
-			/* if it's already processed - no need to continue */
+			// if it's already processed - no need to continue
 			for (auto & grp : groups)
 				if (plib::container::contains(grp, &n))
 					return true;
@@ -273,19 +268,19 @@ namespace devices
 
 		void process_net(analog_net_t &n)
 		{
-			/* ignore empty nets. FIXME: print a warning message */
+			// ignore empty nets. FIXME: print a warning message
 			if (n.num_cons() == 0)
 				return;
-			/* add the net */
+			// add the net
 			groups.back().push_back(&n);
-			/* process all terminals connected to this net */
+			// process all terminals connected to this net
 			for (auto &term : n.core_terms())
 			{
-				/* only process analog terminals */
+				// only process analog terminals
 				if (term->is_type(detail::terminal_type::TERMINAL))
 				{
 					auto *pt = static_cast<terminal_t *>(term);
-					/* check the connected terminal */
+					// check the connected terminal
 					analog_net_t &connected_net = pt->connected_terminal()->net();
 					if (!already_processed(connected_net))
 						process_net(connected_net);
@@ -301,7 +296,7 @@ namespace devices
 				if (!net->isRailNet() && net->num_cons() > 0)
 				{
 					netlist.log().debug("   ==> not a rail net\n");
-					/* Must be an analog net */
+					// Must be an analog net
 					auto &n = *static_cast<analog_net_t *>(net.get());
 					if (!already_processed(n))
 					{

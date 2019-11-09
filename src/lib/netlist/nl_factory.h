@@ -1,10 +1,9 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nl_factory.h
- *
- *
- */
+
+///
+/// \file nl_factory.h
+///
 
 #ifndef NLFACTORY_H_
 #define NLFACTORY_H_
@@ -68,10 +67,10 @@ namespace factory {
 		const pstring &sourcefile() const { return m_sourcefile; }
 
 	private:
-		pstring m_name;                             /* device name */
-		pstring m_classname;                        /* device class name */
-		pstring m_def_param;                        /* default parameter */
-		pstring m_sourcefile;                       /* source file */
+		pstring m_name;                             ///< device name
+		pstring m_classname;                        ///< device class name
+		pstring m_def_param;                        ///< default parameter
+		pstring m_sourcefile;                       ///< source file
 	};
 
 	template <class C>
@@ -161,4 +160,4 @@ namespace factory {
 	} // namespace devices
 } // namespace netlist
 
-#endif /* NLFACTORY_H_ */
+#endif // NLFACTORY_H_

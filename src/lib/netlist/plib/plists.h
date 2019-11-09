@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * plists.h
- *
- */
 
 #ifndef PLISTS_H_
 #define PLISTS_H_
+
+///
+/// \file plists.h
+///
 
 #include "palloc.h"
 #include "pchrono.h"
@@ -22,12 +22,12 @@
 
 namespace plib {
 
-	/**! fixed size array allowing to override constructor and initialize members by placement new.
-	 *
-	 * Use with care. This template is provided to improve locality of storage
-	 * in high frequency applications. It should not be used for anything else.
-	 *
-	 */
+	/// \brief fixed size array allowing to override constructor and initialize members by placement new.
+	///
+	/// Use with care. This template is provided to improve locality of storage
+	/// in high frequency applications. It should not be used for anything else.
+	///
+	///
 	template <class C, std::size_t N>
 	class uninitialised_array_t
 	{
@@ -92,16 +92,16 @@ namespace plib {
 
 	private:
 
-		/* ensure proper alignment */
+		// ensure proper alignment
 		PALIGNAS_VECTOROPT()
 		std::array<typename std::aligned_storage<sizeof(C), alignof(C)>::type, N> m_buf;
 		unsigned m_initialized;
 	};
 
-	/**! a simple linked list.
-	 *
-	 * the list allows insertions deletions whilst being processed.
-	 */
+	/// \brief a simple linked list.
+	///
+	/// The list allows insertions deletions whilst being processed.
+	///
 	template <class LC>
 	class linkedlist_t
 	{
@@ -194,7 +194,7 @@ namespace plib {
 				elem->m_next->m_prev = elem->m_prev;
 			else
 			{
-				/* update tail */
+				// update tail
 			}
 		}
 
@@ -292,7 +292,7 @@ namespace plib {
 		Element m_object;
 	};
 
-	/* Use TS = true for a threadsafe queue */
+	// Use TS = true for a threadsafe queue
 	template <class T, bool TS>
 	class timed_queue_linear : nocopyassignmove
 	{
@@ -311,7 +311,7 @@ namespace plib {
 		void push(T && e) noexcept
 		{
 #if 0
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			T * i(m_end-1);
 			for (; *i < e; --i)
@@ -323,7 +323,7 @@ namespace plib {
 			*(i+1) = std::move(e);
 			++m_end;
 #else
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			T * i(m_end++);
 			*i = std::move(e);
@@ -344,7 +344,7 @@ namespace plib {
 		template <bool KEEPSTAT, class R>
 		void remove(const R &elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_remove.inc();
@@ -362,7 +362,7 @@ namespace plib {
 		template <bool KEEPSTAT, class R>
 		void retime(R && elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_retime.inc();
@@ -391,10 +391,10 @@ namespace plib {
 		{
 			lock_guard_type lck(m_lock);
 			m_end = &m_list[0];
-			/* put an empty element with maximum time into the queue.
-			 * the insert algo above will run into this element and doesn't
-			 * need a comparison with queue start.
-			 */
+			// put an empty element with maximum time into the queue.
+			// the insert algo above will run into this element and doesn't
+			// need a comparison with queue start.
+			//
 			m_list[0] = T::never();
 			m_end++;
 		}
@@ -443,7 +443,7 @@ namespace plib {
 		template <bool KEEPSTAT>
 		void push(T &&e) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			*m_end++ = e;
 			std::push_heap(&m_list[0], m_end, compare());
@@ -464,7 +464,7 @@ namespace plib {
 		template <bool KEEPSTAT, class R>
 		void remove(const R &elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_remove.inc();
@@ -484,7 +484,7 @@ namespace plib {
 		template <bool KEEPSTAT>
 		void retime(const T &elem) noexcept
 		{
-			/* Lock */
+			// Lock
 			lock_guard_type lck(m_lock);
 			if (KEEPSTAT)
 				m_prof_retime.inc();
@@ -529,4 +529,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PLISTS_H_ */
+#endif // PLISTS_H_

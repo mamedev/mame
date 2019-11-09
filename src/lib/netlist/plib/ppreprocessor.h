@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * ppreprocessor.h
- *
- */
 
 #ifndef PPREPROCESSOR_H_
 #define PPREPROCESSOR_H_
+
+///
+/// \file ppreprocessor.h
+///
 
 #include "plists.h"
 #include "pstream.h"
@@ -95,7 +95,7 @@ namespace plib {
 			{
 				if (this->gptr() == this->egptr())
 				{
-					/* clang reports sign error - weird */
+					// clang reports sign error - weird
 					std::size_t bytes = pstring_mem_t_size(m_strm->m_outbuf) - static_cast<std::size_t>(m_strm->m_pos);
 
 					if (bytes > m_buf.size())
@@ -104,7 +104,7 @@ namespace plib {
 					//printf("%ld\n", (long int)bytes);
 					this->setg(m_buf.data(), m_buf.data(), m_buf.data() + bytes);
 
-					m_strm->m_pos += static_cast</*pos_type*/long>(bytes);
+					m_strm->m_pos += static_cast<long>(bytes);
 				}
 
 				return this->gptr() == this->egptr()
@@ -160,7 +160,7 @@ namespace plib {
 			pstring m_name;
 		};
 
-		/* vector used as stack because we need to loop through stack */
+		// vector used as stack because we need to loop through stack
 		std::vector<input_context> m_stack;
 		pstring_t<pu8_traits> m_outbuf;
 		std::istream::pos_type m_pos;
@@ -173,4 +173,4 @@ namespace plib {
 
 } // namespace plib
 
-#endif /* PPREPROCESSOR_H_ */
+#endif // PPREPROCESSOR_H_

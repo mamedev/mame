@@ -1,14 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * mat_cr.h
- *
- * Compressed row format matrices
- *
- */
 
 #ifndef MAT_CR_H_
 #define MAT_CR_H_
+
+///
+/// \file mat_cr.h
+///
+/// Compressed row format matrices
+///
 
 #include "palloc.h"
 #include "parray.h"
@@ -132,7 +132,7 @@ namespace plib
 			row_idx[size()] = nz;
 			nz_num = nz;
 
-			/* build nzbd */
+			// build nzbd
 
 			for (std::size_t k=0; k < size(); k++)
 			{
@@ -147,9 +147,8 @@ namespace plib
 		template <typename VTV, typename VTR>
 		void mult_vec(VTR & res, const VTV & x) const noexcept
 		{
-			/*
-			 * res = A * x
-			 */
+
+			 // res = A * x
 #if 0
 			//plib::omp::set_num_threads(4);
 			plib::omp::for_static(0, constants<std::size_t>::zero(), m_size, [this, &res, &x](std::size_t row)
@@ -176,7 +175,7 @@ namespace plib
 #endif
 		}
 
-		/* throws error if P(source)>P(destination) */
+		// throws error if P(source)>P(destination)
 		template <typename LUMAT>
 		void slim_copy_from(LUMAT & src)
 		{
@@ -185,20 +184,20 @@ namespace plib
 				C dp = row_idx[r];
 				for (C sp = src.row_idx[r]; sp < src.row_idx[r+1]; sp++)
 				{
-					/* advance dp to source column and fill 0s if necessary */
+					// advance dp to source column and fill 0s if necessary
 					while (col_idx[dp] < src.col_idx[sp])
 						A[dp++] = 0;
 					if (row_idx[r+1] <= dp || col_idx[dp] != src.col_idx[sp])
 						pthrow<pexception>("slim_copy_from error");
 					A[dp++] = src.A[sp];
 				}
-				/* fill remaining elements in row */
+				// fill remaining elements in row
 				while (dp < row_idx[r+1])
 					A[dp++] = 0;
 			}
 		}
 
-		/* only copies common elements */
+		// only copies common elements
 		template <typename LUMAT>
 		void reduction_copy_from(LUMAT & src) noexcept
 		{
@@ -208,7 +207,7 @@ namespace plib
 				C dp(row_idx[r]);
 				while(sp < src.row_idx[r+1])
 				{
-					/* advance dp to source column and fill 0s if necessary */
+					// advance dp to source column and fill 0s if necessary
 					if (col_idx[dp] < src.col_idx[sp])
 						A[dp++] = 0;
 					else if (col_idx[dp] == src.col_idx[sp])
@@ -216,13 +215,13 @@ namespace plib
 					else
 						sp++;
 				}
-				/* fill remaining elements in row */
+				// fill remaining elements in row
 				while (dp < row_idx[r+1])
 					A[dp++] = 0;
 			}
 		}
 
-		/* no checks at all - may crash */
+		// no checks at all - may crash
 		template <typename LUMAT>
 		void raw_copy_from(LUMAT & src) noexcept
 		{
@@ -379,7 +378,7 @@ namespace plib
 		void gaussian_back_substitution(V1 &V, const V2 &RHS)
 		{
 			const std::size_t iN = base::size();
-			/* row n-1 */
+			// row n-1
 			V[iN - 1] = RHS[iN - 1] / base::A[base::diag[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
@@ -397,7 +396,7 @@ namespace plib
 		void gaussian_back_substitution(V1 &V)
 		{
 			const std::size_t iN = base::size();
-			/* row n-1 */
+			// row n-1
 			V[iN - 1] = V[iN - 1] / base::A[base::diag[iN - 1]];
 
 			for (std::size_t j = iN - 1; j-- > 0;)
@@ -492,7 +491,7 @@ namespace plib
 		void build(M &fill, std::size_t ilup)
 		{
 			std::size_t p(0);
-			/* build ilu_rows */
+			// build ilu_rows
 			for (decltype(fill.size()) i=1; i < fill.size(); i++)
 			{
 				bool found(false);
@@ -526,25 +525,25 @@ namespace plib
 			m_ILUp = ilup;
 		}
 
+		/// \brief incomplete LU Factorization.
+		///
+		/// We are following http://de.wikipedia.org/wiki/ILU-Zerlegung here.
+		///
+		/// The result is stored in matrix LU
+		///
+		/// For i = 1,...,N-1
+		///   For k = 0, ... , i - 1
+		///     If a[i,k] != 0
+		///       a[i,k] = a[i,k] / a[k,k]
+		///       For j = k + 1, ... , N - 1
+		///         If a[i,j] != 0
+		///           a[i,j] = a[i,j] - a[i,k] * a[k,j]
+		///         j=j+1
+		///      k=k+1
+		///    i=i+1
+		///
 		void incomplete_LU_factorization(const base &mat)
 		{
-			/*
-			 * incomplete LU Factorization according to http://de.wikipedia.org/wiki/ILU-Zerlegung
-			 *
-			 * Result is stored in matrix LU
-			 *
-			 * For i = 1,...,N-1
-			 *   For k = 0, ... , i - 1
-			 *     If a[i,k] != 0
-			 *       a[i,k] = a[i,k] / a[k,k]
-			 *       For j = k + 1, ... , N - 1
-			 *         If a[i,j] != 0
-			 *           a[i,j] = a[i,j] - a[i,k] * a[k,j]
-			 *         j=j+1
-			 *      k=k+1
-			 *    i=i+1
-			 *
-			 */
 			if (m_ILUp < 1)
 				this->raw_copy_from(mat);
 			else
@@ -568,7 +567,7 @@ namespace plib
 
 					while (i_j < p_i_end && k_j < p_k_end )  // pj = (i, j)
 					{
-						// we can assume that within a row ja increases continuously */
+						// we can assume that within a row ja increases continuously
 						const std::size_t c_i_j(base::col_idx[i_j]); // row i, column j
 						const auto c_k_j(base::col_idx[k_j]); // row k, column j
 
@@ -582,30 +581,32 @@ namespace plib
 			}
 		}
 
+
+		/// \brief Solve a linear equation
+		///
+		/// Solve a linear equation Ax = r
+		///
+		/// where
+		///     A = L*U
+		///
+		///     L unit lower triangular
+		///     U upper triangular
+		///
+		/// ==> LUx = r
+		///
+		/// ==> Ux = L⁻¹ r = w
+		///
+		/// ==> r = Lw
+		///
+		/// This can be solved for w using backwards elimination in L.
+		///
+		/// Now Ux = w
+		///
+		/// This can be solved for x using backwards elimination in U.
+		///
 		template <typename R>
 		void solveLU (R &r)
 		{
-			/*
-			 * Solve a linear equation Ax = r
-			 * where
-			 *      A = L*U
-			 *
-			 *      L unit lower triangular
-			 *      U upper triangular
-			 *
-			 * ==> LUx = r
-			 *
-			 * ==> Ux = L⁻¹ r = w
-			 *
-			 * ==> r = Lw
-			 *
-			 * This can be solved for w using backwards elimination in L.
-			 *
-			 * Now Ux = w
-			 *
-			 * This can be solved for x using backwards elimination in U.
-			 *
-			 */
 			for (std::size_t i = 1; i < base::size(); ++i )
 			{
 				typename base::value_type tmp(0);
@@ -634,4 +635,4 @@ namespace plib
 
 } // namespace plib
 
-#endif /* MAT_CR_H_ */
+#endif // MAT_CR_H_

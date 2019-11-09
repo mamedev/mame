@@ -1,12 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * pchrono.h
- *
- */
 
 #ifndef PCHRONO_H_
 #define PCHRONO_H_
+
+///
+/// \file pchrono.h
+///
 
 #include "pconfig.h"
 #include "ptypes.h"
@@ -65,9 +65,9 @@ namespace plib {
 						"rdtscp;"
 						"shl $32, %%rdx;"
 						"or %%rdx, %%rax;"
-						: "=a"(v)           /* outputs  */
-						:                   /* inputs   */
-						: "%rcx", "%rdx"    /* clobbers */
+						: "=a"(v)           // outputs
+						:                   // inputs
+						: "%rcx", "%rdx"    // clobbers
 				);
 				return v;
 			}
@@ -88,9 +88,9 @@ namespace plib {
 						"rdtsc;"
 						"shl $32, %%rdx;"
 						"or %%rdx, %%rax;"
-						: "=a"(v)   /* outputs  */
-						:           /* inputs   */
-						: "%rdx"    /* clobbers */
+						: "=a"(v)   // outputs
+						:           // inputs
+						: "%rdx"    // clobbers
 				);
 				return v;
 			}
@@ -103,16 +103,14 @@ namespace plib {
 		#endif
 
 
-		/* Based on "How to Benchmark Code Execution Times on Intel?? IA-32 and IA-64
-		 * Instruction Set Architectures", Intel, 2010
-		 *
-		 */
+		// Based on "How to Benchmark Code Execution Times on Intel?? IA-32 and IA-64
+		// Instruction Set Architectures", Intel, 2010
+
 		#if PUSE_ACCURATE_STATS && PHAS_RDTSCP
-		/*
-		 * kills performance completely, but is accurate
-		 * cpuid serializes, but clobbers ebx and ecx
-		 *
-		 */
+		//
+		// kills performance completely, but is accurate
+		// cpuid serializes, but clobbers ebx and ecx
+		//
 
 		struct exact_ticks : public base_ticks<exact_ticks, int64_t>
 		{
@@ -127,9 +125,9 @@ namespace plib {
 						"rdtsc;"
 						"shl $32, %%rdx;"
 						"or %%rdx, %%rax;"
-						: "=a"(v) /* outputs */
-						: "a"(0x0)                /* inputs */
-						: "%ebx", "%ecx", "%rdx"  /* clobbers*/
+						: "=a"(v) // outputs
+						: "a"(0x0)                // inputs
+						: "%ebx", "%ecx", "%rdx"  // clobbers
 				);
 				return v;
 			}
@@ -235,9 +233,9 @@ namespace plib {
 			{
 				guard_t() = default;
 				COPYASSIGNMOVE(guard_t, default)
-				/* using default constructor will trigger warning on
-				 * unused local variable.
-				 */
+				// using default constructor will trigger warning on
+				// unused local variable.
+
 				// NOLINTNEXTLINE(modernize-use-equals-default)
 				~guard_t() { }
 			};
@@ -265,4 +263,4 @@ namespace plib {
 	using pperfcount_t = plib::chrono::counter<enabled_>;
 } // namespace plib
 
-#endif /* PCHRONO_H_ */
+#endif // PCHRONO_H_

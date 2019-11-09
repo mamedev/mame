@@ -406,6 +406,8 @@ void mc68hc11d0_device::io_map(address_map &map)
 	map(0x2a, 0x2a).rw(FUNC(mc68hc11d0_device::spdr_r<0>), FUNC(mc68hc11d0_device::spdr_w<0>)); // SPDR
 	map(0x2c, 0x2c).r(FUNC(mc68hc11d0_device::sccr1_r)).nopw(); // SCCR1
 	map(0x2d, 0x2d).r(FUNC(mc68hc11d0_device::sccr2_r)).nopw(); // SCCR2
+	map(0x2e, 0x2e).lr8([] { return 0xc0; }, "scsr_r").nopw(); // SCSR
+	map(0x2f, 0x2f).nopw(); // SCDR
 	map(0x39, 0x39).nopw(); // OPTION
 	map(0x3a, 0x3a).nopw(); // COPRST (watchdog)
 	map(0x3d, 0x3d).rw(FUNC(mc68hc11d0_device::init_r), FUNC(mc68hc11d0_device::init_w)); // INIT
