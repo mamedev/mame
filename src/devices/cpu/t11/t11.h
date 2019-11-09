@@ -47,7 +47,7 @@ protected:
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 12; }
-	virtual uint32_t execute_max_cycles() const override { return 110; }
+	virtual uint32_t execute_max_cycles() const override { return 114; }
 	virtual uint32_t execute_input_lines() const override { return 4; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
