@@ -9909,6 +9909,9 @@ quizard4                        // (c) TAB Austria 1998
 quizard4_40                     // (c) TAB Austria 1997
 quizard4_41                     // (c) TAB Austria 1998
 
+@source:cdsys5.cpp
+minijook                        //
+
 @source:cedar_magnet.cpp
 cedmag
 mag_time
@@ -36235,6 +36238,9 @@ slivera                         //
 @source:slotcarn.cpp
 slotcarn                        // (c) 1985 Wing Co. Ltd
 spielbud                        // (c) 1985 ADP
+
+@source:slsstars.cpp
+slsstars                        //
 
 @source:sm1800.cpp
 sm1800                          //

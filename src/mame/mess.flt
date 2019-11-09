@@ -138,6 +138,7 @@ ccs2810.cpp
 ccs300.cpp
 cd2650.cpp
 cdc721.cpp
+cdsys5.cpp
 cfx9850.cpp
 cgc7900.cpp
 cgenie.cpp
@@ -756,6 +757,7 @@ sk101bl.cpp
 slc1.cpp
 slc1a.cpp
 slicer.cpp
+slsstars.cpp
 sm1800.cpp
 sm7238.cpp
 smc777.cpp
