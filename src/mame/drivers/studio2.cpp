@@ -185,7 +185,9 @@ Notes:
     Usage
     - All variants: Boot up, then press F3, then press a letter (Q,W,E,A) to choose an inbuilt game.
     - If using a cart, boot up, press F3, then follow the instructions that came with the cart (usually press Q).
-    - Currently, Visicom cannot run any carts, and has no support for st2 files.
+    - Visicom has no support for st2 files.
+    - Visicom always reserves buttons 1,2,3,4,7(Q,W,E,A,Z) for the internal games, which are always available.
+      The cartridges use 5(S) to start, except gambler1 which uses 9(C).
 
 */
 
@@ -269,9 +271,9 @@ class visicom_state : public studio2_state
 {
 public:
 	visicom_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag),
-			m_color0_ram(*this, "color0_ram"),
-			m_color1_ram(*this, "color1_ram")
+		: studio2_state(mconfig, type, tag)
+		, m_color0_ram(*this, "color0_ram")
+		, m_color1_ram(*this, "color1_ram")
 	{ }
 
 	void visicom(machine_config &config);
@@ -282,6 +284,8 @@ private:
 	required_shared_ptr<uint8_t> m_color0_ram;
 	required_shared_ptr<uint8_t> m_color1_ram;
 
+	virtual void machine_start() override;
+
 	DECLARE_WRITE8_MEMBER( dma_w );
 	void visicom_io_map(address_map &map);
 	void visicom_map(address_map &map);
@@ -291,9 +295,9 @@ class mpt02_state : public studio2_state
 {
 public:
 	mpt02_state(const machine_config &mconfig, device_type type, const char *tag)
-		: studio2_state(mconfig, type, tag),
-			m_cti(*this, CDP1864_TAG),
-			m_color_ram(*this, "color_ram")
+		: studio2_state(mconfig, type, tag)
+		, m_cti(*this, CDP1864_TAG)
+		, m_color_ram(*this, "color_ram")
 	{ }
 
 	void mpt02(machine_config &config);
@@ -526,6 +530,12 @@ READ8_MEMBER( studio2_state::cart_a00 ) { return m_cart->read_rom(offset + 0x600
 READ8_MEMBER( studio2_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
 READ8_MEMBER( studio2_state::cart_e00 ) { return m_cart->read_rom(offset + 0xa00); }
 READ8_MEMBER( mpt02_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
+
+void visicom_state::machine_start()
+{
+	// register for state saving
+	save_item(NAME(m_keylatch));
+}
 
 void studio2_state::machine_start()
 {
