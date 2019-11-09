@@ -1592,19 +1592,6 @@ void cosmic_state::init_cosmica()
 {
 	m_sound_enabled = 1;
 	m_dive_bomb_b_select = 0;
-
-	uint8_t *ROM = memregion("maincpu")->base();
-
-	{
-		char filename[256];
-		sprintf(filename,"decrypted_%s", machine().system().name);
-		FILE *fp = fopen(filename, "w+b");
-		if (fp)
-		{
-			fwrite(ROM, 0x3000, 1, fp);
-			fclose(fp);
-		}
-	}
 }
 
 
