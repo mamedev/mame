@@ -30,16 +30,15 @@ public:
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 	virtual image_init_result call_create(int format_type, util::option_resolution *create_args) override;
-	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 1; }
-	virtual bool is_creatable() const override { return 1; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return "psion_pack"; }
-	virtual const char *file_extensions() const override { return "opk"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return true; }
+	virtual bool is_creatable() const noexcept override { return true; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return false; }
+	virtual const char *image_interface() const noexcept override { return "psion_pack"; }
+	virtual const char *file_extensions() const noexcept override { return "opk"; }
 	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
@@ -55,6 +54,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return image_software_list_loader::instance(); }
 
 private:
 	// internal device state

@@ -38,14 +38,14 @@ protected:
 	virtual void call_unload() override;
 	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return false; }
-	virtual bool is_creatable() const override { return false; }
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return true; }
-	virtual const char *image_interface() const override { return "hp9825_rom"; }
-	virtual const char *file_extensions() const override { return "bin"; }
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "hp9825_rom"; }
+	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
 	offs_t m_rom_limit;
 	unsigned m_loaded_regions;

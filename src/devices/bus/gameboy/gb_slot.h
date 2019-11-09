@@ -118,7 +118,18 @@ public:
 	// image-level overrides
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return false; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual const char *image_interface() const noexcept override { return "gameboy_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin,gb,gbc"; }
+
+	// slot interface overrides
+	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	int get_type() { return m_type; }
 	static int get_cart_type(const uint8_t *ROM, uint32_t len);
@@ -128,18 +139,6 @@ public:
 	void setup_ram(uint8_t banks);
 	void internal_header_logging(uint8_t *ROM, uint32_t len);
 	void save_ram() { if (m_cart && m_cart->get_ram_size()) m_cart->save_ram(); }
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return 1; }
-	virtual bool is_writeable() const override { return 0; }
-	virtual bool is_creatable() const override { return 0; }
-	virtual bool must_be_loaded() const override { return 0; }
-	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const char *image_interface() const override { return "gameboy_cart"; }
-	virtual const char *file_extensions() const override { return "bin,gb,gbc"; }
-
-	// slot interface overrides
-	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
 	// reading and writing
 	virtual uint8_t read_rom(offs_t offset);
@@ -153,6 +152,9 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override;
+
+	// device_image_interface implementation
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int m_type;
 	device_gb_cart_interface*       m_cart;
@@ -196,8 +198,8 @@ public:
 
 	// image-level overrides
 	virtual image_init_result call_load() override;
-	virtual const char *image_interface() const override { return "megaduck_cart"; }
-	virtual const char *file_extensions() const override { return "bin"; }
+	virtual const char *image_interface() const noexcept override { return "megaduck_cart"; }
+	virtual const char *file_extensions() const noexcept override { return "bin"; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;

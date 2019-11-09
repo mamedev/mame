@@ -702,7 +702,8 @@ void legacy_floppy_image_device::device_config_complete()
 		for (int i = 0; floppy_options && floppy_options[i].construct; i++)
 		{
 			// only add if creatable
-			if (floppy_options[i].param_guidelines) {
+			if (floppy_options[i].param_guidelines)
+			{
 				// allocate a new format and append it to the list
 				add_format(floppy_options[i].name, floppy_options[i].description, floppy_options[i].extensions, floppy_options[i].param_guidelines);
 			}
@@ -757,21 +758,21 @@ void legacy_floppy_image_device::call_unload()
 	machine().scheduler().timer_set(attotime::from_msec(250), timer_expired_delegate(FUNC(legacy_floppy_image_device::set_wpt),this), 1);
 }
 
-bool legacy_floppy_image_device::is_creatable() const
+bool legacy_floppy_image_device::is_creatable() const noexcept
 {
-	int cnt = 0;
-	if (m_config != nullptr)
+	if (m_config)
 	{
 		const struct FloppyFormat *floppy_options = m_config->formats;
-		int i;
-		for ( i = 0; floppy_options[i].construct; i++ ) {
-			if(floppy_options[i].param_guidelines) cnt++;
+		for (int i = 0; floppy_options[i].construct; i++)
+		{
+			if (floppy_options[i].param_guidelines)
+				return true;
 		}
 	}
-	return (cnt>0) ? 1 : 0;
+	return false;
 }
 
-const char *legacy_floppy_image_device::image_interface() const
+const char *legacy_floppy_image_device::image_interface() const noexcept
 {
 	return m_config->interface;
 }

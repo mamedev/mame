@@ -118,25 +118,23 @@ public:
 	void set_width(int width) { m_width = width; }
 	void set_endian(endianness_t end) { m_endianness = end; }
 
-	// image-level overrides
+	// device_image_interface implementation
 	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual software_list_loader const &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
-
-	u32 common_get_size(char const *region);
-	void common_load_rom(u8 *ROM, u32 len, char const *region);
-
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return false; }
-	virtual bool is_creatable() const override { return false; }
-	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
-	virtual bool is_reset_on_load() const override { return true; }
-	virtual char const *image_interface() const override { return m_interface; }
-	virtual char const *file_extensions() const override { return m_extensions; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
+	virtual bool is_readable()  const noexcept override { return true; }
+	virtual bool is_writeable() const noexcept override { return false; }
+	virtual bool is_creatable() const noexcept override { return false; }
+	virtual bool must_be_loaded() const noexcept override { return m_must_be_loaded; }
+	virtual bool is_reset_on_load() const noexcept override { return true; }
+	virtual char const *image_interface() const noexcept override { return m_interface; }
+	virtual char const *file_extensions() const noexcept override { return m_extensions; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
+
+	u32 common_get_size(char const *region);
+	void common_load_rom(u8 *ROM, u32 len, char const *region);
 
 	// reading and writing
 	virtual u8 read_rom(offs_t offset);
@@ -177,6 +175,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
+	// device_image_interface implementation
+	virtual software_list_loader const &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
+
 	char const *m_interface;
 	char const *m_default_card;
 	char const *m_extensions;
@@ -204,7 +205,7 @@ public:
 
 	generic_socket_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	virtual iodevice_t image_type() const override { return IO_ROM; }
+	virtual iodevice_t image_type() const noexcept override { return IO_ROM; }
 };
 
 class generic_cartslot_device : public generic_slot_device
@@ -223,7 +224,7 @@ public:
 
 	generic_cartslot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
-	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
+	virtual iodevice_t image_type() const noexcept override { return IO_CARTSLOT; }
 };
 
 
