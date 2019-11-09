@@ -81,7 +81,9 @@ sf2mdta, sf2ceb: scroll 2X has strange 0x200 writes that cause missing fighters'
 sgyxz, wofabl: garbage left behind. A priority problem can be seen in 3rd demo where
        the fighters walk through the crowd instead of behind.
 
-slampic: no sound. A priority problem between sprites and crowd.
+slampic: no sound. Some minor gfx issues (sprites on character select screen)
+
+slampic2: no sound. All gfx issues confirmed present on real board.
 
 */
 
@@ -581,7 +583,7 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 	int base = m_sprite_base / 2;
 	int num_sprites = m_gfxdecode->gfx(2)->elements();
 	int last_sprite_offset = 0x1ffc;
-	uint16_t *sprite_ram = m_sprite_ram; //m_gfxram;
+	uint16_t *sprite_ram = m_gfxram;
 	uint16_t tileno,colour,xpos,ypos;
 	bool flipx, flipy;
 
@@ -933,9 +935,6 @@ void cps_state::slampic_map(address_map &map)
 	map(0x880000, 0x880001).nopw(); //.w(FUNC(cps_state::cps1_soundlatch_w));    /* Sound command */
 	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98000d).w(FUNC(cps_state::slampic_layer_w));
-	
-	map(0x990000, 0x993fff).ram().share("spriteram");
-	
 	map(0xf00000, 0xf0ffff).r(FUNC(cps_state::qsound_rom_r));          /* Slammasters protection */
 	map(0xf18000, 0xf19fff).ram();
 	map(0xf1c000, 0xf1c001).portr("IN2");            /* Player 3 controls (later games) */
@@ -2480,8 +2479,8 @@ ROM_END
 
 void cps_state::init_dinopic()
 {
-	//m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
-	//m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
+	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x990000, 0x993fff, m_bootleg_sprite_ram.get());
 	init_cps1();
 }
 
@@ -3209,7 +3208,7 @@ MACHINE_START_MEMBER(cps_state, slampic)
 	m_layer_scroll3x_offset = 0x40;
 	m_sprite_base = 0x1000;
 	m_sprite_list_end_marker = 0x8000;
-	m_sprite_x_offset = 0;
+	m_sprite_x_offset = 2;
 }
 
 void cps_state::slampic(machine_config &config)
@@ -3395,7 +3394,7 @@ ROM_END
 	
 	RAM
 	2x  NEC D431000ACZ-70L   main ram   1Mbit (128Kx8) SRAM 70ns
-	2x  SRM20256LM12         gfx?       256Kbit (32Kx8) SRAM 120ns SOP28   (mounted on tiny SOP->DIP adapter pcbs)
+	2x  SRM20256LM12         gfx?       256Kbit (32Kx8) SRAM 120ns SOP28   (mounted on SOP->DIP adapter pcbs)
 	6x  T6116S45L            gfx?       16Kbit (2Kx8) SRAM 45ns
 	4x  T6116S35L            gfx?       16Kbit (2Kx8) SRAM 35ns
 	
@@ -3441,8 +3440,8 @@ ROM_END
 	9   coin
 	10  start
 	
-	player 3 btn 3: jamma 25  (non-std, player 1 btn 4/neogeo btn D)
-	player 4 btn 4: jamma ac  (non-std, player 2 btn 4/neogeo btn D)
+	player 3 btn 3:  jamma 25  (non-std, player 1 btn 4/neogeo btn D)
+	player 4 btn 4:  jamma ac  (non-std, player 2 btn 4/neogeo btn D)
 	
 	
 	h/w issues compared to original game (slammast)
@@ -3680,12 +3679,12 @@ READ16_MEMBER(cps_state::slampic2_cps_a_r)
 
 WRITE16_MEMBER(cps_state::slampic2_sound_w)
 {
-	logerror("Sound command: %04x\n", data);
+	//logerror("Sound command: %04x\n", data);
 }
 
 WRITE16_MEMBER(cps_state::slampic2_sound2_w)
 {
-	logerror("Sound2 command: %04x\n", data);
+	//logerror("Sound2 command: %04x\n", data);
 }
 
 static INPUT_PORTS_START( slampic2 )
@@ -3845,7 +3844,7 @@ ROM_START( slampic2 )
 	// ROM_LOAD64_BYTE( "rom4.bin",  0x600003, 0x40000, CRC(9683dd30) SHA1(8b258b386baff5e06a9b7f176c49507f7e531b95) )  // ~ 14.bin
 	// ROM_CONTINUE(                 0x600007, 0x40000)
 
-	ROM_REGION( 0x2000, "audiocpu", 0 )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) // NO DUMP  -  protected PIC
 	ROM_LOAD( "pic_u33.bin", 0x0000, 0x1007, BAD_DUMP CRC(6dba4094) SHA1(ca3362de83205fc6563d16a59b8e6e4bb7ebf4a6) )
 	
 	ROM_REGION( 0x140000, "oki", 0 )
@@ -3916,8 +3915,8 @@ GAME( 1992, sf2b2,     sf2,      sf2b,      sf2mdt,   cps_state, init_sf2mdtb,  
 
 GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 
-GAME( 1993, slampic,   slammast, slampic,   slampic,  cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
-GAME( 1993, slampic2,  0,        slampic2,  slampic2, cps_state, init_slampic2, ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )                       // 930713 ETC
+GAME( 1993, slampic,   slammast, slampic,   slampic,  cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
+GAME( 1993, slampic2,  0,        slampic2,  slampic2, cps_state, init_slampic2, ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
 
 GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, init_cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, init_wofabl,   ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy graphics glitches - 921005 - Sangokushi 2
