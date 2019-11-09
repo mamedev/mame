@@ -129,6 +129,7 @@ protected:
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_region_stars(*this, "stars")
 		, m_led_cboard(*this, "led_cboard%u", 0U)
+		, bootleg_sprite_renderer(fcrash_render_sprites)
 	{ }
 
 public:
@@ -217,6 +218,7 @@ public:
 	void init_sf2mdtb();
 	void init_sf2b();
 	void init_slampic();
+	void init_slampic2();
 	void init_wofabl();
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
@@ -228,6 +230,7 @@ public:
 	DECLARE_MACHINE_START(punipic);
 	DECLARE_MACHINE_START(sf2mdt);
 	DECLARE_MACHINE_START(slampic);
+	DECLARE_MACHINE_START(slampic2);
 	DECLARE_MACHINE_START(sgyxz);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
@@ -240,6 +243,10 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
 	DECLARE_WRITE16_MEMBER(slampic_layer_w);
+	DECLARE_WRITE16_MEMBER(slampic_layer2_w);
+	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
+	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
+	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sf2mdt_snd_bankswitch_w);
@@ -250,6 +257,7 @@ public:
 	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();
 	void fcrash_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void slampic2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
 	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	void fcrash_build_palette();
@@ -282,6 +290,7 @@ public:
 	void punipic(machine_config &config);
 	void dinopic(machine_config &config);
 	void slampic(machine_config &config);
+	void slampic2(machine_config &config);
 	void sf2b(machine_config &config);
 	void knightsb(machine_config &config);
 	void fcrash(machine_config &config);
@@ -318,6 +327,7 @@ public:
 	void sgyxz_sound_map(address_map &map);
 	void wofabl_map(address_map &map);
 	void slampic_map(address_map &map);
+	void slampic2_map(address_map &map);
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void varthb_map(address_map &map);
@@ -334,7 +344,7 @@ protected:
 	uint16_t *     m_scroll3;
 	uint16_t *     m_obj;
 	uint16_t *     m_other;
-	std::unique_ptr<uint16_t[]>     m_buffered_obj;
+	std::unique_ptr<uint16_t[]> m_buffered_obj;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram1;
 	optional_shared_ptr<uint8_t> m_qsound_sharedram2;
 	std::unique_ptr<uint8_t[]> m_decrypt_kabuki;
@@ -378,12 +388,12 @@ protected:
 	int          m_palette_align;
 	int          m_palette_size;
 	int          m_stars_rom_size;
-	uint8_t        m_empty_tile[32*32];
+	uint8_t      m_empty_tile[32*32];
 	int          m_cps_version;
 
 	/* fcrash video config */
-	uint8_t        m_layer_enable_reg;
-	uint8_t        m_layer_mask_reg[4];
+	uint8_t      m_layer_enable_reg;
+	uint8_t      m_layer_mask_reg[4];
 	int          m_layer_scroll1x_offset;
 	int          m_layer_scroll2x_offset;
 	int          m_layer_scroll3x_offset;
@@ -407,6 +417,9 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_memory_region m_region_stars;
 	output_finder<3> m_led_cboard;
+	
+	// fcrash
+	void (cps_state::*bootleg_sprite_renderer)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 class cps2_state : public cps_state
