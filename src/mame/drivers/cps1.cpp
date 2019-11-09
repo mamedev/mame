@@ -1956,6 +1956,21 @@ static INPUT_PORTS_START( sf2amf )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+	
+/* SWB.6 enables turbo mode, SWB.4 and SWB.5 sets the speed */
+static INPUT_PORTS_START( sf2amfx )
+	PORT_INCLUDE( sf2hack )
+	
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x18, 0x18, "Game Speed" )   PORT_DIPLOCATION("SW(B):4,5")
+	PORT_DIPSETTING(    0x18, "Normal" )
+	PORT_DIPSETTING(    0x10, "Fast" )
+	PORT_DIPSETTING(    0x08, "Very Fast" )
+	PORT_DIPSETTING(    0x00, "Extremely Fast" )
+	PORT_DIPNAME( 0x20, 0x20, "Turbo Mode Enable" )   PORT_DIPLOCATION("SW(B):6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )  // normal speed
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // the speed set by SWB.4 and SWB.5
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( sf2accp2 )
 	PORT_INCLUDE( sf2 )
@@ -10058,7 +10073,7 @@ ROM_END
 
 /* This set is identical to sf2amf2 except for program roms, the pcb has some kind of mod around the rom area with cut traces
    and a17 pins of u221 and u195 bent out of their sockets and connected together with a wire.
-   Perhaps it is an "upgraded" sf2amf2 board ? */
+   Perhaps it's an "upgraded" sf2amf2 board ? */
 ROM_START( sf2amf3 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_BYTE( "u222.bin", 0x000000, 0x80000, CRC(0d305e8b) SHA1(7094160abbf24c119a575d93e3fe1ab84b537de0) )
@@ -13529,8 +13544,8 @@ GAME( 1992, sf2acc,      sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,  
 GAME( 1992, sf2acca,     sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Accelerator!, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on World version
 GAME( 1992, sf2accp2,    sf2ce,    cps1_12MHz, sf2accp2, cps_state, init_cps1,     ROT0,   "bootleg (Testron)", "Street Fighter II': Champion Edition (Accelerator Pt.II, bootleg)", MACHINE_SUPPORTS_SAVE )        // 920313 - based on World version
 GAME( 1992, sf2amf,      sf2ce,    cps1_12MHz, sf2amf,   cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (Alpha Magic-F, bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
-GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
-GAME( 1992, sf2amf3,     sf2ce,    cps1_12MHz, sf2hack,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
+GAME( 1992, sf2amf2,     sf2ce,    cps1_12MHz, sf2amfx,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg, set 1)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version
+GAME( 1992, sf2amf3,     sf2ce,    cps1_10MHz, sf2amfx,  cps_state, init_sf2hack,  ROT0,   "bootleg", "Street Fighter II': Champion Edition (L735 Test Rom, bootleg, set 2)", MACHINE_SUPPORTS_SAVE )     // 920313 - based on World version, confirmed 10MHz
 GAME( 1992, sf2dkot2,    sf2ce,    cps1_12MHz, sf2,      cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (Double K.O. Turbo II, bootleg)", MACHINE_SUPPORTS_SAVE ) // 902140 !!! - based on USA version
 GAME( 1992, sf2level,    sf2ce,    sf2m3,      sf2level, cps_state, init_cps1,     ROT0,   "bootleg", "Street Fighter II': Champion Edition (bootleg with level selection)", MACHINE_SUPPORTS_SAVE ) // 920322 - based on USA version
 GAME( 1992, sf2ceblp,    sf2ce,    cps1_10MHz, sf2,      cps_state, init_sf2ceblp, ROT0,   "bootleg", "Street Fighter II': Champion Edition (protected bootleg on non-dash board)", MACHINE_SUPPORTS_SAVE )          // 920313 - based on USA version
