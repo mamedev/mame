@@ -1204,7 +1204,7 @@ ROM_START( berzerk ) /* All ROMs except 5C were white labels and revision RC31, 
 	ROM_LOAD( "berzerk_rc31_3d.rom2.3d",  0x1800, 0x0800, CRC(a1d5248b) SHA1(a0b7842f6a5f86c16d80d78e7012c78b3ea11d1d) )
 	ROM_LOAD( "berzerk_rc31_5d.rom3.5d",  0x2000, 0x0800, CRC(fcaefa95) SHA1(07f849aa39f1e3db938187ffde4a46a588156ddc) )
 	ROM_LOAD( "berzerk_rc31_6d.rom4.6d",  0x2800, 0x0800, CRC(1e35b9a0) SHA1(5a5e549ec0e4803ab2d1eac6b3e7171aedf28244) )
-	ROM_LOAD( "berzerk_rc3a1_5c.rom5.5c", 0x3000, 0x0800, CRC(e0fab8f5) SHA1(31acef9583546671debe768e3d5c695ba1b9f7e0) )
+	ROM_LOAD( "berzerk_rc31a_5c.rom5.5c", 0x3000, 0x0800, CRC(e0fab8f5) SHA1(31acef9583546671debe768e3d5c695ba1b9f7e0) )
 	ROM_FILL(                             0x3800, 0x0800, 0xff ) /* ROM socket ROM6 at 3C is unpopulated */
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
