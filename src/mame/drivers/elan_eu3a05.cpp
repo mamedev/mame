@@ -223,7 +223,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x5016, 0x5016).rw(m_sys, FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_r), FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_w));
 
 	// 502x - 503x video regs area?
-	map(0x5020, 0x503f).rw(m_vid, FUNC(elan_eu3a05vid_device::read), FUNC(elan_eu3a05vid_device::write));
+	map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
 
 	// 504x GPIO area?
 	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));

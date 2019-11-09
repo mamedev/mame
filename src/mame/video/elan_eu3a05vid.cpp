@@ -6,14 +6,40 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "Elan EU3A05 Video")
 
-// map(0x0600, 0x3dff).ram().share("vram");
-// map(0x3e00, 0x3fff).ram().share("spriteram");
+// tilemaps start at 0x0600 in mainram, sprites at 0x3e00, unlike eu3a14 these could be fixed addresses
 
 elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_VID, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_bank(*this, finder_base::DUMMY_TAG)
+	m_bank(*this, finder_base::DUMMY_TAG),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this))
 {
+}
+
+device_memory_interface::space_config_vector elan_eu3a05vid_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+void elan_eu3a05vid_device::map(address_map &map)
+{
+	map(0x00, 0x1f).rw(FUNC(elan_eu3a05vid_device::read_unmapped), FUNC(elan_eu3a05vid_device::write_unmapped));
+
+	map(0x00, 0x06).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
+	map(0x07, 0x07).rw(FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
+	map(0x08, 0x08).ram(); // unknown
+	map(0x09, 0x09).rw(FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_w));
+	map(0x0a, 0x0a).rw(FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w));
+	map(0x0b, 0x0b).rw(FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w));
+	map(0x0c, 0x0c).rw(FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w));
+	map(0x0d, 0x0e).rw(FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w));
+	map(0x0f, 0x16).rw(FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w));
+	map(0x17, 0x17).ram(); // unknown
+	map(0x18, 0x18).ram(); // unknown
+	// no other writes seen
 }
 
 void elan_eu3a05vid_device::device_start()
@@ -567,106 +593,13 @@ WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 	m_vidctrl = data;
 }
 
-READ8_MEMBER(elan_eu3a05vid_device::read)
+READ8_MEMBER(elan_eu3a05vid_device::read_unmapped)
 {
-	uint8_t ret = 0x00;
-
-	switch (offset)
-	{
-	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
-		// unknown, space invaders sets these to fixed values, tetris has them as 00
-		break;
-
-	case 0x07:
-		ret = elan_eu3a05_vidctrl_r(space, offset - 0x07);
-		break;
-
-	case 0x08:
-		break;
-
-	case 0x09:
-		ret = tile_gfxbase_lo_r(space, offset - 0x09);
-		break;
-
-	case 0x0a:
-		ret = tile_gfxbase_hi_r(space, offset - 0x0a);
-		break;
-
-	case 0x0b:
-		ret = sprite_gfxbase_lo_r(space, offset - 0x0b);
-		break;
-
-	case 0x0c:
-		ret = sprite_gfxbase_hi_r(space, offset - 0x0c);
-		break;
-
-	case 0x0d: case 0x0e:
-		ret = splitpos_r(space, offset - 0x0d);
-		break;
-
-	case 0x0f: case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16:
-		ret = tile_scroll_r(space, offset - 0x0f);
-		break;
-
-	case 0x17:
-		break;
-
-	case 0x18:
-		break;
-
-	default:
-		break;
-	}
-
-	return ret;
+	logerror("%s: elan_eu3a05vid_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	return 0x00;
 }
 
-WRITE8_MEMBER(elan_eu3a05vid_device::write)
+WRITE8_MEMBER(elan_eu3a05vid_device::write_unmapped)
 {
-	switch (offset)
-	{
-	case 0x00: case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06:
-		// unknown, space invaders sets these to fixed values, tetris has them as 00
-		break;
-
-	case 0x07:
-		elan_eu3a05_vidctrl_w(space, offset - 0x07, data);
-		break;
-
-	case 0x08:
-		break;
-
-	case 0x09:
-		tile_gfxbase_lo_w(space, offset - 0x09, data);
-		break;
-
-	case 0x0a:
-		tile_gfxbase_hi_w(space, offset - 0x0a, data);
-		break;
-
-	case 0x0b:
-		sprite_gfxbase_lo_w(space, offset - 0x0b, data);
-		break;
-
-	case 0x0c:
-		sprite_gfxbase_hi_w(space, offset - 0x0c, data);
-		break;
-
-	case 0x0d: case 0x0e:
-		splitpos_w(space, offset - 0x0d, data);
-		break;
-
-	case 0x0f: case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16:
-		tile_scroll_w(space, offset - 0x0f, data);
-		break;
-
-	case 0x17:
-		break;
-
-	case 0x18:
-		break;
-
-	default:
-		break;
-	}
+	logerror("%s: elan_eu3a05vid_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }
