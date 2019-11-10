@@ -406,7 +406,7 @@ void segag80v_state::opcodes_map(address_map &map)
 void segag80v_state::main_portmap(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0xbc, 0xbc); /* AM_READ ??? */
+	map(0xbc, 0xbc); /* .r(FUNC(segag80v_state::)); ??? */
 	map(0xbd, 0xbe).w(FUNC(segag80v_state::multiply_w));
 	map(0xbe, 0xbe).r(FUNC(segag80v_state::multiply_r));
 	map(0xbf, 0xbf).w(FUNC(segag80v_state::unknown_w));

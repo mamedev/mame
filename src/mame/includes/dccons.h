@@ -7,9 +7,9 @@
 
 #include "dc.h"
 
+#include "bus/ata/ataintf.h"
 #include "imagedev/chd_cd.h"
 #include "machine/gdrom.h"
-#include "machine/ataintf.h"
 #include "machine/intelfsh.h"
 
 class dc_cons_state : public dc_state

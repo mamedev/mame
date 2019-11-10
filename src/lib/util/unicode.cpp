@@ -195,7 +195,7 @@ int uchar_from_utf8(char32_t *uchar, const char *utf8char, size_t count)
 	{
 		char32_t const auxchar = (unsigned char)utf8char[i];
 
-		// all auxillary chars must be between 0x80-0xbf
+		// all auxiliary chars must be between 0x80-0xbf
 		if ((auxchar & 0xc0) != 0x80)
 			return -1;
 

@@ -219,6 +219,7 @@ private:
 	u16 m_lio_isr;
 	u8 m_lio_imr;
 	bool m_lio_int;
+	int m_lio_fifo;
 
 	u16 m_dmalo;
 	u8 m_mapindex;
@@ -358,6 +359,15 @@ void pi4d2x_state::map(address_map &map)
 		[this](u8 data)
 		{
 			m_lio_imr = data;
+
+			// fifo interrupt status follows line state if not enabled
+			if (!BIT(m_lio_imr, LIO_FIFO))
+			{
+				if (m_lio_fifo)
+					m_lio_isr |= (1U << LIO_FIFO);
+				else
+					m_lio_isr &= ~(1U << LIO_FIFO);
+			}
 
 			// update interrupt line
 			bool const lio_int = ~m_lio_isr & m_lio_imr;
@@ -616,7 +626,7 @@ void pi4d2x_state::common(machine_config &config)
 			else
 				m_lio_isr |= (1U << LIO_VRSTAT);
 		});
-	m_gfx->out_int_ge().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_GE>)).invert();
+	m_gfx->out_int().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_GE>)).invert();
 	m_gfx->out_int_fifo().set(*this, FUNC(pi4d2x_state::lio_interrupt<LIO_FIFO>)).invert();
 
 	// TODO: vme slot, cpu interrupt 0
@@ -643,14 +653,22 @@ void pi4d2x_state::initialize()
 
 void pi4d2x_state::lio_interrupt(unsigned number, int state)
 {
-	// TODO: special handling for fifo half-full interrupt
 	u16 const mask = 1 << number;
 
+	if (number == LIO_FIFO)
+	{
+		m_lio_fifo = state;
+
+		// special handling for enabled fifo interrupt
+		if ((m_lio_imr & mask) && !(m_lio_isr & mask))
+			return;
+	}
+
 	// record interrupt state
-	if (!state)
-		m_lio_isr &= ~mask;
-	else
+	if (state)
 		m_lio_isr |= mask;
+	else
+		m_lio_isr &= ~mask;
 
 	// update interrupt line
 	bool const lio_int = ~m_lio_isr & m_lio_imr;

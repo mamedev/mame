@@ -322,7 +322,7 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 {
 	if (offset < 0x400)
 	{
-		//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
+		//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context(), offset, mem_mask);
 
 		switch(offset)
 		{
@@ -343,7 +343,7 @@ READ16_MEMBER( rf5c400_device::rf5c400_r )
 
 			default:
 			{
-				//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context().c_str(), offset, mem_mask);
+				//osd_printf_debug("%s:rf5c400_r: %08X, %08X\n", machine().describe_context(), offset, mem_mask);
 				return 0;
 			}
 		}
@@ -458,11 +458,11 @@ WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 
 			default:
 			{
-				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
+				//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
 				break;
 			}
 		}
-		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context().c_str(), data, offset, mem_mask);
+		//osd_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
 	}
 	else
 	{

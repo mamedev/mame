@@ -1250,7 +1250,7 @@ void gba_state::gba_map(address_map &map)
 	map(0x06000000, 0x06017fff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
-	//AM_RANGE(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
+	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
 }
 

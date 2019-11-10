@@ -1758,20 +1758,13 @@ void c128_state::ntsc(machine_config &config)
 	QUICKLOAD(config, "quickload", "p00,prg", CBM_QUICKLOAD_DELAY).set_load_callback(FUNC(c128_state::quickload_c128), this);
 
 	// software list
-	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10");
-	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart");
-	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart");
-	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass");
-	SOFTWARE_LIST(config, "flop_list_c64").set_original("c64_flop");
-	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop");
-	SOFTWARE_LIST(config, "from_list").set_original("c128_rom");
-	subdevice<software_list_device>("cart_list_vic10")->set_filter("NTSC");
-	subdevice<software_list_device>("cart_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
-	subdevice<software_list_device>("cass_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list_c64")->set_filter("NTSC");
-	subdevice<software_list_device>("flop_list")->set_filter("NTSC");
-	subdevice<software_list_device>("from_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_vic10").set_original("vic10").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list_c64").set_original("c64_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("c128_cart").set_filter("NTSC");
+	SOFTWARE_LIST(config, "cass_list_c64").set_original("c64_cass").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list_c64").set_original("c64_flop").set_filter("NTSC");
+	SOFTWARE_LIST(config, "flop_list").set_original("c128_flop").set_filter("NTSC");
+	SOFTWARE_LIST(config, "from_list").set_original("c128_rom").set_filter("NTSC");
 
 	// function ROM
 	GENERIC_SOCKET(config, "from", generic_plain_slot, "c128_rom", "bin,rom");

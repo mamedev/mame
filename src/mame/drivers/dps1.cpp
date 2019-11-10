@@ -84,14 +84,14 @@ void dps1_state::io_map(address_map &map)
 	map(0xbe, 0xbf).w(FUNC(dps1_state::portbe_w)); // disable eprom
 	map(0xff, 0xff).rw(FUNC(dps1_state::portff_r), FUNC(dps1_state::portff_w));
 	// other allocated ports, optional
-	// AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("uart2", mc2661_device, read, write) // S2651
-	// AM_RANGE(0x08, 0x0b) parallel ports
-	// AM_RANGE(0x10, 0x11) // interrupt response
+	// map(0x04, 0x07).rw("uart2", FUNC(mc2661_device::read), FUNC(mc2661_device::write)); // S2651
+	// map(0x08, 0x0b) parallel ports
+	// map(0x10, 0x11) // interrupt response
 	map(0x14, 0x14).rw("am9519a", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x15, 0x15).rw("am9519a", FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
 	map(0x16, 0x16).rw("am9519b", FUNC(am9519_device::data_r), FUNC(am9519_device::data_w));
 	map(0x17, 0x17).rw("am9519b", FUNC(am9519_device::stat_r), FUNC(am9519_device::cmd_w));
-	// AM_RANGE(0x18, 0x1f) control lines 0 to 7
+	// map(0x18, 0x1f) control lines 0 to 7
 	map(0xe0, 0xe3).noprw(); //unknown device
 }
 

@@ -6907,13 +6907,25 @@ has been replaced with an all-zero block. -->
 
 	<!-- dumped from an Olivetti Prodest PC1 branded release -->
 	<software name="actnserv" supported="no">
-		<description>Action Service</description>
+		<description>Action Service (5.25")</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
 		<info name="developer" value="Cobra Soft" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
 				<rom name="ActionService.dsk" size="368640" crc="eda62ae8" sha1="1917192e6c2eedf109029693c07194d13355578b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actnserv35" cloneof="actnserv">
+		<description>Action Service (Smash16 release) (3.5")</description>
+		<year>1990</year>
+		<publisher>Smash16</publisher>
+		<info name="developer" value="Cobra Soft" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Action Service (Smash16 release) [Cobra Soft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="9e65ac5e" sha1="e300c2d745fe2ca765312b765352c69ee4b6b883"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8818,6 +8830,42 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
+	<software name="italy90">
+		<description>Italy '90 Soccer</description>
+		<year>1989</year>
+		<publisher>Simulmondo</publisher>
+		<info name="developer" value="Dardari Bros." />
+		<info name="usage" value="PC Booter" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Italy '90 Soccer [Simulmondo] [1989] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7bfdc1e0" sha1="0dbbc892ce27ace5da144ff8c6a9a55a2f295c32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="intkarat">
+		<description>International Karate</description>
+		<year>1990</year>
+		<publisher>System 3 Software</publisher>
+		<info name="developer" value="System 3 Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="International Karate (Prism Leisure release) [System 3] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="e8b3d837" sha1="a469f0bb4bdd27b7c72366dbc9223d532f9031de"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joeblade">
+		<description>Joe Blade (Smash16 release)</description>
+		<year>1992</year>
+		<publisher>Interceptor Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Joe Blade (Smash16 release) [Interceptor Software] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="69a11fc6" sha1="4a5265a03087ad94ee23f15de7896c9e1c069b7f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shogun">
 		<description>James Clavell's Shogun (set 1)</description>
 		<year>1987</year>
@@ -9312,7 +9360,7 @@ has been replaced with an all-zero block. -->
 		</part>
 	</software>
 
-	<software name="lombrall35" cloneof="lombrall"  supported="partial">
+	<software name="lombrall35" cloneof="lombrall" supported="partial">
 		<description>Lombard RAC Rally (3.5")</description>
 		<year>1989</year>
 		<publisher>Mandarin Software</publisher>
@@ -10103,6 +10151,17 @@ has been replaced with an all-zero block. -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="[PC] Outrun [3.5DD]  [Disk 1 of 1].img" size="737280" crc="5bf4afae" sha1="f189136da8ac284cfb3bf06b402328cd827a42a2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="outruna" cloneof="outrun">
+		<description>Out Run (Kixx release)</description>
+		<year>1989</year>
+		<publisher>Sega Computer Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Outrun (Kixx release) [Sega] [1989] [3.5DD]  [Disk 1 of 1].img" size="737280" crc="55bf00de" sha1="b48e9536263481ac283149c3ab679e9369027729"/>
 			</dataarea>
 		</part>
 	</software>
@@ -11209,6 +11268,23 @@ has been replaced with an all-zero block. -->
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Star Trek V - The Final Frontier [Mindscape] [1989] [3.5DD] [Disk 3 of 3].img" size="737280" crc="c2de0c66" sha1="9dfd73c44c828b67f408eb5273b73b42e871964d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starflt">
+		<description>Starflight</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Binary Systems" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 1 of 2].img" size="368640" crc="9e50175b" sha1="496bea78bb92544882f4f3df2404482929f14d0d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Starflight [Electronic Arts] [1986] [5.25''DD] [Disk 2 of 2].img" size="368640" crc="a0d1c41d" sha1="7a2c8628736d376543c3ac12959050f3ae03c791"/>
 			</dataarea>
 		</part>
 	</software>

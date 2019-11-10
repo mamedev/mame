@@ -1227,7 +1227,7 @@ int renderer_d3d9::config_adapter_mode()
 		// make sure it's a pixel format we can get behind
 		if (m_pixformat != D3DFMT_X1R5G5B5 && m_pixformat != D3DFMT_R5G6B5 && m_pixformat != D3DFMT_X8R8G8B8)
 		{
-			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename().c_str());
+			osd_printf_error("Device %s currently in an unsupported mode\n", win->monitor()->devicename());
 			return 1;
 		}
 	}
@@ -1250,7 +1250,7 @@ int renderer_d3d9::config_adapter_mode()
 	result = d3dintf->d3dobj->CheckDeviceType(m_adapter, D3DDEVTYPE_HAL, m_pixformat, m_pixformat, !win->fullscreen());
 	if (FAILED(result))
 	{
-		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename().c_str());
+		osd_printf_error("Proposed video mode not supported on device %s\n", win->monitor()->devicename());
 		return 1;
 	}
 

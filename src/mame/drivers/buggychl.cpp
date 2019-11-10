@@ -223,11 +223,11 @@ void buggychl_state::buggychl_map(address_map &map)
 	map(0xd603, 0xd603).mirror(0x00e4).portr("IN0");    /* player inputs */
 	map(0xd608, 0xd608).mirror(0x00e4).portr("WHEEL");
 	map(0xd609, 0xd609).mirror(0x00e4).portr("IN1");    /* coin + accelerator */
-//  AM_RANGE(0xd60a, 0xd60a) AM_MIRROR(0x00e4) // other inputs, not used?
-//  AM_RANGE(0xd60b, 0xd60b) AM_MIRROR(0x00e4) // other inputs, not used?
+//  map(0xd60a, 0xd60a).mirror(0x00e4); // other inputs, not used?
+//  map(0xd60b, 0xd60b).mirror(0x00e4); // other inputs, not used?
 	map(0xd610, 0xd610).mirror(0x00e4).r(m_soundlatch2, FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0xd611, 0xd611).mirror(0x00e4).r(FUNC(buggychl_state::sound_status_main_r));
-//  AM_RANGE(0xd613, 0xd613) AM_MIRROR(0x00e4) AM_WRITE(sound_reset_w)
+//  map(0xd613, 0xd613).mirror(0x00e4).w(FUNC(buggychl_state::sound_reset_w));
 	map(0xd618, 0xd618).mirror(0x00e7).nopw();    /* accelerator clear; TODO: should we emulate the proper quadrature counter here? */
 	map(0xd700, 0xd7ff).w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xd820, 0xd83f).ram(); // TODO

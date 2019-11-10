@@ -225,7 +225,6 @@ private:
 	void ghox_68k_mem(address_map &map);
 	void ghox_hd647180_mem_map(address_map &map);
 	void hd647180_io_map(address_map &map);
-	void hd647180_mem_map(address_map &map);
 	void kbash2_68k_mem(address_map &map);
 	void kbash_68k_mem(address_map &map);
 	void kbash_v25_mem(address_map &map);

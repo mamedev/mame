@@ -298,7 +298,7 @@ void liberate_state::deco16_io_map(address_map &map)
 void liberate_state::prosoccr_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w(FUNC(liberate_state::prosoccr_io_bank_w));
-	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
+	//map(0x01, 0x01).portr("TILT");
 }
 
 void liberate_state::liberatb_map(address_map &map)

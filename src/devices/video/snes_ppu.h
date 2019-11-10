@@ -31,7 +31,7 @@
 #define SNES_PAL              0x10
 
 
-#define SNES_LAYER_DEBUG  0
+#define SNES_LAYER_DEBUG  1
 
 
 // ======================> snes_ppu_device
@@ -111,7 +111,7 @@ protected:
 
 	SNES_SCANLINE m_scanlines[2];
 
-	struct
+	struct layer_t
 	{
 		/* clipmasks */
 		uint8_t window1_enabled, window1_invert;
@@ -120,11 +120,12 @@ protected:
 		/* color math enabled */
 		uint8_t color_math;
 
-		uint8_t charmap;
-		uint8_t tilemap;
+		uint16_t charmap;
+		uint16_t tilemap;
 		uint8_t tilemap_size;
 
 		uint8_t tile_size;
+		uint8_t tile_mode;
 		uint8_t mosaic_enabled;   // actually used only for layers 0->3!
 
 		uint8_t main_window_enabled;
@@ -134,7 +135,14 @@ protected:
 
 		uint16_t hoffs;
 		uint16_t voffs;
-	} m_layer[6]; // this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
+
+		uint8_t priority[2];
+
+		uint16_t mosaic_counter;
+		uint16_t mosaic_offset;
+	};
+
+	layer_t m_layer[6]; // this is for the BG1 - BG2 - BG3 - BG4 - OBJ - color layers
 
 	struct
 	{
@@ -219,7 +227,7 @@ protected:
 	uint8_t m_clip_to_black;
 	uint8_t m_prevent_color_math;
 	uint8_t m_sub_add_mode;
-	uint8_t m_bg3_priority_bit;
+	uint8_t m_bg_priority;
 	uint8_t m_direct_color;
 	uint8_t m_ppu_last_scroll;      /* as per Anomie's doc and Theme Park, all scroll regs shares (but mode 7 ones) the same
 	                               'previous' scroll value */
@@ -262,9 +270,10 @@ protected:
 	inline void draw_bgtile_hires(uint8_t layer, int16_t ii, uint8_t colour, uint16_t pal, uint8_t direct_colors, uint8_t priority);
 	inline void draw_oamtile(int16_t ii, uint8_t colour, uint16_t pal, uint8_t priority);
 	inline void draw_tile(uint8_t planes, uint8_t layer, uint32_t tileaddr, int16_t x, uint8_t priority, uint8_t flip, uint8_t direct_colors, uint16_t pal, uint8_t hires);
-	inline uint32_t get_tmap_addr(uint8_t layer, uint8_t tile_size, uint32_t base, uint32_t x, uint32_t y);
-	inline void update_line(uint16_t curline, uint8_t layer, uint8_t priority_b, uint8_t priority_a, uint8_t color_depth, uint8_t hires, uint8_t offset_per_tile, uint8_t direct_colors);
-	void update_line_mode7(uint16_t curline, uint8_t layer, uint8_t priority_b, uint8_t priority_a);
+	inline uint32_t get_tmap_addr(uint8_t layer, uint8_t hires, uint8_t tile_size, uint32_t base, uint32_t x, uint32_t y);
+	inline uint32_t get_tile(uint8_t layer_idx, uint32_t hoffset, uint32_t voffset);
+	inline void update_line(uint16_t curline, uint8_t layer, uint8_t direct_colors);
+	void update_line_mode7(uint16_t curline, uint8_t layer);
 	void update_obsel(void);
 	void oam_list_build(void);
 	int is_sprite_on_scanline(uint16_t curline, uint8_t sprite);
@@ -281,6 +290,9 @@ protected:
 	void draw_screens(uint16_t curline);
 	void update_windowmasks(void);
 	void update_offsets(void);
+	void update_video_mode(void);
+	void cache_background(void);
+	uint16_t direct_color(uint16_t palette, uint16_t group);
 	inline void draw_blend(uint16_t offset, uint16_t *colour, uint8_t prevent_color_math, uint8_t black_pen_clip, int switch_screens);
 
 	void dynamic_res_change();

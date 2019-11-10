@@ -465,7 +465,7 @@ READ_LINE_MEMBER( comx35_state::ef2_r )
 
 READ_LINE_MEMBER( comx35_state::ef4_r )
 {
-	return m_exp->ef4_r() | (m_cassette->input() > 0.0f);
+	return m_exp->ef4_r() | ((m_cassette->input() > 0.0f) ? 1 : 0);
 }
 
 WRITE_LINE_MEMBER( comx35_state::q_w )

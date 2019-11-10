@@ -9,27 +9,27 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass1" interface="sc3000_cass">
 			<dataarea name="cass" size="1660342">
-				<rom name="TheSecretOfBastowManor_Pt1.wav" size="1660342" crc="4e26b753" sha1="e23d728b3959cf5f42b62f1495c33e65aa06580e" offset="0" />
+				<rom name="TheSecretOfBastowManor_Pt1.wav" size="1660342" crc="4e26b753" sha1="e23d728b3959cf5f42b62f1495c33e65aa06580e"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sc3000_cass">
 			<dataarea name="cass" size="3383930">
-				<rom name="TheSecretOfBastowManor_Pt2.wav" size="3383930" crc="8a023fe8" sha1="9d00a27a08850ee10f786f8cf0c446a4eb415873" offset="0" />
+				<rom name="TheSecretOfBastowManor_Pt2.wav" size="3383930" crc="8a023fe8" sha1="9d00a27a08850ee10f786f8cf0c446a4eb415873"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sc3000_cass">
 			<dataarea name="cass" size="9604160">
-				<rom name="TheSecretOfBastowManor_Pt3.wav" size="9604160" crc="bc2db5c6" sha1="2281f015dffb522bda928dd7a04685b96f239a64" offset="0" />
+				<rom name="TheSecretOfBastowManor_Pt3.wav" size="9604160" crc="bc2db5c6" sha1="2281f015dffb522bda928dd7a04685b96f239a64"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sc3000_cass">
 			<dataarea name="cass" size="9635070">
-				<rom name="TheSecretOfBastowManor_Pt4.wav" size="9635070" crc="16adb5ff" sha1="ddae963d717e6bf0e74c07bbaeb947ddda44c48f" offset="0" />
+				<rom name="TheSecretOfBastowManor_Pt4.wav" size="9635070" crc="16adb5ff" sha1="ddae963d717e6bf0e74c07bbaeb947ddda44c48f"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sc3000_cass">
 			<dataarea name="cass" size="8990380">
-				<rom name="TheSecretOfBastowManor_Pt5.wav" size="8990380" crc="64febb9b" sha1="047cebfc04bb038f61d938fb4f5c3ecb26f91e64" offset="0" />
+				<rom name="TheSecretOfBastowManor_Pt5.wav" size="8990380" crc="64febb9b" sha1="047cebfc04bb038f61d938fb4f5c3ecb26f91e64"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="7141680">
-				<rom name="CityLander.wav" size="7141680" crc="4570cb68" sha1="868fa0a002d02805533fdfb027853fcf613c4e13" offset="0" />
+				<rom name="CityLander.wav" size="7141680" crc="4570cb68" sha1="868fa0a002d02805533fdfb027853fcf613c4e13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="10451972">
-				<rom name="Dragonquest.wav" size="10451972" crc="39e55170" sha1="01c5ad7697ad980401781ec9eae33e359e30f67d" offset="0" />
+				<rom name="Dragonquest.wav" size="10451972" crc="39e55170" sha1="01c5ad7697ad980401781ec9eae33e359e30f67d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="14216966">
-				<rom name="DungeonsBeneathCairo.wav" size="14216966" crc="49ec80c2" sha1="36bfc2d0cb992de1aecff1851ed4d7c514bf4f25" offset="0" />
+				<rom name="DungeonsBeneathCairo.wav" size="14216966" crc="49ec80c2" sha1="36bfc2d0cb992de1aecff1851ed4d7c514bf4f25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="9565890">
-				<rom name="Environoid.wav" size="9565890" crc="8f878a44" sha1="5e826099ac4c8af7865df990cdaa96455e9ce6d9" offset="0" />
+				<rom name="Environoid.wav" size="9565890" crc="8f878a44" sha1="5e826099ac4c8af7865df990cdaa96455e9ce6d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="18196834">
-				<rom name="Help.wav" size="18196834" crc="cd952d6b" sha1="6d32dd33f884677c54300be57a8cdaf283478a82" offset="0" />
+				<rom name="Help.wav" size="18196834" crc="cd952d6b" sha1="6d32dd33f884677c54300be57a8cdaf283478a82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -104,7 +104,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="25191280">
-				<rom name="TheHouse.wav" size="25191280" crc="85b183d2" sha1="a222e8763a357b4f962b207b6c7d4b73bbc841a9" offset="0" />
+				<rom name="TheHouse.wav" size="25191280" crc="85b183d2" sha1="a222e8763a357b4f962b207b6c7d4b73bbc841a9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -116,7 +116,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4539370">
-				<rom name="Lawn.wav" size="4539370" crc="bcc0d3ae" sha1="fe453dcf1db4f1f2972367a734488c482a6a9cc8" offset="0" />
+				<rom name="Lawn.wav" size="4539370" crc="bcc0d3ae" sha1="fe453dcf1db4f1f2972367a734488c482a6a9cc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,27 +128,27 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass1" interface="sc3000_cass">
 			<dataarea name="cass" size="1471940">
-				<rom name="TheCaseOfTheMadMummy_Pt1.wav" size="1471940" crc="015e9f5a" sha1="f9dad83618df356ec90c4e6b17c79d60548c86b7" offset="0" />
+				<rom name="TheCaseOfTheMadMummy_Pt1.wav" size="1471940" crc="015e9f5a" sha1="f9dad83618df356ec90c4e6b17c79d60548c86b7"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="sc3000_cass">
 			<dataarea name="cass" size="7096050">
-				<rom name="TheCaseOfTheMadMummy_Pt2.wav" size="7096050" crc="78373569" sha1="2b671bda5e4c2f59cd5e8e19038326229215f567" offset="0" />
+				<rom name="TheCaseOfTheMadMummy_Pt2.wav" size="7096050" crc="78373569" sha1="2b671bda5e4c2f59cd5e8e19038326229215f567"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="sc3000_cass">
 			<dataarea name="cass" size="8716606">
-				<rom name="TheCaseOfTheMadMummy_Pt3.wav" size="8716606" crc="46ea34d1" sha1="821b2a7825bf0e2a3586f3eb77ccfe1a6f5d4cda" offset="0" />
+				<rom name="TheCaseOfTheMadMummy_Pt3.wav" size="8716606" crc="46ea34d1" sha1="821b2a7825bf0e2a3586f3eb77ccfe1a6f5d4cda"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="sc3000_cass">
 			<dataarea name="cass" size="8759294">
-				<rom name="TheCaseOfTheMadMummy_Pt4.wav" size="8759294" crc="e02d43f2" sha1="fa82ea479117106547f5d633fb261aefb9389c59" offset="0" />
+				<rom name="TheCaseOfTheMadMummy_Pt4.wav" size="8759294" crc="e02d43f2" sha1="fa82ea479117106547f5d633fb261aefb9389c59"/>
 			</dataarea>
 		</part>
 		<part name="cass5" interface="sc3000_cass">
 			<dataarea name="cass" size="7711302">
-				<rom name="TheCaseOfTheMadMummy_Pt5.wav" size="7711302" crc="393fb342" sha1="475ea7799c735bbb967aac38deba5f435dae9e95" offset="0" />
+				<rom name="TheCaseOfTheMadMummy_Pt5.wav" size="7711302" crc="393fb342" sha1="475ea7799c735bbb967aac38deba5f435dae9e95"/>
 			</dataarea>
 		</part>
 	</software>
@@ -160,7 +160,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4331832">
-				<rom name="QuickDraw.wav" size="4331832" crc="1e6b2539" sha1="01d74b28d4d156aa5c111bfb31e568c4f2bbfdb9" offset="0" />
+				<rom name="QuickDraw.wav" size="4331832" crc="1e6b2539" sha1="01d74b28d4d156aa5c111bfb31e568c4f2bbfdb9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -172,7 +172,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="14320112">
-				<rom name="SolarConquest.wav" size="14320112" crc="7c3653f9" sha1="0c74aabf394f4d765df130a93625c1db72189d98" offset="0" />
+				<rom name="SolarConquest.wav" size="14320112" crc="7c3653f9" sha1="0c74aabf394f4d765df130a93625c1db72189d98"/>
 			</dataarea>
 		</part>
 	</software>
@@ -185,7 +185,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="9770486">
-				<rom name="VideoPoker.wav" size="9770486" crc="88a59002" sha1="bfaa050f28b855a856039effcc0498484070f370" offset="0" />
+				<rom name="VideoPoker.wav" size="9770486" crc="88a59002" sha1="bfaa050f28b855a856039effcc0498484070f370"/>
 			</dataarea>
 		</part>
 	</software>
@@ -198,7 +198,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4364214">
-				<rom name="Voltron.wav" size="4364214" crc="39589e11" sha1="951c4166299dfc52518bbec67000aa504ff7563b" offset="0" />
+				<rom name="Voltron.wav" size="4364214" crc="39589e11" sha1="951c4166299dfc52518bbec67000aa504ff7563b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -210,7 +210,7 @@
 		<info name="usage" value="Requires BASIC Level 3 cartridge" />
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="31128834">
-				<rom name="vortex blaster 2.wav" size="31128834" crc="242851df" sha1="5a0be3c35317ff39e2e687c72bb1ea73e3b6cd28" offset="0" />
+				<rom name="vortex blaster 2.wav" size="31128834" crc="242851df" sha1="5a0be3c35317ff39e2e687c72bb1ea73e3b6cd28"/>
 			</dataarea>
 		</part>
 	</software>

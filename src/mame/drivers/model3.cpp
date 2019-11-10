@@ -1158,7 +1158,7 @@ READ64_MEMBER(model3_state::real3d_dma_r)
 			}
 			break;
 	}
-	osd_printf_debug("real3d_dma_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
+	osd_printf_debug("real3d_dma_r: %08X, %016X\n", offset, mem_mask);
 	return 0;
 }
 

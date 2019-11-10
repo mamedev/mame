@@ -241,12 +241,12 @@ void spdodgeb_state::spdodgeb_map(address_map &map)
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x10ff).writeonly().share("spriteram");
 	map(0x2000, 0x2fff).ram().w(FUNC(spdodgeb_state::videoram_w)).share("videoram");
-	map(0x3000, 0x3000).portr("IN0"); //AM_WRITENOP
-	map(0x3001, 0x3001).portr("DSW"); //AM_WRITENOP
+	map(0x3000, 0x3000).portr("IN0"); //.nopw();
+	map(0x3001, 0x3001).portr("DSW"); //.nopw();
 	map(0x3002, 0x3002).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x3003, 0x3003) AM_WRITENOP
+//  map(0x3003, 0x3003).nopw();
 	map(0x3004, 0x3004).w(FUNC(spdodgeb_state::scrollx_lo_w));
-//  AM_RANGE(0x3005, 0x3005) AM_WRITENOP         /* mcu63701_output_w */
+//  map(0x3005, 0x3005).nopw();         /* mcu63701_output_w */
 	map(0x3006, 0x3006).w(FUNC(spdodgeb_state::ctrl_w));  /* scroll hi, flip screen, bank switch, palette select */
 	map(0x3800, 0x3800).w(FUNC(spdodgeb_state::mcu63701_w));
 	map(0x3801, 0x3805).r(FUNC(spdodgeb_state::mcu63701_r));

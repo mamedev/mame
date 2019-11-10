@@ -110,7 +110,7 @@ void mephisto_pinball_state::mephisto_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x10000, 0x107ff).ram().share("nvram");
-	map(0x12000, 0x1201f).noprw(); //AM_DEVREADWRITE("muart", i8256_device, read, write)
+	map(0x12000, 0x1201f).noprw(); //.rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x13000, 0x130ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));

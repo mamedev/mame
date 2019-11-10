@@ -17,7 +17,6 @@
 
 #include "chainentry.h"
 
-class render_primitive;
 class bgfx_slider;
 class bgfx_parameter;
 class texture_manager;
@@ -31,14 +30,17 @@ public:
 	bgfx_chain(std::string name, std::string author, bool transform, target_manager& targets, std::vector<bgfx_slider*> sliders, std::vector<bgfx_parameter*> params, std::vector<bgfx_chain_entry*> entries, std::vector<bgfx_target*> target_list, uint32_t screen_index);
 	~bgfx_chain();
 
-	void process(render_primitive* prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
+	void process(chain_manager::screen_prim &prim, int view, int screen, texture_manager& textures, osd_window &window, uint64_t blend = 0L);
 	void repopulate_targets();
 
 	// Getters
 	std::vector<bgfx_slider*>& sliders() { return m_sliders; }
 	std::vector<bgfx_chain_entry*>& entries() { return m_entries; }
 	uint32_t applicable_passes();
-	bool transform() { return m_transform; }
+	bool transform() const { return m_transform; }
+	bool has_converter() const { return m_has_converter; }
+
+	void prepend_converter(bgfx_effect *effect, chain_manager &chains);
 
 private:
 	std::string                         m_name;
@@ -53,6 +55,7 @@ private:
 	std::map<std::string, bgfx_target*> m_target_map;
 	int64_t                             m_current_time;
 	uint32_t                            m_screen_index;
+	bool                                m_has_converter;
 };
 
 #endif // __DRAWBGFX_CHAIN__

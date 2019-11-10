@@ -114,7 +114,7 @@ private:
 	bool     m_sound_frequency_test_bit;
 	bool     m_sound_mode;
 	u8       m_stereo_image[8];
-	const float m_sound_input_gain = 0.05;
+	const float m_sound_input_gain = 0.05f;
 	const int m_sound_max_channels = 8;
 	int16_t  m_ulaw_lookup[256];
 	void refresh_sound_frequency();

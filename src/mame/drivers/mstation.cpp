@@ -288,7 +288,7 @@ void mstation_state::mstation_io(address_map &map)
 	map(0x07, 0x08).rw(FUNC(mstation_state::bank2_r), FUNC(mstation_state::bank2_w));
 	map(0x09, 0x09).r(FUNC(mstation_state::battery_status_r));
 	map(0x10, 0x1f).rw("rtc", FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
-	//AM_RANGE( 0x2c, 0x2c ) printer
+	//map(0x2c, 0x2c) printer
 }
 
 

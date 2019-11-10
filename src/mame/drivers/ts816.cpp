@@ -87,7 +87,7 @@ void ts816_state::ts816_io(address_map &map)
 	map(0x38, 0x3b).rw("sio7", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 7 for user 13 & 14
 	map(0x40, 0x43).rw("sio4", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 4 for user 7 & 8
 	map(0x48, 0x4b).rw("sio8", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 8 for user 15 & 16
-	//AM_RANGE(0x50, 0x53) // SIO 0 for RS232 1 and part of tape interface
+	//map(0x50, 0x53) // SIO 0 for RS232 1 and part of tape interface
 	map(0x50, 0x50).r(FUNC(ts816_state::keyin_r)).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x52, 0x52).r(FUNC(ts816_state::status_r));
 	map(0x58, 0x5b).rw("sio9", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w)); // SIO 9 for RS232 2 & 3

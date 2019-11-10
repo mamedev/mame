@@ -203,15 +203,15 @@ void msisaac_state::msisaac_map(address_map &map)
 	map(0xf082, 0xf082).portr("DSW3");
 	map(0xf083, 0xf083).portr("IN0");
 	map(0xf084, 0xf084).portr("IN1");
-//  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
+//  map(0xf086, 0xf086).portr("IN2");
 
 	map(0xf100, 0xf17f).ram().share("spriteram");   //sprites
 	map(0xf400, 0xf7ff).ram().w(FUNC(msisaac_state::msisaac_fg_videoram_w)).share("videoram");
 	map(0xf800, 0xfbff).ram().w(FUNC(msisaac_state::msisaac_bg2_videoram_w)).share("videoram3");
 	map(0xfc00, 0xffff).ram().w(FUNC(msisaac_state::msisaac_bg_videoram_w)).share("videoram2");
-//  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
-//  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
-//  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
+//  map(0xf801, 0xf801).w(FUNC(msisaac_state::msisaac_bgcolor_w));
+//  map(0xfc00, 0xfc00).w(FUNC(msisaac_state::flip_screen_w));
+//  map(0xfc03, 0xfc04).w(FUNC(msisaac_state::msisaac_coin_counter_w));
 }
 
 WRITE8_MEMBER(msisaac_state::sound_control_0_w)

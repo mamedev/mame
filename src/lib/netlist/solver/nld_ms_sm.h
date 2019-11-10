@@ -90,14 +90,16 @@ namespace devices
 		float_ext_type &lAinv(const T1 &r, const T2 &c) { return m_lAinv[r][c]; }
 
 	private:
+		template <typename T, std::size_t N, std::size_t M>
+		using array2D = std::array<std::array<T, M>, N>;
 		static constexpr std::size_t m_pitch  = (((  storage_N) + 7) / 8) * 8;
-		float_ext_type m_A[storage_N][m_pitch];
-		float_ext_type m_Ainv[storage_N][m_pitch];
-		float_ext_type m_W[storage_N][m_pitch];
+		array2D<float_ext_type, storage_N, m_pitch> m_A;
+		array2D<float_ext_type, storage_N, m_pitch> m_Ainv;
+		array2D<float_ext_type, storage_N, m_pitch> m_W;
 		std::array<float_ext_type, storage_N> m_RHS; // right hand side - contains currents
 
-		float_ext_type m_lA[storage_N][m_pitch];
-		float_ext_type m_lAinv[storage_N][m_pitch];
+		array2D<float_ext_type, storage_N, m_pitch> m_lA;
+		array2D<float_ext_type, storage_N, m_pitch> m_lAinv;
 
 		//float_ext_type m_RHSx[storage_N];
 
@@ -208,7 +210,14 @@ namespace devices
 		static constexpr const bool incremental = true;
 		const std::size_t iN = size();
 
-		std::array<float_type, storage_N> new_V; // = { 0.0 };
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<float_type, storage_N> new_V;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<float_type, m_pitch> v;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<std::size_t, m_pitch> cols;
+		// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+		std::array<float_type, m_pitch> z;
 
 		if ((m_cnt % 50) == 0)
 		{
@@ -225,8 +234,6 @@ namespace devices
 			}
 			for (std::size_t row = 0; row < iN; row ++)
 			{
-				std::array<float_type, m_pitch> v = {0};
-				std::array<std::size_t, m_pitch> cols;
 				std::size_t colcount = 0;
 
 				auto &nz = m_terms[row]->m_nz;
@@ -244,7 +251,6 @@ namespace devices
 					float_type lamba = 0.0;
 					std::array<float_type, m_pitch> w = {0};
 
-					std::array<float_type, m_pitch> z;
 					/* compute w and lamba */
 					for (std::size_t i = 0; i < iN; i++)
 						z[i] = Ainv(i, row); /* u is row'th column */
@@ -295,7 +301,7 @@ namespace devices
 	template <typename FT, int SIZE>
 	matrix_solver_sm_t<FT, SIZE>::matrix_solver_sm_t(netlist_state_t &anetlist, const pstring &name,
 			const solver_parameters_t *params, const std::size_t size)
-	: matrix_solver_t(anetlist, name, NOSORT, params)
+	: matrix_solver_t(anetlist, name, params)
 	, m_dim(size)
 	, m_cnt(0)
 	{

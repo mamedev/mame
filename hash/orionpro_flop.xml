@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="disk01p.odi" size="819200" crc="df89e2b3" sha1="4b1ca5c4657c16c277738120a412cf2138ccab5a" offset="0" />
+				<rom name="disk01p.odi" size="819200" crc="df89e2b3" sha1="4b1ca5c4657c16c277738120a412cf2138ccab5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__corona__p4.odi" size="819200" crc="52022a60" sha1="b22293950f17b2397bf084afc0c5f38f7017fdf2" offset="0" />
+				<rom name="error404-1_disks_pro__corona__p4.odi" size="819200" crc="52022a60" sha1="b22293950f17b2397bf084afc0c5f38f7017fdf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__pro_rom_100__pro_v100.odi" size="819200" crc="9495c1d0" sha1="cc33b1a289785febdb62528859d6aecc38eabd4f" offset="0" />
+				<rom name="error404-1_disks_pro__pro_rom_100__pro_v100.odi" size="819200" crc="9495c1d0" sha1="cc33b1a289785febdb62528859d6aecc38eabd4f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__pro_soft__p3.odi" size="819200" crc="e6189f5c" sha1="bb24e68afc37897e0b70c3feaf43926fdbf2a749" offset="0" />
+				<rom name="error404-1_disks_pro__pro_soft__p3.odi" size="819200" crc="e6189f5c" sha1="bb24e68afc37897e0b70c3feaf43926fdbf2a749"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__pro_tp30__p02.odi" size="819200" crc="fb4341e4" sha1="a0fa66c8757f9959734de412d512d03d318fdc0e" offset="0" />
+				<rom name="error404-1_disks_pro__pro_tp30__p02.odi" size="819200" crc="fb4341e4" sha1="a0fa66c8757f9959734de412d512d03d318fdc0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__pro_tp30_doc__p2.odi" size="819200" crc="688b9068" sha1="423ed31e21cebfa301d688dbca3608bbf7fbc660" offset="0" />
+				<rom name="error404-1_disks_pro__pro_tp30_doc__p2.odi" size="819200" crc="688b9068" sha1="423ed31e21cebfa301d688dbca3608bbf7fbc660"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__prodos_101__p1.odi" size="819200" crc="7e31d286" sha1="8696a28b8a00396a2d7e69dbae66bd2ca4bd2c4a" offset="0" />
+				<rom name="error404-1_disks_pro__prodos_101__p1.odi" size="819200" crc="7e31d286" sha1="8696a28b8a00396a2d7e69dbae66bd2ca4bd2c4a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__prodos_200__prodos20.odi" size="819200" crc="b3411437" sha1="690655f73c6f0eca59fb5b88f97be875a2760b18" offset="0" />
+				<rom name="error404-1_disks_pro__prodos_200__prodos20.odi" size="819200" crc="b3411437" sha1="690655f73c6f0eca59fb5b88f97be875a2760b18"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="error404-1_disks_pro__utils_cpm__disk01p.odi" size="819200" crc="f216b157" sha1="aab948dd9bd19de18fd864468b36e12a547bb56a" offset="0" />
+				<rom name="error404-1_disks_pro__utils_cpm__disk01p.odi" size="819200" crc="f216b157" sha1="aab948dd9bd19de18fd864468b36e12a547bb56a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="prodos20.odi" size="819200" crc="f9db9796" sha1="a7b7d5c482d43629f2f07bde29fe487bb56b7a9c" offset="0" />
+				<rom name="prodos20.odi" size="819200" crc="f9db9796" sha1="a7b7d5c482d43629f2f07bde29fe487bb56b7a9c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="textpics__pro_1__31.odi" size="819200" crc="6efcf796" sha1="8b4fe9a52b4b0bc1866d5255b05fc169883f3f35" offset="0" />
+				<rom name="textpics__pro_1__31.odi" size="819200" crc="6efcf796" sha1="8b4fe9a52b4b0bc1866d5255b05fc169883f3f35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="textpics__pro_2__28.odi" size="819200" crc="1ea263ba" sha1="6e6e21a2eef6919751e912067a92fa8479d62031" offset="0" />
+				<rom name="textpics__pro_2__28.odi" size="819200" crc="1ea263ba" sha1="6e6e21a2eef6919751e912067a92fa8479d62031"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="doc_doc_2__bios_pro.odi" size="819200" crc="dd5caf42" sha1="36c418a255923e7137a5be72787cb9f746dfba96" offset="0" />
+				<rom name="doc_doc_2__bios_pro.odi" size="819200" crc="dd5caf42" sha1="36c418a255923e7137a5be72787cb9f746dfba96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,7 +151,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="doc_doc_2__p20.odi" size="819200" crc="dd5caf42" sha1="36c418a255923e7137a5be72787cb9f746dfba96" offset="0" />
+				<rom name="doc_doc_2__p20.odi" size="819200" crc="dd5caf42" sha1="36c418a255923e7137a5be72787cb9f746dfba96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="doc_doc_3__bios_pro.odi" size="819200" crc="ab7c0b28" sha1="e94fa5811919a2a7c42e5a8f4ade3a7c4e929d5c" offset="0" />
+				<rom name="doc_doc_3__bios_pro.odi" size="819200" crc="ab7c0b28" sha1="e94fa5811919a2a7c42e5a8f4ade3a7c4e929d5c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__bascom_pushkov__bascom.odi" size="819200" crc="94a6de7e" sha1="34cbb8ce720d3aff35ff021d74514b25263869e0" offset="0" />
+				<rom name="soft__bascom_pushkov__bascom.odi" size="819200" crc="94a6de7e" sha1="34cbb8ce720d3aff35ff021d74514b25263869e0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__basic__p3.odi" size="819200" crc="e6189f5c" sha1="bb24e68afc37897e0b70c3feaf43926fdbf2a749" offset="0" />
+				<rom name="soft__basic__p3.odi" size="819200" crc="e6189f5c" sha1="bb24e68afc37897e0b70c3feaf43926fdbf2a749"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__corona10__p4.odi" size="819200" crc="52022a60" sha1="b22293950f17b2397bf084afc0c5f38f7017fdf2" offset="0" />
+				<rom name="soft__corona10__p4.odi" size="819200" crc="52022a60" sha1="b22293950f17b2397bf084afc0c5f38f7017fdf2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +206,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__corona22.odi" size="819200" crc="7b68c7df" sha1="0c798584d6590eaa9c6f057370f2bca1177f704f" offset="0" />
+				<rom name="soft__corona22.odi" size="819200" crc="7b68c7df" sha1="0c798584d6590eaa9c6f057370f2bca1177f704f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +217,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__m80__p5.odi" size="819200" crc="fe9872d0" sha1="0713d96ded956a20aff1a55f5001a38c0c360ef0" offset="0" />
+				<rom name="soft__m80__p5.odi" size="819200" crc="fe9872d0" sha1="0713d96ded956a20aff1a55f5001a38c0c360ef0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -228,7 +228,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__massm_pushkov__massm.odi" size="819200" crc="4aed60cd" sha1="fe4a6fedc01adc03ce875ca3a636350df6640a08" offset="0" />
+				<rom name="soft__massm_pushkov__massm.odi" size="819200" crc="4aed60cd" sha1="fe4a6fedc01adc03ce875ca3a636350df6640a08"/>
 			</dataarea>
 		</part>
 	</software>
@@ -239,7 +239,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="829440">
-				<rom name="soft__multifont20_pushkov__multifnt.odi" size="829440" crc="90fc7aec" sha1="109fe16d66ff3fc1b03409d708f82f7662bf4144" offset="0" />
+				<rom name="soft__multifont20_pushkov__multifnt.odi" size="829440" crc="90fc7aec" sha1="109fe16d66ff3fc1b03409d708f82f7662bf4144"/>
 			</dataarea>
 		</part>
 	</software>
@@ -250,7 +250,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="829440">
-				<rom name="soft__pas-1.odi" size="829440" crc="986f187b" sha1="1aff357779dc1c6639870ef66abc7b374603c7d4" offset="0" />
+				<rom name="soft__pas-1.odi" size="829440" crc="986f187b" sha1="1aff357779dc1c6639870ef66abc7b374603c7d4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +261,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__sound_pushkov__sound.odi" size="819200" crc="471e107a" sha1="f7e2b43b73556b6aa29fd2fd5b52ca78ab5eacba" offset="0" />
+				<rom name="soft__sound_pushkov__sound.odi" size="819200" crc="471e107a" sha1="f7e2b43b73556b6aa29fd2fd5b52ca78ab5eacba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -272,7 +272,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="829440">
-				<rom name="soft__tbasic410_pushkov__tbas-pro.odi" size="829440" crc="e306c505" sha1="69c2def53fdf7ea349df6c3f01ba362b813f91bd" offset="0" />
+				<rom name="soft__tbasic410_pushkov__tbas-pro.odi" size="829440" crc="e306c505" sha1="69c2def53fdf7ea349df6c3f01ba362b813f91bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -283,7 +283,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__tpascal30_1__p02.odi" size="819200" crc="fb4341e4" sha1="a0fa66c8757f9959734de412d512d03d318fdc0e" offset="0" />
+				<rom name="soft__tpascal30_1__p02.odi" size="819200" crc="fb4341e4" sha1="a0fa66c8757f9959734de412d512d03d318fdc0e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +294,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="soft__tpascalpro_pushkov__turbopro.odi" size="819200" crc="413906af" sha1="446c20066627d4bb29df2776fa75570bb122c37f" offset="0" />
+				<rom name="soft__tpascalpro_pushkov__turbopro.odi" size="819200" crc="413906af" sha1="446c20066627d4bb29df2776fa75570bb122c37f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +305,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="system__prodos_101_1__p1.odi" size="819200" crc="5c33177e" sha1="014620a8b051c8913844c4ad4e6987d5a9590afb" offset="0" />
+				<rom name="system__prodos_101_1__p1.odi" size="819200" crc="5c33177e" sha1="014620a8b051c8913844c4ad4e6987d5a9590afb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -316,7 +316,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="system__prodos_200__p1-pro.odi" size="819200" crc="c30983b6" sha1="4ca322eb91ce3db9a213c4f456281b7be88b8f96" offset="0" />
+				<rom name="system__prodos_200__p1-pro.odi" size="819200" crc="c30983b6" sha1="4ca322eb91ce3db9a213c4f456281b7be88b8f96"/>
 			</dataarea>
 		</part>
 	</software>
@@ -327,7 +327,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="system__rom_210_1__bios-210.odi" size="819200" crc="1916190c" sha1="704fb8f30a33dc8e28311768de1b2c86af715999" offset="0" />
+				<rom name="system__rom_210_1__bios-210.odi" size="819200" crc="1916190c" sha1="704fb8f30a33dc8e28311768de1b2c86af715999"/>
 			</dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="system__rom_210_src__list-5.odi" size="819200" crc="609089f4" sha1="0bd6879b9ab42379218657f541a6141b6cbe3e7c" offset="0" />
+				<rom name="system__rom_210_src__list-5.odi" size="819200" crc="609089f4" sha1="0bd6879b9ab42379218657f541a6141b6cbe3e7c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -349,7 +349,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk" interface="floppy_5_25">
 			<dataarea name="flop" size="819200">
-				<rom name="utils__ibm-disk.odi" size="819200" crc="79f84962" sha1="3f153034d9f8ca2dffda87638f1c18961ea2bf73" offset="0" />
+				<rom name="utils__ibm-disk.odi" size="819200" crc="79f84962" sha1="3f153034d9f8ca2dffda87638f1c18961ea2bf73"/>
 			</dataarea>
 		</part>
 	</software>

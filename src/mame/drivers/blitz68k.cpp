@@ -80,10 +80,11 @@ public:
 	{ }
 
 	void init_bankrob();
+	void init_bankroba();
+	void init_bankrobb();
 	void init_cjffruit();
 	void init_deucesw2();
 	void init_megadble();
-	void init_bankroba();
 	void init_maxidbl();
 	void init_cj3play();
 	void init_megadblj();
@@ -100,8 +101,11 @@ public:
 	void dualgame(machine_config &config);
 	void bankroba(machine_config &config);
 	void ramdac_config(machine_config &config);
-private:
 
+protected:
+	virtual void machine_start() override { m_leds.resolve(); }
+
+private:
 	DECLARE_WRITE16_MEMBER(blit_copy_w);
 	DECLARE_READ8_MEMBER(blit_status_r);
 	DECLARE_WRITE8_MEMBER(blit_x_w);
@@ -197,8 +201,6 @@ private:
 	void ramdac_map(address_map &map);
 	void steaser_map(address_map &map);
 
-	virtual void machine_start() override { m_leds.resolve(); }
-
 	optional_shared_ptr<uint16_t> m_nvram;
 	std::unique_ptr<uint8_t[]> m_blit_buffer;
 	optional_shared_ptr<uint16_t> m_frame_buffer;
@@ -216,6 +218,21 @@ private:
 	required_device<palette_device> m_palette;
 	optional_device<mc6845_device> m_crtc;
 	output_finder<17> m_leds;
+
+	struct blit_t
+	{
+		uint8_t x, y;
+		uint8_t w, h;
+		uint8_t addr[3];
+		uint8_t pen[4];
+		uint8_t flag[8];
+		uint8_t flipx, flipy;
+		uint8_t solid;
+		uint8_t trans;
+		int addr_factor;
+	};
+
+	blit_t m_blit;
 };
 
 /*************************************************************************************************************
@@ -224,40 +241,38 @@ private:
 
 *************************************************************************************************************/
 
-struct blit_t
-{
-	uint8_t x, y;
-	uint8_t w, h;
-	uint8_t addr[3];
-	uint8_t pen[4];
-	uint8_t flag[8];
-	uint8_t flipx, flipy;
-	uint8_t solid;
-	uint8_t trans;
-	int addr_factor;
-} blit;
-
 VIDEO_START_MEMBER(blitz68k_state,blitz68k)
 {
 	m_blit_buffer = std::make_unique<uint8_t[]>(512*256);
-	blit.addr_factor = 2;
+	m_blit.addr_factor = 2;
+
+	save_pointer(NAME(m_blit_buffer), 512*256);
+	save_item(NAME(m_blit.x));
+	save_item(NAME(m_blit.y));
+	save_item(NAME(m_blit.w));
+	save_item(NAME(m_blit.h));
+	save_item(NAME(m_blit.addr));
+	save_item(NAME(m_blit.pen));
+	save_item(NAME(m_blit.flag));
+	save_item(NAME(m_blit.flipx));
+	save_item(NAME(m_blit.flipy));
+	save_item(NAME(m_blit.solid));
+	save_item(NAME(m_blit.trans));
 }
 
 VIDEO_START_MEMBER(blitz68k_state,blitz68k_addr_factor1)
 {
 	VIDEO_START_CALL_MEMBER(blitz68k);
-	blit.addr_factor = 1;
+	m_blit.addr_factor = 1;
 }
 
 uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	uint8_t *src = m_blit_buffer.get();
 
-	for(y = 0; y < 256; y++)
+	for(int y = 0; y < 256; y++)
 	{
-		for(x = 0; x < 512; x++)
+		for(int x = 0; x < 512; x++)
 		{
 			bitmap.pix32(y, x) = m_palette->pen(*src++);
 		}
@@ -271,13 +286,11 @@ uint32_t blitz68k_state::screen_update_blitz68k(screen_device &screen, bitmap_rg
 
 uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-
 	uint16_t *src = m_frame_buffer;
 
-	for(y = 0; y < 256; y++)
+	for(int y = 0; y < 256; y++)
 	{
-		for(x = 0; x < 512; )
+		for(int x = 0; x < 512; )
 		{
 			uint16_t pen = *src++;
 			bitmap.pix32(y, x++) = m_palette->pen((pen >>  8) & 0xf);
@@ -297,7 +310,7 @@ uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bi
     To do:
     - register names should be properly renamed
       "transpen" 8/2 is for layer clearance;
-      "transpen" 10/2 is the trasparency pen;
+      "transpen" 10/2 is the transparency pen;
       "vregs" are pen selects, they select the proper color to render, and are tied to the first three gfx offsets;
     - shrinking bit? (some pictures in steaser, "00" on top of ilpag)
     - draw direction (card choose in steaser, in service mode)
@@ -377,11 +390,11 @@ READ8_MEMBER(blitz68k_state::blit_status_r)
 
 WRITE8_MEMBER(blitz68k_state::blit_x_w)
 {
-	blit.x = data;
+	m_blit.x = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_y_w)
 {
-	blit.y = data;
+	m_blit.y = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_xy_w)
 {
@@ -394,11 +407,11 @@ WRITE8_MEMBER(blitz68k_state::blit_xy_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_w_w)
 {
-	blit.w = data;
+	m_blit.w = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_h_w)
 {
-	blit.h = data;
+	m_blit.h = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_wh_w)
 {
@@ -411,11 +424,11 @@ WRITE8_MEMBER(blitz68k_state::blit_wh_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_addr0_w)
 {
-	blit.addr[0] = data;
+	m_blit.addr[0] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_addr1_w)
 {
-	blit.addr[1] = data;
+	m_blit.addr[1] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
 {
@@ -426,63 +439,63 @@ WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
 }
 WRITE8_MEMBER(blitz68k_state::blit_addr2_w)
 {
-	blit.addr[2] = data;
+	m_blit.addr[2] = data;
 }
 
 
 WRITE8_MEMBER(blitz68k_state::blit_pens_w)
 {
-	blit.pen[offset] = data;
+	m_blit.pen[offset] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen0_w)
 {
-	blit.pen[0] = data;
+	m_blit.pen[0] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen1_w)
 {
-	blit.pen[1] = data;
+	m_blit.pen[1] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen2_w)
 {
-	blit.pen[2] = data;
+	m_blit.pen[2] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_pen3_w)
 {
-	blit.pen[3] = data;
+	m_blit.pen[3] = data;
 }
 
 
 WRITE8_MEMBER(blitz68k_state::blit_flag0_w)
 {
-	blit.flag[0] = data;
+	m_blit.flag[0] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flag1_w)
 {
-	blit.flag[1] = data;
+	m_blit.flag[1] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flipx_w)
 {
-	blit.flipx = data;
+	m_blit.flipx = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flipy_w)
 {
-	blit.flipy = data;
+	m_blit.flipy = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_solid_w)
 {
-	blit.solid = data;
+	m_blit.solid = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_trans_w)
 {
-	blit.trans = data;
+	m_blit.trans = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flag6_w)
 {
-	blit.flag[6] = data;
+	m_blit.flag[6] = data;
 }
 WRITE8_MEMBER(blitz68k_state::blit_flag7_w)
 {
-	blit.flag[7] = data;
+	m_blit.flag[7] = data;
 }
 
 WRITE8_MEMBER(blitz68k_state::blit_flags_w)
@@ -506,32 +519,32 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 	uint32_t src;
 
 	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", machine().describe_context(),
-				blit.x,  blit.y, blit.w, blit.h,
-				blit.addr[2], blit.addr[1], blit.addr[0],
-				blit.pen[0], blit.pen[1], blit.pen[2], blit.pen[3],
-				blit.flag[0], blit.flag[1], blit.flipx, blit.flipy,     blit.solid, blit.trans, blit.flag[6], blit.flag[7]
+				m_blit.x,  m_blit.y, m_blit.w, m_blit.h,
+				m_blit.addr[2], m_blit.addr[1], m_blit.addr[0],
+				m_blit.pen[0], m_blit.pen[1], m_blit.pen[2], m_blit.pen[3],
+				m_blit.flag[0], m_blit.flag[1], m_blit.flipx, m_blit.flipy,     m_blit.solid, m_blit.trans, m_blit.flag[6], m_blit.flag[7]
 	);
 
-	x_size = (blit.w + 1) * 2;
-	y_size = (blit.h + 1);
+	x_size = (m_blit.w + 1) * 2;
+	y_size = (m_blit.h + 1);
 
-	blit_dst_ypos = (blit.y);
-	blit_dst_xpos = (blit.x);
+	blit_dst_ypos = (m_blit.y);
+	blit_dst_xpos = (m_blit.x);
 
 	blit_dst_xpos *= 2;
 
-	src = (blit.addr[2] << 16) | (blit.addr[1] << 8) | blit.addr[0];
+	src = (m_blit.addr[2] << 16) | (m_blit.addr[1] << 8) | m_blit.addr[0];
 
 	uint8_t pen = 0;
-	if (blit.solid)
+	if (m_blit.solid)
 	{
 		pen = src & 0xff;
 	}
 
-	src *= blit.addr_factor;
+	src *= m_blit.addr_factor;
 
-	int flipx = (blit.flipx == 0);
-	int flipy = (blit.flipy == 0);
+	int flipx = (m_blit.flipx == 0);
+	int flipy = (m_blit.flipy == 0);
 
 	for (y = 0; y < y_size; y++)
 	{
@@ -540,17 +553,17 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 			int drawx = (blit_dst_xpos + (flipx ? -x+1 : x)) & 0x1ff;
 			int drawy = (blit_dst_ypos + (flipy ? -y+1 : y)) & 0x0ff;
 
-			if (!blit.solid)
+			if (!m_blit.solid)
 			{
 				src %= blit_romsize;
 				pen = blit_rom[src];
 				src++;
 			}
 
-			if (pen || !blit.trans)
+			if (pen || !m_blit.trans)
 			{
 				if (pen <= 3)
-					pen = blit.pen[pen] & 0xf;
+					pen = m_blit.pen[pen] & 0xf;
 
 				m_blit_buffer[drawy * 512 + drawx] = pen;
 			}
@@ -560,8 +573,8 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 	// used by cjffruit in service mode (girl select screen)
 	blit_dst_xpos += (flipx ?        +1 :      0);
 	blit_dst_ypos += (flipy ? -y_size+1 : y_size);
-	blit.x = blit_dst_xpos / 2;
-	blit.y = blit_dst_ypos;
+	m_blit.x = blit_dst_xpos / 2;
+	m_blit.y = blit_dst_ypos;
 }
 
 WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
@@ -639,8 +652,8 @@ void blitz68k_state::ilpag_map(address_map &map)
 	map(0x100000, 0x1fffff).rom().region("blitter", 0);
 	map(0x200000, 0x20ffff).ram().share("nvram");
 
-//  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
-//  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
+//  map(0x800000, 0x800001).r(FUNC(blitz68k_state::test_r));
+//  map(0x880000, 0x880001).r(FUNC(blitz68k_state::test_r));
 
 	map(0x900000, 0x900000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -656,9 +669,9 @@ void blitz68k_state::ilpag_map(address_map &map)
 
 	map(0xc00000, 0xc00001).w(FUNC(blitz68k_state::lamps_w));
 	map(0xc00180, 0xc00181).portr("IN2");
-//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
+//  map(0xc00200, 0xc00201).w(FUNC(blitz68k_state::sound_write_w));
 	map(0xc00380, 0xc00381).portr("IN3");
-//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  map(0xc00300, 0xc00301).w(FUNC(blitz68k_state::irq_callback_w));
 }
 
 void blitz68k_state::steaser_map(address_map &map)
@@ -668,9 +681,9 @@ void blitz68k_state::steaser_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().share("nvram");
 
 	map(0x800000, 0x800001).r(FUNC(blitz68k_state::test_r));
-//  AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
+//  map(0x840000, 0x840001).w(FUNC(blitz68k_state::sound_write_w));
 	map(0x880000, 0x880001).r(FUNC(blitz68k_state::test_r));
-//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
+//  map(0x8c0000, 0x8c0001).w(FUNC(blitz68k_state::sound_write_w));
 
 	map(0x900000, 0x900000).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -688,11 +701,11 @@ void blitz68k_state::steaser_map(address_map &map)
 	map(0x9e0000, 0x9e0001).r(FUNC(blitz68k_state::blitter_status_r));
 	map(0x9f0000, 0x9f0001).nopw(); //???
 
-//  AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
+//  map(0xc00000, 0xc00001).w(FUNC(blitz68k_state::lamps_w));
 	map(0xbd0000, 0xbd0001).r(FUNC(blitz68k_state::test_r));
-//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
-//  AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  map(0xc00200, 0xc00201).w(FUNC(blitz68k_state::sound_write_w));
+//  map(0xc00380, 0xc00381).portr("IN3");
+//  map(0xc00300, 0xc00301).w(FUNC(blitz68k_state::irq_callback_w));
 }
 
 /*************************************************************************************************************
@@ -833,7 +846,7 @@ void blitz68k_state::bankroba_map(address_map &map)
 	map(0x900002, 0x900002).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x900004, 0x900004).w("ramdac", FUNC(ramdac_device::mask_w));
 
-//  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
+//  map(0x940000, 0x940001).w   // lev 6
 
 	map(0x980000, 0x980000).w(FUNC(blitz68k_state::blit_flag0_w));
 	map(0x980002, 0x980002).w(FUNC(blitz68k_state::blit_flag1_w));
@@ -2157,6 +2170,34 @@ ROM_START( bankroba )
 	ROM_LOAD( "palce16v8h.u72",   0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( bankrobb ) // DK-B main PCB + 8L74 sub PCB
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_BYTE( "bank 1.23-b.u32", 0x00000, 0x20000, CRC(81f88277) SHA1(ad0127d0e4c79074d4695288f31211868c097e3a) )
+	ROM_LOAD16_BYTE( "bank 1.23-a.u31", 0x00001, 0x20000, CRC(dc72bad8) SHA1(a885279c3de0cbe55836023a87b44e9f577f19d8) )
+
+	ROM_REGION( 0x2000, "mcu1", 0 ) // 68HC705C8P code
+	ROM_LOAD( "c8-bank.u2", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x2000, "mcu2", 0 ) // on sub PCB, 68HC705C8P code
+	ROM_LOAD( "8l6_74_-4.01.u18", 0x0000, 0x2000, NO_DUMP ) // actual label 8l6(74)-4.01
+
+	ROM_REGION( 0x180000, "blitter", 0 ) // data for the blitter
+	ROM_LOAD( "bank-c.u46", 0x00000,  0x80000, CRC(f9f77d0f) SHA1(e56e78e7b6abff99fa228bcbe3eccf1eb40c1ee8) )
+	ROM_LOAD( "bank-d.u51", 0x80000,  0x80000, CRC(4145d57c) SHA1(bec349706d0d06ed52252835313616ae6e023b28) )
+	ROM_LOAD( "bank-e.u61", 0x100000, 0x80000, CRC(0d75efbb) SHA1(0d4dd5f3d1fdd31e0f99acdc23f05d8e67393a48) ) // u61 might be wrong, not readable on the pics
+
+	ROM_REGION( 0x80000, "samples", 0 ) // 8 bit unsigned
+	ROM_LOAD( "bank-g.u18", 0x00000, 0x80000, CRC(009a5fea) SHA1(bf76a8f5dcf88bb6f6f9f60b4423157a262a6f78) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "pal20x10a.u12",  0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x10a.u40",  0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x8a.u43",   0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x8a.u48",   0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "pal20x8a.u52",   0x000, 0x0cc, NO_DUMP )
+	ROM_LOAD( "palce16v8h.u71", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 /*************************************************************************************************************
 
 Triple Play
@@ -2250,7 +2291,7 @@ Other:
 
 Note:
   Game supports a Centronics iDP-3541 printer (4-pin connector) and a Deltronics DL-1275 ticket dispenser.
-  It is also available on board CJ-8L REV-B LEV-1, wih a R6545AP as CRT controller.
+  It is also available on board CJ-8L REV-B LEV-1, with a R6545AP as CRT controller.
 
 *************************************************************************************************************/
 
@@ -2820,6 +2861,16 @@ void blitz68k_state::init_bankroba()
 	ROM[0x178ec/2] = 0x4e71;
 }
 
+void blitz68k_state::init_bankrobb()
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	// loop
+	ROM[0x1dae/2] = 0x4e71;
+
+	ROM[0xf912/2] = 0x67ee;
+}
+
 void blitz68k_state::init_cj3play()
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
@@ -2927,7 +2978,8 @@ GAME( 1990,  megadble, 0,       maxidbl,  maxidbl,  blitz68k_state, init_megadbl
 GAME( 1993,  steaser,  0,       steaser,  steaser,  blitz68k_state, empty_init,    ROT0, "<unknown>",                      "Strip Teaser (Italy, Ver. 1.22)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // In-game strings are in Italian but service mode is half English / half French?
 GAME( 1993,  bankrob,  0,       bankrob,  bankrob,  blitz68k_state, init_bankrob,  ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 3.32)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC APRIL 1995
 GAME( 1993,  bankroba, bankrob, bankroba, bankrob,  blitz68k_state, init_bankroba, ROT0, "Entertainment Technology Corp.", "Bank Robbery (Ver. 2.00)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // BLITZ SYSTEM INC MAY 10TH, 1993
-GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                  // MARCH 10TH, 1994
+GAME( 1993,  bankrobb, bankrob, bankroba, bankrob,  blitz68k_state, init_bankrobb, ROT0, "Blitz Systems Inc.",             "Bank Robbery (Ver. 1.23)",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // @ 1993 BLITZ SYSTEM INC
+GAME( 1993?, poker52,  0,       maxidbl,  maxidbl,  blitz68k_state, empty_init,    ROT0, "Blitz Systems Inc.",             "Poker 52 (Ver. 1.2)",                            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // MARCH 10TH, 1994
 GAME( 1995,  dualgame, 0,       dualgame, dualgame, blitz68k_state, init_dualgame, ROT0, "Labtronix Technologies",         "Dual Games (prototype)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // SEPTEMBER 5TH, 1995
 GAME( 1995,  hermit,   0,       hermit,   hermit,   blitz68k_state, init_hermit,   ROT0, "Dugamex",                        "The Hermit (Ver. 1.14)",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 1995
 GAME( 1997,  deucesw2, 0,       deucesw2, deucesw2, blitz68k_state, init_deucesw2, ROT0, "<unknown>",                      "Deuces Wild 2 - American Heritage (Ver. 2.02F)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )                     // APRIL 10TH, 1997

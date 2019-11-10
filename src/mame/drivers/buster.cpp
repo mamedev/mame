@@ -83,7 +83,7 @@ WRITE8_MEMBER(buster_state::coin_output_w)
 
 void buster_state::mainmap(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();// AM_SHARE("rom")
+	map(0x0000, 0x3fff).rom();// .share("rom");
 	map(0x4000, 0x47ff).ram().share("wram");
 	map(0x5000, 0x5fff).ram().share("vram");
 	map(0x6000, 0x6000).w("crtc", FUNC(mc6845_device::address_w));

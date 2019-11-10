@@ -167,15 +167,6 @@ video_manager::video_manager(running_machine &machine)
 	if (sscanf(machine.options().snap_size(), "%dx%d", &m_snap_width, &m_snap_height) != 2)
 		m_snap_width = m_snap_height = 0;
 
-	// start recording movie if specified
-	const char *filename = machine.options().mng_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_MNG);
-
-	filename = machine.options().avi_write();
-	if (filename[0] != 0)
-		begin_recording(filename, MF_AVI);
-
 	// if no screens, create a periodic timer to drive updates
 	if (no_screens)
 	{

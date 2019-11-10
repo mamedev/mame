@@ -832,7 +832,7 @@ WRITE_LINE_MEMBER(igs009_state::vblank_irq)
 void igs009_state::jingbell(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'000'000) / 2);   /* HD64180RP8, 8 MHz? */
+	HD64180RP(config, m_maincpu, XTAL(12'000'000));   /* HD64180RP8, 8 MHz? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs009_state::jingbell_map);
 	m_maincpu->set_addrmap(AS_IO, &igs009_state::jingbell_portmap);
 

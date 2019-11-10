@@ -206,7 +206,7 @@ void isbc_state::isbc2861_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x00000, 0xdffff).ram();
 	map(0xe0000, 0xfffff).rw(FUNC(isbc_state::bioslo_r), FUNC(isbc_state::bioslo_w)).share("biosram");
-//  AM_RANGE(0x100000, 0x1fffff) AM_RAM // FIXME: XENIX doesn't like this, IRMX is okay with it
+//  map(0x100000, 0x1fffff).ram(); // FIXME: XENIX doesn't like this, IRMX is okay with it
 	map(0xff0000, 0xffffff).rom().region("user1", 0);
 }
 

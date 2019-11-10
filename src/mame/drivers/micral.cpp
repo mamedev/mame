@@ -164,7 +164,7 @@ void micral_state::mem_map(address_map &map)
 	map(0x0000, 0xf7ff).ram();
 	map(0xf800, 0xfeff).rom();
 	map(0xff00, 0xffef).ram();
-	map(0xfff6, 0xfff7); // AM_WRITENOP // unknown ports
+	map(0xfff6, 0xfff7); // .nopw(); // unknown ports
 	map(0xfff8, 0xfff9).rw(FUNC(micral_state::video_r), FUNC(micral_state::video_w));
 	map(0xfffa, 0xfffa).r(FUNC(micral_state::keyin_r));
 	map(0xfffb, 0xfffb).r(FUNC(micral_state::unk_r));

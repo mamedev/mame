@@ -54,21 +54,7 @@ ToDo:
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patch in Hippodrome;
 - background pen in Birdie Try is presumably wrong.
-- Pixel clock frequency isn't verified;
-- Finally, get a proper decap of the MCU used by Dragonninja
-
-
-The current Dragonninja MCU program was made by hacking the expected startup
-synchronisation command in the Bad Dudes MCU program (location $09A4 changed
-from $0B to $03).  There may be other differences in a real Dragonninja MCU.
-The table of expected values for command 7 is the same for Dragonninja (from
-debugging main CPU program).
-
-Bad Dudes only seems to use commands $0B (sync), $01 (reset if parameter is not
-$3B), $07 (return table index if parameter matches table otherwise reset) and
-$09 (set table index to zero).  Dragonninja only seems to use commands $03 (on
-startup), $07 (same function as Bad Dudes) and $09 (same function as Bad
-Dudes).  Most of the MCU program isn't utilised.
+- Pixel clock frequency isn't verified
 
 
 Guru-Readme for Data East 16 bit games (Updated 7-Feb-2017)
@@ -2386,9 +2372,8 @@ ROM_START( drgninja ) /* DE-0297-0 main board, DE-0299-0 sub/rom board */
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Sound CPU */
 	ROM_LOAD( "eg07.8a",   0x8000, 0x8000, CRC(001d2f51) SHA1(f186671f0450ccf9201577a5caf0efc490c6645e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller - using hacked baddudes program */
-	ROM_LOAD( "eg31.9a",   0x0000, 0x1000, CRC(c3f6bc70) SHA1(3c80197dc70c6cb283df5d11d29a9d9baabcd99b) BAD_DUMP ) // Hand crafted, needs real dump
-
+	ROM_REGION( 0x1000, "mcu", 0 )  /* i8751 microcontroller */
+	ROM_LOAD( "eg31.9a",   0x0000, 0x1000, CRC(657aab2d) SHA1(c3b3837d1208596509e09ddd8e3e58845a4e07b2) )
 	/* various graphic and sound roms also differ when compared to baddudes */
 
 	ROM_REGION( 0x10000, "gfx1", 0 ) /* chars */

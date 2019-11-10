@@ -22,7 +22,7 @@
 |        YM2203C              9  0     |
 +--------------------------------------+
 
-  CPU: Z180 (surface scratched)
+  CPU: Z180 (surface scratched 64-pin DIP)
        PIC16C5x (surface scratched, exact model unknown)
 Sound: YM2203C
   OSC: 14.31818MHz, 12.288MHz
@@ -287,7 +287,7 @@ void mosaic_state::machine_reset()
 void mosaic_state::mosaic(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, XTAL(12'288'000)/2);  /* 6.144MHz - Verified */
+	HD64180RP(config, m_maincpu, XTAL(12'288'000));  /* 6.144MHz - Verified */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mosaic_state::mosaic_map);
 	m_maincpu->set_addrmap(AS_IO, &mosaic_state::mosaic_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(mosaic_state::irq0_line_hold));

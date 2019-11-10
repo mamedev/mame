@@ -238,11 +238,11 @@ Notes:
 #include "cpu/psx/psx.h"
 #include "cpu/m68000/m68000.h"
 #include "video/psx.h"
+#include "bus/ata/ataintf.h"
 #include "bus/scsi/scsi.h"
 #include "bus/scsi/scsicd.h"
 #include "bus/rs232/xvd701.h"
 #include "machine/am53cf96.h"
-#include "machine/ataintf.h"
 #include "machine/fdc37c665gt.h"
 #include "machine/i2cmem.h"
 #include "machine/ram.h"
@@ -1077,7 +1077,6 @@ void twinkle_state::cdrom_config(device_t *device)
 {
 	device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
 	device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
-	device = device->subdevice("cdda");
 }
 
 void twinkle_state::twinkle(machine_config &config)

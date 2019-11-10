@@ -77,7 +77,7 @@ namespace plib {
 
 
 	fpexception_e::fpexception_e(const pstring &text)
-		: pexception(pfmt("Out of memory: {}")(text))
+		: pexception(pfmt("Exception error: {}")(text))
 	{
 	}
 

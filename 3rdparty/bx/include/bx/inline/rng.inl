@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -103,6 +103,10 @@ namespace bx
 
 	inline void generateSphereHammersley(void* _data, uint32_t _stride, uint32_t _num, float _scale)
 	{
+		// Reference(s):
+		// - Sampling with Hammersley and Halton Points
+		//   https://web.archive.org/web/20190207230709/http://www.cse.cuhk.edu.hk/~ttwong/papers/udpoint/udpoints.html
+
 		uint8_t* data = (uint8_t*)_data;
 
 		for (uint32_t ii = 0; ii < _num; ii++)

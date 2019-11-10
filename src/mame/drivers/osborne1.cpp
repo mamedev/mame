@@ -349,7 +349,7 @@ void osborne1nv_state::osborne1nv(machine_config &config)
 	osborne1(config);
 	m_maincpu->set_addrmap(AS_IO, &osborne1nv_state::osborne1nv_io);
 
-	m_screen->set_palette(finder_base::DUMMY_TAG);
+	m_screen->set_no_palette();
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	sy6545_1_device &crtc(SY6545_1(config, "crtc", XTAL(12'288'000)/8));

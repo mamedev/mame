@@ -484,10 +484,10 @@ void rc759_state::rc759_io(address_map &map)
 	map(0x056, 0x057).noprw(); // in reality, access to sound and rtc is a bit more involved
 	map(0x05a, 0x05a).w(m_snd, FUNC(sn76489a_device::write));
 	map(0x05c, 0x05c).rw(FUNC(rc759_state::rtc_r), FUNC(rc759_state::rtc_w));
-//  AM_RANGE(0x060, 0x06f) AM_WRITE8(crt_control_w, 0x00ff)
+//  map(0x060, 0x06f).w(FUNC(rc759_state::crt_control_w)).umask16(0x00ff);
 	map(0x070, 0x077).mirror(0x08).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x080, 0x0ff).rw(FUNC(rc759_state::nvram_r), FUNC(rc759_state::nvram_w)).umask16(0x00ff);
-//  AM_RANGE(0x100, 0x101) net
+//  map(0x100, 0x101) net
 	map(0x180, 0x1bf).rw(FUNC(rc759_state::palette_r), FUNC(rc759_state::palette_w)).umask16(0x00ff);
 	map(0x230, 0x231).w(FUNC(rc759_state::txt_irst_w));
 	map(0x240, 0x241).w(FUNC(rc759_state::txt_ca_w));
@@ -495,16 +495,16 @@ void rc759_state::rc759_io(address_map &map)
 	map(0x260, 0x260).rw(FUNC(rc759_state::centronics_control_r), FUNC(rc759_state::centronics_control_w));
 	map(0x280, 0x287).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
 	map(0x288, 0x288).w(FUNC(rc759_state::floppy_control_w));
-//  AM_RANGE(0x28a, 0x28b) external printer data
-//  AM_RANGE(0x28d, 0x28d) external printer control
+//  map(0x28a, 0x28b) external printer data
+//  map(0x28d, 0x28d) external printer control
 	map(0x28e, 0x28e).rw(FUNC(rc759_state::floppy_ack_r), FUNC(rc759_state::floppy_reserve_w));
 	map(0x290, 0x290).w(FUNC(rc759_state::floppy_release_w));
-//  AM_RANGE(0x292, 0x293) AM_READWRITE8(printer_ack_r, printer_reserve_w, 0x00ff)
-//  AM_RANGE(0x294, 0x295) AM_WRITE8(printer_release_w, 0x00ff)
+//  map(0x292, 0x293).rw(FUNC(rc759_state::printer_ack_r), FUNC(rc759_state::printer_reserve_w)).umask16(0x00ff);
+//  map(0x294, 0x295).w(FUNC(rc759_state::printer_release_w)).umask16(0x00ff);
 	map(0x300, 0x30f).rw(m_isbx, FUNC(isbx_slot_device::mcs0_r), FUNC(isbx_slot_device::mcs0_w)).umask16(0x00ff);
 	map(0x310, 0x31f).rw(m_isbx, FUNC(isbx_slot_device::mcs1_r), FUNC(isbx_slot_device::mcs1_w)).umask16(0x00ff);
-//  AM_RANGE(0x320, 0x321) isbx dma ack
-//  AM_RANGE(0x330, 0x331) isbx tc
+//  map(0x320, 0x321) isbx dma ack
+//  map(0x330, 0x331) isbx tc
 }
 
 

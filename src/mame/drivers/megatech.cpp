@@ -4,7 +4,7 @@
 
 About MegaTech:
 
-Megatech games are identical to their Genesis/SMS equivlents, however the Megatech cartridges contain
+Megatech games are identical to their Genesis/SMS equivalents, however the Megatech cartridges contain
 a BIOS rom with the game instructions.  The last part number of the bios ROM is the cart/game ID code.
 
 The instruction rom appears to map at 0x300000 in the cart space.
@@ -17,8 +17,8 @@ with their Playchoice 10 system.
 The BIOS screen is based around SMS hardware, with an additional Z80 and SMS VDP chip not present on
 a standard Genesis.
 
-SMS games run on Megatech in the Genesis's SMS compatability mode, where the Genesis Z80 becomes the
-main CPU and the Genesis VDP acts in a mode mimicing the behavior of the SMS VDP. A pin on the carts
+SMS games run on Megatech in the Genesis's SMS compatibility mode, where the Genesis Z80 becomes the
+main CPU and the Genesis VDP acts in a mode mimicking the behavior of the SMS VDP. A pin on the carts
 determines which mode the game runs in.
 
 Additions will only be made to this driver if proof that the dumped set are original roms with original
@@ -538,7 +538,7 @@ void mtech_state::megatech_bios_map(address_map &map)
 	map(0x6400, 0x6407).rw("io1", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x6800, 0x6807).rw("io2", FUNC(cxd1095_device::read), FUNC(cxd1095_device::write));
 	map(0x7000, 0x77ff).rom(); // from bios rom (0x7000-0x77ff populated in ROM)
-	//AM_RANGE(0x7800, 0x7fff) AM_RAM // ?
+	//map(0x7800, 0x7fff).ram(); // ?
 	map(0x8000, 0x9fff).rw(FUNC(mtech_state::read_68k_banked_data), FUNC(mtech_state::write_68k_banked_data)); // window into 68k address space, reads instr rom and writes to reset banks on z80 carts?
 }
 
@@ -691,12 +691,12 @@ void mtech_state::megatech(machine_config &config)
 	m_bioscpu->set_addrmap(AS_PROGRAM, &mtech_state::megatech_bios_map);
 	m_bioscpu->set_addrmap(AS_IO, &mtech_state::megatech_bios_portmap);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("BIOS_DSW0");
 	io1.in_portb_cb().set_ioport("BIOS_DSW1");
 	io1.out_porte_cb().set(FUNC(mtech_state::cart_select_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("BIOS_IN0");
 	io2.in_portb_cb().set_ioport("BIOS_IN1");
 	io2.in_portc_cb().set(FUNC(mtech_state::bios_portc_r));
@@ -1486,7 +1486,7 @@ ROM_END
 - Enduro Racer
 
 Games seen in auction (#122011114579) known not to be original but manufactured/bootlegged on actual megatech carts.
-The labels are noticably different than expected.  Be careful if thinking of obtaining!
+The labels are noticeably different than expected.  Be careful if thinking of obtaining!
 - After Burner II (GEN)
 - Castle of Illusion Starring Mickey Mouse (GEN)
 - Double Dragon (SMS)

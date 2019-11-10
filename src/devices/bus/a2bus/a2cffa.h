@@ -15,7 +15,7 @@
 #pragma once
 
 #include "a2bus.h"
-#include "machine/ataintf.h"
+#include "bus/ata/ataintf.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS

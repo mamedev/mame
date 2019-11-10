@@ -24,13 +24,13 @@ Todo:
 
 WRITE8_MEMBER(glass_state::shareram_w)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	reinterpret_cast<u8 *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
 }
 
 READ8_MEMBER(glass_state::shareram_r)
 {
-	// why isn't there an AM_SOMETHING macro for this?
+	// why isn't there address map functionality for this?
 	return reinterpret_cast<u8 const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
 }
 

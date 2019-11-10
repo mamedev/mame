@@ -12,7 +12,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="rom.bin" size="2048" crc="682b876a" sha1="ecc0146c40daa79a13934b8884bc8fd0f96461c1" offset="0" />
+				<rom name="rom.bin" size="2048" crc="682b876a" sha1="ecc0146c40daa79a13934b8884bc8fd0f96461c1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 		<part name="cart" interface="vc4000_cart">
 			<feature name="slot" value="std" />
 			<dataarea name="rom" size="2048">
-				<rom name="rom.bin" size="2048" crc="df923137" sha1="59d53670590dab3f9ebb30279cff44098fc27be2" offset="0" />
+				<rom name="rom.bin" size="2048" crc="df923137" sha1="59d53670590dab3f9ebb30279cff44098fc27be2"/>
 			</dataarea>
 		</part>
 	</software>

@@ -35293,4 +35293,122 @@
 		</part>
 	</software>
 
+	<software name="hntpalac">
+		<description>The Haunted Palace (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Crystalware</publisher>
+		<info name="release" value="2019-09-20"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the haunted palace (4am crack) side a.dsk" size="143360" crc="2bd7a1db" sha1="7de158267b537c123cf30d1b63a6c374772fac9d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the haunted palace (4am crack) side b.dsk" size="143360" crc="f0e29f9e" sha1="91bec5b0d430feeabc8ae719525c9c04d822d8c1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wgbbenh">
+		<description>The World's Greatest Baseball Game (Enhanced Version) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Quest</publisher>
+		<info name="release" value="2019-09-29"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 - Interactive and statistical game play"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version)(4am crack) disk 1 - interactive and statistical game play.dsk" size="143360" crc="06291f92" sha1="61c8ccd17cd988284b12a825e7af6f0a5d89187b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 - Team trading functions"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version)(4am crack) disk 2 - team trading functions.dsk" size="143360" crc="eb43d434" sha1="69026be09657404cd9d08e038ac9ef6627bd522d" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 - 1984 teams roster"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version)(4am crack) disk 3 - 1984 teams roster.dsk" size="143360" crc="034912e1" sha1="6783ed0dd291cccaf4cf2a6383d272bb4d036dbf" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4 - 1985 teams roster"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the world's greatest baseball game (enhanced version)(4am crack) disk 4 - 1985 teams roster.dsk" size="143360" crc="6bbc19a9" sha1="12e35693433e6e2b9505c716f28322b201d26ad5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hmwnmult">
+		<description>Whole Numbers: Multiplication (cleanly cracked)</description>
+		<year>1987</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-10-03"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="whole numbers- multiplication (4am crack).dsk" size="143360" crc="edc88a92" sha1="4c24102023914a9ac9a9ddd1ffd00139cacb29e6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ewstat33">
+		<description>Statistics (Version 3.3) (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Edu-Ware</publisher>
+		<info name="release" value="2019-10-03"/>
+		<!-- This is version 3.3, dated February 20, 1982. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="statistics v3.3 (4am crack).dsk" size="143360" crc="388e039d" sha1="01b45f202602a2846d0b437b2c729ee88280fc45" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frcbaskl">
+		<description>Fractions: Basic Skills (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-10-04"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions- basic skills (4am crack).dsk" size="143360" crc="ee5ef674" sha1="8d0a1486283fbddcfd36d0aaca3f30a27043eb33" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="balanact">
+		<description>Balancing Act (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Intellectual Software</publisher>
+		<info name="release" value="2019-10-13"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="balancing act (4am crack).dsk" size="143360" crc="a5dd929c" sha1="5e523ba9acc08d10f6bd000b982bfc5804013f1b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frcsubtr">
+		<description>Fractions: Subtraction (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-10-13"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions- subtraction (4am crack).dsk" size="143360" crc="dc619fdd" sha1="9053d4818485f0120b0ff9d701bfcf7b3b0f0962" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

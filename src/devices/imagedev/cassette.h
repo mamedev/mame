@@ -17,23 +17,25 @@
 
 enum cassette_state
 {
-	/* this part of the state is controlled by the UI */
+	// this part of the state is controlled by the UI
 	CASSETTE_STOPPED            = 0,
 	CASSETTE_PLAY               = 1,
 	CASSETTE_RECORD             = 2,
 
-	/* this part of the state is controlled by drivers */
+	// this part of the state is controlled by drivers
 	CASSETTE_MOTOR_ENABLED      = 0,
 	CASSETTE_MOTOR_DISABLED     = 4,
 	CASSETTE_SPEAKER_ENABLED    = 0,
 	CASSETTE_SPEAKER_MUTED      = 8,
 
-	/* masks */
+	// masks
 	CASSETTE_MASK_UISTATE       = 3,
 	CASSETTE_MASK_MOTOR         = 4,
 	CASSETTE_MASK_SPEAKER       = 8,
 	CASSETTE_MASK_DRVSTATE      = 12
 };
+
+DECLARE_ENUM_BITWISE_OPERATORS(cassette_state)
 
 
 /***************************************************************************
@@ -54,7 +56,6 @@ public:
 	void set_formats(const struct CassetteFormat*  const *formats) { m_formats = formats; }
 	void set_create_opts(const struct CassetteOptions  *create_opts) { m_create_opts = create_opts; }
 	void set_default_state(cassette_state default_state) { m_default_state = default_state; }
-	void set_default_state(int default_state) { m_default_state = (cassette_state)default_state; }
 	void set_interface(const char *interface) { m_interface = interface; }
 
 	// image-level overrides
@@ -76,7 +77,7 @@ public:
 
 	// specific implementation
 	cassette_state get_state() { return m_state; }
-	void set_state(cassette_state state) { change_state(state, (cassette_state)(~0)); }
+	void set_state(cassette_state state) { change_state(state, cassette_state(~0)); }
 	void change_state(cassette_state state, cassette_state mask);
 
 	double input();

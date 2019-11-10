@@ -12,7 +12,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00543 - Thomas &amp; Friends - Thomas and the School Trip (UK).bin" size="0x200000" crc="a66f7afb" sha1="49ee00ad8ca64fac28c2ab3c8e2b2116e121884e" offset="0" />
+				<rom name="500-00543 - Thomas &amp; Friends - Thomas and the School Trip (UK).bin" size="0x200000" crc="a66f7afb" sha1="49ee00ad8ca64fac28c2ab3c8e2b2116e121884e" />
 			</dataarea>
 		</part>
 	</software>
@@ -27,7 +27,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-00547 - Leap's Big Day (UK).bin" size="0x200000" crc="ecab224a" sha1="2f5155eb4017c91d3129b722201b3d05cf2454b6" offset="0" />
+				<rom name="500-00547 - Leap's Big Day (UK).bin" size="0x200000" crc="ecab224a" sha1="2f5155eb4017c91d3129b722201b3d05cf2454b6" />
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 			<feature name="pcb_rev" value="REV.00"/>
 			<feature name="u1" value="OKi 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-01120 - I Know My abc's (UK) (Dec 18 2002).bin" size="0x200000" crc="017d6820" sha1="6f30e0731b82c931759b07151a03b5a91e412e58" offset="0" />
+				<rom name="500-01120 - I Know My abc's (UK) (Dec 18 2002).bin" size="0x200000" crc="017d6820" sha1="6f30e0731b82c931759b07151a03b5a91e412e58" />
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 		<info name="serial" value="500-01120"/>
 		<part name="cart" interface="leapfrog_mfleappad_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-01120 - I Know My abc's (UK) (Feb 12 2002).bin" size="0x200000" crc="1f265010" sha1="a5fa878f5bcf92e80cb606d5f869d166d3805e05" offset="0" />
+				<rom name="500-01120 - I Know My abc's (UK) (Feb 12 2002).bin" size="0x200000" crc="1f265010" sha1="a5fa878f5bcf92e80cb606d5f869d166d3805e05" />
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@
 			<feature name="pcb_rev" value="REV.02"/>
 			<feature name="u1" value="SunPlus 16m"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-01121 - Joy Joy - The Jet Plane - High-Flying Adventures (UK).bin" size="0x200000" crc="239437dc" sha1="874006ea723d4c824fe150be394635df3af5ab47" offset="0" />
+				<rom name="500-01121 - Joy Joy - The Jet Plane - High-Flying Adventures (UK).bin" size="0x200000" crc="239437dc" sha1="874006ea723d4c824fe150be394635df3af5ab47" />
 			</dataarea>
 		</part>
 	</software>
@@ -84,7 +84,7 @@
 			<feature name="pcb_rev" value="REV.0"/>
 			<feature name="u1" value="Sunplus16m-b"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-10523 - The Foot Book (UK).bin" size="0x200000" crc="3708694c" sha1="359b118bbb795763e65da0434dc6ddb2e8284388" offset="0" />
+				<rom name="500-10523 - The Foot Book (UK).bin" size="0x200000" crc="3708694c" sha1="359b118bbb795763e65da0434dc6ddb2e8284388" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,7 +99,7 @@
 			<feature name="pcb_rev" value="REV.00"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-11074 - El gran dia de Croki (SP).bin" size="0x200000" crc="7939e721" sha1="886e85bdfc56587ef48c94f7bfed055c931b4d3e" offset="0" />
+				<rom name="500-11074 - El gran dia de Croki (SP).bin" size="0x200000" crc="7939e721" sha1="886e85bdfc56587ef48c94f7bfed055c931b4d3e" />
 			</dataarea>
 		</part>
 	</software>
@@ -114,7 +114,7 @@
 			<feature name="pcb_rev" value="REV:00"/>
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-11282 UBL - Vroom! Vroom! - On the Go (UK).bin" size="0x400000" crc="88c24bd7" sha1="723a4c6d10d1a5205330c7401594cdc3217a137d" offset="0" />
+				<rom name="500-11282 UBL - Vroom! Vroom! - On the Go (UK).bin" size="0x400000" crc="88c24bd7" sha1="723a4c6d10d1a5205330c7401594cdc3217a137d" />
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 			<feature name="pcb_rev" value="REV.01"/>
 			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x200000">
-				<rom name="500-11436 - Las Princesas Disney (SP).bin" size="0x200000" crc="21a50739" sha1="ad39c8e899edc427fec01aaa07cf8aacf7bd246f" offset="0" />
+				<rom name="500-11436 - Las Princesas Disney (SP).bin" size="0x200000" crc="21a50739" sha1="ad39c8e899edc427fec01aaa07cf8aacf7bd246f" />
 			</dataarea>
 		</part>
 	</software>
@@ -144,7 +144,7 @@
 			<feature name="pcb_rev" value="Rev:00"/>
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
-				<rom name="500-12049 - Mi Primer Dia de Escuela (SP).bin" size="0x400000" crc="878e3d34" sha1="b5893b2c852e472312a3f49320cec765fd1e4045" offset="0" />
+				<rom name="500-12049 - Mi Primer Dia de Escuela (SP).bin" size="0x400000" crc="878e3d34" sha1="b5893b2c852e472312a3f49320cec765fd1e4045" />
 			</dataarea>
 		</part>
 	</software>

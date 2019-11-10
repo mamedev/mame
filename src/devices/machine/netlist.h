@@ -72,11 +72,11 @@ public:
 
 	void set_setup_func(func_type &&func) { m_setup_func = std::move(func); }
 
-	ATTR_HOT inline netlist::setup_t &setup();
-	ATTR_HOT inline netlist_mame_t &netlist() { return *m_netlist; }
+	netlist::setup_t &setup();
+	netlist_mame_t &netlist() noexcept { return *m_netlist; }
 
-	ATTR_HOT void update_icount(netlist::netlist_time time);
-	ATTR_HOT void check_mame_abort_slice();
+	void update_icount(netlist::netlist_time time) noexcept;
+	void check_mame_abort_slice() noexcept;
 
 	static void register_memregion_source(netlist::nlparse_t &setup, device_t &dev, const char *name);
 
@@ -111,7 +111,7 @@ private:
 	netlist::netlist_time        m_rem;
 	netlist::netlist_time        m_old;
 
-	netlist::pool_owned_ptr<netlist_mame_t> m_netlist;
+	netlist::unique_pool_ptr<netlist_mame_t> m_netlist;
 
 	func_type m_setup_func;
 };

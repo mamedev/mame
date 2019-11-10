@@ -373,4 +373,4 @@ inline u64 d2u(double d)
 	return u.vv;
 }
 
-#endif  /* MAME_EMU_EMUCORE_H */
+#endif // MAME_EMU_EMUCORE_H

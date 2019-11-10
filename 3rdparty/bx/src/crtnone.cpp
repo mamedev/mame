@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -75,7 +75,7 @@ extern "C" char* strcat(char* _dst, const char* _src)
 
 extern "C" const char* strchr(const char* _str, int _ch)
 {
-	return bx::strFind(_str, _ch);
+	return bx::strFind(_str, _ch).getPtr();
 }
 
 extern "C" int32_t strcmp(const char* _lhs, const char* _rhs)
@@ -95,7 +95,7 @@ extern "C" int32_t strcasecmp(const char* _lhs, const char* _rhs)
 
 extern "C" const char* strstr(const char* _str, const char* _find)
 {
-	return bx::strFind(_str, _find);
+	return bx::strFind(_str, _find).getPtr();
 }
 
 extern "C" void qsort(void* _base, size_t _num, size_t _size, bx::ComparisonFn _fn)

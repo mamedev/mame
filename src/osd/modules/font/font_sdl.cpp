@@ -88,7 +88,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	// if no success, try the font path
 	if (!font)
 	{
-		osd_printf_verbose("Searching font %s in -%s path/s\n", family.c_str(), font_path.c_str());
+		osd_printf_verbose("Searching font %s in -%s path/s\n", family, font_path);
 		//emu_file file(options().font_path(), OPEN_FLAG_READ);
 		emu_file file(font_path.c_str(), OPEN_FLAG_READ);
 		if (file.open(family.c_str()) == osd_file::error::NONE)
@@ -96,7 +96,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 			std::string full_name = file.fullpath();
 			font = TTF_OpenFont_Magic(full_name, POINT_SIZE, 0);
 			if (font)
-				osd_printf_verbose("Found font %s\n", full_name.c_str());
+				osd_printf_verbose("Found font %s\n", full_name);
 		}
 	}
 
@@ -112,7 +112,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	{
 		if (!BDF_Check_Magic(name))
 		{
-			osd_printf_verbose("font %s is not TrueType or BDF, using MAME default\n", name.c_str());
+			osd_printf_verbose("font %s is not TrueType or BDF, using MAME default\n", name);
 		}
 		return false;
 	}

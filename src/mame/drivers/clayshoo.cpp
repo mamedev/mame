@@ -238,9 +238,9 @@ void clayshoo_state::main_io_map(address_map &map)
 	map(0x00, 0x00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x33).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
-//  AM_RANGE(0x50, 0x50) AM_NOP // ?
-//  AM_RANGE(0x60, 0x60) AM_NOP // ?
+//  map(0x40, 0x43).noprw(); // 8253 for sound?
+//  map(0x50, 0x50).noprw(); // ?
+//  map(0x60, 0x60).noprw(); // ?
 }
 
 

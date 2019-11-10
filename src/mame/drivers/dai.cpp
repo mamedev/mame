@@ -80,7 +80,7 @@ void dai_state::dai_mem(address_map &map)
 	map(0xf000, 0xf7ff).w(FUNC(dai_state::dai_stack_interrupt_circuit_w));
 	map(0xf800, 0xf8ff).ram();
 	map(0xfb00, 0xfbff).rw(FUNC(dai_state::dai_amd9511_r), FUNC(dai_state::dai_amd9511_w));
-	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
+	map(0xfc00, 0xfcff).rw(FUNC(dai_state::dai_pit_r), FUNC(dai_state::dai_pit_w)); // .rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xfd00, 0xfdff).rw(FUNC(dai_state::dai_io_discrete_devices_r), FUNC(dai_state::dai_io_discrete_devices_w));
 	map(0xfe00, 0xfeff).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xff00, 0xff0f).mirror(0xf0).m(m_tms5501, FUNC(tms5501_device::io_map));

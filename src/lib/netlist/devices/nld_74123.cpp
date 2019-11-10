@@ -182,7 +182,7 @@ namespace netlist
 
 	NETLIB_UPDATE(74123)
 	{
-		netlist_sig_t m_trig;
+		netlist_sig_t m_trig(0);
 		netlist_sig_t res = !m_CLRQ();
 		netlist_time t_AB_to_Q = NLTIME_FROM_NS(10);
 		netlist_time t_C_to_Q = NLTIME_FROM_NS(10);

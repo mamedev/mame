@@ -428,7 +428,7 @@ Notes:
       29F400       - Fujitsu 29F400TA-90PFTN 512k x8 FlashROM (TSOP48)
       Custom ASIC  - CAPCOM DL-3229 SCU (QFP144). Decapping reveals this is a Hitachi HD6417099 SH2 variant
                      with built-in encryption, clocked at 6.250MHz
-      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated)
+      FM1208S      - RAMTRON FM1208S 4k (512bytes x8) Nonvolatile Ferroelectric RAM (not populated on type D boards)
       MACH111      - AMD MACH111 CPLD stamped 'CP3B1A' (PLCC44)
       *            - These components located on the other side of the PCB
 
@@ -477,8 +477,8 @@ Hardware registers info
                 -e-- ---- ---- ---- Tilemap 0 Line Scroll Enable
                 --d- ---- ---- ---- Tilemap 0 Line Zoom Enable (seems unused in games, but might be enabled in jojo dev.menu BG test)
                 ---c ---- ---- ---- Tilemap 0 ?? set together with Zoom
-                ---- b--- ---- ---- Tilemap 0 Flip X (not implemented, Warzard demo fights during special moves)
-                ---- -a-- ---- ---- Tilemap 0 Flip Y (not implemented, Capcom logos background during sfiii2 flashing)
+                ---- b--- ---- ---- Tilemap 0 Flip X
+                ---- -a-- ---- ---- Tilemap 0 Flip Y
                 ---- --98 7654 3210 Tilemap 0 ?? always 0
         28      -edc ba98 ---- ---- Tilemap 0 Line Scroll and Zoom Base address (1st word is scroll, 2nd word is zoom)
                 ---- ---- -654 3210 Tilemap 0 Tiles Base address
@@ -2018,16 +2018,18 @@ void cps3_state::process_character_dma(u32 address)
 		u32 dat1 = little_endianize_int32(m_char_ram[i + 0 + (address)]);
 		u32 dat2 = little_endianize_int32(m_char_ram[i + 1 + (address)]);
 		u32 dat3 = little_endianize_int32(m_char_ram[i + 2 + (address)]);
-		u32 real_source      = (dat3 << 1) - 0x400000;
-		u32 real_destination =  dat2 << 3;
-		u32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);
 
 		// 0x01000000 is the end of list marker
 		if (dat1 & 0x01000000) break;
 
+		u32 dma_command      = (dat1 & 0x00e00000) >> 21;
+		u32 real_length      = (((dat1 & 0x001fffff) + 1) << 3); // for command 4 here is number of 16bit words -1
+		u32 real_destination = dat2 << 3;
+		u32 real_source      = (dat3 << 1) - 0x400000;
+
 		//logerror("%08x %08x %08x real_source %08x (rom %d offset %08x) real_destination %08x, real_length %08x\n", dat1, dat2, dat3, real_source, real_source/0x800000, real_source%0x800000, real_destination, real_length);
 
-		switch ((dat1 >> 21) & 7)
+		switch (dma_command)
 		{
 		case 4: /* Sets a table used by the decompression routines */
 			/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
@@ -2041,9 +2043,18 @@ void cps3_state::process_character_dma(u32 address)
 		      - this is used on SFIII NG Sean's Stage ONLY */
 			do_alt_char_dma(real_source, real_destination, real_length);
 			break;
+		case 0: // not compressed DMA
+			// warzard use this at stage's start, code looks intent, not a game bug
+			for (u8* dest = (u8*)m_char_ram.get(); real_length; --real_length)
+			{
+				dest[(real_destination & 0x7fffff) ^ 3] = m_user5[DMA_XOR(real_source)];
+				m_gfxdecode->gfx(1)->mark_dirty((real_destination & 0x7fffff) / 0x100);
+				real_source++;
+				real_destination++;
+			}
+			break;
 		default:
-			// warzard uses command 0, uncompressed? but for what?
-			logerror("Unknown DMA List Command Type %d\n", (dat1 >> 21) & 7);
+			logerror("Unknown DMA List Command Type %d\n", dma_command);
 			break;
 		}
 	}
@@ -2787,7 +2798,7 @@ ROM_START( jojobar1 )
 	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
 	DISK_REGION( "scsi:1:cdrom" )
-	DISK_IMAGE_READONLY( "cap-jjm-0", 0, BAD_DUMP SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) )
+	DISK_IMAGE_READONLY( "cap-jjm-0", 0, SHA1(1651896d127dbf32af99175ae91227cd90675aaa) )
 ROM_END
 
 

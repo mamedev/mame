@@ -777,6 +777,8 @@ void cninja_state::cninja(machine_config &config)
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
 
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
+
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000) / 4, 376, 0, 256, 274, 8, 248);
@@ -956,6 +958,8 @@ void cninja_state::cninjabl(machine_config &config)
 	irq.raster1_irq_callback().set_inputline(m_maincpu, 3);
 	irq.raster2_irq_callback().set_inputline(m_maincpu, 4);
 	irq.vblank_irq_callback().set_inputline(m_maincpu, 5);
+
+	MCFG_VIDEO_START_OVERRIDE(cninja_state,cninja)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

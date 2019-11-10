@@ -25,7 +25,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="426028">
-				<rom name="f30.wav" size="426028" crc="e30fcc63" sha1="531e49cbd37cb08af45efe2f979cf8fd54ebb706" offset="0" />
+				<rom name="f30.wav" size="426028" crc="e30fcc63" sha1="531e49cbd37cb08af45efe2f979cf8fd54ebb706"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="632348">
-				<rom name="f28.wav" size="632348" crc="c7ced86d" sha1="256b04ad5a3442308604bc9917a063174b4b9d02" offset="0" />
+				<rom name="f28.wav" size="632348" crc="c7ced86d" sha1="256b04ad5a3442308604bc9917a063174b4b9d02"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="631660">
-				<rom name="f24.wav" size="631660" crc="b9015ca2" sha1="2c5f75e41c0dfadff0b5b75ddbf6c5bd4a0350ba" offset="0" />
+				<rom name="f24.wav" size="631660" crc="b9015ca2" sha1="2c5f75e41c0dfadff0b5b75ddbf6c5bd4a0350ba"/>
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="664652">
-				<rom name="f15.wav" size="664652" crc="d3bc5c32" sha1="c49a094603221fe1a01324f8d973e26cef86198d" offset="0" />
+				<rom name="f15.wav" size="664652" crc="d3bc5c32" sha1="c49a094603221fe1a01324f8d973e26cef86198d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -81,7 +81,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="583692">
-				<rom name="f7.wav" size="583692" crc="46caaae3" sha1="67cc7540211a9847d8d4b4ed9de9629383f67a4e" offset="0" />
+				<rom name="f7.wav" size="583692" crc="46caaae3" sha1="67cc7540211a9847d8d4b4ed9de9629383f67a4e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -95,7 +95,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="752876">
-				<rom name="f25.wav" size="752876" crc="98e3c4a7" sha1="d3869dd3f652430852bed38d8d9ba1a8ad8d81b2" offset="0" />
+				<rom name="f25.wav" size="752876" crc="98e3c4a7" sha1="d3869dd3f652430852bed38d8d9ba1a8ad8d81b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -109,7 +109,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="666732">
-				<rom name="f18.wav" size="666732" crc="cf7bc405" sha1="3f32491f4394db419310988751d1bc16338f553a" offset="0" />
+				<rom name="f18.wav" size="666732" crc="cf7bc405" sha1="3f32491f4394db419310988751d1bc16338f553a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -123,7 +123,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="266220">
-				<rom name="f21.wav" size="266220" crc="9d37708a" sha1="d0345d44fe6d4c16a2523e04a8ccbe42624e0d2e" offset="0" />
+				<rom name="f21.wav" size="266220" crc="9d37708a" sha1="d0345d44fe6d4c16a2523e04a8ccbe42624e0d2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -137,7 +137,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="316028">
-				<rom name="f11.wav" size="316028" crc="36f856b3" sha1="a9074f500b1a7eb3832b7dba89fe78a4d2aff285" offset="0" />
+				<rom name="f11.wav" size="316028" crc="36f856b3" sha1="a9074f500b1a7eb3832b7dba89fe78a4d2aff285"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,7 +151,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="507772">
-				<rom name="f26.wav" size="507772" crc="c285fa48" sha1="d48ea00356f65af4d241a113457f6db6f8611423" offset="0" />
+				<rom name="f26.wav" size="507772" crc="c285fa48" sha1="d48ea00356f65af4d241a113457f6db6f8611423"/>
 			</dataarea>
 		</part>
 	</software>
@@ -165,7 +165,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="735692">
-				<rom name="f14.wav" size="735692" crc="5b770716" sha1="fafff9f95759106bcf2734a051eba42fba10e464" offset="0" />
+				<rom name="f14.wav" size="735692" crc="5b770716" sha1="fafff9f95759106bcf2734a051eba42fba10e464"/>
 			</dataarea>
 		</part>
 	</software>
@@ -179,7 +179,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="597644">
-				<rom name="f9.wav" size="597644" crc="22102133" sha1="e02db15bd6bb36a0e48691a58aa4b93cbea3c79a" offset="0" />
+				<rom name="f9.wav" size="597644" crc="22102133" sha1="e02db15bd6bb36a0e48691a58aa4b93cbea3c79a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -193,7 +193,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="738908">
-				<rom name="f10.wav" size="738908" crc="459d1c03" sha1="39411d342cd1624b608f275f459c5919a6d1cdcd" offset="0" />
+				<rom name="f10.wav" size="738908" crc="459d1c03" sha1="39411d342cd1624b608f275f459c5919a6d1cdcd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="845372">
-				<rom name="f13.wav" size="845372" crc="d6826e26" sha1="fa88292f2a7b148f0a0ff35d5a23ca01747b808c" offset="0" />
+				<rom name="f13.wav" size="845372" crc="d6826e26" sha1="fa88292f2a7b148f0a0ff35d5a23ca01747b808c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -221,7 +221,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="859020">
-				<rom name="f12.wav" size="859020" crc="6fb78310" sha1="8e7676c17a2bc2da6d0aa68a0874ee880aacf665" offset="0" />
+				<rom name="f12.wav" size="859020" crc="6fb78310" sha1="8e7676c17a2bc2da6d0aa68a0874ee880aacf665"/>
 			</dataarea>
 		</part>
 	</software>
@@ -235,7 +235,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="876460">
-				<rom name="f27.wav" size="876460" crc="ea528fac" sha1="71defb4fe12afe7dd91b0f0512641f35630ff456" offset="0" />
+				<rom name="f27.wav" size="876460" crc="ea528fac" sha1="71defb4fe12afe7dd91b0f0512641f35630ff456"/>
 			</dataarea>
 		</part>
 	</software>
@@ -249,7 +249,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="359596">
-				<rom name="f1.wav" size="359596" crc="75478925" sha1="57651331d3da445392ff936e8e382fa90d29f844" offset="0" />
+				<rom name="f1.wav" size="359596" crc="75478925" sha1="57651331d3da445392ff936e8e382fa90d29f844"/>
 			</dataarea>
 		</part>
 	</software>
@@ -263,12 +263,12 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="326124">
-				<rom name="f8a.wav" size="326124" crc="42e029d3" sha1="1c049bc4193404d66fc80a8ae10ac780b0e00c50" offset="0" />
+				<rom name="f8a.wav" size="326124" crc="42e029d3" sha1="1c049bc4193404d66fc80a8ae10ac780b0e00c50"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc1000_cass">
 			<dataarea name="cass" size="375132">
-				<rom name="f8b.wav" size="375132" crc="23ee6191" sha1="eb470c77ee09304f732604afdd102490209b76fe" offset="0" />
+				<rom name="f8b.wav" size="375132" crc="23ee6191" sha1="eb470c77ee09304f732604afdd102490209b76fe"/>
 			</dataarea>
 		</part>
 	</software>
@@ -282,7 +282,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="506316">
-				<rom name="f4.wav" size="506316" crc="24e478b1" sha1="1479d86212677107b505635396d22065deb28535" offset="0" />
+				<rom name="f4.wav" size="506316" crc="24e478b1" sha1="1479d86212677107b505635396d22065deb28535"/>
 			</dataarea>
 		</part>
 	</software>
@@ -296,7 +296,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="578092">
-				<rom name="f3.wav" size="578092" crc="45e7b9d0" sha1="e9433a8e234466c199d83876911049d09b3be87c" offset="0" />
+				<rom name="f3.wav" size="578092" crc="45e7b9d0" sha1="e9433a8e234466c199d83876911049d09b3be87c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -310,7 +310,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="740636">
-				<rom name="f6.wav" size="740636" crc="14055426" sha1="78d74d0b54743fb2fba752d3e350ed6d94f0f47f" offset="0" />
+				<rom name="f6.wav" size="740636" crc="14055426" sha1="78d74d0b54743fb2fba752d3e350ed6d94f0f47f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -324,7 +324,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="1810012">
-				<rom name="f20.wav" size="1810012" crc="3f32b010" sha1="5b281c9a6dfaf610ab9495feeb2da55607201e82" offset="0" />
+				<rom name="f20.wav" size="1810012" crc="3f32b010" sha1="5b281c9a6dfaf610ab9495feeb2da55607201e82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="670908">
-				<rom name="f5.wav" size="670908" crc="6ef25fb5" sha1="223862aa232d1ee03ad747198498d5ea8bc6638c" offset="0" />
+				<rom name="f5.wav" size="670908" crc="6ef25fb5" sha1="223862aa232d1ee03ad747198498d5ea8bc6638c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -352,7 +352,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="531324">
-				<rom name="f2.wav" size="531324" crc="d9d1c328" sha1="984b58745e6ee79d39b74f049748e39682acd61c" offset="0" />
+				<rom name="f2.wav" size="531324" crc="d9d1c328" sha1="984b58745e6ee79d39b74f049748e39682acd61c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -366,7 +366,7 @@
 
 		<part name="cass1" interface="mc1000_cass">
 			<dataarea name="cass" size="401852">
-				<rom name="f22.wav" size="401852" crc="a172953b" sha1="bd9324a63f186e5be4e346c10d097b921bf52619" offset="0" />
+				<rom name="f22.wav" size="401852" crc="a172953b" sha1="bd9324a63f186e5be4e346c10d097b921bf52619"/>
 			</dataarea>
 		</part>
 	</software>
@@ -380,31 +380,31 @@
 		<part name="cass1" interface="mc1000_cass">
 			<feature name="part_id" value="Compositor de Musica"/>
 			<dataarea name="cass" size="609500">
-				<rom name="mc1000_1_1_compositor_de_musicas.wav" size="609500" crc="ae66d227" sha1="ba33f588a580b6893713ac7437f9b4d98cb7ffac" offset="0" status="baddump" />
+				<rom name="mc1000_1_1_compositor_de_musicas.wav" size="609500" crc="ae66d227" sha1="ba33f588a580b6893713ac7437f9b4d98cb7ffac" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc1000_cass">
 			<feature name="part_id" value="Aterrissagem em Marte"/>
 			<dataarea name="cass" size="461580">
-				<rom name="mc1000_1_2_aterrissagem_em_marte.wav" size="461580" crc="cdfc08b8" sha1="807b60925135de67f258568d784c16993a10dbb8" offset="0" status="baddump" />
+				<rom name="mc1000_1_2_aterrissagem_em_marte.wav" size="461580" crc="cdfc08b8" sha1="807b60925135de67f258568d784c16993a10dbb8" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc1000_cass">
 			<feature name="part_id" value="Bombardeio na Cidade"/>
 			<dataarea name="cass" size="339596">
-				<rom name="mc1000_1_3_bombardeio_na_cidade.wav" size="339596" crc="c74f3b26" sha1="9ed8a57a808727752dd3bb37af7eb0eb5db375f1" offset="0" status="baddump" />
+				<rom name="mc1000_1_3_bombardeio_na_cidade.wav" size="339596" crc="c74f3b26" sha1="9ed8a57a808727752dd3bb37af7eb0eb5db375f1" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mc1000_cass">
 			<feature name="part_id" value="Matematica para Jardim de Infancia"/>
 			<dataarea name="cass" size="659084">
-				<rom name="mc1000_1_4_matematica_para_jardim_de_infancia.wav" size="659084" crc="ff0a069c" sha1="8839cbe36e107d4134903d0204b1d9156aeb0460" offset="0" status="baddump" />
+				<rom name="mc1000_1_4_matematica_para_jardim_de_infancia.wav" size="659084" crc="ff0a069c" sha1="8839cbe36e107d4134903d0204b1d9156aeb0460" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="mc1000_cass">
 			<feature name="part_id" value="Batalha com Tanques"/>
 			<dataarea name="cass" size="554828">
-				<rom name="mc1000_1_5_batalha_com_tanques.wav" size="554828" crc="62237abf" sha1="709e7e7f85841782dd0fba952f95dbc621ff8301" offset="0" status="baddump" />
+				<rom name="mc1000_1_5_batalha_com_tanques.wav" size="554828" crc="62237abf" sha1="709e7e7f85841782dd0fba952f95dbc621ff8301" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -418,301 +418,301 @@
 		<part name="cass1" interface="mc1000_cass">
 			<feature name="part_id" value="Apresentacao (APRE)"/>
 			<dataarea name="cass" size="489228">
-				<rom name="mc1000_fita_50_programas_01_apresentacao_apre.wav" size="489228" crc="b8473115" sha1="af2eb19c9d6b98912ef3aeff95b3d0b005fb007a" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_01_apresentacao_apre.wav" size="489228" crc="b8473115" sha1="af2eb19c9d6b98912ef3aeff95b3d0b005fb007a" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc1000_cass">
 			<feature name="part_id" value="Desenhando (DESE)"/>
 			<dataarea name="cass" size="266348">
-				<rom name="mc1000_fita_50_programas_02_desenhando_dese.wav" size="266348" crc="0e4531b0" sha1="cf5b326eb76a58371b4f8d6416577b666acb7c9c" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_02_desenhando_dese.wav" size="266348" crc="0e4531b0" sha1="cf5b326eb76a58371b4f8d6416577b666acb7c9c" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc1000_cass">
 			<feature name="part_id" value="Some sounds (SONS)"/>
 			<dataarea name="cass" size="213468">
-				<rom name="mc1000_fita_50_programas_03_some_sounds_sons.wav" size="213468" crc="18f475dd" sha1="7b911f61283de969e549e05ef02f0e36a858e348" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_03_some_sounds_sons.wav" size="213468" crc="18f475dd" sha1="7b911f61283de969e549e05ef02f0e36a858e348" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mc1000_cass">
 			<feature name="part_id" value="Grafimania (GRAF)"/>
 			<dataarea name="cass" size="163004">
-				<rom name="mc1000_fita_50_programas_04_grafimania_graf.wav" size="163004" crc="6361305d" sha1="090fbaf586f06d3198957e36721003da20ff3561" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_04_grafimania_graf.wav" size="163004" crc="6361305d" sha1="090fbaf586f06d3198957e36721003da20ff3561" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass5" interface="mc1000_cass">
 			<feature name="part_id" value="Dente-de-leao (DENT)"/>
 			<dataarea name="cass" size="101292">
-				<rom name="mc1000_fita_50_programas_05_dente_de_leao_dent.wav" size="101292" crc="7d4f6569" sha1="f0bf86473d031a701b21891131de20d8919d9d3d" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_05_dente_de_leao_dent.wav" size="101292" crc="7d4f6569" sha1="f0bf86473d031a701b21891131de20d8919d9d3d" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass6" interface="mc1000_cass">
 			<feature name="part_id" value="Caleidoscopio (CALE)"/>
 			<dataarea name="cass" size="87196">
-				<rom name="mc1000_fita_50_programas_06_caleidoscopio_cale.wav" size="87196" crc="2b4fa79f" sha1="f57938771f18f84900483ba97c2b7167b17a2756" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_06_caleidoscopio_cale.wav" size="87196" crc="2b4fa79f" sha1="f57938771f18f84900483ba97c2b7167b17a2756" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass7" interface="mc1000_cass">
 			<feature name="part_id" value="3 telas (TELA)"/>
 			<dataarea name="cass" size="94860">
-				<rom name="mc1000_fita_50_programas_07_3_telas_tela.wav" size="94860" crc="a74164b6" sha1="adde65a5d38772e5e3ab866ca698952d192b9e80" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_07_3_telas_tela.wav" size="94860" crc="a74164b6" sha1="adde65a5d38772e5e3ab866ca698952d192b9e80" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass8" interface="mc1000_cass">
 			<feature name="part_id" value="Teias (TEIA)"/>
 			<dataarea name="cass" size="102284">
-				<rom name="mc1000_fita_50_programas_08_teias_teia.wav" size="102284" crc="00c89aab" sha1="15cc023730d947c42aa8e59d6b92c15a3334a1b8" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_08_teias_teia.wav" size="102284" crc="00c89aab" sha1="15cc023730d947c42aa8e59d6b92c15a3334a1b8" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass9" interface="mc1000_cass">
 			<feature name="part_id" value="Reflexo (REFL)"/>
 			<dataarea name="cass" size="94684">
-				<rom name="mc1000_fita_50_programas_09_reflexo_refl.wav" size="94684" crc="f5b23b22" sha1="c073344e2e90a1034bd2d52c2a90e7c61c8782c0" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_09_reflexo_refl.wav" size="94684" crc="f5b23b22" sha1="c073344e2e90a1034bd2d52c2a90e7c61c8782c0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass10" interface="mc1000_cass">
 			<feature name="part_id" value="Linhas (LINH)"/>
 			<dataarea name="cass" size="99052">
-				<rom name="mc1000_fita_50_programas_10_linhas_linh.wav" size="99052" crc="62f69360" sha1="ae03a492a971a43232c58ad9bcc12181da49d36a" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_10_linhas_linh.wav" size="99052" crc="62f69360" sha1="ae03a492a971a43232c58ad9bcc12181da49d36a" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass11" interface="mc1000_cass">
 			<feature name="part_id" value="Cicloide (CICL)"/>
 			<dataarea name="cass" size="81212">
-				<rom name="mc1000_fita_50_programas_11_cicloide_cicl.wav" size="81212" crc="ff5825d8" sha1="a1338fd93b3671a378f52224b50d26bedd9e1bab" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_11_cicloide_cicl.wav" size="81212" crc="ff5825d8" sha1="a1338fd93b3671a378f52224b50d26bedd9e1bab" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass12" interface="mc1000_cass">
 			<feature name="part_id" value="Senoides (SENO)"/>
 			<dataarea name="cass" size="82124">
-				<rom name="mc1000_fita_50_programas_12_senoides_seno.wav" size="82124" crc="37712d8a" sha1="7de98cd758cd0c7227ba57fe8b41a13f7721044d" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_12_senoides_seno.wav" size="82124" crc="37712d8a" sha1="7de98cd758cd0c7227ba57fe8b41a13f7721044d" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass13" interface="mc1000_cass">
 			<feature name="part_id" value="Histograma (HIST)"/>
 			<dataarea name="cass" size="425964">
-				<rom name="mc1000_fita_50_programas_13_histograma_hist.wav" size="425964" crc="b4ec3d5e" sha1="b6a6b8a92319124b1328c40e0a04e819e91ff608" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_13_histograma_hist.wav" size="425964" crc="b4ec3d5e" sha1="b6a6b8a92319124b1328c40e0a04e819e91ff608" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass14" interface="mc1000_cass">
 			<feature name="part_id" value="Jogo de dados (DADO)"/>
 			<dataarea name="cass" size="229164">
-				<rom name="mc1000_fita_50_programas_14_jogo_de_dados_dado.wav" size="229164" crc="f881f923" sha1="7d55813fdc1deb58001e9fd2c1687501a13acba5" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_14_jogo_de_dados_dado.wav" size="229164" crc="f881f923" sha1="7d55813fdc1deb58001e9fd2c1687501a13acba5" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass15" interface="mc1000_cass">
 			<feature name="part_id" value="Frases (FRAS)"/>
 			<dataarea name="cass" size="291996">
-				<rom name="mc1000_fita_50_programas_15_frases_fras.wav" size="291996" crc="6a51544e" sha1="119de9fcb145369f92f515b4a8aed49d98b9b830" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_15_frases_fras.wav" size="291996" crc="6a51544e" sha1="119de9fcb145369f92f515b4a8aed49d98b9b830" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass16" interface="mc1000_cass">
 			<feature name="part_id" value="Numero oculto (NUME)"/>
 			<dataarea name="cass" size="124460">
-				<rom name="mc1000_fita_50_programas_16_numero_oculto_nume.wav" size="124460" crc="b00af10e" sha1="7e12c7bf6727a9c73a309364a89334c4016965ae" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_16_numero_oculto_nume.wav" size="124460" crc="b00af10e" sha1="7e12c7bf6727a9c73a309364a89334c4016965ae" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass17" interface="mc1000_cass">
 			<feature name="part_id" value="Reverso (REVE)"/>
 			<dataarea name="cass" size="399420">
-				<rom name="mc1000_fita_50_programas_17_reverso_reve.wav" size="399420" crc="919148c4" sha1="9c4ab207f0f6abaf6cac91d3decea8372142ba49" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_17_reverso_reve.wav" size="399420" crc="919148c4" sha1="9c4ab207f0f6abaf6cac91d3decea8372142ba49" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass18" interface="mc1000_cass">
 			<feature name="part_id" value="Calendario (CALE)"/>
 			<dataarea name="cass" size="260380">
-				<rom name="mc1000_fita_50_programas_18_calendario_cale.wav" size="260380" crc="1476eba6" sha1="ac1d1168272e81a1026333109564885a364af22a" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_18_calendario_cale.wav" size="260380" crc="1476eba6" sha1="ac1d1168272e81a1026333109564885a364af22a" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass19" interface="mc1000_cass">
 			<feature name="part_id" value="Tira-letras (TIRA)"/>
 			<dataarea name="cass" size="127628">
-				<rom name="mc1000_fita_50_programas_19_tira_letras_tira.wav" size="127628" crc="87fc6b3e" sha1="8f753ce79f610ac0fdab6f0aabb9a231f6f2b7a0" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_19_tira_letras_tira.wav" size="127628" crc="87fc6b3e" sha1="8f753ce79f610ac0fdab6f0aabb9a231f6f2b7a0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass20" interface="mc1000_cass">
 			<feature name="part_id" value="Espelho (ESPE)"/>
 			<dataarea name="cass" size="120220">
-				<rom name="mc1000_fita_50_programas_20_espelho_espe.wav" size="120220" crc="ab87857e" sha1="b36a5ca2959dd75457548420ad544b06f63027f3" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_20_espelho_espe.wav" size="120220" crc="ab87857e" sha1="b36a5ca2959dd75457548420ad544b06f63027f3" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass21" interface="mc1000_cass">
 			<feature name="part_id" value="Negativo (NEGT)"/>
 			<dataarea name="cass" size="117484">
-				<rom name="mc1000_fita_50_programas_21_negativo_negt.wav" size="117484" crc="f83b0d4a" sha1="4db22774a8f880c2e562fea683d192ac616a5d52" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_21_negativo_negt.wav" size="117484" crc="f83b0d4a" sha1="4db22774a8f880c2e562fea683d192ac616a5d52" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass22" interface="mc1000_cass">
 			<feature name="part_id" value="Moldura (MOLD)"/>
 			<dataarea name="cass" size="167708">
-				<rom name="mc1000_fita_50_programas_22_moldura_mold.wav" size="167708" crc="cb7a3be8" sha1="390002d6f241e3909e846bf9204c9a250e3c54e4" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_22_moldura_mold.wav" size="167708" crc="cb7a3be8" sha1="390002d6f241e3909e846bf9204c9a250e3c54e4" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass23" interface="mc1000_cass">
 			<feature name="part_id" value="Ordenador alfabetico (SORT)"/>
 			<dataarea name="cass" size="218428">
-				<rom name="mc1000_fita_50_programas_23_ordenador_alfabetico_sort.wav" size="218428" crc="933c05d7" sha1="942889490e378ac83b3513963bb4bfb15a337179" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_23_ordenador_alfabetico_sort.wav" size="218428" crc="933c05d7" sha1="942889490e378ac83b3513963bb4bfb15a337179" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass24" interface="mc1000_cass">
 			<feature name="part_id" value="Conversor arabicos-romanos (ROMA)"/>
 			<dataarea name="cass" size="138668">
-				<rom name="mc1000_fita_50_programas_24_conversao_arabicos_romanos_roma.wav" size="138668" crc="858e4fca" sha1="bee6207043b42e0788414f09222035a9c970df36" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_24_conversao_arabicos_romanos_roma.wav" size="138668" crc="858e4fca" sha1="bee6207043b42e0788414f09222035a9c970df36" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass25" interface="mc1000_cass">
 			<feature name="part_id" value="Palpites para loto (LOTO)"/>
 			<dataarea name="cass" size="159804">
-				<rom name="mc1000_fita_50_programas_25_palpites_para_loto_loto.wav" size="159804" crc="83fd51af" sha1="4969800ada5688e9bccbdb1eb8a738294d0be870" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_25_palpites_para_loto_loto.wav" size="159804" crc="83fd51af" sha1="4969800ada5688e9bccbdb1eb8a738294d0be870" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass26" interface="mc1000_cass">
 			<feature name="part_id" value="C.P.F. (CPF)"/>
 			<dataarea name="cass" size="133692">
-				<rom name="mc1000_fita_50_programas_26_cpf_cpf.wav" size="133692" crc="23ff1845" sha1="ef85e05da81416e374446186fee0be63a5a8faae" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_26_cpf_cpf.wav" size="133692" crc="23ff1845" sha1="ef85e05da81416e374446186fee0be63a5a8faae" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass27" interface="mc1000_cass">
 			<feature name="part_id" value="Conversao graus Celsius-Fahrenheit-Celsius (CFC)"/>
 			<dataarea name="cass" size="132476">
-				<rom name="mc1000_fita_50_programas_27_conversao_celsius_fahrenheit_celsius_cfc.wav" size="132476" crc="194f9c50" sha1="f49a222b9374d911b2eac8b9153fd8692ef0955e" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_27_conversao_celsius_fahrenheit_celsius_cfc.wav" size="132476" crc="194f9c50" sha1="f49a222b9374d911b2eac8b9153fd8692ef0955e" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass28" interface="mc1000_cass">
 			<feature name="part_id" value="Palindromas (PALI)"/>
 			<dataarea name="cass" size="135260">
-				<rom name="mc1000_fita_50_programas_28_palindromas_pali.wav" size="135260" crc="507fd2a5" sha1="75c01363aa2b9203ba2e8f547ecf937de88bf05f" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_28_palindromas_pali.wav" size="135260" crc="507fd2a5" sha1="75c01363aa2b9203ba2e8f547ecf937de88bf05f" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass29" interface="mc1000_cass">
 			<feature name="part_id" value="Agenda telefonica (AGEN)"/>
 			<dataarea name="cass" size="359692">
-				<rom name="mc1000_fita_50_programas_29_agenda_telefonica_agen.wav" size="359692" crc="236b88e3" sha1="fcc1eb66523c9b2a2a147f2dad3112cb4292a408" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_29_agenda_telefonica_agen.wav" size="359692" crc="236b88e3" sha1="fcc1eb66523c9b2a2a147f2dad3112cb4292a408" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass30" interface="mc1000_cass">
 			<feature name="part_id" value="Econometro (ECON)"/>
 			<dataarea name="cass" size="186316">
-				<rom name="mc1000_fita_50_programas_30_econometro_econ.wav" size="186316" crc="b258d7b0" sha1="9750b6ed75eac0245e3db6cb2f8e3f8d32e068eb" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_30_econometro_econ.wav" size="186316" crc="b258d7b0" sha1="9750b6ed75eac0245e3db6cb2f8e3f8d32e068eb" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass31" interface="mc1000_cass">
 			<feature name="part_id" value="Alfabeto I (ALFI)"/>
 			<dataarea name="cass" size="115596">
-				<rom name="mc1000_fita_50_programas_31_alfabeto_i_alfi.wav" size="115596" crc="5b943d8c" sha1="dd13faa2147dd93fb1acd3d4abce91464d2bacb1" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_31_alfabeto_i_alfi.wav" size="115596" crc="5b943d8c" sha1="dd13faa2147dd93fb1acd3d4abce91464d2bacb1" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass32" interface="mc1000_cass">
 			<feature name="part_id" value="Alfabeto II (ALII)"/>
 			<dataarea name="cass" size="99164">
-				<rom name="mc1000_fita_50_programas_32_alfabeto_ii_alii.wav" size="99164" crc="8f1d2005" sha1="e21cbeb7833c40e054f870a2622f70d245ef17dc" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_32_alfabeto_ii_alii.wav" size="99164" crc="8f1d2005" sha1="e21cbeb7833c40e054f870a2622f70d245ef17dc" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass33" interface="mc1000_cass">
 			<feature name="part_id" value="Codigo Morse (MORS)"/>
 			<dataarea name="cass" size="120316">
-				<rom name="mc1000_fita_50_programas_33_codigo_morse_mors.wav" size="120316" crc="9ac62da7" sha1="ba1f20925b66641185eb64e4c3a0cb6c4fcb5df1" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_33_codigo_morse_mors.wav" size="120316" crc="9ac62da7" sha1="ba1f20925b66641185eb64e4c3a0cb6c4fcb5df1" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass34" interface="mc1000_cass">
 			<feature name="part_id" value="Cebolinha (CEBO)"/>
 			<dataarea name="cass" size="139084">
-				<rom name="mc1000_fita_50_programas_34_cebolinha_cebo.wav" size="139084" crc="53c2e0ec" sha1="378cba2f77cc6c3cdbe691b94270fa6124ecd459" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_34_cebolinha_cebo.wav" size="139084" crc="53c2e0ec" sha1="378cba2f77cc6c3cdbe691b94270fa6124ecd459" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass35" interface="mc1000_cass">
 			<feature name="part_id" value="Numeros primos (PRIM)"/>
 			<dataarea name="cass" size="168396">
-				<rom name="mc1000_fita_50_programas_35_numeros_primos_prim.wav" size="168396" crc="8e9d948c" sha1="d72a8ff1dd6b07df67abfbc636b963eba2e9271d" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_35_numeros_primos_prim.wav" size="168396" crc="8e9d948c" sha1="d72a8ff1dd6b07df67abfbc636b963eba2e9271d" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass36" interface="mc1000_cass">
 			<feature name="part_id" value="Fatorial (FACT)"/>
 			<dataarea name="cass" size="217244">
-				<rom name="mc1000_fita_50_programas_36_fatorial_fact.wav" size="217244" crc="5e0a46fb" sha1="9ab8dd65a480d06c3a85484e199e21e72f960660" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_36_fatorial_fact.wav" size="217244" crc="5e0a46fb" sha1="9ab8dd65a480d06c3a85484e199e21e72f960660" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass37" interface="mc1000_cass">
 			<feature name="part_id" value="Calculo de pi (PI)"/>
 			<dataarea name="cass" size="100748">
-				<rom name="mc1000_fita_50_programas_37_calculo_de_pi_pi.wav" size="100748" crc="b99403ca" sha1="bb19192f77dccb1196268ac6f756b238fc234372" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_37_calculo_de_pi_pi.wav" size="100748" crc="b99403ca" sha1="bb19192f77dccb1196268ac6f756b238fc234372" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass38" interface="mc1000_cass">
 			<feature name="part_id" value="Triangulos (TRAI)"/>
 			<dataarea name="cass" size="138764">
-				<rom name="mc1000_fita_50_programas_38_triangulos_tria.wav" size="138764" crc="15d70dbb" sha1="8762c4564660d43f812a418105f38674378b701d" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_38_triangulos_tria.wav" size="138764" crc="15d70dbb" sha1="8762c4564660d43f812a418105f38674378b701d" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass39" interface="mc1000_cass">
 			<feature name="part_id" value="Raiz de polinomios (RAIZ)"/>
 			<dataarea name="cass" size="142812">
-				<rom name="mc1000_fita_50_programas_39_raiz_de_polinomios_raiz.wav" size="142812" crc="280fee83" sha1="03a10961527bbdadda6be56935f58d234bc450d7" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_39_raiz_de_polinomios_raiz.wav" size="142812" crc="280fee83" sha1="03a10961527bbdadda6be56935f58d234bc450d7" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass40" interface="mc1000_cass">
 			<feature name="part_id" value="Fatores primos (FAPR)"/>
 			<dataarea name="cass" size="141724">
-				<rom name="mc1000_fita_50_programas_40_fatores_primos_fapr.wav" size="141724" crc="8a5af03d" sha1="daf3f1ebf4704a101a2f13b601fd9434e9532abc" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_40_fatores_primos_fapr.wav" size="141724" crc="8a5af03d" sha1="daf3f1ebf4704a101a2f13b601fd9434e9532abc" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass41" interface="mc1000_cass">
 			<feature name="part_id" value="Conversao de base (BASE)"/>
 			<dataarea name="cass" size="132508">
-				<rom name="mc1000_fita_50_programas_41_conversao_de_base_base.wav" size="132508" crc="4c8807e2" sha1="f08e2da6284d95c8558b32bf7352d13dd196a214" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_41_conversao_de_base_base.wav" size="132508" crc="4c8807e2" sha1="f08e2da6284d95c8558b32bf7352d13dd196a214" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass42" interface="mc1000_cass">
 			<feature name="part_id" value="Regressao linear (RLIN)"/>
 			<dataarea name="cass" size="157036">
-				<rom name="mc1000_fita_50_programas_42_regressao_linear_rlin.wav" size="157036" crc="ec5ed7d0" sha1="390570d7ac5c7d6e439efed7d6a1a512d1cf6aa5" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_42_regressao_linear_rlin.wav" size="157036" crc="ec5ed7d0" sha1="390570d7ac5c7d6e439efed7d6a1a512d1cf6aa5" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass43" interface="mc1000_cass">
 			<feature name="part_id" value="Exponenciais (EXPO)"/>
 			<dataarea name="cass" size="160460">
-				<rom name="mc1000_fita_50_programas_43_exponenciais_expo.wav" size="160460" crc="c69db959" sha1="3f0bebf891261fbccdbe52ca59e0914d3eae1dde" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_43_exponenciais_expo.wav" size="160460" crc="c69db959" sha1="3f0bebf891261fbccdbe52ca59e0914d3eae1dde" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass44" interface="mc1000_cass">
 			<feature name="part_id" value="Soma de matrizes (MATR)"/>
 			<dataarea name="cass" size="149052">
-				<rom name="mc1000_fita_50_programas_44_soma_de_matrizes_matr.wav" size="149052" crc="48d634c6" sha1="82f2d441ad8808376c9753889f3a4f64d298aa95" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_44_soma_de_matrizes_matr.wav" size="149052" crc="48d634c6" sha1="82f2d441ad8808376c9753889f3a4f64d298aa95" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass45" interface="mc1000_cass">
 			<feature name="part_id" value="Teste de aritmetica (ARIT)"/>
 			<dataarea name="cass" size="237500">
-				<rom name="mc1000_fita_50_programas_45_teste_de_aritmetica_arit.wav" size="237500" crc="e575db54" sha1="740ac672a2912df76df297ec85e393c6b24bc41e" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_45_teste_de_aritmetica_arit.wav" size="237500" crc="e575db54" sha1="740ac672a2912df76df297ec85e393c6b24bc41e" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass46" interface="mc1000_cass">
 			<feature name="part_id" value="Grafico de funcoes (GRSI)"/>
 			<dataarea name="cass" size="343884">
-				<rom name="mc1000_fita_50_programas_46_grafico_de_funcoes_grsi.wav" size="343884" crc="d492eb00" sha1="cf61cc433711f4dd138df076ce37fd364ad85774" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_46_grafico_de_funcoes_grsi.wav" size="343884" crc="d492eb00" sha1="cf61cc433711f4dd138df076ce37fd364ad85774" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass47" interface="mc1000_cass">
 			<feature name="part_id" value="Invasao das formigas (FORM)"/>
 			<dataarea name="cass" size="81452">
-				<rom name="mc1000_fita_50_programas_47_invasao_das_formigas_form.wav" size="81452" crc="2637f2ea" sha1="db4f01f47412f14a5fb8d4adc731d2e67c527b94" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_47_invasao_das_formigas_form.wav" size="81452" crc="2637f2ea" sha1="db4f01f47412f14a5fb8d4adc731d2e67c527b94" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass48" interface="mc1000_cass">
 			<feature name="part_id" value="Graficos simulados (GSIM)"/>
 			<dataarea name="cass" size="95724">
-				<rom name="mc1000_fita_50_programas_48_graficos_simulados_gsim.wav" size="95724" crc="ff2a8bde" sha1="9aa83ed550afa5de4eb3b7c565ca80475ce7a7d9" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_48_graficos_simulados_gsim.wav" size="95724" crc="ff2a8bde" sha1="9aa83ed550afa5de4eb3b7c565ca80475ce7a7d9" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass49" interface="mc1000_cass">
 			<feature name="part_id" value="Calculo de volumes (VOLM)"/>
 			<dataarea name="cass" size="745180">
-				<rom name="mc1000_fita_50_programas_49_calculo_de_volumes_volm.wav" size="745180" crc="2a680b2a" sha1="d18713b8aa7bac81559355457e6a1daa07e8cb3c" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_49_calculo_de_volumes_volm.wav" size="745180" crc="2a680b2a" sha1="d18713b8aa7bac81559355457e6a1daa07e8cb3c" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="cass50" interface="mc1000_cass">
 			<feature name="part_id" value="Demo printer (IMPR)"/>
 			<dataarea name="cass" size="288876">
-				<rom name="mc1000_fita_50_programas_50_demo_printer_impr.wav" size="288876" crc="da769bbb" sha1="35ea4431c53a3e7f30ea8c8ad581d0005d80c99a" offset="0" status="baddump" />
+				<rom name="mc1000_fita_50_programas_50_demo_printer_impr.wav" size="288876" crc="da769bbb" sha1="35ea4431c53a3e7f30ea8c8ad581d0005d80c99a" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -726,25 +726,25 @@
 		<part name="cass1" interface="mc1000_cass">
 			<feature name="part_id" value="Side A Part 1"/>
 			<dataarea name="cass" size="1772988">
-				<rom name="mc1000_fita_curso_de_basic_1.wav" size="1772988" crc="7b42f631" sha1="1de0291dfd856da05f189065c6cae13f6ee34718" offset="0" />
+				<rom name="mc1000_fita_curso_de_basic_1.wav" size="1772988" crc="7b42f631" sha1="1de0291dfd856da05f189065c6cae13f6ee34718"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="mc1000_cass">
 			<feature name="part_id" value="Side A Part 2"/>
 			<dataarea name="cass" size="1626828">
-				<rom name="mc1000_fita_curso_de_basic_2.wav" size="1626828" crc="fef12eac" sha1="8dc428cb1c4c0d6cdeab356f7c5c8f6296422e98" offset="0" />
+				<rom name="mc1000_fita_curso_de_basic_2.wav" size="1626828" crc="fef12eac" sha1="8dc428cb1c4c0d6cdeab356f7c5c8f6296422e98"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="mc1000_cass">
 			<feature name="part_id" value="Side B Part 1"/>
 			<dataarea name="cass" size="1486428">
-				<rom name="mc1000_fita_curso_de_basic_3.wav" size="1486428" crc="26d63ca2" sha1="dfa4cababf20095cce4fbf5be11a3ae94322d49a" offset="0" />
+				<rom name="mc1000_fita_curso_de_basic_3.wav" size="1486428" crc="26d63ca2" sha1="dfa4cababf20095cce4fbf5be11a3ae94322d49a"/>
 			</dataarea>
 		</part>
 		<part name="cass4" interface="mc1000_cass">
 			<feature name="part_id" value="Side B Part 2"/>
 			<dataarea name="cass" size="1177628">
-				<rom name="mc1000_fita_curso_de_basic_4.wav" size="1177628" crc="62a84f2c" sha1="7653cc92186de419b1cc4bb43e7b97704b6a0aac" offset="0" />
+				<rom name="mc1000_fita_curso_de_basic_4.wav" size="1177628" crc="62a84f2c" sha1="7653cc92186de419b1cc4bb43e7b97704b6a0aac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -764,17 +764,17 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="302892">
-                <rom name="amazing 2.wav" size="302892" crc="93239a52" sha1="ae135b159cb8246d8617097d3a239959ff9cb929" offset="0" />
+                <rom name="amazing 2.wav" size="302892" crc="93239a52" sha1="ae135b159cb8246d8617097d3a239959ff9cb929"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="325164">
-                <rom name="amazing 3.wav" size="325164" crc="53bb3ffd" sha1="6066742b1e36f05887c3de7c0cdba3715e56d50c" offset="0" />
+                <rom name="amazing 3.wav" size="325164" crc="53bb3ffd" sha1="6066742b1e36f05887c3de7c0cdba3715e56d50c"/>
             </dataarea>
         </part>
         <part name="cass3" interface="mc1000_cass">
             <dataarea name="cass" size="232668">
-                <rom name="amazing.wav" size="232668" crc="9dec1422" sha1="33e5386fe8ef60cf5501b1891a30b36651761c6c" offset="0" />
+                <rom name="amazing.wav" size="232668" crc="9dec1422" sha1="33e5386fe8ef60cf5501b1891a30b36651761c6c"/>
             </dataarea>
         </part>
     </software>
@@ -786,7 +786,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="68844">
-                <rom name="mostra nome de arquivo.wav" size="68844" crc="1dbd1e56" sha1="394f0e1f93b777329eae3c79314d352a84c84815" offset="0" />
+                <rom name="mostra nome de arquivo.wav" size="68844" crc="1dbd1e56" sha1="394f0e1f93b777329eae3c79314d352a84c84815"/>
             </dataarea>
         </part>
     </software>
@@ -798,7 +798,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="702764">
-                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179" offset="0" />
+                <rom name="aventura.wav" size="702764" crc="82a6263b" sha1="834d9511e22f5c34244923108366201e82b89179"/>
             </dataarea>
         </part>
     </software>
@@ -810,7 +810,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="216444">
-                <rom name="awari.wav" size="216444" crc="4e695eeb" sha1="daf34c61a385a6044f52d3b3a0fead5bc25786b6" offset="0" />
+                <rom name="awari.wav" size="216444" crc="4e695eeb" sha1="daf34c61a385a6044f52d3b3a0fead5bc25786b6"/>
             </dataarea>
         </part>
     </software>
@@ -822,7 +822,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="266668">
-                <rom name="boneco animado sg6.wav" size="266668" crc="066c1f17" sha1="d4ef4e152f892e8566c7a789dc591d9451e5bb73" offset="0" />
+                <rom name="boneco animado sg6.wav" size="266668" crc="066c1f17" sha1="d4ef4e152f892e8566c7a789dc591d9451e5bb73"/>
             </dataarea>
         </part>
     </software>
@@ -834,12 +834,12 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="1224700">
-                <rom name="capa e espada alt.wav" size="1224700" crc="1b4ee35e" sha1="1d02c0bb984d83a14c170655c7c704e52bf5824a" offset="0" />
+                <rom name="capa e espada alt.wav" size="1224700" crc="1b4ee35e" sha1="1d02c0bb984d83a14c170655c7c704e52bf5824a"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="1224028">
-                <rom name="capa e espada.wav" size="1224028" crc="6dfde138" sha1="6a6395381cf29111a5143a5bae5e517d8150277e" offset="0" />
+                <rom name="capa e espada.wav" size="1224028" crc="6dfde138" sha1="6a6395381cf29111a5143a5bae5e517d8150277e"/>
             </dataarea>
         </part>
     </software>
@@ -851,7 +851,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="176812">
-                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf" offset="0" />
+                <rom name="circulos.wav" size="176812" crc="402caaea" sha1="614201ff32f80c91bf433243bc046eee78e190bf"/>
             </dataarea>
         </part>
     </software>
@@ -863,7 +863,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="290236">
-                <rom name="come come.wav" size="290236" crc="2aff8ec3" sha1="622bb22f427cf583064e943d02fe9a8a57d61d87" offset="0" />
+                <rom name="come come.wav" size="290236" crc="2aff8ec3" sha1="622bb22f427cf583064e943d02fe9a8a57d61d87"/>
             </dataarea>
         </part>
     </software>
@@ -875,7 +875,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="333484">
-                <rom name="damas.wav" size="333484" crc="323edc1f" sha1="ad04c3568d598879f63e4a45a89270812bdcafe6" offset="0" />
+                <rom name="damas.wav" size="333484" crc="323edc1f" sha1="ad04c3568d598879f63e4a45a89270812bdcafe6"/>
             </dataarea>
         </part>
     </software>
@@ -887,7 +887,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="412892">
-                <rom name="draw print.wav" size="412892" crc="2e8b4101" sha1="0693a63c7a65a864c15dd899f3d4a4dfd31606f0" offset="0" />
+                <rom name="draw print.wav" size="412892" crc="2e8b4101" sha1="0693a63c7a65a864c15dd899f3d4a4dfd31606f0"/>
             </dataarea>
         </part>
     </software>
@@ -899,12 +899,12 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="757388">
-                <rom name="engine para adventures 2.wav" size="757388" crc="84577d7e" sha1="e34884828bd8902ae63c1d8b407035db25b102a5" offset="0" />
+                <rom name="engine para adventures 2.wav" size="757388" crc="84577d7e" sha1="e34884828bd8902ae63c1d8b407035db25b102a5"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="615356">
-                <rom name="engine para adventures.wav" size="615356" crc="2b6aaeba" sha1="aec9b2ab7e82dd5884a352e20a04741640819ad1" offset="0" />
+                <rom name="engine para adventures.wav" size="615356" crc="2b6aaeba" sha1="aec9b2ab7e82dd5884a352e20a04741640819ad1"/>
             </dataarea>
         </part>
     </software>
@@ -916,7 +916,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="549964">
-                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f" offset="0" />
+                <rom name="explosao.wav" size="549964" crc="d231d3af" sha1="a3cce871efa9f8762257ac7ea47c71311f25920f"/>
             </dataarea>
         </part>
     </software>
@@ -928,17 +928,17 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="161212">
-                <rom name="graficos em 3d 2.wav" size="161212" crc="2b66d72c" sha1="ae267b2e917c3aeaf2b509df396071a6391c03d7" offset="0" />
+                <rom name="graficos em 3d 2.wav" size="161212" crc="2b66d72c" sha1="ae267b2e917c3aeaf2b509df396071a6391c03d7"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="312092">
-                <rom name="graficos em 3d 3.wav" size="312092" crc="25eeda66" sha1="66515ed2845ecbc2a2bfdc92ed2b014127d10424" offset="0" />
+                <rom name="graficos em 3d 3.wav" size="312092" crc="25eeda66" sha1="66515ed2845ecbc2a2bfdc92ed2b014127d10424"/>
             </dataarea>
         </part>
         <part name="cass3" interface="mc1000_cass">
             <dataarea name="cass" size="108092">
-                <rom name="graficos em 3d.wav" size="108092" crc="2afb2dd1" sha1="b7712378f87b0aa442511f909cdf394fe3171c6a" offset="0" />
+                <rom name="graficos em 3d.wav" size="108092" crc="2afb2dd1" sha1="b7712378f87b0aa442511f909cdf394fe3171c6a"/>
             </dataarea>
         </part>
     </software>
@@ -950,7 +950,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="482092">
-                <rom name="hamurabi.wav" size="482092" crc="4d894a09" sha1="fc9bb4eb7cab0c544e623a7a1731910b824b8107" offset="0" />
+                <rom name="hamurabi.wav" size="482092" crc="4d894a09" sha1="fc9bb4eb7cab0c544e623a7a1731910b824b8107"/>
             </dataarea>
         </part>
     </software>
@@ -962,7 +962,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="216236">
-                <rom name="hanoi solucao circular.wav" size="216236" crc="14e1964f" sha1="f9676f8403faa2d8ba5c8aba657f9893e23d22ed" offset="0" />
+                <rom name="hanoi solucao circular.wav" size="216236" crc="14e1964f" sha1="f9676f8403faa2d8ba5c8aba657f9893e23d22ed"/>
             </dataarea>
         </part>
     </software>
@@ -974,12 +974,12 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="276140">
-                <rom name="hgr print 64 2.wav" size="276140" crc="dc88eb54" sha1="bbbfaf25c591b1097132d1451b2960bd23374983" offset="0" />
+                <rom name="hgr print 64 2.wav" size="276140" crc="dc88eb54" sha1="bbbfaf25c591b1097132d1451b2960bd23374983"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="301228">
-                <rom name="hgr print 64.wav" size="301228" crc="e4eaf422" sha1="37438b2e26dec14809e020162bbc623b8977cdf5" offset="0" />
+                <rom name="hgr print 64.wav" size="301228" crc="e4eaf422" sha1="37438b2e26dec14809e020162bbc623b8977cdf5"/>
             </dataarea>
         </part>
     </software>
@@ -991,62 +991,62 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="368780">
-                <rom name="hgr print 10.wav" size="368780" crc="5bd47cbc" sha1="1066ee0728d9c0573852c67fec7c519e5f5906d6" offset="0" />
+                <rom name="hgr print 10.wav" size="368780" crc="5bd47cbc" sha1="1066ee0728d9c0573852c67fec7c519e5f5906d6"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="391708">
-                <rom name="hgr print 11.wav" size="391708" crc="14453cfa" sha1="a8a3dfab558861f6a4cb49d7c423aaed1d323a4d" offset="0" />
+                <rom name="hgr print 11.wav" size="391708" crc="14453cfa" sha1="a8a3dfab558861f6a4cb49d7c423aaed1d323a4d"/>
             </dataarea>
         </part>
         <part name="cass3" interface="mc1000_cass">
             <dataarea name="cass" size="426332">
-                <rom name="hgr print 12.wav" size="426332" crc="6119473b" sha1="81ec218a8500f6bfe51b06292ec0ba5051d39678" offset="0" />
+                <rom name="hgr print 12.wav" size="426332" crc="6119473b" sha1="81ec218a8500f6bfe51b06292ec0ba5051d39678"/>
             </dataarea>
         </part>
         <part name="cass4" interface="mc1000_cass">
             <dataarea name="cass" size="366204">
-                <rom name="hgr print 2.wav" size="366204" crc="506c5a8d" sha1="a039a343bf749a234f86e53beae26533389f7c3f" offset="0" />
+                <rom name="hgr print 2.wav" size="366204" crc="506c5a8d" sha1="a039a343bf749a234f86e53beae26533389f7c3f"/>
             </dataarea>
         </part>
         <part name="cass5" interface="mc1000_cass">
             <dataarea name="cass" size="358684">
-                <rom name="hgr print 3.wav" size="358684" crc="d584a3b7" sha1="1baebe754cb88b4f9e349dafbf6d4ad38e517922" offset="0" />
+                <rom name="hgr print 3.wav" size="358684" crc="d584a3b7" sha1="1baebe754cb88b4f9e349dafbf6d4ad38e517922"/>
             </dataarea>
         </part>
         <part name="cass6" interface="mc1000_cass">
             <dataarea name="cass" size="418188">
-                <rom name="hgr print 4.wav" size="418188" crc="22d7d41e" sha1="9b981838a90f845cc466d1d83278e425e410b818" offset="0" />
+                <rom name="hgr print 4.wav" size="418188" crc="22d7d41e" sha1="9b981838a90f845cc466d1d83278e425e410b818"/>
             </dataarea>
         </part>
         <part name="cass7" interface="mc1000_cass">
             <dataarea name="cass" size="393452">
-                <rom name="hgr print 5.wav" size="393452" crc="7eda4a84" sha1="8376c9cfec9fb4c7d33ef3fe3ed729bbce675ac1" offset="0" />
+                <rom name="hgr print 5.wav" size="393452" crc="7eda4a84" sha1="8376c9cfec9fb4c7d33ef3fe3ed729bbce675ac1"/>
             </dataarea>
         </part>
         <part name="cass8" interface="mc1000_cass">
             <dataarea name="cass" size="406012">
-                <rom name="hgr print 6.wav" size="406012" crc="a60b49c8" sha1="7f832fd22e5c4fef05e84fabfd3992e52964d1d3" offset="0" />
+                <rom name="hgr print 6.wav" size="406012" crc="a60b49c8" sha1="7f832fd22e5c4fef05e84fabfd3992e52964d1d3"/>
             </dataarea>
         </part>
         <part name="cass9" interface="mc1000_cass">
             <dataarea name="cass" size="424300">
-                <rom name="hgr print 7.wav" size="424300" crc="9d6d5111" sha1="57e4f2ec6a5d3ff109e163185beb0b3065f1faf9" offset="0" />
+                <rom name="hgr print 7.wav" size="424300" crc="9d6d5111" sha1="57e4f2ec6a5d3ff109e163185beb0b3065f1faf9"/>
             </dataarea>
         </part>
         <part name="cass10" interface="mc1000_cass">
             <dataarea name="cass" size="417916">
-                <rom name="hgr print 8.wav" size="417916" crc="05ef09f7" sha1="2971eb0416a492be700bf5e405708e20a8e74a6f" offset="0" />
+                <rom name="hgr print 8.wav" size="417916" crc="05ef09f7" sha1="2971eb0416a492be700bf5e405708e20a8e74a6f"/>
             </dataarea>
         </part>
         <part name="cass11" interface="mc1000_cass">
             <dataarea name="cass" size="392460">
-                <rom name="hgr print 9.wav" size="392460" crc="0b6224d7" sha1="7dfeca391984c9472da335a465313ab99a864735" offset="0" />
+                <rom name="hgr print 9.wav" size="392460" crc="0b6224d7" sha1="7dfeca391984c9472da335a465313ab99a864735"/>
             </dataarea>
         </part>
         <part name="cass12" interface="mc1000_cass">
             <dataarea name="cass" size="380460">
-                <rom name="hgr print.wav" size="380460" crc="721f3a06" sha1="188669d5b1b193b5dd594bd6f91e638eba961547" offset="0" />
+                <rom name="hgr print.wav" size="380460" crc="721f3a06" sha1="188669d5b1b193b5dd594bd6f91e638eba961547"/>
             </dataarea>
         </part>
     </software>
@@ -1058,7 +1058,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="275756">
-                <rom name="jogo da cobra.wav" size="275756" crc="cdbbfeb4" sha1="1a46b99a0ca5ab2b7bd59c84b08938bd7da035ff" offset="0" />
+                <rom name="jogo da cobra.wav" size="275756" crc="cdbbfeb4" sha1="1a46b99a0ca5ab2b7bd59c84b08938bd7da035ff"/>
             </dataarea>
         </part>
     </software>
@@ -1070,17 +1070,17 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="49100">
-                <rom name="jogo da vida de conway 2.wav" size="49100" crc="58489ad6" sha1="515653094e106ccb7ca72a7a89b97da3e355813d" offset="0" />
+                <rom name="jogo da vida de conway 2.wav" size="49100" crc="58489ad6" sha1="515653094e106ccb7ca72a7a89b97da3e355813d"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="56028">
-                <rom name="jogo da vida de conway 3.wav" size="56028" crc="6f45555d" sha1="be12200bf6cab01cdbe8115eefce2742d5b32662" offset="0" />
+                <rom name="jogo da vida de conway 3.wav" size="56028" crc="6f45555d" sha1="be12200bf6cab01cdbe8115eefce2742d5b32662"/>
             </dataarea>
         </part>
         <part name="cass3" interface="mc1000_cass">
             <dataarea name="cass" size="190460">
-                <rom name="jogo da vida de conway.wav" size="190460" crc="6c37aec8" sha1="8ab0749201923cb549ad6d791620c71125ae301a" offset="0" />
+                <rom name="jogo da vida de conway.wav" size="190460" crc="6c37aec8" sha1="8ab0749201923cb549ad6d791620c71125ae301a"/>
             </dataarea>
         </part>
     </software>
@@ -1092,7 +1092,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="811724">
-                <rom name="labirinto.wav" size="811724" crc="3faf8ebe" sha1="4c2fe02873ca1ecaf152d54aea9dd15c969f8022" offset="0" />
+                <rom name="labirinto.wav" size="811724" crc="3faf8ebe" sha1="4c2fe02873ca1ecaf152d54aea9dd15c969f8022"/>
             </dataarea>
         </part>
     </software>
@@ -1104,7 +1104,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="292716">
-                <rom name="maze maker.wav" size="292716" crc="ac56c8e7" sha1="71a437a3a6018a247bd239187b70e0e39542dd1d" offset="0" />
+                <rom name="maze maker.wav" size="292716" crc="ac56c8e7" sha1="71a437a3a6018a247bd239187b70e0e39542dd1d"/>
             </dataarea>
         </part>
     </software>
@@ -1116,7 +1116,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="492668">
-                <rom name="mina de ouro.wav" size="492668" crc="606a0c7b" sha1="2f7ba270900ce9fe54ad2a3b94352bf2e2954b18" offset="0" />
+                <rom name="mina de ouro.wav" size="492668" crc="606a0c7b" sha1="2f7ba270900ce9fe54ad2a3b94352bf2e2954b18"/>
             </dataarea>
         </part>
     </software>
@@ -1128,7 +1128,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="227132">
-                <rom name="modos de video.wav" size="227132" crc="5e349ed7" sha1="729b1d6e236e06c643d746c943252b703c044304" offset="0" />
+                <rom name="modos de video.wav" size="227132" crc="5e349ed7" sha1="729b1d6e236e06c643d746c943252b703c044304"/>
             </dataarea>
         </part>
     </software>
@@ -1140,7 +1140,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="1003836">
-                <rom name="simulador de voo.wav" size="1003836" crc="7de71c8f" sha1="d740c569144151a34f9facf3ef141990d433ece8" offset="0" />
+                <rom name="simulador de voo.wav" size="1003836" crc="7de71c8f" sha1="d740c569144151a34f9facf3ef141990d433ece8"/>
             </dataarea>
         </part>
     </software>
@@ -1152,12 +1152,12 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="832572">
-                <rom name="star trek 1.wav" size="832572" crc="d233a4f9" sha1="76279157ef2923ca415b7143f624a16e00cfdc98" offset="0" />
+                <rom name="star trek 1.wav" size="832572" crc="d233a4f9" sha1="76279157ef2923ca415b7143f624a16e00cfdc98"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="690828">
-                <rom name="star trek 2.wav" size="690828" crc="1efb2f5d" sha1="22b3f1d4c1443908421cacf11fac9314a94c4725" offset="0" />
+                <rom name="star trek 2.wav" size="690828" crc="1efb2f5d" sha1="22b3f1d4c1443908421cacf11fac9314a94c4725"/>
             </dataarea>
         </part>
     </software>
@@ -1169,7 +1169,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="901884">
-                <rom name="foto de steve jobs.wav" size="901884" crc="5a4f54bf" sha1="a4ba646755008f2929f6530aeb5420b38ad730c7" offset="0" />
+                <rom name="foto de steve jobs.wav" size="901884" crc="5a4f54bf" sha1="a4ba646755008f2929f6530aeb5420b38ad730c7"/>
             </dataarea>
         </part>
     </software>
@@ -1181,17 +1181,17 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="161868">
-                <rom name="testa color artifacting 2.wav" size="161868" crc="954256c2" sha1="3e65461e6d33e84d112326591f5d2476867be02f" offset="0" />
+                <rom name="testa color artifacting 2.wav" size="161868" crc="954256c2" sha1="3e65461e6d33e84d112326591f5d2476867be02f"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="141484">
-                <rom name="testa color artifacting 3.wav" size="141484" crc="0ff96798" sha1="d10405573601ce67de539f414a6dae026ee3b378" offset="0" />
+                <rom name="testa color artifacting 3.wav" size="141484" crc="0ff96798" sha1="d10405573601ce67de539f414a6dae026ee3b378"/>
             </dataarea>
         </part>
         <part name="cass3" interface="mc1000_cass">
             <dataarea name="cass" size="165628">
-                <rom name="testa color artifacting.wav" size="165628" crc="43f00cff" sha1="0c12c5ff98d230b46753b5aba896a050e10654a3" offset="0" />
+                <rom name="testa color artifacting.wav" size="165628" crc="43f00cff" sha1="0c12c5ff98d230b46753b5aba896a050e10654a3"/>
             </dataarea>
         </part>
     </software>
@@ -1203,7 +1203,7 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="407916">
-                <rom name="travessia.wav" size="407916" crc="7bb5efde" sha1="fedb7691219b277461f4869917ddf357346adbb5" offset="0" />
+                <rom name="travessia.wav" size="407916" crc="7bb5efde" sha1="fedb7691219b277461f4869917ddf357346adbb5"/>
             </dataarea>
         </part>
     </software>
@@ -1215,12 +1215,12 @@
 
         <part name="cass1" interface="mc1000_cass">
             <dataarea name="cass" size="52108">
-                <rom name="visualiza cassete 2.wav" size="52108" crc="6030ad9a" sha1="04c1eca0be9cdb80437d09b9ce11758681acca4c" offset="0" />
+                <rom name="visualiza cassete 2.wav" size="52108" crc="6030ad9a" sha1="04c1eca0be9cdb80437d09b9ce11758681acca4c"/>
             </dataarea>
         </part>
         <part name="cass2" interface="mc1000_cass">
             <dataarea name="cass" size="61516">
-                <rom name="visualiza cassete.wav" size="61516" crc="97d7e459" sha1="7b386f40f1e90e508fd56c7eb6f8aa8ed58c1e22" offset="0" />
+                <rom name="visualiza cassete.wav" size="61516" crc="97d7e459" sha1="7b386f40f1e90e508fd56c7eb6f8aa8ed58c1e22"/>
             </dataarea>
         </part>
     </software>

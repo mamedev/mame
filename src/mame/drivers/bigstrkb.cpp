@@ -42,7 +42,7 @@ lev 7 : 0x7c : 0000 05be - xxx
 void bigstrkb_state::bigstrkb_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-//  AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE_LEGACY(megasys1_vregs_C_r, megasys1_vregs_C_w) AM_SHARE("megasys1_vregs")
+//  map(0x0c0000, 0x0cffff).rw(FUNC(bigstrkb_state::megasys1_vregs_C_r), FUNC(bigstrkb_state::megasys1_vregs_C_w)).share("megasys1_vregs");
 
 	map(0x0C2004, 0x0C2005).nopw();
 	map(0x0C200C, 0x0C200d).nopw();

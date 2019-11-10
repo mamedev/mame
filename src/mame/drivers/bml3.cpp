@@ -381,11 +381,11 @@ void bml3_state::bml3_mem(address_map &map)
 	// TIMER - System timer enable
 	map(0xffca, 0xffca).r(FUNC(bml3_state::firq_status_r)); // timer irq
 	// LPFLG - Light pen interrupt
-//  AM_RANGE(0xffcb, 0xffcb)
+//  map(0xffcb, 0xffcb)
 	// MODE_SEL - Graphics mode select
 	map(0xffd0, 0xffd0).w(FUNC(bml3_state::hres_reg_w));
 	// TRACE - Trace counter
-//  AM_RANGE(0xffd1, 0xffd1)
+//  map(0xffd1, 0xffd1)
 	// REMOTE - Remote relay control for cassette - bit 7
 	map(0xffd2, 0xffd2).w(FUNC(bml3_state::relay_w));
 	// MUSIC_SEL - Music select: toggle audio output level when rising
@@ -396,14 +396,14 @@ void bml3_state::bml3_mem(address_map &map)
 	map(0xffd5, 0xffd5).noprw();
 	// INTERLACE_SEL - Interlaced video mode (manual has "INTERACE SEL"!)
 	map(0xffd6, 0xffd6).w(FUNC(bml3_state::vres_reg_w));
-//  AM_RANGE(0xffd7, 0xffd7) baud select
+//  map(0xffd7, 0xffd7) baud select
 	// C_REG_SEL - Attribute register (character/video mode and colours)
 	map(0xffd8, 0xffd8).rw(FUNC(bml3_state::vram_attr_r), FUNC(bml3_state::vram_attr_w));
 	// KB - Keyboard mode register, interrupt control, keyboard LEDs
 	map(0xffe0, 0xffe0).rw(FUNC(bml3_state::keyboard_r), FUNC(bml3_state::keyboard_w));
-//  AM_RANGE(0xffe8, 0xffe8) bank register
-//  AM_RANGE(0xffe9, 0xffe9) IG mode register
-//  AM_RANGE(0xffea, 0xffea) IG enable register
+//  map(0xffe8, 0xffe8) bank register
+//  map(0xffe9, 0xffe9) IG mode register
+//  map(0xffea, 0xffea) IG enable register
 	map(0xa000, 0xfeff).rom().region("maincpu", 0xa000);
 	map(0xfff0, 0xffff).rom().region("maincpu", 0xfff0);
 	map(0xa000, 0xbfff).w(FUNC(bml3_state::a000_w));

@@ -698,14 +698,14 @@ void c1541_base_t::c1541pd_mem(address_map &map)
 void c1541_prologic_dos_classic_t::c1541pdc_mem(address_map &map)
 {
 	map(0x0000, 0xffff).rw(FUNC(c1541_prologic_dos_classic_t::read), FUNC(c1541_prologic_dos_classic_t::write));
-/*  AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x6000) AM_RAM AM_SHARE("share1")
-    AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
-    AM_RANGE(0x1c00, 0x1c0f) AM_MIRROR(0x63f0) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
-    AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
-    AM_RANGE(0x8800, 0x9fff) AM_RAM
-    AM_RANGE(0xa000, 0xb7ff) AM_ROM AM_REGION(M6502_TAG, 0x0000)
-    AM_RANGE(0xb800, 0xb80f) AM_READWRITE(pia_r, pia_w)
-    AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0x2000)*/
+/*  map(0x0000, 0x07ff).mirror(0x6000).ram().share("share1");
+    map(0x1800, 0x180f).mirror(0x63f0).rw(M6522_0_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+    map(0x1c00, 0x1c0f).mirror(0x63f0).rw(M6522_1_TAG, FUNC(via6522_device::read), FUNC(via6522_device::write));
+    map(0x8000, 0x87ff).ram().share("share1");
+    map(0x8800, 0x9fff).ram();
+    map(0xa000, 0xb7ff).rom().region(M6502_TAG, 0x0000);
+    map(0xb800, 0xb80f).rw(FUNC(c1541_prologic_dos_classic_t::pia_r), FUNC(c1541_prologic_dos_classic_t::pia_w));
+    map(0xf000, 0xffff).rom().region(M6502_TAG, 0x2000);*/
 }
 
 

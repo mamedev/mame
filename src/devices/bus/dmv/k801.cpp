@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K801 RS-232 Switchable Interface

@@ -11,14 +11,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="CP/M Plus BIOS 2.0"/>
 			<dataarea name="flop" size="709312">
-				<rom name="bios20.imd" size="709312" crc="7283244a" sha1="e7acaa95d21da76b7098e3277267f89db12961d0" offset="0"/>
+				<rom name="bios20.imd" size="709312" crc="7283244a" sha1="e7acaa95d21da76b7098e3277267f89db12961d0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Winchester Setup"/>
 			<dataarea name="flop" size="109151">
-				<rom name="winch.imd" size="109151" crc="dc112146" sha1="02d773e561a5abda680a8ebdfafc35058fdb5a09" offset="0"/>
+				<rom name="winch.imd" size="109151" crc="dc112146" sha1="02d773e561a5abda680a8ebdfafc35058fdb5a09"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,21 +31,21 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="358022">
-				<rom name="cpm_plus.imd" size="358022" crc="4bdb61ce" sha1="ef7ead3043135ea2d32795baa9ba0bc5f5695d87" offset="0"/>
+				<rom name="cpm_plus.imd" size="358022" crc="4bdb61ce" sha1="ef7ead3043135ea2d32795baa9ba0bc5f5695d87"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Additional Files"/>
 			<dataarea name="flop" size="364682">
-				<rom name="cpm_add.imd" size="364682" crc="3b190357" sha1="c733db6d9592088f7b655a156edefbf5b6834555" offset="0"/>
+				<rom name="cpm_add.imd" size="364682" crc="3b190357" sha1="c733db6d9592088f7b655a156edefbf5b6834555"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Winchester Hard Disk Drive Option Disk"/>
 			<dataarea name="flop" size="197582">
-				<rom name="v1050win.imd" size="197582" crc="f76803e0" sha1="a5781a879141ad5e312bb72b8db245bf2b443d40" offset="0"/>
+				<rom name="v1050win.imd" size="197582" crc="f76803e0" sha1="a5781a879141ad5e312bb72b8db245bf2b443d40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -58,14 +58,14 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333493">
-				<rom name="cpm disk1.imd" size="333493" crc="63d4df2c" sha1="4b54c6dbca25ce7dcf5f129c89363ad5120633de" offset="0"/>
+				<rom name="cpm disk1.imd" size="333493" crc="63d4df2c" sha1="4b54c6dbca25ce7dcf5f129c89363ad5120633de"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Additional Files"/>
 			<dataarea name="flop" size="331979">
-				<rom name="cpm disk2.imd" size="331979" crc="39b9bd5a" sha1="c4c6ea52c983eda9282954e5fc9c7935bedfac14" offset="0"/>
+				<rom name="cpm disk2.imd" size="331979" crc="39b9bd5a" sha1="c4c6ea52c983eda9282954e5fc9c7935bedfac14"/>
 			</dataarea>
 		</part>
 	</software>
@@ -78,7 +78,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="340134">
-				<rom name="multiplan.imd" size="340134" crc="208d8691" sha1="59fc9aeb7b6153d984d60650f04815024a89dfff" offset="0"/>
+				<rom name="multiplan.imd" size="340134" crc="208d8691" sha1="59fc9aeb7b6153d984d60650f04815024a89dfff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="345760">
-				<rom name="wordstar.imd" size="345760" crc="7edebcf2" sha1="f05cb6cf17c0b374f361e015439109424a416f67" offset="0"/>
+				<rom name="wordstar.imd" size="345760" crc="7edebcf2" sha1="f05cb6cf17c0b374f361e015439109424a416f67"/>
 			</dataarea>
 		</part>
 	</software>
@@ -105,7 +105,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="296192">
-				<rom name="drgraph.imd" size="296192" crc="6e2f4584" sha1="7a397df02bc26ccc72d36208dc4273ba06ba32f5" offset="0"/>
+				<rom name="drgraph.imd" size="296192" crc="6e2f4584" sha1="7a397df02bc26ccc72d36208dc4273ba06ba32f5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -119,7 +119,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="342198">
-				<rom name="cbasic and demostration.imd" size="342198" crc="d1bdf16c" sha1="999e905464efdff62acf8ae36f2d792d12274259" offset="0"/>
+				<rom name="cbasic and demostration.imd" size="342198" crc="d1bdf16c" sha1="999e905464efdff62acf8ae36f2d792d12274259"/>
 			</dataarea>
 		</part>
 	</software>

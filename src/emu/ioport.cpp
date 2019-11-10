@@ -1706,7 +1706,7 @@ time_t ioport_manager::initialize()
 		std::string errors;
 		m_portlist.append(device, errors);
 		if (!errors.empty())
-			osd_printf_error("Input port errors:\n%s", errors.c_str());
+			osd_printf_error("Input port errors:\n%s", errors);
 	}
 
 	// renumber player numbers for controller ports
@@ -2558,12 +2558,12 @@ time_t ioport_manager::playback_init()
 	osd_printf_info("INP version %u.%u\n", header.get_majversion(), header.get_minversion());
 	time_t basetime = header.get_basetime();
 	osd_printf_info("Created %s\n", ctime(&basetime));
-	osd_printf_info("Recorded using %s\n", header.get_appdesc().c_str());
+	osd_printf_info("Recorded using %s\n", header.get_appdesc());
 
 	// verify the header against the current game
 	std::string const sysname = header.get_sysname();
 	if (sysname != machine().system().name)
-		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname.c_str(), machine().system().name);
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname, machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -2907,15 +2907,15 @@ void ioport_manager::record_frame(const attotime &curtime)
 			timecode_key = string_format("EXTRA_STOP_%03d", (m_timecode_count-4)/2);
 		}
 
-		osd_printf_info("%s \n", message.c_str());
-		machine().popmessage("%s \n", message.c_str());
+		osd_printf_info("%s \n", message);
+		machine().popmessage("%s \n", message);
 
 		m_timecode_file.printf(
 				"%-19s %s %s %s %s %s %s\n",
-				timecode_key.c_str(),
-				current_time_str.c_str(), elapsed_time_str.c_str(),
-				mseconds_start_str.c_str(), mseconds_elapsed_str.c_str(),
-				frame_start_str.c_str(), frame_elapsed_str.c_str());
+				timecode_key,
+				current_time_str, elapsed_time_str,
+				mseconds_start_str, mseconds_elapsed_str,
+				frame_start_str, frame_elapsed_str);
 
 		machine().video().set_timecode_write(false);
 		machine().video().set_timecode_text(timecode_text);

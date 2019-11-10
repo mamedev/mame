@@ -184,7 +184,7 @@ private:
 
 void pv1000_state::pv1000_mem(address_map &map)
 {
-	//AM_RANGE(0x0000, 0x7fff)      // mapped by the cartslot
+	//map(0x0000, 0x7fff)      // mapped by the cartslot
 	map(0xb800, 0xbbff).ram().share("videoram");
 	map(0xbc00, 0xbfff).ram().w(FUNC(pv1000_state::gfxram_w)).region("gfxram", 0);
 }

@@ -568,7 +568,7 @@ INPUT_PORTS_END
 void luckybal_state::luckybal(machine_config &config)
 {
 	/* basic machine hardware */
-	Z180(config, m_maincpu, CPU_CLOCK / 2);
+	Z80180(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &luckybal_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &luckybal_state::main_io);
 

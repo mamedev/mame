@@ -60,11 +60,11 @@ pulse length is determined by the following formula:
   A data value of $00 represents an "overflow" condition, any pulse  length
 which is more that 255 * 8 in length.
 
-  The value of "clock cylces" from above  (985248)  is  based  on  the  PAL
+  The value of "clock cycles" from above  (985248)  is  based  on  the  PAL
 value.  Since  this  file  format  was  developed  in  Europe,   which   is
 predominantly PAL video, this is only logical.  The  NTSC  value  would  be
 1022730, which is very close to  the  PAL,  and  therefore  won't  cause  a
-compatability problem converting European and NTSC tapes. I would stick  to
+compatibility problem converting European and NTSC tapes. I would stick  to
 using the PAL value just in case.
 
 

@@ -14,6 +14,7 @@
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 
+#include "chainmanager.h"
 #include "chainentry.h"
 
 #include "effect.h"
@@ -55,7 +56,7 @@ bgfx_chain_entry::~bgfx_chain_entry()
 	delete m_clear;
 }
 
-void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
+void bgfx_chain_entry::submit(int view, chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, uint64_t blend, int32_t screen)
 {
 	if (!setup_view(view, screen_width, screen_height, screen))
 	{
@@ -68,8 +69,8 @@ void bgfx_chain_entry::submit(int view, render_primitive* prim, texture_manager&
 	}
 
 	bgfx::TransientVertexBuffer buffer;
-	put_screen_buffer(prim, &buffer);
-	bgfx::setVertexBuffer(0,&buffer);
+	put_screen_buffer(prim.m_screen_width, prim.m_screen_height, &buffer);
+	bgfx::setVertexBuffer(0, &buffer);
 
 	setup_auto_uniforms(prim, textures, screen_count, screen_width, screen_height, screen_scale_x, screen_scale_y, screen_offset_x, screen_offset_y, rotation_type, swap_xy, screen);
 
@@ -145,13 +146,12 @@ void bgfx_chain_entry::setup_screencount_uniforms(uint16_t screen_count)
 	}
 }
 
-void bgfx_chain_entry::setup_sourcesize_uniform(render_primitive* prim) const
+void bgfx_chain_entry::setup_sourcesize_uniform(chain_manager::screen_prim &prim) const
 {
 	bgfx_uniform* source_dims = m_effect->uniform("u_source_dims");
 	if (source_dims != nullptr)
 	{
-		float values[2] = { float(prim->texture.width), float(prim->texture.height) };
-		source_dims->set(values, sizeof(float) * 2);
+		source_dims->set(&prim.m_tex_width, sizeof(float) * 2);
 	}
 }
 
@@ -203,12 +203,12 @@ void bgfx_chain_entry::setup_swapxy_uniform(bool swap_xy) const
 	}
 }
 
-void bgfx_chain_entry::setup_quaddims_uniform(render_primitive* prim) const
+void bgfx_chain_entry::setup_quaddims_uniform(chain_manager::screen_prim &prim) const
 {
 	bgfx_uniform* quad_dims_uniform = m_effect->uniform("u_quad_dims");
 	if (quad_dims_uniform != nullptr)
 	{
-		float values[2] = { float(floor((prim->bounds.x1 - prim->bounds.x0) + 0.5f)), float(floor((prim->bounds.y1 - prim->bounds.y0) + 0.5f)) };
+		float values[2] = { float(prim.m_quad_width), float(prim.m_quad_height) };
 		quad_dims_uniform->set(values, sizeof(float) * 2);
 	}
 }
@@ -223,7 +223,7 @@ void bgfx_chain_entry::setup_screenindex_uniform(int32_t screen) const
 	}
 }
 
-void bgfx_chain_entry::setup_auto_uniforms(render_primitive* prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
+void bgfx_chain_entry::setup_auto_uniforms(chain_manager::screen_prim &prim, texture_manager& textures, uint16_t screen_count, uint16_t screen_width, uint16_t screen_height, float screen_scale_x, float screen_scale_y, float screen_offset_x, float screen_offset_y, uint32_t rotation_type, bool swap_xy, int32_t screen)
 {
 	setup_screensize_uniforms(textures, screen_width, screen_height, screen);
 	setup_screenscale_uniforms(screen_scale_x, screen_scale_y);
@@ -268,7 +268,7 @@ bool bgfx_chain_entry::setup_view(int view, uint16_t screen_width, uint16_t scre
 	return true;
 }
 
-void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::TransientVertexBuffer* buffer) const
+void bgfx_chain_entry::put_screen_buffer(uint16_t screen_width, uint16_t screen_height, bgfx::TransientVertexBuffer* buffer) const
 {
 	if (6 == bgfx::getAvailTransientVertexBuffer(6, ScreenVertex::ms_decl))
 	{
@@ -291,6 +291,14 @@ void bgfx_chain_entry::put_screen_buffer(render_primitive* prim, bgfx::Transient
 	{
 		v[0] = v[1] = 1;
 		v[2] = v[3] = 0;
+	}
+	else if (renderer_type == bgfx::RendererType::Direct3D9)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			u[i] += 0.5f / screen_width;
+			v[i] += 0.5f / screen_height;
+		}
 	}
 
 	vertex[0].m_x = x[0];

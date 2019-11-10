@@ -7,7 +7,7 @@
 		<publisher>Tomy</publisher>
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="01.bin" size="0x80000" crc="b91a4cb6" sha1="21fcfd16a821796fdf38fe0a23dca93b85fd3339" offset="0" />
+				<rom name="01.bin" size="0x80000" crc="b91a4cb6" sha1="21fcfd16a821796fdf38fe0a23dca93b85fd3339"/>
 			</dataarea>
 		</part>
 	</software>
@@ -18,7 +18,7 @@
 		<publisher>Tomy</publisher>
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="01.bin" size="0x80000" crc="4f39e051" sha1="4b21bb88797d4edabcdde7c66933f275e85f3dbc" offset="0" />
+				<rom name="01.bin" size="0x80000" crc="4f39e051" sha1="4b21bb88797d4edabcdde7c66933f275e85f3dbc"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<info name="alt_title" value="ホビークラブ"/>
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="01.bin" size="0x80000" crc="ee9f4328" sha1="0a1bb00e261a1076f38cbb2a1337cc146990ed5b" offset="0" />
+				<rom name="01.bin" size="0x80000" crc="ee9f4328" sha1="0a1bb00e261a1076f38cbb2a1337cc146990ed5b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<info name="alt_title" value="家族で年賀状"/>
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="01.bin" size="0x80000" crc="c6c8f28b" sha1="e182f066084f483f49452f9a8c3b5aa21e404274" offset="0" />
+				<rom name="01.bin" size="0x80000" crc="c6c8f28b" sha1="e182f066084f483f49452f9a8c3b5aa21e404274"/>
 			</dataarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 		<info name="alt_title" value="こどものおもちゃ"/>
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="01.bin" size="0x80000" crc="353d4690" sha1="03e7da042a403e7496ea22c11d9f404cf1b7545c" offset="0" />
+				<rom name="01.bin" size="0x80000" crc="353d4690" sha1="03e7da042a403e7496ea22c11d9f404cf1b7545c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -65,7 +65,7 @@
 		<publisher>Tomy</publisher>
 		<part name="rom" interface="princ_cart">
 			<dataarea name="rom" size="0x80000">
-				<rom name="01.bin" size="0x80000" crc="8cac047a" sha1="bfd26093ff30781f915eca2d61c6025ce4bb7652" offset="0" />
+				<rom name="01.bin" size="0x80000" crc="8cac047a" sha1="bfd26093ff30781f915eca2d61c6025ce4bb7652"/>
 			</dataarea>
 		</part>
 	</software>

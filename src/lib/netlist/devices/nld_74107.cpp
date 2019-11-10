@@ -14,8 +14,8 @@ namespace netlist
 	namespace devices
 	{
 
-	static constexpr const netlist_time delay_107[2] = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
-	static constexpr const netlist_time delay_107A[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
+	static constexpr const std::array<netlist_time, 2> delay_107  = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
+	static constexpr const std::array<netlist_time, 2> delay_107A = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
 
 	NETLIB_OBJECT(74107A)
 	{
@@ -46,7 +46,7 @@ namespace netlist
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
 
-		netlist_time m_delay[2];
+		std::array<netlist_time, 2> m_delay;
 
 		logic_input_t m_J;
 		logic_input_t m_K;
@@ -145,7 +145,7 @@ namespace netlist
 			m_clk.activate_hl();
 	}
 
-#if (!USE_TRUTHTABLE_74107)
+#if (!NL_USE_TRUTHTABLE_74107)
 	NETLIB_DEVICE_IMPL(74107,       "TTL_74107",    "+CLK,+J,+K,+CLRQ,@VCC,@GND")
 	NETLIB_DEVICE_IMPL(74107_dip,   "TTL_74107_DIP", "")
 #endif

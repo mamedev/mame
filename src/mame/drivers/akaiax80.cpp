@@ -84,9 +84,9 @@ void ax80_state::ax80_map(address_map &map)
 	map(0x1060, 0x1060).mirror(0x000e).rw("kdc", FUNC(i8279_device::data_r), FUNC(i8279_device::data_w));   // IC11
 	map(0x1061, 0x1061).mirror(0x000e).rw("kdc", FUNC(i8279_device::status_r), FUNC(i8279_device::cmd_w));  // IC11
 	map(0x1070, 0x1073).mirror(0x000c).rw(PPI1_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC10
-	//AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0dfe) AM_DEVREADWRITE(PPI0_TAG, i8255_device, read, write)   // IC9 - A9 connects to A1-pin
-	//AM_RANGE(0x2200, 0x2201) AM_MIRROR(0x0dfe) AM_DEVREADWRITE(PPI0_TAG, i8255_device, read, write)   // IC9 - A9 connects to A1-pin
-	//AM_RANGE(0x3000, 0x3fff) // steers audio to the various voice channels
+	//map(0x2000, 0x2001).mirror(0x0dfe).rw(PPI0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC9 - A9 connects to A1-pin
+	//map(0x2200, 0x2201).mirror(0x0dfe).rw(PPI0_TAG, FUNC(i8255_device::read), FUNC(i8255_device::write));   // IC9 - A9 connects to A1-pin
+	//map(0x3000, 0x3fff) // steers audio to the various voice channels
 	map(0x4000, 0x5fff).mirror(0x2000).rom().region("maincpu", 0x1000);    // external program EPROM
 	map(0x8000, 0x87ff).mirror(0x3800).ram();
 	map(0xc000, 0xc7ff).mirror(0x3800).ram();

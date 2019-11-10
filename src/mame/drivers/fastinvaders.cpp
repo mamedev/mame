@@ -499,7 +499,7 @@ WRITE8_MEMBER(fastinvaders_state::memory_write_byte)
 
 void fastinvaders_state::fastinvaders_map(address_map &map)
 {
-	//AM_RANGE(0x0000, 0x1fff) AM_ROM   AM_MIRROR(0x8000)
+	//map(0x0000, 0x1fff).rom();   .mirror(0x8000);
 	map(0x0000, 0x27ff).rom().mirror(0x8000);
 	map(0x2800, 0x2fff).ram().mirror(0x8000).share("videoram");
 	map(0x3000, 0x33ff).ram().mirror(0x8000);
@@ -518,7 +518,7 @@ void fastinvaders_state::fastinvaders_6845_io(address_map &map)
 	map(0x21, 0x21).rw(m_crtc6845, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
-	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
+	//map(0x50, 0x50).r(FUNC(fastinvaders_state::io_50_r));//ds5   //latch
 	map(0x60, 0x60).r(FUNC(fastinvaders_state::io_60_r));
 	map(0x70, 0x70).w(FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
 	map(0x80, 0x80).noprw(); //ds8  write here a LOT ?????
@@ -539,11 +539,11 @@ void fastinvaders_state::fastinvaders_8275_io(address_map &map)
 	map(0x10, 0x1f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));
 	map(0x30, 0x33).rw(m_pic8259, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x40, 0x4f).w(FUNC(fastinvaders_state::io_40_w));  //ds4   //latch
-	//AM_RANGE(0x50, 0x50) AM_READ(io_50_r) //ds5   //latch
+	//map(0x50, 0x50).r(FUNC(fastinvaders_state::io_50_r));//latch
 	map(0x60, 0x60).r(FUNC(fastinvaders_state::io_60_r));
 	map(0x70, 0x70).w(FUNC(fastinvaders_state::io_70_w));  //ds7   rest55,rest65,trap, irq0 clear
 	map(0x80, 0x80).noprw(); //write here a LOT
-	//AM_RANGE(0x80, 0x80) AM_WRITE(io_80_w)    //ds8 ????
+	//map(0x80, 0x80).w(FUNC(fastinvaders_state::io_80_w));//ds8 ????
 	map(0x90, 0x90).w(FUNC(fastinvaders_state::io_90_w));  //ds9       sound command
 	map(0xa0, 0xa0).w(FUNC(fastinvaders_state::io_a0_w));  //ds10 irq1 clear
 	map(0xb0, 0xb0).w(FUNC(fastinvaders_state::io_b0_w));  //ds11 irq2 clear

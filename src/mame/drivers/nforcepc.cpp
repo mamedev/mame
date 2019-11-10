@@ -22,12 +22,12 @@
 
 
 #include "emu.h"
+#include "bus/ata/atadev.h"
 #include "cpu/i386/athlon.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
 #include "machine/intelfsh.h"
-#include "machine/atapicdr.h"
-#include "machine/idehd.h"
+#include "video/virge_pci.h"
 #include "includes/xbox_pci.h"
 #include "includes/nforcepc.h"
 
@@ -54,12 +54,6 @@ static const uint8_t test_spd_data[] = {
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 #endif
-
-void nforcepc_ata_devices(device_slot_interface &device)
-{
-	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_CDROM);
-}
 
 /*
   Pci devices
@@ -753,8 +747,9 @@ void nforcepc_state::nforcepc(machine_config &config)
 	mcpx_ide_device &ide(MCPX_IDE(config, ":pci:09.0", 0)); // 10de:01bc NVIDIA Corporation nForce IDE
 	ide.pri_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq14));
 	ide.sec_interrupt_handler().set(":pci:01.0", FUNC(mcpx_isalpc_device::irq15));
-		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(nforcepc_ata_devices, "hdd", "cdrom", true);*/
+		/*subdevice<ide_controller_32_device>(":pci:09.0:ide")->options(ata_devices, "hdd", "cdrom", true);*/
 	NV2A_AGP(config, ":pci:1e.0", 0, 0x10de01b7, 0); // 10de:01b7 NVIDIA Corporation nForce AGP to PCI Bridge
+	VIRGEDX_PCI(config, ":pci:0a.0", 0);
 	SST_49LF020(config, "bios", 0);
 }
 
@@ -764,6 +759,16 @@ ROM_START(nforcepc)
 	ROMX_LOAD("a7n266c.bin", 0, 0x40000, CRC(f4f0e4fc) SHA1(87f11545db178914623e41fb51e328da479a2efc), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "a7n266c1001d", "a7n266c1001d") // bios version 1001.D downloaded from Asus website
 	ROMX_LOAD("a7nc101d.awd", 0, 0x40000, CRC(ead1147c) SHA1(27227df98e0c5fb9fecdb4bb6ef72df19766c330), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(2, "a7n266c1001e", "a7n266c1001e") // bios version 1001.E
+	ROMX_LOAD("a7nc101e.awd", 0, 0x40000, CRC(a029cd42) SHA1(e257915534bc725f389e57945b45c81e7ef40dcc), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "a7n266c1002c", "a7n266c1002c") // beta bios version 1002C.003 ?
+	ROMX_LOAD("1002c.003", 0, 0x40000, CRC(57ced539) SHA1(525d15523be3b373a10c1f6ae355803613506ce2), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "a7n266c1003", "a7n266c1003") // bios version 1003
+	ROMX_LOAD("a7nc1003.awd", 0, 0x40000, CRC(ac27f751) SHA1(96d5539ee2a40ea58a32013c16109159a3c41bb8), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "a7n266c1004", "a7n266c1004") // bios version 1004
+	ROMX_LOAD("a7nc1004.awd", 0, 0x40000, CRC(04124e4f) SHA1(8778a6722eddaf83101f89834969f0037af65cb9), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "a7n266c1005", "a7n266c1005") // beta bios version 1005.005 ?
+	ROMX_LOAD("1005nc.005", 0, 0x40000, CRC(9ca5a9c9) SHA1(5ffb57b9f1e0e163b33c093a3e017020b247b3d3), ROM_BIOS(6))
 ROM_END
 
 static INPUT_PORTS_START(nforcepc)

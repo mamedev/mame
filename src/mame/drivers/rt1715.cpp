@@ -331,8 +331,7 @@ WRITE_LINE_MEMBER(rt1715_state::crtc_drq_w)
 {
 	if (state)
 	{
-		address_space &mem = m_maincpu->space(AS_PROGRAM);
-		m_crtc->dack_w(mem, 0, m_p_videoram[m_dma_adr++]);
+		m_crtc->dack_w(m_p_videoram[m_dma_adr++]);
 		m_dma_adr %= (80 * 24);
 	}
 }

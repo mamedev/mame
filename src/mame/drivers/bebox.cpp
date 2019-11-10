@@ -59,7 +59,7 @@ void bebox_state::main_mem(address_map &map)
 	map(0x800003F8, 0x800003FF).rw("ns16550_0", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x80000480, 0x8000048F).rw(FUNC(bebox_state::bebox_80000480_r), FUNC(bebox_state::bebox_80000480_w));
 	map(0x80000CF8, 0x80000CFF).rw(m_pcibus, FUNC(pci_bus_device::read_64be), FUNC(pci_bus_device::write_64be));
-	//AM_RANGE(0x800042E8, 0x800042EF) AM_DEVWRITE8("cirrus", cirrus_device, cirrus_42E8_w, 0xffffffffffffffffU )
+	//map(0x800042E8, 0x800042EF).w("cirrus", FUNC(cirrus_device::cirrus_42E8_w));
 
 	map(0xBFFFFFF0, 0xBFFFFFFF).r(FUNC(bebox_state::bebox_interrupt_ack_r));
 	map(0xC00A0000, 0xC00BFFFF).rw("vga", FUNC(cirrus_gd5428_device::mem_r), FUNC(cirrus_gd5428_device::mem_w));
@@ -210,7 +210,7 @@ void bebox_state::bebox_peripherals(machine_config &config)
 	scsictrl.set_scsi_port("scsi");
 
 	ide_controller_device &idectrl(IDE_CONTROLLER(config, "ide"));
-	idectrl.set_default_ata_devices("hdd", nullptr);
+	idectrl.options(ata_devices, "hdd", nullptr, false);
 	idectrl.irq_handler().set(FUNC(bebox_state::bebox_ide_interrupt));
 
 	/* pci */

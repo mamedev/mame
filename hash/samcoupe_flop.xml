@@ -13,7 +13,7 @@
 		<publisher>Revelation Software / Software Projects</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
-				<rom name="manic miner (1992) (revelation software) (demo).dsk" size="819200" crc="02708a54" sha1="a2d5634f5e64960db21eed38c1cef79bd2e13e7a" offset="0"/>
+				<rom name="manic miner (1992) (revelation software) (demo).dsk" size="819200" crc="02708a54" sha1="a2d5634f5e64960db21eed38c1cef79bd2e13e7a"/>
 			</dataarea>
 		</part>
 	</software>

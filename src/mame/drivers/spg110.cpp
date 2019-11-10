@@ -7,9 +7,16 @@
         die markings show
 
         "SunPlus PA7801" ( known as Sunplus SPG110? )
-        Classic Arcade Pinball
-        EA Sports (NHL95 + Madden 95)
-        Spiderman 5-in-1 (original release)
+        JAKKS Classic Arcade Pinball
+        JAKKS Spiderman 5-in-1 (original release)
+        Conny TV Virtual Tennis
+
+        assumed:
+        JAKKS EA Sports (NHL 95 + Madden 95) (US)
+        JAKKS EA Sports (NHL 95 + Fifa 96) (US)
+        JAKKS Bob the Builder
+        Conny Ping Pong
+        JAKKS Disney (original release)
 
 *******************************************************************************/
 
@@ -330,6 +337,153 @@ static INPUT_PORTS_START( jak_spdmo )
 
 INPUT_PORTS_END
 
+
+
+static INPUT_PORTS_START( conyteni )
+	PORT_START("PA")
+	PORT_DIPNAME( 0x0001, 0x0000, "PA" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+
+	PORT_START("PB")
+	PORT_DIPNAME( 0x0001, 0x0000, "PB" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Console Back")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Console Enter")
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Console Right")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_NAME("Console Down")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Console Left")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Console Up")
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+
+	PORT_START("PC")
+	PORT_DIPNAME( 0x0001, 0x0000, "PC" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+
+	PORT_START("JOYX")
+
+	PORT_START("JOYY")
+
+INPUT_PORTS_END
+
 void spg110_game_state::spg110_base(machine_config &config)
 {
 	SPG110(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -364,6 +518,19 @@ ROM_START( jak_spdmo )
 	ROM_LOAD16_WORD_SWAP( "spidermaneyes.bin", 0x000000, 0x200000, CRC(d5eaa6ae) SHA1(df226d378b41cf6ef90b9f72e48ff5e66385dcba) )
 ROM_END
 
+ROM_START( conyteni )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "tennis_m29w160eb.bin", 0x000000, 0x200000, CRC(70050f17) SHA1(929f0d8599b7380b5994684424bb91063c4f6569) )
+
+	// MCU (I/O?) read protected TODO: add NO_DUMP
+ROM_END
+
+
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Classic Arcade Pinball (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
+
+// Conny PDC (Pocket Dream Console) is probably SunPlus too
+
+// this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some mutligames?
+CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny",      "TV Virtual Tennis", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs motion inputs, and video fixes, setting to PAL

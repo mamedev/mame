@@ -115,7 +115,7 @@ void inufuku_state::inufuku_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();         // main rom
 
-//  AM_RANGE(0x100000, 0x100007) AM_WRITENOP    // ?
+//  map(0x100000, 0x100007).nopw();    // ?
 
 	map(0x180000, 0x180001).portr("P1");
 	map(0x180002, 0x180003).portr("P2");
@@ -137,7 +137,7 @@ void inufuku_state::inufuku_map(address_map &map)
 
 	map(0x780000, 0x780013).w(FUNC(inufuku_state::inufuku_palettereg_w)); // bg & text palettebank register
 	map(0x7a0000, 0x7a0023).w(FUNC(inufuku_state::inufuku_scrollreg_w));  // bg & text scroll register
-//  AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP                    // ?
+//  map(0x7e0000, 0x7e0001).nopw();                    // ?
 
 	map(0x800000, 0xbfffff).rom(); // data rom
 	map(0xfd0000, 0xfdffff).ram(); // work ram

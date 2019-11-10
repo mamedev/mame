@@ -95,10 +95,10 @@ void alto2_cpu_device::iomem_map(address_map &map)
 	map(0177205, 0177233).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	map(0177234, 0177237).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Experimental cursor control }
 	map(0177240, 0177257).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto-II debugger }
-//  AM_RANGE(0177244,                    0177247)                           AM_READWRITE( noop_r, noop_w )          // { Graphics keyboard }
+//  map(0177244, 0177247).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Graphics keyboard }
 	map(0177260, 0177377).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	// page 0377
-//  AM_RANGE(0177400,                    0177405)                           AM_READWRITE( noop_r, noop_w )          // { Maxc2 maintenance interface }
+//  map(0177400, 0177405).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Maxc2 maintenance interface }
 	map(0177400, 0177400).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { Alto DLS input }
 	map(0177401, 0177417).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // UNUSED RANGE
 	map(0177420, 0177420).rw(FUNC(alto2_cpu_device::noop_r), FUNC(alto2_cpu_device::noop_w));          // { "" }

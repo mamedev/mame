@@ -30,6 +30,7 @@ public:
 		, m_cartslot(*this, "cartslot")
 		, m_io_joy(*this, "JOY")
 		, m_bios(*this, "bios")
+		, m_ram(*this, "ram")
 	{ }
 
 	void gamate(machine_config &config);
@@ -62,6 +63,7 @@ private:
 	required_device<gamate_cart_slot_device> m_cartslot;
 	required_ioport m_io_joy;
 	required_shared_ptr<uint8_t> m_bios;
+	required_shared_ptr<uint8_t> m_ram;
 	emu_timer *timer1;
 	emu_timer *timer2;
 };
@@ -116,7 +118,7 @@ READ8_MEMBER(gamate_state::read_cart)
 
 void gamate_state::gamate_mem(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0x1c00).ram();
+	map(0x0000, 0x03ff).mirror(0x1c00).ram().share("ram");
 	map(0x4000, 0x400f).mirror(0x03f0).rw(FUNC(gamate_state::sound_r), FUNC(gamate_state::sound_w));
 	map(0x4400, 0x4400).mirror(0x03ff).portr("JOY");
 	map(0x4800, 0x4800).mirror(0x03ff).r(FUNC(gamate_state::gamate_nmi_r));
@@ -150,6 +152,7 @@ void gamate_state::init_gamate()
 
 void gamate_state::machine_start()
 {
+	memset(m_ram, 0xff, m_ram.bytes());  /* memory seems to contain 0xff at power up */
 	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(1000));
 

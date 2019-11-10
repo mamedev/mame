@@ -44,8 +44,8 @@
 #include "machine/pc9801_kbd.h"
 #include "machine/pc9801_cd.h"
 
-#include "machine/idectrl.h"
-#include "machine/idehd.h"
+#include "bus/ata/atadev.h"
+#include "bus/ata/ataintf.h"
 
 #include "debugger.h"
 #include "emupal.h"

@@ -490,12 +490,12 @@ void popobear_state::popobear_mem(address_map &map)
 	map(0x480000, 0x48001f).ram().share("vregs");
 	map(0x480020, 0x480023).ram();
 	map(0x480028, 0x48002d).ram();
-//  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(480020_r) AM_WRITE(480020_w)
-//  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(480028_w)
-//  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(48002c_w)
+//  map(0x480020, 0x480021).noprw(); //.rw(FUNC(popobear_state::480020_r) FUNC(popobear_state::480020_w));
+//  map(0x480028, 0x480029).noprw(); //.w(FUNC(popobear_state::480028_w));
+//  map(0x48002c, 0x48002d).noprw(); //.w(FUNC(popobear_state::48002c_w));
 	map(0x480031, 0x480031).w(FUNC(popobear_state::irq_ack_w));
 	map(0x480034, 0x480035).ram(); // coin counter or coin lockout
-	map(0x48003a, 0x48003b).ram(); //AM_READ(48003a_r) AM_WRITE(48003a_w)
+	map(0x48003a, 0x48003b).ram(); //.rw(FUNC(popobear_state::48003a_r) FUNC(popobear_state::48003a_w));
 
 	map(0x480400, 0x4807ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 

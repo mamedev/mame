@@ -14,12 +14,23 @@
 //  sns_rom_superfx_device - constructor
 //-------------------------------------------------
 
-DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX, sns_rom_superfx_device, "sns_rom_superfx", "SNES Cart (LoROM) + SuperFX")
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX1, sns_rom_superfx1_device, "sns_rom_superfx1", "SNES Cart (LoROM) + SuperFX 1")
+DEFINE_DEVICE_TYPE(SNS_LOROM_SUPERFX2, sns_rom_superfx2_device, "sns_rom_superfx2", "SNES Cart (LoROM) + SuperFX 2")
 
 
-sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sns_rom_device(mconfig, SNS_LOROM_SUPERFX, tag, owner, clock)
+sns_rom_superfx_device::sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: sns_rom_device(mconfig, type, tag, owner, clock)
 	, m_superfx(*this, "superfx")
+{
+}
+
+sns_rom_superfx1_device::sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sns_rom_superfx_device(mconfig, SNS_LOROM_SUPERFX1, tag, owner, clock)
+{
+}
+
+sns_rom_superfx2_device::sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sns_rom_superfx_device(mconfig, SNS_LOROM_SUPERFX2, tag, owner, clock)
 {
 }
 
@@ -85,11 +96,18 @@ WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
 }
 
 
-void sns_rom_superfx_device::device_add_mconfig(machine_config &config)
+void sns_rom_superfx1_device::device_add_mconfig(machine_config &config)
 {
-	SUPERFX(config, m_superfx, DERIVED_CLOCK(1, 1));  /* 21.48MHz */
-	m_superfx->set_addrmap(AS_PROGRAM, &sns_rom_superfx_device::sfx_map);
-	m_superfx->irq().set(FUNC(sns_rom_superfx_device::snes_extern_irq_w));  /* IRQ line from cart */
+	SUPERFX1(config, m_superfx, DERIVED_CLOCK(1, 1));  /* 21.48MHz, with internal /2 divider */
+	m_superfx->set_addrmap(AS_PROGRAM, &sns_rom_superfx1_device::sfx_map);
+	m_superfx->irq().set(FUNC(sns_rom_superfx1_device::snes_extern_irq_w));  /* IRQ line from cart */
+}
+
+void sns_rom_superfx2_device::device_add_mconfig(machine_config &config)
+{
+	SUPERFX2(config, m_superfx, DERIVED_CLOCK(1, 1));  /* 21.48MHz */
+	m_superfx->set_addrmap(AS_PROGRAM, &sns_rom_superfx2_device::sfx_map);
+	m_superfx->irq().set(FUNC(sns_rom_superfx2_device::snes_extern_irq_w));  /* IRQ line from cart */
 }
 
 uint8_t sns_rom_superfx_device::chip_read(offs_t offset)

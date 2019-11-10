@@ -73,10 +73,10 @@ void capr1_state::cspin2_map(address_map &map)
 	map(0xa000, 0xa00f).rw("te7750", FUNC(te7750_device::read), FUNC(te7750_device::write));
 	map(0xc000, 0xc001).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 	map(0xc004, 0xc004).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-//  AM_RANGE(0xc008, 0xc009) AM_DEVWRITE("fifo1", m66300_device, write)
-//  AM_RANGE(0xc00c, 0xc00d) AM_DEVWRITE("fifo2", m66300_device, write)
-//  AM_RANGE(0xe000, 0xe001) AM_WRITENOP
-//  AM_RANGE(0xe002, 0xe004) AM_WRITENOP
+//  map(0xc008, 0xc009).w("fifo1", FUNC(m66300_device::write));
+//  map(0xc00c, 0xc00d).w("fifo2", FUNC(m66300_device::write));
+//  map(0xe000, 0xe001).nopw();
+//  map(0xe002, 0xe004).nopw();
 }
 
 

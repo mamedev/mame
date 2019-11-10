@@ -1152,6 +1152,9 @@ void sound_manager::update(void *ptr, int param)
 	for (auto &stream : m_stream_list)
 		stream->apply_sample_rate_changes();
 
+	// notify that new samples have been generated
+	emulator_info::sound_hook();
+
 	g_profiler.stop();
 }
 

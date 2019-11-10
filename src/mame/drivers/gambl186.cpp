@@ -380,11 +380,11 @@ void gambl186_state::gambl186_io(address_map &map)
 	map(0x0502, 0x0503).portr("IN1");
 	map(0x0504, 0x0505).portr("IN2");  // Seems to writes more upd7759 params in MSB...
 
-	//AM_RANGE(0x0500, 0x050f) AM_READ(unk_r)
+	//map(0x0500, 0x050f).r(FUNC(gambl186_state::unk_r));
 	map(0x0580, 0x0581).portr("DSW1");
 	map(0x0582, 0x0583).portr("JOY");
 	map(0x0584, 0x0585).portr("DSW0").nopw(); // Watchdog: bit 8
-//  AM_RANGE(0x0600, 0x0603) AM_WRITENOP // lamps
+//  map(0x0600, 0x0603).nopw(); // lamps
 	map(0x0680, 0x0683).rw(FUNC(gambl186_state::comms_r), FUNC(gambl186_state::comms_w));
 	map(0x0700, 0x0701).w(FUNC(gambl186_state::data_bank_w));
 }

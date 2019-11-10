@@ -175,8 +175,8 @@ void vme_mvme350_card_device::mvme350_mem(address_map &map)
 	map(0x060000, 0x06001f).ram(); /* Area is cleared on start */
 	map(0x080000, 0x080035).rw("pit", FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff); /* PIT ?*/
 #endif
-//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//map(0x100000, 0xfeffff).rw(FUNC(vme_mvme350_card_device::vme_a24_r), FUNC(vme_mvme350_card_device::vme_a24_w)); /* VMEbus Rev B addresses (24 bits) - not verified */
+//map(0xff0000, 0xffffff).rw(FUNC(vme_mvme350_card_device::vme_a16_r), FUNC(vme_mvme350_card_device::vme_a16_w)); /* VMEbus Rev B addresses (16 bits) - not verified */
 }
 
 ROM_START( mvme350 )

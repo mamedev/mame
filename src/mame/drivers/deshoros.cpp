@@ -182,12 +182,12 @@ void destiny_state::main_map(address_map &map)
 	map(0x9003, 0x9003).portr("KEY1");
 	map(0x9004, 0x9004).portr("KEY2");
 	map(0x9005, 0x9005).portr("DIPSW").w(FUNC(destiny_state::out_w));
-//  AM_RANGE(0x9006, 0x9006) AM_NOP // printer motor on
-//  AM_RANGE(0x9007, 0x9007) AM_NOP // printer data
+//  map(0x9006, 0x9006).noprw(); // printer motor on
+//  map(0x9007, 0x9007).noprw(); // printer data
 	map(0x900a, 0x900b).w(FUNC(destiny_state::sound_w));
 	map(0x900c, 0x900c).w(FUNC(destiny_state::bank_select_w));
-//  AM_RANGE(0x900d, 0x900d) AM_NOP // printer motor off
-//  AM_RANGE(0x900e, 0x900e) AM_NOP // printer motor jam reset
+//  map(0x900d, 0x900d).noprw(); // printer motor off
+//  map(0x900e, 0x900e).noprw(); // printer motor jam reset
 	map(0xc000, 0xffff).rom();
 }
 

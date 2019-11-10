@@ -1396,7 +1396,7 @@ void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, 
 	line0 = string_format(_("%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"),
 			emulator_info::get_appname(),
 			bare_build_version,
-			visible_items,
+			m_available_items,
 			(driver_list::total() - 1),
 			m_persistent_data.bios_count());
 

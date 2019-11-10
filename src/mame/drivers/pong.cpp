@@ -59,9 +59,9 @@ TODO: Volleyball...
 #include "netlist/devices/net_lib.h"
 
 #include "machine/nl_breakout.h"
-#include "machine/nl_pong.h"
-#include "machine/nl_pongd.h"
 #include "machine/nl_rebound.h"
+#include "machine/nl_pongf.h"
+#include "machine/nl_pongdoubles.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -298,17 +298,6 @@ public:
 	}
 
 	void rebound(machine_config &config);
-
-	NETLIST_START(rebound)
-
-		//MEMREGION_SOURCE("maincpu")
-		LOCAL_SOURCE(rebound_schematics)
-		PARAM(NETLIST.USE_DEACTIVATE, 1)
-		//FIXME: unknown name causes segmentation fault
-		//INCLUDE(rebound)
-		INCLUDE(rebound_schematics)
-
-	NETLIST_END()
 
 protected:
 
@@ -563,7 +552,7 @@ void pong_state::pongf(machine_config &config)
 
 	/* basic machine hardware */
 
-	subdevice<netlist_mame_device>("maincpu")->set_setup_func(NETLIST_NAME(pong_fast));
+	subdevice<netlist_mame_device>("maincpu")->set_setup_func(NETLIST_NAME(pongf));
 }
 
 void pong_state::pongd(machine_config &config)
@@ -607,7 +596,7 @@ void pong_state::pongd(machine_config &config)
 void rebound_state::rebound(machine_config &config)
 {
 	/* basic machine hardware */
-	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(rebound_schematics));
+	NETLIST_CPU(config, "maincpu", NETLIST_CLOCK).set_source(NETLIST_NAME(rebound));
 
 	// FIXME: Later
 	NETLIST_ANALOG_INPUT(config, "maincpu:pot1", "POTP1.DIAL");

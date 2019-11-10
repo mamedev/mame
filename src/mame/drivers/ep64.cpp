@@ -391,7 +391,7 @@ void ep64_state::ep64_io(address_map &map)
 void ep64_state::dave_64k_mem(address_map &map)
 {
 	map(0x000000, 0x007fff).rom().region(Z80_TAG, 0);
-	//AM_RANGE(0x010000, 0x01ffff)      // mapped by the cartslot
+	//map(0x010000, 0x01ffff)      // mapped by the cartslot
 	map(0x3f0000, 0x3fffff).m(m_nick, FUNC(nick_device::vram_map));
 }
 

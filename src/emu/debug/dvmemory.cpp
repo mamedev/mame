@@ -323,7 +323,7 @@ void debug_view_memory::view_update()
 					int ch;
 					char valuetext[64];
 					u64 chunkdata = 0;
-					floatx80 chunkdata80 = { 0, 0 };
+					extFloat80_t chunkdata80 = { 0, 0 };
 					bool ismapped;
 
 					if (m_data_format != 11)
@@ -341,8 +341,8 @@ void debug_view_memory::view_update()
 							sprintf(valuetext, "%.24g", u64_to_double(chunkdata));
 							break;
 						case 11:
-							float64 f64 = floatx80_to_float64(chunkdata80);
-							sprintf(valuetext, "%.24g", u64_to_double(f64));
+							float64_t f64 = extF80M_to_f64(&chunkdata80);
+							sprintf(valuetext, "%.24g", u64_to_double(f64.v));
 							break;
 						}
 					else {
@@ -812,21 +812,21 @@ bool debug_view_memory::read(u8 size, offs_t offs, u64 &data)
 //  read - read a 80 bit value
 //-------------------------------------------------
 
-bool debug_view_memory::read(u8 size, offs_t offs, floatx80 &data)
+bool debug_view_memory::read(u8 size, offs_t offs, extFloat80_t &data)
 {
 	u64 t;
 	bool mappedhi, mappedlo;
 	const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 
 	if (source.m_endianness == ENDIANNESS_LITTLE) {
-		mappedlo = read(8, offs, data.low);
+		mappedlo = read(8, offs, data.signif);
 		mappedhi = read(2, offs+8, t);
-		data.high = (bits16)t;
+		data.signExp = u16(t);
 	}
 	else {
 		mappedhi = read(2, offs, t);
-		data.high = (bits16)t;
-		mappedlo = read(8, offs + 2, data.low);
+		data.signExp = u16(t);
+		mappedlo = read(8, offs + 2, data.signif);
 	}
 
 	return mappedhi && mappedlo;

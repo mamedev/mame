@@ -255,37 +255,37 @@ void i7000_state::i7000_mem(address_map &map)
 	map(0x0000, 0x0fff).rom().region("boot", 0);
 	map(0x2000, 0x2fff).ram().share("videoram");
 	map(0x4000, 0xffff).ram();
-//  AM_RANGE(0x4000, 0xbfff) AM_ROM AM_REGION("cardslot", 0)
+//  map(0x4000, 0xbfff).rom().region("cardslot", 0);
 }
 
 void i7000_state::i7000_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-//  AM_RANGE(0x06, 0x06) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0x08, 0x09) AM_WRITE(i7000_io_?_w) //printer perhaps?
-//  AM_RANGE(0x0c, 0x0c) AM_WRITE(i7000_io_?_w) //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
-//  AM_RANGE(0x10, 0x10) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0x14, 0x15) AM_WRITE(i7000_io_?_w)
+//  map(0x06, 0x06).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x08, 0x09).w(FUNC(i7000_state::i7000_io_?_w)); //printer perhaps?
+//  map(0x0c, 0x0c).w(FUNC(i7000_state::i7000_io_?_w)); //0x0C and 0x10 may be related to mem page swapping. (self-test "4. PAG")
+//  map(0x10, 0x10).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x14, 0x15).w(FUNC(i7000_state::i7000_io_?_w));
 
 	map(0x18, 0x1b).rw("pit8253", FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 
-//  AM_RANGE(0x1c, 0x1c) AM_WRITE(i7000_io_printer_data_w) //ASCII data
+//  map(0x1c, 0x1c).w(FUNC(i7000_state::i7000_io_printer_data_w)); //ASCII data
 	map(0x1d, 0x1d).portr("DSW");
-//  AM_RANGE(0x1e, 0x1e) AM_READWRITE(i7000_io_printer_status_r, i7000_io_?_w)
-//  AM_RANGE(0x1f, 0x1f) AM_WRITE(i7000_io_printer_strobe_w) //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
-//  AM_RANGE(0x20, 0x21) AM_READWRITE(i7000_io_keyboard_r, i7000_io_keyboard_w)
+//  map(0x1e, 0x1e).rw(FUNC(i7000_state::i7000_io_printer_status_r), FUNC(i7000_state::i7000_io_?_w));
+//  map(0x1f, 0x1f).w(FUNC(i7000_state::i7000_io_printer_strobe_w)); //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
+//  map(0x20, 0x21).rw(FUNC(i7000_state::i7000_io_keyboard_r), FUNC(i7000_state::i7000_io_keyboard_w));
 
 	map(0x20, 0x21).rw("i8279", FUNC(i8279_device::read), FUNC(i8279_device::write));
 
-//  AM_RANGE(0x24, 0x24) AM_READ(i7000_io_?_r)
-//  AM_RANGE(0x25, 0x25) AM_WRITE(i7000_io_?_w)
+//  map(0x24, 0x24).r(FUNC(i7000_state::i7000_io_?_r));
+//  map(0x25, 0x25).w(FUNC(i7000_state::i7000_io_?_w));
 
-//  AM_RANGE(0x28, 0x2d) AM_READWRITE(i7000_io_joystick_r, i7000_io_joystick_w)
+//  map(0x28, 0x2d).rw(FUNC(i7000_state::i7000_io_joystick_r), FUNC(i7000_state::i7000_io_joystick_w));
 
-//  AM_RANGE(0x3b, 0x3b) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0x66, 0x67) AM_WRITE(i7000_io_?_w)
-//  AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
+//  map(0x3b, 0x3b).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0x66, 0x67).w(FUNC(i7000_state::i7000_io_?_w));
+//  map(0xbb, 0xbb).w(FUNC(i7000_state::i7000_io_?_w)); //may be related to page-swapping...
 }
 
 DEVICE_IMAGE_LOAD_MEMBER(i7000_state::card_load)

@@ -38,20 +38,20 @@
  * netlists like kidniki.
  */
 
-#ifndef USE_OPENMP
-#define USE_OPENMP              (0)
+#ifndef PUSE_OPENMP
+#define PUSE_OPENMP              (0)
 #endif
 
 /*
  * Set this to one if you want to use aligned storage optimizations.
  */
 
-#ifndef USE_ALIGNED_OPTIMIZATIONS
-#define USE_ALIGNED_OPTIMIZATIONS (0)
+#ifndef PUSE_ALIGNED_OPTIMIZATIONS
+#define PUSE_ALIGNED_OPTIMIZATIONS (0)
 #endif
 
-#define USE_ALIGNED_ALLOCATION (USE_ALIGNED_OPTIMIZATIONS)
-#define USE_ALIGNED_HINTS      (USE_ALIGNED_OPTIMIZATIONS)
+#define PUSE_ALIGNED_ALLOCATION (PUSE_ALIGNED_OPTIMIZATIONS)
+#define PUSE_ALIGNED_HINTS      (PUSE_ALIGNED_OPTIMIZATIONS)
 /*
  * Standard alignment macros
  */
@@ -114,67 +114,28 @@ typedef __int128_t INT128;
 //============================================================
 
 #if defined(OPENMP)
-#define HAS_OPENMP ( OPENMP >= 200805 )
+#if ( OPENMP >= 200805 )
+#define PHAS_OPENMP (1)
+#else
+#define PHAS_OPENMP (0)
+#endif
 #elif defined(_OPENMP)
-#define HAS_OPENMP ( _OPENMP >= 200805 )
+#if ( _OPENMP >= 200805 )
+#define PHAS_OPENMP (1)
 #else
-#define HAS_OPENMP (0)
+#define PHAS_OPENMP (0)
 #endif
-
-//============================================================
-//  Pointer to Member Function
-//============================================================
-
-// This will be autodetected
-//#define PPMF_TYPE 0
-
-#define PPMF_TYPE_PMF             0
-#define PPMF_TYPE_GNUC_PMF_CONV   1
-#define PPMF_TYPE_INTERNAL        2
-
-#if defined(__GNUC__)
-	/* does not work in versions over 4.7.x of 32bit MINGW  */
-	#if defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 7)))
-		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__MINGW32__) && !defined(__x86_64) && defined(__i386__)
-		#define PHAS_PMF_INTERNAL 1
-		#define MEMBER_ABI _thiscall
-	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
-		#define PHAS_PMF_INTERNAL 0
-	#elif defined(__arm__) || defined(__ARMEL__) || defined(__aarch64__) || defined(__MIPSEL__) || defined(__mips_isa_rev) || defined(__mips64) || defined(__EMSCRIPTEN__)
-		#define PHAS_PMF_INTERNAL 2
-	#else
-		#define PHAS_PMF_INTERNAL 1
-	#endif
-#elif defined(_MSC_VER) && defined (_M_X64)
-	#define PHAS_PMF_INTERNAL 3
 #else
-	#define PHAS_PMF_INTERNAL 0
+#define PHAS_OPENMP (0)
 #endif
 
-#ifndef MEMBER_ABI
-	#define MEMBER_ABI
-#endif
-
-#ifndef PPMF_TYPE
-	#if (PHAS_PMF_INTERNAL > 0)
-		#define PPMF_TYPE PPMF_TYPE_INTERNAL
-	#else
-		#define PPMF_TYPE PPMF_TYPE_PMF
-	#endif
-#else
-	#undef PHAS_PMF_INTERNAL
-	#define PHAS_PMF_INTERNAL 0
-	#undef MEMBER_ABI
-	#define MEMBER_ABI
-#endif
 
 //============================================================
 //  WARNINGS
 //============================================================
 
-#if (USE_OPENMP)
-#if (!(HAS_OPENMP))
+#if (PUSE_OPENMP)
+#if (!(PHAS_OPENMP))
 #error To use openmp compile and link with "-fopenmp"
 #endif
 #endif

@@ -185,7 +185,7 @@
 
 		<part name="rom" interface="hp9845b_rom">
 			<feature name="base" value="0x0f4000"  />
-			<dataarea name="rom" size="0x8000" width="16" endianness="big" >
+			<dataarea name="rom" size="0x8000" width="16" endianness="big">
 				<rom name="09845-65525-17_40-reva-assembly_execution_and_development.bin" size="0x2000" crc="ff91e559" sha1="52d8d1d535cf1cd39a1e794115f94dced545d1af" offset="0x0000" />
 				<rom name="09845-65525-17_50-reva-assembly_execution_and_development.bin" size="0x2000" crc="52d8c5b4" sha1="c015fbdc14d9dd2eb5f23cb9e03412fb05b81e42" offset="0x2000" />
 				<rom name="09845-65525-17_60-reva-assembly_execution_and_development.bin" size="0x2000" crc="dc79c562" sha1="8a8bd52b0467e3ffc5685e12537cccc56c78492a" offset="0x4000" />
@@ -277,7 +277,7 @@
 
 		<part name="rom" interface="hp9845b_rom">
 			<feature name="base" value="0x250000"  />
-			<dataarea name="rom" size="0x4000" width="16" endianness="big" >
+			<dataarea name="rom" size="0x4000" width="16" endianness="big">
 				<rom name="09845-66520-45_00-test_rom.bin" size="0x2000" crc="95a5b299" sha1="ef362f8fe0049ba4bb483aca873812ceaa4c8d7c" offset="0x0000" />
 				<rom name="09845-66520-45_10-test_rom.bin" size="0x2000" crc="257e4c66" sha1="4443ca1e7b9565c290e3c2f743602bdf64d0cae0" offset="0x2000" />
 			</dataarea>

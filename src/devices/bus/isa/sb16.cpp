@@ -376,12 +376,12 @@ ROM_END
 void sb16_lle_device::sb16_io(address_map &map)
 {
 	map(0x0000, 0x0000).mirror(0xff00).rw(FUNC(sb16_lle_device::dsp_data_r), FUNC(sb16_lle_device::dsp_data_w));
-//  AM_RANGE(0x0001, 0x0001) // MIDI related?
-//  AM_RANGE(0x0002, 0x0002)
+//  map(0x0001, 0x0001) // MIDI related?
+//  map(0x0002, 0x0002)
 	map(0x0004, 0x0004).mirror(0xff00).rw(FUNC(sb16_lle_device::mode_r), FUNC(sb16_lle_device::mode_w));
 	map(0x0005, 0x0005).mirror(0xff00).rw(FUNC(sb16_lle_device::dac_ctrl_r), FUNC(sb16_lle_device::dac_ctrl_w));
 	map(0x0006, 0x0006).mirror(0xff00).r(FUNC(sb16_lle_device::dma_stat_r));
-//  AM_RANGE(0x0007, 0x0007) // unknown
+//  map(0x0007, 0x0007) // unknown
 	map(0x0008, 0x0008).mirror(0xff00).rw(FUNC(sb16_lle_device::ctrl8_r), FUNC(sb16_lle_device::ctrl8_w));
 	map(0x0009, 0x0009).mirror(0xff00).w(FUNC(sb16_lle_device::rate_w));
 	map(0x000A, 0x000A).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_cnt_lo_r));
@@ -399,9 +399,9 @@ void sb16_lle_device::sb16_io(address_map &map)
 	map(0x001B, 0x001B).mirror(0xff00).r(FUNC(sb16_lle_device::adc_data_r));
 	map(0x001D, 0x001D).mirror(0xff00).w(FUNC(sb16_lle_device::dma8_w));
 	map(0x001F, 0x001F).mirror(0xff00).r(FUNC(sb16_lle_device::dma8_r));
-//  AM_RANGE(0x0080, 0x0080) // ASP comms
-//  AM_RANGE(0x0081, 0x0081)
-//  AM_RANGE(0x0082, 0x0082)
+//  map(0x0080, 0x0080) // ASP comms
+//  map(0x0081, 0x0081)
+//  map(0x0082, 0x0082)
 }
 
 const tiny_rom_entry *sb16_lle_device::device_rom_region() const

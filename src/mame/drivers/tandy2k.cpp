@@ -392,9 +392,9 @@ void tandy2k_state::tandy2k_io(address_map &map)
 void tandy2k_state::tandy2k_hd_io(address_map &map)
 {
 	tandy2k_io(map);
-//  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
-//  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, hdc_reset_r, hdc_reset_w, 0x00ff)
-//  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_device, wd1010_r, wd1010_w, 0x00ff)
+//  map(0x000e0, 0x000ff).w(FUNC(tandy2k_state::hdc_dack_w).umask16(0x00ff));
+//  map(0x0026c, 0x0026c).rw(WD1010_TAG, FUNC(wd1010_device::hdc_reset_r), FUNC(wd1010_device::hdc_reset_w));
+//  map(0x0026e, 0x0027e).rw(WD1010_TAG, FUNC(wd1010_device::wd1010_r), FUNC(wd1010_device::wd1010_w));
 }
 
 void tandy2k_state::vpac_mem(address_map &map)

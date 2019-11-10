@@ -31,7 +31,9 @@
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/adc0804.h"
 #include "machine/eepromser.h"
+#include "machine/rescap.h"
 #include "sound/k053260.h"
 #include "sound/ym2151.h"
 #include "video/k053250.h"
@@ -167,7 +169,7 @@ void overdriv_state::overdriv_master_map(address_map &map)
 	map(0x0e0000, 0x0e0001).nopw();            /* unknown (always 0x30) */
 	map(0x100000, 0x10001f).rw(m_k053252, FUNC(k053252_device::read), FUNC(k053252_device::write)).umask16(0x00ff); /* 053252? (LSB) */
 	map(0x140000, 0x140001).nopw(); //watchdog reset?
-	map(0x180000, 0x180001).portr("PADDLE").nopw();  // writes 0 at POST and expect that motor busy flag is off, then checks if paddle is at center otherwise throws a "VOLUME ERROR".
+	map(0x180001, 0x180001).rw("adc", FUNC(adc0804_device::read), FUNC(adc0804_device::write));
 	map(0x1c0000, 0x1c001f).w(m_k051316_1, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
 	map(0x1c8000, 0x1c801f).w(m_k051316_2, FUNC(k051316_device::ctrl_w)).umask16(0xff00);
 	map(0x1d0000, 0x1d001f).w(m_k053251, FUNC(k053251_device::write)).umask16(0xff00);
@@ -282,10 +284,11 @@ static INPUT_PORTS_START( overdriv )
 	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM )   // motor busy flag
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", adc0804_device, intr_r)
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
+	// POST checks if paddle is at center otherwise throws a "VOLUME ERROR"
 
 	PORT_START( "EEPROMOUT" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, di_write)
@@ -341,6 +344,8 @@ void overdriv_state::overdriv(machine_config &config)
 	config.m_minimum_quantum = attotime::from_hz(12000);
 
 	EEPROM_ER5911_16BIT(config, "eeprom").default_data(overdriv_default_eeprom, 128);
+
+	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set_ioport("PADDLE");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

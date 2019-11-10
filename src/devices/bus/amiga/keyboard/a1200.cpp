@@ -47,6 +47,8 @@
 #include "a1200.h"
 #include "matrix.h"
 
+#include "cpu/m6805/m68hc05.h"
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -171,13 +173,13 @@ WRITE_LINE_MEMBER(a1200_kbd_device::mpu_tcmp)
 
 void a1200_kbd_device::device_add_mconfig(machine_config &config)
 {
-	M68HC705C8A(config, m_mpu, XTAL(3'000'000));
-	m_mpu->port_r<1>().set(FUNC(a1200_kbd_device::mpu_portb_r));
-	m_mpu->port_r<3>().set_ioport("MOD");
-	m_mpu->port_w<0>().set(FUNC(a1200_kbd_device::mpu_porta_w));
-	m_mpu->port_w<1>().set(FUNC(a1200_kbd_device::mpu_portb_w));
-	m_mpu->port_w<2>().set(FUNC(a1200_kbd_device::mpu_portc_w));
-	m_mpu->tcmp().set(FUNC(a1200_kbd_device::mpu_tcmp));
+	m68hc705c8a_device &mpu(M68HC705C8A(config, m_mpu, XTAL(3'000'000)));
+	mpu.portb_r().set(FUNC(a1200_kbd_device::mpu_portb_r));
+	mpu.portd_r().set_ioport("MOD");
+	mpu.porta_w().set(FUNC(a1200_kbd_device::mpu_porta_w));
+	mpu.portb_w().set(FUNC(a1200_kbd_device::mpu_portb_w));
+	mpu.portc_w().set(FUNC(a1200_kbd_device::mpu_portc_w));
+	mpu.tcmp().set(FUNC(a1200_kbd_device::mpu_tcmp));
 }
 
 tiny_rom_entry const *a1200_kbd_device::device_rom_region() const

@@ -48,19 +48,22 @@ ifeq ($(config),release)
   override TARGET              = $(TARGETDIR)/genie.exe
   DEFINES            += -DNDEBUG -DLUA_COMPAT_MODULE
   INCLUDES           += -I"../../src/host/lua-5.3.0/src"
-  INCLUDES           +=
   ALL_CPPFLAGS       += $(CPPFLAGS) -MMD -MP -MP $(DEFINES) $(INCLUDES)
-  ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
-  ALL_CFLAGS         += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
-  ALL_CXXFLAGS       += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
-  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
-  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os
+  ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os $(MPARAM)
+  ALL_CFLAGS         += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os $(MPARAM)
+  ALL_CXXFLAGS       += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os $(MPARAM)
+  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os $(MPARAM)
+  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -Os $(MPARAM)
   ALL_RESFLAGS       += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS        += $(LDFLAGS) -L. -s
+  ALL_LDFLAGS        += $(LDFLAGS) -L"." -s
+  LIBDEPS            +=
   LDDEPS             +=
+  LDRESP              =
   LIBS               += $(LDDEPS) -lole32
   EXTERNAL_LIBS      +=
-  LINKCMD             = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  LINKOBJS            = $(OBJECTS)
+  LINKCMD             = $(CC) -o $(TARGET) $(LINKOBJS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  OBJRESP             =
   OBJECTS := \
 	$(OBJDIR)/src/host/lua-5.3.0/src/lapi.o \
 	$(OBJDIR)/src/host/lua-5.3.0/src/lauxlib.o \
@@ -132,19 +135,22 @@ ifeq ($(config),debug)
   override TARGET              = $(TARGETDIR)/genie.exe
   DEFINES            += -D_DEBUG -DLUA_COMPAT_MODULE
   INCLUDES           += -I"../../src/host/lua-5.3.0/src"
-  INCLUDES           +=
   ALL_CPPFLAGS       += $(CPPFLAGS) -MMD -MP -MP $(DEFINES) $(INCLUDES)
-  ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
-  ALL_CFLAGS         += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
-  ALL_CXXFLAGS       += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
-  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
-  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g
+  ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g $(MPARAM)
+  ALL_CFLAGS         += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g $(MPARAM)
+  ALL_CXXFLAGS       += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g $(MPARAM)
+  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g $(MPARAM)
+  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH) -Wall -Wextra -g $(MPARAM)
   ALL_RESFLAGS       += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  ALL_LDFLAGS        += $(LDFLAGS) -L.
+  ALL_LDFLAGS        += $(LDFLAGS) -L"."
+  LIBDEPS            +=
   LDDEPS             +=
+  LDRESP              =
   LIBS               += $(LDDEPS) -lole32
   EXTERNAL_LIBS      +=
-  LINKCMD             = $(CC) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  LINKOBJS            = $(OBJECTS)
+  LINKCMD             = $(CC) -o $(TARGET) $(LINKOBJS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)
+  OBJRESP             =
   OBJECTS := \
 	$(OBJDIR)/src/host/lua-5.3.0/src/lapi.o \
 	$(OBJDIR)/src/host/lua-5.3.0/src/lauxlib.o \
@@ -222,7 +228,7 @@ RESOURCES := \
 all: $(OBJDIRS) $(TARGETDIR) prebuild prelink $(TARGET)
 	@:
 
-$(TARGET): $(GCH) $(OBJECTS) $(LDDEPS) $(EXTERNAL_LIBS) $(RESOURCES) | $(TARGETDIR) $(OBJDIRS)
+$(TARGET): $(GCH) $(OBJECTS) $(LIBDEPS) $(EXTERNAL_LIBS) $(RESOURCES) $(OBJRESP) $(LDRESP) | $(TARGETDIR) $(OBJDIRS)
 	@echo Linking genie
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
@@ -261,223 +267,235 @@ $(GCH_OBJC): $(PCH) $(MAKEFILE) | $(OBJDIR)
 	$(SILENT) $(CC) $(ALL_OBJCFLAGS) -x objective-c-header $(DEFINES) $(INCLUDES) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lapi.o: ../../src/host/lua-5.3.0/src/lapi.c $(GCH) $(MAKEFILE)
+ifneq (,$(OBJRESP))
+$(OBJRESP): $(OBJECTS) | $(TARGETDIR) $(OBJDIRS)
+	$(SILENT) echo $^
+	$(SILENT) echo $^ > $@
+endif
+
+ifneq (,$(LDRESP))
+$(LDRESP): $(LDDEPS) | $(TARGETDIR) $(OBJDIRS)
+	$(SILENT) echo $^
+	$(SILENT) echo $^ > $@
+endif
+
+$(OBJDIR)/src/host/lua-5.3.0/src/lapi.o: ../../src/host/lua-5.3.0/src/lapi.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lauxlib.o: ../../src/host/lua-5.3.0/src/lauxlib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lauxlib.o: ../../src/host/lua-5.3.0/src/lauxlib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lbaselib.o: ../../src/host/lua-5.3.0/src/lbaselib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lbaselib.o: ../../src/host/lua-5.3.0/src/lbaselib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lbitlib.o: ../../src/host/lua-5.3.0/src/lbitlib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lbitlib.o: ../../src/host/lua-5.3.0/src/lbitlib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lcode.o: ../../src/host/lua-5.3.0/src/lcode.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lcode.o: ../../src/host/lua-5.3.0/src/lcode.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lcorolib.o: ../../src/host/lua-5.3.0/src/lcorolib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lcorolib.o: ../../src/host/lua-5.3.0/src/lcorolib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lctype.o: ../../src/host/lua-5.3.0/src/lctype.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lctype.o: ../../src/host/lua-5.3.0/src/lctype.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ldblib.o: ../../src/host/lua-5.3.0/src/ldblib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ldblib.o: ../../src/host/lua-5.3.0/src/ldblib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ldebug.o: ../../src/host/lua-5.3.0/src/ldebug.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ldebug.o: ../../src/host/lua-5.3.0/src/ldebug.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ldo.o: ../../src/host/lua-5.3.0/src/ldo.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ldo.o: ../../src/host/lua-5.3.0/src/ldo.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ldump.o: ../../src/host/lua-5.3.0/src/ldump.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ldump.o: ../../src/host/lua-5.3.0/src/ldump.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lfunc.o: ../../src/host/lua-5.3.0/src/lfunc.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lfunc.o: ../../src/host/lua-5.3.0/src/lfunc.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lgc.o: ../../src/host/lua-5.3.0/src/lgc.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lgc.o: ../../src/host/lua-5.3.0/src/lgc.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/linit.o: ../../src/host/lua-5.3.0/src/linit.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/linit.o: ../../src/host/lua-5.3.0/src/linit.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/liolib.o: ../../src/host/lua-5.3.0/src/liolib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/liolib.o: ../../src/host/lua-5.3.0/src/liolib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/llex.o: ../../src/host/lua-5.3.0/src/llex.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/llex.o: ../../src/host/lua-5.3.0/src/llex.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lmathlib.o: ../../src/host/lua-5.3.0/src/lmathlib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lmathlib.o: ../../src/host/lua-5.3.0/src/lmathlib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lmem.o: ../../src/host/lua-5.3.0/src/lmem.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lmem.o: ../../src/host/lua-5.3.0/src/lmem.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/loadlib.o: ../../src/host/lua-5.3.0/src/loadlib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/loadlib.o: ../../src/host/lua-5.3.0/src/loadlib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lobject.o: ../../src/host/lua-5.3.0/src/lobject.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lobject.o: ../../src/host/lua-5.3.0/src/lobject.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lopcodes.o: ../../src/host/lua-5.3.0/src/lopcodes.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lopcodes.o: ../../src/host/lua-5.3.0/src/lopcodes.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/loslib.o: ../../src/host/lua-5.3.0/src/loslib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/loslib.o: ../../src/host/lua-5.3.0/src/loslib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lparser.o: ../../src/host/lua-5.3.0/src/lparser.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lparser.o: ../../src/host/lua-5.3.0/src/lparser.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lstate.o: ../../src/host/lua-5.3.0/src/lstate.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lstate.o: ../../src/host/lua-5.3.0/src/lstate.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lstring.o: ../../src/host/lua-5.3.0/src/lstring.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lstring.o: ../../src/host/lua-5.3.0/src/lstring.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lstrlib.o: ../../src/host/lua-5.3.0/src/lstrlib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lstrlib.o: ../../src/host/lua-5.3.0/src/lstrlib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ltable.o: ../../src/host/lua-5.3.0/src/ltable.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ltable.o: ../../src/host/lua-5.3.0/src/ltable.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ltablib.o: ../../src/host/lua-5.3.0/src/ltablib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ltablib.o: ../../src/host/lua-5.3.0/src/ltablib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/ltm.o: ../../src/host/lua-5.3.0/src/ltm.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/ltm.o: ../../src/host/lua-5.3.0/src/ltm.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lundump.o: ../../src/host/lua-5.3.0/src/lundump.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lundump.o: ../../src/host/lua-5.3.0/src/lundump.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lutf8lib.o: ../../src/host/lua-5.3.0/src/lutf8lib.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lutf8lib.o: ../../src/host/lua-5.3.0/src/lutf8lib.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lvm.o: ../../src/host/lua-5.3.0/src/lvm.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lvm.o: ../../src/host/lua-5.3.0/src/lvm.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/lua-5.3.0/src/lzio.o: ../../src/host/lua-5.3.0/src/lzio.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/lua-5.3.0/src/lzio.o: ../../src/host/lua-5.3.0/src/lzio.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host/lua-5.3.0/src
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_chdir.o: ../../src/host/os_chdir.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_chdir.o: ../../src/host/os_chdir.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_copyfile.o: ../../src/host/os_copyfile.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_copyfile.o: ../../src/host/os_copyfile.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_getcwd.o: ../../src/host/os_getcwd.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_getcwd.o: ../../src/host/os_getcwd.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_is64bit.o: ../../src/host/os_is64bit.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_is64bit.o: ../../src/host/os_is64bit.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_isdir.o: ../../src/host/os_isdir.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_isdir.o: ../../src/host/os_isdir.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_isfile.o: ../../src/host/os_isfile.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_isfile.o: ../../src/host/os_isfile.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_match.o: ../../src/host/os_match.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_match.o: ../../src/host/os_match.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_mkdir.o: ../../src/host/os_mkdir.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_mkdir.o: ../../src/host/os_mkdir.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_pathsearch.o: ../../src/host/os_pathsearch.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_pathsearch.o: ../../src/host/os_pathsearch.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_rmdir.o: ../../src/host/os_rmdir.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_rmdir.o: ../../src/host/os_rmdir.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_stat.o: ../../src/host/os_stat.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_stat.o: ../../src/host/os_stat.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_ticks.o: ../../src/host/os_ticks.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_ticks.o: ../../src/host/os_ticks.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/os_uuid.o: ../../src/host/os_uuid.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/os_uuid.o: ../../src/host/os_uuid.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/path_getabsolute.o: ../../src/host/path_getabsolute.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/path_getabsolute.o: ../../src/host/path_getabsolute.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/path_getrelative.o: ../../src/host/path_getrelative.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/path_getrelative.o: ../../src/host/path_getrelative.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/path_helpers.o: ../../src/host/path_helpers.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/path_helpers.o: ../../src/host/path_helpers.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/path_isabsolute.o: ../../src/host/path_isabsolute.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/path_isabsolute.o: ../../src/host/path_isabsolute.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/premake.o: ../../src/host/premake.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/premake.o: ../../src/host/premake.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/premake_main.o: ../../src/host/premake_main.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/premake_main.o: ../../src/host/premake_main.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/scripts.o: ../../src/host/scripts.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/scripts.o: ../../src/host/scripts.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/string_endswith.o: ../../src/host/string_endswith.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/string_endswith.o: ../../src/host/string_endswith.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 
-$(OBJDIR)/src/host/string_hash.o: ../../src/host/string_hash.c $(GCH) $(MAKEFILE)
+$(OBJDIR)/src/host/string_hash.o: ../../src/host/string_hash.c $(GCH) $(MAKEFILE) | $(OBJDIR)/src/host
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"
 

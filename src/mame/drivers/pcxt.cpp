@@ -399,7 +399,7 @@ void pcxt_state::tetriskr_io(address_map &map)
 	map(0x0000, 0x00ff).m(m_mb, FUNC(pc_noppi_mb_device::map));
 	map(0x03c8, 0x03c8).portr("IN0");
 	map(0x03c9, 0x03c9).portr("IN1");
-//  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?
+//  map(0x03ce, 0x03ce).portr("IN1"); //read then discarded?
 }
 
 void pcxt_state::bank_map(address_map &map)

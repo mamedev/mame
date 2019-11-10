@@ -126,10 +126,10 @@ function createProjects_mame_nl(_target, _subtarget)
 
 files{
 	MAME_DIR .. "src/mame/drivers/pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pong.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pong.h",
-	MAME_DIR .. "src/mame/machine/nl_pongd.cpp",
-	MAME_DIR .. "src/mame/machine/nl_pongd.h",
+	MAME_DIR .. "src/mame/machine/nl_pongf.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongf.h",
+	MAME_DIR .. "src/mame/machine/nl_pongdoubles.cpp",
+	MAME_DIR .. "src/mame/machine/nl_pongdoubles.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
 	MAME_DIR .. "src/mame/machine/nl_rebound.cpp",
@@ -148,12 +148,18 @@ files{
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
+	MAME_DIR .. "src/mame/audio/nl_1942.cpp",
+  MAME_DIR .. "src/mame/audio/nl_1942.h",
 
 	MAME_DIR .. "src/mame/drivers/gamemachine.cpp",
+  MAME_DIR .. "src/mame/audio/nl_gamemachine.h",
+  MAME_DIR .. "src/mame/audio/nl_gamemachine.cpp",
 
 	MAME_DIR .. "src/mame/drivers/popeye.cpp",
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
+  MAME_DIR .. "src/mame/audio/nl_popeye.cpp",
+  MAME_DIR .. "src/mame/audio/nl_popeye.h",
 
 	MAME_DIR .. "src/mame/drivers/mario.cpp",
 	MAME_DIR .. "src/mame/includes/mario.h",
@@ -187,6 +193,8 @@ files{
 	MAME_DIR .. "src/mame/video/zaccaria.cpp",
 
 	MAME_DIR .. "src/mame/drivers/cocoloco.cpp",
+  MAME_DIR .. "src/mame/audio/nl_cocoloco.h",
+  MAME_DIR .. "src/mame/audio/nl_cocoloco.cpp",
 
 	MAME_DIR .. "src/mame/drivers/palestra.cpp",
 	MAME_DIR .. "src/mame/machine/nl_palestra.cpp",

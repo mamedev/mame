@@ -110,7 +110,7 @@ void altos5_state::io_map(address_map &map)
 	map(0x10, 0x13).rw("pio1", FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).w(FUNC(altos5_state::port14_w));
 	map(0x1c, 0x1f).rw("dart", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
-	//AM_RANGE(0x20, 0x23) // Hard drive
+	//map(0x20, 0x23) // Hard drive
 	map(0x2c, 0x2f).rw("sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 }
 

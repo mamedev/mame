@@ -29,8 +29,8 @@ void mb90082_device::mb90082_vram(address_map &map)
 	{
 		map(0x0000, 0x023f).ram(); // main screen vram
 		map(0x0400, 0x063f).ram(); // main screen attr
-//  AM_RANGE(0x0800, 0x0a3f) AM_RAM // sub screen vram
-//  AM_RANGE(0x0c00, 0x0e3f) AM_RAM // sub screen attr
+//  map(0x0800, 0x0a3f).ram(); // sub screen vram
+//  map(0x0c00, 0x0e3f).ram(); // sub screen attr
 	}
 }
 

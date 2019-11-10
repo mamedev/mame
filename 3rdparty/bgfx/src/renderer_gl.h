@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -9,12 +9,15 @@
 #define BGFX_USE_EGL (BGFX_CONFIG_RENDERER_OPENGLES && (0 \
 			|| BX_PLATFORM_ANDROID                        \
 			|| BX_PLATFORM_BSD                            \
-			|| BX_PLATFORM_EMSCRIPTEN                     \
 			|| BX_PLATFORM_LINUX                          \
 			|| BX_PLATFORM_NX                             \
 			|| BX_PLATFORM_RPI                            \
 			|| BX_PLATFORM_STEAMLINK                      \
 			|| BX_PLATFORM_WINDOWS                        \
+			) )
+
+#define BGFX_USE_HTML5 (BGFX_CONFIG_RENDERER_OPENGLES && (0 \
+			|| BX_PLATFORM_EMSCRIPTEN                     \
 			) )
 
 #define BGFX_USE_WGL (BGFX_CONFIG_RENDERER_OPENGL && BX_PLATFORM_WINDOWS)
@@ -29,6 +32,24 @@
 			|| BX_PLATFORM_OSX     \
 			|| BX_PLATFORM_WINDOWS \
 			)
+
+#define BGFX_GL_PROFILER_BEGIN(_view, _abgr)                                               \
+	BX_MACRO_BLOCK_BEGIN                                                                   \
+		GL_CHECK(glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, s_viewName[view]) ); \
+		BGFX_PROFILER_BEGIN(s_viewName[view], _abgr);                                      \
+	BX_MACRO_BLOCK_END
+
+#define BGFX_GL_PROFILER_BEGIN_LITERAL(_name, _abgr)                                       \
+	BX_MACRO_BLOCK_BEGIN                                                                   \
+		GL_CHECK(glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, "" # _name) );       \
+		BGFX_PROFILER_BEGIN_LITERAL("" # _name, _abgr);                                    \
+	BX_MACRO_BLOCK_END
+
+#define BGFX_GL_PROFILER_END()        \
+	BX_MACRO_BLOCK_BEGIN              \
+		BGFX_PROFILER_END();          \
+		GL_CHECK(glPopDebugGroup() ); \
+	BX_MACRO_BLOCK_END
 
 #if BGFX_CONFIG_RENDERER_OPENGL
 #	if BGFX_CONFIG_RENDERER_OPENGL >= 31
@@ -105,6 +126,10 @@ typedef uint64_t GLuint64;
 
 #	if BGFX_USE_EGL
 #		include "glcontext_egl.h"
+#	endif // BGFX_USE_EGL
+
+#	if BGFX_USE_HTML5
+#		include "glcontext_html5.h"
 #	endif // BGFX_USE_EGL
 
 #	if BX_PLATFORM_EMSCRIPTEN
@@ -587,6 +612,10 @@ typedef uint64_t GLuint64;
 #	define GL_MAX_ARRAY_TEXTURE_LAYERS 0x88FF
 #endif // GL_MAX_ARRAY_TEXTURE_LAYERS
 
+#ifndef GL_MAX_LABEL_LENGTH
+#	define GL_MAX_LABEL_LENGTH 0x82E8
+#endif // GL_MAX_LABEL_LENGTH
+
 #ifndef GL_QUERY_RESULT
 #	define GL_QUERY_RESULT 0x8866
 #endif // GL_QUERY_RESULT
@@ -631,7 +660,7 @@ typedef uint64_t GLuint64;
 #	define GL_RENDERBUFFER_FREE_MEMORY_ATI 0x87FD
 #endif // GL_RENDERBUFFER_FREE_MEMORY_ATI
 
-// http://developer.download.nvidia.com/opengl/specs/GL_NVX_gpu_memory_info.txt
+// https://web.archive.org/web/20190207230448/http://developer.download.nvidia.com/opengl/specs/GL_NVX_gpu_memory_info.txt
 #ifndef GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX
 #	define GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX 0x9047
 #endif // GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX
@@ -916,6 +945,14 @@ typedef uint64_t GLuint64;
 #	define GL_TEXTURE 0x1702
 #endif // GL_TEXTURE
 
+#ifndef GL_BUFFER
+#	define GL_BUFFER 0x82E0
+#endif // GL_BUFFER
+
+#ifndef GL_COMMAND_BARRIER_BIT
+#	define GL_COMMAND_BARRIER_BIT 0x00000040
+#endif // GL_COMMAND_BARRIER_BIT
+
 // _KHR or _ARB...
 #define GL_DEBUG_OUTPUT_SYNCHRONOUS         0x8242
 #define GL_DEBUG_NEXT_LOGGED_MESSAGE_LENGTH 0x8243
@@ -1177,10 +1214,10 @@ namespace bgfx { namespace gl
 
 	struct VertexBufferGL
 	{
-		void create(uint32_t _size, void* _data, VertexDeclHandle _declHandle, uint16_t _flags)
+		void create(uint32_t _size, void* _data, VertexLayoutHandle _layoutHandle, uint16_t _flags)
 		{
 			m_size = _size;
-			m_decl = _declHandle;
+			m_layoutHandle = _layoutHandle;
 			const bool drawIndirect = 0 != (_flags & BGFX_BUFFER_DRAW_INDIRECT);
 
 			m_target = drawIndirect ? GL_DRAW_INDIRECT_BUFFER : GL_ARRAY_BUFFER;
@@ -1204,7 +1241,7 @@ namespace bgfx { namespace gl
 			{
 				// orphan buffer...
 				destroy();
-				create(m_size, NULL, m_decl, 0);
+				create(m_size, NULL, m_layoutHandle, 0);
 			}
 
 			GL_CHECK(glBindBuffer(m_target, m_id) );
@@ -1221,7 +1258,7 @@ namespace bgfx { namespace gl
 		GLuint m_id;
 		GLenum m_target;
 		uint32_t m_size;
-		VertexDeclHandle m_decl;
+		VertexLayoutHandle m_layoutHandle;
 	};
 
 	struct TextureGL
@@ -1265,6 +1302,7 @@ namespace bgfx { namespace gl
 		uint32_t m_width;
 		uint32_t m_height;
 		uint32_t m_depth;
+		uint32_t m_numLayers;
 		uint8_t m_numMips;
 		uint8_t m_requestedFormat;
 		uint8_t m_textureFormat;
@@ -1304,6 +1342,7 @@ namespace bgfx { namespace gl
 		uint16_t destroy();
 		void resolve();
 		void discard(uint16_t _flags);
+		void set();
 
 		SwapChainGL* m_swapChain;
 		GLuint m_fbo[2];
@@ -1336,7 +1375,7 @@ namespace bgfx { namespace gl
 			bx::memCopy(m_unboundUsedAttrib, m_used, sizeof(m_unboundUsedAttrib) );
 		}
 
-		void bindAttributes(const VertexDecl& _vertexDecl, uint32_t _baseVertex = 0);
+		void bindAttributes(const VertexLayout& _layout, uint32_t _baseVertex = 0);
 
 		void bindAttributesEnd()
 		{

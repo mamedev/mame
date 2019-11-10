@@ -9,7 +9,7 @@
 <softwarelist name="stv" description="Sega Titan Video cartridges">
 
 	<!-- Game: Astra SuperStars -->
-	<software name="astrass" supported="no" >
+	<software name="astrass" supported="no">
 		<description>Astra SuperStars (J 980514 V1.002)</description>
 		<year>1998</year>
 		<publisher>Sunsoft</publisher>
@@ -45,7 +45,7 @@
 	</software>
 
 	<!-- Game: Batman Forever -->
-	<software name="batmanfr" supported="no" >
+	<software name="batmanfr" supported="no">
 		<description>Batman Forever (JUE 960507 V1.000)</description>
 		<year>1996</year>
 		<publisher>Acclaim</publisher>
@@ -121,7 +121,7 @@
 	</software>
 
 	<!-- Game: Critter Crusher -->
-	<software name="critcrsh" supported="no" >
+	<software name="critcrsh" supported="no">
 		<description>Critter Crusher (EA 951204 V1.000)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -294,7 +294,7 @@
 	</software>
 
 	<!-- Game: Funky Head Boxers -->
-	<software name="fhboxers" supported="no" >
+	<software name="fhboxers" supported="no">
 		<description>Funky Head Boxers (JUETBKAL 951218 V1.000)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -315,7 +315,7 @@
 	</software>
 
 	<!-- Game: Find Love -->
-	<software name="findlove" supported="no" >
+	<software name="findlove" supported="no">
 		<description>Find Love (J 971212 V1.000)</description>
 		<year>1997</year>
 		<publisher>Daiki / FCF</publisher>
@@ -477,7 +477,7 @@
 	</software>
 
 	<!-- Game: Magical Zunou Power -->
-	<software name="magzun" supported="no" >
+	<software name="magzun" supported="no">
 		<description>Magical Zunou Power (J 961031 V1.000)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -536,7 +536,7 @@
 	</software>
 
 	<!-- Game: Microman Battle Charge -->
-	<software name="micrombc" supported="no" >
+	<software name="micrombc" supported="no">
 		<description>Microman Battle Charge (J 990326 V1.000)</description>
 		<year>1999</year>
 		<publisher>Sega</publisher>
@@ -555,7 +555,7 @@
 	</software>
 
 	<!-- Game: Virtual Mahjong 2 - My Fair Lady -->
-	<software name="myfairld" supported="no" >
+	<software name="myfairld" supported="no">
 		<description>Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)</description>
 		<year>1998</year>
 		<publisher>Micronet</publisher>
@@ -574,7 +574,7 @@
 	</software>
 
 	<!-- Game: Name Club Ver.3 -->
-	<software name="nclubv3" supported="no" >
+	<software name="nclubv3" supported="no">
 		<description>Name Club Ver.3 (J 970723 V1.000)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -749,7 +749,7 @@
 	</software>
 
 	<!-- Game: DaeJeon! SanJeon SuJeon -->
-	<software name="sanjeon" cloneof="sasissu" supported="no" >
+	<software name="sanjeon" cloneof="sasissu" supported="no">
 		<description>DaeJeon! SanJeon SuJeon (AJTUE 990412 V1.000)</description>
 		<year>1999</year>
 		<publisher>Sega / Deniam</publisher>
@@ -790,7 +790,7 @@
 	</software>
 
 	<!-- Game: Sea Bass Fishing -->
-	<software name="seabass" supported="no" >
+	<software name="seabass" supported="no">
 		<description>Sea Bass Fishing (JUET 971110 V0.001)</description>
 		<year>1997</year>
 		<publisher>A wave inc. (Able license)</publisher>
@@ -823,7 +823,7 @@
 	</software>
 
 	<!-- Game: Shienryu -->
-	<software name="shienryu" supported="no" >
+	<software name="shienryu" supported="no">
 		<description>Shienryu (JUET 961226 V1.000)</description>
 		<year>1997</year>
 		<publisher>Warashi</publisher>
@@ -856,7 +856,7 @@
 	</software>
 
 	<!-- Game: Soukyugurentai / Terra Diver -->
-	<software name="sokyugrt" supported="no" >
+	<software name="sokyugrt" supported="no">
 		<description>Soukyugurentai / Terra Diver (JUET 960821 V1.000)</description>
 		<year>1996</year>
 		<publisher>Raizing / Eighting</publisher>
@@ -872,7 +872,7 @@
 	</software>
 
 	<!-- Game: Steep Slope Sliders -->
-	<software name="sss" supported="no" >
+	<software name="sss" supported="no">
 		<description>Steep Slope Sliders (JUET 981110 V1.000)</description>
 		<year>1998</year>
 		<publisher>Capcom / Cave / Victor</publisher>
@@ -890,7 +890,7 @@
 	</software>
 
 	<!-- Game: Stress Busters -->
-	<software name="stress" supported="no" >
+	<software name="stress" supported="no">
 		<description>Stress Busters (J 981020 V1.000)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
@@ -932,7 +932,7 @@
 	</software>
 
 	<!-- Game: Technical Bowling -->
-	<software name="techbowl" supported="no" >
+	<software name="techbowl" supported="no">
 		<description>Technical Bowling (J 971212 V1.000)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -986,7 +986,7 @@
 	</software>
 
 	<!-- Game: Tecmo World Cup '98 -->
-	<software name="twcup98" supported="no" >
+	<software name="twcup98" supported="no">
 		<description>Tecmo World Cup '98 (JUET 980410 V1.000)</description>
 		<year>1998</year>
 		<publisher>Tecmo</publisher>
@@ -1002,7 +1002,7 @@
 	</software>
 
 	<!-- Game: Virtua Fighter Kids -->
-	<software name="vfkids" supported="no" >
+	<software name="vfkids" supported="no">
 		<description>Virtua Fighter Kids (JUET 960319 V0.000)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -1041,7 +1041,7 @@
 	</software>
 
 	<!-- Game: Virtual Mahjong -->
-	<software name="vmahjong" supported="no" >
+	<software name="vmahjong" supported="no">
 		<description>Virtual Mahjong (J 961214 V1.000)</description>
 		<year>1997</year>
 		<publisher>Micronet</publisher>
@@ -1060,7 +1060,7 @@
 	</software>
 
 	<!-- Game: Winter Heat -->
-	<software name="winterht" supported="no" >
+	<software name="winterht" supported="no">
 		<description>Winter Heat (JUET 971012 V1.000)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
@@ -1079,7 +1079,7 @@
 	</software>
 
 	<!-- Game: Zen Nippon Pro-Wrestling Featuring Virtua -->
-	<software name="znpwfv" supported="no" >
+	<software name="znpwfv" supported="no">
 		<description>Zen Nippon Pro-Wrestling Featuring Virtua (J 971123 V1.000)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>

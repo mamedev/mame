@@ -423,7 +423,7 @@ input_device_joystick::input_device_joystick(input_manager &manager, const char 
 		m_joymap.parse(input_class_joystick::map_8way);
 	}
 	else if (mapstring != input_class_joystick::map_8way)
-		osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string().c_str());
+		osd_printf_verbose("Input: Default joystick map = %s\n", m_joymap.to_string());
 }
 
 
@@ -648,7 +648,7 @@ bool input_class_joystick::set_global_joystick_map(const char *mapstring)
 	if (!map.parse(mapstring))
 		return false;
 
-	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string().c_str());
+	osd_printf_verbose("Input: Changing default joystick map = %s\n", map.to_string());
 
 	// iterate over joysticks and set the map
 	for (int joynum = 0; joynum <= maxindex(); joynum++)

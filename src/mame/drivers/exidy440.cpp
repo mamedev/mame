@@ -2157,6 +2157,6 @@ GAME( 1987, hitnmiss2, hitnmiss, exidy440, hitnmiss, exidy440_state, init_exidy4
 GAME( 1988, whodunit,  0,        exidy440, whodunit, exidy440_state, init_exidy440, ROT0, "Exidy", "Who Dunit (version 9.0)",          0 )
 GAME( 1988, whodunit8, whodunit, exidy440, whodunit, exidy440_state, init_exidy440, ROT0, "Exidy", "Who Dunit (version 8.0)",          0 )
 GAME( 1988, showdown,  0,        exidy440, showdown, exidy440_state, init_showdown, ROT0, "Exidy", "Showdown (version 5.0)",           0 )
-GAME( 1988, showdown4, showdown, exidy440, showdown, exidy440_state, init_showdown, ROT0, "Exidy", "Showdown (version 4.0)",           MACHINE_NOT_WORKING ) // different PAL, expects different values
+GAME( 1988, showdown4, showdown, exidy440, showdown, exidy440_state, init_showdown, ROT0, "Exidy", "Showdown (version 4.0)",           MACHINE_NOT_WORKING ) // no PLD, but it does have a chip at location 11-B on the board (markings removed).
 GAME( 1989, yukon,     0,        exidy440, showdown, exidy440_state, init_yukon,    ROT0, "Exidy", "Yukon (version 2.0)",              0 )
 GAME( 1989, yukon1,    yukon,    exidy440, showdown, exidy440_state, init_yukon,    ROT0, "Exidy", "Yukon (version 1.0)",              0 )

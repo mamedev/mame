@@ -2720,9 +2720,9 @@ void dcs2_audio_denver_5ch_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "flspeaker").front_left();
 	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").rear_left();
-	SPEAKER(config, "rrspeaker").rear_right();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "rlspeaker").headrest_left();
+	SPEAKER(config, "rrspeaker").headrest_right();
+	SPEAKER(config, "subwoofer").backrest();
 
 	DMADAC(config, "dac1").add_route(ALL_OUTPUTS, "flspeaker", 1.0);
 	DMADAC(config, "dac2").add_route(ALL_OUTPUTS, "frspeaker", 1.0);

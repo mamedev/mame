@@ -243,7 +243,7 @@ void gmaster_state::gmaster_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).rw(FUNC(gmaster_state::gmaster_io_r), FUNC(gmaster_state::gmaster_io_w));
-	//AM_RANGE(0x8000, 0xfeff)      // mapped by the cartslot
+	//map(0x8000, 0xfeff)      // mapped by the cartslot
 }
 
 

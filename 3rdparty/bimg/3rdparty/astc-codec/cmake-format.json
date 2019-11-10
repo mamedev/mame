@@ -1,0 +1,38 @@
+{
+  "line_width": 120,
+  "dangle_parens": false,
+  "first_comment_is_literal": true,
+  "algorithm_order": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "command_case": "lower",
+  "additional_commands": {
+    "foo": {
+      "flags": [
+        "BAR",
+        "BAZ"
+      ],
+      "kwargs": {
+        "HEADERS": "*",
+        "DEPENDS": "*",
+        "SOURCES": "*"
+      }
+    }
+  },
+  "separate_fn_name_with_space": false,
+  "always_wrap": [],
+  "separate_ctrl_name_with_space": false,
+  "max_subargs_per_line": 5,
+  "fence_pattern": "^\\s*([`~]{3}[`~]*)(.*)$",
+  "enable_markup": true,
+  "ruler_pattern": "^\\s*[^\\w\\s]{3}.*[^\\w\\s]{3}$",
+  "tab_size": 2,
+  "keyword_case": "unchanged",
+  "enum_char": ".",
+  "literal_comment_pattern": null,
+  "bullet_char": "*",
+  "line_ending": "unix"
+}

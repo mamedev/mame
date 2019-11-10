@@ -1346,7 +1346,8 @@
 	</software>
 
 	<software name="asspd001a" cloneof="asspd001" supported="no">
-		<description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Alt)</description>            <year>199?</year>
+		<description>PD Games Volume 001 (Tanx, Roller-Pede, Amigoids, Cave Runner, Avatris) (Alt)</description>
+		<year>199?</year>
 		<publisher>The Assassins</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />

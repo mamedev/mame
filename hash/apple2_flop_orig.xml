@@ -729,10 +729,11 @@
 		<info name="release" value="2018-10-13"/>
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- It runs on any Apple II with 48K. -->
+		<!-- WOZ updated on 2019-09-13 to fix hang loading level 3. -->
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="233473">
-				<rom name="drol.woz" size="233473" crc="6f8efd51" sha1="d6bc91908869701e952d037540fb79b87686415f" />
+			<dataarea name="flop" size="234753">
+				<rom name="drol.woz" size="234753" crc="90f71e85" sha1="0271bfb1d57f0757af8ab4b3a6f112a2a0c0e7da" />
 			</dataarea>
 		</part>
 	</software>
@@ -7437,6 +7438,823 @@
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="235529">
 				<rom name="olin in emerald side b.woz" size="235529" crc="6a3673d7" sha1="3785eeff9cd0c43f5a31961c869994160e016420" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrwar">
+		<description>Carriers at War</description>
+		<year>1984</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Master disk"/>
+			<dataarea name="flop" size="235556">
+				<rom name="carriers at war disk 1a - master disk.woz" size="235556" crc="8cbe8c7e" sha1="0ac90558dbcac13f25be891421ea94dcc5df5dfb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Scenario disk"/>
+			<dataarea name="flop" size="235558">
+				<rom name="carriers at war disk 1b - scenario disk.woz" size="235558" crc="7584231b" sha1="57698d71527b6dfea861d7cb9c6c8fcf003ee84e" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Backup scenario disk 1"/>
+			<dataarea name="flop" size="235567">
+				<rom name="carriers at war disk 2a - backup scenario disk 1.woz" size="235567" crc="2bf0f8db" sha1="e773d5a53e270550f4a85e67ad48dcfafc4bd4d4" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Backup scenario disk 2"/>
+			<dataarea name="flop" size="235567">
+				<rom name="carriers at war disk 2b - backup scenario disk 2.woz" size="235567" crc="d2effe61" sha1="b23daea23ffc932504c43fe37c2adb7c3d0916e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eurablaz">
+		<description>Europe Ablaze</description>
+		<year>1985</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A - Master disk"/>
+			<dataarea name="flop" size="235594">
+				<rom name="europe ablaze disk 1a - master disk.woz" size="235594" crc="44a5cfb8" sha1="f0abd95b4a037d109f790cf7a6e4d7a782009f83" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B - Scenario disk"/>
+			<dataarea name="flop" size="235596">
+				<rom name="europe ablaze disk 1b - scenario disk.woz" size="235596" crc="044db361" sha1="a5097a867dcac055ff578af624cfd0da8530ad4a" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A - Backup master disk"/>
+			<dataarea name="flop" size="242257">
+				<rom name="europe ablaze disk 2a - backup master disk.woz" size="242257" crc="50116792" sha1="3db001af13709b2f161a9d33f50566e00c6eb585" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B - Backup scenario disk"/>
+			<dataarea name="flop" size="235619">
+				<rom name="europe ablaze disk 2b - backup scenario disk.woz" size="235619" crc="0af563cc" sha1="d7ea4a13ccbd14f024c8e1ce4106986c07a7899e" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A - Save game disk A"/>
+			<dataarea name="flop" size="235599">
+				<rom name="europe ablaze disk 3a - save game disk a.woz" size="235599" crc="ef7da412" sha1="f500d16e1836a8e40d3688db9421b7ff5d935591" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side B - Save game disk B"/>
+			<dataarea name="flop" size="235599">
+				<rom name="europe ablaze disk 3b - save game disk b.woz" size="235599" crc="f4262c8c" sha1="63135a79b8d1fa1287e5a155daa955de165c7325" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="halmonte">
+		<description>Halls of Montezuma</description>
+		<year>1987</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235618">
+				<rom name="halls of montezuma side a - master disk.woz" size="235618" crc="f865f618" sha1="938ce204ad17633eb0deb605dfb2706a35e7449a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235625">
+				<rom name="halls of montezuma side b - scenario disk.woz" size="235625" crc="87f2a672" sha1="8599ce6465b1cd2c2415994701ae9b86e3116626" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="panzbatl">
+		<description>Panzer Battles</description>
+		<year>1989</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235542">
+				<rom name="panzer battles side a - master disk.woz" size="235542" crc="e81f710a" sha1="c901fb39218ec5468cc68e4c233c784040521764" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235544">
+				<rom name="panzer battles side b - scenario disk.woz" size="235544" crc="278a2f66" sha1="417d01bb1848330a8937ddc7d2c2def5141bfbe5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rchstr10">
+		<description>Reach For The Stars (Version 1.0)</description>
+		<year>1983</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235510">
+				<rom name="reach for the stars 1.0.woz" size="235510" crc="f6caa5eb" sha1="06143a70901ab2a95a2bf710aed64aeaa19c1556" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rchstr20">
+		<description>Reach For The Stars (Version 2.0)</description>
+		<year>1985</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235491">
+				<rom name="reach for the stars 2.0.woz" size="235491" crc="dcd74f46" sha1="5fd29a712756defba5248e551337e27f4f6c876d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rchstr30">
+		<description>Reach For The Stars (Version 3.0)</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235534">
+				<rom name="reach for the stars 3.0.woz" size="235534" crc="47b16069" sha1="338d0da131221de56a06a99ed3d1cb7398ab6152" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssrussia">
+		<description>Russia</description>
+		<year>1987</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235565">
+				<rom name="russia side a - master disk.woz" size="235565" crc="2d46ec6c" sha1="f86b1ea2442471c67af3ef01a8795c8b4a0b68c3" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235567">
+				<rom name="russia side b - scenario disk.woz" size="235567" crc="c2a0be04" sha1="406f8cb153a3bc0be2d3d5df896439b77928c18f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbotcwv1">
+		<description>Decisive Battles of the Civil War: Volume One</description>
+		<year>1987</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235614">
+				<rom name="decisive battles of the american civil war volume one side a - master disk.woz" size="235614" crc="a9fa93b5" sha1="0836338d695e7adbaee4ca8eaa8773c7e60280de" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235616">
+				<rom name="decisive battles of the american civil war volume one side b - scenario disk.woz" size="235616" crc="c670da9f" sha1="b27e92a68f43861e0054b79e03805b4bbf3e2fc9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batlfrnt">
+		<description>Battlefront</description>
+		<year>1986</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-12"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235566">
+				<rom name="battlefront side a - master disk.woz" size="235566" crc="7cd8b98f" sha1="084932f545aef9937a78b29b133e42f9d00f5e3a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235568">
+				<rom name="battlefront side b - scenario disk.woz" size="235568" crc="ac27d934" sha1="1a3126d7b7e8bbf37b68744adf374a80d30fe0a1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oilrig">
+		<description>Oil Rig</description>
+		<year>1981</year>
+		<publisher>C.P.U. Software</publisher>
+		<info name="release" value="2019-09-21"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234769">
+				<rom name="oil rig.woz" size="234769" crc="9d355152" sha1="36c5af05be7d90aaa359414cfbb45c858b12ab59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amgovml">
+		<description>American Government (Micro Learningware)</description>
+		<year>1984</year>
+		<publisher>Micro Learningware</publisher>
+		<info name="release" value="2019-09-24"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="american government.woz" size="234776" crc="1d781dab" sha1="0697e23dc8da788e9bab95f945c4b8e2cb34ad14" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlkdsdsk">
+		<description>Muppet Learning Keys: The Muppet Discovery Disk</description>
+		<year>1984</year>
+		<publisher>Sunburst Communications</publisher>
+		<info name="release" value="2019-09-26"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235513">
+				<rom name="muppet learning keys- the muppet discovery disk.woz" size="235513" crc="0032f3a8" sha1="0d9d9bb049071262d9246e766631c509a7266de0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsl1">
+		<description>Leisure Suit Larry in The Land of The Lounge Lizards</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="release" value="2019-09-28"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 128K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="234888">
+				<rom name="leisure suit larry in the land of the lounge lizards disk 1a.woz" size="234888" crc="a1de126d" sha1="44232e6c20a9e68f72c2c7629ff83c2dc99f79d6" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="235596">
+				<rom name="leisure suit larry in the land of the lounge lizards disk 1b.woz" size="235596" crc="09f704cb" sha1="745360380088aa61fd056259e37feb1df9b9758c" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="235596">
+				<rom name="leisure suit larry in the land of the lounge lizards disk 2a.woz" size="235596" crc="effd0ae7" sha1="c38c74c059cf063887bb74a0af4ed8e6dc682b54" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="235596">
+				<rom name="leisure suit larry in the land of the lounge lizards disk 2b.woz" size="235596" crc="02985a4a" sha1="3c564f9b14cf397796e3b9fd41490281b0e6200f" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side A"/>
+			<dataarea name="flop" size="235596">
+				<rom name="leisure suit larry in the land of the lounge lizards disk 3a.woz" size="235596" crc="1463b109" sha1="32f48c48e87fe716de1db5cfd1b52694a4fe2750" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="idamiano">
+		<description>I, Damiano</description>
+		<year>1985</year>
+		<publisher>Bantam Software</publisher>
+		<info name="release" value="2019-09-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235569">
+				<rom name="i, damiano side a.woz" size="235569" crc="1f262c40" sha1="ea5a0fb44124bb89a0f7e6502a136dd24c5d30a0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235589">
+				<rom name="i, damiano side b.woz" size="235589" crc="a8634aba" sha1="70870265ac476bece35fc5bb2415ab2b30523d54" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crmstopr">
+		<description>Crime Stopper</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-09-28"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="242146">
+				<rom name="crime stopper.woz" size="242146" crc="a3f353f8" sha1="9bafc69292e39aebf5fcf253ffcd34cb02ed669f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qpspdrmn">
+		<description>Questprobe featuring Spider-Man</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-09-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234823">
+				<rom name="questprobe featuring spider-man side a.woz" size="234823" crc="f560335e" sha1="8c7f230eb8fe444617b93af8c9e400906b75fe49" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234823">
+				<rom name="questprobe featuring spider-man side b.woz" size="234823" crc="1ad643ed" sha1="68b94de28f99620eb3a6a89f9462effd5e2919ac" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bchlndng">
+		<description>Beach Landing</description>
+		<year>1984</year>
+		<publisher>Optimum Resource</publisher>
+		<info name="release" value="2019-09-28"/>
+		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple //e or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235485">
+				<rom name="beach landing.woz" size="235485" crc="8ad464a0" sha1="7605b34cf01ed8d96c4a3b0e9067ecd91cb8ba44" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vaultzur">
+		<description>Vaults of Zurich</description>
+		<year>1982</year>
+		<publisher>Artworx</publisher>
+		<info name="release" value="2019-09-28"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235497">
+				<rom name="vaults of zurich.woz" size="235497" crc="1a42863c" sha1="fc1185de0dec030a34a1a2627af1d7bf5e968a58" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbotcwv2">
+		<description>Decisive Battles of the American Civil War: Volume Two</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-19"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235578">
+				<rom name="decisive battles of the american civil war volume two side a - master disk.woz" size="235578" crc="30c483b9" sha1="cbb8bda5723def98ca183646c695d532e1461d18" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235580">
+				<rom name="decisive battles of the american civil war volume two side b - scenario disk.woz" size="235580" crc="6a2bf6ce" sha1="7eff676e25d0c96d5af5b556ff4994bd8947ac29" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbotcwv3">
+		<description>Decisive Battles of the American Civil War: Volume Three</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235625">
+				<rom name="decisive battles of the american civil war volume three side a - master disk.woz" size="235625" crc="8f7aed91" sha1="ad584617e8deea0dac7a648411942345f9ece676" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235627">
+				<rom name="decisive battles of the american civil war volume three side b - scenario disk.woz" size="235627" crc="1ce9edc5" sha1="3f8e1c8ca03eefa1c46b881fe0b566e7a2b96162" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcarthwr">
+		<description>MacArthur's War</description>
+		<year>1988</year>
+		<publisher>Strategic Studies Group</publisher>
+		<info name="release" value="2019-09-21"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A - Master disk"/>
+			<dataarea name="flop" size="235581">
+				<rom name="macarthur's war side a - master disk.woz" size="235581" crc="5ee7a50e" sha1="0e35c7de38ad3c1ddfdce482d6d69066daf9992f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B - Scenario disk"/>
+			<dataarea name="flop" size="235583">
+				<rom name="macarthur's war side b - scenario disk.woz" size="235583" crc="fdf61a37" sha1="920b47a8875102e61fd9891cf887cfd4bbdb86f5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tapper">
+		<description>Tapper</description>
+		<year>1984</year>
+		<publisher>Bally Midway</publisher>
+		<info name="release" value="2019-09-21"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234740">
+				<rom name="tapper.woz" size="234740" crc="54817971" sha1="e990e3b6912e2afd3881744202a31d44c7cca592" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spckadet">
+		<description>Space Kadet</description>
+		<year>1982</year>
+		<publisher>Datamost</publisher>
+		<info name="release" value="2019-09-21"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234764">
+				<rom name="space kadet.woz" size="234764" crc="bcb95177" sha1="5f57c05d9fe91b61507062b87cedb469f56c0556" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wntgames">
+		<description>Winter Games</description>
+		<year>1985</year>
+		<publisher>Epyx</publisher>
+		<info name="release" value="2019-10-03"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235443">
+				<rom name="winter games side a.woz" size="235443" crc="f4efaabf" sha1="b48d6598ca98a213a39a6d65827e63020092481d" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235443">
+				<rom name="winter games side b.woz" size="235443" crc="c27d43fa" sha1="8e79d61971ad57c919e3b691c9a3d8999e4fbac7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aplstinv">
+		<description>Apple Stellar Invaders</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2019-10-03"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="235460">
+				<rom name="apple stellar invaders.woz" size="235460" crc="edf89d17" sha1="12ffab9535d9a98b26638b7d8de72de8556efa71" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ulysgflc">
+		<description>Ulysses and the Golden Fleece</description>
+		<year>1981</year>
+		<publisher>On-Line Systems</publisher>
+		<info name="release" value="2019-10-04"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242146">
+				<rom name="ulysses and the golden fleece side a.woz" size="242146" crc="21d6194d" sha1="86ef1ae8cbeb738c9167adefbbc87a85ed5f7615" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235510">
+				<rom name="ulysses and the golden fleece side b.woz" size="235510" crc="7168c183" sha1="e5b2b512c68a98ee4d436acaeaab33aa4e5798b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simlineq">
+		<description>Simultaneous Linear Equations</description>
+		<year>1984</year>
+		<publisher>Microcomputer Workshops</publisher>
+		<info name="release" value="2019-10-07"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="252755">
+				<rom name="simultaneous linear equations.woz" size="252755" crc="de565e61" sha1="6f11ae0b7b74e130503cea4a347b662db6fdc9b8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="covetmir">
+		<description>The Coveted Mirror</description>
+		<year>1985</year>
+		<publisher>Polarware</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- This re-release requires a 64K Apple ][+ or later;
+		the optional double hi-res graphics mode requires a
+		128K Apple //e or later.-->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234878">
+				<rom name="the coveted mirror 2.0 side a.woz" size="234878" crc="c8f37420" sha1="3409d2d539e5b24217e512e0f4d379a4a12ed4a5" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B (Boot disk)"/>
+			<dataarea name="flop" size="234878">
+				<rom name="the coveted mirror 2.0 side b (boot).woz" size="234878" crc="bb03d3d6" sha1="00570626b8b6ebf5ab04185744704f13a0af8b97" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alibi">
+		<description>Alibi</description>
+		<year>1981</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="248803">
+				<rom name="alibi.woz" size="248803" crc="12ac7a0b" sha1="38e38af85103b666b8d610a18d18ccd344a4a302" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reversal">
+		<description>Reversal</description>
+		<year>1980</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- The disk label says it requires a 32K Apple ][, but under
+		emulation I could not get it to work on less than a 48K Apple ][+. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234813">
+				<rom name="reversal.woz" size="234813" crc="ec850ca7" sha1="e6726b394b80467052b698c6c71941dd569082e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hntpalac">
+		<description>The Haunted Palace</description>
+		<year>1982</year>
+		<publisher>Crystalware</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235480">
+				<rom name="the haunted palace side a.woz" size="235480" crc="c50da672" sha1="76a1137940f17495b8ff4b336fccafed7b78067a" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235480">
+				<rom name="the haunted palace side b.woz" size="235480" crc="b078bc2b" sha1="8fec41306ab05b395df33b88c337609b66ad7a15" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sherhlms">
+		<description>Sherlock Holmes in Another Bow</description>
+		<year>1985</year>
+		<publisher>Bantam Software</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235540">
+				<rom name="sherlock holmes in another bow side a.woz" size="235540" crc="1732e581" sha1="09700ab41f161d7ae85dce73d6caaed2dbf84cdb" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235560">
+				<rom name="sherlock holmes in another bow side b.woz" size="235560" crc="9a3f6312" sha1="ee2a62b36982f5a09c81d353f0aebf6ded2123dc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogfght2">
+		<description>Dogfight II</description>
+		<year>1981</year>
+		<publisher>Micro Lab</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P" />
+
+		<!-- It requires a 48K Apple ][ or Apple ][+.
+		Due to compatibility issues created by the copy protection,
+		it will not run on later models. -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="188158">
+				<rom name="dogfight ii.woz" size="188158" crc="789c1c34" sha1="234fb379e91e741c7533d65e01f65547d942432d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="masksun">
+		<description>The Mask of the Sun (Version 2.1)</description>
+		<year>1982</year>
+		<publisher>Broderbund Software</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="234816">
+				<rom name="the mask of the sun v2.1 side a.woz" size="234816" crc="6f53a1a8" sha1="be0a62cac5e1b658b531a3a72e081be38bb3f50f" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234816">
+				<rom name="the mask of the sun v2.1 side b.woz" size="234816" crc="74c541b4" sha1="2e8b846c425685718135391fdbb16ce53cacaa06" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pulsar2">
+		<description>Pulsar ][</description>
+		<year>1981</year>
+		<publisher>Sirius Software</publisher>
+		<info name="release" value="2019-10-14"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="168203">
+				<rom name="pulsar ][.woz" size="168203" crc="d7ca2e40" sha1="a2558764c118dc708c2306cbaac6d353815127d4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntlet">
+		<description>Gauntlet</description>
+		<year>1986</year>
+		<publisher>Mindscape</publisher>
+		<info name="release" value="2019-10-19"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+		<!-- This was released with several different copy protections;
+		this version was protected with the E7 bitstream. Game code and data
+		is identical to other protected variants. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="235440">
+				<rom name="gauntlet side a.woz" size="235440" crc="adcde10f" sha1="ac3bf5d9d37e76d286188a35dbcbfbf4b4977640" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="235440">
+				<rom name="gauntlet side b.woz" size="235440" crc="2a6a240f" sha1="6279fc79ce45a7df2d506a8c47223c506f725c2d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gohayden">
+		<description>Go (Hayden)</description>
+		<year>1982</year>
+		<publisher>Hayden Book Company</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+		<!--"Go" is a 1982 board game by Stan Erwin and published by Hayden Book Company. It requires a 48K Apple ][+ or later.-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234775">
+				<rom name="go.woz" size="234775" crc="aa3a005d" sha1="d96d7d67c1a2f664735f412c25229b91306cd5bf" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gbusters">
+		<description>Ghostbusters</description>
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="241426">
+				<rom name="ghostbusters.woz" size="241426" crc="c4176675" sha1="3e5be969ad5a6fc56188397d60b9616f3f3cb785" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galwars">
+		<description>Galactic Wars</description>
+		<year>1980</year>
+		<publisher>Apple Computer</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234768">
+				<rom name="galactic wars.woz" size="234768" crc="f285f463" sha1="c830b95c49a107569d424803344732fed6523983" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guderian">
+		<description>Guderian</description>
+		<year>1986</year>
+		<publisher>The Avalon Hill</publisher>
+		<info name="release" value="2019-10-20"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234755">
+				<rom name="guderian.woz" size="234755" crc="8415b9d0" sha1="62c4582dcbb181e42052e81671c27f2dace6865e" />
 			</dataarea>
 		</part>
 	</software>

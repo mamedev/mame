@@ -11,7 +11,7 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="simplicalc[cbm_1981](vic20).g64" size="333744" crc="5cccae94" sha1="1c4fceb35a64db38f8909547e895355d9c396e82" offset="0" />
+				<rom name="simplicalc[cbm_1981](vic20).g64" size="333744" crc="5cccae94" sha1="1c4fceb35a64db38f8909547e895355d9c396e82"/>
 			</dataarea>
 		</part>
 	</software>
@@ -25,7 +25,7 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="vicfile[cbm_1981](vic20).g64" size="333744" crc="0051ea87" sha1="408fb1af3959bc79aa100ed729c51e30e5ae31ec" offset="0" />
+				<rom name="vicfile[cbm_1981](vic20).g64" size="333744" crc="0051ea87" sha1="408fb1af3959bc79aa100ed729c51e30e5ae31ec"/>
 			</dataarea>
 		</part>
 	</software>
@@ -39,7 +39,7 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="vicfile[cbm_198x](alt)(vic20).g64" size="333744" crc="ca9dc8ea" sha1="ea7e443cd3afa99ee12846604898b3c16863cdd3" offset="0" />
+				<rom name="vicfile[cbm_198x](alt)(vic20).g64" size="333744" crc="ca9dc8ea" sha1="ea7e443cd3afa99ee12846604898b3c16863cdd3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="vicwriter[cbm_1981](vic20).g64" size="333744" crc="2a75180c" sha1="54fd41c6f11614d6b1e6763aa64ee92b9cc53f1a" offset="0" />
+				<rom name="vicwriter[cbm_1981](vic20).g64" size="333744" crc="2a75180c" sha1="54fd41c6f11614d6b1e6763aa64ee92b9cc53f1a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 		<sharedfeat name="requirement" value="vic1001_cart:speakez"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="speakeasy.d64" size="174848" crc="bfd060ca" sha1="d2c5b5c2b6c5ef01891e3256a4aad8ec2bbbbfe5" offset="0" />
+				<rom name="speakeasy.d64" size="174848" crc="bfd060ca" sha1="d2c5b5c2b6c5ef01891e3256a4aad8ec2bbbbfe5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -79,7 +79,7 @@
 		<sharedfeat name="requirement" value="vic1001_cart:data20dm"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="data20.d64" size="174848" crc="06664680" sha1="1586afa380272d333801992c829707e26f81c455" offset="0" />
+				<rom name="data20.d64" size="174848" crc="06664680" sha1="1586afa380272d333801992c829707e26f81c455"/>
 			</dataarea>
 		</part>
 	</software>

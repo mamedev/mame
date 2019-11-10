@@ -68,7 +68,7 @@ void altair_state::io_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	// TODO: Remove AM_MIRROR() and use SIO address S0-S7
+	// TODO: Remove mirror() and use SIO address S0-S7
 	map(0x00, 0x01).mirror(0x10).rw("acia", FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 }
 

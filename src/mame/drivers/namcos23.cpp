@@ -3012,7 +3012,7 @@ void namcos23_state::gmen_sh2_map(address_map &map)
 	map(0x00000000, 0x0000ffff).ram().share("gmen_sh2_shared");
 	map(0x00800000, 0x008fffff).rom().region("data", 0xc00000); //c00000 "data" for final furlong 2. 0x1b6bc0 "user1" for gunmen wars
 	map(0x01800000, 0x0183ffff).ram(); // ???
-	//AM_RANGE(0x02800000, 0x02800003) AM_RAM // probably transfer status related, reads/writes after each end of flash transfer, TBD
+	//map(0x02800000, 0x02800003).ram(); // probably transfer status related, reads/writes after each end of flash transfer, TBD
 	map(0x04000000, 0x043fffff).ram(); // SH-2 main work RAM (SDRAM)
 	map(0x06000000, 0x06000003).noprw(); // serial port for camera?
 }

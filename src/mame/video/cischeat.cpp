@@ -1009,11 +1009,11 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 
-		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
+		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%02X",
 							m_scudhamm_motor_command,
 							scudhamm_motor_pos_r(space,0,0xffff),
 							scudhamm_motor_status_r(space,0,0xffff),
-							scudhamm_analog_r(space,0,0xffff) );
+							scudhamm_analog_r() );
 
 #if 0
 	// captflag

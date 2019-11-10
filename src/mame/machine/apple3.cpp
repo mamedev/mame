@@ -124,7 +124,10 @@ uint8_t apple3_state::apple3_c0xx_r(offs_t offset)
 		case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2A: case 0x2B:
 		case 0x2C: case 0x2D: case 0x2E: case 0x2F:
-			m_cnxx_slot = -1;
+			if (!machine().side_effects_disabled())
+			{
+				m_cnxx_slot = -1;
+			}
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33:
@@ -813,6 +816,10 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 		}
 		else
 		{
+			if (machine().side_effects_disabled())
+			{
+				return 0xff;
+			}
 			/* now identify the device */
 			device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card((offset>>8) & 0x7);
 
@@ -839,18 +846,21 @@ uint8_t apple3_state::apple3_memory_r(offs_t offset)
 		}
 		else
 		{
-			if (offset == 0xcfff)
+			if (!machine().side_effects_disabled())
 			{
-				m_cnxx_slot = -1;
-			}
-
-			if (m_cnxx_slot != -1)
-			{
-				device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
-
-				if (slotdevice != nullptr)
+				if (offset == 0xcfff)
 				{
-					rv = slotdevice->read_c800(offset&0x7ff);
+					m_cnxx_slot = -1;
+				}
+
+				if (m_cnxx_slot != -1)
+				{
+					device_a2bus_card_interface *slotdevice = m_a2bus->get_a2bus_card(m_cnxx_slot);
+
+					if (slotdevice != nullptr)
+					{
+						rv = slotdevice->read_c800(offset&0x7ff);
+					}
 				}
 			}
 		}

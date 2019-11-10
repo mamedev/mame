@@ -1566,7 +1566,7 @@ void bfm_sc2_state::sc2_basemap(address_map &map)
 	map(0x2C00, 0x2C00).w(FUNC(bfm_sc2_state::unlock_w));                     /* custom chip unlock */
 	map(0x2D00, 0x2D01).w(m_ym2413, FUNC(ym2413_device::write));
 	map(0x2E00, 0x2E00).w(FUNC(bfm_sc2_state::bankswitch_w));                 /* write bank (rom page select for 0x6000 - 0x7fff ) */
-	//AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)                /* vfd2 data (not usually connected!)*/
+	//map(0x2F00, 0x2F00).w(FUNC(bfm_sc2_state::vfd2_data_w));                /* vfd2 data (not usually connected!)*/
 
 	map(0x3FFE, 0x3FFE).r(FUNC(bfm_sc2_state::direct_input_r));
 	map(0x3FFF, 0x3FFF).r(FUNC(bfm_sc2_state::coin_input_r));

@@ -544,7 +544,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 			uint64_t datamask = entry->datamask();
 			int index = entry->index();
 			const std::string &format_string = entry->format_string();
-			osd_printf_info("[%3d] datasize %d mask %016" PRIx64 " [%s] [%s]\n", index, datasize, datamask, symbol, format_string.c_str());
+			osd_printf_info("[%3d] datasize %d mask %016" PRIx64 " [%s] [%s]\n", index, datasize, datamask, symbol, format_string);
 		}
 #endif
 
@@ -583,7 +583,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 
 #if 0
 		for ( const auto &reg: m_gdb_registers )
-			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name.c_str());
+			osd_printf_info(" %3d (%d) %d %d [%s]\n", reg.gdb_regnum, reg.state_index, reg.gdb_bitsize, reg.gdb_type, reg.gdb_name);
 #endif
 
 		std::string socket_name = string_format("socket.localhost:%d", m_debugger_port);

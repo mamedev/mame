@@ -161,18 +161,18 @@ void media_identifier::collect_files(std::vector<file_info> &info, char const *p
 							if (util::archive_file::error::NONE == err)
 								digest_data(info, curfile.c_str(), &data[0], length);
 							else
-								osd_printf_error("%s: error decompressing file\n", curfile.c_str());
+								osd_printf_error("%s: error decompressing file\n", curfile);
 						}
 						catch (...)
 						{
 							// resizing the buffer could cause a bad_alloc if archive contains large files
-							osd_printf_error("%s: error decompressing file\n", curfile.c_str());
+							osd_printf_error("%s: error decompressing file\n", curfile);
 						}
 						data.clear();
 					}
 					else
 					{
-						osd_printf_error("%s: file too large to decompress into memory\n", curfile.c_str());
+						osd_printf_error("%s: file too large to decompress into memory\n", curfile);
 					}
 				}
 			}
@@ -209,12 +209,12 @@ void media_identifier::digest_file(std::vector<file_info> &info, char const *pat
 		m_total++;
 		if (err != CHDERR_NONE)
 		{
-			osd_printf_info("%-20sNOT A CHD\n", core_filename_extract_base(path).c_str());
+			osd_printf_info("%-20sNOT A CHD\n", core_filename_extract_base(path));
 			m_nonroms++;
 		}
 		else if (!chd.compressed())
 		{
-			osd_printf_info("%-20sis a writeable CHD\n", core_filename_extract_base(path).c_str());
+			osd_printf_info("%-20sis a writeable CHD\n", core_filename_extract_base(path));
 		}
 		else
 		{
@@ -413,7 +413,7 @@ void media_identifier::print_results(std::vector<file_info> const &info)
 {
 	for (file_info const &file : info)
 	{
-		osd_printf_info("%-20s", core_filename_extract_base(file.name()).c_str());
+		osd_printf_info("%-20s", core_filename_extract_base(file.name()));
 		if (file.matches().empty())
 		{
 			osd_printf_info("NO MATCH\n");

@@ -30,6 +30,8 @@
 //#define REAL_PCI_CHIPSET
 
 #include "emu.h"
+#include "bus/ata/atapicdr.h"
+#include "bus/ata/idehd.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at.h"
@@ -38,8 +40,6 @@
 #include "machine/nvram.h"
 #include "machine/ins8250.h"
 #include "machine/microtch.h"
-#include "machine/atapicdr.h"
-#include "machine/idehd.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/ds128x.h"

@@ -20,7 +20,7 @@ To verify:
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="63296">
-				<rom name="chess game 2, the (1986)(eaglesoft)(nl)[run'cas-'].cas" size="63296" crc="58523f94" sha1="b8a706f228c2f7baee88f67ea7b68fb26e50f5b2" offset="0" />
+				<rom name="chess game 2, the (1986)(eaglesoft)(nl)[run'cas-'].cas" size="63296" crc="58523f94" sha1="b8a706f228c2f7baee88f67ea7b68fb26e50f5b2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -34,7 +34,7 @@ To verify:
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="21494">
-				<rom name="leonardo (1987)(omega system)(jp)[cload + run].cas" size="21494" crc="5383ba81" sha1="658031b8578ecd3f95e648fc2d527be05de3ed40" offset="0" />
+				<rom name="leonardo (1987)(omega system)(jp)[cload + run].cas" size="21494" crc="5383ba81" sha1="658031b8578ecd3f95e648fc2d527be05de3ed40"/>
 			</dataarea>
 		</part>
 	</software>
@@ -47,7 +47,7 @@ To verify:
 
 		<part name="cass1" interface="msx_cass">
 			<dataarea name="cass" size="172263">
-				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)[run'cas-'].cas" size="172263" crc="443d80f9" sha1="b8323adf0b5c9d05223f3c587d52d94b933c00f6" offset="0" />
+				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)[run'cas-'].cas" size="172263" crc="443d80f9" sha1="b8323adf0b5c9d05223f3c587d52d94b933c00f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -61,13 +61,13 @@ To verify:
 		<part name="cass1" interface="msx_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="52193">
-				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)(side a)[run'cas-'].cas" size="52193" crc="fced9743" sha1="eeb226eab09670fd11f3d797ce667a11133cfd7c" offset="0" />
+				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)(side a)[run'cas-'].cas" size="52193" crc="fced9743" sha1="eeb226eab09670fd11f3d797ce667a11133cfd7c"/>
 			</dataarea>
 		</part>
 		<part name="cass2" interface="msx_cass">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="cass" size="120071">
-				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)(side b)[run'cas-'].cas" size="120071" crc="e3bd39b3" sha1="bb8b304ff3f8a527648fb765da2ff9284f5c9f4c" offset="0" />
+				<rom name="red lights of amsterdam (1986)(eaglesoft)(nl)(side b)[run'cas-'].cas" size="120071" crc="e3bd39b3" sha1="bb8b304ff3f8a527648fb765da2ff9284f5c9f4c"/>
 			</dataarea>
 		</part>
 	</software>

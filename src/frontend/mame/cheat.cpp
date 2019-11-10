@@ -153,7 +153,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		if (!itemnode->get_value() || !itemnode->get_value()[0])
 			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 
-		// check for non-existant value
+		// check for non-existent value
 		if (!itemnode->has_attribute("value"))
 			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
 
@@ -810,14 +810,14 @@ bool cheat_entry::activate()
 		// if we're a oneshot cheat, execute the "on" script and indicate change
 		execute_on_script();
 		changed = true;
-		m_manager.machine().popmessage("Activated %s", m_description.c_str());
+		m_manager.machine().popmessage("Activated %s", m_description);
 	}
 	else if (is_oneshot_parameter() && (m_state != SCRIPT_STATE_OFF))
 	{
 		// if we're a oneshot parameter cheat and we're active, execute the "state change" script and indicate change
 		execute_change_script();
 		changed = true;
-		m_manager.machine().popmessage("Activated\n %s = %s", m_description.c_str(), m_parameter->text());
+		m_manager.machine().popmessage("Activated\n %s = %s", m_description, m_parameter->text());
 	}
 
 	return changed;

@@ -80,7 +80,7 @@ void ts802_state::ts802_mem(address_map &map)
 
 void ts802_state::ts802_io(address_map &map)
 {
-	//ADDRESS_MAP_UNMAP_HIGH
+	//map.unmap_value_high();
 	map.global_mask(0xff);
 	map(0x00, 0x03).r(FUNC(ts802_state::port00_r));  // DIP switches
 	// 04 - written once after OS boot to bank in RAM from 0000-3FFF instead of ROM.  4000-FFFF is always RAM.
@@ -88,7 +88,7 @@ void ts802_state::ts802_io(address_map &map)
 	// 08-0B: Z80 CTC
 	map(0x08, 0x0b).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	// 0C-0F: Z80 SIO #1
-	//AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("dart1", z80dart_device, ba_cd_r, ba_cd_w)
+	//map(0x0c, 0x0f).rw("dart1", FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x0c, 0x0c).r(FUNC(ts802_state::port0c_r));
 	map(0x0d, 0x0d).r(FUNC(ts802_state::port0d_r)).w(m_terminal, FUNC(generic_terminal_device::write));
 	map(0x0e, 0x0e).r(FUNC(ts802_state::port0e_r));

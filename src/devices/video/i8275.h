@@ -83,10 +83,10 @@ public:
 	auto vrtc_wr_callback() { return m_write_vrtc.bind(); }
 	auto lc_wr_callback() { return m_write_lc.bind(); }
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
-	DECLARE_WRITE8_MEMBER( dack_w );
+	void dack_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( lpen_w );
 

@@ -409,7 +409,7 @@ WRITE8_MEMBER(zorba_state::io_write_byte)
 	address_space& prog_space = m_maincpu->space(AS_IO);
 
 	if (offset == 0x10)
-		m_crtc->dack_w(space, 0, data);
+		m_crtc->dack_w(data);
 	else
 		prog_space.write_byte(offset, data);
 }

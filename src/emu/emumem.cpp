@@ -34,7 +34,7 @@
 
 #define VPRINTF(x)  do { if (VERBOSE) printf x; } while (0)
 
-#define VALIDATE_REFCOUNTS 1
+#define VALIDATE_REFCOUNTS 0
 
 void handler_entry::dump_map(std::vector<memory_entry> &map) const
 {

@@ -52,6 +52,7 @@ public:
 	void init_chryangl();
 	void init_goldstar();
 	void init_jkrmast();
+	void init_pkrmast();
 	void init_cmast91();
 	void init_wcherry();
 	void init_super9();
@@ -70,6 +71,7 @@ public:
 	void ladylinr(machine_config &config);
 	void ladylinrb(machine_config &config);
 	void wcherry(machine_config &config);
+	void crazybon(machine_config &config);
 	void pkrmast(machine_config &config);
 	void moonlght(machine_config &config);
 	void kkotnoli(machine_config &config);
@@ -82,6 +84,7 @@ public:
 	void feverch_portmap(address_map &map);
 	void cm_map(address_map &map);
 	void cmast91_portmap(address_map &map);
+	void crazybon_portmap(address_map &map);
 	void flaming7_map(address_map &map);
 	void goldstar_map(address_map &map);
 	void goldstar_readport(address_map &map);
@@ -89,6 +92,7 @@ public:
 	void ladylinr_map(address_map &map);
 	void lucky8_map(address_map &map);
 	void common_decrypted_opcodes_map(address_map &map);
+	void super972_decrypted_opcodes_map(address_map &map);
 	void mbstar_map(address_map &map);
 	void megaline_portmap(address_map &map);
 	void ncb3_readwriteport(address_map &map);
@@ -239,6 +243,7 @@ public:
 	void init_flaming7();
 	void init_flam7_tw();
 	void init_luckylad();
+	void init_super972();
 
 	DECLARE_VIDEO_START(bingowng);
 	DECLARE_VIDEO_START(magical);
@@ -254,6 +259,7 @@ public:
 	void lucky8(machine_config &config);
 	void lucky8f(machine_config &config);
 	void lucky8k(machine_config &config);
+	void super972(machine_config &config);
 	void wcat3(machine_config &config);
 	void magodds(machine_config &config);
 	void flam7_w4(machine_config &config);
@@ -301,8 +307,8 @@ public:
 	void chryangla_decrypted_opcodes_map(address_map &map);
 
 protected:
-	void do_blockswaps(uint8_t* ROM);
-	void dump_to_file(uint8_t* ROM);
+	void do_blockswaps(uint8_t *rom);
+	void dump_to_file(uint8_t *rom);
 
 	uint8_t cb3_decrypt(uint8_t cipherText, uint16_t address);
 	uint8_t chry10_decrypt(uint8_t cipherText);

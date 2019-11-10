@@ -1,0 +1,82 @@
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
+
+#include <metal_stdlib>
+#include <simd/simd.h>
+
+using namespace metal;
+
+struct SSBO0
+{
+    float4 as[1];
+};
+
+struct SSBO1
+{
+    float4 bs[1];
+};
+
+constant uint3 gl_WorkGroupSize [[maybe_unused]] = uint3(1u);
+
+template<typename T, uint A>
+inline void spvArrayCopyFromConstantToStack1(thread T (&dst)[A], constant T (&src)[A])
+{
+    for (uint i = 0; i < A; i++)
+    {
+        dst[i] = src[i];
+    }
+}
+
+template<typename T, uint A>
+inline void spvArrayCopyFromConstantToThreadGroup1(threadgroup T (&dst)[A], constant T (&src)[A])
+{
+    for (uint i = 0; i < A; i++)
+    {
+        dst[i] = src[i];
+    }
+}
+
+template<typename T, uint A>
+inline void spvArrayCopyFromStackToStack1(thread T (&dst)[A], thread const T (&src)[A])
+{
+    for (uint i = 0; i < A; i++)
+    {
+        dst[i] = src[i];
+    }
+}
+
+template<typename T, uint A>
+inline void spvArrayCopyFromStackToThreadGroup1(threadgroup T (&dst)[A], thread const T (&src)[A])
+{
+    for (uint i = 0; i < A; i++)
+    {
+        dst[i] = src[i];
+    }
+}
+
+template<typename T, uint A>
+inline void spvArrayCopyFromThreadGroupToStack1(thread T (&dst)[A], threadgroup const T (&src)[A])
+{
+    for (uint i = 0; i < A; i++)
+    {
+        dst[i] = src[i];
+    }
+}
+
+template<typename T, uint A>
+inline void spvArrayCopyFromThreadGroupToThreadGroup1(threadgroup T (&dst)[A], threadgroup const T (&src)[A])
+{
+    for (uint i = 0; i < A; i++)
+    {
+        dst[i] = src[i];
+    }
+}
+
+kernel void main0(device SSBO0& _16 [[buffer(0)]], device SSBO1& _32 [[buffer(1)]], uint3 gl_GlobalInvocationID [[thread_position_in_grid]], uint gl_LocalInvocationIndex [[thread_index_in_threadgroup]])
+{
+    float4 _37[2] = { _16.as[gl_GlobalInvocationID.x], _32.bs[gl_GlobalInvocationID.x] };
+    float4 values[2];
+    spvArrayCopyFromStackToStack1(values, _37);
+    _16.as[0] = values[gl_LocalInvocationIndex];
+    _32.bs[1] = float4(40.0);
+}
+

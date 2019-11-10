@@ -137,7 +137,7 @@ void pencil2_state::mem_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x5fff).nopw();  // stop error log filling up
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
-	//AM_RANGE(0x8000, 0xffff)      // mapped by the cartslot
+	//map(0x8000, 0xffff)      // mapped by the cartslot
 }
 
 void pencil2_state::io_map(address_map &map)

@@ -219,7 +219,7 @@ void fastfred_state::jumpcoas_map(address_map &map)
 	map(0xe802, 0xe802).portr("BUTTONS");
 	map(0xe803, 0xe803).portr("JOYS");
 	map(0xf000, 0xf007).mirror(0x07f8).w(m_outlatch, FUNC(ls259_device::write_d0));
-	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
+	//map(0xf800, 0xf800).r("watchdog", FUNC(watchdog_timer_device::reset_r));  // Why doesn't this work???
 	map(0xf800, 0xf801).nopr().w("ay8910.1", FUNC(ay8910_device::address_data_w));
 }
 

@@ -92,26 +92,26 @@ void cassette_image_device::update()
 	{
 		double new_position = m_position + (cur_time - m_position_time)*m_speed*m_direction;
 
-		switch(m_state & CASSETTE_MASK_UISTATE)
+		switch (int(m_state & CASSETTE_MASK_UISTATE)) // cast to int to suppress unhandled enum value warning
 		{
 		case CASSETTE_RECORD:
 			cassette_put_sample(m_cassette, m_channel, m_position, new_position - m_position, m_value);
 			break;
 
 		case CASSETTE_PLAY:
-			if ( m_cassette )
+			if (m_cassette)
 			{
 				cassette_get_sample(m_cassette, m_channel, new_position, 0.0, &m_value);
-				/* See if reached end of tape */
+				// See if reached end of tape
 				double length = get_length();
 				if (new_position > length)
 				{
-					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = length;
 				}
 				else if (new_position < 0)
 				{
-					m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = 0;
 				}
 			}
@@ -124,9 +124,7 @@ void cassette_image_device::update()
 
 void cassette_image_device::change_state(cassette_state state, cassette_state mask)
 {
-	cassette_state new_state = m_state;
-	new_state = (cassette_state)(new_state & ~mask);
-	new_state = (cassette_state)(new_state | (state & mask));
+	cassette_state new_state = (m_state & ~mask) | (state & mask);
 	if ((m_state ^ new_state) & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR))
 		m_position_time = machine().time().as_double();
 	m_state = new_state;
@@ -138,7 +136,7 @@ double cassette_image_device::input()
 {
 	update();
 	int32_t sample = m_value;
-	double double_value = sample / ((double) 0x7FFFFFFF);
+	double double_value = sample / double(0x7FFFFFFF);
 
 	LOGMASKED(LOG_DETAIL, "cassette_input(): time_index=%g value=%g\n", m_position, double_value);
 
@@ -366,7 +364,7 @@ std::string cassette_image_device::call_display()
 		// figure out where we are in the cassette
 		double position = get_position();
 		double length = get_length();
-		cassette_state uistate = cassette_state(get_state() & CASSETTE_MASK_UISTATE);
+		cassette_state uistate = get_state() & CASSETTE_MASK_UISTATE;
 
 		// choose which frame of the animation we are at
 		int n = (int(position) / ANIMATION_FPS) % ARRAY_LENGTH(shapes);

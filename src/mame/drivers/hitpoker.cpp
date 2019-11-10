@@ -236,7 +236,7 @@ void hitpoker_state::hitpoker_map(address_map &map)
 	map(0xbe81, 0xbe81).w("crtc", FUNC(mc6845_device::register_w));
 	map(0xbe90, 0xbe91).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xbea0, 0xbea0).portr("VBLANK"); //probably other bits as well
-//  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
+//  map(0xbe00, 0xbeff).r(FUNC(hitpoker_state::test_r));
 	map(0xc000, 0xdfff).rw(FUNC(hitpoker_state::hitpoker_cram_r), FUNC(hitpoker_state::hitpoker_cram_w));
 	map(0xe000, 0xefff).rw(FUNC(hitpoker_state::hitpoker_paletteram_r), FUNC(hitpoker_state::hitpoker_paletteram_w));
 }

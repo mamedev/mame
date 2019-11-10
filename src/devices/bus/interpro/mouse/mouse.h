@@ -43,11 +43,10 @@ class device_interpro_mouse_port_interface : public device_slot_card_interface
 {
 	friend class interpro_mouse_port_device;
 
-public:
-	DECLARE_WRITE32_MEMBER(state_w) { m_port->m_state_func(space, offset, data, mem_mask); }
-
 protected:
 	device_interpro_mouse_port_interface(machine_config const &mconfig, device_t &device);
+
+	void state_w(u32 data, u32 mem_mask) { m_port->m_state_func(offs_t(0), data, mem_mask); }
 
 private:
 	interpro_mouse_port_device *m_port;

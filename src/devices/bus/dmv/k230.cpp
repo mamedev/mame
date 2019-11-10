@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     K230 Internal 8088 module without interrupt controller
@@ -139,12 +140,18 @@ dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag,
 
 void dmv_k230_device::device_start()
 {
+	// register for state saving
+	save_item(NAME(m_switch16));
+	save_item(NAME(m_hold));
 }
 
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
 	m_bus->m_iospace->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+
+	// register for state saving
+	save_item(NAME(m_snr));
 }
 
 //-------------------------------------------------

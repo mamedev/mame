@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -67,9 +67,7 @@ namespace bx
 	template <typename Ty>
 	bx::Vec3 randUnitHemisphere(Ty* _rng, const bx::Vec3& _normal);
 
-	/// Sampling with Hammersley and Halton Points
-	/// http://www.cse.cuhk.edu.hk/~ttwong/papers/udpoint/udpoints.html
-	///
+	/// Sampling with Hammersley and Halton Points.
 	void generateSphereHammersley(void* _data, uint32_t _stride, uint32_t _num, float _scale = 1.0f);
 
 	/// Fisher-Yates shuffle.

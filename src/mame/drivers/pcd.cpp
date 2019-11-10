@@ -437,7 +437,7 @@ void pcd_state::pcd_io(address_map &map)
 	map(0xf9c0, 0xf9c3).rw(m_usart[0], FUNC(mc2661_device::read), FUNC(mc2661_device::write));  // UARTs
 	map(0xf9d0, 0xf9d3).rw(m_usart[1], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
 	map(0xf9e0, 0xf9e3).rw(m_usart[2], FUNC(mc2661_device::read), FUNC(mc2661_device::write));
-//  AM_RANGE(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
+//  map(0xfa00, 0xfa7f) // pcs4-n (peripheral chip select)
 	map(0xfb00, 0xfb00).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 	map(0xfb02, 0xffff).rw(FUNC(pcd_state::nmi_io_r), FUNC(pcd_state::nmi_io_w));
 }

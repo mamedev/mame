@@ -136,13 +136,13 @@ void cesclassic_state::cesclassic_map(address_map &map)
 	map(0x480000, 0x481fff).ram().share("nvram"); //8k according to schematics (games doesn't use that much tho)
 	map(0x600000, 0x600001).portr("SYSTEM");
 	map(0x610000, 0x610001).w(FUNC(cesclassic_state::outputs_w));
-//  AM_RANGE(0x640000, 0x640001) AM_WRITENOP
+//  map(0x640000, 0x640001).nopw();
 	map(0x640040, 0x640041).w(FUNC(cesclassic_state::lamps_w));
 	map(0x670000, 0x670001).portr("DSW");
 	map(0x70ff00, 0x70ff01).nopw(); // writes 0xffff at irq 3 end of service, watchdog?
 	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...
 	map(0x900101, 0x900101).w(m_oki, FUNC(okim6295_device::write));
-//  AM_RANGE(0x904000, 0x904001) AM_WRITENOP //some kind of serial
+//  map(0x904000, 0x904001).nopw(); //some kind of serial
 }
 
 static INPUT_PORTS_START( cesclassic )

@@ -58,7 +58,7 @@ void midtunit_state::main_map(address_map &map)
 	map(0x01800000, 0x0187ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x01a80000, 0x01a800ff).rw(m_video, FUNC(midtunit_video_device::midtunit_dma_r), FUNC(midtunit_video_device::midtunit_dma_w));
 	map(0x01b00000, 0x01b0001f).w(m_video, FUNC(midtunit_video_device::midtunit_control_w));
-/*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE(midtunit_cmos_enable_w) */
+//  map(0x01c00060, 0x01c0007f).w(FUNC(midtunit_state::midtunit_cmos_enable_w));
 	map(0x01d00000, 0x01d0001f).r(FUNC(midtunit_state::midtunit_sound_state_r));
 	map(0x01d01020, 0x01d0103f).rw(FUNC(midtunit_state::midtunit_sound_r), FUNC(midtunit_state::midtunit_sound_w));
 	map(0x01d81060, 0x01d8107f).w("watchdog", FUNC(watchdog_timer_device::reset16_w));

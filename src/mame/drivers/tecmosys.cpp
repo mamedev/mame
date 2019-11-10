@@ -309,7 +309,7 @@ void tecmosys_state::main_map(address_map &map)
 	map(0x800000, 0x80ffff).ram().share("spriteram"); // obj ram
 	map(0x880000, 0x88000b).r(FUNC(tecmosys_state::unk880000_r));
 	map(0x880000, 0x88002f).w(FUNC(tecmosys_state::unk880000_w)).share("880000regs");  // 10 byte dta@88000c, 880022=watchdog?
-	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // AM_WRITEONLY // obj pal
+	map(0x900000, 0x907fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // .writeonly(); // obj pal
 
 	//map(0x980000, 0x9807ff).writeonly(); // bg pal
 	//map(0x980800, 0x980fff).w(FUNC(tecmosys_state::paletteram_xGGGGGRRRRRBBBBB_word_w)).share("paletteram"); // fix pal

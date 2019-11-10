@@ -278,7 +278,7 @@ void f1_state::act_f1_io(address_map &map)
 	map(0x0020, 0x0027).rw(m_sio, FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w)).umask16(0x00ff);
 	map(0x0030, 0x0030).w(FUNC(f1_state::m1_w));
 	map(0x0040, 0x0047).rw(m_fdc, FUNC(wd2797_device::read), FUNC(wd2797_device::write)).umask16(0x00ff);
-//  AM_RANGE(0x01e0, 0x01ff) winchester
+//  map(0x01e0, 0x01ff) winchester
 }
 
 

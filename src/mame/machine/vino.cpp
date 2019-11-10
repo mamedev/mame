@@ -37,6 +37,7 @@ vino_device::vino_device(const machine_config &mconfig, const char *tag, device_
 	, m_i2c_stop(*this)
 	, m_interrupt_cb(*this)
 	, m_picture(*this, "srcimg")
+	, m_avivideo(*this, "srcavi")
 	, m_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_input_bitmap(nullptr)
 {
@@ -142,6 +143,7 @@ void vino_device::device_reset()
 void vino_device::device_add_mconfig(machine_config &config)
 {
 	IMAGE_PICTURE(config, m_picture);
+	IMAGE_AVIVIDEO(config, m_avivideo);
 }
 
 void vino_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -494,12 +496,14 @@ void vino_device::end_of_field(int channel)
 		}
 		else if (is_even_field(channel))
 		{
+			LOGMASKED(LOG_FIELDS, "Even field ended, setting page index to %08x\n", chan.m_line_size + 8);
 			line_count_w(channel, 0);
 			page_index_w(channel, chan.m_line_size + 8);
 			next_desc_w(channel, chan.m_start_desc_ptr);
 		}
 		else // odd field
 		{
+			LOGMASKED(LOG_FIELDS, "Odd field ended, setting page index to %08x\n", 0);
 			line_count_w(channel, 0);
 			page_index_w(channel, 0);
 			chan.m_start_desc_ptr = chan.m_next_desc_ptr;
@@ -729,8 +733,14 @@ uint32_t vino_device::bilinear_pixel(float s, float t)
 	if (m_input_bitmap == nullptr)
 		return 0xff000000;
 
-	const uint32_t width = m_input_bitmap->width() - 1;
-	const uint32_t height = m_input_bitmap->height() - 1;
+	uint32_t width = m_input_bitmap->width();
+	uint32_t height = m_input_bitmap->height();
+
+	if (width == 0 || height == 0)
+		return 0xff000000;
+
+	width--;
+	height--;
 
 	int32_t s0 = (int32_t)floorf(s * width);
 	int32_t s1 = (int32_t)floorf(s * width + 1);
@@ -763,7 +773,7 @@ uint32_t vino_device::bilinear_pixel(float s, float t)
 
 void vino_device::input_pixel(int channel, int32_t &y, int32_t &u, int32_t &v)
 {
-	m_input_bitmap = &m_picture->get_bitmap();
+	m_input_bitmap = &m_avivideo->get_frame();
 	if (m_input_bitmap)
 	{
 		channel_t &chan = m_channels[channel];
@@ -803,6 +813,15 @@ void vino_device::fetch_pixel(int channel)
 		int32_t y = 0, u = 0, v = 0;
 		input_pixel(channel, y, u, v);
 		process_pixel(channel, y, u, v);
+	}
+	else
+	{
+		count_pixel(channel);
+		if (chan.m_end_of_field)
+		{
+			end_of_field(channel);
+			chan.m_end_of_field = false;
+		}
 	}
 }
 
