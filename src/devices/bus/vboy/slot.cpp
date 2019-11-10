@@ -2,6 +2,9 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
  Virtual Boy cartridge slot
+
+ TODO:
+ - Sound capabilities
  ***************************************************************************/
 
 #include "emu.h"

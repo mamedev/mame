@@ -51,6 +51,12 @@ image_init_result vboy_flat_rom_device::load()
 		// this should fail a validity check
 		assert(!(rom_base() & 0x00ff'ffff));
 
+		// This is a simplification that improves performance.  In
+		// reality, cartridge ROM is 16 bits wide and 32-bit accesses
+		// are split up automatically.  MAME doesn't really support
+		// dynamic bus sizing, and it's a lot faster to execute from a
+		// ROM handler than to go through the trampolines necessary to
+		// emulate 16-bit accesses.
 		device_generic_cart_interface::install_non_power_of_two<2>(
 				romregion->bytes() >> 2,
 				0x00ff'ffff >> 2,
@@ -108,36 +114,6 @@ image_init_result vboy_flat_rom_sram_device::load()
 			if (chip_space())
 			{
 				device_generic_cart_interface::install_non_power_of_two<2>(
-						sramregion->bytes(),
-						0x00ff'ffff >> 2,
-						0,
-						0,
-						chip_base(),
-						[this, sramregion] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
-						{
-							LOG(
-									"Install SRAM 0x%08X-0x%08X at 0x%08X-0x%08X mirror %08X\n",
-									src,
-									src + ((end - begin) >> 2),
-									begin,
-									end,
-									mirror);
-							u8 *const base(&reinterpret_cast<u8 *>(sramregion->base())[src]);
-							chip_space()->install_readwrite_handler(
-									begin,
-									end,
-									read8sm_delegate(*this, NAME([base] (offs_t offset) { return base[offset]; })),
-									write8sm_delegate(*this, NAME([base] (offs_t offset, u8 data) { base[offset] = data; })),
-									0x0000'00ff);
-						});
-			}
-			save_pointer(NAME(&sramregion->as_u8()), sramregion->bytes());
-			break;
-
-		case 16:
-			if (chip_space())
-			{
-				device_generic_cart_interface::install_non_power_of_two<2>(
 						sramregion->bytes() >> 1,
 						0x00ff'ffff >> 2,
 						0,
@@ -152,19 +128,19 @@ image_init_result vboy_flat_rom_sram_device::load()
 									begin,
 									end,
 									mirror);
-							u16 *const base(&reinterpret_cast<u16 *>(sramregion->base())[src]);
+							u8 *const base(&reinterpret_cast<u8 *>(sramregion->base())[src << 1]);
 							chip_space()->install_readwrite_handler(
 									begin,
 									end,
-									read16s_delegate(*this, NAME([base] (offs_t offset, u16 mem_mask) { return base[offset]; })),
-									write16s_delegate(*this, NAME([base] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(base + offset); })),
-									0x0000'ffff);
+									read8sm_delegate(*this, NAME([base] (offs_t offset) { return base[offset]; })),
+									write8sm_delegate(*this, NAME([base] (offs_t offset, u8 data) { base[offset] = data; })),
+									0x00ff'00ff);
 						});
 			}
-			save_pointer(NAME(&sramregion->as_u16()), sramregion->bytes() >> 1);
+			save_pointer(NAME(&sramregion->as_u8()), sramregion->bytes());
 			break;
 
-		case 32:
+		case 16:
 			if (chip_space())
 			{
 				device_generic_cart_interface::install_non_power_of_two<2>(
@@ -173,7 +149,7 @@ image_init_result vboy_flat_rom_sram_device::load()
 						0,
 						0,
 						chip_base(),
-						[this, sram = reinterpret_cast<u32 *>(sramregion->base())] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
+						[this, sramregion] (offs_t begin, offs_t end, offs_t mirror, offs_t src)
 						{
 							LOG(
 									"Install SRAM 0x%08X-0x%08X at 0x%08X-0x%08X mirror %08X\n",
@@ -182,10 +158,16 @@ image_init_result vboy_flat_rom_sram_device::load()
 									begin,
 									end,
 									mirror);
-							chip_space()->install_ram(begin, end, mirror, &sram[src]);
+							u16 *const base(&reinterpret_cast<u16 *>(sramregion->base())[src << 1]);
+							chip_space()->install_readwrite_handler(
+									begin,
+									end,
+									read16s_delegate(*this, NAME([base] (offs_t offset, u16 mem_mask) { return base[offset]; })),
+									write16s_delegate(*this, NAME([base] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(base + offset); })),
+									0xffff'ffff);
 						});
 			}
-			save_pointer(NAME(&sramregion->as_u32()), sramregion->bytes() >> 2);
+			save_pointer(NAME(&sramregion->as_u16()), sramregion->bytes() >> 1);
 			break;
 
 		default:
@@ -201,6 +183,8 @@ image_init_result vboy_flat_rom_sram_device::load()
 
 void vboy_flat_rom_sram_device::unload()
 {
+	vboy_flat_rom_device::unload();
+
 	memory_region *const sramregion(memregion("^sram"));
 	if (sramregion)
 		battery_save(sramregion->base(), sramregion->bytes());
