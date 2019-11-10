@@ -316,19 +316,19 @@
 	
 		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.09" top="0.25" right="0.275" bottom="0.32" />
+			<bounds left="0.06" top="0.22" right="0.275" bottom="0.32" />
 		</text>
 		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.275" top="0.25" right="0.46" bottom="0.32" />
+			<bounds left="0.255" top="0.22" right="0.46" bottom="0.32" />
 		</text>	
 		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.09" top="0.32" right="0.275" bottom="0.39" />
+			<bounds left="0.06" top="0.29" right="0.275" bottom="0.39" />
 		</text>
 		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.275" top="0.32" right="0.46" bottom="0.39" />
+			<bounds left="0.255" top="0.29" right="0.44" bottom="0.39" />
 		</text>
 		
 		<rect state="1000">
@@ -410,19 +410,19 @@
 		
 		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.54" top="0.25" right="0.725" bottom="0.32" />
+			<bounds left="0.51" top="0.22" right="0.725" bottom="0.32" />
 		</text>
 		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.725" top="0.25" right="0.91" bottom="0.32" />
+			<bounds left="0.695" top="0.22" right="0.91" bottom="0.32" />
 		</text>	
 		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.54" top="0.32" right="0.725" bottom="0.39" />
+			<bounds left="0.51" top="0.29" right="0.725" bottom="0.39" />
 		</text>
 		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.725" top="0.32" right="0.91" bottom="0.39" />
+			<bounds left="0.695" top="0.29" right="0.91" bottom="0.39" />
 		</text>
 		
 		<rect state="1000">
