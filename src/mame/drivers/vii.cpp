@@ -296,6 +296,7 @@ public:
 protected:
 	virtual void machine_reset() override;
 
+private:
 	READ16_MEMBER(sentx_porta_r);
 	READ16_MEMBER(sentx_portb_r);
 	READ16_MEMBER(sentx_portc_r);
@@ -306,13 +307,19 @@ protected:
 
 	DECLARE_WRITE8_MEMBER(sentx_tx_w);
 
-	int m_outputs[6];
-	int m_outpos;
+	uint8_t m_lcd_card1[6];
+	uint8_t m_lcd_card2[6];
+	uint8_t m_lcd_options[6];
+	uint8_t m_lcd_options_select[6];
+	uint8_t m_lcd_led[6];
 
-private:
+	void set_card1(uint8_t value, int select_bits);
+	void set_card2(uint8_t value, int select_bits);
+	void set_options(uint8_t value, int select_bits);
+	void set_options_select(uint8_t value, int select_bits);
+	void set_controller_led(uint8_t value, int select_bits);
 
 	uint16_t m_porta_data;
-
 };
 
 class jakks_gkr_state : public spg2xx_game_state
@@ -2823,9 +2830,13 @@ void sentx6p_state::machine_reset()
 	spg2xx_game_state::machine_reset();
 
 	for (int i = 0; i < 6; i++)
-		m_outputs[i] = 0x00;
-	
-	m_outpos = 0;
+	{
+		m_lcd_card1[i] = 0x00;
+		m_lcd_card2[i] = 0x00;
+		m_lcd_options[i] = 0x00;
+		m_lcd_options_select[i] = 0x00;
+		m_lcd_led[i] = 0x00;
+	}
 }
 
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
@@ -2883,6 +2894,83 @@ WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
 	logerror("%s: sentx_portc_w %04x\n", machine().describe_context(), data);
 }
 
+/*
+	Card Table
+	(the controller must contain an MCU under the glob to receive thes commands
+	 and convert them to actual LCD segments)
+
+         off      00
+    | A  diamonds 01 | A  hearts 0e   | A  spades 1b  | A  clubs 28 |
+    | 2  diamonds 02 | 2  hearts 0f   | 2  spades 1c  | 2  clubs 29 |
+    | 3  diamonds 03 | 3  hearts 10   | 3  spades 1d  | 3  clubs 2a |
+    | 4  diamonds 04 | 4  hearts 11   | 4  spades 1e  | 4  clubs 2b |
+    | 5  diamonds 05 | 5  hearts 12   | 5  spades 1f  | 5  clubs 2c |
+    | 6  diamonds 06 | 6  hearts 13   | 6  spades 20  | 6  clubs 2d |
+    | 7  diamonds 07 | 7  hearts 14   | 7  spades 21  | 7  clubs 2e |
+    | 8  diamonds 08 | 8  hearts 15   | 8  spades 22  | 8  clubs 2f |
+    | 9  diamonds 09 | 9  hearts 16   | 9  spades 23  | 9  clubs 30 |
+    | 10 diamonds 0a | 10 hearts 17   | 10 spades 24  | 10 clubs 31 |
+    | J  diamonds 0b | J  hearts 18   | J  spades 25  | J  clubs 32 |
+    | Q  diamonds 0c | Q  hearts 19   | Q  spades 26  | Q  clubs 33 |
+    | K  diamonds 0d | K  hearts 1a   | K  spades 27  | K  clubs 34 |
+
+*/
+
+void sentx6p_state::set_card1(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_card1[i] = value;
+		}
+	}
+}
+
+void sentx6p_state::set_card2(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_card2[i] = value;
+		}
+	}
+}
+
+void sentx6p_state::set_options(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_options[i] = value;
+		}
+	}
+}
+
+void sentx6p_state::set_options_select(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_options_select[i] = value;
+		}
+	}
+}
+
+void sentx6p_state::set_controller_led(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_led[i] = value;
+		}
+	}
+}
+
 WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
@@ -2893,64 +2981,53 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 	// RX function is at 0x029811
 	// similar logic to write controller ID, check if selected, then recieve data
 
-	/*
-	during gameplay - when player is active and 2 cards should be being shown on their LCD panel as well as select options.  LED is also turned on at this point.
-
-	sentx_tx_w 38 (with controller select bits 01x) (always 38 or 39?)
-	sentx_tx_w 12 (with controller select bits 01x) 00cccccc - cards to display on LCD? (number changes depending on cards)   
-	sentx_tx_w 61 (with controller select bits 01x) 01cccccc - cards to display on LCD? (number changes depending on cards)
-	sentx_tx_w 38 (with controller select bits 01x) (always 38 or 39?)
-	sentx_tx_w b9 (with controller select bits 01x)  - which options are available to slect - 80 = no selections shown, b9 = regular options, no bet/check    a7 = when bet + check are available
-	sentx_tx_w c8 (with controller select bits 01x) c0 = no selection highlight c1 = fold selected, c2 = check selected, c4 = bet selected , c8 = call selected, d0 = raise selected, e0 = all in selected,
-	
-	when the display is inactive (and LED is off)
-
-	sentx_tx_w 39 (with controller select bits 01x)
-	sentx_tx_w 00 (with controller select bits 01x)
-	sentx_tx_w 40 (with controller select bits 01x)
-	sentx_tx_w 39 (with controller select bits 01x)
-	sentx_tx_w 80 (with controller select bits 01x)
-	sentx_tx_w c0 (with controller select bits 01x)
-	
-	however these don't stay synced as 6 byte write sequences on boot / when starting game etc., must be packets, or we're not filtering correctly?
-	writes with other controllers selected follow the same logic.
-
-	card table - the controllers must have some kind of MCU to receive the command and convert it to the segment display, as the code writes the card
-	number (see table below) and not the individual segment info
-
-	   off      00
-	| A  diamonds 01 | A  hearts 0e   | A  spades 1b  | A  clubs 28 |
-	| 2  diamonds 02 | 2  hearts 0f   | 2  spades 1c  | 2  clubs 29 |
-	| 3  diamonds 03 | 3  hearts 10   | 3  spades 1d  | 3  clubs 2a |
-	| 4  diamonds 04 | 4  hearts 11   | 4  spades 1e  | 4  clubs 2b |
-	| 5  diamonds 05 | 5  hearts 12   | 5  spades 1f  | 5  clubs 2c |
-	| 6  diamonds 06 | 6  hearts 13   | 6  spades 20  | 6  clubs 2d |
-	| 7  diamonds 07 | 7  hearts 14   | 7  spades 21  | 7  clubs 2e |
-	| 8  diamonds 08 | 8  hearts 15   | 8  spades 22  | 8  clubs 2f |
-	| 9  diamonds 09 | 9  hearts 16   | 9  spades 23  | 9  clubs 30 |
-	| 10 diamonds 0a | 10 hearts 17   | 10 spades 24  | 10 clubs 31 |
-	| J  diamonds 0b | J  hearts 18   | J  spades 25  | J  clubs 32 |
-	| Q  diamonds 0c | Q  hearts 19   | Q  spades 26  | Q  clubs 33 |
-	| K  diamonds 0d | K  hearts 1a   | K  spades 27  | K  clubs 34 |
-	
-	note, the command values used (38,39,3a are outside of this table)
-
-	*/
-
-	if (select_bits == 0x01) // test for p1 writes only for now
+	switch (data)
 	{
-#if 0 // this isn't correct, something needs to sync the streams
-		m_outputs[m_outpos] = data;
-		m_outpos++;
-		if (m_outpos == 6)
-		{
-			m_outpos = 0;
-			logerror("tx data %02x %02x %02x %02x %02x %02x)\n", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3], m_outputs[4], m_outputs[5]);
-		}
-#endif
-	}
-}
+	case 0x00: // card 1 off
+	case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: // card 1 show Diamonds A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x0e: case 0x0f: case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: case 0x18: case 0x19: case 0x1a: // card 1 show Hearts   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // card 1 show Spades   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f: case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: // card 1 show Clubs    A,2,3,4,5,6,7,8,10,J,Q,K
+		set_card1(data & 0x3f, select_bits);
+		break;
 
+	case 0x40: // card 2 off
+	case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: // card 1 show Diamonds A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x4e: case 0x4f: case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: case 0x58: case 0x59: case 0x5a: // card 1 show Hearts   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f: case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // card 1 show Spades   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f: case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: // card 1 show Clubs    A,2,3,4,5,6,7,8,10,J,Q,K
+		set_card2(data & 0x3f, select_bits);
+		break;
+
+	case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87: case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f: // show selection options
+	case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97: case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7: case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7: case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+		set_options(data & 0x3f, select_bits);
+		break;
+
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: // show selection cursor
+	case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+	case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+	case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
+		set_options_select(data & 0x3f, select_bits);
+		break;
+
+	case 0x38:
+	case 0x39:
+		set_controller_led(data & 0x01, select_bits);
+		break;
+
+	case 0x3a:
+		// reset controller?
+		break;
+
+	default:
+		printf("unknown LCD command %02x with controller select %02x\n", data, select_bits);
+		break;
+	}
+
+}
 
 
 void sentx6p_state::sentx6p(machine_config &config)
