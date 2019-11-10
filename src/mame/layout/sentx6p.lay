@@ -2,10 +2,17 @@
 <mamelayout version="2">
 
 	<element name="DISPLAYBG">
+		<!-- white bg -->
 		<rect>
-			<color red="0.1" green="0.1" blue="0.1" />
-			<bounds x="0" y="0" width="1" height="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+			<bounds left="0" top="0" right="1" bottom="1" />
 		</rect>
+		<!-- unit edge -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.02" top="0.0125" right="0.98" bottom="0.9875" />
+		</rect>
+		<!-- screen -->
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
 			<bounds left="0.05" top="0.025" right="0.95" bottom="0.975" />			
@@ -29,6 +36,80 @@
 		<rect>
 			<color red="0.6" green="0.6" blue="0.6" />
 			<bounds left="0.54" top="0.045" right="0.91" bottom="0.39" />			
+		</rect>
+		<!-- cover bottom -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.02" top="0.635" right="0.98" bottom="0.9875" />
+		</rect>		
+	</element>
+
+	<element name="LED">
+		<!--<rect>
+			<color red="0.0" green="1.0" blue="1.0" />
+			<bounds left="0.02" top="0.635" right="0.98" bottom="0.9875" />
+		</rect>-->
+	
+		<disk>
+			<color red="0.2" green="0.2" blue="0.2" />
+			<bounds left="0.46" top="0.64" right="0.54" bottom="0.68" />
+		</disk>
+	
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
+		</disk>
+		<disk state="0">
+			<color red="0.2" green="0.0" blue="0.0" />
+			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
+		</disk>
+		
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>
+
+	<element name="OPTION_FOLD">
+		<rect state="0">
+			<color alpha="0.5" red="0.2" green="1.0" blue="0.1" />
+			<bounds left="0.07" top="0.42" right="0.93" bottom="0.625" />
+		</rect>
+		
+		<text state="0" string="FOLD" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
+		</text>
+		
+		<text state="0" string="CHECK" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
+		</text>	
+	
+		<text state="0" string="BET" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
+		</text>
+		
+		<text state="0" string="CALL" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
+		</text>	
+		
+		<text state="0" string="RAISE" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
+		</text>
+		
+		<text state="0" string="ALL IN" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
+		</text>			
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
 		</rect>		
 	</element>
 
@@ -238,7 +319,10 @@
 		<bezel name="NUMBER_RIGHT_BZ0" element="NUMBER_RIGHT">
 			<bounds left="4.5" top="0" right="5.0" bottom="1" />
 		</bezel>
-
+		<bezel name="LED_BZ0" element="LED">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>
+		
 		<!-- Player 2 -->
 		<bezel name="BACKGROUND_BZ1" element="DISPLAYBG">
 			<bounds left="4.5" top="1" right="5.0" bottom="2" />
@@ -255,7 +339,10 @@
 		<bezel name="NUMBER_RIGHT_BZ1" element="NUMBER_RIGHT">
 			<bounds left="4.5" top="1" right="5.0" bottom="2" />
 		</bezel>
-
+		<bezel name="LED_BZ1" element="LED">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>
+		
 		<!-- Player 3 -->
 		<bezel name="BACKGROUND_BZ2" element="DISPLAYBG">
 			<bounds left="4.5" top="2" right="5.0" bottom="3" />
@@ -272,7 +359,10 @@
 		<bezel name="NUMBER_RIGHT_BZ2" element="NUMBER_RIGHT">
 			<bounds left="4.5" top="2" right="5.0" bottom="3" />
 		</bezel>
-
+		<bezel name="LED_BZ2" element="LED">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>
+		
 		<!-- Player 4 -->
 		<bezel name="BACKGROUND_BZ3" element="DISPLAYBG">
 			<bounds left="0" top="2" right="0.5" bottom="3" />
@@ -289,7 +379,10 @@
 		<bezel name="NUMBER_RIGHT_BZ3" element="NUMBER_RIGHT">
 			<bounds left="0" top="2" right="0.5" bottom="3" />
 		</bezel>
-	
+		<bezel name="LED_BZ3" element="LED">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>
+		
 		<!-- Player 5 -->
 		<bezel name="BACKGROUND_BZ4" element="DISPLAYBG">
 			<bounds left="0" top="1" right="0.5" bottom="2" />
@@ -306,7 +399,10 @@
 		<bezel name="NUMBER_RIGHT_BZ4" element="NUMBER_RIGHT">
 			<bounds left="0" top="1" right="0.5" bottom="2" />
 		</bezel>
-	
+		<bezel name="LED_BZ4" element="LED">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>
+		
 		<!-- Player 6 -->
 		<bezel name="BACKGROUND_BZ5" element="DISPLAYBG">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
@@ -323,6 +419,13 @@
 		<bezel name="NUMBER_RIGHT_BZ5" element="NUMBER_RIGHT">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
 		</bezel>	
+	
+		<bezel name="FOLD_BZ5" element="OPTION_FOLD">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="LED_BZ5" element="LED">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>		
 	
 		<screen index="0">
 			<bounds left="0.5" top="0" right="4.5" bottom="3" />

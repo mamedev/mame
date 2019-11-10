@@ -291,7 +291,8 @@ public:
 		m_suite1(*this, "SUITE_LEFT_BZ%u", 0U),
 		m_suite2(*this, "SUITE_RIGHT_BZ%u", 0U),
 		m_number1(*this, "NUMBER_LEFT_BZ%u", 0U),
-		m_number2(*this, "NUMBER_RIGHT_BZ%u", 0U)
+		m_number2(*this, "NUMBER_RIGHT_BZ%u", 0U),
+		m_led(*this, "LED_BZ%u", 0U)
 	{ }
 
 	void sentx6p(machine_config &config);
@@ -331,6 +332,7 @@ private:
 	output_finder<6> m_suite2;
 	output_finder<6> m_number1;
 	output_finder<6> m_number2;
+	output_finder<6> m_led;
 };
 
 class jakks_gkr_state : public spg2xx_game_state
@@ -2843,6 +2845,7 @@ void sentx6p_state::machine_start()
 	m_suite2.resolve();
 	m_number1.resolve();
 	m_number2.resolve();
+	m_led.resolve();
 }
 
 void sentx6p_state::machine_reset()
@@ -3017,6 +3020,8 @@ void sentx6p_state::set_controller_led(uint8_t value, int select_bits)
 		if (select_bits & (1 << i))
 		{
 			m_lcd_led[i] = value;
+
+			m_led[i] = value ^ 1;
 		}
 	}
 }
