@@ -64,45 +64,175 @@
 			<bounds left="0.47" top="0.645" right="0.53" bottom="0.675" />
 		</disk>
 		
-		
 		<rect state="1000">
 			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
 			<bounds x="0" y="0" width="1" height="1" />
 		</rect>		
 	</element>
 
-	<element name="OPTION_FOLD">
-		<rect state="0">
-			<color alpha="0.5" red="0.2" green="1.0" blue="0.1" />
-			<bounds left="0.07" top="0.42" right="0.93" bottom="0.625" />
+	<element name="OPTION_SELECTS_FOLD">
+		<!-- FOLD -->
+		<rect state="1"> 
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.092" top="0.421" right="0.458" bottom="0.489" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
+		</rect>		
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>	
+	
+	<element name="OPTION_SELECTS_CHECK">
+		<!-- CHECK -->
+		<rect state="1"> 
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.542" top="0.421" right="0.908" bottom="0.489" />
+		</rect>	
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
+		</rect>	
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>	
+	
+	<element name="OPTION_SELECTS_BET">
+		<!-- BET -->
+		<rect state="1"> 
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.092" top="0.491" right="0.458" bottom="0.559" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
 		</rect>
 		
-		<text state="0" string="FOLD" align="0">
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>		
+	
+	<element name="OPTION_SELECTS_CALL">
+		<!-- CALL -->
+		<rect state="1"> 
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.542" top="0.491" right="0.908" bottom="0.559" />
+		</rect>	
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
+		</rect>	
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>	
+	</element>	
+		
+	<element name="OPTION_SELECTS_RAISE">
+		<!-- RAISE -->
+		<rect state="1"> 
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.092" top="0.561" right="0.458" bottom="0.629" />
+		</rect>
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
+		</rect>	
+	
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>	
+	</element>	
+	
+	<element name="OPTION_SELECTS_ALLIN">	
+		<!-- ALL IN -->
+		<rect state="1"> 
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.542" top="0.561" right="0.908" bottom="0.629" />
+		</rect>			
+		<rect state="1">
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
+		</rect>		
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>
+	
+	<element name="OPTION_FOLD">
+		<text state="1" string="FOLD" align="0">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds left="0.10" top="0.425" right="0.45" bottom="0.485" />
 		</text>
 		
-		<text state="0" string="CHECK" align="0">
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>		
+		
+	<element name="OPTION_CHECK">		
+		<text state="1" string="CHECK" align="0">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds left="0.55" top="0.425" right="0.90" bottom="0.485" />
 		</text>	
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>		
 	
-		<text state="0" string="BET" align="0">
+	<element name="OPTION_BET">	
+		<text state="1" string="BET" align="0">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds left="0.10" top="0.495" right="0.45" bottom="0.555" />
 		</text>
 		
-		<text state="0" string="CALL" align="0">
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>		
+		
+	<element name="OPTION_CALL">		
+		<text state="1" string="CALL" align="0">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds left="0.55" top="0.495" right="0.90" bottom="0.555" />
 		</text>	
 		
-		<text state="0" string="RAISE" align="0">
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>	
+		
+	<element name="OPTION_RAISE">		
+		<text state="1" string="RAISE" align="0">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds left="0.10" top="0.565" right="0.45" bottom="0.625" />
 		</text>
 		
-		<text state="0" string="ALL IN" align="0">
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>	
+		
+	<element name="OPTION_ALLIN">		
+		<text state="1" string="ALL IN" align="0">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds left="0.55" top="0.565" right="0.90" bottom="0.625" />
 		</text>			
@@ -323,6 +453,43 @@
 			<bounds left="4.5" top="0" right="5.0" bottom="1" />
 		</bezel>
 		
+		<bezel name="SELECT_FOLD_BZ0" element="OPTION_SELECTS_FOLD">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_CHECK_BZ0" element="OPTION_SELECTS_CHECK">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>			
+		<bezel name="SELECT_BET_BZ0" element="OPTION_SELECTS_BET">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>			
+		<bezel name="SELECT_CALL_BZ0" element="OPTION_SELECTS_CALL">
+				<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_RAISE_BZ0" element="OPTION_SELECTS_RAISE">
+				<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_ALLIN_BZ0" element="OPTION_SELECTS_ALLIN">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>				
+		<bezel name="OPTION_FOLD_BZ0" element="OPTION_FOLD">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_CHECK_BZ0" element="OPTION_CHECK">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>			
+		<bezel name="OPTION_BET_BZ0" element="OPTION_BET">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>			
+		<bezel name="OPTION_CALL_BZ0" element="OPTION_CALL">
+				<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_RAISE_BZ0" element="OPTION_RAISE">
+				<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_ALLIN_BZ0" element="OPTION_ALLIN">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>			
+		
 		<!-- Player 2 -->
 		<bezel name="BACKGROUND_BZ1" element="DISPLAYBG">
 			<bounds left="4.5" top="1" right="5.0" bottom="2" />
@@ -342,7 +509,43 @@
 		<bezel name="LED_BZ1" element="LED">
 			<bounds left="4.5" top="1" right="5.0" bottom="2" />
 		</bezel>
-		
+		<bezel name="SELECT_FOLD_BZ1" element="OPTION_SELECTS_FOLD">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="SELECT_CHECK_BZ1" element="OPTION_SELECTS_CHECK">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>			
+		<bezel name="SELECT_BET_BZ1" element="OPTION_SELECTS_BET">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>			
+		<bezel name="SELECT_CALL_BZ1" element="OPTION_SELECTS_CALL">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="SELECT_RAISE_BZ1" element="OPTION_SELECTS_RAISE">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="SELECT_ALLIN_BZ1" element="OPTION_SELECTS_ALLIN">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>		
+		<bezel name="OPTION_FOLD_BZ1" element="OPTION_FOLD">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="OPTION_CHECK_BZ1" element="OPTION_CHECK">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>			
+		<bezel name="OPTION_BET_BZ1" element="OPTION_BET">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>			
+		<bezel name="OPTION_CALL_BZ1" element="OPTION_CALL">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="OPTION_RAISE_BZ1" element="OPTION_RAISE">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="OPTION_ALLIN_BZ1" element="OPTION_ALLIN">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+	
 		<!-- Player 3 -->
 		<bezel name="BACKGROUND_BZ2" element="DISPLAYBG">
 			<bounds left="4.5" top="2" right="5.0" bottom="3" />
@@ -361,7 +564,43 @@
 		</bezel>
 		<bezel name="LED_BZ2" element="LED">
 			<bounds left="4.5" top="2" right="5.0" bottom="3" />
-		</bezel>
+		</bezel>	
+		<bezel name="SELECT_FOLD_BZ2" element="OPTION_SELECTS_FOLD">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="SELECT_CHECK_BZ2" element="OPTION_SELECTS_CHECK">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>			
+		<bezel name="SELECT_BET_BZ2" element="OPTION_SELECTS_BET">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>			
+		<bezel name="SELECT_CALL_BZ2" element="OPTION_SELECTS_CALL">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="SELECT_RAISE_BZ2" element="OPTION_SELECTS_RAISE">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="SELECT_ALLIN_BZ2" element="OPTION_SELECTS_ALLIN">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>		
+		<bezel name="OPTION_FOLD_BZ2" element="OPTION_FOLD">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="OPTION_CHECK_BZ2" element="OPTION_CHECK">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>			
+		<bezel name="OPTION_BET_BZ2" element="OPTION_BET">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>			
+		<bezel name="OPTION_CALL_BZ2" element="OPTION_CALL">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="OPTION_RAISE_BZ2" element="OPTION_RAISE">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="OPTION_ALLIN_BZ2" element="OPTION_ALLIN">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>		
 		
 		<!-- Player 4 -->
 		<bezel name="BACKGROUND_BZ3" element="DISPLAYBG">
@@ -381,8 +620,44 @@
 		</bezel>
 		<bezel name="LED_BZ3" element="LED">
 			<bounds left="0" top="2" right="0.5" bottom="3" />
-		</bezel>
-		
+		</bezel>	
+		<bezel name="SELECT_FOLD_BZ3" element="OPTION_SELECTS_FOLD">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="SELECT_CHECK_BZ3" element="OPTION_SELECTS_CHECK">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>			
+		<bezel name="SELECT_BET_BZ3" element="OPTION_SELECTS_BET">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>			
+		<bezel name="SELECT_CALL_BZ3" element="OPTION_SELECTS_CALL">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="SELECT_RAISE_BZ3" element="OPTION_SELECTS_RAISE">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="SELECT_ALLIN_BZ3" element="OPTION_SELECTS_ALLIN">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>			
+		<bezel name="OPTION_FOLD_BZ3" element="OPTION_FOLD">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="OPTION_CHECK_BZ3" element="OPTION_CHECK">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>			
+		<bezel name="OPTION_BET_BZ3" element="OPTION_BET">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>			
+		<bezel name="OPTION_CALL_BZ3" element="OPTION_CALL">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="OPTION_RAISE_BZ3" element="OPTION_RAISE">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="OPTION_ALLIN_BZ3" element="OPTION_ALLIN">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+	
 		<!-- Player 5 -->
 		<bezel name="BACKGROUND_BZ4" element="DISPLAYBG">
 			<bounds left="0" top="1" right="0.5" bottom="2" />
@@ -401,8 +676,44 @@
 		</bezel>
 		<bezel name="LED_BZ4" element="LED">
 			<bounds left="0" top="1" right="0.5" bottom="2" />
-		</bezel>
-		
+		</bezel>	
+		<bezel name="SELECT_FOLD_BZ4" element="OPTION_SELECTS_FOLD">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="SELECT_CHECK_BZ4" element="OPTION_SELECTS_CHECK">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>			
+		<bezel name="SELECT_BET_BZ4" element="OPTION_SELECTS_BET">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>			
+		<bezel name="SELECT_CALL_BZ4" element="OPTION_SELECTS_CALL">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="SELECT_RAISE_BZ4" element="OPTION_SELECTS_RAISE">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="SELECT_ALLIN_BZ4" element="OPTION_SELECTS_ALLIN">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>		
+		<bezel name="OPTION_FOLD_BZ4" element="OPTION_FOLD">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="OPTION_CHECK_BZ4" element="OPTION_CHECK">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>			
+		<bezel name="OPTION_BET_BZ4" element="OPTION_BET">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>			
+		<bezel name="OPTION_CALL_BZ4" element="OPTION_CALL">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="OPTION_RAISE_BZ4" element="OPTION_RAISE">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="OPTION_ALLIN_BZ4" element="OPTION_ALLIN">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>		
+					
 		<!-- Player 6 -->
 		<bezel name="BACKGROUND_BZ5" element="DISPLAYBG">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
@@ -419,14 +730,46 @@
 		<bezel name="NUMBER_RIGHT_BZ5" element="NUMBER_RIGHT">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
 		</bezel>	
-	
-		<bezel name="FOLD_BZ5" element="OPTION_FOLD">
-			<bounds left="0" top="0" right="0.5" bottom="1" />
-		</bezel>	
 		<bezel name="LED_BZ5" element="LED">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_FOLD_BZ5" element="OPTION_SELECTS_FOLD">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_CHECK_BZ5" element="OPTION_SELECTS_CHECK">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>			
+		<bezel name="SELECT_BET_BZ5" element="OPTION_SELECTS_BET">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>			
+		<bezel name="SELECT_CALL_BZ5" element="OPTION_SELECTS_CALL">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_RAISE_BZ5" element="OPTION_SELECTS_RAISE">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="SELECT_ALLIN_BZ5" element="OPTION_SELECTS_ALLIN">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_FOLD_BZ5" element="OPTION_FOLD">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_CHECK_BZ5" element="OPTION_CHECK">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>			
+		<bezel name="OPTION_BET_BZ5" element="OPTION_BET">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>			
+		<bezel name="OPTION_CALL_BZ5" element="OPTION_CALL">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_RAISE_BZ5" element="OPTION_RAISE">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="OPTION_ALLIN_BZ5" element="OPTION_ALLIN">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
 		</bezel>		
-	
+		
 		<screen index="0">
 			<bounds left="0.5" top="0" right="4.5" bottom="3" />
 		</screen>

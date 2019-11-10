@@ -282,6 +282,7 @@ private:
 	output_finder<4> m_leds;
 };
 
+
 class sentx6p_state : public spg2xx_game_state
 {
 public:
@@ -292,6 +293,19 @@ public:
 		m_suite2(*this, "SUITE_RIGHT_BZ%u", 0U),
 		m_number1(*this, "NUMBER_LEFT_BZ%u", 0U),
 		m_number2(*this, "NUMBER_RIGHT_BZ%u", 0U),
+		m_select_fold(*this, "SELECT_FOLD_BZ%u", 0U),
+		m_select_check(*this, "SELECT_CHECK_BZ%u", 0U),
+		m_select_bet(*this, "SELECT_BET_BZ%u", 0U),
+		m_select_call(*this, "SELECT_CALL_BZ%u", 0U),
+		m_select_raise(*this, "SELECT_RAISE_BZ%u", 0U),
+		m_select_allin(*this, "SELECT_ALLIN_BZ%u", 0U),
+		m_option_fold(*this, "OPTION_FOLD_BZ%u", 0U),
+		m_option_check(*this, "OPTION_CHECK_BZ%u", 0U),
+		m_option_bet(*this, "OPTION_BET_BZ%u", 0U),
+		m_option_call(*this, "OPTION_CALL_BZ%u", 0U),
+		m_option_raise(*this, "OPTION_RAISE_BZ%u", 0U),
+		m_option_allin(*this, "OPTION_ALLIN_BZ%u", 0U),
+
 		m_led(*this, "LED_BZ%u", 0U)
 	{ }
 
@@ -332,6 +346,21 @@ private:
 	output_finder<6> m_suite2;
 	output_finder<6> m_number1;
 	output_finder<6> m_number2;
+	
+	output_finder<6> m_select_fold;
+	output_finder<6> m_select_check;
+	output_finder<6> m_select_bet;
+	output_finder<6> m_select_call;
+	output_finder<6> m_select_raise;
+	output_finder<6> m_select_allin;
+
+	output_finder<6> m_option_fold;
+	output_finder<6> m_option_check;
+	output_finder<6> m_option_bet;
+	output_finder<6> m_option_call;
+	output_finder<6> m_option_raise;
+	output_finder<6> m_option_allin;
+
 	output_finder<6> m_led;
 };
 
@@ -2845,6 +2874,21 @@ void sentx6p_state::machine_start()
 	m_suite2.resolve();
 	m_number1.resolve();
 	m_number2.resolve();
+
+	m_select_fold.resolve();
+	m_select_check.resolve();
+	m_select_bet.resolve();
+	m_select_call.resolve();
+	m_select_raise.resolve();
+	m_select_allin.resolve();
+
+	m_option_fold.resolve();
+	m_option_check.resolve();
+	m_option_bet.resolve();
+	m_option_call.resolve();
+	m_option_raise.resolve();
+	m_option_allin.resolve();
+
 	m_led.resolve();
 }
 
@@ -2998,9 +3042,27 @@ void sentx6p_state::set_options(uint8_t value, int select_bits)
 		if (select_bits & (1 << i))
 		{
 			m_lcd_options[i] = value;
+
+			// assume same mapping as selector bit below
+			m_option_fold[i] =  (value & 0x01) ? 1 : 0;
+			m_option_check[i] = (value & 0x02) ? 1 : 0;
+			m_option_bet[i] =   (value & 0x04) ? 1 : 0;
+			m_option_call[i] =  (value & 0x08) ? 1 : 0;
+			m_option_raise[i] = (value & 0x10) ? 1 : 0;
+			m_option_allin[i] = (value & 0x20) ? 1 : 0;
 		}
 	}
 }
+
+/*
+	c0 = no selection highlight (00)
+	c1 = fold selected (01)
+	c2 = check selected (02)
+	c4 = bet selected (04)
+	c8 = call selected (08)
+	d0 = raise selected (10)
+	e0 = all in selected (20)
+*/
 
 void sentx6p_state::set_options_select(uint8_t value, int select_bits)
 {
@@ -3009,9 +3071,18 @@ void sentx6p_state::set_options_select(uint8_t value, int select_bits)
 		if (select_bits & (1 << i))
 		{
 			m_lcd_options_select[i] = value;
+
+			m_select_fold[i] =  (value & 0x01) ? 1 : 0;
+			m_select_check[i] = (value & 0x02) ? 1 : 0;
+			m_select_bet[i] =   (value & 0x04) ? 1 : 0;
+			m_select_call[i] =  (value & 0x08) ? 1 : 0;
+			m_select_raise[i] = (value & 0x10) ? 1 : 0;
+			m_select_allin[i] = (value & 0x20) ? 1 : 0;
 		}
 	}
 }
+
+
 
 void sentx6p_state::set_controller_led(uint8_t value, int select_bits)
 {
