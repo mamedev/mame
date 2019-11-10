@@ -1623,6 +1623,14 @@ ROM_START( td60c )
 	ROM_CONTINUE( 0x10001, 0x8000 )
 ROM_END
 
+// BIOS-String: Phoenix 80286 ROM BIOS PLUS Version 3.10.01 - CPU: AMD N80L286-16/S / FPU: socket provided - RAM: 640KB DIP / 4xSIPP30
+// Chipset: SUNTAC ST62??? ST62C303-A - BIOS: Phoenix - Keyboard-BIOS: NEC D8041AHC - ISA16: 4 - ISA8: 2 - OSC: [unreadable] - 32.000 MHz
+ROM_START( suntac303 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "286-suntac-2055712.bin", 0x10000, 0x8000, CRC(407b89d8) SHA1(d419bdd8bfb6191c68254204efdd756c5131701c))
+	ROM_CONTINUE( 0x10001, 0x8000 )
+ROM_END
+
 // Chaintech Chaintech ELT-286B-160B(E) mainboards - NEAT chipset: Chips P82C206, P82C211C, P82C212B, P82C215
 ROM_START( elt286b )
 	ROM_REGION(0x20000, "bios", 0)
@@ -3268,6 +3276,13 @@ ROM_END
 //**************************************************************************
 //  80486 motherboard
 //**************************************************************************
+
+// Abit PM4
+ROM_START( abpm4 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "pm4_0c.bin", 0x00000, 0x20000, CRC(eaad7812) SHA1(81670c44e30fa8b8ac0aa28a5c367819ff1ca73c))
+ROM_END
+
 // Eagle EAGLEN486 GC10A - Chipset: NEC ADC006, LGS Prime 3B 9543 - CPU: Socket 3 - RAM: 2xSIMM72, Cache: fake (not connected, marked write back)
 // On board: IDE, Floppy, 2xser, par - ISA16: 4, PCI: 2 - BIOS: 32pin (sst29ee010), only the first half is occupied - // BIOS-String: Phoenix NuBIOS Version 4.04
 ROM_START( gc10a )
@@ -3373,7 +3388,7 @@ ROM_START( abpw4 )
 	ROMX_LOAD( "award_486_bios_d2144079_c1984-1995.bin",0x10000, 0x10000, CRC(c69184da) SHA1(e8a799f9a3eebfd09c1d19a909574fca17fce7a0), ROM_BIOS(0))
 	// 1: BIOS-String: 09/12/95-Winbond-83C491-2C4J6A12-2E
 	ROM_SYSTEM_BIOS(1, "2c4j6a12", "2C4J6A12-2E")
-	ROMX_LOAD( "pw4_2e.bin", 0x10000, 0x10000, CRC(c4aeac4d) SHA1(e58f2e2d5c337f447808535629686dde54c09fab), ROM_BIOS(1))
+	ROMX_LOAD( "pw4_2e.bin", 0x10000, 0x10000, CRC(91de48d5) SHA1(e58f2e2d5c337f447808535629686dde54c09fab), ROM_BIOS(1))
 ROM_END
 
 // Vintage Sprite SM 486-50USC - Chipset: UM82C491F - BIOS: EPROM/MR-BIOS 1.50 - Keyboard-BIOS: JETkey V3.0
@@ -3581,6 +3596,13 @@ ROM_END
 
 // ***** 486 motherboards using the SiS 85C496/85C497 chipset
 
+// Abit AB-PI4(T) - Bios: 32pin - Keyboard-BIOS: Winbond 83C42 - CPU: Socket 3 - ISA16: 4, PCI: 3 - Chipset: SiS 85C495, 85C497
+// RAM: 4xSIMM72, Cache: 9x32pin (occupied: 4xW24512AK-20, 1xW2457AK) - On board: 2xIDE
+ROM_START( abpi4 ) // boots into "boot block" rescue BIOS
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "pi4_0b.bin", 0x00000, 0x20000, CRC(2cd67f19) SHA1(4cf0b4ff10645371361d3782c8be06c463e70219))
+ROM_END
+
 // ASUS PCI/I-A486S (4xSIMM72, Cache: 128/256/512KB, 1 EISA) - BIOS: 32pin
 // SiS 85C496/85C497 chipset; SMC 37C665 I/O; AMIKEY-2, S3 Trio 64 on board VGA, the manual also mentions Trio 32
 ROM_START( aa486s )
@@ -3588,7 +3610,7 @@ ROM_START( aa486s )
 	// 0: BIOS-String: 05/22/95/SiS-496-497B-PCI-A486-0-00 / #401A0-0203
 	ROM_SYSTEM_BIOS(0, "v203", "ASUS PCI/I-A486S V2.03")
 	ROMX_LOAD( "si4a0203.awd", 0x00000, 0x20000, CRC(95fcb7c6) SHA1(c19164d67af18c774e6eb06bd1570d95a24b2856), ROM_BIOS(0))
-	// 1 boots into "boot block" rescue BIOS
+	// 1: boots into "boot block" rescue BIOS
 	ROM_SYSTEM_BIOS(1, "v304", "ASUS PCI/I-A486S V3.04")
 	ROMX_LOAD( "si4a0304.awd", 0x00000, 0x20000, CRC(a00ad907) SHA1(598d97ea29f930a9359429dc540d27bfdd0fcd20), ROM_BIOS(1))
 ROM_END
@@ -3681,6 +3703,14 @@ ROM_END
 
 
 // ***** 486 motherboards using the SiS 85C471 + 85C407 chipset
+
+// Abit AH4/AH4T ( the T model has a voltage regulator for DX4 CPUs) - CPU: Socket 3 - Chipset: SIS 85C471 / SIS 85C407
+// RAM: 4xSIMM72, Cache: 9x28pin (32pin sockets except TAG) - BIOS: AMI - Keyboard-BIOS: AMIKEY - OSC: 14.31818 - ISA8: 1, ISA16: 4, ISA16/VL: 3
+// BIOS-String: 08/30/95-SIS-85C471-2C4I9A12-02
+ROM_START( abah4 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD( "ah4t_an4r2_02.bin", 0x10000, 0x10000, CRC(b45dc3b7) SHA1(94206ac9ed50fc37d954cc3cd1fb062fd75ea984))
+ROM_END
 
 // ASUS VL/I-486SV2G (GX4) (4xSIMM72, Cache: 128/256/512/1024KB, 7 ISA, 2 VLB)
 // SiS 85C471 + 85C407; AMIKEY-2
@@ -4120,6 +4150,7 @@ COMP( 19??, ht12a,     ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 199?, suntac5,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with 5-chip SUNTAC chipset", MACHINE_NOT_WORKING )
 COMP( 199?, headg2,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with Headland G2 chipset", MACHINE_NOT_WORKING )
 COMP( 198?, vlsi5,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with 5-chip VLSI chipset", MACHINE_NOT_WORKING )
+COMP( 198?, suntac303, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>", "286 motherboards with Suntac ST62C303-A chipset", MACHINE_NOT_WORKING )
 COMP( 199?, bi025c,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>",   "BI-025C HT-12 286 (HT12/A chipset)", MACHINE_NOT_WORKING )
 COMP( 199?, kma202f,   ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>",   "KMA-202F-12R (Winbond chipset)", MACHINE_NOT_WORKING )
 COMP( 198?, td60c,     ibm5170, 0,       atvga,     0,     at_state,     init_at,        "<unknown>",   "TD60C", MACHINE_NOT_WORKING )
@@ -4144,7 +4175,7 @@ COMP( 1987, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 1991, pcd204,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Philips",     "PCD204 (PCD200 series)", MACHINE_NOT_WORKING )
 COMP( 1981, wpc250,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
-COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "Chaintech", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )
+COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "<unknown>", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
 COMP( 1987, comportii ,ibm5170, 0,       comportii, 0,     at_state,     init_at,        "Compaq",      "Portable II", MACHINE_NOT_WORKING )
 COMP( 1987, comportiii,ibm5170, 0,       comportiii,0,     at_state,     init_at,        "Compaq",      "Portable III", MACHINE_NOT_WORKING )
@@ -4231,7 +4262,10 @@ COMP( 199?, op82c392,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, sis85c471, ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the SiS 85C471/85C407 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, um8886,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, um8498f,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
+COMP( 199?, abah4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-AH4", MACHINE_NOT_WORKING )
 COMP( 199?, abpb4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PB4", MACHINE_NOT_WORKING )
+COMP( 199?, abpi4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PI4", MACHINE_NOT_WORKING )
+COMP( 199?, abpm4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PM4", MACHINE_NOT_WORKING )
 COMP( 199?, abpw4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PW4", MACHINE_NOT_WORKING )
 COMP( 199?, alator2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Alaris",      "Tornado 2", MACHINE_NOT_WORKING )
 COMP( 199?, mb4d33,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aquarius System (ASI)", "MB-4D33/50NR", MACHINE_NOT_WORKING )
