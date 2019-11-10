@@ -1,0 +1,331 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+	<element name="DISPLAYBG">
+		<rect>
+			<color red="0.1" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.05" top="0.025" right="0.95" bottom="0.975" />			
+		</rect>
+		<!-- card 1 outline -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.07" top="0.035" right="0.48" bottom="0.4" />			
+		</rect>	
+		<!-- cart 1 inner fill -->
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.39" />			
+		</rect>	
+		<!-- card 2 outline -->
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.52" top="0.035" right="0.93" bottom="0.4" />			
+		</rect>		
+		<!-- card 2 inner fill -->
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.39" />			
+		</rect>		
+	</element>
+
+	<element name="NUMBER_LEFT">
+		<!--<rect state="0">
+			<color alpha="0.5" red="0.2" green="0.1" blue="1.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</rect>-->
+		
+		<text state="1" string="A" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="2" string="2" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="3" string="3" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>
+		<text state="4" string="4" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="5" string="5" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="6" string="6" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="7" string="7" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="8" string="8" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="9" string="9" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="10" string="10" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="11" string="J" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="12" string="Q" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>	
+		<text state="13" string="K" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.045" right="0.46" bottom="0.25" />
+		</text>		
+	
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>
+
+	<element name="SUITE_LEFT">
+		<!--<rect state="0">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds left="0.09" top="0.25" right="0.46" bottom="0.39" />
+		</rect>-->
+	
+		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.25" right="0.275" bottom="0.32" />
+		</text>
+		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.275" top="0.25" right="0.46" bottom="0.32" />
+		</text>	
+		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.09" top="0.32" right="0.275" bottom="0.39" />
+		</text>
+		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.275" top="0.32" right="0.46" bottom="0.39" />
+		</text>
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>	
+	</element>
+
+	<element name="NUMBER_RIGHT">
+		<!--<rect state="0">
+			<color alpha="0.5" red="0.2" green="0.1" blue="1.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</rect>-->
+		
+		<text state="1" string="A" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="2" string="2" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="3" string="3" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="4" string="4" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="5" string="5" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="6" string="6" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="7" string="7" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="8" string="8" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="9" string="9" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="10" string="10" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="11" string="J" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="12" string="Q" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>	
+		<text state="13" string="K" align="0">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.045" right="0.91" bottom="0.25" />
+		</text>		
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>		
+	</element>
+
+	<element name="SUITE_RIGHT">
+		<!--<rect state="0">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds left="0.54" top="0.25" right="0.91" bottom="0.39" />
+		</rect>-->
+		
+		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.25" right="0.725" bottom="0.32" />
+		</text>
+		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.725" top="0.25" right="0.91" bottom="0.32" />
+		</text>	
+		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.54" top="0.32" right="0.725" bottom="0.39" />
+		</text>
+		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds left="0.725" top="0.32" right="0.91" bottom="0.39" />
+		</text>
+		
+		<rect state="1000">
+			<color alpha="0.5" red="1.0" green="0.1" blue="0.1" />
+			<bounds x="0" y="0" width="1" height="1" />
+		</rect>	
+	</element>
+
+	<view name="Screen">
+
+		<!-- Player 1 -->
+		<bezel name="BACKGROUND_BZ0" element="DISPLAYBG">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>
+		<bezel name="SUITE_LEFT_BZ0" element="SUITE_LEFT">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>
+		<bezel name="NUMBER_LEFT_BZ0" element="NUMBER_LEFT">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>	
+		<bezel name="SUITE_RIGHT_BZ0" element="SUITE_RIGHT">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>
+		<bezel name="NUMBER_RIGHT_BZ0" element="NUMBER_RIGHT">
+			<bounds left="4.5" top="0" right="5.0" bottom="1" />
+		</bezel>
+
+		<!-- Player 2 -->
+		<bezel name="BACKGROUND_BZ1" element="DISPLAYBG">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>
+		<bezel name="SUITE_LEFT_BZ1" element="SUITE_LEFT">
+				<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>
+		<bezel name="NUMBER_LEFT_BZ1" element="NUMBER_LEFT">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>	
+		<bezel name="SUITE_RIGHT_BZ1" element="SUITE_RIGHT">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>
+		<bezel name="NUMBER_RIGHT_BZ1" element="NUMBER_RIGHT">
+			<bounds left="4.5" top="1" right="5.0" bottom="2" />
+		</bezel>
+
+		<!-- Player 3 -->
+		<bezel name="BACKGROUND_BZ2" element="DISPLAYBG">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>
+		<bezel name="SUITE_LEFT_BZ2" element="SUITE_LEFT">
+				<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>
+		<bezel name="NUMBER_LEFT_BZ2" element="NUMBER_LEFT">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>	
+		<bezel name="SUITE_RIGHT_BZ2" element="SUITE_RIGHT">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>
+		<bezel name="NUMBER_RIGHT_BZ2" element="NUMBER_RIGHT">
+			<bounds left="4.5" top="2" right="5.0" bottom="3" />
+		</bezel>
+
+		<!-- Player 4 -->
+		<bezel name="BACKGROUND_BZ3" element="DISPLAYBG">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>
+		<bezel name="SUITE_LEFT_BZ3" element="SUITE_LEFT">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>
+		<bezel name="NUMBER_LEFT_BZ3" element="NUMBER_LEFT">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>	
+		<bezel name="SUITE_RIGHT_BZ3" element="SUITE_RIGHT">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>
+		<bezel name="NUMBER_RIGHT_BZ3" element="NUMBER_RIGHT">
+			<bounds left="0" top="2" right="0.5" bottom="3" />
+		</bezel>
+	
+		<!-- Player 5 -->
+		<bezel name="BACKGROUND_BZ4" element="DISPLAYBG">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>
+		<bezel name="SUITE_LEFT_BZ4" element="SUITE_LEFT">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>
+		<bezel name="NUMBER_LEFT_BZ4" element="NUMBER_LEFT">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>	
+		<bezel name="SUITE_RIGHT_BZ4" element="SUITE_RIGHT">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>
+		<bezel name="NUMBER_RIGHT_BZ4" element="NUMBER_RIGHT">
+			<bounds left="0" top="1" right="0.5" bottom="2" />
+		</bezel>
+	
+		<!-- Player 6 -->
+		<bezel name="BACKGROUND_BZ5" element="DISPLAYBG">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>
+		<bezel name="SUITE_LEFT_BZ5" element="SUITE_LEFT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>
+		<bezel name="NUMBER_LEFT_BZ5" element="NUMBER_LEFT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+		<bezel name="SUITE_RIGHT_BZ5" element="SUITE_RIGHT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>
+		<bezel name="NUMBER_RIGHT_BZ5" element="NUMBER_RIGHT">
+			<bounds left="0" top="0" right="0.5" bottom="1" />
+		</bezel>	
+	
+		<screen index="0">
+			<bounds left="0.5" top="0" right="4.5" bottom="3" />
+		</screen>
+	</view>
+</mamelayout>

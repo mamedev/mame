@@ -165,6 +165,7 @@
 #include "speaker.h"
 
 #include "pvmil.lh"
+#include "sentx6p.lh"
 
 class spg2xx_game_state : public driver_device
 {
@@ -284,9 +285,13 @@ private:
 class sentx6p_state : public spg2xx_game_state
 {
 public:
-	sentx6p_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spg2xx_game_state(mconfig, type, tag),
-		m_porta_data(0x0000)
+	sentx6p_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0x0000),
+		m_suite1(*this, "SUITE_LEFT_BZ%u", 0U),
+		m_suite2(*this, "SUITE_RIGHT_BZ%u", 0U),
+		m_number1(*this, "NUMBER_LEFT_BZ%u", 0U),
+		m_number2(*this, "NUMBER_RIGHT_BZ%u", 0U)
 	{ }
 
 	void sentx6p(machine_config &config);
@@ -294,6 +299,7 @@ public:
 	void mem_map_2m_texas(address_map &map);
 
 protected:
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 private:
@@ -320,6 +326,11 @@ private:
 	void set_controller_led(uint8_t value, int select_bits);
 
 	uint16_t m_porta_data;
+
+	output_finder<6> m_suite1;
+	output_finder<6> m_suite2;
+	output_finder<6> m_number1;
+	output_finder<6> m_number2;
 };
 
 class jakks_gkr_state : public spg2xx_game_state
@@ -2824,6 +2835,15 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
+void sentx6p_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
+
+	m_suite1.resolve();
+	m_suite2.resolve();
+	m_number1.resolve();
+	m_number2.resolve();
+}
 
 void sentx6p_state::machine_reset()
 {
@@ -2923,6 +2943,21 @@ void sentx6p_state::set_card1(uint8_t value, int select_bits)
 		if (select_bits & (1 << i))
 		{
 			m_lcd_card1[i] = value;
+
+			int val = m_lcd_card1[i];
+			if (val == 0)
+			{
+				m_suite1[i] = 0;
+				m_number1[i] = 0;
+			}
+			else
+			{
+				int suite = (val-1) / 13;
+				int number = (val-1) % 13;
+
+				m_suite1[i] = suite+1;
+				m_number1[i] = number+1;
+			}
 		}
 	}
 }
@@ -2934,6 +2969,21 @@ void sentx6p_state::set_card2(uint8_t value, int select_bits)
 		if (select_bits & (1 << i))
 		{
 			m_lcd_card2[i] = value;
+
+			int val = m_lcd_card2[i];
+			if (val == 0)
+			{
+				m_suite2[i] = 0;
+				m_number2[i] = 0;
+			}
+			else
+			{
+				int suite = (val-1) / 13;
+				int number = (val-1) % 13;
+
+				m_suite2[i] = suite+1;
+				m_number2[i] = number+1;
+			}
 		}
 	}
 }
@@ -3030,6 +3080,8 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 }
 
 
+
+
 void sentx6p_state::sentx6p(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -3049,6 +3101,8 @@ void sentx6p_state::sentx6p(machine_config &config)
 	m_maincpu->portc_out().set(FUNC(sentx6p_state::sentx_portc_w));
 
 	m_maincpu->uart_tx().set(FUNC(sentx6p_state::sentx_tx_w));
+
+	config.set_default_layout(layout_sentx6p);
 }
 
 
@@ -3440,3 +3494,4 @@ CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_st
 // "go 02d1d0" "do r1 = ff" to get past initial screen
 // a 'deluxe' version of this also exists with extra game modes
 CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+
