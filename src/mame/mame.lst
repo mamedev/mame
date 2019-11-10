@@ -2644,6 +2644,7 @@ hot307h                         // Shuttle HOT-307H motherboard (486)
 mb1433ucv                       // Biostar MB-1433UCV motherboard (486)
 gc10a                           // EAGLEN486 GC10A motherboard (486)
 hot419                          // Shuttle HOT-419 motherboard (486)
+ts34t25                         // Highscreen 486-25 aka Midwest Micro Elite TS34T-25 notebook
 
 @source:atari_s1.cpp
 aavenger                        //

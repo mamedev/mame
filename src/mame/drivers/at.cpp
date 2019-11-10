@@ -4023,6 +4023,17 @@ ROM_START( lion3500 )
 	ROM_LOAD( "lion3500.bin", 0x00000, 0x20000, CRC(fc409ac3) SHA1(9a7aa08b981dedffff31fda5d3496469ae2ec3a5) )
 ROM_END
 
+// Highscreen 486-25 aka Midwest Micro Elite TS34T-25 notebook
+// integrated trackball - CPU: i486sx-25 - Chipset: Chips F82C721, Intel ?80C51SLBG, MCCS1468188F, AvaSem AV9129-08CW28, ACC Micro 2046, LT1137CS
+// Video: CL-GD6410-320C-A - HD: Maxtor 2585AT
+ROM_START( ts34t25 )// blank display
+	ROM_REGION( 0x20000, "bios", 0 )
+	ROM_LOAD( "p101a002_sys_bios_62fc.u24", 0x00000, 0x20000, CRC(2ce568bc) SHA1(84dc595abf0bf1948a6479afdea4a169f40e3b1b))
+
+	ROM_REGION( 0x8000, "pmu", 0 ) // rom contains "PMU" string
+	ROM_LOAD( "s34t0003_51slbios_019f.u31", 0x00000, 0x8000, CRC(40467716) SHA1(f976f2ce13eb22e0ed164d31d6382eda489545c1))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -4238,6 +4249,7 @@ COMP( 1995, ficpio2,   ibm5170, 0,       ficpio2,   0,     at_state,     init_at
 COMP( 199?, gete486vl, ibm5170, 0,       at486,     0,     at_state,     init_at,        "GENOA",       "TurboExpress 486 VL", MACHINE_NOT_WORKING )
 COMP( 199?, ga486vf,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Gigabyte",    "GA-486VF", MACHINE_NOT_WORKING )
 COMP( 199?, ga486vs,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Gigabyte",    "GA-486VS", MACHINE_NOT_WORKING )
+COMP( 199?, ts34t25,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Highscreen",  "486-25", MACHINE_NOT_WORKING )
 COMP( 1992, a433cc,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "J-Bond",      "A433C-C/A450C-C", MACHINE_NOT_WORKING )
 COMP( 199?, ls486e,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "LuckyStar",   "LS-486E Rev:C", MACHINE_NOT_WORKING )
 COMP( 199?, ms4125,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "MSI",         "MS-4125", MACHINE_NOT_WORKING )
