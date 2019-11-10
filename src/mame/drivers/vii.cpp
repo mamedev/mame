@@ -2897,8 +2897,8 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 	during gameplay - when player is active and 2 cards should be being shown on their LCD panel as well as select options.  LED is also turned on at this point.
 
 	sentx_tx_w 38 (with controller select bits 01x) (always 38 or 39?)
-	sentx_tx_w 12 (with controller select bits 01x) - cards to display on LCD? (number changes depending on cards)
-	sentx_tx_w 61 (with controller select bits 01x) - cards to display on LCD? (number changes depending on cards)
+	sentx_tx_w 12 (with controller select bits 01x) 00cccccc - cards to display on LCD? (number changes depending on cards)   
+	sentx_tx_w 61 (with controller select bits 01x) 01cccccc - cards to display on LCD? (number changes depending on cards)
 	sentx_tx_w 38 (with controller select bits 01x) (always 38 or 39?)
 	sentx_tx_w b9 (with controller select bits 01x)  - which options are available to slect - 80 = no selections shown, b9 = regular options, no bet/check    a7 = when bet + check are available
 	sentx_tx_w c8 (with controller select bits 01x) c0 = no selection highlight c1 = fold selected, c2 = check selected, c4 = bet selected , c8 = call selected, d0 = raise selected, e0 = all in selected,
@@ -2914,6 +2914,26 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 	
 	however these don't stay synced as 6 byte write sequences on boot / when starting game etc., must be packets, or we're not filtering correctly?
 	writes with other controllers selected follow the same logic.
+
+	card table - the controllers must have some kind of MCU to receive the command and convert it to the segment display, as the code writes the card
+	number (see table below) and not the individual segment info
+
+	   off      00
+	| A  diamonds 01 | A  hearts 0e   | A  spades 1b  | A  clubs 28 |
+	| 2  diamonds 02 | 2  hearts 0f   | 2  spades 1c  | 2  clubs 29 |
+	| 3  diamonds 03 | 3  hearts 10   | 3  spades 1d  | 3  clubs 2a |
+	| 4  diamonds 04 | 4  hearts 11   | 4  spades 1e  | 4  clubs 2b |
+	| 5  diamonds 05 | 5  hearts 12   | 5  spades 1f  | 5  clubs 2c |
+	| 6  diamonds 06 | 6  hearts 13   | 6  spades 20  | 6  clubs 2d |
+	| 7  diamonds 07 | 7  hearts 14   | 7  spades 21  | 7  clubs 2e |
+	| 8  diamonds 08 | 8  hearts 15   | 8  spades 22  | 8  clubs 2f |
+	| 9  diamonds 09 | 9  hearts 16   | 9  spades 23  | 9  clubs 30 |
+	| 10 diamonds 0a | 10 hearts 17   | 10 spades 24  | 10 clubs 31 |
+	| J  diamonds 0b | J  hearts 18   | J  spades 25  | J  clubs 32 |
+	| Q  diamonds 0c | Q  hearts 19   | Q  spades 26  | Q  clubs 33 |
+	| K  diamonds 0d | K  hearts 1a   | K  spades 27  | K  clubs 34 |
+	
+	note, the command values used (38,39,3a are outside of this table)
 
 	*/
 
