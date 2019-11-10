@@ -294,6 +294,8 @@ public:
 	void mem_map_2m_texas(address_map &map);
 
 protected:
+	virtual void machine_reset() override;
+
 	READ16_MEMBER(sentx_porta_r);
 	READ16_MEMBER(sentx_portb_r);
 	READ16_MEMBER(sentx_portc_r);
@@ -303,6 +305,9 @@ protected:
 	DECLARE_WRITE16_MEMBER(sentx_portc_w);
 
 	DECLARE_WRITE8_MEMBER(sentx_tx_w);
+
+	int m_outputs[6];
+	int m_outpos;
 
 private:
 
@@ -2813,6 +2818,16 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 }
 
 
+void sentx6p_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	for (int i = 0; i < 6; i++)
+		m_outputs[i] = 0x00;
+	
+	m_outpos = 0;
+}
+
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
@@ -2871,7 +2886,49 @@ WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
 WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 {
 	int select_bits = (m_porta_data >> 8) & 0x3f;
-	logerror("%s: sentx_tx_w %02x (with controller select bits %02xx)\n", machine().describe_context(), data, select_bits);
+
+	// TX function is at 0x029773
+	// starts by writing controller select, then checking if controller is selected, then transmits data
+
+	// RX function is at 0x029811
+	// similar logic to write controller ID, check if selected, then recieve data
+
+	/*
+	during gameplay - when player is active and 2 cards should be being shown on their LCD panel as well as select options.  LED is also turned on at this point.
+
+	sentx_tx_w 38 (with controller select bits 01x) (always 38 or 39?)
+	sentx_tx_w 12 (with controller select bits 01x) - cards to display on LCD? (number changes depending on cards)
+	sentx_tx_w 61 (with controller select bits 01x) - cards to display on LCD? (number changes depending on cards)
+	sentx_tx_w 38 (with controller select bits 01x) (always 38 or 39?)
+	sentx_tx_w b9 (with controller select bits 01x)  - which options are available to slect - 80 = no selections shown, b9 = regular options, no bet/check    a7 = when bet + check are available
+	sentx_tx_w c8 (with controller select bits 01x) c0 = no selection highlight c1 = fold selected, c2 = check selected, c4 = bet selected , c8 = call selected, d0 = raise selected, e0 = all in selected,
+	
+	when the display is inactive (and LED is off)
+
+	sentx_tx_w 39 (with controller select bits 01x)
+	sentx_tx_w 00 (with controller select bits 01x)
+	sentx_tx_w 40 (with controller select bits 01x)
+	sentx_tx_w 39 (with controller select bits 01x)
+	sentx_tx_w 80 (with controller select bits 01x)
+	sentx_tx_w c0 (with controller select bits 01x)
+	
+	however these don't stay synced as 6 byte write sequences on boot / when starting game etc., must be packets, or we're not filtering correctly?
+	writes with other controllers selected follow the same logic.
+
+	*/
+
+	if (select_bits == 0x01) // test for p1 writes only for now
+	{
+#if 0 // this isn't correct, something needs to sync the streams
+		m_outputs[m_outpos] = data;
+		m_outpos++;
+		if (m_outpos == 6)
+		{
+			m_outpos = 0;
+			logerror("tx data %02x %02x %02x %02x %02x %02x)\n", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3], m_outputs[4], m_outputs[5]);
+		}
+#endif
+	}
 }
 
 
