@@ -67,6 +67,7 @@ protected:
 	
 private:
 	required_ioport m_joy;
+	required_ioport m_hwconfig;
 };
 
 class spectrum_mface128_device : public spectrum_mface_base_device

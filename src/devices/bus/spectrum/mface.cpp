@@ -35,7 +35,8 @@
 	With the MF menu on-screen, press Symbol Shift + A (STOP) to see checksum, space to return.
 	
 	The enable/disable switch became necessary on later versions as games had started including checks to detect presence of the interface.
-	eg. Renegade ("The Hit Squad" re-release) whilst loading, writes to 0x9f specifically to cause the MF (if present) to page in and crash the machine.
+	eg. Renegade ("The Hit Squad" re-release) whilst loading, reads from 0x9f specifically to cause the MF (if present) to page in and crash the machine.
+	Todo: confirm exact operation of disable switch.
 	
 	As mentioned in the user instructions, there is a "joystick disable" jumper inside the unit which must be cut to allow Beta disk compatibility.
 	The joystick is not actually disabled but rather just data bus bits D6 + D7 are held hi-z for any reads of kempston range 0b000xxxxx.
@@ -106,13 +107,10 @@ INPUT_PORTS_START( mface1 )
 	PORT_INCLUDE( mface )
 	
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x01, 0x00, "Disable Switch")
-	PORT_CONFSETTING(0x00, "Off")
-	PORT_CONFSETTING(0x01, "On")
-	PORT_CONFNAME(0x02, 0x00, "Joystick Enable Jumper")
+	PORT_CONFNAME(0x01, 0x00, "Joystick Enable Jumper")
 	PORT_CONFSETTING(0x00, "Closed")
-	PORT_CONFSETTING(0x02, "Open")
-	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_CONFSETTING(0x01, "Open")
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNUSED)
 	
 	PORT_START("JOY")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
@@ -245,6 +243,7 @@ spectrum_mface_base_device::spectrum_mface_base_device(const machine_config &mco
 spectrum_mface1_device::spectrum_mface1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: spectrum_mface_base_device(mconfig, SPECTRUM_MFACE1, tag, owner, clock)
 	, m_joy(*this, "JOY")
+	, m_hwconfig(*this, "CONFIG")
 {
 }
 
@@ -306,16 +305,13 @@ uint8_t spectrum_mface1_device::iorq_r(offs_t offset)
 {
 	uint8_t data = m_exp->iorq_r(offset);
 	
-	if (ioport("CONFIG")->read() & 0x01)  // disable switch
-		return data;
-
 	if (!machine().side_effects_disabled())
 	{
 		switch (offset & 0xff)
 		{
 		case 0x1f:
 			m_romcs = 0;
-			if (!(ioport("CONFIG")->read() & 0x02))  // joystick disable jumper
+			if (!(m_hwconfig->read() & 0x01))  // joystick disable jumper
 				data = m_joy->read() & 0x1f;
 			break;
 		case 0x9f:
@@ -459,7 +455,6 @@ INPUT_CHANGED_MEMBER(spectrum_mface1_device::magic_button)
 	}
 	else  // key pressed
 	{
-		if (!(ioport("CONFIG")->read() & 0x01))  // disable switch
-			m_slot->nmi_w(ASSERT_LINE);
+		m_slot->nmi_w(ASSERT_LINE);
 	}
 }
