@@ -1979,6 +1979,18 @@ ROM_END
 //  80286 Desktop
 //**************************************************************************
 
+// Wang PC-250/16
+// Phoenix 80286 ROM BIOS PLUS Version 3.10 07 / ROMBIOS Version 03.13.00 (c) Copyright Wang Laboratories, Inc. 1991
+ROM_START( wpc250 )
+	ROM_REGION(0x20000, "bios", 0)
+	ROM_LOAD16_BYTE( "wang_pc_250-16_bios_vers_03.13.00_chip_l47_9514rol_lo.bin", 0x10000, 0x8000, CRC(8f3a3061) SHA1(42b13f662f1f0b00748e21b4aa60cfcbc4b098c0))
+	ROM_LOAD16_BYTE( "wang_pc_250-16_bios_vers_03.13.00_chip_l46_9514roh_hi.bin", 0x10001, 0x8000, CRC(3ba0cb84) SHA1(09111f9a6672fad58b11dc1f22240c78521bcc1c))
+
+	// Wang PC-250/16 graphics card using a Chips F82C452
+	ROM_REGION(0x8000, "gfx1", 0)
+	ROM_LOAD( "wang_3050_bios_rom.bin", 0x0000, 0x8000, CRC(a895ad45) SHA1(afeacfffdf32f225c604d28580327e9ecfa96ea5))
+ROM_END
+
 // Philips PCD204 (PCD200 series)
 // Chipset: Paradise PVGA1A-JK, Faraday FE3031-JK - BIOS: M1212 U66/U67 R1.00.01 CKS:056B/617D - Keyboard-BIOS: Phoenix 1072217
 // BIOS-String: - - On board: Floppy, 1xIDE, VGA, Parallel, Serial - Slot for ISA slot adapter: 1 - HD: Maxtor 7060AT (C/H/S: 1024/7/17)
@@ -4130,6 +4142,7 @@ COMP( 1990, n8810m16v, ibm5170, 0,       atvga,     0,     at_state,     init_at
 COMP( 198?, o286foxii, ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Octek",       "Fox II", MACHINE_NOT_WORKING )
 COMP( 1987, m290,      ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Olivetti",    "M290", MACHINE_NOT_WORKING )
 COMP( 1991, pcd204,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Philips",     "PCD204 (PCD200 series)", MACHINE_NOT_WORKING )
+COMP( 1981, wpc250,    ibm5170, 0,       atvga,     0,     at_state,     init_at,        "Wang Laboratories, Inc.", "PC-250/16", MACHINE_NOT_WORKING )
 COMP( 1990, n8810m30,  ibm5170, 0,       neat,      0,     at_state,     init_at,        "Nixdorf Computer AG", "8810 M30", MACHINE_NOT_WORKING )
 COMP( 198?, elt286b,   ibm5170, 0,       neat,      0,     at_state,     init_at,        "Chaintech", "ELT-286B-160B(E)", MACHINE_NOT_WORKING )
 COMP( 1985, k286i,     ibm5170, 0,       k286i,     0,     at_state,     init_at,        "Kaypro",      "286i", MACHINE_NOT_WORKING )
