@@ -16,7 +16,7 @@ _________________________________________________________________
 18V403  Baseball                TV Arcade IV            yes
 18V404  Speedway/Tag            TV Arcade               yes
 18V405  Gunfighter/Moonship Battle   TV Arcade          yes
-18V500  Math and Social Studies TV School House I       no, but Guru has one
+18V500  Math and Social Studies TV School House I       yes
 18V501  Math Fun                TV School House II      yes
 18V600  Blackjack               TV Casino I             yes
 18V601  Bingo                   TV Casino II            no
@@ -193,7 +193,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<year>1978</year>
 		<publisher>Hanimex</publisher>
 		<info name="serial" value="MG-200" />
-		<info name="usage" value="Works only on the MPT-02" />
+		<info name="usage" value="Press 'Clear' then choose a game by pressing 1-5 on Keypad A" />
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
