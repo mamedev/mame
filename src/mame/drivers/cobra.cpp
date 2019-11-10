@@ -10,7 +10,7 @@
 
     Game                                     ID        Year    Notes
     -----------------------------------------------------------------------
-    Fighting Bujutsu / Fighting Wu-Shu     | GN645   | 1997  |
+    Fighting Bujutsu / Fighting Wu-Shu     | GN645   | 1997  | PWB405270B I/O board
     Racing Jam DX                          | GY676   | 1997  | GY676-PWB(F) LAN board
 
 
@@ -48,6 +48,10 @@
         BTA0803
         4x TOA2602
         Bt121KPJ80 RAMDAC
+		
+    PWB405270B I/O board (Joystick pod board). H8/3644 based JVS I/O board found in Windy II cabs for later games that support JVS controls.
+    ----------------------------------
+        Hitachi H8/3644 Microcontroller. Unknown clock speed
 
     GY676-PWB(F) LAN Board
     ----------------------
@@ -850,6 +854,8 @@ public:
 	void cobra_video_exit();
 	int decode_debug_state_value(int v);
 	void cobra(machine_config &config);
+	void bujutsu(machine_config &config);
+	void racjamdx(machine_config &config);
 	void cobra_gfx_map(address_map &map);
 	void cobra_main_map(address_map &map);
 	void cobra_sub_map(address_map &map);
@@ -3324,18 +3330,26 @@ void cobra_state::cobra(machine_config &config)
 	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
 
 	M48T58(config, "m48t58", 0);
+}
 
-	K001604(config, m_k001604, 0);     // on the LAN board in Racing Jam DX
+void cobra_state::bujutsu(machine_config &config)
+{
+	cobra(config);
+	
+	COBRA_JVS_HOST(config, m_jvs_host, 4000000); //fixme: add the H8/3644 for proper inputs
+	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
+	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
+	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
+}
+
+void cobra_state::racjamdx(machine_config &config)
+{
+	K001604(config, m_k001604, 0);
 	m_k001604->set_layer_size(0);
 	m_k001604->set_roz_size(1);
 	m_k001604->set_txt_mem_offset(0);  // correct?
 	m_k001604->set_roz_mem_offset(0);  // correct?
 	m_k001604->set_palette(m_palette);
-
-	COBRA_JVS_HOST(config, m_jvs_host, 4000000);
-	COBRA_JVS(config, m_jvs1, 0, m_jvs_host, true);
-	COBRA_JVS(config, m_jvs2, 0, m_jvs_host, true);
-	COBRA_JVS(config, m_jvs3, 0, m_jvs_host, true);
 }
 
 /*****************************************************************************/
@@ -3612,5 +3626,5 @@ ROM_END
 
 /*************************************************************************/
 
-GAME( 1997, bujutsu,  0, cobra, cobra, cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING )
-GAME( 1997, racjamdx, 0, cobra, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )
+GAME( 1997, bujutsu,  0, bujutsu, cobra,  cobra_state, init_bujutsu,  ROT0, "Konami", "Fighting Bujutsu", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_CONTROLS ) //requires an H8/3644 for proper controls
+GAME( 1997, racjamdx, 0, racjamdx, cobra, cobra_state, init_racjamdx, ROT0, "Konami", "Racing Jam DX",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )

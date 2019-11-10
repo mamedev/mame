@@ -6,7 +6,7 @@
 
     Konami 'Hornet' Hardware
     Konami, 1997-2000
-f
+
     Known games on this hardware include....
 
     Game                             (C)      Year
@@ -46,13 +46,13 @@ f
     Hardware configurations:
     ------------------------
 
-    Game              KONAMI ID  CPU PCB    GFX Board(s)  notes
+    Game              KONAMI ID  CPU PCB    GFX Board(s)  Notes
     ----------------------------------------------------------------------
     Gradius 4         GX837      GN715(A)   GN715(B)
-    NBA Play By Play  GX778      GN715(A)   GN715(B)
+    NBA Play By Play  GX778      GN715(A)   GN715(B)      PWB405270B I/O board
     Teraburst         GX715      GN715(A)   GN715(B)      GN680(E) I/O board
-    Silent Scope      GQ830      GN715(A)   2x GN715(B)
-    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
+    Silent Scope      GQ830      GN715(A)   2x GN715(B)   GQ830(L) I/O board
+    Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ830(L) I/O board and GQ931(H) LAN PCB
 
 
     PCB Layouts
@@ -224,6 +224,37 @@ f
     S/Scope      830A13  -       830A14  -
     S/Scope 2    -       -       -       -          (no ROMs, not used)
 
+    PWB405270B I/O board (Joystick pod board)
+    |------------------------------------------|
+    |     CN1         CN2                      |
+    |                                          |
+    |                              CN4         |
+    |                     DSW(8)               |
+    |                                          |
+    |058232                                    |
+    |                                          |
+    |                                          |
+    |                                          |
+    |                                  USB-B   |
+    |                                          |
+    |                                  USB-A   |
+    |    H8/3644                               |
+    |                                          |
+    |------------------------------------------|
+
+    This board normally comes packaged with Konami "Windy II" cabinets for JVS I/O support. Konami alternatively
+    packaged this board with NBA: Play by Play kits to support four players. This is a rare instance where a game
+    uses both JAMMA (players 1 and 2) AND JVS (players 3 and 4) inputs at the same time. A similar board, GO787-PWB(B)A,
+    was also developed for a "JAMMA to JVS converter" but uses the same H8/3644 MCU. Gradius 4 will always say "JVS Not Found"
+    if the main board (possibly from the PPC403GA's serial port) isn't communicating with its MCU even if the DIP 6 is set
+    to "off" position.
+
+	Notes:
+          058232 - Konami Custom Ceramic Package (SIL14)
+         H8/3644 - Hitachi H8/3644 Microcontroller. Unknown clock speed
+         USB-A/B - USB connectors to main board
+           CN1/2 - Player input connectors
+             CN4 - Coin/Service/Test input connector
 
     Teraburst uses a different variation of the I/O board used in Operation: Thunder Hurricane (see gticlub.cpp). Analog inputs are controlled by
     two CCD cameras, one from each gun. This specific variation uses a K056800 which normally acts as a sound interface controller. Perhaps this
@@ -244,7 +275,7 @@ f
     |32MHz                           715A17.20K|
     |8464                 PAL(002962)          |
     |      056800         PAL(002961)          |
-    |   PAL(056787A)      PAL(002960)          |
+    |                     PAL(002960)          |
     |   CN1                                    |
     |------------------------------------------|
     Notes:
@@ -256,6 +287,11 @@ f
       LM1881  - Video sync separator (DIP8)
       056800  - Konami Custom (QFP80)
 
+
+    GQ830 PWB(J) I/O PCB
+    ------------------------------------------
+    Note: This is simply another ADC12138. It uses two 5k potentiometers for X/Y analog inputs sending the data back
+    to the main pcb (either to the main ADC12138 or PPC403GA's serial port). Silent Scope EX would later use this pcb.
 
     LAN PCB: GQ931 PWB(H)      (C) 1999 Konami
     ------------------------------------------
@@ -485,7 +521,6 @@ private:
 	void jamma_jvs_cmd_exec();
 	void hornet_map(address_map &map);
 	void terabrst_map(address_map &map);
-	void sscope_map(address_map &map);
 	void sscope2_map(address_map &map);
 	void gn680_memmap(address_map &map);
 	void sharc0_map(address_map &map);
@@ -798,11 +833,6 @@ void hornet_state::terabrst_map(address_map &map)
 	map(0x74080000, 0x7408000f).rw(FUNC(hornet_state::gun_r), FUNC(hornet_state::gun_w));
 }
 
-void hornet_state::sscope_map(address_map &map) //placeholder; may remove if mapping the second ADC12138 isn't necessary
-{
-	hornet_map(map);
-}
-
 void hornet_state::sscope2_map(address_map &map)
 {
 	sscope_map(map);
@@ -1002,7 +1032,7 @@ static INPUT_PORTS_START( gradius4 )
 	PORT_DIPSETTING( 0x00, "15KHz" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(nbapbp) //Need to add inputs for player 3 and 4.
+static INPUT_PORTS_START(nbapbp) //Player 3 and 4's inputs normally require H8/3644 support
 	PORT_INCLUDE(gradius4)
 
 	PORT_MODIFY("DSW")
@@ -1213,8 +1243,6 @@ void hornet_state::terabrst(machine_config &config) //todo: add K056800 from I/O
 void hornet_state::sscope(machine_config &config)
 {
 	hornet(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::sscope_map);
 
 	ADSP21062(config, m_dsp2, XTAL(36'000'000));
 	m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
@@ -1458,7 +1486,7 @@ void hornet_state::init_sscope()
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
+	m_maincpu->ppc4xx_spu_set_tx_handler(write8_delegate(*this, FUNC(hornet_state::jamma_jvs_w))); //sscope actually isn't JVS. It instead needs commands to communicate with its secondary ADC12138
 }
 
 void hornet_state::init_sscope2() //fixme: eventually set sscope2 to load gfx roms from the comm board
@@ -1732,8 +1760,8 @@ ROM_END
 /*************************************************************************/
 
 GAME(  1998, gradius4,  0,        hornet,   gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbp,    0,        hornet,   nbapbp,   hornet_state, init_nbapbp,   ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, nbapbpa,   nbapbp,   hornet,   nbapbp,   hornet_state, init_nbapbp,   ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,    0,        hornet,   nbapbp,   hornet_state, init_nbapbp,   ROT0, "Konami", "NBA Play By Play (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS ) //requires an H8/3644 for players 3 and 4
+GAME(  1998, nbapbpa,   nbapbp,   hornet,   nbapbp,   hornet_state, init_nbapbp,   ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 GAME(  1998, terabrst,  0,        terabrst, terabrst, hornet_state, init_terabrst, ROT0, "Konami", "Teraburst (1998/07/17 ver UEL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, terabrsta, terabrst, terabrst, terabrst, hornet_state, init_terabrst, ROT0, "Konami", "Teraburst (1998/02/25 ver AAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
