@@ -82,6 +82,22 @@
 #define NL_USE_FLOAT128 PUSE_FLOAT128
 #endif
 
+/// \brief Support float type for matrix calculations.
+///
+/// Defaults to off to provide faster build times
+
+#ifndef NL_USE_FLOAT_MATRIX
+#define NL_USE_FLOAT_MATRIX (0)
+#endif
+
+/// \brief Support long double type for matrix calculations.
+///
+/// Defaults to off to provide faster build times
+
+#ifndef NL_USE_LONG_DOUBLE_MATRIX
+#define NL_USE_LONG_DOUBLE_MATRIX (0)
+#endif
+
 //============================================================
 //  DEBUGGING
 //============================================================

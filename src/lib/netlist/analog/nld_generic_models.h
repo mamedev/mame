@@ -5,7 +5,7 @@
 #define NLD_GENERIC_MODELS_H_
 
 ///
-/// \file nl_generic_models.h
+/// \file nld_generic_models.h
 ///
 
 #include "netlist/nl_base.h"
@@ -210,7 +210,7 @@ namespace analog
 			m_Vmin = nlconst::magic(-5.0) * m_Vt;
 
 			m_Vcrit = m_Vt * plib::log(m_Vt / m_Is / nlconst::sqrt2());
-			m_VtInv = nlconst::one() / m_Vt;
+			m_VtInv = plib::reciprocal(m_Vt);
 			//printf("%g %g\n", m_Vmin, m_Vcrit);
 		}
 

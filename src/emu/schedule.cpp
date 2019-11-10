@@ -209,7 +209,7 @@ void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period)
 //  timer was started
 //-------------------------------------------------
 
-attotime emu_timer::elapsed() const
+attotime emu_timer::elapsed() const noexcept
 {
 	return machine().time() - m_start;
 }
@@ -220,7 +220,7 @@ attotime emu_timer::elapsed() const
 //  remaining until the timer expires
 //-------------------------------------------------
 
-attotime emu_timer::remaining() const
+attotime emu_timer::remaining() const noexcept
 {
 	attotime curtime = machine().time();
 	if (curtime >= m_expire)
@@ -356,7 +356,7 @@ device_scheduler::~device_scheduler()
 //  time - return the current time
 //-------------------------------------------------
 
-attotime device_scheduler::time() const
+attotime device_scheduler::time() const noexcept
 {
 	// if we're currently in a callback, use the timer's expiration time as a base
 	if (m_callback_timer != nullptr)

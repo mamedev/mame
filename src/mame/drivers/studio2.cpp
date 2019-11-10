@@ -613,7 +613,7 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 			}
 
 			if (image.length() != (blocks << 8))
-				logerror("Wrong sized image: Expected 0x%04X; Found 0x%04X",blocks<<8,image.length());
+				logerror("Wrong sized image: Expected 0x%04X; Found 0x%04X\n",blocks<<8,image.length());
 
 			char* catalogue = &header[16];
 			char* title = &header[32];

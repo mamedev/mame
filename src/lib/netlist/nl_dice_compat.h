@@ -26,8 +26,6 @@ sed -e 's/#define \(.*\)"\(.*\)"[ \t]*,[ \t]*\(.*\)/NET_ALIAS(\1,\2.\3)/' src/ma
 
 #ifndef NL_CONVERT_CPP
 #include "devices/net_lib.h"
-#include "analog/nld_twoterm.h"
-
 #endif
 
 
@@ -125,8 +123,8 @@ public:
 #define CHIP_555_Mono(name,  pdesc)   \
 	NE555_DIP(name) \
 	NET_C(name.6, name.7) \
-	RES(name ## _R, (pdesc)->r) \
-	CAP(name ## _C, (pdesc)->c) \
+	RES(name ## _R, pdesc ## _R) \
+	CAP(name ## _C, pdesc ## _C) \
 	NET_C(name.6, name ## _R.1) \
 	NET_C(name.6, name ## _C.1) \
 	NET_C(name ## _R.2, V5) \
@@ -167,8 +165,8 @@ public:
 	NET_C(name.14, name ## _R2.2) \
 	NET_C(VCC,     name ## _R2.1)
 #define CHIP_SERIES_RC(name,  pdesc)   \
-	RES(name ## _R, (pdesc)->r) \
-	CAP(name ## _C, (pdesc)->c) \
+	RES(name ## _R, pdesc ## _R) \
+	CAP(name ## _C, pdesc ## _C) \
 	NET_C(name ## _R.1, name ## _C.2) \
 	ALIAS(name.3, name ## _R.1) \
 	ALIAS(name.2, name ## _R.2) \

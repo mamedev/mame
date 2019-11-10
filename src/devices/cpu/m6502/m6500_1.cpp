@@ -189,12 +189,12 @@ void m6500_1_device::device_reset()
 }
 
 
-u64 m6500_1_device::execute_clocks_to_cycles(u64 clocks) const
+u64 m6500_1_device::execute_clocks_to_cycles(u64 clocks) const noexcept
 {
 	return (clocks + 1) / 2;
 }
 
-u64 m6500_1_device::execute_cycles_to_clocks(u64 cycles) const
+u64 m6500_1_device::execute_cycles_to_clocks(u64 cycles) const noexcept
 {
 	return cycles * 2;
 }

@@ -26,7 +26,7 @@ namespace devices
 	{
 		m_cnt = 0;
 		m_off = netlist_time::from_fp<decltype(m_offset())>(m_offset());
-		m_feedback.m_delegate = NETLIB_DELEGATE(extclock, update);
+		m_feedback.set_delegate(NETLIB_DELEGATE(extclock, update));
 
 		//m_feedback.m_delegate .set(&NETLIB_NAME(extclock)::update, this);
 		//m_Q.initial(0);
@@ -55,9 +55,9 @@ namespace devices
 		// continue with optimized clock handlers ....
 
 		if ((m_size & (m_size-1)) == 0) // power of 2?
-			m_feedback.m_delegate.set(&NETLIB_NAME(extclock)::clk2_pow2, this);
+			m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2_pow2, this));
 		else
-			m_feedback.m_delegate.set(&NETLIB_NAME(extclock)::clk2, this);
+			m_feedback.set_delegate(nldelegate(&NETLIB_NAME(extclock)::clk2, this));
 	}
 
 
@@ -70,7 +70,7 @@ namespace devices
 	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
 	NETLIB_DEVICE_IMPL(res_sw,              "RES_SWITCH",             "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")
-	NETLIB_DEVICE_IMPL(gnd,                 "GND",                    "")
+	NETLIB_DEVICE_IMPL(gnd,                 "GNDA",                   "")
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 
 	NETLIB_DEVICE_IMPL(logic_input,         "LOGIC_INPUT",            "IN,FAMILY")

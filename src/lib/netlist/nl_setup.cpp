@@ -33,7 +33,7 @@ namespace netlist
 		register_alias_nofqn(alias_fqn, out_fqn);
 	}
 
-	void nlparse_t::register_dippins_arr(const pstring &terms)
+	void nlparse_t::register_dip_alias_arr(const pstring &terms)
 	{
 		std::vector<pstring> list(plib::psplit(terms,", "));
 		if (list.size() == 0 || (list.size() % 2) == 1)
@@ -46,6 +46,90 @@ namespace netlist
 		{
 			register_alias(plib::pfmt("{1}")(i+1), list[i * 2]);
 			register_alias(plib::pfmt("{1}")(n-i), list[i * 2 + 1]);
+		}
+	}
+
+	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
+		const char * params_and_connections)
+	{
+		auto params(plib::psplit(pstring(params_and_connections), ",", false));
+		for (auto &i : params)
+			i = plib::trim(i);
+		register_dev(classname, name, params);
+	}
+
+	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
+		std::initializer_list<const char *> params_and_connections)
+	{
+		std::vector<pstring> params;
+		for (auto &i : params_and_connections)
+			params.push_back(pstring(i));
+		register_dev(classname, name, params);
+	}
+
+	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
+		const std::vector<pstring> &params_and_connections)
+	{
+		factory::element_t *f = m_setup.factory().factory_by_name(classname);
+		auto paramlist = plib::psplit(f->param_desc(), ",");
+
+		register_dev(classname, name);
+
+		if (params_and_connections.size() > 0)
+		{
+			auto ptok(params_and_connections.begin());
+			auto ptok_end(params_and_connections.end());
+
+			for (const pstring &tp : paramlist)
+			{
+				//printf("x %s %s\n", tp.c_str(), ptok->c_str());
+				if (plib::startsWith(tp, "+"))
+				{
+					if (ptok == ptok_end)
+					{
+						auto err(MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size()));
+						log().fatal(err);
+						plib::pthrow<nl_exception>(err);
+						//break;
+					}
+					pstring output_name = *ptok;
+					log().debug("Link: {1} {2}\n", tp, output_name);
+
+					register_link(name + "." + tp.substr(1), output_name);
+					++ptok;
+				}
+				else if (plib::startsWith(tp, "@"))
+				{
+					pstring term = tp.substr(1);
+					m_setup.log().debug("Link: {1} {2}\n", tp, term);
+
+					register_link(name + "." + term, term);
+				}
+				else
+				{
+					if (ptok == params_and_connections.end())
+					{
+						auto err(MF_PARAM_COUNT_MISMATCH_2(name, params_and_connections.size()));
+						log().fatal(err);
+						plib::pthrow<nl_exception>(err);
+					}
+					pstring paramfq = name + "." + tp;
+
+					log().debug("Defparam: {1}\n", paramfq);
+					// remove quotes
+					if (plib::startsWith(*ptok, "\"") && plib::endsWith(*ptok, "\""))
+						register_param(paramfq, ptok->substr(1, ptok->length() - 2));
+					else
+						register_param(paramfq, *ptok);
+					++ptok;
+				}
+			}
+			if (ptok != params_and_connections.end())
+			{
+				auto err(MF_PARAM_COUNT_EXCEEDED_2(name, params_and_connections.size()));
+				log().fatal(err);
+				plib::pthrow<nl_exception>(err);
+			}
 		}
 	}
 

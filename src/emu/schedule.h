@@ -64,7 +64,7 @@ class emu_timer
 public:
 	// getters
 	emu_timer *next() const { return m_next; }
-	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
+	running_machine &machine() const noexcept { assert(m_machine != nullptr); return *m_machine; }
 	bool enabled() const { return m_enabled; }
 	int param() const { return m_param; }
 	void *ptr() const { return m_ptr; }
@@ -79,8 +79,8 @@ public:
 	void adjust(attotime start_delay, s32 param = 0, const attotime &periodicity = attotime::never);
 
 	// timing queries
-	attotime elapsed() const;
-	attotime remaining() const;
+	attotime elapsed() const noexcept;
+	attotime remaining() const noexcept;
 	attotime start() const { return m_start; }
 	attotime expire() const { return m_expire; }
 	attotime period() const { return m_period; }
@@ -121,10 +121,10 @@ public:
 	~device_scheduler();
 
 	// getters
-	running_machine &machine() const { return m_machine; }
-	attotime time() const;
+	running_machine &machine() const noexcept { return m_machine; }
+	attotime time() const noexcept;
 	emu_timer *first_timer() const { return m_timer_list; }
-	device_execute_interface *currently_executing() const { return m_executing_device; }
+	device_execute_interface *currently_executing() const noexcept { return m_executing_device; }
 	bool can_save() const;
 
 	// execution

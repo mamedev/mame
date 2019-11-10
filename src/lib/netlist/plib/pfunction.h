@@ -72,46 +72,37 @@ namespace plib {
 
 		/// \brief Compile an expression
 		///
-		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		/// \param expr infix or postfix expression. default is infix, postrix
 		///          to be prefixed with rpn, e.g. "rpn:A B + 1.3 /"
+		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile(const std::vector<pstring> &inputs, const pstring &expr);
+		void compile(const pstring &expr, const std::vector<pstring> &inputs);
 
 		/// \brief Compile a rpn expression
 		///
-		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		/// \param expr Reverse polish notation expression, e.g. "A B + 1.3 /"
+		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_postfix(const std::vector<pstring> &inputs, const pstring &expr);
+		void compile_postfix(const pstring &expr, const std::vector<pstring> &inputs);
 
 		/// \brief Compile an infix expression
 		///
-		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		/// \param expr Infix expression, e.g. "(A+B)/1.3"
+		/// \param inputs Vector of input variables, e.g. {"A","B"}
 		///
-		void compile_infix(const std::vector<pstring> &inputs, const pstring &expr);
+		void compile_infix(const pstring &expr, const std::vector<pstring> &inputs);
 
 		/// \brief Evaluate the expression
 		///
 		/// \param values for input variables, e.g. {1.1, 2.2}
 		/// \return value of expression
 		///
-		NT evaluate(const std::vector<NT> &values) noexcept;
+		NT evaluate(const std::vector<NT> &values = std::vector<NT>()) noexcept;
 
 	private:
 
 		void compile_postfix(const std::vector<pstring> &inputs,
 				const std::vector<pstring> &cmds, const pstring &expr);
-
-		NT lfsr_random() noexcept
-		{
-			std::uint16_t lsb = m_lfsr & 1;
-			m_lfsr >>= 1;
-			if (lsb)
-				m_lfsr ^= 0xB400u; // taps 15, 13, 12, 10
-			return static_cast<NT>(m_lfsr) / static_cast<NT>(0xffffu);
-		}
 
 		std::vector<rpn_inst> m_precompiled; //!< precompiled expression
 

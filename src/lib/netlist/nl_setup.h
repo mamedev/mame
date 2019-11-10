@@ -21,7 +21,7 @@
 #include <stack>
 #include <unordered_map>
 #include <vector>
-
+#include <initializer_list>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -36,11 +36,14 @@
 	setup.register_alias(# alias, # name);
 
 #define DIPPINS(pin1, ...)                                                     \
-		setup.register_dippins_arr( # pin1 ", " # __VA_ARGS__);
+		setup.register_dip_alias_arr( # pin1 ", " # __VA_ARGS__);
 
 // to be used to reference new library truthtable devices
 #define NET_REGISTER_DEV(type, name)                                           \
 		setup.register_dev(# type, # name);
+
+#define NET_REGISTER_DEVEXT(type, name, ...)                                   \
+		setup.register_dev(# type, # name, # __VA_ARGS__);
 
 #define NET_CONNECT(name, input, output)                                       \
 		setup.register_link(# name "." # input, # output);
@@ -239,8 +242,16 @@ namespace netlist
 
 		void register_model(const pstring &model_in) { m_models.register_model(model_in); }
 		void register_alias(const pstring &alias, const pstring &out);
-		void register_dippins_arr(const pstring &terms);
+		void register_dip_alias_arr(const pstring &terms);
 		void register_dev(const pstring &classname, const pstring &name);
+		void register_dev(const pstring &classname, const pstring &name,
+			const std::vector<pstring> &params_and_connections);
+
+		void register_dev(const pstring &classname, const pstring &name,
+			std::initializer_list<const char *> params_and_connections);
+		void register_dev(const pstring &classname, const pstring &name,
+			const char *params_and_connections);
+
 		void register_link(const pstring &sin, const pstring &sout);
 		void register_link_arr(const pstring &terms);
 		void register_param(const pstring &param, const pstring &value);

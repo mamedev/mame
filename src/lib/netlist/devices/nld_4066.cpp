@@ -41,7 +41,7 @@ namespace netlist
 	{
 		// Start in off condition
 		// FIXME: is ROFF correct?
-		m_R.set_R(nlconst::one() / exec().gmin());
+		m_R.set_R(plib::reciprocal(exec().gmin()));
 
 	}
 
@@ -56,7 +56,7 @@ namespace netlist
 
 		if (in < low)
 		{
-			R = nlconst::one() / exec().gmin();
+			R = plib::reciprocal(exec().gmin());
 		}
 		else if (in > high)
 		{

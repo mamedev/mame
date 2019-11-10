@@ -438,17 +438,17 @@ READ8_MEMBER(st6228_device::regs_r)
 	return ret;
 }
 
-uint32_t st6228_device::execute_min_cycles() const
+uint32_t st6228_device::execute_min_cycles() const noexcept
 {
 	return 2;
 }
 
-uint32_t st6228_device::execute_max_cycles() const
+uint32_t st6228_device::execute_max_cycles() const noexcept
 {
 	return 5;
 }
 
-uint32_t st6228_device::execute_input_lines() const
+uint32_t st6228_device::execute_input_lines() const noexcept
 {
 	return 0;
 }

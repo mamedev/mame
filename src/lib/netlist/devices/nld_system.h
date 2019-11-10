@@ -28,9 +28,14 @@
 		NET_REGISTER_DEV(ANALOG_INPUT, name)                                    \
 		PARAM(name.IN, v)
 
+#if 0
 #define MAINCLOCK(name, freq)                                                   \
 		NET_REGISTER_DEV(MAINCLOCK, name)                                       \
 		PARAM(name.FREQ, freq)
+#else
+#define MAINCLOCK(name, freq)                                                   \
+		NET_REGISTER_DEVEXT(MAINCLOCK, name, freq)
+#endif
 
 #define CLOCK(name, freq)                                                       \
 		NET_REGISTER_DEV(CLOCK, name)                                           \

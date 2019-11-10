@@ -409,7 +409,7 @@ void device_t::calculate_derived_clock()
 //  clock ticks to an attotime
 //-------------------------------------------------
 
-attotime device_t::clocks_to_attotime(u64 numclocks) const
+attotime device_t::clocks_to_attotime(u64 numclocks) const noexcept
 {
 	if (m_clock == 0)
 		return attotime::never;
@@ -429,7 +429,7 @@ attotime device_t::clocks_to_attotime(u64 numclocks) const
 //  attotime to CPU clock ticks
 //-------------------------------------------------
 
-u64 device_t::attotime_to_clocks(const attotime &duration) const
+u64 device_t::attotime_to_clocks(const attotime &duration) const noexcept
 {
 	if (m_clock == 0)
 		return 0;

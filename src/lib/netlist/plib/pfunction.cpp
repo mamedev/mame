@@ -10,20 +10,21 @@
 #include "putil.h"
 
 #include <stack>
+#include <type_traits>
 
 namespace plib {
 
 	template <typename NT>
-	void pfunction<NT>::compile(const std::vector<pstring> &inputs, const pstring &expr)
+	void pfunction<NT>::compile(const pstring &expr, const std::vector<pstring> &inputs)
 	{
 		if (plib::startsWith(expr, "rpn:"))
-			compile_postfix(inputs, expr.substr(4));
+			compile_postfix(expr.substr(4), inputs);
 		else
-			compile_infix(inputs, expr);
+			compile_infix(expr, inputs);
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile_postfix(const std::vector<pstring> &inputs, const pstring &expr)
+	void pfunction<NT>::compile_postfix(const pstring &expr, const std::vector<pstring> &inputs)
 	{
 		std::vector<pstring> cmds(plib::psplit(expr, " "));
 		compile_postfix(inputs, cmds, expr);
@@ -113,13 +114,61 @@ namespace plib {
 	}
 
 	template <typename NT>
-	void pfunction<NT>::compile_infix(const std::vector<pstring> &inputs, const pstring &expr)
+	void pfunction<NT>::compile_infix(const pstring &expr, const std::vector<pstring> &inputs)
 	{
 		// Shunting-yard infix parsing
 		std::vector<pstring> sep = {"(", ")", ",", "*", "/", "+", "-", "^"};
-		std::vector<pstring> sexpr(plib::psplit(plib::replace_all(expr, " ", ""), sep));
+		std::vector<pstring> sexpr1(plib::psplit(plib::replace_all(expr, " ", ""), sep));
 		std::stack<pstring> opstk;
 		std::vector<pstring> postfix;
+		std::vector<pstring> sexpr;
+
+		// FIXME: We really need to switch to ptokenizer and fix negative number
+		//        handling in ptokenizer.
+
+		// Fix numbers
+		for (std::size_t i = 0; i < sexpr1.size(); )
+		{
+			if ((i == 0) && (sexpr1.size() > 1) && (sexpr1[0] == "-")
+				&& (plib::left(sexpr1[1],1) >= "0") && (plib::left(sexpr1[1],1) <= "9"))
+			{
+				if (sexpr1.size() < 4)
+				{
+					sexpr.push_back(sexpr1[0] + sexpr1[1]);
+					i+=2;
+				}
+				else
+				{
+					auto r(plib::right(sexpr1[1], 1));
+					auto ne(sexpr1[2]);
+					if ((r == "e" || r == "E") && (ne == "-" || ne == "+"))
+					{
+						sexpr.push_back(sexpr1[0] + sexpr1[1] + ne + sexpr1[3]);
+						i+=4;
+					}
+					else
+					{
+						sexpr.push_back(sexpr1[0] + sexpr1[1]);
+						i+=2;
+					}
+				}
+			}
+			else if (i + 2 < sexpr1.size() && sexpr1[i].length() > 1)
+			{
+				auto l(plib::left(sexpr1[i], 1));
+				auto r(plib::right(sexpr1[i], 1));
+				auto ne(sexpr1[i+1]);
+				if ((l >= "0") && (l <= "9") && (r == "e" || r == "E") && (ne == "-" || ne == "+"))
+				{
+					sexpr.push_back(sexpr1[i] + ne + sexpr1[i+2]);
+					i+=3;
+				}
+				else
+					sexpr.push_back(sexpr1[i++]);
+			}
+			else
+				sexpr.push_back(sexpr1[i++]);
+		}
 
 		for (std::size_t i = 0; i < sexpr.size(); i++)
 		{
@@ -176,9 +225,33 @@ namespace plib {
 			postfix.push_back(opstk.top());
 			opstk.pop();
 		}
+		//printf("e : %s\n", expr.c_str());
+		//for (auto &s : postfix)
+		//	printf("x : %s\n", s.c_str());
 		compile_postfix(inputs, postfix, expr);
 	}
 
+	template <typename NT>
+	static inline typename std::enable_if<std::is_floating_point<NT>::value, NT>::type
+	lfsr_random(std::uint16_t &lfsr) noexcept
+	{
+		std::uint16_t lsb = lfsr & 1;
+		lfsr >>= 1;
+		if (lsb)
+			lfsr ^= 0xB400u; // taps 15, 13, 12, 10
+		return static_cast<NT>(lfsr) / static_cast<NT>(0xffffu);
+	}
+
+	template <typename NT>
+	static inline typename std::enable_if<std::is_integral<NT>::value, NT>::type
+	lfsr_random(std::uint16_t &lfsr) noexcept
+	{
+		std::uint16_t lsb = lfsr & 1;
+		lfsr >>= 1;
+		if (lsb)
+			lfsr ^= 0xB400u; // taps 15, 13, 12, 10
+		return static_cast<NT>(lfsr);
+	}
 
 	#define ST1 stack[ptr]
 	#define ST2 stack[ptr-1]
@@ -208,7 +281,7 @@ namespace plib {
 				OP(COS,  0, plib::cos(ST2))
 				OP(TRUNC,  0, plib::trunc(ST2))
 				case RAND:
-					stack[ptr++] = lfsr_random();
+					stack[ptr++] = lfsr_random<NT>(m_lfsr);
 					break;
 				case PUSH_INPUT:
 					stack[ptr++] = values[static_cast<unsigned>(rc.m_param)];

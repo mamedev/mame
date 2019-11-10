@@ -5,7 +5,7 @@
 #define NLID_TWOTERM_H_
 
 ///
-/// \file nld_twoterm.h
+/// \file nlid_twoterm.h
 ///
 /// Devices with two terminals ...
 ///
@@ -124,9 +124,9 @@ namespace analog
 		{
 		}
 
-		void set_R(const nl_fptype R)
+		void set_R(nl_fptype R)
 		{
-			const nl_fptype G = nlconst::one() / R;
+			const nl_fptype G = plib::reciprocal(R);
 			set_mat( G, -G, nlconst::zero(),
 					-G,  G, nlconst::zero());
 		}
@@ -398,7 +398,7 @@ namespace analog
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
+				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")
@@ -447,7 +447,7 @@ namespace analog
 			register_subalias("P", m_P);
 			register_subalias("N", m_N);
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
+				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 		}
 
 		NETLIB_IS_TIMESTEP(m_func() != "")

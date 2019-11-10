@@ -14,6 +14,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <initializer_list>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
