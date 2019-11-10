@@ -165,6 +165,7 @@
 #include "speaker.h"
 
 #include "pvmil.lh"
+#include "sentx6p.lh"
 
 class spg2xx_game_state : public driver_device
 {
@@ -193,7 +194,6 @@ public:
 	void non_spg_base(machine_config &config);
 	void lexizeus(machine_config &config);
 	void taikeegr(machine_config &config);
-	void sentx6p(machine_config &config);
 
 	void init_crc();
 	void init_zeus();
@@ -217,7 +217,7 @@ protected:
 	DECLARE_READ16_MEMBER(rad_porta_r);
 	DECLARE_READ16_MEMBER(rad_portb_r);
 	DECLARE_READ16_MEMBER(rad_portc_r);
-	
+
 	DECLARE_WRITE16_MEMBER(jakks_porta_w);
 	DECLARE_WRITE16_MEMBER(jakks_portb_w);
 
@@ -232,7 +232,6 @@ protected:
 	virtual void mem_map_2m(address_map &map);
 	virtual void mem_map_1m(address_map &map);
 
-	void mem_map_2m_texas(address_map &map);
 
 
 	uint32_t m_current_bank;
@@ -281,6 +280,88 @@ private:
 	uint16_t m_outdat;
 	required_ioport m_p4inputs;
 	output_finder<4> m_leds;
+};
+
+
+class sentx6p_state : public spg2xx_game_state
+{
+public:
+	sentx6p_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_porta_data(0x0000),
+		m_suite1(*this, "SUITE_LEFT_BZ%u", 0U),
+		m_suite2(*this, "SUITE_RIGHT_BZ%u", 0U),
+		m_number1(*this, "NUMBER_LEFT_BZ%u", 0U),
+		m_number2(*this, "NUMBER_RIGHT_BZ%u", 0U),
+		m_select_fold(*this, "SELECT_FOLD_BZ%u", 0U),
+		m_select_check(*this, "SELECT_CHECK_BZ%u", 0U),
+		m_select_bet(*this, "SELECT_BET_BZ%u", 0U),
+		m_select_call(*this, "SELECT_CALL_BZ%u", 0U),
+		m_select_raise(*this, "SELECT_RAISE_BZ%u", 0U),
+		m_select_allin(*this, "SELECT_ALLIN_BZ%u", 0U),
+		m_option_fold(*this, "OPTION_FOLD_BZ%u", 0U),
+		m_option_check(*this, "OPTION_CHECK_BZ%u", 0U),
+		m_option_bet(*this, "OPTION_BET_BZ%u", 0U),
+		m_option_call(*this, "OPTION_CALL_BZ%u", 0U),
+		m_option_raise(*this, "OPTION_RAISE_BZ%u", 0U),
+		m_option_allin(*this, "OPTION_ALLIN_BZ%u", 0U),
+
+		m_led(*this, "LED_BZ%u", 0U)
+	{ }
+
+	void sentx6p(machine_config &config);
+
+	void mem_map_2m_texas(address_map &map);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+private:
+	READ16_MEMBER(sentx_porta_r);
+	READ16_MEMBER(sentx_portb_r);
+	READ16_MEMBER(sentx_portc_r);
+
+	DECLARE_WRITE16_MEMBER(sentx_porta_w);
+	DECLARE_WRITE16_MEMBER(sentx_portb_w);
+	DECLARE_WRITE16_MEMBER(sentx_portc_w);
+
+	DECLARE_WRITE8_MEMBER(sentx_tx_w);
+
+	uint8_t m_lcd_card1[6];
+	uint8_t m_lcd_card2[6];
+	uint8_t m_lcd_options[6];
+	uint8_t m_lcd_options_select[6];
+	uint8_t m_lcd_led[6];
+
+	void set_card1(uint8_t value, int select_bits);
+	void set_card2(uint8_t value, int select_bits);
+	void set_options(uint8_t value, int select_bits);
+	void set_options_select(uint8_t value, int select_bits);
+	void set_controller_led(uint8_t value, int select_bits);
+
+	uint16_t m_porta_data;
+
+	output_finder<6> m_suite1;
+	output_finder<6> m_suite2;
+	output_finder<6> m_number1;
+	output_finder<6> m_number2;
+
+	output_finder<6> m_select_fold;
+	output_finder<6> m_select_check;
+	output_finder<6> m_select_bet;
+	output_finder<6> m_select_call;
+	output_finder<6> m_select_raise;
+	output_finder<6> m_select_allin;
+
+	output_finder<6> m_option_fold;
+	output_finder<6> m_option_check;
+	output_finder<6> m_option_bet;
+	output_finder<6> m_option_call;
+	output_finder<6> m_option_raise;
+	output_finder<6> m_option_allin;
+
+	output_finder<6> m_led;
 };
 
 class jakks_gkr_state : public spg2xx_game_state
@@ -777,7 +858,7 @@ void spg2xx_game_state::mem_map_2m(address_map &map)
 	map(0x000000, 0x1fffff).mirror(0x200000).bankr("cartbank");
 }
 
-void spg2xx_game_state::mem_map_2m_texas(address_map &map)
+void sentx6p_state::mem_map_2m_texas(address_map &map)
 {
 	map(0x000000, 0x1fffff).bankr("cartbank");
 	map(0x3f0000, 0x3f7fff).ram();
@@ -1943,9 +2024,9 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Low Battery" )
-	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Low Battery" )  // NOT just a battery sensor, actually needs to be high (On) in order for it to attempt to read any controllers on startup, otherwise it will hang after the VS MAXX logo with no way forward.
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_START("P2")
 	// these must be sense lines
@@ -2021,8 +2102,8 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Console Select")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Console Ok")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_5) PORT_NAME("Console Select") // the Console buttons also work for Player 1
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_1) PORT_NAME("Console Ok")
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -2044,6 +2125,32 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	// these are presuambly read through the UART as the LCD screens are driven by it, currently not hooked up
+	PORT_START("CTRL1")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_START("CTRL2")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("CTRL3")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+
+	PORT_START("CTRL4")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+
+	PORT_START("CTRL5")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(5)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(5)
+
+	PORT_START("CTRL6")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(6)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(6)
+
 INPUT_PORTS_END
 
 
@@ -2785,20 +2892,319 @@ void spg2xx_game_state::taikeegr(machine_config &config)
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
 }
 
+void sentx6p_state::machine_start()
+{
+	spg2xx_game_state::machine_start();
 
-void spg2xx_game_state::sentx6p(machine_config &config)
+	m_suite1.resolve();
+	m_suite2.resolve();
+	m_number1.resolve();
+	m_number2.resolve();
+
+	m_select_fold.resolve();
+	m_select_check.resolve();
+	m_select_bet.resolve();
+	m_select_call.resolve();
+	m_select_raise.resolve();
+	m_select_allin.resolve();
+
+	m_option_fold.resolve();
+	m_option_check.resolve();
+	m_option_bet.resolve();
+	m_option_call.resolve();
+	m_option_raise.resolve();
+	m_option_allin.resolve();
+
+	m_led.resolve();
+}
+
+void sentx6p_state::machine_reset()
+{
+	spg2xx_game_state::machine_reset();
+
+	for (int i = 0; i < 6; i++)
+	{
+		m_lcd_card1[i] = 0x00;
+		m_lcd_card2[i] = 0x00;
+		m_lcd_options[i] = 0x00;
+		m_lcd_options_select[i] = 0x00;
+		m_lcd_led[i] = 0x00;
+	}
+}
+
+READ16_MEMBER(sentx6p_state::sentx_porta_r)
+{
+	int select_bits = (m_porta_data >> 8) & 0x3f;
+	logerror("%s: sentx_porta_r (with controller select bits %02x)\n", machine().describe_context(), select_bits);
+
+	/* 0000 = no controller? (system buttons only?)
+	   0100 = controller 1?
+	   0200 = controller 2?
+	   0400 = controller 3?
+	   0800 = controller 4?
+	   1000 = controller 5?
+	   2000 = controller 6?
+
+	   this is an assumption based on startup, where the port is polled after writing those values
+	*/
+
+	// the code around 029811 uses a ram value shifted left 8 times as the select bits (select_bits) on write
+	// then does a mask with them on the reads from this port, without shifting, comparing with 0
+	uint16_t ret = (m_io_p1->read() & 0xffc0) | select_bits;
+
+	//if (select_bits == 0x00)
+	//  ret |= 0x8000;
+	//else
+	//  ret &= ~0x8000;
+
+	return ret;
+}
+
+READ16_MEMBER(sentx6p_state::sentx_portb_r)
+{
+	return m_io_p2->read();
+}
+
+READ16_MEMBER(sentx6p_state::sentx_portc_r)
+{
+	return m_io_p3->read();
+}
+
+WRITE16_MEMBER(sentx6p_state::sentx_porta_w)
+{
+	logerror("%s: sentx_porta_w %04x\n", machine().describe_context(), data);
+
+	COMBINE_DATA(&m_porta_data);
+}
+
+WRITE16_MEMBER(sentx6p_state::sentx_portb_w)
+{
+	logerror("%s: sentx_portb_w %04x\n", machine().describe_context(), data);
+}
+
+WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
+{
+	logerror("%s: sentx_portc_w %04x\n", machine().describe_context(), data);
+}
+
+/*
+    Card Table
+    (the controller must contain an MCU under the glob to receive thes commands
+     and convert them to actual LCD segments)
+
+         off      00
+    | A  diamonds 01 | A  hearts 0e   | A  spades 1b  | A  clubs 28 |
+    | 2  diamonds 02 | 2  hearts 0f   | 2  spades 1c  | 2  clubs 29 |
+    | 3  diamonds 03 | 3  hearts 10   | 3  spades 1d  | 3  clubs 2a |
+    | 4  diamonds 04 | 4  hearts 11   | 4  spades 1e  | 4  clubs 2b |
+    | 5  diamonds 05 | 5  hearts 12   | 5  spades 1f  | 5  clubs 2c |
+    | 6  diamonds 06 | 6  hearts 13   | 6  spades 20  | 6  clubs 2d |
+    | 7  diamonds 07 | 7  hearts 14   | 7  spades 21  | 7  clubs 2e |
+    | 8  diamonds 08 | 8  hearts 15   | 8  spades 22  | 8  clubs 2f |
+    | 9  diamonds 09 | 9  hearts 16   | 9  spades 23  | 9  clubs 30 |
+    | 10 diamonds 0a | 10 hearts 17   | 10 spades 24  | 10 clubs 31 |
+    | J  diamonds 0b | J  hearts 18   | J  spades 25  | J  clubs 32 |
+    | Q  diamonds 0c | Q  hearts 19   | Q  spades 26  | Q  clubs 33 |
+    | K  diamonds 0d | K  hearts 1a   | K  spades 27  | K  clubs 34 |
+
+*/
+
+void sentx6p_state::set_card1(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_card1[i] = value;
+
+			int val = m_lcd_card1[i];
+			if (val == 0)
+			{
+				m_suite1[i] = 0;
+				m_number1[i] = 0;
+			}
+			else
+			{
+				int suite = (val-1) / 13;
+				int number = (val-1) % 13;
+
+				m_suite1[i] = suite+1;
+				m_number1[i] = number+1;
+			}
+		}
+	}
+}
+
+void sentx6p_state::set_card2(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_card2[i] = value;
+
+			int val = m_lcd_card2[i];
+			if (val == 0)
+			{
+				m_suite2[i] = 0;
+				m_number2[i] = 0;
+			}
+			else
+			{
+				int suite = (val-1) / 13;
+				int number = (val-1) % 13;
+
+				m_suite2[i] = suite+1;
+				m_number2[i] = number+1;
+			}
+		}
+	}
+}
+
+void sentx6p_state::set_options(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_options[i] = value;
+
+			// assume same mapping as selector bit below
+			m_option_fold[i] =  (value & 0x01) ? 1 : 0;
+			m_option_check[i] = (value & 0x02) ? 1 : 0;
+			m_option_bet[i] =   (value & 0x04) ? 1 : 0;
+			m_option_call[i] =  (value & 0x08) ? 1 : 0;
+			m_option_raise[i] = (value & 0x10) ? 1 : 0;
+			m_option_allin[i] = (value & 0x20) ? 1 : 0;
+		}
+	}
+}
+
+/*
+    c0 = no selection highlight (00)
+    c1 = fold selected (01)
+    c2 = check selected (02)
+    c4 = bet selected (04)
+    c8 = call selected (08)
+    d0 = raise selected (10)
+    e0 = all in selected (20)
+*/
+
+void sentx6p_state::set_options_select(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_options_select[i] = value;
+
+			m_select_fold[i] =  (value & 0x01) ? 1 : 0;
+			m_select_check[i] = (value & 0x02) ? 1 : 0;
+			m_select_bet[i] =   (value & 0x04) ? 1 : 0;
+			m_select_call[i] =  (value & 0x08) ? 1 : 0;
+			m_select_raise[i] = (value & 0x10) ? 1 : 0;
+			m_select_allin[i] = (value & 0x20) ? 1 : 0;
+		}
+	}
+}
+
+
+
+void sentx6p_state::set_controller_led(uint8_t value, int select_bits)
+{
+	for (int i = 0; i < 6; i++)
+	{
+		if (select_bits & (1 << i))
+		{
+			m_lcd_led[i] = value;
+
+			m_led[i] = value ^ 1;
+		}
+	}
+}
+
+WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
+{
+	int select_bits = (m_porta_data >> 8) & 0x3f;
+
+	// TX function is at 0x029773
+	// starts by writing controller select, then checking if controller is selected, then transmits data
+
+	// RX function is at 0x029811
+	// similar logic to write controller ID, check if selected, then recieve data
+
+	switch (data)
+	{
+	case 0x00: // card 1 off
+	case 0x01: case 0x02: case 0x03: case 0x04: case 0x05: case 0x06: case 0x07: case 0x08: case 0x09: case 0x0a: case 0x0b: case 0x0c: case 0x0d: // card 1 show Diamonds A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x0e: case 0x0f: case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17: case 0x18: case 0x19: case 0x1a: // card 1 show Hearts   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // card 1 show Spades   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f: case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: // card 1 show Clubs    A,2,3,4,5,6,7,8,10,J,Q,K
+		set_card1(data & 0x3f, select_bits);
+		break;
+
+	case 0x40: // card 2 off
+	case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: // card 1 show Diamonds A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x4e: case 0x4f: case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: case 0x58: case 0x59: case 0x5a: // card 1 show Hearts   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f: case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // card 1 show Spades   A,2,3,4,5,6,7,8,10,J,Q,K
+	case 0x68: case 0x69: case 0x6a: case 0x6b: case 0x6c: case 0x6d: case 0x6e: case 0x6f: case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: // card 1 show Clubs    A,2,3,4,5,6,7,8,10,J,Q,K
+		set_card2(data & 0x3f, select_bits);
+		break;
+
+	case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87: case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f: // show selection options
+	case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97: case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
+	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7: case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
+	case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7: case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
+		set_options(data & 0x3f, select_bits);
+		break;
+
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7: case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf: // show selection cursor
+	case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7: case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde: case 0xdf:
+	case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7: case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee: case 0xef:
+	case 0xf0: case 0xf1: case 0xf2: case 0xf3: case 0xf4: case 0xf5: case 0xf6: case 0xf7: case 0xf8: case 0xf9: case 0xfa: case 0xfb: case 0xfc: case 0xfd: case 0xfe: case 0xff:
+		set_options_select(data & 0x3f, select_bits);
+		break;
+
+	case 0x38:
+	case 0x39:
+		set_controller_led(data & 0x01, select_bits);
+		break;
+
+	case 0x3a:
+		// reset controller?
+		break;
+
+	default:
+		printf("unknown LCD command %02x with controller select %02x\n", data, select_bits);
+		break;
+	}
+
+}
+
+
+
+
+void sentx6p_state::sentx6p(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_state::mem_map_2m_texas);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sentx6p_state::mem_map_2m_texas);
 	m_maincpu->set_pal(true);
 
 	spg2xx_base(config);
 
 	m_screen->set_refresh_hz(50);
 
-	m_maincpu->porta_in().set_ioport("P1");
-	m_maincpu->portb_in().set_ioport("P2");
-	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->porta_in().set(FUNC(sentx6p_state::sentx_porta_r));
+	m_maincpu->portb_in().set(FUNC(sentx6p_state::sentx_portb_r));
+	m_maincpu->portc_in().set(FUNC(sentx6p_state::sentx_portc_r));
+
+	m_maincpu->porta_out().set(FUNC(sentx6p_state::sentx_porta_w));
+	m_maincpu->portb_out().set(FUNC(sentx6p_state::sentx_portb_w));
+	m_maincpu->portc_out().set(FUNC(sentx6p_state::sentx_portc_w));
+
+	m_maincpu->uart_tx().set(FUNC(sentx6p_state::sentx_tx_w));
+
+	config.set_default_layout(layout_sentx6p);
 }
 
 
@@ -3014,6 +3420,9 @@ ROM_END
 
 ROM_START( sentx6p )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	// chksum:05B58350 is @ 0x3000.
+	// This is the correct sum of 0x3010 - 0x1fffff (the first half of the ROM area after the checksum string)
+	// The 2nd half is not summed (and not used by the game?) but definitely exists in ROM (same data on 2 units)
 	ROM_LOAD16_WORD_SWAP( "senario texas holdem.bin", 0x000000, 0x400000, CRC(7c7d2d33) SHA1(71631074ba66e3b0cdeb86ebca3931599f3a911c) )
 ROM_END
 
@@ -3186,4 +3595,5 @@ CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_st
 
 // "go 02d1d0" "do r1 = ff" to get past initial screen
 // a 'deluxe' version of this also exists with extra game modes
-CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, spg2xx_game_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+
