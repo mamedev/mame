@@ -1132,6 +1132,30 @@ ROM_START( zdsupers )
 	ROMX_LOAD("z184m v2.9e.10d", 0x8000, 0x8000, CRC(de2f200b) SHA1(ad5ce601669a82351e412fc6c1c70c47779a1e55), ROM_BIOS(1))
 ROM_END
 
+/****************************************************** Zenith Z-150 series ***
+
+Form factor: Desktop
+
+******************************************************************************/
+
+ROM_START( zdz150 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("444-260-18.bin", 0x8000, 0x4000, CRC(685208fe) SHA1(a1384627e8ecfd93842f6eabda4a417dd92be6df))
+	ROM_LOAD("444-229-18.bin", 0xc000, 0x4000, CRC(a6078b8a) SHA1(9a970013f5109a5003365eb2923cc26f08516dcb))
+ROM_END
+
+/****************************************************** Zenith Z-160 series ***
+
+Form factor: (Trans-)Portable
+
+******************************************************************************/
+
+ROM_START( zdz160 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(46dd9695) SHA1(beaf6b45cecdadf630a94902fa84006bf00e2b3d))
+ROM_END
+
+
 /************************************************************** CompuAdd 810 **
 
 http://mkgraham.dx.am/810.html
@@ -1397,3 +1421,5 @@ COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )
 COMP( 1987, zdsupers,       ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "SuperSport",            0 )
+COMP( 198?, zdz150,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-150 series",          0 )
+COMP( 198?, zdz160,         ibm5150, 0,      zenith,         pccga,    pc_state, empty_init,    "Zenith Data Systems",             "Z-160 series",          0 )

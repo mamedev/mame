@@ -31838,7 +31838,9 @@ poisk2                          //
 sicpc1605                       // Siemens Sicomp PC16-05
 ssam88s                         //
 sx16                            // Sanyo SX-16
-zdsupers                        //
+zdsupers                        // Zenith SuperSport
+zdz150                          // Zenith Z-150 series
+zdz160                          // Zenith Z-160 series
 ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
