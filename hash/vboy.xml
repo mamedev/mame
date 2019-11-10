@@ -453,7 +453,7 @@ According to Planet Virtual Boy, the following undumped protos exist
 			<dataarea name="rom" size="2097152" width="32" endianness="little">
 				<rom name="virtual boy wario land (japan, usa).bin" size="2097152" crc="133e9372" sha1="274c328fbd904f20e69172ab826bf8f94ced1bdb" offset="000000" />
 			</dataarea>
-			<dataarea name="sram" size="0x10000" width="16" endianness="little">
+			<dataarea name="sram" size="8192" width="8" endianness="little">
 			</dataarea>
 		</part>
 	</software>

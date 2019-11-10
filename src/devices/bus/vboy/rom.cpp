@@ -132,6 +132,9 @@ image_init_result vboy_flat_rom_sram_device::load()
 							chip_space()->install_readwrite_handler(
 									begin,
 									end,
+									0,
+									mirror,
+									0,
 									read8sm_delegate(*this, NAME([base] (offs_t offset) { return base[offset]; })),
 									write8sm_delegate(*this, NAME([base] (offs_t offset, u8 data) { base[offset] = data; })),
 									0x00ff'00ff);
@@ -162,6 +165,9 @@ image_init_result vboy_flat_rom_sram_device::load()
 							chip_space()->install_readwrite_handler(
 									begin,
 									end,
+									0,
+									mirror,
+									0,
 									read16s_delegate(*this, NAME([base] (offs_t offset, u16 mem_mask) { return base[offset]; })),
 									write16s_delegate(*this, NAME([base] (offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(base + offset); })),
 									0xffff'ffff);
