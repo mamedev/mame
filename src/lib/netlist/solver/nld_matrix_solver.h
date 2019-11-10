@@ -38,20 +38,12 @@ namespace solver
 		GMRES
 	)
 
-#if (NL_USE_FLOAT128)
 	P_ENUM(matrix_fp_type_e,
 		  FLOAT
 		, DOUBLE
 		, LONGDOUBLE
 		, FLOAT128
 	)
-#else
-	P_ENUM(matrix_fp_type_e,
-		  FLOAT
-		, DOUBLE
-		, LONGDOUBLE
-	)
-#endif
 
 	struct solver_parameters_t
 	{

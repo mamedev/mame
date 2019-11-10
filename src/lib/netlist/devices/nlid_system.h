@@ -1,15 +1,11 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
-/*
- * nlid_system.h
- *
- * netlist devices defined in the core
- *
- * This file contains internal headers
- */
-
 #ifndef NLID_SYSTEM_H_
 #define NLID_SYSTEM_H_
+
+///
+/// \file nlid_system.h
+///
 
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/nl_base.h"
@@ -44,6 +40,7 @@ namespace devices
 		param_num_t<unsigned>   m_max_link_loops;
 	};
 
+#if 0
 	// -----------------------------------------------------------------------------
 	// mainclock
 	// -----------------------------------------------------------------------------
@@ -81,7 +78,7 @@ namespace devices
 	private:
 		param_fp_t m_freq;
 	};
-
+#endif
 	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
@@ -228,7 +225,7 @@ namespace devices
 		NETLIB_CONSTRUCTOR(logic_input)
 		, m_Q(*this, "Q")
 		, m_IN(*this, "IN", false)
-		/* make sure we get the family first */
+		// make sure we get the family first
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
 		{
 			set_logic_family(state().setup().family_from_model(m_FAMILY()));
@@ -342,7 +339,7 @@ namespace devices
 
 	private:
 		analog::NETLIB_NAME(twoterm) m_RIN;
-		/* Fixme: only works if the device is time-stepped - need to rework */
+		// Fixme: only works if the device is time-stepped - need to rework
 		analog::NETLIB_NAME(twoterm) m_ROUT;
 		analog_input_t m_I;
 		analog_output_t m_Q;
@@ -456,10 +453,10 @@ namespace devices
 	// power pins - not a device, but a helper
 	// -----------------------------------------------------------------------------
 
-	/**
-	 * Power Pins are passive inputs. Delegate noop will silently ignore any
-	 * updates.
-	 */
+	/// \brief Power pins class.
+	///
+	/// Power Pins are passive inputs. Delegate noop will silently ignore any
+	/// updates.
 	class nld_power_pins
 	{
 	public:
@@ -479,7 +476,7 @@ namespace devices
 			}
 		}
 
-		/* FIXME: this will seg-fault if force_analog_input = false */
+		// FIXME: this will seg-fault if force_analog_input = false
 		nl_fptype VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
 		nl_fptype GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
 
@@ -494,4 +491,4 @@ namespace devices
 } // namespace devices
 } // namespace netlist
 
-#endif /* NLD_SYSTEM_H_ */
+#endif // NLD_SYSTEM_H_

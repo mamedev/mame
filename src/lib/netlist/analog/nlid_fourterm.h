@@ -128,7 +128,7 @@ namespace analog {
 	public:
 		NETLIB_CONSTRUCTOR_DERIVED(CCCS, VCCS)
 		{
-			m_gfac = nlconst::one() / m_RI();
+			m_gfac = plib::reciprocal(m_RI());
 		}
 
 		NETLIB_RESETI();

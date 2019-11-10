@@ -55,7 +55,7 @@ namespace analog
 	/// |:---:|------|-----------------------------------------------------------------------|-------|---------:|----------------:|:----:|
 	/// |  Y  | IS   | transport saturation current                                          | A     |   1E-016 |          1E-015 |   *  |
 	/// |  Y  | BF   | ideal maximum forward beta                                            | -     |      100 |             100 |      |
-	/// | Y  | NF   | forward current emission coefficient                                  | -     |        1 |               1 |      |
+	/// |  Y  | NF   | forward current emission coefficient                                  | -     |        1 |               1 |      |
 	/// |     | VAF  | forward Early voltage                                                 | V     | infinite |             200 |      |
 	/// |     | IKF  | corner for forward beta high current roll-off                         | A     | infinite |            0.01 |   *  |
 	/// |     | ISE  | B-E leakage saturation current                                        | A     |        0 | 0.0000000000001 |   *  |

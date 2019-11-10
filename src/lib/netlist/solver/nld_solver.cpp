@@ -329,19 +329,29 @@ namespace devices
 			switch (m_params.m_fp_type())
 			{
 				case solver::matrix_fp_type_e::FLOAT:
+#if (NL_USE_FLOAT_MATRIX)
 					ms = create_solvers<float>(sname, grp);
+#else
+					ms = create_solvers<double>(sname, grp);
+#endif
 					break;
 				case solver::matrix_fp_type_e::DOUBLE:
 					ms = create_solvers<double>(sname, grp);
 					break;
 				case solver::matrix_fp_type_e::LONGDOUBLE:
+#if (NL_USE_LONG_DOUBLE_MATRIX)
 					ms = create_solvers<long double>(sname, grp);
-					break;
-#if (NL_USE_FLOAT128)
-				case solver::matrix_fp_type_e::FLOAT128:
-					ms = create_solvers<__float128>(sname, grp);
-					break;
+#else
+					ms = create_solvers<double>(sname, grp);
 #endif
+					break;
+				case solver::matrix_fp_type_e::FLOAT128:
+#if (NL_USE_FLOAT128)
+					ms = create_solvers<__float128>(sname, grp);
+#else
+					ms = create_solvers<double>(sname, grp);
+#endif
+					break;
 			}
 
 			log().verbose("Solver {1}", ms->name());

@@ -38,7 +38,7 @@ namespace netlist { namespace devices {
 
 	NETLIB_RESET(CD4316_GATE)
 	{
-		m_R.set_R(nlconst::one() / exec().gmin());
+		m_R.set_R(plib::reciprocal(exec().gmin()));
 	}
 
 	NETLIB_UPDATE(CD4316_GATE)
@@ -47,7 +47,7 @@ namespace netlist { namespace devices {
 		if (m_S() && !m_E())
 			m_R.set_R(m_base_r());
 		else
-			m_R.set_R(nlconst::one() / exec().gmin());
+			m_R.set_R(plib::reciprocal(exec().gmin()));
 		m_R.solve_later(NLTIME_FROM_NS(1));
 	}
 

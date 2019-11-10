@@ -161,7 +161,7 @@ namespace netlist
 		if (m_VCCHack)
 			m_VCCHack->initial(supply_V);
 		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
-		m_RN.set_G_V_I(nlconst::one() / logic_family()->R_low(),
+		m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
 				logic_family()->low_offset_V(), nlconst::zero());
 		m_RP.set_G_V_I(G_OFF,
 			nlconst::zero(),
@@ -183,12 +183,12 @@ namespace netlist
 				m_RN.set_G_V_I(G_OFF,
 					nlconst::zero(),
 					nlconst::zero());
-				m_RP.set_G_V_I(nlconst::one() / logic_family()->R_high(),
+				m_RP.set_G_V_I(plib::reciprocal(logic_family()->R_high()),
 						logic_family()->high_offset_V(), nlconst::zero());
 			}
 			else
 			{
-				m_RN.set_G_V_I(nlconst::one() / logic_family()->R_low(),
+				m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
 						logic_family()->low_offset_V(), nlconst::zero());
 				m_RP.set_G_V_I(G_OFF,
 					nlconst::zero(),

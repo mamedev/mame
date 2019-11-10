@@ -256,6 +256,7 @@ namespace netlist
 		ENTRY(PUSE_ALIGNED_OPTIMIZATIONS)
 		ENTRY(PHAS_OPENMP)
 		ENTRY(PUSE_OPENMP)
+		ENTRY(PUSE_FLOAT128)
 		ENTRY(PPMF_TYPE)
 		ENTRY(PHAS_PMF_INTERNAL)
 		ENTRY(NL_USE_MEMPOOL)
@@ -263,6 +264,9 @@ namespace netlist
 		ENTRY(NL_USE_COPY_INSTEAD_OF_REFERENCE)
 		ENTRY(NL_USE_TRUTHTABLE_7448)
 		ENTRY(NL_AUTO_DEVICES)
+		ENTRY(NL_USE_FLOAT128)
+		ENTRY(NL_USE_FLOAT_MATRIX)
+		ENTRY(NL_USE_LONG_DOUBLE_MATRIX)
 		ENTRY(NL_DEBUG)
 		ENTRY(NVCCBUILD)
 
@@ -350,14 +354,14 @@ namespace netlist
 				log().verbose("Using default startup strategy");
 				for (auto &n : m_nets)
 					for (auto & term : n->core_terms())
-						if (term->m_delegate.has_object())
+						if (term->delegate().has_object())
 						{
-							if (!plib::container::contains(t, &term->m_delegate))
+							if (!plib::container::contains(t, &term->delegate()))
 							{
-								t.push_back(&term->m_delegate);
-								term->m_delegate();
+								t.push_back(&term->delegate());
+								term->run_delegate();
 							}
-							auto *dev = reinterpret_cast<core_device_t *>(term->m_delegate.object());
+							auto *dev = reinterpret_cast<core_device_t *>(term->delegate().object());
 							if (!plib::container::contains(d, dev))
 								d.push_back(dev);
 						}
@@ -536,8 +540,8 @@ namespace netlist
 
 	void core_device_t::set_default_delegate(detail::core_terminal_t &term)
 	{
-		if (!term.m_delegate.is_set())
-			term.m_delegate.set(&core_device_t::update, this);
+		if (!term.delegate().is_set())
+			term.set_delegate(nldelegate(&core_device_t::update, this));
 	}
 
 	log_type & core_device_t::log()
@@ -632,14 +636,14 @@ namespace netlist
 	// net_t
 	// ----------------------------------------------------------------------------------------
 
-	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *mr)
+	detail::net_t::net_t(netlist_state_t &nl, const pstring &aname, core_terminal_t *railterminal)
 		: object_t(aname)
 		, netlist_ref(nl)
 		, m_new_Q(*this, "m_new_Q", 0)
 		, m_cur_Q (*this, "m_cur_Q", 0)
 		, m_in_queue(*this, "m_in_queue", queue_status::DELIVERED)
 		, m_next_scheduled_time(*this, "m_time", netlist_time::zero())
-		, m_railterminal(mr)
+		, m_railterminal(railterminal)
 	{
 	}
 
@@ -721,8 +725,8 @@ namespace netlist
 	// logic_net_t
 	// ----------------------------------------------------------------------------------------
 
-	logic_net_t::logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr)
-		: net_t(nl, aname, mr)
+	logic_net_t::logic_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal)
+		: net_t(nl, aname, railterminal)
 	{
 	}
 
@@ -730,8 +734,8 @@ namespace netlist
 	// analog_net_t
 	// ----------------------------------------------------------------------------------------
 
-	analog_net_t::analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *mr)
-		: net_t(nl, aname, mr)
+	analog_net_t::analog_net_t(netlist_state_t &nl, const pstring &aname, detail::core_terminal_t *railterminal)
+		: net_t(nl, aname, railterminal)
 		, m_cur_Analog(*this, "m_cur_Analog", nlconst::zero())
 		, m_solver(nullptr)
 	{
@@ -745,10 +749,10 @@ namespace netlist
 			const state_e state, nldelegate delegate)
 	: device_object_t(dev, dev.name() + "." + aname)
 	, plib::linkedlist_t<core_terminal_t>::element_t()
-	, m_delegate(delegate)
 	#if NL_USE_COPY_INSTEAD_OF_REFERENCE
 	, m_Q(*this, "m_Q", 0)
 	#endif
+	, m_delegate(delegate)
 	, m_net(nullptr)
 	, m_state(*this, "m_state", state)
 	{
@@ -852,7 +856,7 @@ namespace netlist
 		state().setup().register_term(*this);
 	}
 
-	void analog_output_t::initial(const nl_fptype val) noexcept
+	void analog_output_t::initial(nl_fptype val) noexcept
 	{
 		net().set_Q_Analog(val);
 	}
@@ -898,11 +902,6 @@ namespace netlist
 		}
 	}
 
-
-	void param_t::update_param() noexcept
-	{
-		device().update_param();
-	}
 
 	pstring param_t::get_initial(const device_t &dev, bool *found)
 	{
@@ -992,17 +991,6 @@ namespace netlist
 	bool detail::net_t::is_analog() const noexcept
 	{
 		return dynamic_cast<const analog_net_t *>(this) != nullptr;
-	}
-
-	void netlist_t::process_queue(const netlist_time delta) noexcept
-	{
-		if (!m_use_stats)
-			process_queue_stats<false>(delta, m_mainclock);
-		else
-		{
-			auto sm_guard(m_stat_mainloop.guard());
-			process_queue_stats<true>(delta, m_mainclock);
-		}
 	}
 
 } // namespace netlist

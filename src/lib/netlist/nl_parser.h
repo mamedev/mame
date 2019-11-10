@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud
 
 ///
-/// \file nl_parser.c
+/// \file nl_parser.h
 ///
 
 #ifndef NL_PARSER_H_
