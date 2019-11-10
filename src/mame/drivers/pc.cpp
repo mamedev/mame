@@ -43,9 +43,9 @@ public:
 	{ }
 
 	void ataripc1(machine_config &config);
+	void coppc400(machine_config &config);
 	void ncrpc4i(machine_config &config);
 	void kaypro16(machine_config &config);
-	void kaypropc(machine_config &config);
 	void m15(machine_config &config);
 	void bondwell(machine_config &config);
 	void siemens(machine_config &config);
@@ -59,7 +59,6 @@ public:
 	void olytext30(machine_config &config);
 	void zenith(machine_config &config);
 	void eagle1600(machine_config &config);
-	void eaglespirit(machine_config &config);
 	void laser_turbo_xt(machine_config &config);
 	void ibm5550(machine_config &config);
 	void comport(machine_config &config);
@@ -67,8 +66,6 @@ public:
 	void ittxtra(machine_config &config);
 	void cadd810(machine_config &config);
 	void juko16(machine_config &config);
-	void hyo88t(machine_config &config);
-	void kyoxt(machine_config &config);
 
 	void init_bondwell();
 
@@ -1329,6 +1326,30 @@ ROM_START( olystar20f )
 	ROM_LOAD("20f_u11_v1.3.bin", 0x0000, 0x2000, CRC(d252ee8d) SHA1(035385521abc3d1b79967b5302a87d08f9383215))
 ROM_END
 
+/********************************************************* Cordata PPC-400 ***
+Form factor: Luggable
+Links: https://www.system-cfg.com/detailcollection.php?ident=243
+CPU: 8088/4.77MHz
+RAM: 256K or 512K
+Mass storage: 1/2 floppy disks 5.25" DD, 10MB or 20MB harddisk
+On board: serial, parallel, video (CGA, Hercules, 640x400 mode)
+Monitor: 9" monochrome
+
+*****************************************************************************/
+
+void pc_state::coppc400(machine_config &config)
+{
+	pccga(config);
+
+	subdevice<ram_device>(RAM_TAG)->set_default_size("512K").set_extra_options("256K");
+	// the top 16K of the 512K are used for graphics even if a RAM expansion card is used
+}
+
+ROM_START( coppc400 )
+	ROM_REGION(0x10000, "bios", 0)
+	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(3d9b6594) SHA1(41f85e692e2020326fd580f7c436c23c76840119))
+ROM_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1345,6 +1366,7 @@ COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state,
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
 COMP( 1985, bw230,          ibm5150, 0,      bondwell,       bondwell, pc_state, init_bondwell, "Bondwell Holding",                "BW230 (PRO28 Series)",  0 )
 COMP( 1982, mpc1600,        ibm5150, 0,      mpc1600,        pccga,    pc_state, empty_init,    "Columbia Data Products",          "MPC 1600",              0 )
+COMP( 198?, coppc400,       ibm5150, 0,      coppc400,       pccga,    pc_state, empty_init,    "Corona Data Systems, Inc.",       "Cordata PPC-400",               MACHINE_NOT_WORKING )
 COMP( 1983, comport,        ibm5150, 0,      comport,        pccga,    pc_state, empty_init,    "Compaq",                          "Compaq Portable",       MACHINE_NOT_WORKING )
 COMP( 198?, cadd810,        ibm5150, 0,      cadd810,        pccga,    pc_state, empty_init,    "CompuAdd",                        "810",                   MACHINE_NOT_WORKING )
 COMP( 1984, dgone,          ibm5150, 0,      dgone,          pccga,    pc_state, empty_init,    "Data General",                    "Data General/One" ,     MACHINE_NOT_WORKING )

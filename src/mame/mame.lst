@@ -31809,6 +31809,7 @@ ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 cadd810                         // CompuAdd 810
 comport                         // Compaq Portable
+coppc400                        // Cordata PPC-400 portable
 dgone                           // 1984 Data General/One
 eagle1600                       //
 eaglespirit                     // Eagle PC Spirit
