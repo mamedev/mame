@@ -152,12 +152,12 @@ public:
 	}
 
 	// execution management
-	device_scheduler &scheduler() const noexcept(MAME_NDEBUG) { assert(m_scheduler != nullptr); return *m_scheduler; }
-	bool executing() const noexcept(MAME_NDEBUG) { return scheduler().currently_executing() == this; }
-	s32 cycles_remaining() const noexcept(MAME_NDEBUG) { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
-	void eat_cycles(int cycles) noexcept(MAME_NDEBUG) { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
-	void adjust_icount(int delta) noexcept(MAME_NDEBUG) { if (executing()) *m_icountptr += delta; }
-	void abort_timeslice() noexcept(MAME_NDEBUG);
+	device_scheduler &scheduler() const noexcept { assert(m_scheduler != nullptr); return *m_scheduler; }
+	bool executing() const noexcept { return scheduler().currently_executing() == this; }
+	s32 cycles_remaining() const noexcept { return executing() ? *m_icountptr : 0; } // cycles remaining in this timeslice
+	void eat_cycles(int cycles) noexcept { if (executing()) *m_icountptr = (cycles > *m_icountptr) ? 0 : (*m_icountptr - cycles); }
+	void adjust_icount(int delta) noexcept { if (executing()) *m_icountptr += delta; }
+	void abort_timeslice() noexcept;
 
 	// input and interrupt management
 	void set_input_line(int linenum, int state) { m_input[linenum].set_state_synced(state); }
@@ -183,8 +183,8 @@ public:
 	void signal_interrupt_trigger() { trigger(m_inttrigger); }
 
 	// time and cycle accounting
-	attotime local_time() const noexcept(MAME_NDEBUG);
-	u64 total_cycles() const noexcept(MAME_NDEBUG);
+	attotime local_time() const noexcept;
+	u64 total_cycles() const noexcept;
 
 	// required operation overrides
 	void run() { execute_run(); }

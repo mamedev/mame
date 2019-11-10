@@ -92,7 +92,7 @@ device_execute_interface::~device_execute_interface()
 //  run before we run again
 //-------------------------------------------------
 
-void device_execute_interface::abort_timeslice() noexcept(MAME_NDEBUG)
+void device_execute_interface::abort_timeslice() noexcept
 {
 	// ignore if not the executing device
 	if (!executing())
@@ -207,7 +207,7 @@ void device_execute_interface::trigger(int trigid)
 //  for a device
 //-------------------------------------------------
 
-attotime device_execute_interface::local_time() const noexcept(MAME_NDEBUG)
+attotime device_execute_interface::local_time() const noexcept
 {
 	// if we're active, add in the time from the current slice
 	if (executing())
@@ -225,7 +225,7 @@ attotime device_execute_interface::local_time() const noexcept(MAME_NDEBUG)
 //  cycles executed on this device
 //-------------------------------------------------
 
-u64 device_execute_interface::total_cycles() const noexcept(MAME_NDEBUG)
+u64 device_execute_interface::total_cycles() const noexcept
 {
 	if (executing())
 	{
