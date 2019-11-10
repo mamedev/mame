@@ -19,11 +19,37 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_SOUND, elan_eu3a05_sound_device, "elan_eu3a05soun
 elan_eu3a05_sound_device::elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ELAN_EU3A05_SOUND, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
+	device_memory_interface(mconfig, *this),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 6, 0, address_map_constructor(FUNC(elan_eu3a05_sound_device::map), this)),
 	m_stream(nullptr),
 	m_space_read_cb(*this),
 	m_sound_end_cb{ { *this }, { *this }, { *this }, { *this }, { *this }, { *this } }
 {
 }
+
+device_memory_interface::space_config_vector elan_eu3a05_sound_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+void elan_eu3a05_sound_device::map(address_map &map)
+{
+	map(0x00, 0x3f).rw(FUNC(elan_eu3a05_sound_device::read_unmapped), FUNC(elan_eu3a05_sound_device::write_unmapped));
+
+	map(0x00, 0x11).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_addr_w)); // 6 * 24-bit (3 byte) channel addresses
+	map(0x12, 0x23).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_size_w)); // 6 * 24-bit (3 byte) channel lengths
+	map(0x24, 0x24).rw(FUNC(elan_eu3a05_sound_device::reg50a4_r), FUNC(elan_eu3a05_sound_device::reg50a4_w)); // unknown TODO
+	map(0x25, 0x25).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_trigger_w));
+	map(0x26, 0x27).rw(FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r), FUNC(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)); // 0x26 = volume channels 0,1,2,3  0x27 = volume channels 5,6  (lunar rescue sets 0x03 0x00 and just uses a single channel)
+	map(0x28, 0x28).r(FUNC(elan_eu3a05_sound_device::elan_eu3a05_50a8_r)); // stopped status? (read only?)
+	map(0x29, 0x29).rw(FUNC(elan_eu3a05_sound_device::reg50a9_r), FUNC(elan_eu3a05_sound_device::reg50a9_w)); // IRQ mask?
+
+	// no other reads/writes seen?
+}
+
+
 
 void elan_eu3a05_sound_device::device_start()
 {
@@ -40,7 +66,7 @@ void elan_eu3a05_sound_device::device_start()
 	save_item(NAME(m_sound_trigger));
 	save_item(NAME(m_sound_unk));
 	save_item(NAME(m_volumes));
-	save_item(NAME(m_5024));
+	save_item(NAME(m_50a4));
 	save_item(NAME(m_50a9));
 }
 
@@ -61,7 +87,7 @@ void elan_eu3a05_sound_device::device_reset()
 	m_volumes[0] = 0xff;
 	m_volumes[1] = 0x0f;
 
-	m_5024 = 0x00;
+	m_50a4 = 0x00;
 	m_50a9 = 0x00;
 }
 
@@ -104,7 +130,9 @@ void elan_eu3a05_sound_device::sound_stream_update(sound_stream &stream, stream_
 					m_sound_current_nib_pos[channel] = 0;
 					m_isstopped |= (1 << channel);
 
-					m_sound_end_cb[channel](1); // generate interrupt based on which channel just stopped?
+					// maybe, seems to match the system IRQ mask when the sound interrupts are enabled?
+					if (m_50a9 & (1 << channel))
+						m_sound_end_cb[channel](1); // generate interrupt based on which channel just stopped?
 				}
 			}
 			else
@@ -310,96 +338,13 @@ WRITE8_MEMBER(elan_eu3a05_sound_device::elan_eu3a05_sound_volume_w)
 	m_volumes[offset] = data;
 }
 
-WRITE8_MEMBER(elan_eu3a05_sound_device::write)
+READ8_MEMBER(elan_eu3a05_sound_device::read_unmapped)
 {
-	switch (offset)
-	{
-	case 0x00: case 0x01: case 0x02: // channel 0 address
-	case 0x03: case 0x04: case 0x05: // channel 1 address
-	case 0x06: case 0x07: case 0x08: // channel 2 address
-	case 0x09: case 0x0a: case 0x0b: // channel 3 address
-	case 0x0c: case 0x0d: case 0x0e: // channel 4 address
-	case 0x0f: case 0x10: case 0x11: // channel 5 address
-		elan_eu3a05_sound_addr_w(space, offset, data);
-		break;
-
-	case 0x12: case 0x13: case 0x14: // channel 0 length
-	case 0x15: case 0x16: case 0x17: // channel 1 length
-	case 0x18: case 0x19: case 0x1a: // channel 2 length
-	case 0x1b: case 0x1c: case 0x1d: // channel 3 length
-	case 0x1e: case 0x1f: case 0x20: // channel 4 length
-	case 0x21: case 0x22: case 0x23: // channel 5 length
-		elan_eu3a05_sound_size_w(space, offset - 0x12, data);
-		break;
-
-	case 0x24: // unk
-		m_5024 = data;
-		break;
-
-	case 0x25: // trigger
-		elan_eu3a05_sound_trigger_w(space, offset - 0x25, data);
-		break;
-
-	case 0x26: // volume channels 0,1,2,3 ? (lunar rescue sets 0x03 here and 0x00 below and just uses a single channel)
-	case 0x27: // volume channels 5,6 ?
-		elan_eu3a05_sound_volume_w(space, offset - 0x26, data);
-		break;
-
-	case 0x28: // stopped status?
-		LOGMASKED( LOG_AUDIO, "%s: write to stop state register? %02x\n", machine().describe_context(), data);
-		break;
-
-	case 0x29: // interrupt enable? or looping?
-		m_50a9 = data;
-		break;
-	}
+	logerror("%s: elan_eu3a05_sound_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	return 0x00;
 }
 
-READ8_MEMBER(elan_eu3a05_sound_device::read)
+WRITE8_MEMBER(elan_eu3a05_sound_device::write_unmapped)
 {
-	uint8_t ret = 0x00;
-
-	switch (offset)
-	{
-	case 0x00: case 0x01: case 0x02: // channel 0 address
-	case 0x03: case 0x04: case 0x05: // channel 1 address
-	case 0x06: case 0x07: case 0x08: // channel 2 address
-	case 0x09: case 0x0a: case 0x0b: // channel 3 address
-	case 0x0c: case 0x0d: case 0x0e: // channel 4 address
-	case 0x0f: case 0x10: case 0x11: // channel 5 address
-		ret = elan_eu3a05_sound_addr_r(space, offset);
-		break;
-
-	case 0x12: case 0x13: case 0x14: // channel 0 length
-	case 0x15: case 0x16: case 0x17: // channel 1 length
-	case 0x18: case 0x19: case 0x1a: // channel 2 length
-	case 0x1b: case 0x1c: case 0x1d: // channel 3 length
-	case 0x1e: case 0x1f: case 0x20: // channel 4 length
-	case 0x21: case 0x22: case 0x23: // channel 5 length
-		ret = elan_eu3a05_sound_size_r(space, offset - 0x12);
-		break;
-
-	case 0x24: // unk
-		ret = m_5024;
-		break;
-
-	case 0x25: // trigger
-		ret = elan_eu3a05_sound_trigger_r(space, offset - 0x25);
-		break;
-
-	case 0x26: // volume channels 0,1,2,3 ?
-	case 0x27: // volume channels 5,6 ?
-		ret = elan_eu3a05_sound_volume_r(space, offset - 0x26);
-		break;
-
-	case 0x28: // stopped status?
-		ret = elan_eu3a05_50a8_r(space, offset - 0x28);
-		break;
-
-	case 0x29: // interrupt enable? or looping?
-		ret = m_50a9;
-		break;
-	}
-
-	return ret;
+	logerror("%s: elan_eu3a05_sound_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }

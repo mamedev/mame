@@ -8,25 +8,140 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A14_VID, elan_eu3a14vid_device, "elan_eu3a14vid", "El
 
 elan_eu3a14vid_device::elan_eu3a14vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A14_VID, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_bank(*this, finder_base::DUMMY_TAG),
-	m_screen(*this, finder_base::DUMMY_TAG)
+	m_screen(*this, finder_base::DUMMY_TAG),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 7, 0, address_map_constructor(FUNC(elan_eu3a14vid_device::map), this))
 {
+}
+
+device_memory_interface::space_config_vector elan_eu3a14vid_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+/* Windowing mode note
+
+ huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and "Target Range" mode timer??
+ 5100 - 0x0f when effect is enabled, 0x00 otherwise?
+ 5101 - 0x0e in both modes
+ 5102 - 0x86 in both modes
+ 5103 - 0x0e in tropy room (left?)                                  / 0x2a in "Target Range" mode (left position?)
+ 5104 - trophy room window / highlight top, move with cursor        / 0xbf in "Target Range" mode (top?)
+ 5105 - 0x52 in trophy room (right?)                                / counts from 0xa1 to 0x2a in "Target Range" mode (right position?)
+ 5106 - trophy room window / highlight bottom, move with cursor     / 0xcb in "Target Range" mode (bottom?)
+*/
+
+void elan_eu3a14vid_device::map(address_map &map)
+{
+	map(0x00, 0x7f).rw(FUNC(elan_eu3a14vid_device::read_unmapped), FUNC(elan_eu3a14vid_device::write_unmapped));
+
+	map(0x00, 0x06).ram(); // see Windowing note above
+	map(0x07, 0x07).rw(FUNC(elan_eu3a14vid_device::reg5107_r), FUNC(elan_eu3a14vid_device::reg5107_w)); // writes on transitions, maybe layer disables?
+	map(0x08, 0x08).rw(FUNC(elan_eu3a14vid_device::reg5108_r), FUNC(elan_eu3a14vid_device::reg5108_w)); // 0x04 in both modes // hnt3, frequently rewrites same values TODO
+	map(0x09, 0x09).rw(FUNC(elan_eu3a14vid_device::reg5109_r), FUNC(elan_eu3a14vid_device::reg5109_w)); // related to above?
+	// 0x0a
+	// 0x0b
+	// 0x0c
+	// 0x0d
+	// 0x0e
+	// 0x0f
+	map(0x10, 0x15).rw(FUNC(elan_eu3a14vid_device::tilecfg_r), FUNC(elan_eu3a14vid_device::tilecfg_w));
+	map(0x16, 0x17).rw(FUNC(elan_eu3a14vid_device::rowscrollcfg_r), FUNC(elan_eu3a14vid_device::rowscrollcfg_w));
+	// 0x18
+	// 0x19
+	map(0x1a, 0x1e).rw(FUNC(elan_eu3a14vid_device::rowscrollsplit_r), FUNC(elan_eu3a14vid_device::rowscrollsplit_w));
+	// 0x1f
+	// 0x20
+	map(0x21, 0x24).rw(FUNC(elan_eu3a14vid_device::scrollregs_r), FUNC(elan_eu3a14vid_device::scrollregs_w)); 	// 0x21,0x22 = scroll reg 1,  0x23,0x24 = scroll reg 2
+	map(0x25, 0x2c).rw(FUNC(elan_eu3a14vid_device::rowscrollregs_r), FUNC(elan_eu3a14vid_device::rowscrollregs_w)); // 0x25,0x26 = rowscroll reg 1, 0x27,0x28 = rowscroll reg 2, 0x29,0x2a = rowscroll reg 3, 0x2b,0x2c = rowscroll reg 3
+	// 0x2d
+	// 0x2e
+	// 0x2f
+	// 0x30
+	// 0x31
+	// 0x32
+	// 0x33
+	// 0x34
+	// 0x35
+	// 0x36
+	// 0x37
+	// 0x38
+	// 0x39
+	// 0x3a
+	// 0x3b
+	// 0x3c
+	// 0x3d
+	// 0x3e
+	// 0x3f
+	map(0x40, 0x45).rw(FUNC(elan_eu3a14vid_device::ramtilecfg_r), FUNC(elan_eu3a14vid_device::ramtilecfg_w));
+	// 0x46
+	// 0x47
+	map(0x48, 0x4b).ram(); 	// hnt3 (always 0 tho?)
+	// 0x4c
+	// 0x4d
+	// 0x4e
+	// 0x4f
+	map(0x50, 0x50).rw(FUNC(elan_eu3a14vid_device::spriteaddr_r), FUNC(elan_eu3a14vid_device::spriteaddr_w));
+	map(0x51, 0x52).rw(FUNC(elan_eu3a14vid_device::spritebase_r), FUNC(elan_eu3a14vid_device::spritebase_w));
+	map(0x53, 0x53).ram(); // startup
+
+	// nothing else used?
 }
 
 void elan_eu3a14vid_device::device_start()
 {
 	elan_eu3a05commonvid_device::device_start();
+
+	save_item(NAME(m_scrollregs));
+	save_item(NAME(m_tilecfg));
+	save_item(NAME(m_rowscrollregs));
+	save_item(NAME(m_rowscrollsplit));
+	save_item(NAME(m_rowscrollcfg));
+	save_item(NAME(m_ramtilecfg));
+	save_item(NAME(m_spritebase));
+
+	save_item(NAME(m_5107));
+	save_item(NAME(m_5108));
+	save_item(NAME(m_5109));
+
+	save_item(NAME(m_spriteaddr));
 }
 
 void elan_eu3a14vid_device::device_reset()
 {
 	elan_eu3a05commonvid_device::device_reset();
 
+	for (int i = 0; i < 4; i++)
+		m_scrollregs[i] = 0x00;
+
+	for (int i = 0; i < 6; i++)
+		m_tilecfg[i] = 0x00;
+
+	for (int i = 0; i < 8; i++)
+		m_rowscrollregs[i] = 0x00;
+
+	for (int i = 0; i < 5; i++)
+		m_rowscrollsplit[i] = 0x00;
+
+	for (int i = 0; i < 2; i++)
+		m_rowscrollcfg[i] = 0x00;
+
+	for (int i = 0; i < 6; i++)
+		m_ramtilecfg[i] = 0x00;
+
+	for (int i = 0; i < 2; i++)
+		m_spritebase[i] = 0x00;
+
+	m_5107 = 0x00;
+	m_5108 = 0x00;
+	m_5109 = 0x00;
+
 	m_spriteaddr = 0x14; // ?? rad_foot never writes, other games seem to use it to set sprite location
 }
-
-
 
 uint8_t elan_eu3a14vid_device::read_vram(int offset)
 {
@@ -63,6 +178,22 @@ uint8_t elan_eu3a14vid_device::read_gfxdata(int offset, int x)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte((offset+x) & 0x3fffff);
+}
+
+uint8_t elan_eu3a14vid_device::readpix(int baseaddr, int count, int drawfromram)
+{
+	int pix;
+
+	if (drawfromram)
+	{
+		pix = read_vram((baseaddr + count) & 0x3fff);
+	}
+	else
+	{
+		address_space& fullbankspace = m_bank->space(AS_PROGRAM);
+		pix =  fullbankspace.read_byte((baseaddr+count) & 0x3fffff);
+	}
+	return pix;
 }
 
 void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rectangle& cliprect, int bpp, int tileno, int palette, int priority, int flipx, int flipy, int xpos, int ypos, int transpen, int size, int base, int drawfromram)
@@ -105,7 +236,6 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 		return;
 	}
 
-
 	int count = 0;
 	for (int y = 0; y < size; y++)
 	{
@@ -127,18 +257,6 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 
 		for (int x = 0; x < xstride; x++)
 		{
-			int pix;
-
-			if (drawfromram)
-			{
-				pix = read_vram((baseaddr + count) & 0x3fff);
-			}
-			else
-			{
-				address_space& fullbankspace = m_bank->space(AS_PROGRAM);
-				pix =  fullbankspace.read_byte((baseaddr+count) & 0x3fffff);
-			}
-
 			if (realy >= cliprect.min_y && realy <= cliprect.max_y)
 			{
 				if (bpp == 8) // 8bpp
@@ -146,6 +264,8 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 					int realx = x + xposwithscroll;
 					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 					{
+						uint8_t pix = readpix(baseaddr, count, drawfromram);
+
 						if (pix)
 						{
 							if (pridst[realx] <= priority)
@@ -172,29 +292,30 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 				else if (bpp == 4) // 4bpp
 				{
 					int realx = (x * 2) + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0xf0)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0xf0) >> 4) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
 
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+					if (((realx + 1) >= cliprect.min_x) || (realx <= cliprect.max_x))
 					{
-						if (pix & 0x0f)
+						uint8_t pix = readpix(baseaddr, count, drawfromram);
+
+						int mask = 0xf0;
+						int shift = 4;
+
+						for (int i = 0; i < 4; i++)
 						{
-							if (pridst[realx] <= priority)
+							if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 							{
-								dst[realx] = (pix & 0x0f) | palette;
-								pridst[realx] = priority;
+								if (pix & mask)
+								{
+									if (pridst[realx] <= priority)
+									{
+										dst[realx] = ((pix & mask) >> shift) | palette;
+										pridst[realx] = priority;
+									}
+								}
 							}
+							mask >>= 4;
+							shift -= 4;
+							realx++;
 						}
 					}
 				}
@@ -205,57 +326,31 @@ void elan_eu3a14vid_device::draw_background_tile(bitmap_ind16& bitmap, const rec
 				else if (bpp == 2) // 2bpp (hnt3 ram text)
 				{
 					int realx = (x * 4) + xposwithscroll;
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
+
+					if (((realx + 3) >= cliprect.min_x) || (realx <= cliprect.max_x))
 					{
-						if (pix & 0xc0)
+						uint8_t pix = readpix(baseaddr, count, drawfromram);
+
+						int mask = 0xc0;
+						int shift = 6;
+
+						for (int i = 0; i < 4; i++)
 						{
-							if (pridst[realx] <= priority)
+							if (realx >= cliprect.min_x && realx <= cliprect.max_x)
 							{
-								dst[realx] = ((pix & 0xc0) >> 6) | palette;
-								pridst[realx] = priority;
+								if (pix & 0xc0)
+								{
+									if (pridst[realx] <= priority)
+									{
+										dst[realx] = ((pix & mask) >> shift) | palette;
+										pridst[realx] = priority;
+									}
+								}
 							}
-						}
-					}
 
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x30)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x30) >> 4) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x0c)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x0c) >> 2) | palette;
-								pridst[realx] = priority;
-							}
-						}
-					}
-
-					realx++;
-
-					if (realx >= cliprect.min_x && realx <= cliprect.max_x)
-					{
-						if (pix & 0x03)
-						{
-							if (pridst[realx] <= priority)
-							{
-								dst[realx] = ((pix & 0x03) >> 0) | palette;
-								pridst[realx] = priority;
-							}
+							realx++;
+							mask >>= 2;
+							shift -= 2;
 						}
 					}
 				}
@@ -674,8 +769,6 @@ void elan_eu3a14vid_device::draw_sprite_line(screen_device &screen, bitmap_ind16
 
 void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// first 4 sprite entries seem to be garbage sprites, so we start at 0x20
-	// likely we're just interpreting them wrong and they're used for blanking things or clipping?
 	for (int i = m_spriterambase; i < m_spriterambase + 0x800; i += 8)
 	{
 		/*
@@ -763,4 +856,13 @@ void elan_eu3a14vid_device::draw_sprites(screen_device &screen, bitmap_ind16 &bi
 		}
 	}
 }
+READ8_MEMBER(elan_eu3a14vid_device::read_unmapped)
+{
+	logerror("%s: elan_eu3a14vid_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	return 0x00;
+}
 
+WRITE8_MEMBER(elan_eu3a14vid_device::write_unmapped)
+{
+	logerror("%s: elan_eu3a14vid_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
+}

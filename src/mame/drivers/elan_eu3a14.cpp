@@ -219,7 +219,7 @@ void elan_eu3a14_state::bank_map(address_map &map)
 	map(0x000000, 0x3fffff).rom().region("maincpu", 0);
 }
 
-void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
+void elan_eu3a14_state::radica_eu3a14_map(address_map& map)
 {
 	map(0x0000, 0x01ff).ram();
 	map(0x0200, 0x3fff).ram().share("mainram"); // 200-9ff is sprites? a00 - ??? is tilemap?
@@ -243,7 +243,6 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	// 5019 - 46 on startup (hnt3) 22 (bb3, foot) na (gtg) 09    (rsg)
 	// 501a - 01 on startup (hnt3) 03 (bb3, foot) na (gtg) 02,01 (rsg)
 
-
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
 	map(0x5040, 0x5040).w(FUNC(elan_eu3a14_state::porta_dir_w));
 	map(0x5041, 0x5041).portr("IN0").w(FUNC(elan_eu3a14_state::porta_dat_w));
@@ -256,60 +255,13 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map &map)
 	map(0x5047, 0x5047).nopw();
 	map(0x5048, 0x5048).nopw();
 
-	// 5060 - 506e  r/w during startup on foot
+	// 5060 - 506e  r/w during startup on foot (adc?)
 
-	// sound appears to be the same as eu3a05
-	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
+	// 0x5080 - 50bf = SOUND AREA (same as eu5a03?)
+	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
 
-	// video regs are in the 51xx range
-
-	// huntin'3 seems to use some registers for a windowing / highlight effect on the trophy room names and "Target Range" mode timer??
-	// 5100 - 0x0f when effect is enabled, 0x00 otherwise?
-	// 5101 - 0x0e in both modes
-	// 5102 - 0x86 in both modes
-	// 5103 - 0x0e in tropy room (left?)                                  / 0x2a in "Target Range" mode (left position?)
-	// 5104 - trophy room window / highlight top, move with cursor        / 0xbf in "Target Range" mode (top?)
-	// 5105 - 0x52 in trophy room (right?)                                / counts from 0xa1 to 0x2a in "Target Range" mode (right position?)
-	// 5106 - trophy room window / highlight bottom, move with cursor     / 0xcb in "Target Range" mode (bottom?)
-	// 5107 - 0x00
-	// 5108 - 0x04 in both modes
-	// 5109 - 0xc2 in both modes
-
-	map(0x5100, 0x5100).ram();
-	map(0x5101, 0x5101).ram();
-	map(0x5102, 0x5102).ram();
-	map(0x5103, 0x5106).ram();
-	map(0x5107, 0x5107).ram(); // on transitions, maybe layer disables?
-	map(0x5108, 0x5109).ram(); // hnt3, frequently rewrites same values, maybe something to do with raster irq?
-
-	// layer specific regs?
-	map(0x5110, 0x5115).rw(m_vid, FUNC(elan_eu3a14vid_device::tilecfg_r), FUNC(elan_eu3a14vid_device::tilecfg_w));
-	map(0x5116, 0x5117).rw(m_vid, FUNC(elan_eu3a14vid_device::rowscrollcfg_r), FUNC(elan_eu3a14vid_device::rowscrollcfg_w)); // 00 01 in hnt3 (could just be extra tile config bits, purpose guessed)   set to 00 05 in rad_gtg overhead part (no rowscroll)
-	//  0x5118, 0x5119  not used
-	map(0x511a, 0x511e).rw(m_vid, FUNC(elan_eu3a14vid_device::rowscrollsplit_r), FUNC(elan_eu3a14vid_device::rowscrollsplit_w)); // hnt3 (60 68 78 90 b8 - rowscroll position list see note below
-
-
-	// register value notes for 511a-511e and how they relate to screen
-	// 00-6f normal scroll reg
-	// 60-67 is where the first extra scroll reg (rowscrollregs) is onscreen
-	// 68-77 is the 2nd
-	// 78-8f is the 3rd
-	// 90-b7 is the 4th
-	// b8-ff no scroll?
-
-	map(0x5121, 0x5124).rw(m_vid, FUNC(elan_eu3a14vid_device::scrollregs_r), FUNC(elan_eu3a14vid_device::scrollregs_w));
-	map(0x5125, 0x512c).rw(m_vid, FUNC(elan_eu3a14vid_device::rowscrollregs_r), FUNC(elan_eu3a14vid_device::rowscrollregs_w)); // 4 extra x scroll regs
-
-	// layer specific regs?
-	map(0x5140, 0x5145).rw(m_vid, FUNC(elan_eu3a14vid_device::ramtilecfg_r), FUNC(elan_eu3a14vid_device::ramtilecfg_w)); // hnt3
-	map(0x5148, 0x514b).ram(); // hnt3 (always 0 tho?)
-
-	// sprite specific regs?
-	map(0x5150, 0x5150).rw(m_vid, FUNC(elan_eu3a14vid_device::spriteaddr_r), FUNC(elan_eu3a14vid_device::spriteaddr_w)); // startup 01 bb3,gtg,rsg, (na) foot 0c hnt3
-	map(0x5151, 0x5152).rw(m_vid, FUNC(elan_eu3a14vid_device::spritebase_r), FUNC(elan_eu3a14vid_device::spritebase_w));
-	map(0x5153, 0x5153).ram(); // startup
-
-	
+	// 0x5100 - 517f = VIDEO AREA
+	map(0x5100, 0x517f).m(m_vid, FUNC(elan_eu3a14vid_device::map));
 
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
 

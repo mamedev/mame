@@ -11,7 +11,7 @@
 
 // ======================> elan_eu3a05_sound_device
 
-class elan_eu3a05_sound_device : public device_t, public device_sound_interface
+class elan_eu3a05_sound_device : public device_t, public device_sound_interface, public device_memory_interface
 {
 public:
 	elan_eu3a05_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -20,8 +20,8 @@ public:
 
 	template <unsigned N> auto sound_end_cb() { return m_sound_end_cb[N].bind(); }
 	
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_READ8_MEMBER(read);
+	void map(address_map& map);
+
 
 protected:
 	// device-level overrides
@@ -30,6 +30,8 @@ protected:
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
+	virtual space_config_vector memory_space_config() const override;
+	const address_space_config      m_space_config;
 
 private:
 	sound_stream *m_stream;
@@ -45,7 +47,7 @@ private:
 	uint8_t m_isstopped;
 
 	uint8_t m_volumes[2];
-	uint8_t m_5024;
+	uint8_t m_50a4;
 	uint8_t m_50a9;
 
 	void handle_sound_trigger(int which);
@@ -66,8 +68,16 @@ private:
 
 	DECLARE_READ8_MEMBER(elan_eu3a05_50a8_r);
 
+	DECLARE_READ8_MEMBER(reg50a4_r) { return m_50a4; }
+	DECLARE_WRITE8_MEMBER(reg50a4_w) { m_50a4 = data; }
+	DECLARE_READ8_MEMBER(reg50a9_r) { return m_50a9; }
+	DECLARE_WRITE8_MEMBER(reg50a9_w) { m_50a9 = data; }
+
 	DECLARE_READ8_MEMBER(elan_eu3a05_sound_volume_r);
 	DECLARE_WRITE8_MEMBER(elan_eu3a05_sound_volume_w);
+
+	DECLARE_WRITE8_MEMBER(write_unmapped);
+	DECLARE_READ8_MEMBER(read_unmapped);
 
 	devcb_write_line m_sound_end_cb[6];
 };
