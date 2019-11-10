@@ -217,7 +217,7 @@ protected:
 	DECLARE_READ16_MEMBER(rad_porta_r);
 	DECLARE_READ16_MEMBER(rad_portb_r);
 	DECLARE_READ16_MEMBER(rad_portc_r);
-	
+
 	DECLARE_WRITE16_MEMBER(jakks_porta_w);
 	DECLARE_WRITE16_MEMBER(jakks_portb_w);
 
@@ -346,7 +346,7 @@ private:
 	output_finder<6> m_suite2;
 	output_finder<6> m_number1;
 	output_finder<6> m_number2;
-	
+
 	output_finder<6> m_select_fold;
 	output_finder<6> m_select_check;
 	output_finder<6> m_select_bet;
@@ -2102,8 +2102,8 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Console Select")
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Console Ok")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_5) PORT_NAME("Console Select") // the Console buttons also work for Player 1
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_1) PORT_NAME("Console Ok")
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -2125,6 +2125,32 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	// these are presuambly read through the UART as the LCD screens are driven by it, currently not hooked up
+	PORT_START("CTRL1")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_START("CTRL2")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_START("CTRL3")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+
+	PORT_START("CTRL4")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+
+	PORT_START("CTRL5")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(5)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(5)
+
+	PORT_START("CTRL6")
+	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(6)
+	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(6)
+
 INPUT_PORTS_END
 
 
@@ -2927,9 +2953,9 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 	uint16_t ret = (m_io_p1->read() & 0xffc0) | select_bits;
 
 	//if (select_bits == 0x00)
-	//	ret |= 0x8000;
+	//  ret |= 0x8000;
 	//else
-	//	ret &= ~0x8000;
+	//  ret &= ~0x8000;
 
 	return ret;
 }
@@ -2962,9 +2988,9 @@ WRITE16_MEMBER(sentx6p_state::sentx_portc_w)
 }
 
 /*
-	Card Table
-	(the controller must contain an MCU under the glob to receive thes commands
-	 and convert them to actual LCD segments)
+    Card Table
+    (the controller must contain an MCU under the glob to receive thes commands
+     and convert them to actual LCD segments)
 
          off      00
     | A  diamonds 01 | A  hearts 0e   | A  spades 1b  | A  clubs 28 |
@@ -3055,13 +3081,13 @@ void sentx6p_state::set_options(uint8_t value, int select_bits)
 }
 
 /*
-	c0 = no selection highlight (00)
-	c1 = fold selected (01)
-	c2 = check selected (02)
-	c4 = bet selected (04)
-	c8 = call selected (08)
-	d0 = raise selected (10)
-	e0 = all in selected (20)
+    c0 = no selection highlight (00)
+    c1 = fold selected (01)
+    c2 = check selected (02)
+    c4 = bet selected (04)
+    c8 = call selected (08)
+    d0 = raise selected (10)
+    e0 = all in selected (20)
 */
 
 void sentx6p_state::set_options_select(uint8_t value, int select_bits)
