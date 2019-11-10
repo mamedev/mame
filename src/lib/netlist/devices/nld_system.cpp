@@ -70,7 +70,7 @@ namespace devices
 	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
 	NETLIB_DEVICE_IMPL(res_sw,              "RES_SWITCH",             "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")
-	NETLIB_DEVICE_IMPL(gnd,                 "GND",                    "")
+	NETLIB_DEVICE_IMPL(gnd,                 "GNDA",                   "")
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")
 
 	NETLIB_DEVICE_IMPL(logic_input,         "LOGIC_INPUT",            "IN,FAMILY")

@@ -128,7 +128,7 @@ namespace devices
 		, m_funcparam({nlconst::zero()})
 		{
 			if (m_func() != "")
-				m_compiled.compile(std::vector<pstring>({{pstring("T")}}), m_func());
+				m_compiled.compile(m_func(), std::vector<pstring>({{pstring("T")}}));
 			connect(m_feedback, m_Q);
 		}
 		//NETLIB_RESETI();
@@ -370,7 +370,7 @@ namespace devices
 				inps.push_back(n);
 				m_vals.push_back(nlconst::zero());
 			}
-			m_compiled.compile(inps, m_func());
+			m_compiled.compile(m_func(), inps);
 		}
 
 	protected:

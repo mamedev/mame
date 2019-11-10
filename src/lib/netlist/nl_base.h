@@ -22,6 +22,7 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
+#include "plib/pfunction.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
@@ -1733,6 +1734,7 @@ namespace netlist
 		pstring p = this->get_initial(device, &found);
 		if (found)
 		{
+#if 0
 			bool err = false;
 			auto vald = plib::pstonum_ne<T>(p, err);
 			if (err)
@@ -1741,6 +1743,15 @@ namespace netlist
 				plib::pthrow<nl_exception>(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
 			}
 			m_param = vald;
+#else
+			plib::pfunction<nl_fptype> func;
+			func.compile_infix(p, {});
+			auto valx = func.evaluate();
+			if (std::is_integral<T>::value)
+				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
+					plib::pthrow<nl_exception>(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
+			m_param = static_cast<T>(valx);
+#endif
 		}
 		else
 			m_param = val;

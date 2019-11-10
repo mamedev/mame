@@ -79,12 +79,14 @@ namespace plib {
 			{
 			}
 
-			bool is(const token_id_t &tok_id) const { return m_id.id() == tok_id.id(); }
-			bool is_not(const token_id_t &tok_id) const { return !is(tok_id); }
+			bool is(const token_id_t &tok_id) const noexcept { return m_id.id() == tok_id.id(); }
+			bool is_not(const token_id_t &tok_id) const noexcept { return !is(tok_id); }
 
-			bool is_type(const token_type type) const { return m_type == type; }
+			bool is_type(const token_type type) const noexcept { return m_type == type; }
 
-			pstring str() const { return m_token; }
+			token_type type() const noexcept { return m_type; }
+
+			pstring str() const noexcept { return m_token; }
 
 		private:
 			token_type m_type;

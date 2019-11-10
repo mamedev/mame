@@ -33,7 +33,7 @@
 #define LM3900(name)                                                           \
 		NET_REGISTER_DEV(LM3900, name)
 
-#endif
+#endif // NL_AUTO_DEVICES
 
 /* ----------------------------------------------------------------------------
  *  External declarations
@@ -41,6 +41,6 @@
 
 NETLIST_EXTERNAL(OPAMP_lib)
 
-#endif
+#endif // __PLIB_PREPROCESSOR__
 
 #endif

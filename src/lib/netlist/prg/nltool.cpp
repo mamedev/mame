@@ -674,18 +674,24 @@ void tool_app_t::header_entry(const netlist::factory::element_t *e)
 		if (!plib::startsWith(s, "@"))
 			vs += ", p" + plib::replace_all(plib::replace_all(s, "+", ""), ".", "_");
 	mac_out("#define " + e->name() + "(name" + vs + ")");
-	mac_out("\tNET_REGISTER_DEV(" + e->name() +", name)");
+
+	vs = "";
 
 	for (const auto &s : v)
 	{
 		pstring r(plib::replace_all(plib::replace_all(plib::replace_all(s, "+", ""), ".", "_"), "@",""));
 		if (plib::startsWith(s, "+"))
-			mac_out("\tNET_CONNECT(name, " + r + ", p" + r + ")");
+			vs += ", p" + r;
 		else if (plib::startsWith(s, "@"))
-			mac_out("\tNET_CONNECT(name, " + r + ", " + r + ")");
+		{
+			// automatically connected
+			//mac_out("\tNET_CONNECT(name, " + r + ", " + r + ")");
+		}
 		else
-			mac_out("\tNETDEV_PARAMI(name, " + r + ", p" + r + ")");
+			vs += ", p" + r;
 	}
+
+	mac_out("\tNET_REGISTER_DEVEXT(" + e->name() +", name" + vs + ")", false);
 	mac_out("", false);
 }
 
@@ -730,7 +736,6 @@ void tool_app_t::create_header()
 	pout("#ifndef NLD_DEVINC_H\n");
 	pout("#define NLD_DEVINC_H\n");
 	pout("\n");
-	pout("#include \"nl_setup.h\"\n");
 	pout("#ifndef __PLIB_PREPROCESSOR__\n");
 	pout("\n");
 	pout("// ----------------------------------------------------------------------------\n");
