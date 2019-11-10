@@ -2234,7 +2234,7 @@ GAME( 1987, kozure,    0,        kozure,    kozure,   armedf_state,   init_kozur
 GAME( 1988, cclimbr2,  0,        cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, cclimbr2a, cclimbr2, cclimbr2,  cclimbr2, armedf_state,   init_cclimbr2, ROT0,   "Nichibutsu",                    "Crazy Climber 2 (Japan, Harder)", MACHINE_SUPPORTS_SAVE  )
 
-GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, armedf,    0,        armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu",                    "Armed Formation (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, skyrobo,   0,        bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
