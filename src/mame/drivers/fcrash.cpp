@@ -3389,11 +3389,13 @@ ROM_END
 // ************************************************************************* SLAMPIC2
 
 /*
+	Saturday Night Slam Masters: single board bootleg
+	
 	CPU
 	1x  MC68000P10           main cpu
 	
 	GFX
-	1x  Custom QFP 160-pin   "PLUS-B A37558.6 9325"
+	1x  Custom QFP 160-pin   "PLUS-B A37558.6 9325"   CPS-B-xx clone?
 	
 	RAM
 	2x  NEC D431000ACZ-70L   main ram   1Mbit (128Kx8) SRAM 70ns
@@ -3887,7 +3889,7 @@ ROM_END
 // ************************************************************************* CAPTCOMMB2
 
 /*
-	Single board bootleg
+	Captain Commando: single board bootleg
 	Very similar to knightsb board
 	Sound is usual Z80+YM2151 but with 2x oki MSM5205 instead of oki M6295 for samples
 	
@@ -4230,14 +4232,13 @@ ROM_START( captcommb2 )
 	ROM_LOAD( "2_gal16v8.ic7", 0x0000, 0x0117, CRC(bad3316b) SHA1(b25141540fbaab028ba563f4fe1796b6039a4d59) )
 ROM_END
 
-
 // ************************************************************************* KNIGHTSB3
 
 /*
-	Single board bootleg
+	Knights of the Round: single board bootleg
 	Very similar to knightsb and captcommb2 boards
 	Sound is usual Z80+YM2151 but with 2x oki MSM5205 instead of oki M6295 for samples
-	pcb: ORD 92032
+	pcb marking: ORD 92032
 	Very similar to knightsb set:
 	 maincpu roms are just 1 byte different, vector 1 (stack pointer init) is ff80d6 instead of ff81d6
 	 knightsb gfx roms are 4x 1MB (but not dumped), these are 8x 512KB (suspect data is same)
@@ -4261,7 +4262,7 @@ ROM_START( knightsb3 )
 	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x80000, CRC(b818272c) SHA1(680b1539bbeebf26706c9367decce2a8de0144e4) )  // 27c040
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(b0b9a4c2) SHA1(7d49b260224756303f9c6cdb67e8c531b0f5689f) )  // 27c040
 
-	ROM_REGION( 0x400000, "gfx", 0 ) // = knights but arranged differently 
+	ROM_REGION( 0x400000, "gfx", 0 ) // = knights but arranged differently
 	ROM_LOAD64_BYTE( "svr-01.bin", 0x000000, 0x40000, CRC(b08dc61f) SHA1(9527636ba0ccc7f02db6ba7013e932582ff85a93) )
 	ROM_CONTINUE(                  0x000004, 0x40000)
 	ROM_LOAD64_BYTE( "svr-02.bin", 0x000001, 0x40000, CRC(cca262aa) SHA1(587b25a724a89095299bd1f655d833d26a420c30) )
@@ -4285,6 +4286,75 @@ ROM_START( knightsb3 )
 	ROM_RELOAD( 0x10000, 0x40000 )
 ROM_END
 
+// ************************************************************************* DINOPIC3
+
+/*
+	Cadillacs and Dinosaurs: single board bootleg
+	Very small, compact and densely packed board which ahas been used for more than one game,
+	 (have seen Punisher and Slammasters bootlegs that looked identical, presumably just rom swaps)
+	No Z80, uses a PIC + oki M6295, same as other CPS1.5/Q-sound bootlegs
+	pcb marking: 3M05B
+	maincpu roms are same data as dinopic but arranged as 2x 2MB 16-bit mask roms
+	
+	repair note:
+	if any gfx issues, check the 9x Harris CD74HC597E shift registers,
+	(4 were dead on the board used for this dump!)
+	
+	TODO: confirm clocks
+*/
+
+ROM_START( dinopic3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // = dinopic but arranged differently
+	ROM_LOAD16_WORD_SWAP( "tk1-305_27c800.bin", 0x000000, 0x100000, CRC(aa468337) SHA1(496df3bd62cdea0b104f96a7988ad21c94a70c2b) )
+	ROM_LOAD16_WORD_SWAP( "tk1-204_27c800.bin", 0x100000, 0x100000, CRC(0efd1ddb) SHA1(093cf7906eda36533c7021329c629ba5a995c5ee) )
+	
+	ROM_REGION( 0x400000, "gfx", 0 ) // = dino but arranged differently
+	ROM_LOAD64_WORD("tb416-02_27c160.bin", 0x000000, 0x80000, CRC(bfd01d21) SHA1(945f2764b0ca7f9e1569a591363c70207e8efbd0) )
+	ROM_CONTINUE( 0x200000, 0x80000 )
+	ROM_CONTINUE( 0x000004, 0x80000 )
+	ROM_CONTINUE( 0x200004, 0x80000 )
+	ROM_LOAD64_WORD("tb415-01_27c160.bin", 0x000002, 0x80000, CRC(ef508ec5) SHA1(ebb521b51d7269b4a9b441bd44b6d5320a72aaaa) )
+	ROM_CONTINUE( 0x200002, 0x80000 )
+	ROM_CONTINUE( 0x000006, 0x80000 )
+	ROM_CONTINUE( 0x200006, 0x80000 )
+	
+	// no markings, assume pic16c57, secured
+	//ROM_REGION( 0x2000, "audiocpu", 0 )
+	//ROM_LOAD( "pic_t1.bin", 0x0000, 0x1007, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "ti-i_27c040.bin", 0x000000, 0x80000, CRC(7d921309) SHA1(d51e60e904d302c2516b734189e141aa171b2b82) )  // = dinopic, dinopic2
+	
+	/* pld devices:
+		 __________________________
+		|                  6       |      (no component reference markings on pcb)
+		|                      7   |
+	  ==            5              |
+	  ==                           |
+	  ==                           |
+	  ==                           |
+	  ==                         4 |
+		|     1            2  3    |
+		|__________________________|
+	
+	#1   palce20v8   next to main cpu        secured                 = dinopic2 "gal20v8a-1.bin", tested ok
+	#2   palce20v8   below gfx roms, left    secured                 = dinopic2 "gal20v8a-2.bin", tested ok
+	#3   palce20v8   below gfx roms, middle  secured                 = dinopic2 "gal20v8a-3.bin", tested ok
+	#4   palce16v8   below gfx roms, right   secured, bruteforce ok
+	#5   palce16v8   just below 30M xtal     secured                 = dinopic2 "palce16v8h-1.bin", tested ok
+	#6   palce16v8   just to right 30M xtal  secured                 = dinopic2 "palce16v8h-2.bin", tested ok
+	#7   a1020b      actel plcc84            unattempted
+	(The dinopic2 1-3,5-6 dumps were burnt, tested, and work ok on this board)
+	*/
+	ROM_REGION( 0xe00, "plds", 0 )
+	ROM_LOAD( "1_palce20v8.bin", 0x200, 0x157, CRC(cd99ca47) SHA1(ee1d990fd294aa46f56f31264134251569f6792e) )  // dinopic2
+	ROM_LOAD( "2_palce20v8.bin", 0x400, 0x157, CRC(60d016b9) SHA1(add42c763c819f3fe6d7cf3adc7123a52c2a3be9) )  // dinopic2
+	ROM_LOAD( "3_palce20v8.bin", 0x600, 0x157, CRC(049b7f4f) SHA1(6c6ea03d9a293db69a8bd10e042ee75e3c01313c) )  // dinopic2
+	ROM_LOAD( "4_palce16v8.bin", 0x800, 0x117, CRC(97a67c6d) SHA1(822411f878f1efe462a7a8e93960a1fc5140422e) )
+	ROM_LOAD( "5_palce16v8.bin", 0xa00, 0x117, CRC(48253c66) SHA1(8c94e655b768c45c3edf6ef39e62e3b7a4e57530) )  // dinopic2
+	ROM_LOAD( "6_palce16v8.bin", 0xc00, 0x117, CRC(9ae375ba) SHA1(6f227c2a5b1170a41e6419f12d1e1f98edc6f8e5) )  // dinopic2
+ROM_END
+
 
 // ************************************************************************* DRIVER MACROS
 
@@ -4293,6 +4363,7 @@ GAME( 1990, cawingb2,   cawing,   cawingbl,   cawingbl,   cps_state, init_cawing
 
 GAME( 1993, dinopic,    dino,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
 GAME( 1993, dinopic2,   dino,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
+GAME( 1993, dinopic3,      0,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
 
 GAME( 1990, fcrash,     ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbl,   ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg", "Final Fight (bootleg)", MACHINE_SUPPORTS_SAVE )
