@@ -147,6 +147,7 @@ public:
 		m_cartlobank(*this, MO6_CART_LO),
 		m_carthibank(*this, MO6_CART_HI),
 		m_cart_rom(*this, "cartridge"),
+		m_to7qdd(*this, "to7qdd"),
 		m_thmfc(*this, "thmfc"),
 		m_floppy_led(*this, "floppy"),
 		m_floppy_image(*this, "floppy%u", 0U)
@@ -345,22 +346,20 @@ private:
 	DECLARE_WRITE_LINE_MEMBER(thom_vblank);
 	DECLARE_VIDEO_START( thom );
 
-	DECLARE_READ8_MEMBER( to7_5p14_r );
-	DECLARE_WRITE8_MEMBER( to7_5p14_w );
-	DECLARE_READ8_MEMBER( to7_5p14sd_r );
-	DECLARE_WRITE8_MEMBER( to7_5p14sd_w );
-	DECLARE_READ8_MEMBER( to7_qdd_r );
-	DECLARE_WRITE8_MEMBER( to7_qdd_w );
+	uint8_t to7_5p14_r(offs_t offset);
+	void to7_5p14_w(offs_t offset, uint8_t data);
+	uint8_t to7_5p14sd_r(offs_t offset);
+	void to7_5p14sd_w(offs_t offset, uint8_t data);
 	TIMER_CALLBACK_MEMBER( ans4 );
 	TIMER_CALLBACK_MEMBER( ans3 );
 	TIMER_CALLBACK_MEMBER( ans2 );
 	TIMER_CALLBACK_MEMBER( ans );
-	DECLARE_READ8_MEMBER( to7_network_r );
-	DECLARE_WRITE8_MEMBER( to7_network_w );
-	DECLARE_READ8_MEMBER( to7_floppy_r );
-	DECLARE_WRITE8_MEMBER( to7_floppy_w );
-	DECLARE_READ8_MEMBER( to9_floppy_r );
-	DECLARE_WRITE8_MEMBER( to9_floppy_w );
+	uint8_t to7_network_r(offs_t offset);
+	void to7_network_w(offs_t offset, uint8_t data);
+	uint8_t to7_floppy_r(offs_t offset);
+	void to7_floppy_w(offs_t offset, uint8_t data);
+	uint8_t to9_floppy_r(offs_t offset);
+	void to9_floppy_w(offs_t offset, uint8_t data);
 	WRITE_LINE_MEMBER( fdc_index_0_w );
 	WRITE_LINE_MEMBER( fdc_index_1_w );
 	WRITE_LINE_MEMBER( fdc_index_2_w );
@@ -430,6 +429,7 @@ private:
 	optional_memory_bank m_carthibank;
 	required_region_ptr<uint8_t> m_cart_rom;
 
+	required_device<cq90_028_device> m_to7qdd;
 	required_device<thmfc1_device> m_thmfc;
 	output_finder<> m_floppy_led;
 	required_device_array<legacy_floppy_image_device, 4> m_floppy_image;
@@ -546,6 +546,11 @@ private:
 	emu_timer *m_thom_init_timer;
 	void (thomson_state::*m_thom_init_cb)( int init );
 
+	uint8_t m_to7_controller_type;
+	uint8_t m_to7_floppy_bank;
+	uint8_t m_to7_5p14_select;
+	uint8_t m_to7_5p14sd_select;
+
 	int to7_get_cassette();
 	int mo5_get_cassette();
 	void mo5_set_cassette( int data );
@@ -615,13 +620,6 @@ private:
 	void to7_5p14_index_pulse_callback( int state );
 	void to7_5p14sd_reset();
 	void to7_5p14sd_init();
-	void to7_qdd_index_pulse_cb( int state );
-	legacy_floppy_image_device * to7_qdd_image();
-	void to7_qdd_stat_update();
-	uint8_t to7_qdd_read_byte();
-	void to7_qdd_write_byte( uint8_t data );
-	void to7_qdd_reset();
-	void to7_qdd_init();
 	void to7_network_init();
 	void to7_network_reset();
 	void to7_floppy_init();

@@ -16,37 +16,40 @@
 #include "machine/mc6843.h"
 #include "machine/mc6854.h"
 
-extern uint8_t to7_controller_type; /* set during init */
-extern uint8_t to7_floppy_bank;
-
 /* number of external floppy controller ROM banks */
 #define TO7_NB_FLOP_BANK 9
 
 /* external floppy / network controller active */
-#define THOM_FLOPPY_EXT (to7_controller_type >= 1)
+#define THOM_FLOPPY_EXT (m_to7_controller_type >= 1)
 
 /* internal floppy controller active (no or network extension) */
-#define THOM_FLOPPY_INT (to7_controller_type == 0 || to7_controller_type > 4)
+#define THOM_FLOPPY_INT (m_to7_controller_type == 0 || m_to7_controller_type > 4)
 
 
 /* external controllers */
 /* TO9 internal (WD2793) & external controllers */
 /* TO8 internal (THMFC1) controller */
 
-class thmfc1_device : public device_t
+class thomson_legacy_floppy_interface : public device_interface
+{
+protected:
+	thomson_legacy_floppy_interface(const machine_config &mconfig, device_t &device)
+		: device_interface(device, "thom_flop")
+	{
+	}
+
+	static int floppy_make_addr(chrn_id id, uint8_t *dst, int sector_size);
+	static int floppy_make_sector(legacy_floppy_image_device *img, chrn_id id, uint8_t *dst, int sector_size);
+	static int floppy_make_track(legacy_floppy_image_device *img, uint8_t *dst, int sector_size, int side);
+
+	static int qdd_make_addr(int sector, uint8_t *dst);
+	static int qdd_make_sector(legacy_floppy_image_device *img, int sector, uint8_t *dst);
+	static int qdd_make_disk(legacy_floppy_image_device *img, uint8_t *dst);
+};
+
+class thmfc1_device : public device_t, public thomson_legacy_floppy_interface
 {
 public:
-	// STAT0 flags
-	enum : uint8_t
-	{
-		STAT0_SYNCHRO        = 0x01, // bit clock synchronized
-		STAT0_BYTE_READY_OP  = 0x02, // byte ready (high-level operation)
-		STAT0_CRC_ERROR      = 0x04,
-		STAT0_FINISHED       = 0x08,
-		STAT0_FINISHING      = 0x10, // (unemulated)
-		STAT0_BYTE_READY_POL = 0x80  // polling mode
-	};
-
 	thmfc1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto floppy_active_cb() { return m_floppy_active_cb.bind(); }
@@ -111,6 +114,46 @@ private:
 	emu_timer *m_floppy_cmd;
 };
 
+class cq90_028_device : public device_t, public thomson_legacy_floppy_interface
+{
+public:
+	cq90_028_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	uint8_t qdd_r(offs_t offset);
+	void qdd_w(offs_t offset, uint8_t data);
+
+	void index_pulse_cb(int state);
+	void qdd_reset();
+
+protected:
+	virtual void device_start() override;
+
+private:
+	void stat_update();
+	uint8_t qdd_read_byte();
+	void qdd_write_byte(uint8_t data);
+
+	required_device<legacy_floppy_image_device> m_qdd_image;
+
+	// MC6852 registers
+	uint8_t m_status;
+	uint8_t m_ctrl1;
+	uint8_t m_ctrl2;
+	uint8_t m_ctrl3;
+
+	// extra registers
+	uint8_t m_drive;
+
+	// internal state
+	std::unique_ptr<uint8_t[]> m_data;   // enough for a whole track
+	uint32_t m_data_idx;                 // byte position in track 
+	uint32_t m_start_idx;                // start of write position
+	uint32_t m_data_size;                // track length
+	uint8_t  m_data_crc;                 // checksum when writing
+	uint8_t  m_index_pulse;              // one pulse per track
+};
+
 DECLARE_DEVICE_TYPE(THMFC1, thmfc1_device)
+DECLARE_DEVICE_TYPE(CQ90_028, cq90_028_device)
 
 #endif /* THOMFLOP_H_ */
