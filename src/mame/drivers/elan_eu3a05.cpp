@@ -69,9 +69,12 @@
 
 	The 3D stages are prone to softlocking when the refuel jet is meant to appear.
 
-	2D stages will zap you of your lives and then continues one by one if you die on a boss.  The manual claims
-	you can't continue on a boss (but this isn't true for the 3D stages, where the feature works as expected)
-	rather than the 2D stage implementation, which seems more like a bug.
+	2D stages will zap you of your lives and then continues one by one if you die on a boss meaning if you have
+	2 continues left you'll be offered the continue screen twice while it drains you of your lives before
+	actually presenting you with the Game Over screen.  The manual claims you can't continue on a boss however
+	this isn't true for the 3D stages, where the continue feature works as expected.  Either way, this is a very
+	crude way of implementing a 'no continue' feature on bosses if it isn't simply a bug in the game code that
+	was explained away as a feature.
 
 	Sprites clip on / off the top of the screen in parts - if you move your the player helipcopter to the top
 	of the screen the top 8 pixels clip off too (not currently happening in MAME, probably need to take out
