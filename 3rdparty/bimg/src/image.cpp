@@ -1343,6 +1343,11 @@ namespace bimg
 
 	void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC2 || BIMG_DECODE_BC3) )
+		{
+			return;
+		}
+
 		uint8_t colors[4*3];
 
 		uint32_t c0 = _src[0] | (_src[1] << 8);
@@ -1374,6 +1379,11 @@ namespace bimg
 
 	void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC1 || BIMG_DECODE_BC2 || BIMG_DECODE_BC3) )
+		{
+			return;
+		}
+
 		uint8_t colors[4*4];
 
 		uint32_t c0 = _src[0] | (_src[1] << 8);
@@ -1425,6 +1435,11 @@ namespace bimg
 
 	void decodeBlockDxt23A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC2) )
+		{
+			return;
+		}
+
 		for (uint32_t ii = 0, next = 0; ii < 16*4; ii += 4, next += 4)
 		{
 			uint32_t c0 = (_src[next>>3] >> (next&7) ) & 0xf;
@@ -1434,6 +1449,11 @@ namespace bimg
 
 	void decodeBlockDxt45A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
+		if (!BX_ENABLED(BIMG_DECODE_BC3 || BIMG_DECODE_BC4 || BIMG_DECODE_BC5) )
+		{
+			return;
+		}
+
 		uint8_t alpha[8];
 		alpha[0] = _src[0];
 		alpha[1] = _src[1];
@@ -4255,102 +4275,142 @@ namespace bimg
 		switch (_srcFormat)
 		{
 		case TextureFormat::BC1:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC1) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt1(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt1(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC1 decoder is disabled (BIMG_DECODE_BC1).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC2:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC2) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt23A(temp+3, src);
-					src += 8;
-					decodeBlockDxt(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt23A(temp+3, src);
+						src += 8;
+						decodeBlockDxt(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC2 decoder is disabled (BIMG_DECODE_BC2).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC3:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC3) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt45A(temp+3, src);
-					src += 8;
-					decodeBlockDxt(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt45A(temp+3, src);
+						src += 8;
+						decodeBlockDxt(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC3 decoder is disabled (BIMG_DECODE_BC3).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC4:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC4) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt45A(temp, src);
-					src += 8;
+					for (uint32_t xx = 0; xx < width; ++xx)
+					{
+						decodeBlockDxt45A(temp, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC4 decoder is disabled (BIMG_DECODE_BC4).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
 		case TextureFormat::BC5:
-			for (uint32_t yy = 0; yy < height; ++yy)
+			if (BX_ENABLED(BIMG_DECODE_BC5) )
 			{
-				for (uint32_t xx = 0; xx < width; ++xx)
+				for (uint32_t yy = 0; yy < height; ++yy)
 				{
-					decodeBlockDxt45A(temp+2, src);
-					src += 8;
-					decodeBlockDxt45A(temp+1, src);
-					src += 8;
-
-					for (uint32_t ii = 0; ii < 16; ++ii)
+					for (uint32_t xx = 0; xx < width; ++xx)
 					{
-						float nx = temp[ii*4+2]*2.0f/255.0f - 1.0f;
-						float ny = temp[ii*4+1]*2.0f/255.0f - 1.0f;
-						float nz = bx::sqrt(1.0f - nx*nx - ny*ny);
-						temp[ii*4+0] = uint8_t( (nz + 1.0f)*255.0f/2.0f);
-						temp[ii*4+3] = 0;
-					}
+						decodeBlockDxt45A(temp+2, src);
+						src += 8;
+						decodeBlockDxt45A(temp+1, src);
+						src += 8;
 
-					uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
-					bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
-					bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
-					bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
-					bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+						for (uint32_t ii = 0; ii < 16; ++ii)
+						{
+							float nx = temp[ii*4+2]*2.0f/255.0f - 1.0f;
+							float ny = temp[ii*4+1]*2.0f/255.0f - 1.0f;
+							float nz = bx::sqrt(1.0f - nx*nx - ny*ny);
+							temp[ii*4+0] = uint8_t( (nz + 1.0f)*255.0f/2.0f);
+							temp[ii*4+3] = 0;
+						}
+
+						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
+						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
+						bx::memCopy(&block[1*_dstPitch], &temp[16], 16);
+						bx::memCopy(&block[2*_dstPitch], &temp[32], 16);
+						bx::memCopy(&block[3*_dstPitch], &temp[48], 16);
+					}
 				}
+			}
+			else
+			{
+				BX_WARN(false, "BC5 decoder is disabled (BIMG_DECODE_BC5).");
+				imageCheckerboard(_dst, _width, _height, 16, UINT32_C(0xff000000), UINT32_C(0xff00ff00) );
 			}
 			break;
 
