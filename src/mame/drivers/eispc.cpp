@@ -83,8 +83,9 @@
 #define LOG_NMI     (1U << 9)
 #define LOG_BITS    (1U << 10)
 #define LOG_FPU     (1U << 11)
+#define LOG_COM     (1U << 12)
 
-//#define VERBOSE (LOG_FPU)
+//#define VERBOSE (LOG_COM)
 //#define LOG_OUTPUT_STREAM std::cout
 
 #include "logmacro.h"
@@ -100,6 +101,7 @@
 #define LOGNMI(...)  LOGMASKED(LOG_NMI,  __VA_ARGS__)
 #define LOGBITS(...) LOGMASKED(LOG_BITS, __VA_ARGS__)
 #define LOGFPU(...)  LOGMASKED(LOG_FPU,  __VA_ARGS__)
+#define LOGCOM(...)  LOGMASKED(LOG_COM,  __VA_ARGS__)
 
 class epc_state : public driver_device
 {
@@ -122,7 +124,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_fdc(*this, "fdc")
 		, m_floppy_connectors(*this, "fdc:%u", 0)
-		, m_uart(*this, "uart8250")
+		, m_uart(*this, "uart")
 	{ }
 
 	void epc(machine_config &config);
@@ -173,7 +175,8 @@ private:
 	required_device<eispc_keyboard_device> m_keyboard;
 	emu_timer *m_kbdclk_timer;
 	TIMER_CALLBACK_MEMBER(rxtxclk_w);
-	int m_rxtx_clk_state;
+	bool m_8251rxtx_clk_state;
+	bool m_8251dtr_state;
 	output_finder<3> m_leds;
 
 	// Interrupt Controller
@@ -468,7 +471,8 @@ void epc_state::machine_start()
 	save_item(NAME(m_int));
 	save_item(NAME(m_dreq0_ck));
 	save_item(NAME(m_ppi_portb));
-	save_item(NAME(m_rxtx_clk_state));
+	save_item(NAME(m_8251rxtx_clk_state));
+	save_item(NAME(m_8251dtr_state));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_8087_int));
 	save_item(NAME(m_parer_int));
@@ -493,7 +497,8 @@ void epc_state::machine_reset()
 	m_int = 1;
 	m_dreq0_ck = true;
 	m_ppi_portb = 0;
-	m_rxtx_clk_state = 0;
+	m_8251rxtx_clk_state = 0;
+	m_8251dtr_state = 1;
 	m_nmi_enabled = 0;
 	m_8087_int = 0;
 	m_parer_int = 0;
@@ -512,19 +517,23 @@ void epc_state::machine_reset()
 
 void epc_state::init_epc()
 {
-	/* Keyboard UART Rxc/Txc is 19.2 kHz from x96 divider */
+	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider */
 	m_kbdclk_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(epc_state::rxtxclk_w), this));
-	m_kbdclk_timer->adjust(attotime::from_hz((XTAL(18'432'000) / 96) / 5));
+	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
 }
 
 TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
 {
-	m_kbd8251->write_rxc(m_rxtx_clk_state);
-	m_kbd8251->write_txc(m_rxtx_clk_state);
-	m_rxtx_clk_state ^= 0x01;
-	m_kbdclk_timer->adjust(attotime::from_hz((XTAL(18'432'000) / 96) / 5));
-}
+	m_kbd8251->write_rxc(m_8251rxtx_clk_state);
+	m_kbd8251->write_txc(m_8251rxtx_clk_state);
 
+	if (!m_8251dtr_state) m_uart->rclk_w(m_8251rxtx_clk_state);
+
+	m_8251rxtx_clk_state = !m_8251rxtx_clk_state;
+
+	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider ( 15 (74ls161) * 4 (74ls393.1) * 16 (74ls393) ) */
+	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
+}
 
 template <int Channel>
 uint8_t epc_state::epc_dma8237_io_r(offs_t offset)
@@ -820,7 +829,8 @@ void epc_state::epc(machine_config &config)
 	});
 	m_kbd8251->dtr_handler().set([this](bool state) // Controls RCLK for INS8250, either 19.2KHz or INS8250 BAUDOUT
 	{
-		LOGKBD("KBD DTR: %d\n", state ? 1 : 0); // TODO: Implement clock selection mux, need to check what state does what
+		LOGCOM("KBD DTR: %d\n", state ? 1 : 0); // TODO: Implement clock selection mux, need to check what state does what
+		m_8251dtr_state = state;
 	});
 
 	// Interrupt Controller
@@ -903,18 +913,19 @@ void epc_state::epc(machine_config &config)
 
 	// system board UART TODO: Implement the descrete "Baud Rate Clock" from schematics that generates clocks for the 8250
 	INS8250(config, m_uart, XTAL(18'432'000) / 10); // TEW crystal marked X2 verified. TODO: Let 8051 DTR control RCLK (see above)
-	m_uart->out_tx_callback().set("uart", FUNC(rs232_port_device::write_txd));
-	m_uart->out_dtr_callback().set("uart", FUNC(rs232_port_device::write_dtr));
-	m_uart->out_rts_callback().set("uart", FUNC(rs232_port_device::write_rts));
+	m_uart->out_tx_callback().set("com1", FUNC(rs232_port_device::write_txd));
+	m_uart->out_dtr_callback().set("com1", FUNC(rs232_port_device::write_dtr));
+	m_uart->out_rts_callback().set("com1", FUNC(rs232_port_device::write_rts));
 	m_uart->out_int_callback().set([this](int state)
 	{   // Jumper field J10 decides what IRQ to pull
-		if ((m_io_j10->read() & 0x03) == 0x02) { LOGIRQ("UART IRQ2: %d\n", state); m_pic8259->ir2_w(state); }
-		if ((m_io_j10->read() & 0x0c) == 0x08) { LOGIRQ("UART IRQ3: %d\n", state); m_pic8259->ir3_w(state); }
-		if ((m_io_j10->read() & 0x30) == 0x20) { LOGIRQ("UART IRQ4: %d\n", state); m_pic8259->ir4_w(state); } // Factory setting
-		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGIRQ("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
+		if ((m_io_j10->read() & 0x03) == 0x02) { LOGCOM("UART IRQ2: %d\n", state); m_pic8259->ir2_w(state); }
+		if ((m_io_j10->read() & 0x0c) == 0x08) { LOGCOM("UART IRQ3: %d\n", state); m_pic8259->ir3_w(state); }
+		if ((m_io_j10->read() & 0x30) == 0x20) { LOGCOM("UART IRQ4: %d\n", state); m_pic8259->ir4_w(state); } // Factory setting
+		if ((m_io_j10->read() & 0xc0) == 0x80) { LOGCOM("UART IRQ7: %d\n", state); m_pic8259->ir7_w(state); }
 	});
+	m_uart->out_baudout_callback().set([this](int state){ if (m_8251dtr_state) m_uart->rclk_w(state); });
 
-	rs232_port_device &rs232(RS232_PORT(config, "uart", default_rs232_devices, nullptr));
+	rs232_port_device &rs232(RS232_PORT(config, "com1", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(ins8250_uart_device::rx_w));
 	rs232.dcd_handler().set(m_uart, FUNC(ins8250_uart_device::dcd_w));
 	rs232.dsr_handler().set(m_uart, FUNC(ins8250_uart_device::dsr_w));
