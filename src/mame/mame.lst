@@ -14981,6 +14981,9 @@ gridlee                         // [1983 Videa] prototype - no copyright notice
 @source:groundfx.cpp
 groundfx                        // D51 (c) 1992 Taito Corporation
 
+@source:gsspade.cpp
+gsspade                         //
+
 @source:gstream.cpp
 gstream                         // (c) 2002, Oriental Soft Japan
 x2222                           // (c) 2000, Oriental Soft

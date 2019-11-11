@@ -4758,6 +4758,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/gotcha.cpp",
 	MAME_DIR .. "src/mame/includes/gotcha.h",
 	MAME_DIR .. "src/mame/video/gotcha.cpp",
+	MAME_DIR .. "src/mame/drivers/gsspade.cpp",
 	MAME_DIR .. "src/mame/drivers/gumbo.cpp",
 	MAME_DIR .. "src/mame/includes/gumbo.h",
 	MAME_DIR .. "src/mame/video/gumbo.cpp",
