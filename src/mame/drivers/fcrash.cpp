@@ -771,6 +771,7 @@ void cps_state::knightsb_map(address_map &map)
 	map(0x900000, 0x93ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
 	map(0x980000, 0x98002f).w(FUNC(cps_state::knightsb_layer_w));
 	map(0x990000, 0x990001).nopw(); // same as 880000
+	//  0x990000, 0x993fff  spriteram
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
@@ -3453,7 +3454,7 @@ ROM_END
 	* On the title screen, the blue crystal-like effect behind the main "slammasters" logo is missing.
 	* The bottom and side crowd animations have missing frames.
 	* The foreground ropes of the wrestling ring are glitchy and don't always line up properly with the end sections,
-	    the original game draws all 3 ropes on scroll2 instead of with sprites when 4 players are on screen,
+		the original game draws all 3 ropes on scroll2 instead of with sprites when 4 players are on screen,
 		this bootleg draws the top red rope on scroll2 even with 2 players on screen.
 	* Player 3/4 inputs don't work in test menu (except both btn 3), seems test menu code hasn't been hacked to use the different ports.
 	* Sound is generally very poor quality and the background music consists of short pre-recorded clips which loop continuously.
@@ -3886,7 +3887,7 @@ ROM_END
 // ************************************************************************* CAPTCOMMB2
 
 /*
-    Single board bootleg
+	Single board bootleg
 	Very similar to knightsb board
 	Sound is usual Z80+YM2151 but with 2x oki MSM5205 instead of oki M6295 for samples
 	
@@ -4230,46 +4231,101 @@ ROM_START( captcommb2 )
 ROM_END
 
 
+// ************************************************************************* KNIGHTSB3
+
+/*
+	Single board bootleg
+	Very similar to knightsb and captcommb2 boards
+	Sound is usual Z80+YM2151 but with 2x oki MSM5205 instead of oki M6295 for samples
+	pcb: ORD 92032
+	Very similar to knightsb set:
+	 maincpu roms are just 1 byte different, vector 1 (stack pointer init) is ff80d6 instead of ff81d6
+	 knightsb gfx roms are 4x 1MB (but not dumped), these are 8x 512KB (suspect data is same)
+	Some sound samples are very quiet on real pcb
+	
+	TODO: confirm clocks
+*/
+
+void cps_state::init_knightsb3()
+{
+	m_bootleg_sprite_renderer = &cps_state::captcommb2_render_sprites;
+	m_maincpu->space(AS_PROGRAM).unmap_write(0x980000, 0x980023);
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x980025, write16_delegate(*this, FUNC(cps_state::knightsb_layer_w)));
+	m_msm_1->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_msm_2->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
+	init_dinopic();
+}
+
+ROM_START( knightsb3 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x80000, CRC(b818272c) SHA1(680b1539bbeebf26706c9367decce2a8de0144e4) )  // 27c040
+	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(b0b9a4c2) SHA1(7d49b260224756303f9c6cdb67e8c531b0f5689f) )  // 27c040
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // = knights but arranged differently 
+	ROM_LOAD64_BYTE( "svr-01.bin", 0x000000, 0x40000, CRC(b08dc61f) SHA1(9527636ba0ccc7f02db6ba7013e932582ff85a93) )
+	ROM_CONTINUE(                  0x000004, 0x40000)
+	ROM_LOAD64_BYTE( "svr-02.bin", 0x000001, 0x40000, CRC(cca262aa) SHA1(587b25a724a89095299bd1f655d833d26a420c30) )
+	ROM_CONTINUE(                  0x000005, 0x40000)
+	ROM_LOAD64_BYTE( "svr-03.bin", 0x000002, 0x40000, CRC(1fe7056c) SHA1(eb9e5955c6cf2cfef565672cd0efcfd6921fefc3) )
+	ROM_CONTINUE(                  0x000006, 0x40000)
+	ROM_LOAD64_BYTE( "svr-04.bin", 0x000003, 0x40000, CRC(b29ce7cf) SHA1(d8f99c57561c60bec260c6b5daef81ba7856b547) )
+	ROM_CONTINUE(                  0x000007, 0x40000)
+	ROM_LOAD64_BYTE( "svr-05.bin", 0x200000, 0x40000, CRC(1c774671) SHA1(d553b87e8a0f13f404cff64089847325a18d1afb) )
+	ROM_CONTINUE(                  0x200004, 0x40000)
+	ROM_LOAD64_BYTE( "svr-06.bin", 0x200001, 0x40000, CRC(05463aa3) SHA1(27cc2724e22bf74e972283d6c35d31cea2c1a943) )
+	ROM_CONTINUE(                  0x200005, 0x40000)
+	ROM_LOAD64_BYTE( "svr-07.bin", 0x200002, 0x40000, CRC(87944aaa) SHA1(57d4637d5cf10b9cef95e12c64362c04a604cf64) )
+	ROM_CONTINUE(                  0x200006, 0x40000)
+	ROM_LOAD64_BYTE( "svr-08.bin", 0x200003, 0x40000, CRC(aa9d82fb) SHA1(41ff75bc0cc3766c19d79080893b52d9c759a443) )
+	ROM_CONTINUE(                  0x200007, 0x40000)
+
+	// TODO: dump
+	ROM_REGION( 0x50000, "audiocpu", 0 )
+	ROM_LOAD( "1.ic26", 0x00000, 0x40000, CRC(bd6f9cc1) SHA1(9f33cccef224d2204736a9eae761196866bd6e41) )  // knightsb
+	ROM_RELOAD( 0x10000, 0x40000 )
+ROM_END
+
+
 // ************************************************************************* DRIVER MACROS
 
 GAME( 1990, cawingbl,   cawing,   cawingbl,   cawingbl,   cps_state, init_cawingbl,   ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)", MACHINE_SUPPORTS_SAVE ) // 901012 ETC
 GAME( 1990, cawingb2,   cawing,   cawingbl,   cawingbl,   cps_state, init_cawingbl,   ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)", MACHINE_SUPPORTS_SAVE ) // 901012 ETC
-                                                                                       
+
 GAME( 1993, dinopic,    dino,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
 GAME( 1993, dinopic2,   dino,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
-                                                                                       
+
 GAME( 1990, fcrash,     ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbl,   ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg", "Final Fight (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ffightbla,  ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg", "Final Fight (bootleg on Final Crash PCB)", MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
-                                                                                       
+
 GAME( 1991, kodb,       kod,      kodb,       kodb,       cps_state, init_kodb,       ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
-                                                                                       
-GAME( 1991, knightsb,   knights,  knightsb,   knights,    cps_state, init_dinopic,    ROT0,   "bootleg", "Knights of the Round (bootleg with 2xMSM5205)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
-                                                                                       
+
+GAME( 1991, knightsb,   knights,  knightsb,   knights,    cps_state, init_dinopic,    ROT0,   "bootleg", "Knights of the Round (bootleg with 2xMSM5205, set 1)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
+GAME( 1991, knightsb3,  0,        captcommb2, knights,    cps_state, init_knightsb3,  ROT0,   "bootleg", "Knights of the Round (bootleg with 2xMSM5205, set 2)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
+
 GAME( 1993, mtwinsb,    mtwins,   mtwinsb,    mtwins,     cps_state, init_mtwinsb,    ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
-                                                                                       
+
 GAME( 1993, punipic,    punisher, punipic,    punisher,   cps_state, init_punipic,    ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
 GAME( 1993, punipic2,   punisher, punipic,    punisher,   cps_state, init_punipic,    ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
 GAME( 1993, punipic3,   punisher, punipic,    punisher,   cps_state, init_punipic3,   ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
-                                                                                       
+
 GAME( 1992, sf2m1,      sf2ce,    sf2m1,      sf2,        cps_state, init_sf2m1,      ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
 GAME( 1992, sf2mdt,     sf2ce,    sf2mdt,     sf2mdt,     cps_state, init_sf2mdt,     ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
 GAME( 1992, sf2mdta,    sf2ce,    sf2mdt,     sf2mdt,     cps_state, init_sf2mdta,    ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
 GAME( 1992, sf2mdtb,    sf2ce,    sf2mdt,     sf2mdtb,    cps_state, init_sf2mdtb,    ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
 GAME( 1992, sf2ceb,     sf2ce,    sf2mdt,     sf2mdt,     cps_state, init_sf2mdta,    ROT0,   "bootleg (Playmark)", "Street Fighter II': Champion Edition (Playmark bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
-                                                                                       
+
 GAME( 1992, sf2b,       sf2,      sf2b,       sf2mdt,     cps_state, init_sf2b,       ROT0,   "bootleg (Playmark)", "Street Fighter II: The World Warrior (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
 GAME( 1992, sf2b2,      sf2,      sf2b,       sf2mdt,     cps_state, init_sf2mdtb,    ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
-                                                                                       
+
 GAME( 1992, sf2m9,      sf2ce,    sf2m1,      sf2,        cps_state, init_sf2m1,      ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
-                                                                                       
+
 GAME( 1993, slampic,    slammast, slampic,    slampic,    cps_state, init_dinopic,    ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
 GAME( 1993, slampic2,   0,        slampic2,   slampic2,   cps_state, init_slampic2,   ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
-                                                                                       
+
 GAME( 1999, sgyxz,      wof,      sgyxz,      sgyxz,      cps_state, init_cps1,       ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
 GAME( 1999, wofabl,     wof,      wofabl,     wofabl,     cps_state, init_wofabl,     ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy graphics glitches - 921005 - Sangokushi 2
-                                                                                       
-GAME( 1992, varthb,     varth,    varthb,     varth,      cps_state, init_dinopic,    ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg)", MACHINE_SUPPORTS_SAVE )
-                                               
-GAME( 1991, captcommb2, 0,        captcommb2, captcommb2, cps_state, init_captcommb2, ROT0,   "bootleg", "Captain Commando (bootleg with 2xMSM5205)", MACHINE_SUPPORTS_SAVE )   // 911014 ETC
 
+GAME( 1992, varthb,     varth,    varthb,     varth,      cps_state, init_dinopic,    ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1991, captcommb2, 0,        captcommb2, captcommb2, cps_state, init_captcommb2, ROT0,   "bootleg", "Captain Commando (bootleg with 2xMSM5205)", MACHINE_SUPPORTS_SAVE )   // 911014 ETC
