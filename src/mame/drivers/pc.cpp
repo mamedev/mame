@@ -1260,7 +1260,27 @@ ROM_START( nixpc01 )
 	ROM_LOAD( "nx01.bin", 0xc000, 0x4000, CRC(b0a75d1f) SHA1(7c2890eced917969968fc2e7491cda90a9734e03))
 ROM_END
 
-/******************************************************Leading Edge Model M ***
+/***************************************************** Leading Edge Model D ***
+
+Those use an Intel Wildcard 88, a XT computer sans slots and DRAM on a SIMM like module
+Chipset: Faraday FE2010A
+
+******************************************************************************/
+
+ROM_START( ledgmodd )
+	ROM_REGION(0x10000, "bios", 0)
+	// 0: blank display
+	ROM_SYSTEM_BIOS(0, "le", "Leading Edge")
+	ROMX_LOAD( "wildcard_88-the_leading_edge-model_d-le_303-27.bin", 0xc000, 0x4000, CRC(cc05347d) SHA1(c44f3ce56472e0894ab955a14f6a91a3fb876baf), ROM_BIOS(0) )
+	// 1: blank display
+	ROM_SYSTEM_BIOS(1, "daewoo", "Daewoo")
+	ROMX_LOAD( "wildcard_88-the_leading_edge-model_d-daewoo-pn_23096023.bin", 0xc000, 0x4000, CRC(34f5fa32) SHA1(73c0489532a1f9a0b23bdd1865cd8b0c6f131ad9), ROM_BIOS(1) )
+	// 2: Phoenix 8088 ROM BIOS Version 2.52 / P E Nelson - No scancode from keyboard
+	ROM_SYSTEM_BIOS(2, "wildcard", "Wildcard")
+	ROMX_LOAD( "wildcard7354-1001rev2.52.05.bin", 0x8000, 0x8000, CRC(ea0c4c2f) SHA1(d817f57dd5332a943b33826dbe67b23e4c94a6ca), ROM_BIOS(2) )
+ROM_END
+
+/***************************************************** Leading Edge Model M ***
 
 aka the Sperry PC, the "Sperry HT - 4.71 Bios" that can be found online is identical to the v.4.71 below
 E-TD10 - TOD Error
@@ -1374,6 +1394,7 @@ ROM_START( coppc400 )
 	ROM_LOAD("f800ffff.rom", 0x8000, 0x8000, CRC(3d9b6594) SHA1(41f85e692e2020326fd580f7c436c23c76840119))
 ROM_END
 
+
 /***************************************************************************
 
   Game driver(s)
@@ -1405,7 +1426,8 @@ COMP( 198?, juko16,         ibm5150, 0,      juko16,         pccga,    pc_state,
 COMP( 1985, kaypro16,       ibm5150, 0,      kaypro16,       pccga,    pc_state, empty_init,    "Kaypro Corporation",              "Kaypro 16",             0 )
 COMP( 198?, kaypropc,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kaypro Corporation",              "PC",                    MACHINE_NOT_WORKING )
 COMP( 198?, kyoxt,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Kyocera",                         "XT",                    MACHINE_NOT_WORKING )
-COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge",                    "Model M",               MACHINE_NOT_WORKING )
+COMP( 198?, ledgmodd,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model D",          MACHINE_NOT_WORKING )
+COMP( 198?, ledgmodm,       ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Leading Edge Hardware Products, Inc.", "Model M",          MACHINE_NOT_WORKING )
 COMP( 198?, mpx16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Micromint",                       "MPX-16",                MACHINE_NOT_WORKING )
 COMP( 1985, ncrpc4i,        ibm5150, 0,      ncrpc4i,        pccga,    pc_state, empty_init,    "NCR",                             "PC4i",                  MACHINE_NOT_WORKING )
 COMP( 198?, nixpc01,        ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Nixdorf Computer AG",             "8810/25 CPC - PC01",    MACHINE_NOT_WORKING )

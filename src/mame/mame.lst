@@ -31845,6 +31845,7 @@ sx16                            // Sanyo SX-16
 zdsupers                        // Zenith SuperSport
 zdz150                          // Zenith Z-150 series
 zdz160                          // Zenith Z-160 series
+ledgmodd                        // Leading Edge Model D
 ledgmodm                        // Leading Edge Model M
 eaglepc2                        // Eagle PC-2
 mpx16                           // Ciarcia's Circuit Cellar Micromint MPX-16
