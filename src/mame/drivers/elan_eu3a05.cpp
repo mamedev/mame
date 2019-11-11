@@ -37,10 +37,11 @@
     Space Invaders - hold P1 Down + P1 Button 1 on boot
 	ABL Air-Blaster - none?
 
-	----
-
+	-----------------------------------------------------
     Flaws (NOT emulation bugs, happen on hardware):
-    --
+	-----------------------------------------------------
+
+	rad_sinv:
 
     In QIX the sprites lag behind the line drawing, so you see the line infront of your player until you stop moving
 
@@ -56,12 +57,36 @@
 
     The 200pt right facing bird on the Phoenix score table is corrupt
 
-    Uncertain (to check)
-
     Space Invaders seems to be using a darker than expected palette, there are lighter colours in the palette but
     they don't seem to be used.  It's difficult to judge from hardware videos, although it definitely isn't as
-    white as the menu, so this might also be a non-bug.
+    white as the menu, so this might also be a non-bug. (Uncertain - to check)
 
+	-------------------------
+
+	airblasjs:
+
+	This game is very buggy.
+
+	The 3D stages are prone to softlocking when the refuel jet is meant to appear.
+
+	2D stages will zap you of your lives and then continues one by one if you die on a boss.  The manual claims
+	you can't continue on a boss (but this isn't true for the 3D stages, where the feature works as expected)
+	rather than the 2D stage implementation, which seems more like a bug.
+
+	Sprites clip on / off the top of the screen in parts - if you move your the player helipcopter to the top
+	of the screen the top 8 pixels clip off too (not currently happening in MAME, probably need to take out
+	sprite wrapping on y)
+
+	Sprites wrap around on X too, if you move to the left edge you can see your shadow on the right etc.
+
+	Sound sometimes stops working properly / shot changes for no reason.
+
+	There's no indication of damage most of the time on bosses, some parts won't take damage until other parts
+	have been destroyed, not always obvious.
+
+	Very heavy sprite flicker (not emulated)
+
+	Very heavy slowdown (MAME speed is approximate)
 
 */
 
