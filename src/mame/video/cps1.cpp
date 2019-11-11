@@ -1530,6 +1530,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"captcommj",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommjr1", CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34 },
 	{"captcommb",   CPS_B_21_BT3, mapper_CC63B,  0x36, 0x38, 0x34, 3 },
+	{"captcommb2",  CPS_B_21_BT4, mapper_CC63B },  // junk around health bar with default cps2 mapper, uses BT4(knights) config
 	{"knights",     CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsu",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },
 	{"knightsj",    CPS_B_21_BT4, mapper_KR63B,  0x36, 0, 0x34 },

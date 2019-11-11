@@ -2156,8 +2156,7 @@ static INPUT_PORTS_START( kodr1 )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
-
-static INPUT_PORTS_START( captcomm )
+INPUT_PORTS_START( captcomm )
 	PORT_INCLUDE( cps1_4players )
 
 	PORT_MODIFY("IN0")

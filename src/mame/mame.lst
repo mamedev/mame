@@ -13168,6 +13168,7 @@ fccpu33
 fcombat                         // (c) 1985 Jaleco
 
 @source:fcrash.cpp
+captcommb2                      // bootleg
 cawingb2                        // bootleg
 cawingbl                        // bootleg
 dinopic                         // bootleg

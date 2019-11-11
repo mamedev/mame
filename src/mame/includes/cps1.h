@@ -13,6 +13,7 @@
 #include "sound/qsound.h"
 #include "sound/okim6295.h"
 #include "machine/gen_latch.h"
+#include "machine/74157.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
 #include "cpu/m68000/m68000.h"
@@ -129,7 +130,8 @@ protected:
 		, m_soundlatch2(*this, "soundlatch2")
 		, m_region_stars(*this, "stars")
 		, m_led_cboard(*this, "led_cboard%u", 0U)
-		, bootleg_sprite_renderer(&cps_state::fcrash_render_sprites)
+		, m_msm_mux(*this, "msm_mux%u", 1)
+		, m_bootleg_sprite_renderer(&cps_state::fcrash_render_sprites)
 	{ }
 
 public:
@@ -220,6 +222,7 @@ public:
 	void init_slampic();
 	void init_slampic2();
 	void init_wofabl();
+	void init_captcommb2();
 	DECLARE_MACHINE_START(fcrash);
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(cawingbl);
@@ -232,6 +235,8 @@ public:
 	DECLARE_MACHINE_START(slampic);
 	DECLARE_MACHINE_START(slampic2);
 	DECLARE_MACHINE_START(sgyxz);
+	DECLARE_MACHINE_START(captcommb2);
+	DECLARE_MACHINE_RESET(captcommb2);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
 	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
@@ -254,10 +259,16 @@ public:
 	DECLARE_WRITE8_MEMBER(fcrash_msm5205_0_data_w);
 	DECLARE_WRITE8_MEMBER(fcrash_msm5205_1_data_w);
 	DECLARE_WRITE16_MEMBER(varthb_layer_w);
+	DECLARE_WRITE16_MEMBER(captcommb2_layer_w);
+	DECLARE_WRITE16_MEMBER(captcommb2_soundlatch_w);
+	DECLARE_READ8_MEMBER(captcommb2_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(captcommb2_snd_bankswitch_w);
+	DECLARE_WRITE_LINE_MEMBER(captcommb2_mux_select_w);
 	uint32_t screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_update_transmasks();
 	void fcrash_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void slampic2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void captcommb2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void fcrash_render_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
 	void fcrash_render_high_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
 	void fcrash_build_palette();
@@ -304,6 +315,7 @@ public:
 	void wofhfh(machine_config &config);
 	void cps1_10MHz(machine_config &config);
 	void pang3(machine_config &config);
+	void captcommb2(machine_config &config);
 	void dinopic_map(address_map &map);
 	void fcrash_map(address_map &map);
 	void forgottn_map(address_map &map);
@@ -331,6 +343,8 @@ public:
 	void sound_map(address_map &map);
 	void sub_map(address_map &map);
 	void varthb_map(address_map &map);
+	void captcommb2_map(address_map &map);
+	void captcommb2_z80map(address_map &map);
 
 protected:
 	/* memory pointers */
@@ -379,6 +393,7 @@ protected:
 	int          m_sample_buffer2;
 	int          m_sample_select1;
 	int          m_sample_select2;
+	bool         m_captcommb2_mux_toggle;
 
 	/* video config (never changed after video_start) */
 	const struct CPS1config *m_game_config;
@@ -417,9 +432,10 @@ protected:
 	optional_device<generic_latch_8_device> m_soundlatch2;
 	optional_memory_region m_region_stars;
 	output_finder<3> m_led_cboard;
+	optional_device_array<ls157_device, 2> m_msm_mux;
 	
 	// fcrash
-	void (cps_state::*bootleg_sprite_renderer)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void (cps_state::*m_bootleg_sprite_renderer)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 class cps2_state : public cps_state
@@ -536,6 +552,7 @@ INPUT_PORTS_EXTERN( punisher );
 INPUT_PORTS_EXTERN( sf2 );
 INPUT_PORTS_EXTERN( slammast );
 INPUT_PORTS_EXTERN( varth );
+INPUT_PORTS_EXTERN( captcomm );
 
 
 #endif // MAME_INCLUDES_CPS1_H

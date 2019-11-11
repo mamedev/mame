@@ -85,6 +85,8 @@ slampic: no sound. Some minor gfx issues (sprites on character select screen)
 
 slampic2: no sound. All gfx issues confirmed present on real board.
 
+captcommb2: ok
+
 */
 
 #include "emu.h"
@@ -622,7 +624,7 @@ void cps_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bitmap
 	switch (layer)
 	{
 		case 0:
-			(this->*bootleg_sprite_renderer)(screen, bitmap, cliprect);
+			(this->*m_bootleg_sprite_renderer)(screen, bitmap, cliprect);
 			break;
 		case 1:
 		case 2:
@@ -3640,7 +3642,7 @@ void cps_state::slampic2_map(address_map &map)
 
 void cps_state::init_slampic2()
 {
-	bootleg_sprite_renderer = &cps_state::slampic2_render_sprites;
+	m_bootleg_sprite_renderer = &cps_state::slampic2_render_sprites;
 	
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x930000, 0x933fff, m_bootleg_sprite_ram.get());
@@ -3881,44 +3883,393 @@ ROM_START( slampic2 )
 	ROM_LOAD( "2_gal16v8.p1", 0x0000, 0x0117, CRC(a944ff96) SHA1(2871a1c70b91fcd8628e63497afa1275f3a27f93) )
 ROM_END
 
+// ************************************************************************* CAPTCOMMB2
+
+/*
+    Single board bootleg
+	Very similar to knightsb board
+	Sound is usual Z80+YM2151 but with 2x oki MSM5205 instead of oki M6295 for samples
+	
+	h/w issues compared to original game (captcomm)
+	-----------------------------------------------
+	these are present on the real board so are not emulation issues:
+	
+	* End sequence row scroll effect doesn't work.
+	* Capcom copyright text missing on title screen, deliberately shifted down out of visible area by bootleggers.
+	* Capcom logo missing from end sequence, as above.
+	* Sprite flickering effects eg. when character has invincibility, look a little different to original.
+	* Certain static sprites wobble vertically just a pixel or two  eg. manhole covers, breakable oil drums etc.
+	* Sound quality is generally worse as consequence of M6295->2xM5205 conversion, also M5205 should really have 384KHz xtal so pitch is slightly out,
+	    all percussion missing from music tracks, no fade in/out effects.
+	
+	these are present on the real board but are unintentionally "fixed" in emulation:
+	
+	* All '0' characters are missing in test menu eg. sound test, input test etc.
+	* Wrong tile displayed when character select count-down timer reaches zero (superscript '1' with white bar underneath)
+*/
+
+void cps_state::captcommb2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+{
+	int pos;
+	int last_sprite_offset = 0;
+	uint16_t tileno, colour, xpos, ypos;
+	bool flipx, flipy;
+	uint16_t *sprite_ram = m_bootleg_sprite_ram.get();
+	int base = (sprite_ram[0] ? 0x3000 : 0x1000) / 2;  // writes sprite buffer flip here instead of obj_base register
+	
+	// end of sprite table marker is 0x8000
+	// 1st sprite always 0x100e/0x300e
+	// sprites are: [ypos][tile#][color][xpos]
+	// no block sprites
+	for (pos = base + 7; pos < base + 0x400; pos += 4)
+		if (sprite_ram[pos] == m_sprite_list_end_marker)
+		{
+			last_sprite_offset = pos - 3;
+			break;
+		}
+
+	for (pos = last_sprite_offset - base; pos >= 0; pos -= 4)
+	{
+		tileno = sprite_ram[base + pos] & 0x7fff;      // see below
+		xpos   = sprite_ram[base + pos + 2] & 0x1ff;
+		ypos   = sprite_ram[base + pos - 1] & 0x1ff;
+		flipx  = BIT(sprite_ram[base + pos + 1], 5);
+		flipy  = BIT(sprite_ram[base + pos + 1], 6);
+		colour = sprite_ram[base + pos + 1] & 0x1f;
+		ypos   = 256 - ypos - 16;
+		xpos   = xpos + m_sprite_x_offset + 49;
+
+		if (flip_screen())
+			m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, tileno, colour, !flipx, !flipy, 512-16-xpos, 256-16-ypos, screen.priority(), 2, 15);
+		else
+			m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 2, 15);
+	}
+	
+	/* tileno note:
+		sets the unused msb for certain tiles eg. middle parts of rocket launcher weapon,
+		this means the tile is out of range and therefore transparent,
+		most likely just a bug and the real h/w ignores the unused bit so the effect is not seen.
+	*/
+}
+
+void cps_state::captcommb2(machine_config &config)
+{
+	// xtals: 30MHz, 24MHz, 400KHz
+	M68000(config, m_maincpu, 24000000 / 2);   // 12MHz measured on pcb
+	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::captcommb2_map);
+	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
+	
+	Z80(config, m_audiocpu, 30000000 / 8);  // 3.75MHz measured on pcb
+	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::captcommb2_z80map);
+	
+	MCFG_MACHINE_START_OVERRIDE(cps_state, captcommb2)
+	MCFG_MACHINE_RESET_OVERRIDE(cps_state, captcommb2)
+	
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
+	m_screen->set_screen_update(FUNC(cps_state::screen_update_fcrash));
+	m_screen->screen_vblank().set(FUNC(cps_state::screen_vblank_cps1));
+	m_screen->set_palette(m_palette);
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
+
+	SPEAKER(config, "mono").front_center();
+	GENERIC_LATCH_8(config, m_soundlatch);
+	
+	ym2151_device &ym2151(YM2151(config, "2151", 30000000 / 8));  // 3.75MHz measured on pcb
+	// IRQ pin not used
+	ym2151.add_route(0, "mono", 0.35);
+	ym2151.add_route(1, "mono", 0.35);
+	
+	LS157(config, m_msm_mux[0], 0);
+	m_msm_mux[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
+
+	LS157(config, m_msm_mux[1], 0);
+	m_msm_mux[1]->out_callback().set("msm2", FUNC(msm5205_device::data_w));
+	
+	MSM5205(config, m_msm_1, 400000);  // 400kHz measured on pcb
+	m_msm_1->vck_callback().set(FUNC(cps_state::captcommb2_mux_select_w));
+	m_msm_1->vck_callback().append(m_msm_2, FUNC(msm5205_device::vclk_w));
+	m_msm_1->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm_1->add_route(ALL_OUTPUTS, "mono", 0.25);
+
+	MSM5205(config, m_msm_2, 400000);
+	m_msm_2->set_prescaler_selector(msm5205_device::SEX_4B);
+	m_msm_2->add_route(ALL_OUTPUTS, "mono", 0.25);
+}
+
+void cps_state::captcommb2_map(address_map &map)
+{
+	map(0x000000, 0x3fffff).rom();
+	map(0x800000, 0x800001).portr("IN1");
+	map(0x800002, 0x800003).portr("IN2"); // player 3 + 4 inputs
+	map(0x800004, 0x800005).nopw();       // writes 00 here
+	map(0x800006, 0x800007).w(FUNC(cps_state::captcommb2_soundlatch_w));
+	map(0x800018, 0x80001f).r(FUNC(cps_state::cps1_dsw_r));
+	map(0x800030, 0x800031).nopw();       // coinctrl
+	map(0x800100, 0x80013f).ram().share("cps_a_regs");
+	map(0x800140, 0x80017f).ram().share("cps_b_regs");
+	map(0x800180, 0x800181).nopw();       // original sound latch, not used
+	map(0x880000, 0x880001).nopw();       // ?
+	map(0x900000, 0x92ffff).ram().w(FUNC(cps_state::cps1_gfxram_w)).share("gfxram");
+	map(0x980000, 0x980023).w(FUNC(cps_state::captcommb2_layer_w));
+	//  0x990000, 0x993fff  spriteram
+	//  0x990000, 0x990001  sprite buffer flip
+	//  0x991000, 0x9917ff  sprite buffer #1
+	//  0x993000, 0x9937ff  sprite buffer #2
+	map(0xff0000, 0xffffff).ram().share("mainram");
+}
+
+/*
+ *  z80 mapper IC7 GAL16V8 + IC19 74LS138
+ *  138 pin 15  D000-D7FF R/W   ram
+ *  138 pin 14  D800-DBFF R/W   ym
+ *  138 pin 13  -               ?  pin not used
+ *  138 pin 12  DC00-DFFF R/W   read sound latch, clear /int
+ *  138 pin 11  E800-EBFF W     slave 5205
+ *  138 pin 10  E000-E3FF W     latch bank and 5202 reset lines
+ *  138 pin 9   E400-E7FF W     master 5205
+ *  138 pin 7   EC00-EFFF W     ?  pin not used
+ *  
+ *  gal pin 15  0000-BFFF R     rom
+ */
+void cps_state::captcommb2_z80map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0xbfff).bankr("bank1");
+	map(0xd000, 0xd7ff).ram();
+	map(0xd800, 0xd801).rw("2151", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+	map(0xdc00, 0xdc00).r(FUNC(cps_state::captcommb2_soundlatch_r));   // clear /int here
+	map(0xe000, 0xe000).w(FUNC(cps_state::captcommb2_snd_bankswitch_w));
+	map(0xe400, 0xe400).w("msm_mux1", FUNC(ls157_device::ba_w));      // latch data for mux 1
+	map(0xe800, 0xe800).w("msm_mux2", FUNC(ls157_device::ba_w));      // latch data for mux 2
+}
+
+void cps_state::init_captcommb2()
+{
+	m_bootleg_sprite_renderer = &cps_state::captcommb2_render_sprites;
+	
+	// gfx data bits 2 and 4 swapped
+	uint8_t *gfx = memregion("gfx")->base();
+	for (int i = 0; i < 0x400000; i++)
+	{
+		uint8_t x = gfx[i];
+		gfx[i] = bitswap(x, 7, 6 ,5, 2, 3, 4, 1, 0);
+	}
+	
+	init_dinopic();
+	
+	// patch - fix invisible test screen at start
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x65c] = 0x68;
+	rom[0x7b0] = 0x68;
+}
+
+MACHINE_START_MEMBER(cps_state, captcommb2)
+{
+	membank("bank1")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x10000, 0x4000);
+
+	m_layer_enable_reg = 0x28;
+	m_layer_mask_reg[0] = 0x26;
+	m_layer_mask_reg[1] = 0x24;
+	m_layer_mask_reg[2] = 0x22;
+	m_layer_mask_reg[3] = 0x20;
+	m_layer_scroll1x_offset = 0x3e;
+	m_layer_scroll2x_offset = 0x3c;
+	m_layer_scroll3x_offset = 0x40;
+	//m_sprite_base = 0x1000;
+	m_sprite_list_end_marker = 0x8000;
+	m_sprite_x_offset = 0;
+	
+	save_item(NAME(m_captcommb2_mux_toggle));
+}
+
+MACHINE_RESET_MEMBER(cps_state, captcommb2)
+{
+	m_captcommb2_mux_toggle = 0;
+}
+
+WRITE16_MEMBER(cps_state::captcommb2_layer_w)
+{
+	switch (offset)
+	{
+	case 0x00:
+		m_cps_a_regs[0x0e / 2] = data;  // scroll1 y
+		break;
+	case 0x01:
+		m_cps_a_regs[0x0c / 2] = data;  // scroll1 x
+		break;
+	case 0x02:
+		m_cps_a_regs[0x12 / 2] = data;  // scroll2 y
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data;  // probably don't need this
+		break;
+	case 0x03:
+		m_cps_a_regs[0x10 / 2] = data;  // scroll2 x
+		break;
+	case 0x04:
+		m_cps_a_regs[0x16 / 2] = data;  // scroll3 y
+		break;
+	case 0x05:
+		m_cps_a_regs[0x14 / 2] = data;  // scroll3 x
+		break;
+	case 0x06:
+		m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		m_cps_a_regs[0x02 / 2] = 0x9000 + ((data & 0x1f) << 5);  // scroll1 base
+		break;
+	case 0x10:
+		m_cps_b_regs[m_layer_mask_reg[1] / 2] = data;
+		break;
+	case 0x11:
+		m_cps_b_regs[m_layer_mask_reg[2] / 2] = (data & 0x8000) ? data & 0x7fff : data;
+		m_cps_b_regs[m_layer_mask_reg[3] / 2] = (data & 0x8000) ? 0x7fff : 0x07ff;
+		break;
+	}
+}
+
+WRITE16_MEMBER( cps_state::captcommb2_soundlatch_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_soundlatch->write(data & 0xff);
+		m_audiocpu->set_input_line(0, ASSERT_LINE);
+	}
+}
+
+READ8_MEMBER(cps_state::captcommb2_soundlatch_r)
+{
+	uint8_t latch = m_soundlatch->read();
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return latch;
+}
+
+WRITE8_MEMBER( cps_state::captcommb2_snd_bankswitch_w )
+{
+	m_msm_1->reset_w(BIT(data, 5));
+	m_msm_2->reset_w(BIT(data, 4));
+	membank("bank1")->set_entry(data & 0x0f);
+}
+
+WRITE_LINE_MEMBER(cps_state::captcommb2_mux_select_w)
+{
+	// toggle both mux select pins (and fire /nmi)
+	// vck halved by flipflop IC186  ~2kHz
+	if (!state)
+		return;
+
+	m_captcommb2_mux_toggle = !m_captcommb2_mux_toggle;
+	m_msm_mux[0]->select_w(m_captcommb2_mux_toggle);
+	m_msm_mux[1]->select_w(m_captcommb2_mux_toggle);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_captcommb2_mux_toggle);
+}
+
+static INPUT_PORTS_START( captcommb2 )
+	PORT_INCLUDE(captcomm)
+	
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")  // Player 4
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START4 )
+INPUT_PORTS_END
+
+ROM_START( captcommb2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // = captcommr1 + additional code mapped on top
+	ROM_LOAD16_BYTE( "5.bin", 0x000000, 0x80000, CRC(c3a6ed28) SHA1(f79fed35f7b0dc383837a2ead846acc686dd3487) )
+	ROM_LOAD16_BYTE( "3.bin", 0x000001, 0x80000, CRC(28729335) SHA1(6dd23c2d41e4e182434fe80c03d5c90785e6c0ce) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x20000, CRC(1b526d73) SHA1(3dd8dec61db4f4f5546937602a8fb01c639d72f8) )
+	ROM_CONTINUE(             0x000000, 0x04000)
+	ROM_CONTINUE(             0x018000, 0x04000)
+	ROM_IGNORE(                         0x18000)
+	ROM_LOAD16_BYTE( "2.bin", 0x100001, 0x20000, CRC(73c99709) SHA1(e122e3771b698c44fb998589af0542b1f2a3876a) )
+	ROM_CONTINUE(             0x000001, 0x04000)
+	ROM_CONTINUE(             0x018001, 0x04000)
+	ROM_IGNORE(                         0x18000)
+	
+	ROM_REGION( 0x400000, "gfx", 0 ) // some data bits are swapped, see init()
+	ROM_LOAD64_BYTE( "bnh-01.bin", 0x000000, 0x40000, CRC(ffbc3bdd) SHA1(fcee1befd8279d41a81689394a562e2344191e2a) )
+	ROM_CONTINUE(                  0x000004, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-02.bin", 0x000001, 0x40000, CRC(40e58d52) SHA1(d980d075f4feeaf95ad599e1b95a1b550f6a85d9) )
+	ROM_CONTINUE(                  0x000005, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-03.bin", 0x000002, 0x40000, CRC(58f92cad) SHA1(041cd7d7d325147eefab245cd0610203200be1ce) )
+	ROM_CONTINUE(                  0x000006, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-04.bin", 0x000003, 0x40000, CRC(284eea8a) SHA1(b95cf797b3576d7d62f58d4a70d4b6e64ece7601) )
+	ROM_CONTINUE(                  0x000007, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-05.bin", 0x200000, 0x40000, CRC(d02719b7) SHA1(c67bc53c22030c7a75f2fdde1480f619e2be314c) )
+	ROM_CONTINUE(                  0x200004, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-06.bin", 0x200001, 0x40000, CRC(d9d43b55) SHA1(db462900958e06610cfdc47bb774f37ea1c0a1b7) )
+	ROM_CONTINUE(                  0x200005, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-07.bin", 0x200002, 0x40000, CRC(03b7900d) SHA1(ade31f4b37e8ca50214c5b32a2e5899043f49c8a) )
+	ROM_CONTINUE(                  0x200006, 0x40000)
+	ROM_LOAD64_BYTE( "bnh-08.bin", 0x200003, 0x40000, CRC(327b8da8) SHA1(4bcc6fd637d382ce35b9387568c53d89a55e8ed2) )
+	ROM_CONTINUE(                  0x200007, 0x40000)
+	
+	ROM_REGION( 0x50000, "audiocpu", 0 )
+	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(aed2f4bd) SHA1(3bd567dc350bf6ac3a349548790ad49eb5bd8307) )
+	ROM_RELOAD(        0x10000, 0x40000 )
+	
+	/* pld devices:
+	#1   IC169   gal20v8           secured
+	#2   IC7     gal16v8           secured, bruteforce ok
+	#3   IC72    gal16v8           secured, bruteforce ng, assume registered
+	#4   IC80    gal16v8           secured, bruteforce ng, assume registered
+	#5   IC121   gal20v8           secured
+	#6   IC120   gal20v8           secured
+	#7   IC116   tpc1020afn-084c   unattempted
+	*/
+	ROM_REGION( 0x0200, "plds", 0 )  // z80 mapper + banking
+	ROM_LOAD( "2_gal16v8.ic7", 0x0000, 0x0117, CRC(bad3316b) SHA1(b25141540fbaab028ba563f4fe1796b6039a4d59) )
+ROM_END
+
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1990, cawingbl,  cawing,   cawingbl,  cawingbl, cps_state, init_cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 1)", MACHINE_SUPPORTS_SAVE ) // 901012 ETC
-GAME( 1990, cawingb2,  cawing,   cawingbl,  cawingbl, cps_state, init_cawingbl, ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM205 set 2)", MACHINE_SUPPORTS_SAVE ) // 901012 ETC
+GAME( 1990, cawingbl,   cawing,   cawingbl,   cawingbl,   cps_state, init_cawingbl,   ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 1)", MACHINE_SUPPORTS_SAVE ) // 901012 ETC
+GAME( 1990, cawingb2,   cawing,   cawingbl,   cawingbl,   cps_state, init_cawingbl,   ROT0,   "bootleg", "Carrier Air Wing (bootleg with 2xYM2203 + 2xMSM5205, set 2)", MACHINE_SUPPORTS_SAVE ) // 901012 ETC
+                                                                                       
+GAME( 1993, dinopic,    dino,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
+GAME( 1993, dinopic2,   dino,     dinopic,    dino,       cps_state, init_dinopic,    ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
+                                                                                       
+GAME( 1990, fcrash,     ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbl,   ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg", "Final Fight (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, ffightbla,  ffight,   fcrash,     fcrash,     cps_state, init_cps1,       ROT0,   "bootleg", "Final Fight (bootleg on Final Crash PCB)", MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
+                                                                                       
+GAME( 1991, kodb,       kod,      kodb,       kodb,       cps_state, init_kodb,       ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
+                                                                                       
+GAME( 1991, knightsb,   knights,  knightsb,   knights,    cps_state, init_dinopic,    ROT0,   "bootleg", "Knights of the Round (bootleg with 2xMSM5205)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
+                                                                                       
+GAME( 1993, mtwinsb,    mtwins,   mtwinsb,    mtwins,     cps_state, init_mtwinsb,    ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
+                                                                                       
+GAME( 1993, punipic,    punisher, punipic,    punisher,   cps_state, init_punipic,    ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+GAME( 1993, punipic2,   punisher, punipic,    punisher,   cps_state, init_punipic,    ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+GAME( 1993, punipic3,   punisher, punipic,    punisher,   cps_state, init_punipic3,   ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
+                                                                                       
+GAME( 1992, sf2m1,      sf2ce,    sf2m1,      sf2,        cps_state, init_sf2m1,      ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
+GAME( 1992, sf2mdt,     sf2ce,    sf2mdt,     sf2mdt,     cps_state, init_sf2mdt,     ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
+GAME( 1992, sf2mdta,    sf2ce,    sf2mdt,     sf2mdt,     cps_state, init_sf2mdta,    ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
+GAME( 1992, sf2mdtb,    sf2ce,    sf2mdt,     sf2mdtb,    cps_state, init_sf2mdtb,    ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
+GAME( 1992, sf2ceb,     sf2ce,    sf2mdt,     sf2mdt,     cps_state, init_sf2mdta,    ROT0,   "bootleg (Playmark)", "Street Fighter II': Champion Edition (Playmark bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
+                                                                                       
+GAME( 1992, sf2b,       sf2,      sf2b,       sf2mdt,     cps_state, init_sf2b,       ROT0,   "bootleg (Playmark)", "Street Fighter II: The World Warrior (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
+GAME( 1992, sf2b2,      sf2,      sf2b,       sf2mdt,     cps_state, init_sf2mdtb,    ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
+                                                                                       
+GAME( 1992, sf2m9,      sf2ce,    sf2m1,      sf2,        cps_state, init_sf2m1,      ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
+                                                                                       
+GAME( 1993, slampic,    slammast, slampic,    slampic,    cps_state, init_dinopic,    ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
+GAME( 1993, slampic2,   0,        slampic2,   slampic2,   cps_state, init_slampic2,   ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
+                                                                                       
+GAME( 1999, sgyxz,      wof,      sgyxz,      sgyxz,      cps_state, init_cps1,       ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
+GAME( 1999, wofabl,     wof,      wofabl,     wofabl,     cps_state, init_wofabl,     ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy graphics glitches - 921005 - Sangokushi 2
+                                                                                       
+GAME( 1992, varthb,     varth,    varthb,     varth,      cps_state, init_dinopic,    ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg)", MACHINE_SUPPORTS_SAVE )
+                                               
+GAME( 1991, captcommb2, 0,        captcommb2, captcommb2, cps_state, init_captcommb2, ROT0,   "bootleg", "Captain Commando (bootleg with 2xMSM5205)", MACHINE_SUPPORTS_SAVE )   // 911014 ETC
 
-GAME( 1993, dinopic,   dino,     dinopic,   dino,     cps_state, init_dinopic,  ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 1)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
-GAME( 1993, dinopic2,  dino,     dinopic,   dino,     cps_state, init_dinopic,  ROT0,   "bootleg", "Cadillacs and Dinosaurs (bootleg with PIC16c57, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 930201 ETC
-
-GAME( 1990, fcrash,    ffight,   fcrash,    fcrash,   cps_state, init_cps1,     ROT0,   "bootleg (Playmark)", "Final Crash (bootleg of Final Fight)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbl,  ffight,   fcrash,    fcrash,   cps_state, init_cps1,     ROT0,   "bootleg", "Final Fight (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, ffightbla, ffight,   fcrash,    fcrash,   cps_state, init_cps1,     ROT0,   "bootleg", "Final Fight (bootleg on Final Crash PCB)", MACHINE_SUPPORTS_SAVE ) // same as Final Crash without the modified graphics
-
-GAME( 1991, kodb,      kod,      kodb,      kodb,     cps_state, init_kodb,     ROT0,   "bootleg (Playmark)", "The King of Dragons (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 910731  "ETC"
-
-GAME( 1991, knightsb,  knights,  knightsb,  knights,  cps_state, init_dinopic,  ROT0,   "bootleg", "Knights of the Round (bootleg)", MACHINE_SUPPORTS_SAVE )    // 911127 - based on World version
-
-GAME( 1993, mtwinsb,   mtwins,   mtwinsb,   mtwins,   cps_state, init_mtwinsb,  ROT0,   "David Inc. (bootleg)", "Twins (Mega Twins bootleg)", MACHINE_SUPPORTS_SAVE ) // based on World version
-
-GAME( 1993, punipic,   punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
-GAME( 1993, punipic2,  punisher, punipic,   punisher, cps_state, init_punipic,  ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
-GAME( 1993, punipic3,  punisher, punipic,   punisher, cps_state, init_punipic3, ROT0,   "bootleg", "The Punisher (bootleg with PIC16c57, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930422 ETC
-
-GAME( 1992, sf2m1,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M1, bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
-GAME( 1992, sf2mdt,    sf2ce,    sf2mdt,    sf2mdt,   cps_state, init_sf2mdt,   ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on (heavily modified) World version
-GAME( 1992, sf2mdta,   sf2ce,    sf2mdt,    sf2mdt,   cps_state, init_sf2mdta,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
-GAME( 1992, sf2mdtb,   sf2ce,    sf2mdt,    sf2mdtb,  cps_state, init_sf2mdtb,  ROT0,   "bootleg", "Street Fighter II': Magic Delta Turbo (bootleg, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
-GAME( 1992, sf2ceb,    sf2ce,    sf2mdt,    sf2mdt,   cps_state, init_sf2mdta,  ROT0,   "bootleg (Playmark)", "Street Fighter II': Champion Edition (Playmark bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 920313 - based on World version
-
-GAME( 1992, sf2b,      sf2,      sf2b,      sf2mdt,   cps_state, init_sf2b,     ROT0,   "bootleg (Playmark)", "Street Fighter II: The World Warrior (bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
-GAME( 1992, sf2b2,     sf2,      sf2b,      sf2mdt,   cps_state, init_sf2mdtb,  ROT0,   "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) //910204 - based on World version
-
-GAME( 1992, sf2m9,     sf2ce,    sf2m1,     sf2,      cps_state, init_sf2m1,    ROT0,   "bootleg", "Street Fighter II': Champion Edition (M9, bootleg)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 920313 ETC
-
-GAME( 1993, slampic,   slammast, slampic,   slampic,  cps_state, init_dinopic,  ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
-GAME( 1993, slampic2,  0,        slampic2,  slampic2, cps_state, init_slampic2, ROT0,   "bootleg", "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 930713 ETC
-
-GAME( 1999, sgyxz,     wof,      sgyxz,     sgyxz,    cps_state, init_cps1,     ROT0,   "bootleg (All-In Electronic)", "Warriors of Fate ('sgyxz' bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // 921005 - Sangokushi 2
-GAME( 1999, wofabl,    wof,      wofabl,    wofabl,   cps_state, init_wofabl,   ROT0,   "bootleg", "Sangokushi II (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )   // heavy graphics glitches - 921005 - Sangokushi 2
-
-GAME( 1992, varthb,    varth,    varthb,    varth,    cps_state, init_dinopic,  ROT270, "bootleg", "Varth: Operation Thunderstorm (bootleg)", MACHINE_SUPPORTS_SAVE )
