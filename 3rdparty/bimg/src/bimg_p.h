@@ -14,6 +14,8 @@
 #include <bx/error.h>
 #include <bx/simd_t.h>
 
+#include "config.h"
+
 #define BIMG_CHUNK_MAGIC_TEX BX_MAKEFOURCC('T', 'E', 'X', 0x0)
 #define BIMG_CHUNK_MAGIC_GNF BX_MAKEFOURCC('G', 'N', 'F', ' ')
 
