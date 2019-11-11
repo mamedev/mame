@@ -110,7 +110,7 @@ void f8_cpu_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
 	m_cache = m_program->cache<0, 0, ENDIANNESS_BIG>();
-	m_r = &space(AS_DATA);
+	m_r = space(AS_DATA).cache<0, 0, ENDIANNESS_BIG>();
 	m_iospace = &space(AS_IO);
 
 	// zerofill

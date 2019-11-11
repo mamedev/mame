@@ -68,7 +68,7 @@ private:
 	u16  m_irq_vector;
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
-	address_space *m_r;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_r;
 	address_space *m_iospace;
 	int m_icount;
 	int m_irq_request;
