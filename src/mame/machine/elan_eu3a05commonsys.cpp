@@ -201,6 +201,19 @@ void elan_eu3a05commonsys_device::map(address_map &map)
 }
 
 
+void elan_eu3a05commonsys_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_UNK:
+		{
+			generate_custom_interrupt(0);
+			break;
+		}
+	}
+}
+
+
 void elan_eu3a05commonsys_device::device_start()
 {
 	save_item(NAME(m_rombank_lo));
@@ -210,6 +223,9 @@ void elan_eu3a05commonsys_device::device_start()
 	save_item(NAME(m_custom_nmi)); 
 	save_item(NAME(m_custom_irq_vector)); 
 	save_item(NAME(m_custom_nmi_vector)); 
+
+	m_unk_timer = timer_alloc(TIMER_UNK);
+	m_unk_timer->adjust(attotime::never);
 }
 
 void elan_eu3a05commonsys_device::device_reset()
@@ -228,6 +244,8 @@ void elan_eu3a05commonsys_device::device_reset()
 	m_rombank_hi = 0x00;
 	m_bank->set_bank(0x7f);
 
+	// generate at a fixed frequency for now, but can probably be configured.  drives 3D stages in Air Blaster Joystick
+	m_unk_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
 }
 
 READ8_MEMBER(elan_eu3a05commonsys_device::intmask_r)
