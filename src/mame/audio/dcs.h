@@ -230,7 +230,7 @@ protected:
 	uint32_t      m_timer_period;
 	uint32_t      m_timers_fired;
 
-	std::unique_ptr<uint16_t[]>(m_sram);
+	std::unique_ptr<uint16_t[]> m_sram;
 	uint16_t m_polling_value;
 	uint32_t m_polling32_value;
 	uint32_t *m_internal_program_ram;
