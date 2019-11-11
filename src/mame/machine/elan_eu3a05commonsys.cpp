@@ -245,7 +245,7 @@ void elan_eu3a05commonsys_device::device_reset()
 	m_bank->set_bank(0x7f);
 
 	// generate at a fixed frequency for now, but can probably be configured.  drives 3D stages in Air Blaster Joystick
-	m_unk_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(4096));
+	m_unk_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(2048));
 }
 
 READ8_MEMBER(elan_eu3a05commonsys_device::intmask_r)
