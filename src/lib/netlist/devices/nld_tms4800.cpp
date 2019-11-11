@@ -85,7 +85,7 @@ namespace netlist
 		}
 		else
 		{
-    		unsigned d = 0x00;
+			unsigned d = 0x00;
 			for (std::size_t i=0; i<4; i++)
 			{
 				if (m_OE1())

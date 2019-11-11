@@ -10,11 +10,11 @@
 // ***************************************************************************
 
 #include "netlist/plib/pmain.h"
-#include "netlist/plib/pstrutil.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_setup.h"
+#include "netlist/plib/pstrutil.h"
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
 
@@ -117,7 +117,7 @@ public:
 	pstring usage() override;
 
 	template<typename... ARGS>
-	void poutprefix(pstring prefix, pstring fmt, ARGS&&... args)
+	void poutprefix(const pstring &prefix, const pstring &fmt, ARGS&&... args)
 	{
 		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
 		auto lines(plib::psplit(res, "\n", false));

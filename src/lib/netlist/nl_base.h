@@ -15,6 +15,7 @@
 #include "plib/palloc.h" // owned_ptr
 #include "plib/pdynlib.h"
 #include "plib/pfmtlog.h"
+#include "plib/pfunction.h"
 #include "plib/plists.h"
 #include "plib/pmempool.h"
 #include "plib/ppmf.h"
@@ -22,7 +23,6 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
-#include "plib/pfunction.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
@@ -144,7 +144,7 @@ class NETLIB_NAME(name) : public device_t
 ///
 /// \param cname Name of object as given to \ref NETLIB_OBJECT
 ///
-#define NETLIB_TIMESTEP(cname) 												   \
+#define NETLIB_TIMESTEP(cname)                                                 \
 	void NETLIB_NAME(cname) :: timestep(nl_fptype step) noexcept
 
 #define NETLIB_FAMILY(family) , m_famsetter(*this, family)
@@ -587,7 +587,7 @@ namespace netlist
 			/// \param atype type to check object against.
 			/// \returns true if object is of specified type else false.
 
-			bool is_type(const terminal_type atype) const noexcept { return (type() == atype); }
+			bool is_type(const terminal_type atype) const noexcept(false) { return (type() == atype); }
 
 			void set_net(net_t *anet) noexcept { m_net = anet; }
 			void clear_net() noexcept { m_net = nullptr; }
@@ -1336,7 +1336,7 @@ namespace netlist
 			using base_queue = timed_queue<plib::pqentry_t<net_t *, netlist_time>, false>;
 			using entry_t = plib::pqentry_t<net_t *, netlist_time>;
 			explicit queue_t(netlist_state_t &nl);
-			virtual ~queue_t() noexcept override = default;
+			~queue_t() noexcept override = default;
 
 			queue_t(const queue_t &) = delete;
 			queue_t(queue_t &&) = delete;

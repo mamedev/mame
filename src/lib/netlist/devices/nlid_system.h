@@ -40,45 +40,6 @@ namespace devices
 		param_num_t<unsigned>   m_max_link_loops;
 	};
 
-#if 0
-	// -----------------------------------------------------------------------------
-	// mainclock
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(mainclock)
-	{
-		NETLIB_CONSTRUCTOR(mainclock)
-		, m_Q(*this, "Q")
-		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5))
-		{
-			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-		}
-
-		NETLIB_RESETI()
-		{
-			m_Q.net().set_next_scheduled_time(netlist_time::zero());
-		}
-
-		NETLIB_UPDATE_PARAMI()
-		{
-			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-		}
-
-		NETLIB_UPDATEI()
-		{
-			logic_net_t &net = m_Q.net();
-			// this is only called during setup ...
-			net.toggle_new_Q();
-			net.set_next_scheduled_time(exec().time() + m_inc);
-		}
-
-	public:
-		logic_output_t m_Q;
-		netlist_time m_inc;
-	private:
-		param_fp_t m_freq;
-	};
-#endif
 	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------

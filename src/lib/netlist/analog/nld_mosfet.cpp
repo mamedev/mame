@@ -273,7 +273,7 @@ namespace analog
 				if (Cox > nlconst::zero() && m_model.m_NSUB > nlconst::zero())
 					m_gamma = plib::sqrt (nlconst::two()
 						* constants::Q_e() * constants::eps_Si() * constants::eps_0()
-					 	* m_model.m_NSUB * nlconst::magic(1e6)) / Cox;
+						* m_model.m_NSUB * nlconst::magic(1e6)) / Cox;
 				else
 					m_gamma = nlconst::zero();
 			}

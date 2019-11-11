@@ -14,7 +14,7 @@ namespace netlist
 namespace devices
 {
 
-	static constexpr const std::array<netlist_time, 4> delay =
+	static C14CONSTEXPR const std::array<netlist_time, 4> delay =
 	{
 			NLTIME_FROM_NS(18),
 			NLTIME_FROM_NS(36) - NLTIME_FROM_NS(18),

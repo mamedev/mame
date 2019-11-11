@@ -400,15 +400,6 @@ namespace plib {
 		return plib::unique_ptr<T>(pnew<T>(std::forward<Args>(args)...));
 	}
 
-#if 0
-	template<typename T, typename... Args>
-	static owned_ptr<T> make_owned(Args&&... args)
-	{
-		return owned_ptr<T>(pnew<T>(std::forward<Args>(args)...), true);
-	}
-#endif
-
-
 	template <class T, std::size_t ALIGN = alignof(T)>
 	using aligned_allocator = aligned_arena::allocator_type<T, ALIGN>;
 

@@ -159,7 +159,7 @@ namespace devices
 			case 2:
 				return plib::make_unique<solver::matrix_solver_direct2_t<FT>>(state(), sname, nets, &m_params);
 				break;
-#if 0
+#if 1
 			case 3:
 				return create_solver<FT, 3>(3, sname, nets);
 				break;
@@ -206,8 +206,6 @@ namespace devices
 			case 49:
 				return create_solver<FT, 49>(49, sname);
 				break;
-#endif
-#if 1
 			case 87:
 				return create_solver<FT,86>(86, sname, nets);
 				break;

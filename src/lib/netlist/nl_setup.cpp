@@ -58,12 +58,17 @@ namespace netlist
 		register_dev(classname, name, params);
 	}
 
-	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
+	void nlparse_t::register_devx(const pstring &classname,
 		std::initializer_list<const char *> params_and_connections)
 	{
 		std::vector<pstring> params;
-		for (auto &i : params_and_connections)
-			params.push_back(pstring(i));
+		auto i(params_and_connections.begin());
+		pstring name(*i);
+		++i;
+		for (; i != params_and_connections.end(); ++i)
+		{
+			params.emplace_back(*i);
+		}
 		register_dev(classname, name, params);
 	}
 

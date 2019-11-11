@@ -17,11 +17,11 @@
 #include "nl_factory.h"
 #include "nltypes.h"
 
+#include <initializer_list>
 #include <memory>
 #include <stack>
 #include <unordered_map>
 #include <vector>
-#include <initializer_list>
 
 //============================================================
 //  MACROS / inline netlist definitions
@@ -42,8 +42,9 @@
 #define NET_REGISTER_DEV(type, name)                                           \
 		setup.register_dev(# type, # name);
 
-#define NET_REGISTER_DEVEXT(type, name, ...)                                   \
-		setup.register_dev(# type, # name, # __VA_ARGS__);
+// name is first element so that __VA_ARGS__ always has one element
+#define NET_REGISTER_DEVEXT(type, ...)                                   \
+		setup.register_devx(# type, { PSTRINGIFY_VA(__VA_ARGS__) });
 
 #define NET_CONNECT(name, input, output)                                       \
 		setup.register_link(# name "." # input, # output);
@@ -247,8 +248,7 @@ namespace netlist
 		void register_dev(const pstring &classname, const pstring &name,
 			const std::vector<pstring> &params_and_connections);
 
-		void register_dev(const pstring &classname, const pstring &name,
-			std::initializer_list<const char *> params_and_connections);
+		void register_devx(const pstring &classname, std::initializer_list<const char *> params_and_connections);
 		void register_dev(const pstring &classname, const pstring &name,
 			const char *params_and_connections);
 

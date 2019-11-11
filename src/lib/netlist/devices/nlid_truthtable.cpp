@@ -7,8 +7,8 @@
 #include "plib/plists.h"
 
 #include <bitset>
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 namespace netlist
 {

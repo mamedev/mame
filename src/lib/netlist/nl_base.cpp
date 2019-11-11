@@ -562,17 +562,6 @@ namespace netlist
 	: core_device_t(owner, name)
 	{
 	}
-#if 0
-	setup_t &device_t::setup() noexcept
-	{
-		return state().setup();
-	}
-
-	const setup_t &device_t::setup() const noexcept
-	{
-		return state().setup();
-	}
-#endif
 
 	void device_t::register_subalias(const pstring &name, detail::core_terminal_t &term)
 	{

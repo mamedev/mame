@@ -90,8 +90,8 @@ pfmt::rtype pfmt::setfmt(std::stringstream &strm, char32_t cfmt_spec)
 	if (r.p != pstring::npos)
 	{
 		// a.b format here ...
-    	char32_t pend(0);
-    	int width(0);
+		char32_t pend(0);
+		int width(0);
 		if (fmt != "" && pstring("duxofge").find(static_cast<pstring::value_type>(cfmt_spec)) != pstring::npos)
 		{
 			pend = static_cast<char32_t>(fmt.at(fmt.size() - 1));
