@@ -94,7 +94,8 @@ void wildplt_state::video_start()
 {
 	cischeat_state::video_start();
 	m_buffer_spriteram = &m_ram[0x8000/2];
-	m_spriteram = auto_alloc_array(machine(),uint16_t, 0x1000/2);
+	m_allocated_spriteram = std::make_unique<uint16_t[]>(0x1000/2);
+	m_spriteram = m_allocated_spriteram.get();
 }
 
 WRITE16_MEMBER(wildplt_state::sprite_dma_w)

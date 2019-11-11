@@ -223,7 +223,7 @@ private:
 	std::unique_ptr<int32_t[]> m_zoom_table;
 	std::unique_ptr<uint16_t[]> m_blitter_data;
 
-	scroll_info *m_scanlines;
+	std::unique_ptr<scroll_info[]> m_scanlines;
 
 	int32_t m_direct_write_x0;
 	int32_t m_direct_write_x1;
@@ -700,7 +700,7 @@ void wheelfir_state::machine_start()
 	m_zoom_table = std::make_unique<int32_t[]>(ZOOM_TABLE_SIZE);
 	m_blitter_data = std::make_unique<uint16_t[]>(16);
 
-	m_scanlines = reinterpret_cast<scroll_info*>(auto_alloc_array(machine(), uint8_t, sizeof(scroll_info)*(NUM_SCANLINES+NUM_VBLANK_LINES)));
+	m_scanlines = std::make_unique<scroll_info[]>(NUM_SCANLINES+NUM_VBLANK_LINES);
 
 
 	for(int i=0;i<(ZOOM_TABLE_SIZE);++i)
