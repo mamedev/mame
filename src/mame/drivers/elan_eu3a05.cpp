@@ -102,11 +102,6 @@ private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	// system
-	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
-	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
-
 	INTERRUPT_GEN_MEMBER(interrupt);
 
 	// for callback
@@ -151,42 +146,6 @@ uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_ind16& b
 	return m_vid->screen_update(screen, bitmap, cliprect);
 }
 
-// System control
-
-READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r)
-{
-	// how best to handle this, we probably need to run the PAL machine at 50hz
-	// the text under the radica logo differs between regions
-	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
-	return 0xff; // NTSC
-	//return 0x00; // PAL
-}
-
-READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_5003_r)
-{
-	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
-
-	  I think it might just be an RNG because if you return 0x00
-	  your shots can never hit the stage 3 enemies in Phoenix and
-	  if you return 0xff they always hit.  On the real hardware it
-	  seems to be random.  Could also just be a crude frame counter
-	  used for the same purpose.
-
-	*/
-
-	logerror("%s: elan_eu3a05_5003_r (RNG?)\n", machine().describe_context());
-
-	return machine().rand();
-}
-
-
-
-WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_500b_unk_w)
-{
-	// this is the PAL / NTSC flag when read, so what are writes?
-	logerror("%s: elan_eu3a05_500b_unk_w %02x\n", machine().describe_context(), data);
-}
-
 // sound callback
 READ8_MEMBER(elan_eu3a05_state::read_full_space)
 {
@@ -204,25 +163,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
-	// 500x system regs?
-	map(0x5000, 0x5000).ram();
-	map(0x5001, 0x5001).ram();
-	// 5002
-	map(0x5003, 0x5003).r(FUNC(elan_eu3a05_state::elan_eu3a05_5003_r));
-	map(0x5004, 0x5004).ram();
-	// 5005
-	map(0x5006, 0x5006).ram();
-	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
-	map(0x5009, 0x5009).ram();
-	map(0x500a, 0x500a).ram();
-	map(0x500b, 0x500b).rw(FUNC(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r), FUNC(elan_eu3a05_state::elan_eu3a05_500b_unk_w)); // PAL / NTSC flag at least
-	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
-
-	// 501x DMA controller
-	map(0x500f, 0x5015).rw(m_sys, FUNC(elan_eu3a05sys_device::dma_param_r), FUNC(elan_eu3a05sys_device::dma_param_w));
-	map(0x5016, 0x5016).rw(m_sys, FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_r), FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_w));
-
-	// 502x - 503x video regs area?
+	map(0x5000, 0x501f).m(m_sys, FUNC(elan_eu3a05sys_device::map)); // including DMA controller
 	map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
 
 	// 504x GPIO area?
@@ -482,6 +423,7 @@ void elan_eu3a05_state::airblsjs(machine_config& config)
 {
 	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
+	m_sys->set_pal(); // TODO: also set PAL clocks
 }
 
 
