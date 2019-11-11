@@ -25094,9 +25094,15 @@ ROM_END
 
 ROM_START( sc4boomb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_BYTE( "95426488.lo", 0x00001, 0x080000, CRC(b5ddf816) SHA1(3817eedab684ae06f3b079993d800c4000cf46dd) )
-	ROM_LOAD16_BYTE( "95426489.hi", 0x00000, 0x080000, CRC(c84a8b41) SHA1(86f2f14f9a66aa616f579c835d8111751f36a84e) )
-	sc_mobob_others
+	ROM_LOAD16_BYTE( "mbob-low-95264882.bin",  0x00001, 0x080000, CRC(b5ddf816) SHA1(3817eedab684ae06f3b079993d800c4000cf46dd) )
+	ROM_LOAD16_BYTE( "mbob-high-95426489.bin", 0x00000, 0x080000, CRC(c84a8b41) SHA1(86f2f14f9a66aa616f579c835d8111751f36a84e) )
+
+	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "mbob-sound1-95008842-bfg.ic1", 0x000000, 0x100000, CRC(3205f4c9) SHA1(a8b92e1558911e02281b1c38c64c5e04836794b0) )
+	ROM_LOAD( "mbob-sound2-95008843-bfg.ic2", 0x100000, 0x100000, CRC(95057e16) SHA1(6c26451dd336f908ce0fcea0c56176b589111868) )
+
+	ROM_REGION( 0x4310, "pics", ROMREGION_ERASE00 )
+	ROM_LOAD( "95-891-307.ic14", 0x0000, 0x4310, NO_DUMP ) // protected
 ROM_END
 
 
@@ -25105,20 +25111,6 @@ ROM_START( sc4boomba )
 	ROM_LOAD16_BYTE( "95427489.hi", 0x00000, 0x080000, CRC(6dc23ad0) SHA1(5318dfffca7211600e0f64ea0ef1f45701f57401) )
 	ROM_LOAD16_BYTE( "95427488.lo", 0x00001, 0x080000, CRC(5ac5adbd) SHA1(a4cf828eb3d5d8e2603a1921e6f63e04348beb26) )
 	sc_mobob_others
-ROM_END
-
-
-ROM_START( sc4boombb )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_BYTE( "mbob-high-95426489.bin", 0x00000, 0x080000, CRC(c84a8b41) SHA1(86f2f14f9a66aa616f579c835d8111751f36a84e) )
-	ROM_LOAD16_BYTE( "mbob-low-95264882.bin", 0x00001, 0x080000, CRC(b5ddf816) SHA1(3817eedab684ae06f3b079993d800c4000cf46dd) )
-
-	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 )
-	ROM_LOAD( "mbob-sound1-95008842-bfg.ic1", 0x000000, 0x100000, CRC(3205f4c9) SHA1(a8b92e1558911e02281b1c38c64c5e04836794b0) )
-	ROM_LOAD( "mbob-sound2-95008843-bfg.ic2", 0x100000, 0x100000, CRC(95057e16) SHA1(6c26451dd336f908ce0fcea0c56176b589111868) )
-
-	ROM_REGION( 0x4310, "pics", ROMREGION_ERASE00 )
-	ROM_LOAD( "95-891-307.ic14", 0x0000, 0x4310, NO_DUMP ) // protected
 ROM_END
 
 
@@ -44039,7 +44031,6 @@ INPUT_PORTS_END
 //PROJECT NUMBER PR3332 AWP MONOPOLY BOOM OR BUST S4         PR3307 MPOLY BOOM OR B SOUNDS11   BOOM OR BUST  S.SITE
 GAMEL( 200?, sc4boomb,  0,        sc4_5reel_alt, sc4boomb, sc4_state, init_sc4boomb, ROT0, "BFM", "Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", MACHINE_FLAGS, layout_bfm_sc4 )
 GAMEL( 200?, sc4boomba, sc4boomb, sc4_5reel_alt, sc4boomb, sc4_state, init_sc4boomb, ROT0, "BFM", "Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", MACHINE_FLAGS, layout_bfm_sc4 )
-GAMEL( 200?, sc4boombb, sc4boomb, sc4_5reel_alt, sc4boomb, sc4_state, init_sc4boomb, ROT0, "BFM", "Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 3)", MACHINE_FLAGS, layout_bfm_sc4 )
 
 
 void sc4_state::init_sc4fever()
