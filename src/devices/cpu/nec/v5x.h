@@ -130,6 +130,7 @@ class v50_base_device : public nec_common_device, public device_v5x_interface
 public:
 	template <unsigned Channel> DECLARE_WRITE_LINE_MEMBER(dreq_w) { m_dmau->dreq_w<Channel>(state); }
 	DECLARE_WRITE_LINE_MEMBER(hack_w) { m_dmau->hack_w(state); }
+	DECLARE_WRITE_LINE_MEMBER(tctl2_w) { m_tcu->write_gate2(state); }
 
 protected:
 	v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type);
