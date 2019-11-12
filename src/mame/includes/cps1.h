@@ -211,9 +211,7 @@ public:
 	void init_cawingbl();
 	void init_dinopic();
 	void init_knightsb();
-	
 	void init_knightsb3();
-	
 	void init_mtwinsb();
 	void init_punipic();
 	void init_punipic3();
@@ -307,9 +305,7 @@ public:
 	void slampic2(machine_config &config);
 	void sf2b(machine_config &config);
 	void knightsb(machine_config &config);
-	
 	void knightsb3(machine_config &config);
-	
 	void fcrash(machine_config &config);
 	void sf2m10(machine_config &config);
 	void sf2m3(machine_config &config);

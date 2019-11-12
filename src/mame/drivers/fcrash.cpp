@@ -87,6 +87,10 @@ slampic2: no sound. All gfx issues confirmed present on real board.
 
 captcommb2: ok
 
+knightsb3: ok
+
+dinopic3: no sound. Some minor gfx priority issues, confirmed present on real board.
+
 */
 
 #include "emu.h"
@@ -1499,7 +1503,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( sgyxz )
-	PORT_START ("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -2346,7 +2350,7 @@ void cps_state::dinopic(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(cps_state::cps1_interrupt));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps_state::cpu_space_map);
 
-	//PIC16C57(config, m_audiocpu, 12000000).set_disable(); /* no valid dumps .. */
+	//PIC16C57(config, m_audiocpu, 3750000).set_disable(); /* no valid dumps .. */
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, dinopic)
 
@@ -4243,8 +4247,11 @@ ROM_END
 	 maincpu roms are just 1 byte different, vector 1 (stack pointer init) is ff80d6 instead of ff81d6
 	 knightsb gfx roms are 4x 1MB (but not dumped), these are 8x 512KB (suspect data is same)
 	Some sound samples are very quiet on real pcb
-	
-	TODO: confirm clocks
+	Confirmed clocks (measured) are same as captcommb2:
+	 xtals: 30MHz, 24MHz, 400KHz
+	 68k = 12MHz (P10 model, overclocked)
+	 z80/ym = 3.75MHz
+	 5202 = 400KHz
 */
 
 void cps_state::init_knightsb3()
@@ -4290,17 +4297,20 @@ ROM_END
 
 /*
 	Cadillacs and Dinosaurs: single board bootleg
-	Very small, compact and densely packed board which ahas been used for more than one game,
+	Very small, compact and densely packed board which has been used for more than one game,
 	 (have seen Punisher and Slammasters bootlegs that looked identical, presumably just rom swaps)
 	No Z80, uses a PIC + oki M6295, same as other CPS1.5/Q-sound bootlegs
 	pcb marking: 3M05B
 	maincpu roms are same data as dinopic but arranged as 2x 2MB 16-bit mask roms
+	Confirmed clocks (measured):
+	 xtals: 30MHz, 24MHz
+	 68k = 12MHz (P10 model, overclocked)
+	 pic = 3.75MHz
+	 oki = 1MHz
 	
 	repair note:
-	if any gfx issues, check the 9x Harris CD74HC597E shift registers,
+	for any gfx issues, check the 9x Harris CD74HC597E shift registers,
 	(4 were dead on the board used for this dump!)
-	
-	TODO: confirm clocks
 */
 
 ROM_START( dinopic3 )
