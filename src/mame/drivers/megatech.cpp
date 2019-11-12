@@ -709,8 +709,8 @@ void mtech_state::megatech(machine_config &config)
 	config.set_default_layout(layout_dualhovu);
 
 	screen_device &screen(*subdevice<screen_device>("megadriv"));
-	screen.set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	screen.set_raw(XTAL(10'738'635)/2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	screen.set_screen_update(FUNC(mtech_state::screen_update_main));
 	screen.screen_vblank().set(FUNC(mtech_state::screen_vblank_main));
@@ -719,8 +719,8 @@ void mtech_state::megatech(machine_config &config)
 
 	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
 	// check frq
-	menu.set_raw(XTAL(10'738'635)/2, \
-			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256, \
+	menu.set_raw(XTAL(10'738'635)/2,
+			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,
 			sega315_5124_device::HEIGHT_NTSC, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT, sega315_5124_device::TBORDER_START + sega315_5124_device::NTSC_224_TBORDER_HEIGHT + 224);
 	menu.set_screen_update(FUNC(mtech_state::screen_update_menu));
 

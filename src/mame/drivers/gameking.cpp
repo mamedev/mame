@@ -320,7 +320,7 @@ void gameking_state::gameking3(machine_config &config)
 	screen.set_physical_aspect(3, 2);
 	screen.set_refresh_hz(39.308176); // ?
 	screen.set_screen_update(FUNC(gameking_state::screen_update_gameking3));
-	screen.set_palette(finder_base::DUMMY_TAG);
+	screen.set_no_palette();
 	config.device_remove("palette");
 
 	SOFTWARE_LIST(config, "cart_list").set_original("gameking");

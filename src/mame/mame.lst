@@ -2428,8 +2428,8 @@ elt286b                         // Chaintech ELT-286B-160B(E) motherboard (286)
 uni386w                         // UNICHIP 386W 367C REV 1.0 motherboard (386)
 mokp386sx                       // MORSE KP 386SX V2.21
 at486                           // 19?? IBM AT 486
-atvga                           // 19?? AT VGA
-at386sx                         // 19?? AT VGA 386sx
+atturbo                         // 19?? AT 12 MHz
+at386sx                         // 19?? AT 16 MHz 386SX
 a433cc                          // J-Bond A433C-C/A450C-C
 anch386s                        // ANIX CH-386S-16/20/25G
 scamp386sx                      // motherboards using the SCAMPSX chipset (386sx)
