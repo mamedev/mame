@@ -124,6 +124,7 @@ void lbpc_state::mem_map(address_map &map)
 
 void lbpc_state::io_map(address_map &map)
 {
+	map(0x0061, 0x0061).rw(FUNC(lbpc_state::port61_r), FUNC(lbpc_state::port61_w));
 	map(0x0330, 0x0337).rw("scsi:7:ncr", FUNC(ncr53c80_device::read), FUNC(ncr53c80_device::write));
 	map(0x0370, 0x0377).m("fdc", FUNC(wd37c65c_device::map));
 	map(0x03f8, 0x03ff).rw("com", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
@@ -204,4 +205,4 @@ ROM_START(lbpc)
 ROM_END
 
 
-COMP(1989, lbpc, 0, 0, lbpc, lbpc, lbpc_state, empty_init, "Ampro Computers", "Little Board/PC", MACHINE_IS_SKELETON)
+COMP(1989, lbpc, 0, 0, lbpc, lbpc, lbpc_state, empty_init, "Ampro Computers", "Little Board/PC", MACHINE_NOT_WORKING)
