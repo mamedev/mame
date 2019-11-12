@@ -509,8 +509,8 @@ void v53_device::install_peripheral_io()
 	// unmap everything in I/O space up to the fixed position registers (we avoid overwriting them, it isn't a valid config)
 	space(AS_INTERNAL_IO).unmap_readwrite(0, INTERNAL_IO_ADDR_MASK);
 	space(AS_INTERNAL_IO).install_readwrite_handler(0, INTERNAL_IO_ADDR_MASK,
-		read8sm_delegate(*this, FUNC(v53_device::temp_io_byte_r), this),
-		write8sm_delegate(*this, FUNC(v53_device::temp_io_byte_w), this));
+		read8sm_delegate(*this, FUNC(v53_device::temp_io_byte_r)),
+		write8sm_delegate(*this, FUNC(v53_device::temp_io_byte_w)));
 
 	// IOAG determines if the handlers used 8-bit or 16-bit access
 	// the hng64.cpp games first set everything up in 8-bit mode, then
