@@ -15,25 +15,24 @@ public:
 
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
+	void set_pal(void) { m_is_pal = true; }
 
 	void generate_custom_interrupt(int level);
 
-	DECLARE_READ8_MEMBER(intmask_r);
-	DECLARE_WRITE8_MEMBER(intmask_w);
+	virtual void map(address_map& map);
 
 	DECLARE_READ8_MEMBER(nmi_vector_r);
 	DECLARE_READ8_MEMBER(irq_vector_r);
-
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_w);
-	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_r);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	required_device<m6502_device> m_cpu;
 	required_device<address_map_bank_device> m_bank;
+
 	uint8_t m_intmask[2];
 
 	int m_custom_irq;
@@ -43,6 +42,27 @@ protected:
 
 	uint8_t m_rombank_hi;
 	uint8_t m_rombank_lo;
+
+	bool m_is_pal; // this is usually a jumper connected to the chip that the software can read (clocks also differ on PAL units)
+
+private:
+	DECLARE_READ8_MEMBER(intmask_r);
+	DECLARE_WRITE8_MEMBER(intmask_w);
+
+
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_rombank_w);
+	DECLARE_READ8_MEMBER(elan_eu3a05_rombank_r);
+
+	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
+	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
+	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
+
+	DECLARE_READ8_MEMBER(radica_5009_unk_r) { return machine().rand(); };
+
+	emu_timer *m_unk_timer;
+	static const device_timer_id TIMER_UNK = 0;
+
+
 };
 
 DECLARE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device)

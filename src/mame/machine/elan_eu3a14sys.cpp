@@ -9,8 +9,26 @@
 DEFINE_DEVICE_TYPE(ELAN_EU3A14_SYS, elan_eu3a14sys_device, "elan_eu3a14sys", "Elan EU3A14 System")
 
 elan_eu3a14sys_device::elan_eu3a14sys_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A14_SYS, tag, owner, clock)
+	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A14_SYS, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a14sys_device::map), this))
 {
+}
+
+device_memory_interface::space_config_vector elan_eu3a14sys_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+void elan_eu3a14sys_device::map(address_map& map)
+{
+	elan_eu3a05commonsys_device::map(map); // 00 - 0e
+	map(0x0f, 0x17).rw(FUNC(elan_eu3a14sys_device::dma_param_r), FUNC(elan_eu3a14sys_device::dma_param_w));
+	map(0x18, 0x18).rw(FUNC(elan_eu3a14sys_device::dma_trigger_r), FUNC(elan_eu3a14sys_device::dma_trigger_w));
+	// 5019 - 46 on startup (hnt3) 22 (bb3, foot) na (gtg) 09    (rsg)
+	// 501a - 01 on startup (hnt3) 03 (bb3, foot) na (gtg) 02,01 (rsg)
 }
 
 void elan_eu3a14sys_device::device_start()

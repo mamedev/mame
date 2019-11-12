@@ -356,18 +356,17 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 					// split can be probably configured in more ways than this
 					// exact enable conditions unclear
-					int splitpos = (m_splitpos[0] << 8) | m_splitpos[1];
-
-					if (splitpos != 0xffff)
+					if (drawline < m_splitpos[0])
 					{
-						if (drawline > splitpos)
-							scrollx = get_scroll(3);
-						else
-							scrollx = get_scroll(2);
+						scrollx = get_scroll(0);
+					}
+					else if (drawline < m_splitpos[1])
+					{
+						scrollx = get_scroll(2);
 					}
 					else
 					{
-						scrollx = get_scroll(0);
+						scrollx = get_scroll(3);
 					}
 
 					int base;

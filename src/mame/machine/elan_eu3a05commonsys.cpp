@@ -172,7 +172,8 @@ DEFINE_DEVICE_TYPE(ELAN_EU3A05_COMMONSYS, elan_eu3a05commonsys_device, "elan_eu3
 elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_bank(*this, finder_base::DUMMY_TAG)
+	m_bank(*this, finder_base::DUMMY_TAG),
+	m_is_pal(false)
 {
 }
 
@@ -180,6 +181,38 @@ elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &m
 	elan_eu3a05commonsys_device(mconfig, ELAN_EU3A05_COMMONSYS, tag, owner, clock)
 {
 }
+
+
+void elan_eu3a05commonsys_device::map(address_map &map)
+{
+	map(0x00, 0x00).ram();
+	map(0x01, 0x01).ram();
+	// 5002
+	map(0x03, 0x03).r(FUNC(elan_eu3a05commonsys_device::elan_eu3a05_5003_r));
+	map(0x04, 0x04).ram();
+	// 5005
+	map(0x06, 0x06).ram();
+	map(0x07, 0x08).rw(FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
+	map(0x09, 0x09).r(FUNC(elan_eu3a05commonsys_device::radica_5009_unk_r)); // rad_hnt3 polls this on startup
+	map(0x0a, 0x0a).ram();
+	map(0x0b, 0x0b).rw(FUNC(elan_eu3a05commonsys_device::elan_eu3a05_pal_ntsc_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_500b_unk_w)); // PAL / NTSC flag at least
+	map(0x0c, 0x0d).rw(FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
+	// 0e
+}
+
+
+void elan_eu3a05commonsys_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+		case TIMER_UNK:
+		{
+			generate_custom_interrupt(0);
+			break;
+		}
+	}
+}
+
 
 void elan_eu3a05commonsys_device::device_start()
 {
@@ -190,6 +223,9 @@ void elan_eu3a05commonsys_device::device_start()
 	save_item(NAME(m_custom_nmi)); 
 	save_item(NAME(m_custom_irq_vector)); 
 	save_item(NAME(m_custom_nmi_vector)); 
+
+	m_unk_timer = timer_alloc(TIMER_UNK);
+	m_unk_timer->adjust(attotime::never);
 }
 
 void elan_eu3a05commonsys_device::device_reset()
@@ -208,6 +244,8 @@ void elan_eu3a05commonsys_device::device_reset()
 	m_rombank_hi = 0x00;
 	m_bank->set_bank(0x7f);
 
+	// generate at a fixed frequency for now, but can probably be configured.  drives 3D stages in Air Blaster Joystick
+	m_unk_timer->adjust(attotime::from_hz(4096), 0, attotime::from_hz(2048));
 }
 
 READ8_MEMBER(elan_eu3a05commonsys_device::intmask_r)
@@ -304,4 +342,38 @@ READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r)
 	{
 		return m_rombank_lo;
 	}
+}
+
+
+READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_pal_ntsc_r)
+{
+	// the text under the radica logo differs between regions, sometimes the titles too
+	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
+	if (!m_is_pal) return 0xff; // NTSC
+	else return 0x00; // PAL
+}
+
+READ8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_5003_r)
+{
+	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
+
+	  I think it might just be an RNG because if you return 0x00
+	  your shots can never hit the stage 3 enemies in Phoenix and
+	  if you return 0xff they always hit.  On the real hardware it
+	  seems to be random.  Could also just be a crude frame counter
+	  used for the same purpose.
+
+	*/
+
+	logerror("%s: elan_eu3a05_5003_r (RNG?)\n", machine().describe_context());
+
+	return machine().rand();
+}
+
+
+
+WRITE8_MEMBER(elan_eu3a05commonsys_device::elan_eu3a05_500b_unk_w)
+{
+	// this is the PAL / NTSC flag when read, so what are writes?
+	logerror("%s: elan_eu3a05_500b_unk_w %02x\n", machine().describe_context(), data);
 }

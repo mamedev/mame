@@ -87,8 +87,7 @@ public:
 		m_bank(*this, "bank"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_screen(*this, "screen"),
-		m_tvtype(*this, "TV")
+		m_screen(*this, "screen")
 	{ }
 
 
@@ -105,7 +104,6 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
-	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
 
 	DECLARE_WRITE8_MEMBER(porta_dir_w);
 	DECLARE_WRITE8_MEMBER(portb_dir_w);
@@ -115,7 +113,6 @@ private:
 	DECLARE_WRITE8_MEMBER(portb_dat_w);
 	DECLARE_WRITE8_MEMBER(portc_dat_w);
 
-	DECLARE_READ8_MEMBER(radica_5009_unk_r) { return machine().rand(); };
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
@@ -142,7 +139,6 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_ioport m_tvtype;
 
 	uint8_t m_portdir[3];
 
@@ -171,15 +167,6 @@ READ8_MEMBER(elan_eu3a14_state::read_full_space)
 {
 	address_space& fullbankspace = m_bank->space(AS_PROGRAM);
 	return fullbankspace.read_byte(offset);
-}
-
-
-READ8_MEMBER(elan_eu3a14_state::elan_eu3a05_pal_ntsc_r)
-{
-	// how best to handle this, we probably need to run the PAL machine at 50hz
-	// the text under the radica logo differs between regions
-	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
-	return m_tvtype->read();
 }
 
 WRITE8_MEMBER(elan_eu3a14_state::porta_dir_w)
@@ -226,22 +213,7 @@ void elan_eu3a14_state::radica_eu3a14_map(address_map& map)
 
 	map(0x4800, 0x4bff).rw(m_vid, FUNC(elan_eu3a14vid_device::palette_r), FUNC(elan_eu3a14vid_device::palette_w));
 
-	// 5000 - 501f = SYSTEM AREA
-
-	// similar to eu3a05, at least for pal flags and rom banking
-	// 5001 write
-	// 5004 write
-	// 5006 write
-	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
-	map(0x5009, 0x5009).r(FUNC(elan_eu3a14_state::radica_5009_unk_r)); // rad_hnt3 polls this on startup
-	map(0x500a, 0x500a).nopw(); // startup
-	map(0x500b, 0x500b).r(FUNC(elan_eu3a14_state::elan_eu3a05_pal_ntsc_r)).nopw(); // PAL / NTSC flag at least
-	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
-	// DMA is similar to, but not the same as eu3a05
-	map(0x500f, 0x5017).rw(m_sys, FUNC(elan_eu3a14sys_device::dma_param_r), FUNC(elan_eu3a14sys_device::dma_param_w));
-	map(0x5018, 0x5018).rw(m_sys, FUNC(elan_eu3a14sys_device::dma_trigger_r), FUNC(elan_eu3a14sys_device::dma_trigger_w));
-	// 5019 - 46 on startup (hnt3) 22 (bb3, foot) na (gtg) 09    (rsg)
-	// 501a - 01 on startup (hnt3) 03 (bb3, foot) na (gtg) 02,01 (rsg)
+	map(0x5000, 0x501f).m(m_sys, FUNC(elan_eu3a14sys_device::map)); // including DMA controller
 
 	// probably GPIO like eu3a05, although it access 47/48 as unknown instead of 48/49/4a
 	map(0x5040, 0x5040).w(FUNC(elan_eu3a14_state::porta_dir_w));
@@ -323,9 +295,6 @@ static INPUT_PORTS_START( rad_gtg )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -397,16 +366,6 @@ static INPUT_PORTS_START( rad_rsg ) // base unit just has 4 directions + enter a
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( rad_rsgp )
-	PORT_INCLUDE(rad_rsg)
-
-	PORT_MODIFY("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -482,9 +441,6 @@ static INPUT_PORTS_START( radica_foot )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radica_hnt3 )
@@ -543,18 +499,7 @@ static INPUT_PORTS_START( radica_hnt3 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
-
-static INPUT_PORTS_START( radica_hnt3p )
-	PORT_INCLUDE(radica_hnt3)
-
-	PORT_MODIFY("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( radica_bask )
 	PORT_START("IN0")
@@ -628,16 +573,6 @@ static INPUT_PORTS_START( radica_bask )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( radica_baskp )
-	PORT_INCLUDE(radica_bask)
-
-	PORT_MODIFY("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( radica_bb3 )
@@ -708,17 +643,8 @@ static INPUT_PORTS_START( radica_bb3 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( radica_bb3p )
-	PORT_INCLUDE(radica_bb3)
-
-	PORT_MODIFY("TV")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-INPUT_PORTS_END
 
 void elan_eu3a14_state::machine_start()
 {
@@ -835,13 +761,13 @@ void elan_eu3a14_state::radica_eu3a14(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_helper);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_screen_update(FUNC(elan_eu3a14_state::screen_update));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_screen_update(FUNC(elan_eu3a14_state::screen_update));
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(512);
 
@@ -884,13 +810,14 @@ void elan_eu3a14_state::radica_eu3a14_altrambase_adc(machine_config &config)
 void elan_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks differ too, what are they on PAL?
 {
 	radica_eu3a14(config);
-
-	subdevice<screen_device>("screen")->set_refresh_hz(50);
+	m_sys->set_pal(); // TODO: also set PAL clocks
+	m_screen->set_refresh_hz(50);
 }
 
 void elan_eu3a14_state::radica_eu3a14p_altrambase(machine_config& config)
 {
 	radica_eu3a14p(config);
+
 	m_vid->set_tilerambase(0x0a00 - 0x200);
 }
 
@@ -950,16 +877,16 @@ CONS( 2006, rad_gtg,  0,        0, radica_eu3a14_altrambase_adc, rad_gtg,       
 
 CONS( 2005, rad_rsg,  0,        0, radica_eu3a14_altrambase,     rad_rsg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Real Swing Golf", MACHINE_NOT_WORKING )
 // some Connectv branded Real Swing Golf units have a language selection (checksum in test mode confirmed as different on said units)
-CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p_altrambase,    rad_rsgp,      elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
+CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p_altrambase,    rad_rsg,       elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Real Swing Golf", MACHINE_NOT_WORKING )
 
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
 CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,               radica_foot,   elan_eu3a14_state, empty_init,  "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_bb3,  0,        0, radica_eu3a14_altrambase,     radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p_altrambase,    radica_bb3p,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p_altrambase,    radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,                radica_hnt3,   elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3p,  elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_bask, 0,        0, radica_eu3a14_altrambase,     radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Basketball", MACHINE_NOT_WORKING )
-CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_baskp,  elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
+CONS( 2005, rad_baskp,rad_bask, 0, radica_eu3a14p_altrambase,    radica_bask,   elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Basketball", MACHINE_NOT_WORKING )
