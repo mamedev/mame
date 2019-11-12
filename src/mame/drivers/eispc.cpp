@@ -26,7 +26,8 @@
  * TODO
  * - Complete the Ericsson 1070 MDA ISA board and test all the graphics modes including 640x400 (aka HR)
  * - Add the Ericsson 1065 HDC and boot from a hard drive
- * - Implement the descrete baudrate generator
+ * - Add softlist
+ * - Pass the diagnostics software at EPC5.IMD
  *
  * CREDITS  The driver code is inspired from m24.cpp, myb3k.cpp and genpc.cpp. Information about the EPC has
  *          been contributed by many, mainly the people at Dalby Computer museum http://www.datormuseum.se/
@@ -115,6 +116,7 @@ public:
 		, m_ppi8255(*this, "ppi8255")
 		, m_io_dsw(*this, "DSW")
 		, m_io_j10(*this, "J10")
+		, m_io_s21(*this, "S21")
 		, m_lpt(*this, "lpt")
 		, m_kbd8251(*this, "kbd8251")
 		, m_keyboard(*this, "keyboard")
@@ -166,6 +168,7 @@ private:
 	uint8_t m_ppi_portb;
 	required_ioport m_io_dsw;
 	required_ioport m_io_j10;
+	required_ioport m_io_s21;
 
 	// Printer port
 	optional_device<pc_lpt_device> m_lpt;
@@ -176,7 +179,9 @@ private:
 	emu_timer *m_kbdclk_timer;
 	TIMER_CALLBACK_MEMBER(rxtxclk_w);
 	bool m_8251rxtx_clk_state;
+	bool m_kbdclk_state;
 	bool m_8251dtr_state;
+	int m_kbdclk;
 	output_finder<3> m_leds;
 
 	// Interrupt Controller
@@ -472,6 +477,8 @@ void epc_state::machine_start()
 	save_item(NAME(m_dreq0_ck));
 	save_item(NAME(m_ppi_portb));
 	save_item(NAME(m_8251rxtx_clk_state));
+	save_item(NAME(m_kbdclk_state));
+	save_item(NAME(m_kbdclk));
 	save_item(NAME(m_8251dtr_state));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_8087_int));
@@ -498,6 +505,8 @@ void epc_state::machine_reset()
 	m_dreq0_ck = true;
 	m_ppi_portb = 0;
 	m_8251rxtx_clk_state = 0;
+	m_kbdclk_state = 0;
+	m_kbdclk = 0;
 	m_8251dtr_state = 1;
 	m_nmi_enabled = 0;
 	m_8087_int = 0;
@@ -530,6 +539,17 @@ TIMER_CALLBACK_MEMBER(epc_state::rxtxclk_w)
 	if (!m_8251dtr_state) m_uart->rclk_w(m_8251rxtx_clk_state);
 
 	m_8251rxtx_clk_state = !m_8251rxtx_clk_state;
+
+	// If CLK signal is jumpered in instead of reset signal for the keyboard
+	if ((m_io_s21->read() & 0x01) == 0x01)
+	{
+		if (m_kbdclk++ >= 4) // Frequncy is taken out of the same divider as the rxtx clock but 2 steps later
+		{
+			m_keyboard->rst_line_w(m_kbdclk_state);
+			m_kbdclk = 0;
+			m_kbdclk_state = !m_kbdclk_state;
+		}
+	}
 
 	/* Keyboard UART Rxc/Txc is 19.2 kHz from x960 divider ( 15 (74ls161) * 4 (74ls393.1) * 16 (74ls393) ) */
 	m_kbdclk_timer->adjust(attotime::from_hz(XTAL(18'432'000) / 960) / 2);
@@ -703,15 +723,18 @@ WRITE8_MEMBER( epc_state::ppi_portb_w )
 
 	if (changed & 0x40)
 	{
-		if (m_ppi_portb & 0x40)
+		if ((m_io_s21->read() & 0x01) == 0x00)
 		{
-			LOGKBD("PB6 set, clearing Keyboard RESET\n");
-			m_keyboard->rst_line_w(CLEAR_LINE);
-		}
-		else
-		{
-			LOGKBD("PB6 cleared, asserting Keyboard RESET\n");
-			m_keyboard->rst_line_w(ASSERT_LINE);
+			if (m_ppi_portb & 0x40)
+			{
+				LOGKBD("PB6 set, clearing Keyboard RESET\n");
+				m_keyboard->rst_line_w(CLEAR_LINE);
+			}
+			else
+			{
+				LOGKBD("PB6 cleared, asserting Keyboard RESET\n");
+				m_keyboard->rst_line_w(ASSERT_LINE);
+			}
 		}
 	}
 
@@ -1028,6 +1051,11 @@ static INPUT_PORTS_START( epc_ports )
 	PORT_DIPSETTING(0x00, "no jumper")
 	PORT_DIPSETTING(0x40, "LPT")
 	PORT_DIPSETTING(0x80, "COM")
+
+	PORT_START("S21") // Jumper 0=PB6 reset, 1=KBCLK 4.8kHz - what to send to keyboard pin 3
+	PORT_DIPNAME(0x01, 0x00, "Keyboard Clock/Reset pin")
+	PORT_DIPSETTING(0x00, "PB6")
+	PORT_DIPSETTING(0x01, "4.8kHz") // This setting is apparantly for another keyboard, currently unknown
 INPUT_PORTS_END
 
 ROM_START( epc )
