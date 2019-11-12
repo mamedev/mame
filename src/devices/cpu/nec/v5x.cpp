@@ -40,7 +40,7 @@ DEFINE_DEVICE_TYPE(V50,  v50_device,  "v50",  "NEC V50")
 DEFINE_DEVICE_TYPE(V53,  v53_device,  "v53",  "NEC V53")
 DEFINE_DEVICE_TYPE(V53A, v53a_device, "v53a", "NEC V53A")
 
-WRITE8_MEMBER(device_v5x_interface::SULA_w)
+void device_v5x_interface::SULA_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("SULA_w %02x\n", data);
@@ -48,7 +48,7 @@ WRITE8_MEMBER(device_v5x_interface::SULA_w)
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(device_v5x_interface::TULA_w)
+void device_v5x_interface::TULA_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("TULA_w %02x\n", data);
@@ -56,7 +56,7 @@ WRITE8_MEMBER(device_v5x_interface::TULA_w)
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(device_v5x_interface::IULA_w)
+void device_v5x_interface::IULA_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("IULA_w %02x\n", data);
@@ -64,7 +64,7 @@ WRITE8_MEMBER(device_v5x_interface::IULA_w)
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(device_v5x_interface::DULA_w)
+void device_v5x_interface::DULA_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("DULA_w %02x\n", data);
@@ -72,7 +72,7 @@ WRITE8_MEMBER(device_v5x_interface::DULA_w)
 	install_peripheral_io();
 }
 
-WRITE8_MEMBER(device_v5x_interface::OPHA_w)
+void device_v5x_interface::OPHA_w(u8 data)
 {
 	if (VERBOSE)
 	{
@@ -83,12 +83,39 @@ WRITE8_MEMBER(device_v5x_interface::OPHA_w)
 	m_OPHA = data;
 }
 
-WRITE8_MEMBER(device_v5x_interface::OPSEL_w)
+void device_v5x_interface::OPSEL_w(u8 data)
 {
 	if (VERBOSE)
 		device().logerror("OPSEL_w %02x\n", data);
 	m_OPSEL = data;
 	install_peripheral_io();
+}
+
+void device_v5x_interface::TCKS_w(u8 data)
+{
+	m_TCKS = data;
+	tcu_clock_update();
+}
+
+void device_v5x_interface::interface_clock_changed()
+{
+	tcu_clock_update();
+}
+
+void device_v5x_interface::tcu_clock_update()
+{
+	for (int i = 0; i < 3; i++)
+		m_tcu->set_clockin(i, BIT(m_TCKS, i + 2) ? m_tclk : device().clock() / double(4 << (m_TCKS & 3)));
+}
+
+WRITE_LINE_MEMBER(device_v5x_interface::tclk_w)
+{
+	if (BIT(m_TCKS, 2))
+		m_tcu->write_clk0(state);
+	if (BIT(m_TCKS, 3))
+		m_tcu->write_clk1(state);
+	if (BIT(m_TCKS, 4))
+		m_tcu->write_clk2(state);
 }
 
 void device_v5x_interface::interface_pre_reset()
@@ -101,6 +128,9 @@ void device_v5x_interface::interface_pre_reset()
 	m_IULA = 0x00;
 	m_DULA = 0x00;
 	m_OPHA = 0x00;
+
+	m_TCKS = 0x00;
+	tcu_clock_update();
 }
 
 void device_v5x_interface::interface_post_start()
@@ -111,6 +141,7 @@ void device_v5x_interface::interface_post_start()
 	device().save_item(NAME(m_IULA));
 	device().save_item(NAME(m_DULA));
 	device().save_item(NAME(m_OPHA));
+	device().save_item(NAME(m_TCKS));
 }
 
 void device_v5x_interface::interface_post_load()
@@ -145,10 +176,7 @@ WRITE_LINE_MEMBER(device_v5x_interface::internal_irq_w)
 
 void device_v5x_interface::v5x_add_mconfig(machine_config &config)
 {
-	PIT8254(config, m_tcu, 0);
-	m_tcu->set_clk<0>(device().clock());
-	m_tcu->set_clk<1>(device().clock());
-	m_tcu->set_clk<2>(device().clock());
+	PIT8254(config, m_tcu);
 
 	V5X_DMAU(config, m_dmau, 4000000);
 
@@ -172,6 +200,14 @@ device_v5x_interface::device_v5x_interface(const machine_config &mconfig, nec_co
 	, m_icu(device, "icu")
 	, m_scu(device, "scu")
 	, m_internal_io_config("internal_io", ENDIANNESS_LITTLE, is_16bit ? 16 : 8, INTERNAL_IO_ADDR_WIDTH, 0, address_map_constructor(FUNC(device_v5x_interface::remappable_io_map), this))
+	, m_tclk(0.0)
+	, m_OPSEL(0)
+	, m_SULA(0)
+	, m_TULA(0)
+	, m_IULA(0)
+	, m_DULA(0)
+	, m_OPHA(0)
+	, m_TCKS(0)
 {
 }
 
@@ -229,7 +265,7 @@ void v50_base_device::io_write_word(offs_t a, u16 v)
 }
 
 
-WRITE8_MEMBER(v50_base_device::OPCN_w)
+void v50_base_device::OPCN_w(u8 data)
 {
 	// bit 7: unused
 	// bit 6: unused
@@ -402,7 +438,7 @@ device_memory_interface::space_config_vector v50_base_device::memory_space_confi
 	return spaces;
 }
 
-v50_base_device::v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type)
+v50_base_device::v50_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_16bit, u8 prefetch_size, u8 prefetch_cycles, u32 chip_type)
 	: nec_common_device(mconfig, type, tag, owner, clock, is_16bit, prefetch_size, prefetch_cycles, chip_type, address_map_constructor(FUNC(v50_base_device::internal_port_map), this))
 	, device_v5x_interface(mconfig, *this, is_16bit)
 {
@@ -471,7 +507,7 @@ void v53_device::io_write_word(offs_t a, u16 v)
 }
 
 
-WRITE8_MEMBER(v53_device::SCTL_w)
+void v53_device::SCTL_w(u8 data)
 {
 	// bit 7: unused
 	// bit 6: unused
