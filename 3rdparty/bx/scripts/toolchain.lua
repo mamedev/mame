@@ -556,8 +556,6 @@ function toolchain(_buildDir, _libDir)
 			"WIN32",
 			"_WIN32",
 			"_HAS_EXCEPTIONS=0",
-			"_HAS_ITERATOR_DEBUGGING=0",
-			"_ITERATOR_DEBUG_LEVEL=0",
 			"_SCL_SECURE=0",
 			"_SECURE_SCL=0",
 			"_SCL_SECURE_NO_WARNINGS",
