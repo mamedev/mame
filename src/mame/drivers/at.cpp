@@ -3277,12 +3277,6 @@ ROM_END
 //  80486 motherboard
 //**************************************************************************
 
-// Abit PM4
-ROM_START( abpm4 )
-	ROM_REGION(0x20000, "bios", 0)
-	ROM_LOAD( "pm4_0c.bin", 0x00000, 0x20000, CRC(eaad7812) SHA1(81670c44e30fa8b8ac0aa28a5c367819ff1ca73c))
-ROM_END
-
 // Eagle EAGLEN486 GC10A - Chipset: NEC ADC006, LGS Prime 3B 9543 - CPU: Socket 3 - RAM: 2xSIMM72, Cache: fake (not connected, marked write back)
 // On board: IDE, Floppy, 2xser, par - ISA16: 4, PCI: 2 - BIOS: 32pin (sst29ee010), only the first half is occupied - // BIOS-String: Phoenix NuBIOS Version 4.04
 ROM_START( gc10a )
@@ -3388,7 +3382,7 @@ ROM_START( abpw4 )
 	ROMX_LOAD( "award_486_bios_d2144079_c1984-1995.bin",0x10000, 0x10000, CRC(c69184da) SHA1(e8a799f9a3eebfd09c1d19a909574fca17fce7a0), ROM_BIOS(0))
 	// 1: BIOS-String: 09/12/95-Winbond-83C491-2C4J6A12-2E
 	ROM_SYSTEM_BIOS(1, "2c4j6a12", "2C4J6A12-2E")
-	ROMX_LOAD( "pw4_2e.bin", 0x10000, 0x10000, CRC(91de48d5) SHA1(e58f2e2d5c337f447808535629686dde54c09fab), ROM_BIOS(1))
+	ROMX_LOAD( "pw4_2e.bin", 0x10000, 0x10000, CRC(c4aeac4d) SHA1(e58f2e2d5c337f447808535629686dde54c09fab), ROM_BIOS(1))
 ROM_END
 
 // Vintage Sprite SM 486-50USC - Chipset: UM82C491F - BIOS: EPROM/MR-BIOS 1.50 - Keyboard-BIOS: JETkey V3.0
@@ -4265,7 +4259,6 @@ COMP( 199?, um8498f,   ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, abah4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-AH4", MACHINE_NOT_WORKING )
 COMP( 199?, abpb4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PB4", MACHINE_NOT_WORKING )
 COMP( 199?, abpi4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PI4", MACHINE_NOT_WORKING )
-COMP( 199?, abpm4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PM4", MACHINE_NOT_WORKING )
 COMP( 199?, abpw4,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Abit", "AB-PW4", MACHINE_NOT_WORKING )
 COMP( 199?, alator2,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Alaris",      "Tornado 2", MACHINE_NOT_WORKING )
 COMP( 199?, mb4d33,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Aquarius System (ASI)", "MB-4D33/50NR", MACHINE_NOT_WORKING )
