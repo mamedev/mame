@@ -18675,6 +18675,9 @@ lb186                           // Ampro Little Board/186
 @source:lbeach.cpp
 lbeach                          // (c) 1979 Olympia / Seletron
 
+@source:lbpc.cpp
+lbpc                            // Ampro Little Board/PC
+
 @source:lc80.cpp
 lc80                            //
 lc80_2                          //

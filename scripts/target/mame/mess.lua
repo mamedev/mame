@@ -1590,7 +1590,9 @@ files {
 
 createMESSProjects(_target, _subtarget, "ampro")
 files {
+	MAME_DIR .. "src/mame/drivers/ampro.cpp",
 	MAME_DIR .. "src/mame/drivers/lb186.cpp",
+	MAME_DIR .. "src/mame/drivers/lbpc.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "amstrad")
@@ -3971,7 +3973,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/am1000.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex.cpp",
 	MAME_DIR .. "src/mame/drivers/ampex210.cpp",
-	MAME_DIR .. "src/mame/drivers/ampro.cpp",
 	MAME_DIR .. "src/mame/drivers/ampscarp.cpp",
 	MAME_DIR .. "src/mame/drivers/amust.cpp",
 	MAME_DIR .. "src/mame/drivers/anzterm.cpp",
