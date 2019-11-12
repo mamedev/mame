@@ -8,34 +8,38 @@
 
     Pinout:
 
-        A15   1  A14
-        A13   2  A12
-         D7   3  +5v
-        ¬OE   4  NC
-       SLOT   5  SLOT
-         D0   6  0v
-         D1   7  0v
-         D2   8  ¬CK
-         D6   9  A0
-         D5  10  A1
-         D3  11  A2
-         D4  12  A3
-       ¬INT  13  NC
-       ¬NMI  14  0v
-      ¬HALT  15  ¬OE
-      ¬MREQ  16  NC
-      ¬IORQ  17  NC
-        ¬RD  18  NC
-        ¬WR  19  ¬BUSRQ
-         NC  20  ¬RESET
-      ¬WAIT  21  A7
-       +12v  22  A6
-         NC  23  A5
-        ¬M1  24  A4
-      ¬RFSH  25  ¬ROMCS
-         A8  26  ¬BUSACK
-        A10  27  A9
-         NC  28  A11
+             48K                          128K/+2                          +2A/+2B/+3/3B     
+
+         A         B                    A         B                         A         B
+        A15   1   A14                  A15   1   A14                       A15   1   A14
+        A13   2   A12                  A13   2   A12                       A13   2   A12
+         D7   3   +5V                   D7   3   +5v                        D7   3   +5v
+         NC   4   +9V                   NC   4   +9V                  /OE ROM1   4   NC
+       SLOT   5   SLOT                SLOT   5   SLOT                     SLOT   5   SLOT
+         D0   6   GND                   D0   6   GND                        D0   6   GND
+         D1   7   GND                   D1   7   GND                        D1   7   GND
+         D2   8   CLK                   D2   8   CLK                        D2   8   CKEXT
+         D6   9   A0                    D6   9   A0                         D6   9   A0
+         D5  10   A1                    D5  10   A1                         D5  10   A1
+         D3  11   A2                    D3  11   A2                         D3  11   A2
+         D4  12   A3                    D4  12   A3                         D4  12   A3
+       /INT  13   /IORQGE             /INT  13   /IORQGE (+2 only)        /INT  13   NC
+       /NMI  14   GND                 /NMI  14   GND                      /NMI  14   GND
+      /HALT  15   VIDEO              /HALT  15   NC                      /HALT  15   /OE ROM2
+      /MREQ  16   /Y                 /MREQ  16   NC                      /MREQ  16   /DRD
+      /IORQ  17   V                  /IORQ  17   NC                      /IORQ  17   /DWR
+        /RD  18   U                    /RD  18   NC                        /RD  18   /MTR
+        /WR  19   /BUSRQ               /WR  19   /BUSRQ                    /WR  19   /BUSRQ
+        -5V  20   /RESET               -5V  20   /RESET                     NC  20   /RESET
+      /WAIT  21   A7                 /WAIT  21   A7                      /WAIT  21   A7
+       +12V  22   A6                  +12V  22   A6                       +12V  22   A6
+      12VAC  23   A5                 12VAC  23   A5                       -12V  23   A5
+        /M1  24   A4                   /M1  24   A4                        /M1  24   A4
+      /RFSH  25   /ROMCS             /RFSH  25   /ROMCS                  /RFSH  25   NC
+         A8  26   /BUSACK               A8  26   /BUSACK                    A8  26   /BUSACK
+        A10  27   A9                   A10  27   A9                        A10  27   A9
+         NC  28   A11                   NC  28   A11                     RESET  28   A11
+
 
 **********************************************************************/
 
