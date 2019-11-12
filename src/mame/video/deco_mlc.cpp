@@ -41,7 +41,7 @@ void deco_mlc_state::video_start()
 
 void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,
 		u32 code1,u32 code2, u32 color,int flipx,int sx,
-		int transparent_color,int use8bpp,
+		int transparent_mask,int use8bpp,
 		int scalex, int srcline, int shadowMode )
 {
 	if (!scalex) return;
@@ -106,11 +106,11 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 				{
 					if (!(pri[x] & 0x80))
 					{
-						int c = source1[x_index >> 16];
+						int c = source1[x_index >> 16] & transparent_mask;
 						if (use8bpp)
-							c = (c << 4) | source2[x_index >> 16];
+							c = (c << 4) | (source2[x_index >> 16] & transparent_mask);
 
-						if (c != transparent_color)
+						if ((c & transparent_mask) != 0)
 							pri[x] |= shadowMode; // Mark it shadow / hilighted
 					}
 					x_index += dx;
@@ -123,11 +123,11 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 				{
 					if (!(pri[x] & 0x80))
 					{
-						int c = source1[x_index >> 16];
+						int c = source1[x_index >> 16] & transparent_mask;
 						if (use8bpp)
-							c = (c << 4) | source2[x_index >> 16];
+							c = (c << 4) | (source2[x_index >> 16] & transparent_mask);
 
-						if (c != transparent_color)
+						if ((c & transparent_mask) != 0)
 						{
 							dest[x] = pal[c];
 							pri[x] |= 0x80 | shadowMode; // Mark it drawn
@@ -143,6 +143,7 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 
 void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* dest, u8* pri)
 {
+	const u16 transmask = m_gfxdecode->gfx(0)->depth() - 1;
 	u32 *index_ptr = nullptr;
 	int sprite,h,w,fx1,fy1;
 	int xoffs,yoffs;
@@ -272,7 +273,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 		/* Lookup tiles / size in sprite index ram OR in the lookup rom */
 		if (indx & 0x4000)
 		{
-			index_ptr8 = m_gfx2 + indx * 8; /* Byte ptr */
+			index_ptr8 = m_vrom + indx * 8; /* Byte ptr */
 			h = (index_ptr8[1] >> 0) & 0xf;
 			w = (index_ptr8[3] >> 0) & 0xf;
 
@@ -331,8 +332,9 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			indx = spriteram[offs + 0 - 8] & 0x7fff;
 			if (indx & 0x4000)
 			{
-				index_ptr8 = m_gfx2 + indx * 8;
+				index_ptr8 = m_vrom + indx * 8;
 				sprite2 = (index_ptr8[7] << 8) | index_ptr8[6];
+				//sprite2 |= (index_ptr8[4] & 3) << 16; // TODO : is actually affected?
 			}
 			else
 			{
@@ -467,12 +469,12 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			{
 				if (useIndicesInRom)
 				{
-					const u8* ptr = m_gfx2 + (tile * 2);
+					const u8* ptr = m_vrom + (tile * 2);
 					tile = (*ptr) + ((*(ptr + 1)) << 8);
 
 					if (use8bppMode)
 					{
-						const u8* ptr2 = m_gfx2 + (tile2 * 2);
+						const u8* ptr2 = m_vrom + (tile2 * 2);
 						tile2 = (*ptr2) + ((*(ptr2 + 1)) << 8);
 					}
 					else
@@ -497,7 +499,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 				{
 					const u32* ptr = m_vram + (tile & 0x7fff);
 					tile = (*ptr) & 0xffff;
-
+					// TODO : it's can be 8bpp?
 					if (tileFormat)
 					{
 						colorOffset = (tile & 0xf000) >> 12;
@@ -516,7 +518,7 @@ void deco_mlc_state::draw_sprites(const rectangle &cliprect, int scanline, u32* 
 			drawgfxzoomline(dest,pri,user_clip,m_gfxdecode->gfx(0),
 							tile,tile2,
 							color + colorOffset,fx,realxbase,
-							0,
+							transmask,
 							use8bppMode,xscale, srcline,
 							shadowMode);
 

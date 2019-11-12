@@ -26,10 +26,11 @@ public:
 		m_irq_ram(*this, "irq_ram"),
 		m_clip_ram(*this, "clip_ram"),
 		m_vram(*this, "vram"),
-		m_gfx2(*this,"gfx2")
+		m_vrom(*this,"vrom")
 		{ }
 
 	void init_mlc();
+	void init_mlc_5bpp();
 	void init_avengrgs();
 
 	void mlc(machine_config &config);
@@ -56,7 +57,7 @@ private:
 	required_shared_ptr<u32> m_clip_ram;
 	required_shared_ptr<u32> m_vram;
 
-	required_region_ptr<u8> m_gfx2;
+	required_region_ptr<u8> m_vrom;
 
 	int m_irqLevel;
 	u32 m_mlc_raster_table_1[4*256];
@@ -96,9 +97,10 @@ private:
 	void draw_sprites( const rectangle &cliprect, int scanline, u32* dest, u8* pri);
 	void drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,
 		u32 code1,u32 code2, u32 color,int flipx,int sx,
-		int transparent_color,int use8bpp,
+		int transparent_mask,int use8bpp,
 		int scalex, int srcline, int shadowMode);
 	void descramble_sound();
+	void expand_5bpptile();
 
 	void avengrgs_map(address_map &map);
 	void decomlc_map(address_map &map);
