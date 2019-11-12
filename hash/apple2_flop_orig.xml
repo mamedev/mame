@@ -8590,4 +8590,36 @@
 		</part>
 	</software>
 
+	<software name="chckrkng">
+		<description>Checker King</description>
+		<year>1979</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-11-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple ][ with 16K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35101">
+				<rom name="checker king.woz" size="35101" crc="d4430ffb" sha1="008494e5c869c2d835260fad4145be5fea2da750" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamgmblr">
+		<description>Gammon Gambler</description>
+		<year>1979</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-11-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple ][ with 24K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228112">
+				<rom name="gammon gambler.woz" size="228112" crc="a159448f" sha1="50cb697901df21be816e82a0d46c24e9a3eb98b3" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
