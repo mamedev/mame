@@ -48,7 +48,7 @@ namespace bimg
 		if (_hasMips)
 		{
 			const uint32_t max = bx::max(_width, _height, _depth);
-			const uint32_t num = 1 + uint32_t(bx::log2(float(max) ) );
+			const uint32_t num = 1 + uint32_t(bx::log2((int32_t)max) );
 
 			return uint8_t(num);
 		}

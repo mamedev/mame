@@ -308,7 +308,7 @@ if (SPIRV_CROSS_STATIC)
 endif()
 
 set(spirv-cross-abi-major 0)
-set(spirv-cross-abi-minor 18)
+set(spirv-cross-abi-minor 20)
 set(spirv-cross-abi-patch 0)
 
 if (SPIRV_CROSS_SHARED)
@@ -564,6 +564,16 @@ if (SPIRV_CROSS_CLI)
 						COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_shaders.py --reflect --parallel
 						${spirv-cross-externals}
 						${CMAKE_CURRENT_SOURCE_DIR}/shaders-reflection
+						WORKING_DIRECTORY $<TARGET_FILE_DIR:spirv-cross>)
+				add_test(NAME spirv-cross-test-ue4
+						COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_shaders.py --msl --parallel
+						${spirv-cross-externals}
+						${CMAKE_CURRENT_SOURCE_DIR}/shaders-ue4
+						WORKING_DIRECTORY $<TARGET_FILE_DIR:spirv-cross>)
+				add_test(NAME spirv-cross-test-ue4-opt
+						COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_shaders.py --msl --opt --parallel
+						${spirv-cross-externals}
+						${CMAKE_CURRENT_SOURCE_DIR}/shaders-ue4
 						WORKING_DIRECTORY $<TARGET_FILE_DIR:spirv-cross>)
 			endif()
 		elseif(NOT ${PYTHONINTERP_FOUND})

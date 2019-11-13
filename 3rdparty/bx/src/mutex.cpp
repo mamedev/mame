@@ -12,6 +12,7 @@
 #	include <bx/cpu.h>
 #	include "crt0.h"
 #elif  BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_BSD     \
 	|| BX_PLATFORM_HAIKU   \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
