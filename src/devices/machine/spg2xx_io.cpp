@@ -214,20 +214,20 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		break;
 
 	case 0x10: // Timebase Control
-		LOGMASKED(LOG_IO_READS, "io_r: Timebase Control = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: Timebase Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x12: // Timer A Data
-		LOGMASKED(LOG_IO_WRITES, "io_r: Timer A Data = %04x\n", val);
+		LOGMASKED(LOG_IO_WRITES, "%s: io_r: Timer A Data = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x1c: // Video line counter
 		val = m_screen->vpos();
-		LOGMASKED(LOG_VLINES, "io_r: Video Line = %04x\n", val);
+		LOGMASKED(LOG_VLINES, "%s: io_r: Video Line = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x20: // System Control
-		LOGMASKED(LOG_IO_READS, "io_r: System Control = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: System Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x21: // IRQ Control
@@ -243,7 +243,7 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 		break;
 
 	case 0x25: // ADC Control
-		LOGMASKED(LOG_IO_READS, "io_r: ADC Control = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: ADC Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x27: // ADC Data
@@ -259,13 +259,13 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 	}
 
 	case 0x29: // Wakeup Source
-		LOGMASKED(LOG_IO_READS, "io_r: Wakeup Source = %04x\n", val);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: Wakeup Source = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x2b:
 	{
 		uint16_t pal = m_pal_read_cb();
-		LOGMASKED(LOG_IO_READS, "io_r: NTSC/PAL = %04x\n", pal);
+		LOGMASKED(LOG_IO_READS, "%s: io_r: NTSC/PAL = %04x\n", machine().describe_context(), pal);
 		return pal;
 	}
 
@@ -280,16 +280,16 @@ READ16_MEMBER(spg2xx_io_device::io_r)
 	}
 
 	case 0x2e: // FIQ Source Select
-		LOGMASKED(LOG_FIQ, "io_r: FIQ Source Select = %04x\n", val);
+		LOGMASKED(LOG_FIQ, "%s: io_r: FIQ Source Select = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x2f: // Data Segment
 		val = m_cpu->get_ds();
-		LOGMASKED(LOG_SEGMENT, "io_r: Data Segment = %04x\n", val);
+		LOGMASKED(LOG_SEGMENT, "%s: io_r: Data Segment = %04x\n", machine().describe_context(), val);
 		break;
 
 	default:
-		LOGMASKED(LOG_UNKNOWN_IO, "io_r: Unknown register %04x\n", 0x3d00 + offset);
+		LOGMASKED(LOG_UNKNOWN_IO, "%s: io_r: Unknown register %04x\n", machine().describe_context(), 0x3d00 + offset);
 		break;
 	}
 
@@ -311,7 +311,7 @@ READ16_MEMBER(spg2xx_io_device::io_extended_r)
 		break;
 
 	case 0x31: // UART Status
-		//LOGMASKED(LOG_UART, "%s: io_r: UART Status = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_UART, "%s: io_r: UART Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x36: // UART RX Data
@@ -354,22 +354,26 @@ READ16_MEMBER(spg2xx_io_device::io_extended_r)
 	case 0x37: // UART Rx FIFO Control
 		val &= ~0x0070;
 		val |= (m_uart_rx_available ? 7 : 0) << 4;
-		LOGMASKED(LOG_UART, "io_r: UART Rx FIFO Control = %04x\n", machine().describe_context(), val);
+		LOGMASKED(LOG_UART, "%s: io_r: UART Rx FIFO Control = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x51: // unknown, polled by ClickStart cartridges ( clikstrt )
 		return 0x8000;
 
+	case 0x58: // I2C Command ( tvgogo )
+		LOGMASKED(LOG_I2C, "%s: io_r: I2C Command = %04x\n", machine().describe_context(), val);
+		break;
+
 	case 0x59: // I2C Status
-		LOGMASKED(LOG_I2C, "io_r: I2C Status = %04x\n", val);
+		LOGMASKED(LOG_I2C, "%s: io_r: I2C Status = %04x\n", machine().describe_context(), val);
 		break;
 
 	case 0x5e: // I2C Data In
-		LOGMASKED(LOG_I2C, "io_r: I2C Data In = %04x\n", val);
+		LOGMASKED(LOG_I2C, "%s: io_r: I2C Data In = %04x\n", machine().describe_context(), val);
 		break;
 
 	default:
-		LOGMASKED(LOG_UNKNOWN_IO, "io_r: Unknown register %04x\n", 0x3d00 + offset);
+		LOGMASKED(LOG_UNKNOWN_IO, "%s: io_r: Unknown register %04x\n", machine().describe_context(), 0x3d00 + offset);
 		break;
 	}
 
@@ -590,7 +594,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 			{ 128, 256, 512, 1024 },
 			{ 105000, 210000, 420000, 840000 }
 		};
-		LOGMASKED(LOG_TIMERS, "io_w: Timebase Control = %04x (Source:%s, TMB2:%s, TMB1:%s)\n", data,
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timebase Control = %04x (Source:%s, TMB2:%s, TMB1:%s)\n", machine().describe_context(), data,
 			BIT(data, 4) ? "27MHz" : "32768Hz", s_tmb2_sel[BIT(data, 4)][(data >> 2) & 3], s_tmb1_sel[BIT(data, 4)][data & 3]);
 		m_io_regs[offset] = data;
 		const uint8_t hifreq = BIT(data, 4);
@@ -602,11 +606,11 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	}
 
 	case 0x11: // Timebase Clear
-		LOGMASKED(LOG_TIMERS, "io_w: Timebase Clear = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timebase Clear = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x12: // Timer A Data
-		LOGMASKED(LOG_TIMERS, "io_w: Timer A Data = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer A Data = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		m_timer_a_preload = data;
 		break;
@@ -615,7 +619,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	{
 		static const char* const s_source_a[8] = { "0", "0", "32768Hz", "8192Hz", "4096Hz", "1", "0", "ExtClk1" };
 		static const char* const s_source_b[8] = { "2048Hz", "1024Hz", "256Hz", "TMB1", "4Hz", "2Hz", "1", "ExtClk2" };
-		LOGMASKED(LOG_TIMERS, "io_w: Timer A Control = %04x (Source A:%s, Source B:%s)\n", data,
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer A Control = %04x (Source A:%s, Source B:%s)\n", machine().describe_context(), data,
 			s_source_a[data & 7], s_source_b[(data >> 3) & 7]);
 		m_io_regs[offset] = data;
 		int timer_a_rate = 0;
@@ -673,7 +677,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x15: // Timer A IRQ Clear
 	{
-		LOGMASKED(LOG_TIMERS, "io_w: Timer A IRQ Clear\n");
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer A IRQ Clear\n", machine().describe_context());
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x0800;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
@@ -683,7 +687,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	}
 
 	case 0x16: // Timer B Data
-		LOGMASKED(LOG_TIMERS, "io_w: Timer B Data = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer B Data = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		m_timer_b_preload = data;
 		break;
@@ -691,7 +695,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	case 0x17: // Timer B Control
 	{
 		static const char* const s_source_c[8] = { "0", "0", "32768Hz", "8192Hz", "4096Hz", "1", "0", "ExtClk1" };
-		LOGMASKED(LOG_TIMERS, "io_w: Timer B Control = %04x (Source C:%s)\n", data, s_source_c[data & 7]);
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer B Control = %04x (Source C:%s)\n", machine().describe_context(), data, s_source_c[data & 7]);
 		m_io_regs[offset] = data;
 		if (m_io_regs[0x18] == 1)
 		{
@@ -702,7 +706,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x18: // Timer B Enable
 	{
-		LOGMASKED(LOG_TIMERS, "io_w: Timer B Enable = %04x\n", data);
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer B Enable = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data & 1;
 		if (data & 1)
 		{
@@ -717,7 +721,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x19: // Timer B IRQ Clear
 	{
-		LOGMASKED(LOG_TIMERS, "io_w: Timer B IRQ Clear\n");
+		LOGMASKED(LOG_TIMERS, "%s: io_w: Timer B IRQ Clear\n", machine().describe_context());
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~0x0400;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
@@ -731,7 +735,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 		static const char* const s_sysclk[4] = { "13.5MHz", "27MHz", "27MHz NoICE", "54MHz" };
 		static const char* const s_lvd_voltage[4] = { "2.7V", "2.9V", "3.1V", "3.3V" };
 		static const char* const s_weak_strong[2] = { "Weak", "Strong" };
-		LOGMASKED(LOG_IO_WRITES, "io_w: System Control = %04x (Watchdog:%d, Sleep:%d, SysClk:%s, SysClkInv:%d, LVROutEn:%d, LVREn:%d\n"
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: System Control = %04x (Watchdog:%d, Sleep:%d, SysClk:%s, SysClkInv:%d, LVROutEn:%d, LVREn:%d\n", machine().describe_context()
 			, data, BIT(data, 15), BIT(data, 14), s_sysclk[(data >> 12) & 3], BIT(data, 11), BIT(data, 9), BIT(data, 8));
 		LOGMASKED(LOG_IO_WRITES, "      LVDEn:%d, LVDVoltSel:%s, 32kHzDisable:%d, StrWkMode:%s, VDACDisable:%d, ADACDisable:%d, ADACOutDisable:%d)\n"
 			, BIT(data, 7), s_lvd_voltage[(data >> 5) & 3], BIT(data, 4), s_weak_strong[BIT(data, 3)], BIT(data, 2), BIT(data, 1), BIT(data, 0));
@@ -741,7 +745,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x21: // IRQ Enable
 	{
-		LOGMASKED(LOG_IRQS, "io_w: IRQ Enable = %04x\n", data);
+		LOGMASKED(LOG_IRQS, "%s: io_w: IRQ Enable = %04x\n", machine().describe_context(), data);
 		const uint16_t old = IO_IRQ_ENABLE;
 		m_io_regs[offset] = data;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
@@ -752,7 +756,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 
 	case 0x22: // IRQ Acknowledge
 	{
-		LOGMASKED(LOG_IRQS, "io_w: IRQ Acknowledge = %04x\n", data);
+		LOGMASKED(LOG_IRQS, "%s: io_w: IRQ Acknowledge = %04x\n", machine().describe_context(), data);
 		const uint16_t old = IO_IRQ_STATUS;
 		IO_IRQ_STATUS &= ~data;
 		const uint16_t changed = (old & IO_IRQ_ENABLE) ^ (IO_IRQ_STATUS & IO_IRQ_ENABLE);
@@ -791,7 +795,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 			"256KW, 3c0000-3fffff\n",
 			"512KW, 380000-3fffff\n"
 		};
-		LOGMASKED(LOG_EXT_MEM, "io_w: Ext. Memory Control (not yet implemented) = %04x:\n", data);
+		LOGMASKED(LOG_EXT_MEM, "%s: io_w: Ext. Memory Control (not yet implemented) = %04x:\n", machine().describe_context(), data);
 		LOGMASKED(LOG_EXT_MEM, "      WaitStates:%d, BusArbPrio:%s\n", (data >> 1) & 3, s_bus_arb[(data >> 3) & 7]);
 		LOGMASKED(LOG_EXT_MEM, "      ROMAddrDecode:%s\n", s_addr_decode[(data >> 6) & 3]);
 		LOGMASKED(LOG_EXT_MEM, "      RAMAddrDecode:%s\n", s_ram_decode[(data >> 8) & 15]);
@@ -801,7 +805,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	}
 
 	case 0x24: // Watchdog
-		LOGMASKED(LOG_WATCHDOG, "io_w: Watchdog Pet = %04x\n", data);
+		LOGMASKED(LOG_WATCHDOG, "%s: io_w: Watchdog Pet = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x25: // ADC Control
@@ -827,7 +831,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	}
 
 	case 0x28: // Sleep Mode
-		LOGMASKED(LOG_IO_WRITES, "io_w: Sleep Mode (%s enter value) = %04x\n", data == 0xaa55 ? "valid" : "invalid", data);
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: Sleep Mode (%s enter value) = %04x\n", machine().describe_context(), data == 0xaa55 ? "valid" : "invalid", data);
 		m_io_regs[offset] = data;
 		break;
 
@@ -839,7 +843,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 			"TMB1", "TMB2", "2Hz", "4Hz", "1024Hz", "2048Hz", "4096Hz", "Key"
 		};
 
-		LOGMASKED(LOG_IO_WRITES, "io_w: Wakeup Source = %04x:\n", data);
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: Wakeup Source = %04x:\n", machine().describe_context(), data);
 		bool comma = false;
 		char buf[1024];
 		int char_idx = 0;
@@ -857,12 +861,12 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 	}
 
 	case 0x2c: // PRNG 0 seed
-		LOGMASKED(LOG_IO_WRITES, "io_w: PRNG 0 seed = %04x\n", data & 0x7fff);
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: PRNG 0 seed = %04x\n", machine().describe_context(), data & 0x7fff);
 		m_io_regs[offset] = data & 0x7fff;
 		break;
 
 	case 0x2d: // PRNG 1 seed
-		LOGMASKED(LOG_IO_WRITES, "io_w: PRNG 1 seed = %04x\n", data & 0x7fff);
+		LOGMASKED(LOG_IO_WRITES, "%s: io_w: PRNG 1 seed = %04x\n", machine().describe_context(), data & 0x7fff);
 		m_io_regs[offset] = data & 0x7fff;
 		break;
 
@@ -872,18 +876,18 @@ WRITE16_MEMBER(spg2xx_io_device::io_w)
 		{
 			"PPU", "SPU Channel", "Timer A", "Timer B", "UART/SPI", "External", "Reserved", "None"
 		};
-		LOGMASKED(LOG_FIQ, "io_w: FIQ Source Select (not yet implemented) = %04x, %s\n", data, s_fiq_select[data & 7]);
+		LOGMASKED(LOG_FIQ, "%s: io_w: FIQ Source Select (not yet implemented) = %04x, %s\n", machine().describe_context(), data, s_fiq_select[data & 7]);
 		m_io_regs[offset] = data;
 		break;
 	}
 
 	case 0x2f: // Data Segment
 		m_cpu->set_ds(data & 0x3f);
-		LOGMASKED(LOG_SEGMENT, "io_w: Data Segment = %04x\n", data);
+		LOGMASKED(LOG_SEGMENT, "%s: io_w: Data Segment = %04x\n", machine().describe_context(), data);
 		break;
 
 	default:
-		LOGMASKED(LOG_UNKNOWN_IO, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_IO, "%s: io_w: Unknown register %04x = %04x\n", machine().describe_context(), 0x3d00 + offset, data);
 		m_io_regs[offset] = data;
 		break;
 	}
@@ -994,7 +998,7 @@ WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
 	{
 		static const char* const s_addr_mode[4] = { "16-bit", "None", "8-bit", "24-bit" };
 		static const char* const s_baud_rate[4] = { "/16", "/4", "/8", "/32" };
-		LOGMASKED(LOG_SIO, "io_w: SIO Setup (not implemented) = %04x (DS301Ready:%d, Start:%d, Auto:%d, IRQEn:%d, Width:%d, Related:%d\n", data
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Setup (not implemented) = %04x (DS301Ready:%d, Start:%d, Auto:%d, IRQEn:%d, Width:%d, Related:%d\n", machine().describe_context(), data
 			, BIT(data, 11), BIT(data, 10), BIT(data, 9), BIT(data, 8), BIT(data, 7) ? 16 : 8, BIT(data, 6));
 		LOGMASKED(LOG_SIO, "                                         (Mode:%s, RWProtocol:%d, Rate:sysclk%s, AddrMode:%s)\n"
 			, BIT(data, 5), BIT(data, 4), s_baud_rate[(data >> 2) & 3], s_addr_mode[data & 3]);
@@ -1002,64 +1006,64 @@ WRITE16_MEMBER(spg2xx_io_device::io_extended_w)
 	}
 
 	case 0x52: // SIO Start Address (low)
-		LOGMASKED(LOG_SIO, "io_w: SIO Stat Address (low) (not implemented) = %04x\n", data);
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Stat Address (low) (not implemented) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x53: // SIO Start Address (hi)
-		LOGMASKED(LOG_SIO, "io_w: SIO Stat Address (hi) (not implemented) = %04x\n", data);
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Stat Address (hi) (not implemented) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x54: // SIO Data
-		LOGMASKED(LOG_SIO, "io_w: SIO Data (not implemented) = %04x\n", data);
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Data (not implemented) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x55: // SIO Automatic Transmit Count
-		LOGMASKED(LOG_SIO, "io_w: SIO Auto Transmit Count (not implemented) = %04x\n", data);
+		LOGMASKED(LOG_SIO, "%s: io_w: SIO Auto Transmit Count (not implemented) = %04x\n", machine().describe_context(), data);
 		break;
 
 	case 0x58: // I2C Command
-		LOGMASKED(LOG_I2C, "io_w: I2C Command = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Command = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		do_i2c();
 		break;
 
 	case 0x59: // I2C Status / Acknowledge
-		LOGMASKED(LOG_I2C, "io_w: I2C Acknowledge = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Acknowledge = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] &= ~data;
 		break;
 
 	case 0x5a: // I2C Access Mode
-		LOGMASKED(LOG_I2C, "io_w: I2C Access Mode = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Access Mode = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		break;
 
 	case 0x5b: // I2C Device Address
-		LOGMASKED(LOG_I2C, "io_w: I2C Device Address = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Device Address = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		break;
 
 	case 0x5c: // I2C Sub-Address
-		LOGMASKED(LOG_I2C, "io_w: I2C Sub-Address = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Sub-Address = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		break;
 
 	case 0x5d: // I2C Data Out
-		LOGMASKED(LOG_I2C, "io_w: I2C Data Out = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Data Out = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		break;
 
 	case 0x5e: // I2C Data In
-		LOGMASKED(LOG_I2C, "io_w: I2C Data In = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Data In = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		break;
 
 	case 0x5f: // I2C Controller Mode
-		LOGMASKED(LOG_I2C, "io_w: I2C Controller Mode = %04x\n", data);
+		LOGMASKED(LOG_I2C, "%s: io_w: I2C Controller Mode = %04x\n", machine().describe_context(), data);
 		m_io_regs[offset] = data;
 		break;
 
 	default:
-		LOGMASKED(LOG_UNKNOWN_IO, "io_w: Unknown register %04x = %04x\n", 0x3d00 + offset, data);
+		LOGMASKED(LOG_UNKNOWN_IO, "%s: io_w: Unknown register %04x = %04x\n", machine().describe_context(), 0x3d00 + offset, data);
 		m_io_regs[offset] = data;
 		break;
 	}

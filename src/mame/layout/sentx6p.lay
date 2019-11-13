@@ -2,9 +2,13 @@
 <mamelayout version="2">
 
 	<element name="SELECT">
-		<disk>
+		<disk state ="0">
 			<color red="0.8" green="0.8" blue="0.0" />
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+		</disk>
+		<disk state ="1">
+		  <color red="0.4" green="0.4" blue="0.0" />
+		  <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
 
 		<text string="SELECT" align="0">
@@ -19,9 +23,13 @@
 	</element>
 
 	<element name="OK">
-		<disk>
+		<disk state ="0">
 			<color red="0.0" green="0.8" blue="0.0" />
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+		</disk>
+		<disk state ="1">
+		  <color red="0.0" green="0.4" blue="0.0" />
+		  <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
 
 		<text string="OK" align="0">
@@ -357,19 +365,19 @@
 
 		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.06" top="0.22" right="0.275" bottom="0.32" />
+			<bounds left="0.06" top="0.225" right="0.275" bottom="0.33" />
 		</text>
 		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.255" top="0.22" right="0.46" bottom="0.32" />
+			<bounds left="0.255" top="0.225" right="0.46" bottom="0.33" />
 		</text>
 		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.06" top="0.29" right="0.275" bottom="0.39" />
+			<bounds left="0.06" top="0.295" right="0.275" bottom="0.40" />
 		</text>
 		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.255" top="0.29" right="0.44" bottom="0.39" />
+			<bounds left="0.255" top="0.295" right="0.44" bottom="0.40" />
 		</text>
 
 		<rect state="1000">
@@ -451,19 +459,19 @@
 
 		<text state="1" string="&#x2666;" align="0"> <!-- DIAMOND -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.51" top="0.22" right="0.725" bottom="0.32" />
+			<bounds left="0.51" top="0.225" right="0.725" bottom="0.33" />
 		</text>
 		<text state="2" string="&#x2665;" align="0"> <!-- HEART -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.695" top="0.22" right="0.91" bottom="0.32" />
+			<bounds left="0.695" top="0.225" right="0.91" bottom="0.33" />
 		</text>
 		<text state="3" string="&#x2660;" align="0"> <!-- SPADE -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.51" top="0.29" right="0.725" bottom="0.39" />
+			<bounds left="0.51" top="0.295" right="0.725" bottom="0.40" />
 		</text>
 		<text state="4" string="&#x2663;" align="0"> <!-- CLUB -->
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds left="0.695" top="0.29" right="0.91" bottom="0.39" />
+			<bounds left="0.695" top="0.295" right="0.91" bottom="0.40" />
 		</text>
 
 		<rect state="1000">
@@ -528,10 +536,10 @@
 		<bezel name="OPTION_ALLIN_BZ0" element="OPTION_ALLIN">
 			<bounds left="4.5" top="0" right="5.0" bottom="1" />
 		</bezel>
-		<bezel name="SELECTBTN_BZ0" element="SELECT" inputtag="CTRL0" inputmask="0x1">
+		<bezel element="SELECT" inputtag="CTRL1" inputmask="0x1">
 			<bounds x="4.685" y="0.685" width="0.13" height="0.13" />
 		</bezel>
-		<bezel name="OKBTN_BZ0" element="OK" inputtag="CTRL0" inputmask="0x2">
+		<bezel element="OK" inputtag="CTRL1" inputmask="0x2">
 			<bounds x="4.685" y="0.81" width="0.13" height="0.13" />
 		</bezel>
 		<bezel name="REVEALTXT_BZ0" element="REVEAL">
@@ -593,10 +601,10 @@
 		<bezel name="OPTION_ALLIN_BZ1" element="OPTION_ALLIN">
 			<bounds left="4.5" top="1" right="5.0" bottom="2" />
 		</bezel>
-		<bezel name="SELECTBTN_BZ1" element="SELECT" inputtag="CTRL1" inputmask="0x1">
+		<bezel element="SELECT" inputtag="CTRL2" inputmask="0x1">
 			<bounds x="4.685" y="1.685" width="0.13" height="0.13" />
 		</bezel>
-		<bezel name="OKBTN_BZ1" element="OK" inputtag="CTRL1" inputmask="0x2">
+		<bezel element="OK" inputtag="CTRL2" inputmask="0x2">
 			<bounds x="4.685" y="1.81" width="0.13" height="0.13" />
 		</bezel>
 		<bezel name="REVEALTXT_BZ1" element="REVEAL">
@@ -658,10 +666,10 @@
 		<bezel name="OPTION_ALLIN_BZ2" element="OPTION_ALLIN">
 			<bounds left="4.5" top="2" right="5.0" bottom="3" />
 		</bezel>
-		<bezel name="SELECTBTN_BZ2" element="SELECT" inputtag="CTRL2" inputmask="0x1">
+		<bezel element="SELECT" inputtag="CTRL3" inputmask="0x1">
 			<bounds x="4.685" y="2.685" width="0.13" height="0.13" />
 		</bezel>
-		<bezel name="OKBTN_BZ2" element="OK" inputtag="CTRL2" inputmask="0x2">
+		<bezel element="OK" inputtag="CTRL3" inputmask="0x2">
 			<bounds x="4.685" y="2.81" width="0.13" height="0.13" />
 		</bezel>
 		<bezel name="REVEALTXT_BZ2" element="REVEAL">
@@ -723,10 +731,10 @@
 		<bezel name="OPTION_ALLIN_BZ3" element="OPTION_ALLIN">
 			<bounds left="0" top="2" right="0.5" bottom="3" />
 		</bezel>
-		<bezel name="SELECTBTN_BZ3" element="SELECT" inputtag="CTRL3" inputmask="0x1">
+		<bezel element="SELECT" inputtag="CTRL4" inputmask="0x1">
 			<bounds x="0.185" y="2.685" width="0.13" height="0.13" />
 		</bezel>
-		<bezel name="OKBTN_BZ3" element="OK" inputtag="CTRL3" inputmask="0x2">
+		<bezel element="OK" inputtag="CTRL4" inputmask="0x2">
 			<bounds x="0.185" y="2.81" width="0.13" height="0.13" />
 		</bezel>
 		<bezel name="REVEALTXT_BZ3" element="REVEAL">
@@ -788,10 +796,10 @@
 		<bezel name="OPTION_ALLIN_BZ4" element="OPTION_ALLIN">
 			<bounds left="0" top="1" right="0.5" bottom="2" />
 		</bezel>
-		<bezel name="SELECTBTN_BZ4" element="SELECT" inputtag="CTRL4" inputmask="0x1">
+		<bezel element="SELECT" inputtag="CTRL5" inputmask="0x1">
 			<bounds x="0.185" y="1.685" width="0.13" height="0.13" />
 		</bezel>
-		<bezel name="OKBTN_BZ4" element="OK" inputtag="CTRL4" inputmask="0x2">
+		<bezel element="OK" inputtag="CTRL5" inputmask="0x2">
 			<bounds x="0.185" y="1.81" width="0.13" height="0.13" />
 		</bezel>
 		<bezel name="REVEALTXT_BZ4" element="REVEAL">
@@ -853,10 +861,10 @@
 		<bezel name="OPTION_ALLIN_BZ5" element="OPTION_ALLIN">
 			<bounds left="0" top="0" right="0.5" bottom="1" />
 		</bezel>
-		<bezel name="SELECTBTN_BZ5" element="SELECT" inputtag="CTRL5" inputmask="0x1">
+		<bezel element="SELECT" inputtag="CTRL6" inputmask="0x1">
 			<bounds x="0.185" y="0.685" width="0.13" height="0.13" />
 		</bezel>
-		<bezel name="OKBTN_BZ5" element="OK" inputtag="CTRL5" inputmask="0x2">
+		<bezel element="OK" inputtag="CTRL6" inputmask="0x2">
 			<bounds x="0.185" y="0.81" width="0.13" height="0.13" />
 		</bezel>
 		<bezel name="REVEALTXT_BZ5" element="REVEAL">
