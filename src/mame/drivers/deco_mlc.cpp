@@ -267,7 +267,6 @@ READ32_MEMBER( deco_mlc_state::spriteram_r )
 
 WRITE32_MEMBER( deco_mlc_state::spriteram_w )
 {
-	mem_mask &= 0x0000ffff;
 	if (ACCESSING_BITS_0_15)
 	{
 		data &= 0x0000ffff;
