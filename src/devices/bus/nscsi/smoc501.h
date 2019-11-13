@@ -27,4 +27,4 @@ private:
 
 DECLARE_DEVICE_TYPE(SMOC501, smoc501_device)
 
-#endif // MAME_BUS_NSCSI_CDD2000_H
+#endif // MAME_BUS_NSCSI_SMOC501_H
