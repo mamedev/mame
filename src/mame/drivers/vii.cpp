@@ -2025,7 +2025,8 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Low Battery" )  // NOT just a battery sensor, actually needs to be high (On) in order for it to attempt to read any controllers on startup, otherwise it will hang after the VS MAXX logo with no way forward.
+	// is this really just the battery sensor, or does it have some other meaning, like data ready?
+	PORT_DIPNAME( 0x8000, 0x0000, "Low Battery" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
@@ -2951,6 +2952,13 @@ void sentx6p_state::machine_reset()
 		m_lcd_options_select[i] = 0x00;
 		m_lcd_led[i] = 0x00;
 	}
+
+	/* HACK: this address needs to contain '1' so that it thinks the first controller
+	   is present, otherwise it hangs on boot.  How does this get set?
+	   following addresses are for the other controllers, and get set based on Port B
+	   status flags */
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	mem.write_word(0x1e08,0x0001);
 }
 
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
@@ -3614,7 +3622,7 @@ CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, e
 // ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
 CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
 
-// "go 02d1d0" "do r1 = ff" to get past initial screen
+// "go 02d1d0" "do r1 = ff" to get past initial screen (currently bypassed by setting controller sense in RAM earlier, see hack in machine_reset)
 // a 'deluxe' version of this also exists with extra game modes
-CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
 
