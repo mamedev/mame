@@ -312,6 +312,24 @@ public:
 	void sentx6p(machine_config &config);
 
 	void mem_map_2m_texas(address_map &map);
+	
+	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
+	{
+		if (newval == 1)
+		{
+			m_inputlatches[param] |= 0x01;
+			logerror("latching OK button for Player %d\n", param+1);
+		}
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(select_latch)
+	{
+		if (newval == 1)
+		{
+			m_inputlatches[param] |= 0x02;
+			logerror("latching Select button for Player %d\n", param+1);
+		}
+	}
 
 protected:
 	virtual void machine_start() override;
@@ -339,6 +357,10 @@ private:
 	void set_options(uint8_t value, int select_bits);
 	void set_options_select(uint8_t value, int select_bits);
 	void set_controller_led(uint8_t value, int select_bits);
+
+	void controller_send_data(int which);
+
+	uint8_t m_inputlatches[6];
 
 	uint16_t m_porta_data;
 
@@ -2129,29 +2151,30 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	// these are presuambly read through the UART as the LCD screens are driven by it, currently not hooked up
+	// using PORT_CHANGED_MEMBER because we assume the controller latches them for sending as inputs are only read every few frames
 	PORT_START("CTRL1")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 0) 
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 0) 
 
 	PORT_START("CTRL2")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 1)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 1)
 
 	PORT_START("CTRL3")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 2)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 2)
 
 	PORT_START("CTRL4")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 3)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 3)
 
 	PORT_START("CTRL5")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(5)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(5)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 4)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 4)
 
 	PORT_START("CTRL6")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(6)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(6)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 5)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 5)
 
 INPUT_PORTS_END
 
@@ -2951,6 +2974,8 @@ void sentx6p_state::machine_reset()
 		m_lcd_options[i] = 0x00;
 		m_lcd_options_select[i] = 0x00;
 		m_lcd_led[i] = 0x00;
+
+		m_inputlatches[i] = 0x00;
 	}
 
 	/* HACK: this address needs to contain '1' so that it thinks the first controller
@@ -2959,6 +2984,18 @@ void sentx6p_state::machine_reset()
 	   status flags */
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	mem.write_word(0x1e08,0x0001);
+}
+
+void sentx6p_state::controller_send_data(int which)
+{
+	// TODO: send latched data!
+	m_maincpu->uart_rx(machine().rand());
+
+	if (m_inputlatches[which] & 0x03)
+	{
+		m_inputlatches[which] = 0x00;
+		logerror("clearing input latches for player %d\n", which + 1);
+	}
 }
 
 READ16_MEMBER(sentx6p_state::sentx_porta_r)
@@ -2983,13 +3020,35 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 	// the 'select bits' must also be active when the controller wants to send data, the UART read function
 	// won't proceed if they're zero, but the port is written with 0 before that
 
+	//logerror("%08x\n", m_maincpu->pc());
+
+	// regular logic for writing to the LCDs
 	uint16_t ret = (m_io_p1->read() & 0xffc0) | select_bits;
 
+	// hacks needed for reading from the UART to work
 
-	//if (select_bits == 0x00)
-	//  ret |= 0x8000;
-	//else
-	//  ret &= ~0x8000;
+	// the select bit must be high here to read from the controller?
+	if (m_maincpu->pc() == 0x2981e)
+	{
+		ret ^= 0x3f;
+	}
+
+	// but must be low again here after writing the select bits in order to not
+	// get stuck in a timeout loop
+	if (m_maincpu->pc() == 0x29834)
+	{
+		ret &= ~0x3f;
+
+		// presumably the inputs can only be sent once the controller is actually selected, otherwise
+		// there would be competing UART sources?
+		for (int i = 0; i < 6; i++)
+		{
+			if (select_bits & (1 << i))
+			{
+				controller_send_data(i);
+			}
+		}
+	}
 
 	return ret;
 }
@@ -3209,7 +3268,7 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 		break;
 
 	default:
-		printf("unknown LCD command %02x with controller select %02x\n", data, select_bits);
+		logerror("unknown LCD command %02x with controller select %02x\n", data, select_bits);
 		break;
 	}
 
