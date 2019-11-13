@@ -938,7 +938,7 @@ void spc1500_state::spc1500(machine_config &config)
 
 	/* internal ram */
 	RAM(config, RAM_TAG).set_default_size("64K");
-	}
+}
 
 /* ROM definition */
 ROM_START( spc1500 )
@@ -951,7 +951,6 @@ ROM_START( spc1500 )
 	ROM_LOAD( "ss151fnt.bin", 0x2000, 0x2000, CRC(83c2eb8d) SHA1(2adf7816206dc74b9f0d32cb3b56cbab31fa6044) )
 	ROM_LOAD( "ss152fnt.bin", 0x4000, 0x2000, CRC(f4a5a590) SHA1(c9a02756107083bf602ae7c90cfe29b8b964e0df) )
 	ROM_LOAD( "ss153fnt.bin", 0x6000, 0x2000, CRC(8677d5fa) SHA1(34bfacc855c3846744cd586c150c72e5cbe948b0) )
-
 ROM_END
 
 

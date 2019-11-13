@@ -8,9 +8,9 @@
 /// \file nld_solver.h
 ///
 
+#include "../plib/pstream.h"
 #include "netlist/nl_base.h"
 #include "nld_matrix_solver.h"
-#include "../plib/pstream.h"
 
 #include <map>
 #include <memory>

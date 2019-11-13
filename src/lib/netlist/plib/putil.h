@@ -13,11 +13,36 @@
 #include "pstring.h"
 
 #include <algorithm>
-#include <vector>
 #include <initializer_list>
+#include <vector>
 
 #define PSTRINGIFY_HELP(y) # y
 #define PSTRINGIFY(x) PSTRINGIFY_HELP(x)
+
+#define PNARGS_(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...) N
+#define PNARGS(...) PNARGS_(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+
+#define PCONCAT_(a, b) a ## b
+#define PCONCAT(a, b) PCONCAT_(a, b)
+
+#define PSTRINGIFY_1(x)                     #x
+#define PSTRINGIFY_2(x, x2)                 #x, #x2
+#define PSTRINGIFY_3(x, ...)                #x, PSTRINGIFY_2(__VA_ARGS__)
+#define PSTRINGIFY_4(x, ...)                #x, PSTRINGIFY_3(__VA_ARGS__)
+#define PSTRINGIFY_5(x, ...)                #x, PSTRINGIFY_4(__VA_ARGS__)
+#define PSTRINGIFY_6(x, ...)                #x, PSTRINGIFY_5(__VA_ARGS__)
+#define PSTRINGIFY_7(x, ...)                #x, PSTRINGIFY_6(__VA_ARGS__)
+#define PSTRINGIFY_8(x, ...)                #x, PSTRINGIFY_7(__VA_ARGS__)
+#define PSTRINGIFY_9(x, ...)                #x, PSTRINGIFY_8(__VA_ARGS__)
+#define PSTRINGIFY_10(x, ...)               #x, PSTRINGIFY_9(__VA_ARGS__)
+#define PSTRINGIFY_11(x, ...)               #x, PSTRINGIFY_10(__VA_ARGS__)
+#define PSTRINGIFY_12(x, ...)               #x, PSTRINGIFY_11(__VA_ARGS__)
+#define PSTRINGIFY_13(x, ...)               #x, PSTRINGIFY_12(__VA_ARGS__)
+#define PSTRINGIFY_14(x, ...)               #x, PSTRINGIFY_13(__VA_ARGS__)
+#define PSTRINGIFY_15(x, ...)               #x, PSTRINGIFY_14(__VA_ARGS__)
+#define PSTRINGIFY_16(x, ...)               #x, PSTRINGIFY_15(__VA_ARGS__)
+
+#define PSTRINGIFY_VA(...) PCONCAT(PSTRINGIFY_, PNARGS(__VA_ARGS__))(__VA_ARGS__)
 
 // FIXME:: __FUNCTION__ may be not be supported by all compilers.
 
@@ -43,7 +68,7 @@ namespace plib
 		{ }
 
 		source_location(pstring file, pstring func, unsigned line) noexcept
-		: m_file(std::move(file)), m_func(func), m_line(line), m_col(0)
+		: m_file(std::move(file)), m_func(std::move(func)), m_line(line), m_col(0)
 		{ }
 
 		unsigned line() const noexcept { return m_line; }

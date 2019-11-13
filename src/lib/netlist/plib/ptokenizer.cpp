@@ -12,7 +12,7 @@ namespace plib {
 	// A simple tokenizer
 	// ----------------------------------------------------------------------------------------
 
-	pstring ptokenizer::currentline_str()
+	pstring ptokenizer::currentline_str() const
 	{
 		return m_cur_line;
 	}

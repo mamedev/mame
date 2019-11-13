@@ -34,9 +34,9 @@
 #endif
 
 #include "netlist/macro/nlm_cd4xxx.h"
-#include "netlist/macro/nlm_ttl74xx.h"
 #include "netlist/macro/nlm_opamp.h"
 #include "netlist/macro/nlm_other.h"
+#include "netlist/macro/nlm_ttl74xx.h"
 
 #include "nld_7448.h"
 

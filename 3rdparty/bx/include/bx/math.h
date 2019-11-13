@@ -146,6 +146,10 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t);
 
+	/// Returns inverse linear interpolation of _value between two values _a and _b.
+	///
+	BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value);
+
 	/// Returns the sign of _a.
 	///
 	BX_CONSTEXPR_FUNC float sign(float _a);
@@ -225,7 +229,8 @@ namespace bx
 
 	/// Returns the base 2 logarithm of _a.
 	///
-	BX_CONST_FUNC float log2(float _a);
+	template<typename Ty>
+	BX_CONST_FUNC Ty log2(Ty _a);
 
 	/// Returns the square root of _a.
 	///

@@ -10,11 +10,11 @@
 // ***************************************************************************
 
 #include "netlist/plib/pmain.h"
-#include "netlist/plib/pstrutil.h"
 #include "netlist/devices/net_lib.h"
 #include "netlist/nl_errstr.h"
 #include "netlist/nl_parser.h"
 #include "netlist/nl_setup.h"
+#include "netlist/plib/pstrutil.h"
 #include "netlist/solver/nld_solver.h"
 #include "netlist/tools/nl_convert.h"
 
@@ -117,7 +117,7 @@ public:
 	pstring usage() override;
 
 	template<typename... ARGS>
-	void poutprefix(pstring prefix, pstring fmt, ARGS&&... args)
+	void poutprefix(const pstring &prefix, const pstring &fmt, ARGS&&... args)
 	{
 		pstring res = plib::pfmt(fmt)(std::forward<ARGS>(args)...);
 		auto lines(plib::psplit(res, "\n", false));
@@ -201,16 +201,14 @@ private:
 	tool_app_t &m_app;
 };
 
-class netlist_tool_t : public netlist::netlist_t
+class netlist_tool_t : public netlist::netlist_state_t
 {
 public:
 
 	netlist_tool_t(tool_app_t &app, const pstring &aname)
-	: netlist::netlist_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app))
+	: netlist::netlist_state_t(aname, plib::make_unique<netlist_tool_callbacks_t>(app))
 	{
 	}
-
-	netlist::setup_t &setup() { return nlstate().setup(); }
 
 	void read_netlist(const pstring &filename, const pstring &name,
 			const std::vector<pstring> &logs,
@@ -254,19 +252,19 @@ public:
 		run_state_manager().pre_save();
 		std::size_t size = 0;
 		for (auto const & s : run_state_manager().save_list())
-			size += s->m_dt.size * s->m_count;
+			size += s->dt().size() * s->count();
 
 		std::vector<char> buf(size);
 		char *p = buf.data();
 
 		for (auto const & s : run_state_manager().save_list())
 		{
-			std::size_t sz = s->m_dt.size * s->m_count;
-			if (s->m_dt.is_float || s->m_dt.is_integral)
-				std::copy(static_cast<char *>(s->m_ptr),
-						static_cast<char *>(s->m_ptr) + sz, p);
+			std::size_t sz = s->dt().size() * s->count();
+			if (s->dt().is_float() || s->dt().is_integral())
+				std::copy(static_cast<char *>(s->ptr()),
+						static_cast<char *>(s->ptr()) + sz, p);
 			else
-				log().fatal("found unsupported save element {1}\n", s->m_name);
+				log().fatal("found unsupported save element {1}\n", s->name());
 			p += sz;
 		}
 		return buf;
@@ -276,7 +274,7 @@ public:
 	{
 		std::size_t size = 0;
 		for (auto const & s : run_state_manager().save_list())
-			size += s->m_dt.size * s->m_count;
+			size += s->dt().size() * s->count();
 
 		if (buf.size() != size)
 			plib::pthrow<netlist::nl_exception>("Size different during load state.");
@@ -285,15 +283,15 @@ public:
 
 		for (auto const & s : run_state_manager().save_list())
 		{
-			std::size_t sz = s->m_dt.size * s->m_count;
-			if (s->m_dt.is_float || s->m_dt.is_integral)
-				std::copy(p, p + sz, static_cast<char *>(s->m_ptr));
+			std::size_t sz = s->dt().size() * s->count();
+			if (s->dt().is_float() || s->dt().is_integral())
+				std::copy(p, p + sz, static_cast<char *>(s->ptr()));
 			else
-				log().fatal("found unsupported save element {1}\n", s->m_name);
+				log().fatal("found unsupported save element {1}\n", s->name());
 			p += sz;
 		}
 		run_state_manager().post_load();
-		nlstate().rebuild_lists();
+		this->rebuild_lists();
 	}
 
 protected:
@@ -388,7 +386,7 @@ void tool_app_t::run()
 		auto t_guard(t.guard());
 		//plib::perftime_t<plib::exact_ticks> t;
 
-		nt.enable_stats(opt_stats());
+		nt.exec().enable_stats(opt_stats());
 
 		if (!opt_verb())
 			nt.log().verbose.set_enabled(false);
@@ -399,7 +397,7 @@ void tool_app_t::run()
 				opt_logs(),
 				m_defines, opt_rfolders(), opt_includes());
 
-		nt.reset();
+		nt.exec().reset();
 
 		inps = read_input(nt.setup(), opt_inp());
 		ttr = netlist::netlist_time::from_fp(opt_ttr());
@@ -410,7 +408,7 @@ void tool_app_t::run()
 
 	t.reset();
 
-	netlist::netlist_time nlt = nt.time();
+	netlist::netlist_time nlt = nt.exec().time();
 	{
 		auto t_guard(t.guard());
 
@@ -425,7 +423,7 @@ void tool_app_t::run()
 			std::vector<char> loadstate;
 			reader.read(loadstate);
 			nt.load_state(loadstate);
-			pout("Loaded state, run will continue at {1:.6f}\n", nt.time().as_double());
+			pout("Loaded state, run will continue at {1:.6f}\n", nt.exec().time().as_double());
 		}
 
 		unsigned pos = 0;
@@ -435,7 +433,7 @@ void tool_app_t::run()
 				&& inps[pos].m_time < ttr
 				&& inps[pos].m_time >= nlt)
 		{
-			nt.process_queue(inps[pos].m_time - nlt);
+			nt.exec().process_queue(inps[pos].m_time - nlt);
 			inps[pos].setparam();
 			nlt = inps[pos].m_time;
 			pos++;
@@ -444,7 +442,7 @@ void tool_app_t::run()
 		pout("runnning ...\n");
 
 		if (ttr > nlt)
-			nt.process_queue(ttr - nlt);
+			nt.exec().process_queue(ttr - nlt);
 		else
 		{
 			pout("end time {1:.6f} less than saved time {2:.6f}\n",
@@ -463,7 +461,7 @@ void tool_app_t::run()
 			plib::pbinary_writer writer(strm);
 			writer.write(savestate);
 		}
-		nt.stop();
+		nt.exec().stop();
 	}
 
 	auto emutime(t.as_seconds<nl_fptype>());
@@ -526,11 +524,11 @@ void tool_app_t::static_compile()
 
 	// need to reset ...
 
-	nt.reset();
+	nt.exec().reset();
 
 	std::map<pstring, pstring> mp;
 
-	nt.solver()->create_solver_code(mp);
+	nt.exec().solver()->create_solver_code(mp);
 
 	for (auto &e : mp)
 	{
@@ -538,7 +536,7 @@ void tool_app_t::static_compile()
 		sout << e.second;
 	}
 
-	nt.stop();
+	nt.exec().stop();
 
 }
 
@@ -758,7 +756,7 @@ void tool_app_t::create_header()
 	}
 	pout("#endif // __PLIB_PREPROCESSOR__\n");
 	pout("#endif\n");
-	nt.stop();
+	nt.exec().stop();
 
 }
 
@@ -875,7 +873,7 @@ void tool_app_t::create_docheader()
 			}
 		}
 	}
-	nt.stop();
+	nt.exec().stop();
 }
 
 
@@ -904,7 +902,7 @@ void tool_app_t::listdevices()
 		pstring out = plib::pfmt("{1:-20} {2}(<id>")(f->classname())(f->name());
 
 		f->macro_actions(nt.setup(), f->name() + "_lc");
-		auto d = f->Create(nt.nlstate(), f->name() + "_lc");
+		auto d = f->Create(nt.pool(), nt, f->name() + "_lc");
 		// get the list of terminals ...
 
 		std::vector<pstring> terms(nt.setup().get_terminals_for_device_name(d->name()));

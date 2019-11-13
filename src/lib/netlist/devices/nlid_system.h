@@ -40,45 +40,6 @@ namespace devices
 		param_num_t<unsigned>   m_max_link_loops;
 	};
 
-#if 0
-	// -----------------------------------------------------------------------------
-	// mainclock
-	// -----------------------------------------------------------------------------
-
-	NETLIB_OBJECT(mainclock)
-	{
-		NETLIB_CONSTRUCTOR(mainclock)
-		, m_Q(*this, "Q")
-		, m_freq(*this, "FREQ", nlconst::magic(7159000.0 * 5))
-		{
-			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-		}
-
-		NETLIB_RESETI()
-		{
-			m_Q.net().set_next_scheduled_time(netlist_time::zero());
-		}
-
-		NETLIB_UPDATE_PARAMI()
-		{
-			m_inc = netlist_time::from_fp(plib::reciprocal(m_freq()*nlconst::two()));
-		}
-
-		NETLIB_UPDATEI()
-		{
-			logic_net_t &net = m_Q.net();
-			// this is only called during setup ...
-			net.toggle_new_Q();
-			net.set_next_scheduled_time(exec().time() + m_inc);
-		}
-
-	public:
-		logic_output_t m_Q;
-		netlist_time m_inc;
-	private:
-		param_fp_t m_freq;
-	};
-#endif
 	// -----------------------------------------------------------------------------
 	// clock
 	// -----------------------------------------------------------------------------
@@ -366,7 +327,7 @@ namespace devices
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(pool().make_unique<analog_input_t>(*this, n));
+				m_I.push_back(state().make_object<analog_input_t>(*this, n));
 				inps.push_back(n);
 				m_vals.push_back(nlconst::zero());
 			}
@@ -465,8 +426,8 @@ namespace devices
 		{
 			if (owner.state().setup().is_extended_validation() || force_analog_input)
 			{
-				m_GND = pool().make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
-				m_VCC = pool().make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
+				m_GND = owner.state().make_object<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
+				m_VCC = owner.state().make_object<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
 			}
 			else
 			{
@@ -477,8 +438,8 @@ namespace devices
 		}
 
 		// FIXME: this will seg-fault if force_analog_input = false
-		nl_fptype VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
-		nl_fptype GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
+		nl_fptype VCC() const noexcept { return m_VCC->Q_Analog(); }
+		nl_fptype GND() const noexcept { return m_GND->Q_Analog(); }
 
 	private:
 		void noop() { }

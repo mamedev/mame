@@ -58,12 +58,17 @@ namespace netlist
 		register_dev(classname, name, params);
 	}
 
-	void nlparse_t::register_dev(const pstring &classname, const pstring &name,
+	void nlparse_t::register_devx(const pstring &classname,
 		std::initializer_list<const char *> params_and_connections)
 	{
 		std::vector<pstring> params;
-		for (auto &i : params_and_connections)
-			params.push_back(pstring(i));
+		auto i(params_and_connections.begin());
+		pstring name(*i);
+		++i;
+		for (; i != params_and_connections.end(); ++i)
+		{
+			params.emplace_back(*i);
+		}
 		register_dev(classname, name, params);
 	}
 
@@ -585,9 +590,10 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		out.net().core_terms().clear(); // clear the list
 
 		out.net().add_terminal(new_proxy->in());
-		out_cast.set_proxy(proxy);
+		//out_cast.set_proxy(proxy); - Wrong!
 
 		proxy = new_proxy.get();
+		out_cast.set_proxy(proxy);
 
 		m_nlstate.register_device(new_proxy->name(), std::move(new_proxy));
 	}
@@ -760,7 +766,7 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	{
 		log().debug("adding analog net ...\n");
 		// FIXME: Nets should have a unique name
-		auto anet = pool().make_owned<analog_net_t>(m_nlstate,"net." + t1.name());
+		auto anet = nlstate().pool().make_owned<analog_net_t>(m_nlstate,"net." + t1.name());
 		auto anetp = anet.get();
 		m_nlstate.register_net(std::move(anet));
 		t1.set_net(anetp);
@@ -956,7 +962,7 @@ void setup_t::register_dynamic_log_devices()
 		for (const pstring &ll : loglist)
 		{
 			pstring name = "log_" + ll;
-			auto nc = factory().factory_by_name("LOG")->Create(m_nlstate, name);
+			auto nc = factory().factory_by_name("LOG")->Create(m_nlstate.pool(), m_nlstate, name);
 			register_link(name + ".I", ll);
 			log().debug("    dynamic link {1}: <{2}>\n",ll, name);
 			m_nlstate.register_device(nc->name(), std::move(nc));
@@ -1113,11 +1119,11 @@ public:
 unique_pool_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_state_t &anetlist,
 		const pstring &name, logic_output_t *proxied) const
 {
-	return pool().make_unique<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	return anetlist.make_object<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 }
 unique_pool_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_state_t &anetlist, const pstring &name, logic_input_t *proxied) const
 {
-	return pool().make_unique<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	return anetlist.make_object<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 }
 
 
@@ -1200,7 +1206,7 @@ void setup_t::prepare_to_run()
 		if ( factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			m_nlstate.register_device(e.first, e.second->Create(m_nlstate, e.first));
+			m_nlstate.register_device(e.first, e.second->Create(nlstate().pool(), m_nlstate, e.first));
 		}
 	}
 
@@ -1222,7 +1228,7 @@ void setup_t::prepare_to_run()
 		if ( !factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
-			auto dev = e.second->Create(m_nlstate, e.first);
+			auto dev = e.second->Create(m_nlstate.pool(), m_nlstate, e.first);
 			m_nlstate.register_device(dev->name(), std::move(dev));
 		}
 	}

@@ -32,8 +32,8 @@ public:
 
 	auto irq() { return m_write_irq.bind(); }
 
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 	void set_drive(int drive);
 	void set_side(int side);

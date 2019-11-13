@@ -505,14 +505,7 @@ namespace plib
 						{
 							auto f = std::min(fill[i][j], 1 + fill[i][k] + fill[k][j]);
 							if (f <= ilup)
-							{
-#if 0
-								if (f > fill_max)
-									fill_max = f;
-								ops += 2;
-#endif
 								fill[i][j] = f;
-							}
 						}
 						found = true;
 					}

@@ -250,19 +250,7 @@ namespace plib {
 	{
 		constexpr pqentry_t() noexcept : m_exec_time(), m_object(nullptr) { }
 		constexpr pqentry_t(const Time t, const Element o) noexcept : m_exec_time(t), m_object(o) { }
-#if 0
-		~pqentry_t() = default;
-		constexpr pqentry_t(const pqentry_t &e) noexcept = default;
-		constexpr pqentry_t(pqentry_t &&e) noexcept = default;
-		pqentry_t& operator=(pqentry_t && other) noexcept = default;
-		pqentry_t& operator=(const pqentry_t &other) noexcept = default;
 
-		void swap(pqentry_t &other) noexcept
-		{
-			std::swap(m_exec_time, other.m_exec_time);
-			std::swap(m_object, other.m_object);
-		}
-#endif
 		inline bool operator ==(const pqentry_t &rhs) const noexcept
 		{
 			return m_object == rhs.m_object;

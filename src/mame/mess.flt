@@ -426,6 +426,7 @@ ktm3.cpp
 kyocera.cpp
 laser3k.cpp
 lb186.cpp
+lbpc.cpp
 lc80.cpp
 lcmate2.cpp
 leapfrog_leappad.cpp

@@ -118,7 +118,8 @@ void bbc_1mhzbus_slot_device::jim_w(offs_t offset, uint8_t data)
 //#include "scsi.h"
 //#include "multiform.h"
 #include "opus3.h"
-//#include "ramdisc.h"
+#include "pms64k.h"
+#include "ramdisc.h"
 //#include "graduate.h"
 #include "beebsid.h"
 //#include "prisma3.h"
@@ -141,7 +142,8 @@ void bbc_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("twdd",       BBC_TWDD);            /* Technomatic Winchester (Akhter Host Adaptor + ABD4070 */
 	//device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
 	device.option_add("opus3",      BBC_OPUS3);           /* Opus Challenger 3 */
-	//device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
+	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
+	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
 	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */
@@ -165,7 +167,8 @@ void bbcm_1mhzbus_devices(device_slot_interface &device)
 	//device.option_add("m87",        BBC_M87);             /* Peartree Music 87 Synthesiser */
 	//device.option_add("multiform",  BBC_MULTIFORM);       /* Technomatic Multiform Z80 */
 	device.option_add("opusa",      BBC_OPUSA);           /* Opus Challenger ADFS */
-	//device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
+	device.option_add("pms64k",     BBC_PMS64K);          /* PMS 64K Non-Volatile Ram Module */
+	device.option_add("ramdisc",    BBC_RAMDISC);         /* Morley Electronics RAM Disc */
 	//device.option_add("graduate",   BBC_GRADUATE);        /* The Torch Graduate G400/G800 */
 	device.option_add("beebsid",    BBC_BEEBSID);         /* BeebSID */
 	//device.option_add("prisma3",    BBC_PRISMA3);         /* PRISMA-3 - Millipede 1989 */

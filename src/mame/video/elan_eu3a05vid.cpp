@@ -6,14 +6,40 @@
 
 DEFINE_DEVICE_TYPE(ELAN_EU3A05_VID, elan_eu3a05vid_device, "elan_eu3a05vid", "Elan EU3A05 Video")
 
-// map(0x0600, 0x3dff).ram().share("vram");
-// map(0x3e00, 0x3fff).ram().share("spriteram");
+// tilemaps start at 0x0600 in mainram, sprites at 0x3e00, unlike eu3a14 these could be fixed addresses
 
 elan_eu3a05vid_device::elan_eu3a05vid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: elan_eu3a05commonvid_device(mconfig, ELAN_EU3A05_VID, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	m_cpu(*this, finder_base::DUMMY_TAG),
-	m_bank(*this, finder_base::DUMMY_TAG)
+	m_bank(*this, finder_base::DUMMY_TAG),
+	m_space_config("regs", ENDIANNESS_NATIVE, 8, 5, 0, address_map_constructor(FUNC(elan_eu3a05vid_device::map), this))
 {
+}
+
+device_memory_interface::space_config_vector elan_eu3a05vid_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
+
+void elan_eu3a05vid_device::map(address_map &map)
+{
+	map(0x00, 0x1f).rw(FUNC(elan_eu3a05vid_device::read_unmapped), FUNC(elan_eu3a05vid_device::write_unmapped));
+
+	map(0x00, 0x06).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
+	map(0x07, 0x07).rw(FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
+	map(0x08, 0x08).ram(); // unknown
+	map(0x09, 0x09).rw(FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_w));
+	map(0x0a, 0x0a).rw(FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w));
+	map(0x0b, 0x0b).rw(FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w));
+	map(0x0c, 0x0c).rw(FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w));
+	map(0x0d, 0x0e).rw(FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w));
+	map(0x0f, 0x16).rw(FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w));
+	map(0x17, 0x17).ram(); // unknown
+	map(0x18, 0x18).ram(); // unknown
+	// no other writes seen
 }
 
 void elan_eu3a05vid_device::device_start()
@@ -330,18 +356,17 @@ void elan_eu3a05vid_device::draw_tilemaps(screen_device& screen, bitmap_ind16& b
 
 					// split can be probably configured in more ways than this
 					// exact enable conditions unclear
-					int splitpos = (m_splitpos[0] << 8) | m_splitpos[1];
-
-					if (splitpos != 0xffff)
+					if (drawline < m_splitpos[0])
 					{
-						if (drawline > splitpos)
-							scrollx = get_scroll(3);
-						else
-							scrollx = get_scroll(2);
+						scrollx = get_scroll(0);
+					}
+					else if (drawline < m_splitpos[1])
+					{
+						scrollx = get_scroll(2);
 					}
 					else
 					{
-						scrollx = get_scroll(0);
+						scrollx = get_scroll(3);
 					}
 
 					int base;
@@ -565,4 +590,15 @@ WRITE8_MEMBER(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w)
 
 	*/
 	m_vidctrl = data;
+}
+
+READ8_MEMBER(elan_eu3a05vid_device::read_unmapped)
+{
+	logerror("%s: elan_eu3a05vid_device::read_unmapped (offset %02x)\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+WRITE8_MEMBER(elan_eu3a05vid_device::write_unmapped)
+{
+	logerror("%s: elan_eu3a05vid_device::write_unmapped (offset %02x) (data %02x)\n", machine().describe_context(), offset, data);
 }

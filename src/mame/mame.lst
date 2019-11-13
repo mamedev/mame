@@ -2428,8 +2428,8 @@ elt286b                         // Chaintech ELT-286B-160B(E) motherboard (286)
 uni386w                         // UNICHIP 386W 367C REV 1.0 motherboard (386)
 mokp386sx                       // MORSE KP 386SX V2.21
 at486                           // 19?? IBM AT 486
-atvga                           // 19?? AT VGA
-at386sx                         // 19?? AT VGA 386sx
+atturbo                         // 19?? AT 12 MHz
+at386sx                         // 19?? AT 16 MHz 386SX
 a433cc                          // J-Bond A433C-C/A450C-C
 anch386s                        // ANIX CH-386S-16/20/25G
 scamp386sx                      // motherboards using the SCAMPSX chipset (386sx)
@@ -4310,7 +4310,6 @@ sc4bonbxk                       //
 sc4bonbxl                       //
 sc4boomb                        //
 sc4boomba                       //
-sc4boombb                       //
 sc4botn                         // Back Of The Net (Qps)
 sc4botna                        //
 sc4bpb                          // Bully's Prize Board (Bellfruit)
@@ -10662,6 +10661,27 @@ wofr1                           // 02/10/1992 (c) 1992 (World) (CPS1 + QSound)
 wofu                            // 31/10/1992 (c) 1992 (USA) (CPS1 + QSound)
 wonder3                         // 20/05/1991 (c) 1991 (Japan)
 
+@source:cps1bl_5205.cpp
+captcommb2                      // bootleg
+knightsb                        // bootleg
+knightsb3                       // bootleg
+sf2b                            // bootleg
+sf2b2                           // bootleg
+sf2ceb                          // bootleg
+sf2mdt                          // bootleg
+sf2mdta                         // bootleg
+sf2mdtb                         // bootleg
+
+@source:cps1bl_pic.cpp
+dinopic                         // bootleg
+dinopic2                        // bootleg
+dinopic3                        // bootleg
+punipic                         // bootleg
+punipic2                        // bootleg
+punipic3                        // bootleg
+slampic                         // bootleg
+slampic2                        // bootleg
+
 @source:cps2.cpp
 1944                            // 20/06/2000 (c) 2000 Eighting/Raizing (USA)
 1944d                           //
@@ -13171,28 +13191,14 @@ fcombat                         // (c) 1985 Jaleco
 @source:fcrash.cpp
 cawingb2                        // bootleg
 cawingbl                        // bootleg
-dinopic                         // bootleg
-dinopic2                        // bootleg
 fcrash                          // bootleg of Final Fight
 ffightbl                        // bootleg
 ffightbla                       // bootleg
-knightsb                        // bootleg
 kodb                            // bootleg
 mtwinsb                         // bootleg
-punipic                         // bootleg
-punipic2                        // bootleg
-punipic3                        // bootleg
-sf2b                            // bootleg
-sf2b2                           // bootleg
-sf2ceb                          // bootleg
 sf2m1                           // hack
 sf2m9                           // bootleg
-sf2mdt                          // bootleg
-sf2mdta                         // bootleg
-sf2mdtb                         // bootleg
 sgyxz                           // bootleg (All-In Electronics)
-slampic                         // bootleg
-slampic2                        // bootleg
 varthb                          // bootleg
 wofabl                          // bootleg
 
@@ -14431,6 +14437,7 @@ gjrstar                         // Genius Junior Redstar (Germany)
 gjrstar2                        // Genius Junior Redstar 2 (Germany)
 gjrstar3                        // Genius Junior Redstar 3 (Germany)
 gln                             // Genius Leader Notebook
+pitagor                         // Pitagorin
 gls                             // Genius Leader Select
 pitagjr                         // Pitagorin Junior
 
@@ -14980,6 +14987,9 @@ gridlee                         // [1983 Videa] prototype - no copyright notice
 
 @source:groundfx.cpp
 groundfx                        // D51 (c) 1992 Taito Corporation
+
+@source:gsspade.cpp
+gsspade                         //
 
 @source:gstream.cpp
 gstream                         // (c) 2002, Oriental Soft Japan
@@ -18671,6 +18681,9 @@ lb186                           // Ampro Little Board/186
 
 @source:lbeach.cpp
 lbeach                          // (c) 1979 Olympia / Seletron
+
+@source:lbpc.cpp
+lbpc                            // Ampro Little Board/PC
 
 @source:lc80.cpp
 lc80                            //
@@ -31876,6 +31889,7 @@ misterx                         // 1988 (Yeno) MisterX
 ordisava                        // 1988 Ordisavant (France)
 pc1000                          // 1988 PreComputer 1000
 pc2000                          // 1993 PreComputer 2000
+pc2000s                         // 1993 PreComputer 2000 (Spain)
 
 @source:pc4.cpp
 pc4                             //

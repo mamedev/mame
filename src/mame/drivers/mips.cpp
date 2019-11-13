@@ -520,7 +520,7 @@ void rx2030_state::rx2030(machine_config &config)
 	m_cpu->set_fpu(mips1_device_base::MIPS_R2010A);
 	m_cpu->in_brcond<0>().set([]() { return 1; }); // writeback complete
 
-	V50(config, m_iop, 20_MHz_XTAL / 2);
+	V50(config, m_iop, 20_MHz_XTAL);
 	m_iop->set_addrmap(AS_PROGRAM, &rx2030_state::iop_program_map);
 	m_iop->set_addrmap(AS_IO, &rx2030_state::iop_io_map);
 	m_iop->out_handler<2>().set(m_buzzer, FUNC(speaker_sound_device::level_w));

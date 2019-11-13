@@ -24,15 +24,9 @@ protected:
 	enum
 	{
 		F8_PC0=1, F8_PC1, F8_DC0, F8_DC1, F8_W, F8_A, F8_IS,
-		F8_J, F8_HU, F8_HL, F8_KU, F8_KL, F8_QU, F8_QL,
-
-		F8_R0, F8_R1, F8_R2, F8_R3, F8_R4, F8_R5, F8_R6, F8_R7, F8_R8,
-		F8_R16, F8_R17, F8_R18, F8_R19, F8_R20, F8_R21, F8_R22, F8_R23,
-		F8_R24, F8_R25, F8_R26, F8_R27, F8_R28, F8_R29, F8_R30, F8_R31,
-		F8_R32, F8_R33, F8_R34, F8_R35, F8_R36, F8_R37, F8_R38, F8_R39,
-		F8_R40, F8_R41, F8_R42, F8_R43, F8_R44, F8_R45, F8_R46, F8_R47,
-		F8_R48, F8_R49, F8_R50, F8_R51, F8_R52, F8_R53, F8_R54, F8_R55,
-		F8_R56, F8_R57, F8_R58, F8_R59, F8_R60, F8_R61, F8_R62, F8_R63
+		F8_R0, F8_R1, F8_R2, F8_R3, F8_R4, F8_R5, F8_R6, F8_R7,
+		F8_R8, F8_J, F8_HU, F8_HL, F8_KU, F8_KL, F8_QU, F8_QL,
+		F8_H, F8_K, F8_Q
 	};
 
 	// device-level overrides
@@ -56,7 +50,10 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	void regs_map(address_map &map);
+
 	address_space_config m_program_config;
+	address_space_config m_regs_config;
 	address_space_config m_io_config;
 
 	u16  m_pc0;    /* program counter 0 */
@@ -71,9 +68,9 @@ private:
 	u16  m_irq_vector;
 	address_space *m_program;
 	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_cache;
+	memory_access_cache<0, 0, ENDIANNESS_BIG> *m_r;
 	address_space *m_iospace;
 	int m_icount;
-	u8   m_r[64];  /* scratchpad RAM */
 	int m_irq_request;
 
 	u16 m_debug_pc; // only for the MAME debugger

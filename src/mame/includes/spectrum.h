@@ -95,6 +95,7 @@ public:
 
 	void spectrum_common(machine_config &config);
 	void spectrum(machine_config &config);
+	void spectrum_clone(machine_config &config);
 	void spectrum_128(machine_config &config);
 
 	void init_spectrum();
@@ -148,6 +149,7 @@ protected:
 	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
 	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+	DECLARE_READ8_MEMBER(spectrum_clone_port_ula_r);
 
 	DECLARE_READ8_MEMBER(spectrum_128_pre_opcode_fetch_r);
 	DECLARE_WRITE8_MEMBER(spectrum_128_bank1_w);
@@ -183,6 +185,7 @@ protected:
 	void spectrum_128_mem(address_map &map);
 	void spectrum_128_fetch(address_map &map);
 	void spectrum_io(address_map &map);
+	void spectrum_clone_io(address_map &map);
 	void spectrum_opcodes(address_map &map);
 	void spectrum_map(address_map &map);
 	void spectrum_data(address_map &map);
@@ -245,6 +248,8 @@ protected:
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(uint8_t *quickdata, uint32_t quicksize);
 	void setup_raw(uint8_t *quickdata, uint32_t quicksize);
+	
+	uint8_t floating_bus_r();
 };
 
 

@@ -2891,7 +2891,7 @@ void thomson_state::to8_kbd_init()
 
 void thomson_state::to8_update_floppy_bank()
 {
-	int bank = (m_to8_reg_sys1 & 0x80) ? to7_floppy_bank : (m_to8_bios_bank + TO7_NB_FLOP_BANK);
+	int bank = (m_to8_reg_sys1 & 0x80) ? m_to7_floppy_bank : (m_to8_bios_bank + TO7_NB_FLOP_BANK);
 
 	if ( bank != m_old_floppy_bank )
 	{
@@ -3178,7 +3178,7 @@ READ8_MEMBER( thomson_state::to8_floppy_r )
 
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
-		return to7_floppy_r( space, offset );
+		return to7_floppy_r( offset );
 	else if ( ! (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
 		return m_thmfc->floppy_r( offset );
@@ -3193,7 +3193,7 @@ WRITE8_MEMBER( thomson_state::to8_floppy_w )
 {
 	if ( (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_EXT )
 		/* external controller */
-		to7_floppy_w( space, offset, data );
+		to7_floppy_w( offset, data );
 	else if ( ! (m_to8_reg_sys1 & 0x80) && THOM_FLOPPY_INT )
 		/* internal controller */
 		m_thmfc->floppy_w( offset, data );
@@ -3321,7 +3321,7 @@ READ8_MEMBER( thomson_state::to8_vreg_r )
 			return 0;
 
 		if ( THOM_FLOPPY_EXT )
-			return to7_floppy_r( space, 0xc );
+			return to7_floppy_r( 0xc );
 		else
 			return 0;
 	}
@@ -3386,7 +3386,7 @@ WRITE8_MEMBER( thomson_state::to8_vreg_w )
 		if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) && ( m_to8_reg_sys1 & 0x80 ) )
 		{
 			if ( THOM_FLOPPY_EXT )
-				to7_floppy_w( space, 0xc, data );
+				to7_floppy_w( 0xc, data );
 		}
 		else
 		{
@@ -4269,7 +4269,7 @@ READ8_MEMBER( thomson_state::mo6_vreg_r )
 	if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
 		{
 		if ( !machine().side_effects_disabled() )
-			return to7_floppy_r( space, 0xc );
+			return to7_floppy_r( 0xc );
 		}
 
 	switch ( offset )
@@ -4305,7 +4305,7 @@ WRITE8_MEMBER( thomson_state::mo6_vreg_w )
 
 	case 2: /* display / external floppy register */
 		if ( ( m_to8_reg_sys1 & 0x80 ) && ( m_to8_reg_ram & 0x80 ) )
-			to7_floppy_w( space, 0xc, data );
+			to7_floppy_w( 0xc, data );
 		else
 			to9_set_video_mode( data, 2 );
 		break;
@@ -4313,7 +4313,7 @@ WRITE8_MEMBER( thomson_state::mo6_vreg_w )
 	case 3: /* system register 2 */
 		/* 0xa7dc from external floppy drive aliases the video gate-array */
 		if ( ( offset == 3 ) && ( m_to8_reg_ram & 0x80 ) )
-			to7_floppy_w( space, 0xc, data );
+			to7_floppy_w( 0xc, data );
 		else
 		{
 			m_to8_reg_sys2 = data;
@@ -4452,8 +4452,8 @@ READ8_MEMBER( thomson_state::mo5nr_net_r )
 	if ( machine().side_effects_disabled() )
 		return 0;
 
-	if ( to7_controller_type )
-		return to7_floppy_r ( space, offset );
+	if ( m_to7_controller_type )
+		return to7_floppy_r ( offset );
 
 	logerror( "$%04x %f mo5nr_net_r: read from reg %i\n", m_maincpu->pc(), machine().time().as_double(), offset );
 
@@ -4464,8 +4464,8 @@ READ8_MEMBER( thomson_state::mo5nr_net_r )
 
 WRITE8_MEMBER( thomson_state::mo5nr_net_w )
 {
-	if ( to7_controller_type )
-		to7_floppy_w ( space, offset, data );
+	if ( m_to7_controller_type )
+		to7_floppy_w ( offset, data );
 	else
 		logerror( "$%04x %f mo5nr_net_w: write $%02X to reg %i\n",
 				m_maincpu->pc(), machine().time().as_double(), data, offset );

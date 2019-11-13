@@ -9,6 +9,7 @@
 ///
 
 #include "palloc.h"
+#include "pconfig.h"
 #include "pstream.h"
 #include "pstring.h"
 #include "ptypes.h"
@@ -28,80 +29,21 @@ namespace plib {
 
 	class mempool
 	{
-	private:
-		struct block
-		{
-			block(mempool &mp, std::size_t min_bytes)
-			: m_num_alloc(0)
-			, m_cur(0)
-			, m_data(nullptr)
-			, m_mempool(mp)
-			{
-				min_bytes = std::max(mp.m_min_alloc, min_bytes);
-				m_free = min_bytes;
-				std::size_t alloc_bytes = (min_bytes + mp.m_min_align); // - 1); // & ~(mp.m_min_align - 1);
-				//m_data_allocated = ::operator new(alloc_bytes);
-				m_data_allocated = new char[alloc_bytes];
-				void *r = m_data_allocated;
-				std::align(mp.m_min_align, min_bytes, r, alloc_bytes);
-				m_data  = reinterpret_cast<char *>(r);
-			}
-			~block()
-			{
-				//::operator delete(m_data_allocated);
-				delete [] m_data_allocated;
-			}
-
-			block(const block &) = delete;
-			block(block &&) = delete;
-			block &operator =(const block &) = delete;
-			block &operator =(block &&) = delete;
-
-			std::size_t m_num_alloc;
-			std::size_t m_free;
-			std::size_t m_cur;
-			char *m_data;
-			char *m_data_allocated;
-			mempool &m_mempool;
-		};
-
-		struct info
-		{
-			info(block *b, std::size_t p) : m_block(b), m_pos(p) { }
-			~info() = default;
-			COPYASSIGNMOVE(info, default)
-
-			block * m_block;
-			std::size_t m_pos;
-		};
-
-
-		block * new_block(std::size_t min_bytes)
-		{
-			auto *b = plib::pnew<block>(*this, min_bytes);
-			m_blocks.push_back(b);
-			return b;
-		}
-
-
-		static std::unordered_map<void *, info> &sinfo()
-		{
-			static std::unordered_map<void *, info> spinfo;
-			return spinfo;
-		}
-
-		size_t m_min_alloc;
-		size_t m_min_align;
-
-		std::vector<block *> m_blocks;
-
 	public:
+
+		using size_type = std::size_t;
+
 		static constexpr const bool is_stateless = false;
-		template <class T, std::size_t ALIGN = alignof(T)>
+
+
+		template <class T, size_type ALIGN = alignof(T)>
 		using allocator_type = arena_allocator<mempool, T, ALIGN>;
 
-		mempool(size_t min_alloc = (1<<21), size_t min_align = 16)
-		: m_min_alloc(min_alloc), m_min_align(min_align)
+		mempool(size_t min_alloc = (1<<21), size_t min_align = PALIGN_CACHELINE)
+		: m_min_alloc(min_alloc)
+		, m_min_align(min_align)
+		, m_stat_cur_alloc(0)
+		, m_stat_max_alloc(0)
 		{
 		}
 
@@ -121,13 +63,13 @@ namespace plib {
 				//::operator delete(b->m_data);
 			}
 		}
-
+#if 0
 		static inline mempool &instance()
 		{
 			static mempool s_mempool;
 			return s_mempool;
 		}
-
+#endif
 		void *allocate(size_t align, size_t size)
 		{
 			block *b = nullptr;
@@ -156,29 +98,32 @@ namespace plib {
 			sinfo().insert({ ret, info(b, b->m_cur)});
 			rs -= (capacity - size);
 			b->m_cur += rs;
+			m_stat_cur_alloc += size;
+			m_stat_max_alloc = std::max(m_stat_max_alloc, m_stat_cur_alloc);
 
 			return ret;
 		}
 
-		static void deallocate(void *ptr)
+		static void deallocate(void *ptr, size_t size)
 		{
 
 			auto it = sinfo().find(ptr);
 			if (it == sinfo().end())
-				plib::terminate("mempool::free - pointer not found\n");
+				plib::terminate("mempool::free - pointer not found");
 			block *b = it->second.m_block;
 			if (b->m_num_alloc == 0)
-				plib::terminate("mempool::free - double free was called\n");
+				plib::terminate("mempool::free - double free was called");
 			else
 			{
+				mempool &mp = b->m_mempool;
 				b->m_num_alloc--;
+				mp.m_stat_cur_alloc -= size;
 				//printf("Freeing in block %p %lu\n", b, b->m_num_alloc);
 				if (b->m_num_alloc == 0)
 				{
-					mempool &mp = b->m_mempool;
 					auto itb = std::find(mp.m_blocks.begin(), mp.m_blocks.end(), b);
 					if (itb == mp.m_blocks.end())
-						plib::terminate("mempool::free - block not found\n");
+						plib::terminate("mempool::free - block not found");
 
 					mp.m_blocks.erase(itb);
 					plib::pdelete(b);
@@ -204,7 +149,7 @@ namespace plib {
 			}
 			catch (...)
 			{
-				this->deallocate(mem);
+				this->deallocate(mem, sizeof(T));
 				throw;
 			}
 		}
@@ -220,13 +165,85 @@ namespace plib {
 			}
 			catch (...)
 			{
-				this->deallocate(mem);
+				this->deallocate(mem, sizeof(T));
 				throw;
 			}
 		}
 
+		size_type cur_alloc() const noexcept { return m_stat_cur_alloc; }
+		size_type max_alloc() const noexcept { return m_stat_max_alloc; }
+
 		bool operator ==(const mempool &rhs) const noexcept { return this == &rhs; }
 
+	private:
+		struct block
+		{
+			block(mempool &mp, size_type min_bytes)
+			: m_num_alloc(0)
+			, m_cur(0)
+			, m_data(nullptr)
+			, m_mempool(mp)
+			{
+				min_bytes = std::max(mp.m_min_alloc, min_bytes);
+				m_free = min_bytes;
+				size_type alloc_bytes = (min_bytes + mp.m_min_align); // - 1); // & ~(mp.m_min_align - 1);
+				//m_data_allocated = ::operator new(alloc_bytes);
+				m_data_allocated = new char[alloc_bytes];
+				void *r = m_data_allocated;
+				std::align(mp.m_min_align, min_bytes, r, alloc_bytes);
+				m_data  = reinterpret_cast<char *>(r);
+			}
+			~block()
+			{
+				//::operator delete(m_data_allocated);
+				delete [] m_data_allocated;
+			}
+
+			block(const block &) = delete;
+			block(block &&) = delete;
+			block &operator =(const block &) = delete;
+			block &operator =(block &&) = delete;
+
+			size_type m_num_alloc;
+			size_type m_free;
+			size_type m_cur;
+			char *m_data;
+			char *m_data_allocated;
+			mempool &m_mempool;
+		};
+
+		struct info
+		{
+			info(block *b, size_type p) : m_block(b), m_pos(p) { }
+			~info() = default;
+			COPYASSIGNMOVE(info, default)
+
+			block * m_block;
+			size_type m_pos;
+		};
+
+
+		block * new_block(size_type min_bytes)
+		{
+			auto *b = plib::pnew<block>(*this, min_bytes);
+			m_blocks.push_back(b);
+			return b;
+		}
+
+
+		static std::unordered_map<void *, info> &sinfo()
+		{
+			static std::unordered_map<void *, info> spinfo;
+			return spinfo;
+		}
+
+		size_t m_min_alloc;
+		size_t m_min_align;
+
+		std::vector<block *> m_blocks;
+
+		size_t m_stat_cur_alloc;
+		size_t m_stat_max_alloc;
 	};
 
 } // namespace plib

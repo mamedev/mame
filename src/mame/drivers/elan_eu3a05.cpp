@@ -37,10 +37,11 @@
     Space Invaders - hold P1 Down + P1 Button 1 on boot
 	ABL Air-Blaster - none?
 
-	----
-
+	-----------------------------------------------------
     Flaws (NOT emulation bugs, happen on hardware):
-    --
+	-----------------------------------------------------
+
+	rad_sinv:
 
     In QIX the sprites lag behind the line drawing, so you see the line infront of your player until you stop moving
 
@@ -56,12 +57,39 @@
 
     The 200pt right facing bird on the Phoenix score table is corrupt
 
-    Uncertain (to check)
-
     Space Invaders seems to be using a darker than expected palette, there are lighter colours in the palette but
     they don't seem to be used.  It's difficult to judge from hardware videos, although it definitely isn't as
-    white as the menu, so this might also be a non-bug.
+    white as the menu, so this might also be a non-bug. (Uncertain - to check)
 
+	-------------------------
+
+	airblasjs:
+
+	This game is very buggy.
+
+	The 3D stages are prone to softlocking when the refuel jet is meant to appear.
+
+	2D stages will zap you of your lives and then continues one by one if you die on a boss meaning if you have
+	2 continues left you'll be offered the continue screen twice while it drains you of your lives before
+	actually presenting you with the Game Over screen.  The manual claims you can't continue on a boss however
+	this isn't true for the 3D stages, where the continue feature works as expected.  Either way, this is a very
+	crude way of implementing a 'no continue' feature on bosses if it isn't simply a bug in the game code that
+	was explained away as a feature.
+
+	Sprites clip on / off the top of the screen in parts - if you move your the player helipcopter to the top
+	of the screen the top 8 pixels clip off too (not currently happening in MAME, probably need to take out
+	sprite wrapping on y)
+
+	Sprites wrap around on X too, if you move to the left edge you can see your shadow on the right etc.
+
+	Sound sometimes stops working properly / shot changes for no reason.
+
+	There's no indication of damage most of the time on bosses, some parts won't take damage until other parts
+	have been destroyed, not always obvious.
+
+	Very heavy sprite flicker (not emulated)
+
+	Very heavy slowdown (MAME speed is approximate)
 
 */
 
@@ -101,11 +129,6 @@ public:
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	// system
-	DECLARE_READ8_MEMBER(elan_eu3a05_5003_r);
-	DECLARE_READ8_MEMBER(elan_eu3a05_pal_ntsc_r);
-	DECLARE_WRITE8_MEMBER(elan_eu3a05_500b_unk_w);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 
@@ -151,42 +174,6 @@ uint32_t elan_eu3a05_state::screen_update(screen_device& screen, bitmap_ind16& b
 	return m_vid->screen_update(screen, bitmap, cliprect);
 }
 
-// System control
-
-READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r)
-{
-	// how best to handle this, we probably need to run the PAL machine at 50hz
-	// the text under the radica logo differs between regions
-	logerror("%s: elan_eu3a05_pal_ntsc_r (region + more?)\n", machine().describe_context());
-	return 0xff; // NTSC
-	//return 0x00; // PAL
-}
-
-READ8_MEMBER(elan_eu3a05_state::elan_eu3a05_5003_r)
-{
-	/* masked with 0x0f, 0x01 or 0x03 depending on situation..
-
-	  I think it might just be an RNG because if you return 0x00
-	  your shots can never hit the stage 3 enemies in Phoenix and
-	  if you return 0xff they always hit.  On the real hardware it
-	  seems to be random.  Could also just be a crude frame counter
-	  used for the same purpose.
-
-	*/
-
-	logerror("%s: elan_eu3a05_5003_r (RNG?)\n", machine().describe_context());
-
-	return machine().rand();
-}
-
-
-
-WRITE8_MEMBER(elan_eu3a05_state::elan_eu3a05_500b_unk_w)
-{
-	// this is the PAL / NTSC flag when read, so what are writes?
-	logerror("%s: elan_eu3a05_500b_unk_w %02x\n", machine().describe_context(), data);
-}
-
 // sound callback
 READ8_MEMBER(elan_eu3a05_state::read_full_space)
 {
@@ -204,36 +191,8 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x0000, 0x3fff).ram().share("ram");
 	map(0x4800, 0x49ff).rw(m_vid, FUNC(elan_eu3a05commonvid_device::palette_r), FUNC(elan_eu3a05commonvid_device::palette_w));
 
-	// 500x system regs?
-	map(0x5000, 0x5000).ram();
-	map(0x5001, 0x5001).ram();
-	// 5002
-	map(0x5003, 0x5003).r(FUNC(elan_eu3a05_state::elan_eu3a05_5003_r));
-	map(0x5004, 0x5004).ram();
-	// 5005
-	map(0x5006, 0x5006).ram();
-	map(0x5007, 0x5008).rw(m_sys, FUNC(elan_eu3a05commonsys_device::intmask_r), FUNC(elan_eu3a05commonsys_device::intmask_w));
-	map(0x5009, 0x5009).ram();
-	map(0x500a, 0x500a).ram();
-	map(0x500b, 0x500b).rw(FUNC(elan_eu3a05_state::elan_eu3a05_pal_ntsc_r), FUNC(elan_eu3a05_state::elan_eu3a05_500b_unk_w)); // PAL / NTSC flag at least
-	map(0x500c, 0x500d).rw(m_sys, FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_r), FUNC(elan_eu3a05commonsys_device::elan_eu3a05_rombank_w));
-
-	// 501x DMA controller
-	map(0x500f, 0x5015).rw(m_sys, FUNC(elan_eu3a05sys_device::dma_param_r), FUNC(elan_eu3a05sys_device::dma_param_w));
-	map(0x5016, 0x5016).rw(m_sys, FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_r), FUNC(elan_eu3a05sys_device::elan_eu3a05_dmatrg_w));
-
-	// 502x - 503x video regs area?
-	map(0x5020, 0x5026).ram(); // unknown, space invaders sets these to fixed values, tetris has them as 00
-	map(0x5027, 0x5027).rw(m_vid, FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_r), FUNC(elan_eu3a05vid_device::elan_eu3a05_vidctrl_w));
-	map(0x5028, 0x5028).ram();
-	map(0x5029, 0x5029).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_lo_w)); // tilebase
-	map(0x502a, 0x502a).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::tile_gfxbase_hi_w)); // tilebase
-	map(0x502b, 0x502b).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_lo_w)); // tilebase (spr?)
-	map(0x502c, 0x502c).rw(m_vid, FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_r), FUNC(elan_eu3a05vid_device::sprite_gfxbase_hi_w)); // tilebase (spr?)
-	map(0x502d, 0x502e).rw(m_vid, FUNC(elan_eu3a05vid_device::splitpos_r), FUNC(elan_eu3a05vid_device::splitpos_w)); // split position
-	map(0x502f, 0x5036).rw(m_vid, FUNC(elan_eu3a05vid_device::tile_scroll_r), FUNC(elan_eu3a05vid_device::tile_scroll_w)); // there are 4 scroll values in here, x scroll, y scroll, xscroll1 for split, xscroll2 for split (eu3a14 can do split too)
-	// 5037
-	map(0x5038, 0x5038).ram();
+	map(0x5000, 0x501f).m(m_sys, FUNC(elan_eu3a05sys_device::map)); // including DMA controller
+	map(0x5020, 0x503f).m(m_vid, FUNC(elan_eu3a05vid_device::map));
 
 	// 504x GPIO area?
 	map(0x5040, 0x5046).rw(m_gpio, FUNC(elan_eu3a05gpio_device::gpio_r), FUNC(elan_eu3a05gpio_device::gpio_w));
@@ -244,7 +203,7 @@ void elan_eu3a05_state::elan_eu3a05_map(address_map &map)
 	map(0x5060, 0x506d).ram(); // read/written by tetris (ADC?)
 
 	// 508x sound
-	map(0x5080, 0x50a9).rw(m_sound, FUNC(elan_eu3a05_sound_device::read), FUNC(elan_eu3a05_sound_device::write));
+	map(0x5080, 0x50bf).m(m_sound, FUNC(elan_eu3a05_sound_device::map));
 
 	//map(0x5000, 0x50ff).ram();
 	map(0x6000, 0xdfff).m(m_bank, FUNC(address_map_bank_device::amap8));
@@ -492,6 +451,7 @@ void elan_eu3a05_state::airblsjs(machine_config& config)
 {
 	elan_eu3a05(config);
 	m_screen->set_refresh_hz(50);
+	m_sys->set_pal(); // TODO: also set PAL clocks
 }
 
 

@@ -645,7 +645,7 @@ void rebound_state::rebound(machine_config &config)
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-	ROM_LOAD( "pong.netlist", 0x000000, 0x00457f, CRC(72d5e4fe) SHA1(7bb15828223c34915c5e2869dd7917532a4bb7b4) )
+	ROM_LOAD( "pong.netlist", 0x000000, 0x004554, CRC(614f0e7a) SHA1(188f3ac8c23c576a357ffae4a6f57ba83ba2d194) )
 ROM_END
 
 ROM_START( breakout )

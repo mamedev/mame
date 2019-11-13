@@ -109,7 +109,7 @@ namespace solver
 							{
 								pstring nname(this->name() + "." + pstring(plib::pfmt("m{1}")(m_inps.size())));
 								nl_assert(p->net().is_analog());
-								auto net_proxy_output_u = pool().make_unique<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
+								auto net_proxy_output_u = state().make_object<proxied_analog_output_t>(*this, nname, static_cast<analog_net_t *>(&p->net()));
 								net_proxy_output = net_proxy_output_u.get();
 								m_inps.emplace_back(std::move(net_proxy_output_u));
 							}
@@ -336,7 +336,6 @@ namespace solver
 		{
 			pstring num = plib::pfmt("{1}")(k);
 
-			// FIXME: This shouldn't be necessary, recalculate on each entry ...
 			state().save(*this, m_gonn[k],"GO" + num, this->name(), m_terms[k].count());
 			state().save(*this, m_gtn[k],"GT" + num, this->name(), m_terms[k].count());
 			state().save(*this, m_Idrn[k],"IDR" + num, this->name(), m_terms[k].count());
@@ -362,7 +361,7 @@ namespace solver
 		m_last_step = netlist_time::zero();
 	}
 
-	void matrix_solver_t::update() NL_NOEXCEPT
+	void matrix_solver_t::update() noexcept
 	{
 		const netlist_time new_timestep = solve(exec().time());
 		update_inputs();

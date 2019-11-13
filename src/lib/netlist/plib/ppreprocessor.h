@@ -54,7 +54,7 @@ namespace plib {
 		, m_expr_sep(std::move(s.m_expr_sep))
 		, m_if_flag(s.m_if_flag)
 		, m_if_level(s.m_if_level)
-        , m_stack(std::move(s.m_stack))
+		, m_stack(std::move(s.m_stack))
 		, m_outbuf(std::move(s.m_outbuf))
 		, m_pos(s.m_pos)
 		, m_state(s.m_state)
@@ -84,7 +84,7 @@ namespace plib {
 		class readbuffer : public std::streambuf
 		{
 		public:
-			explicit readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf() 
+			explicit readbuffer(ppreprocessor *strm) : m_strm(strm), m_buf()
 			{ setg(nullptr, nullptr, nullptr); }
 			readbuffer(readbuffer &&rhs) noexcept : m_strm(rhs.m_strm), m_buf()  {}
 			COPYASSIGN(readbuffer, delete)

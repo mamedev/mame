@@ -31,6 +31,33 @@ TEST_CASE("log2", "")
 {
 	log2_test(0.0f);
 	log2_test(256.0f);
+
+	REQUIRE(0.0f == bx::log2(1.0f) );
+	REQUIRE(0 == bx::log2(1) );
+
+	REQUIRE(1.0f == bx::log2(2.0f) );
+	REQUIRE(1 == bx::log2(2) );
+
+	REQUIRE(2.0f == bx::log2(4.0f) );
+	REQUIRE(2 == bx::log2(4) );
+
+	REQUIRE(3.0f == bx::log2(8.0f) );
+	REQUIRE(3 == bx::log2(8) );
+
+	REQUIRE(4.0f == bx::log2(16.0f) );
+	REQUIRE(4 == bx::log2(16) );
+
+	REQUIRE(5.0f == bx::log2(32.0f) );
+	REQUIRE(5 == bx::log2(32) );
+
+	REQUIRE(6.0f == bx::log2(64.0f) );
+	REQUIRE(6 == bx::log2(64) );
+
+	REQUIRE(7.0f == bx::log2(128.0f) );
+	REQUIRE(7 == bx::log2(128) );
+
+	REQUIRE(8.0f == bx::log2(256.0f) );
+	REQUIRE(8 == bx::log2(256) );
 }
 
 TEST_CASE("libm", "")

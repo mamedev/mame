@@ -51,14 +51,19 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	virtual u8 io_read_byte(offs_t a) { return m_io->read_byte(a); }
+	virtual u16 io_read_word(offs_t a) { return m_io->read_word_unaligned(a); }
+	virtual void io_write_byte(offs_t a, u8 v) { m_io->write_byte(a, v); }
+	virtual void io_write_word(offs_t a, u16 v) { m_io->write_word_unaligned(a, v); }
+
 	void set_int_line(int state);
 	void set_nmi_line(int state);
 	void set_poll_line(int state);
 
-private:
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
+private:
 	/* NEC registers */
 	union necbasicregs
 	{                   /* eight general registers */

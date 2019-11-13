@@ -1,14 +1,14 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 
-#include  "nlid_truthtable.h"
+#include "nlid_truthtable.h"
 #include "netlist/nl_setup.h"
 #include "plib/palloc.h"
 #include "plib/plists.h"
 
 #include <bitset>
-#include <vector>
 #include <cstdint>
+#include <vector>
 
 namespace netlist
 {
@@ -245,13 +245,13 @@ namespace devices
 		: truthtable_base_element_t(name, classname, def_param, sourcefile)
 		{ }
 
-		unique_pool_ptr<device_t> Create(netlist_state_t &anetlist, const pstring &name) override
+		unique_pool_ptr<device_t> Create(nlmempool &pool, netlist_state_t &anetlist, const pstring &name) override
 		{
 			using tt_type = nld_truthtable_t<m_NI, m_NO>;
 
 			if (!m_ttbl)
 			{
-				m_ttbl = pool().make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>();
+				m_ttbl = pool.make_unique<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t>();
 				truthtable_parser desc_s(m_NO, m_NI,
 						packed_int(m_ttbl->m_out_state.data(), sizeof(m_ttbl->m_out_state[0]) * 8),
 						m_ttbl->m_timing_index.data(), m_ttbl->m_timing_nt.data());
@@ -266,7 +266,7 @@ namespace devices
 			if (m_family_desc == nullptr)
 				plib::pthrow<nl_exception>("family description not found for {1}", m_family_name);
 
-			return pool().make_unique<tt_type>(anetlist, name, m_family_desc, *m_ttbl, m_desc);
+			return pool.make_unique<tt_type>(anetlist, name, m_family_desc, *m_ttbl, m_desc);
 		}
 	private:
 		unique_pool_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
@@ -512,7 +512,7 @@ namespace factory
 			ENTRY(12, sourcefile);
 			default:
 				pstring msg = plib::pfmt("unable to create truthtable<{1},{2}>")(desc.ni)(desc.no);
-				nl_assert_always(false, msg);
+				nl_assert_always(false, msg.c_str());
 		}
 		ret->m_desc = desc.desc;
 		ret->m_family_name = desc.family;

@@ -189,6 +189,18 @@ Notes:
     - Visicom always reserves buttons 1,2,3,4,7(Q,W,E,A,Z) for the internal games, which are always available.
       The cartridges use 5(S) to start, except gambler1 which uses 9(C).
 
+    Memory organisation of the Studio II:
+    - RAM is mirrored everywhere except:
+      (a) when A9 is high;
+      (b) when a rom is active;
+      (c) when the cartridge wants to disable it;
+      so in effect, RAM exists at 0800-09FF then every 0x400 boundary onwards.
+    - The system ROM exists at 0000-03FF and cannot be deactivated.
+    - The inbuilt games exist at 0400-07FF and are always swapped out when a cart is used.
+    - The cart "grandpak" also uses 0C00-0FFF with a 2nd rom.
+    - Some homebrews make use of 0C00-0DFF (asteroids, berzerk, pacman, scramble). The
+      ST2 loader will enable the extra rombank as needed.
+
 */
 
 #include "emu.h"
@@ -219,6 +231,7 @@ public:
 	studio2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CDP1802_TAG)
+		, m_rom(*this, CDP1802_TAG)
 		, m_beeper(*this, "beeper")
 		, m_vdc(*this, CDP1861_TAG)
 		, m_cart(*this, "cartslot")
@@ -234,9 +247,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
 
 	DECLARE_READ8_MEMBER( cart_400 );
+	DECLARE_READ8_MEMBER( cart_c00 );
+	DECLARE_READ8_MEMBER( rom_000 );
+	DECLARE_READ8_MEMBER( rom_400 );
 
 protected:
 	required_device<cosmac_device> m_maincpu;
+	optional_region_ptr<u8> m_rom;
 	required_device<beep_device> m_beeper;
 	optional_device<cdp1861_device> m_vdc;
 	required_device<generic_slot_device> m_cart;
@@ -248,9 +265,6 @@ protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_a00 );
-	DECLARE_READ8_MEMBER( cart_c00 );
-	DECLARE_READ8_MEMBER( cart_e00 );
 	DECLARE_READ8_MEMBER( dispon_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( dispon_w );
@@ -308,7 +322,6 @@ private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_READ8_MEMBER( cart_c00 );
 	DECLARE_WRITE8_MEMBER( dma_w );
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
@@ -358,8 +371,7 @@ WRITE8_MEMBER( studio2_state::dispon_w )
 void studio2_state::studio2_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x07ff).rom();
-	map(0x0800, 0x09ff).mirror(0xf400).ram();
+	map(0x0000, 0x01ff).mirror(0xfc00).ram();
 }
 
 void studio2_state::studio2_io_map(address_map &map)
@@ -525,11 +537,10 @@ WRITE8_MEMBER( mpt02_state::dma_w )
 /* Machine Initialization */
 
 // trampolines to cartridge
+READ8_MEMBER( studio2_state::rom_000 ) { return m_rom[offset]; }
+READ8_MEMBER( studio2_state::rom_400 ) { return m_rom[offset+0x400]; }
 READ8_MEMBER( studio2_state::cart_400 ) { return m_cart->read_rom(offset); }
-READ8_MEMBER( studio2_state::cart_a00 ) { return m_cart->read_rom(offset + 0x600); }
 READ8_MEMBER( studio2_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
-READ8_MEMBER( studio2_state::cart_e00 ) { return m_cart->read_rom(offset + 0xa00); }
-READ8_MEMBER( mpt02_state::cart_c00 ) { return m_cart->read_rom(offset + 0x800); }
 
 void visicom_state::machine_start()
 {
@@ -539,14 +550,16 @@ void visicom_state::machine_start()
 
 void studio2_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x0000, 0x07ff);
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x03ff, read8_delegate(*this, FUNC(studio2_state::rom_000)));
+
 	if (m_cart->exists())
 	{
-		// these have to be installed only if a cart is present, because they partially overlap the built-in game
+		// cart always overlaps the inbuilt game roms
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0a00, 0x0bff, read8_delegate(*this, FUNC(studio2_state::cart_a00)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0dff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_e00)));
 	}
+	else
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::rom_400)));
 
 	// register for state saving
 	save_item(NAME(m_keylatch));
@@ -556,9 +569,8 @@ void mpt02_state::machine_start()
 {
 	if (m_cart->exists())
 	{
-		// these have to be installed only if a cart is present, because they partially overlap the built-in game
+		// cart always overlaps the inbuilt game roms
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0400, 0x07ff, read8_delegate(*this, FUNC(studio2_state::cart_400)));
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(*this, FUNC(mpt02_state::cart_c00)));
 	}
 
 	// register for state saving
@@ -631,6 +643,8 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 				else
 				{
 					logerror("ST2 Reading block %u to 0x%04x\n", block, offset);
+					if (pages[block] == 0xC)
+						m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
 					image.fread(m_cart->get_rom_base() + offset - 0x400, 0x100);
 				}
 			}
@@ -649,16 +663,14 @@ DEVICE_IMAGE_LOAD_MEMBER( studio2_state::cart_load )
 	}
 	else
 	{
-		// Studio II carts might map their data at $400-$7ff, $a00-$bff and $e00-$fff
-		// MPT-2 carts might map their data at $400-$7ff and $c00-$fff
+		// Studio II and MPT-2 carts might map their data at $400-$7ff and $c00-$fff
 		if (image.get_software_region("rom_400"))
 			memcpy(m_cart->get_rom_base() + 0x000, image.get_software_region("rom_400"), image.get_software_region_length("rom_400"));
-		if (image.get_software_region("rom_a00"))
-			memcpy(m_cart->get_rom_base() + 0x600, image.get_software_region("rom_a00"), image.get_software_region_length("rom_a00"));
 		if (image.get_software_region("rom_c00"))
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0x0c00, 0x0fff, read8_delegate(*this, FUNC(studio2_state::cart_c00)));
 			memcpy(m_cart->get_rom_base() + 0x800, image.get_software_region("rom_c00"), image.get_software_region_length("rom_c00"));
-		if (image.get_software_region("rom_e00"))
-			memcpy(m_cart->get_rom_base() + 0xa00, image.get_software_region("rom_e00"), image.get_software_region_length("rom_e00"));
+		}
 	}
 
 	return image_init_result::PASS;

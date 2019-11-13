@@ -18,12 +18,60 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 
 	nld_base_proxy::nld_base_proxy(netlist_state_t &anetlist, const pstring &name,
-			logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
-			: device_t(anetlist, name)
+		logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
+		: device_t(anetlist, name)
+		, m_tp(nullptr)
+		, m_tn(nullptr)
+		, m_term_proxied(inout_proxied)
+		, m_proxy_term(proxy_inout)
 	{
 		m_logic_family = inout_proxied->logic_family();
-		m_term_proxied = inout_proxied;
-		m_proxy_term = proxy_inout;
+
+		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
+
+		bool f = false;
+		for (auto & pwr_sym : power_syms)
+		{
+			pstring devname = inout_proxied->device().name();
+			auto tp_t = anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
+					/*detail::terminal_type::INPUT,*/ false);
+			auto tn_t = anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
+					/*detail::terminal_type::INPUT,*/ false);
+			if (f && (tp_t != nullptr && tn_t != nullptr))
+				log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
+					m_tp->name(), m_tn->name(),
+					tp_t ? tp_t->name() : "",
+					tn_t ? tn_t->name() : ""));
+			else if (tp_t != nullptr && tn_t != nullptr)
+			{
+				m_tp = tp_t;
+				m_tn = tn_t;
+				f = true;
+			}
+		}
+		//FIXME: Use power terminals and change info to warning or error
+		if (!f)
+		{
+#if 1
+			if (logic_family()->fixed_V() == nlconst::zero())
+				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
+			else
+				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
+#endif
+			m_GNDHack = plib::make_unique<analog_output_t>(*this, "_QGND");
+			m_VCCHack = plib::make_unique<analog_output_t>(*this, "_QVCC");
+
+			m_tp = m_VCCHack.get();
+			m_tn = m_GNDHack.get();
+			m_need_hack = true;
+		}
+		else
+		{
+			log().verbose("D/A Proxy: Found power terminals on device {1}", inout_proxied->device().name());
+			m_need_hack = false;
+		}
+		//printf("vcc: %f\n", logic_family()->fixed_V());
+
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -52,6 +100,7 @@ namespace netlist
 		nl_assert(m_logic_family != nullptr);
 		// FIXME: Variable supply voltage!
 		nl_fptype supply_V = logic_family()->fixed_V();
+		// FIXME: bad hack
 		if (supply_V == nlconst::zero()) supply_V = nlconst::magic(5.0);
 
 		if (m_I.Q_Analog() > logic_family()->high_thresh_V(nlconst::zero(), supply_V))
@@ -82,51 +131,26 @@ namespace netlist
 	, m_last_state(*this, "m_last_var", -1)
 	, m_is_timestep(false)
 	{
-		const std::vector<std::pair<pstring, pstring>> power_syms = { {"VCC", "VEE"}, {"VCC", "GND"}, {"VDD", "VSS"}};
-
 		register_subalias("Q", m_RN.m_P);
 
-		bool f = false;
-		detail::core_terminal_t *tp(nullptr);
-		detail::core_terminal_t *tn(nullptr);
-		for (auto & pwr_sym : power_syms)
-		{
-			pstring devname = out_proxied->device().name();
-			auto tp_t = state().setup().find_terminal(devname + "." + pwr_sym.first,
-					/*detail::terminal_type::INPUT,*/ false);
-			auto tn_t = state().setup().find_terminal(devname + "." + pwr_sym.second,
-					/*detail::terminal_type::INPUT,*/ false);
-			if (f && (tp_t != nullptr && tn_t != nullptr))
-				log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(out_proxied->device().name(),
-					tp->name(), tn->name(),
-					tp_t ? tp_t->name() : "",
-					tn_t ? tn_t->name() : ""));
-			else if (tp_t != nullptr && tn_t != nullptr)
-			{
-				/* alternative logic */
-				tp = tp_t;
-				tn = tn_t;
-				f = true;
-			}
-		}
 		//FIXME: Use power terminals and change info to warning or error
-		if (!f)
+		if (need_hack())
 		{
+#if 1
+			// FIXME: move to base proxy class
 			if (logic_family()->fixed_V() == nlconst::zero())
-				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_1(state().setup().de_alias(out_proxied->device().name())));
+				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(out_proxied->device().name())));
 			else
-				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_1(state().setup().de_alias(out_proxied->device().name())));
-			m_GNDHack = plib::make_unique<analog_output_t>(*this, "_QGND");
-			m_VCCHack = plib::make_unique<analog_output_t>(*this, "_QVCC");
-
-			connect(m_RN.m_N, *m_GNDHack);
-			connect(m_RP.m_P, *m_VCCHack);
+				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(out_proxied->device().name())));
+#endif
+			connect(m_RN.m_N, *m_tn);
+			connect(m_RP.m_P, *m_tp);
 			connect(m_RN.m_P, m_RP.m_N);
 		}
 		else
 		{
 			log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-			if (state().setup().is_extended_validation())
+			if (anetlist.setup().is_extended_validation())
 			{
 				// During validation, don't connect to terminals found
 				// This will cause terminals not connected to a rail net to
@@ -135,8 +159,8 @@ namespace netlist
 			}
 			else
 			{
-				connect(m_RN.m_N, *tn);
-				connect(m_RP.m_P, *tp);
+				connect(m_RN.m_N, *m_tn);
+				connect(m_RP.m_P, *m_tp);
 			}
 			connect(m_RN.m_P, m_RP.m_N);
 		}
@@ -156,10 +180,13 @@ namespace netlist
 		m_last_state = -1;
 		m_RN.reset();
 		m_RP.reset();
-		if (m_GNDHack)
-			m_GNDHack->initial(0);
-		if (m_VCCHack)
-			m_VCCHack->initial(supply_V);
+		if (need_hack())
+		{
+			if (m_tn)
+				m_GNDHack->initial(0);
+			if (m_tp)
+				m_VCCHack->initial(supply_V);
+		}
 		m_is_timestep = m_RN.m_P.net().solver()->has_timestep_devices();
 		m_RN.set_G_V_I(plib::reciprocal(logic_family()->R_low()),
 				logic_family()->low_offset_V(), nlconst::zero());

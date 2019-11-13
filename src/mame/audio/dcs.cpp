@@ -860,7 +860,8 @@ void dcs2_audio_device::device_start()
 	if (m_dram_in_mb != 0)
 	{
 		m_sounddata_words = (m_dram_in_mb << 20) / 2;
-		m_sounddata = auto_alloc_array(machine(), uint16_t, m_sounddata_words);
+		m_sounddata_ptr = std::make_unique<uint16_t[]>(m_sounddata_words);
+		m_sounddata = m_sounddata_ptr.get();
 		save_pointer(NAME(m_sounddata), m_sounddata_words);
 	}
 	else
@@ -879,7 +880,7 @@ void dcs2_audio_device::device_start()
 
 
 	/* allocate memory for the SRAM */
-	m_sram = auto_alloc_array(machine(), uint16_t, 0x8000*4/2);
+	m_sram = std::make_unique<uint16_t[]>(0x8000*4/2);
 
 	/* create the timers */
 	m_internal_timer = subdevice<timer_device>("dcs_int_timer");
@@ -1022,23 +1023,23 @@ void dcs_audio_device::sdrc_remap_memory()
 	else
 	{
 		/* first start with a clean program map */
-		m_program->install_ram(0x0800, 0x3fff, m_sram + 0x4800);
+		m_program->install_ram(0x0800, 0x3fff, &m_sram[0x4800]);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			m_data->install_ram(0x0800, 0x17ff, m_sram + 0x0000);
-			m_data->install_ram(0x1800, 0x27ff, m_sram + 0x1000);
-			m_data->install_ram(0x2800, 0x37ff, m_sram + 0x2000);
+			m_data->install_ram(0x0800, 0x17ff, &m_sram[0x0000]);
+			m_data->install_ram(0x1800, 0x27ff, &m_sram[0x1000]);
+			m_data->install_ram(0x2800, 0x37ff, &m_sram[0x2000]);
 		}
 
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
 			m_data->unmap_readwrite(0x0800, 0x17ff);
-			m_data->install_ram(0x1800, 0x27ff, m_sram + 0x3000);
-			m_data->install_ram(0x2800, 0x37ff, m_sram + 0x2000);
+			m_data->install_ram(0x1800, 0x27ff, &m_sram[0x3000]);
+			m_data->install_ram(0x2800, 0x37ff, &m_sram[0x2000]);
 		}
 	}
 

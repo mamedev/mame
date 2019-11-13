@@ -54,9 +54,9 @@ namespace solver
 		, m_gs_sor(parent,   "SOR_FACTOR", nlconst::magic(1.059))
 		, m_method(parent,   "METHOD", matrix_type_e::MAT_CR)
 		, m_fp_type(parent,  "FPTYPE", matrix_fp_type_e::DOUBLE)
-		, m_reltol(parent,   "RELTOL", nlconst::magic(1e-3))			///< SPICE RELTOL parameter
-		, m_vntol(parent,    "VNTOL",  nlconst::magic(1e-7))			///< SPICE VNTOL parameter
-		, m_accuracy(parent, "ACCURACY", nlconst::magic(1e-7))			///< Iterative solver accuracy
+		, m_reltol(parent,   "RELTOL", nlconst::magic(1e-3))            ///< SPICE RELTOL parameter
+		, m_vntol(parent,    "VNTOL",  nlconst::magic(1e-7))            ///< SPICE VNTOL parameter
+		, m_accuracy(parent, "ACCURACY", nlconst::magic(1e-7))          ///< Iterative solver accuracy
 		, m_nr_loops(parent, "NR_LOOPS", 250)           ///< Maximum number of Newton-Raphson loops
 		, m_gs_loops(parent, "GS_LOOPS", 9)             ///< Maximum number of Gauss-Seidel loops
 
@@ -68,7 +68,7 @@ namespace solver
 		, m_parallel(parent, "PARALLEL", 0)
 
 		// automatic time step
-		, m_dynamic_ts(parent, "DYNAMIC_TS", false)		///< Use dynamic time stepping
+		, m_dynamic_ts(parent, "DYNAMIC_TS", false)     ///< Use dynamic time stepping
 		, m_dynamic_lte(parent, "DYNAMIC_LTE", nlconst::magic(1e-5))    ///< dynamic time stepping slope
 		, m_dynamic_min_ts(parent, "DYNAMIC_MIN_TIMESTEP", nlconst::magic(1e-6)) ///< smallest time step allowed
 

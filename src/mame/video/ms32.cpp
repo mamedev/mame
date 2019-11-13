@@ -398,8 +398,7 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram, 0x20000, 0, m_reverse_sprite_order);
 
 
-
-
+	// TODO: actually understand this (per-scanline priority and alpha-blend over every layer?)
 	asc_pri = scr_pri = rot_pri = 0;
 
 	if((m_priram[0x2b00 / 2] & 0x00ff) == 0x0034)
@@ -413,18 +412,20 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 		scr_pri++;
 
 	// Suchiepai 2 title & Gratia gameplay intermissions uses 0x0f
-	// hayaosi3 uses 0x09 during flames screen on attract
+	// hayaosi3 uses 0x09 during flames screen on attract (text should go above the rest)
 	// this is otherwise 0x17 most of the time except for 0x15 in hayaosi3, tetris plus 2 & world pk soccer 2
 	// kirarast flips between 0x16 in gameplay and 0x17 otherwise
+	if(m_priram[0x3a00 / 2] == 0x09)
+		asc_pri = 3;
 	if((m_priram[0x3a00 / 2] & 0x0030) == 0x00)
 		scr_pri++;
 	else
 		rot_pri++;
 
-//  popmessage("%02x %02x %02x",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2]);
-
+	//popmessage("%02x %02x %02x %d %d %d",m_priram[0x2b00 / 2],m_priram[0x2e00 / 2],m_priram[0x3a00 / 2], asc_pri, scr_pri, rot_pri);
+	
 	// tile-tile mixing
-	for(int prin=0;prin<3;prin++)
+	for(int prin=0;prin<4;prin++)
 	{
 		if(rot_pri == prin)
 			draw_roz(screen, m_temp_bitmap_tilemaps, cliprect, 1 << 1);
@@ -488,7 +489,6 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 				if (m_priram[(spritepri | 0x0a00 | 0x0400) / 2] & 0x38) primask |= 1 << 5;
 				if (m_priram[(spritepri | 0x0a00 | 0x0100) / 2] & 0x38) primask |= 1 << 6;
 				if (m_priram[(spritepri | 0x0a00 | 0x0000) / 2] & 0x38) primask |= 1 << 7;
-
 
 				// TODO: spaghetti code ...
 				if (primask == 0x00)
@@ -556,6 +556,20 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 				{
 					dstptr_bitmap[xx] = paldata[machine().rand()&0xfff];
 					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
+				}
+				else if (primask == 0xcc)
+				{
+					// hayaosi3 final round ($00 normal, $02 mesh, $03/$05/$07 zoomed in)
+					// TODO: may have some blending, hard to say without ref video
+					if (src_tilepri & 0x02)
+						dstptr_bitmap[xx] = paldata[src_tile];
+					else
+					{
+						if (spridat & 0xff)
+							dstptr_bitmap[xx] = paldata[spridat];
+						else
+							dstptr_bitmap[xx] = paldata[src_tile];
+					}
 				}
 				else if (primask == 0xf0)
 				{
@@ -695,6 +709,7 @@ uint32_t ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bit
 				}
 				else
 				{
+					// $fa actually used on hayaosi3 second champ transition, unknown purpose
 					dstptr_bitmap[xx] = 0;
 					popmessage("unhandled priority type %02x, contact MAMEdev",primask);
 				}
