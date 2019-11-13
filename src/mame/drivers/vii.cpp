@@ -317,7 +317,7 @@ public:
 	{
 		if (newval == 1)
 		{
-			m_inputlatches[param] |= 0x01;
+			m_inputlatches[param] |= 0x02;
 			logerror("latching OK button for Player %d\n", param+1);
 		}
 	}
@@ -326,7 +326,7 @@ public:
 	{
 		if (newval == 1)
 		{
-			m_inputlatches[param] |= 0x02;
+			m_inputlatches[param] |= 0x01;
 			logerror("latching Select button for Player %d\n", param+1);
 		}
 	}
@@ -3693,5 +3693,5 @@ CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_st
 
 // "go 02d1d0" "do r1 = ff" to get past initial screen (currently bypassed by setting controller sense in RAM earlier, see hack in machine_reset)
 // a 'deluxe' version of this also exists with extra game modes
-CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
 
