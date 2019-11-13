@@ -2979,7 +2979,12 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 
 	// the code around 029811 uses a ram value shifted left 8 times as the select bits (select_bits) on write
 	// then does a mask with them on the reads from this port, without shifting, comparing with 0
+
+	// the 'select bits' must also be active when the controller wants to send data, the UART read function
+	// won't proceed if they're zero, but the port is written with 0 before that
+
 	uint16_t ret = (m_io_p1->read() & 0xffc0) | select_bits;
+
 
 	//if (select_bits == 0x00)
 	//  ret |= 0x8000;
