@@ -3,8 +3,8 @@
 
 // Yamaha DSPV, dsp used for acoustic simulation
 
-#ifndef DEVICES_SOUND_DSPV_H
-#define DEVICES_SOUND_DSPV_H
+#ifndef MAME_SOUND_DSPV_H
+#define MAME_SOUND_DSPV_H
 
 #pragma once
 
@@ -65,4 +65,4 @@ private:
 
 DECLARE_DEVICE_TYPE(DSPV, dspv_device)
 
-#endif
+#endif // MAME_SOUND_DSPV_H
