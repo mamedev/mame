@@ -2988,8 +2988,13 @@ void sentx6p_state::machine_reset()
 
 void sentx6p_state::controller_send_data(int which)
 {
-	// TODO: send latched data!
-	m_maincpu->uart_rx(machine().rand());
+	// 0x78 have to be set, this is probably because there is an unused space in the commands
+	// going the other way at 0x78 - 0x7f
+	// bit 3 (0x04) can also be set, doesn't care
+
+	uint8_t send = m_inputlatches[which] | 0x78;
+
+	m_maincpu->uart_rx( send );
 
 	if (m_inputlatches[which] & 0x03)
 	{
