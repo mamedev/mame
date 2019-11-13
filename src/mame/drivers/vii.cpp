@@ -514,8 +514,13 @@ public:
 	void tvgogo(machine_config &config);
 
 private:
+	uint8_t m_i2cunk;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	DECLARE_WRITE8_MEMBER(tvg_i2c_w);
+	DECLARE_READ8_MEMBER(tvg_i2c_r);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_tvgogo);
 
@@ -1768,13 +1773,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tvgogo )
 	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Back")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select")
+	PORT_DIPNAME( 0x0004, 0x0004, "P1" )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
@@ -2565,6 +2566,23 @@ void icanpian_state::icanpian(machine_config &config)
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
 }
 
+WRITE8_MEMBER(tvgogo_state::tvg_i2c_w)
+{
+	// unsure what is mapped here (Camera?) but it expects to be able to read back the same byte it writes before it boots.
+	// (offset certainly isn't eeprom address as the generic spg2xx_game_state::eeprom_r / eeprom_r code expects)
+	m_i2cunk = data;
+	logerror("%s: tvg_i2c_w %04x %02x\n", machine().describe_context(), offset, data);
+	m_serial_eeprom[offset & 0x3ff] = data;
+}
+
+READ8_MEMBER(tvgogo_state::tvg_i2c_r)
+{
+	uint8_t ret = m_i2cunk;
+	logerror("%s: tvg_i2c_r %04x %02x\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+
 void tvgogo_state::tvgogo(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -2580,6 +2598,9 @@ void tvgogo_state::tvgogo(machine_config &config)
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo));
 	m_cart->set_must_be_loaded(true);
+
+	m_maincpu->eeprom_w().set(FUNC(tvgogo_state::tvg_i2c_w));
+	m_maincpu->eeprom_r().set(FUNC(tvgogo_state::tvg_i2c_r));
 
 	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");
 }
