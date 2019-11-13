@@ -222,7 +222,7 @@ namespace analog
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);
-			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value for " + m_model.name());
+			nl_assert_always(m_capmod == 0 || m_capmod == 2, "Error: CAPMODEL invalid value");
 
 			//
 			// From http://ltwiki.org/LTspiceHelp/LTspiceHelp/M_MOSFET.htm :
@@ -238,7 +238,7 @@ namespace analog
 
 			// calculate effective channel length
 			m_Leff = m_model.m_L - 2 * m_model.m_LD;
-			nl_assert_always(m_Leff > nlconst::zero(), "Effective Lateral diffusion would be negative for model " + m_model.name());
+			nl_assert_always(m_Leff > nlconst::zero(), "Effective Lateral diffusion would be negative for model");
 
 			nl_fptype Cox = (m_model.m_TOX > nlconst::zero()) ? (constants::eps_SiO2() * constants::eps_0() / m_model.m_TOX) : nlconst::zero();
 
@@ -259,7 +259,7 @@ namespace analog
 				m_phi = m_model.m_PHI;
 			else if (m_model.m_NSUB > nlconst::zero())
 			{
-				nl_assert_always(m_model.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model " + m_model.name());
+				nl_assert_always(m_model.m_NSUB * nlconst::magic(1e6) >= constants::NiSi(), "Error calculating phi for model");
 				m_phi = nlconst::two() * Vt * plib::log (m_model.m_NSUB * nlconst::magic(1e6) / constants::NiSi());
 			}
 			else

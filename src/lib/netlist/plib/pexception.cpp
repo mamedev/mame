@@ -19,12 +19,35 @@ namespace plib {
 	// terminate
 	//============================================================
 
-	void terminate(const pstring &msg) noexcept
+	void terminate(const char *msg) noexcept
 	{
-		std::cerr << msg.c_str() << "\n";
+		try
+		{
+			std::cerr << msg << "\n";
+		}
+		catch (...)
+		{
+			/* ignore */
+		}
 		std::terminate();
 	}
 
+	void passert_fail(const char *assertion, const char *file, int lineno, const char *msg) noexcept
+	{
+		try
+		{
+			std::cerr << file << ":" << lineno << ": ";
+			if (msg != nullptr)
+				std::cerr << msg << "\n";
+			else
+				std::cerr << "Assertion '" << assertion << "' failed.\n";
+		}
+		catch (...)
+		{
+			/* ignore */
+		}
+		std::terminate();
+	}
 
 	//============================================================
 	//  Exceptions

@@ -72,11 +72,11 @@
 
 /// \brief Number of bytes for cache line alignment
 ///
-#define PALIGN_CACHELINE        (64)
+#define PALIGN_CACHELINE        (16)
 
 /// \brief Number of bytes for vector alignment
 ///
-#define PALIGN_VECTOROPT        (64)
+#define PALIGN_VECTOROPT        (16)
 
 #define PALIGNAS_CACHELINE()    PALIGNAS(PALIGN_CACHELINE)
 #define PALIGNAS_VECTOROPT()    PALIGNAS(PALIGN_VECTOROPT)

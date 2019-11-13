@@ -327,7 +327,7 @@ namespace devices
 			for (int i=0; i < m_N(); i++)
 			{
 				pstring n = plib::pfmt("A{1}")(i);
-				m_I.push_back(pool().make_unique<analog_input_t>(*this, n));
+				m_I.push_back(state().make_object<analog_input_t>(*this, n));
 				inps.push_back(n);
 				m_vals.push_back(nlconst::zero());
 			}
@@ -426,8 +426,8 @@ namespace devices
 		{
 			if (owner.state().setup().is_extended_validation() || force_analog_input)
 			{
-				m_GND = pool().make_unique<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
-				m_VCC = pool().make_unique<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
+				m_GND = owner.state().make_object<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
+				m_VCC = owner.state().make_object<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
 			}
 			else
 			{

@@ -87,12 +87,6 @@ namespace netlist
 	template <typename T>
 	using unique_pool_ptr = nlmempool::unique_pool_ptr<T>;
 
-	inline nlmempool &pool()
-	{
-		static nlmempool static_pool;
-		return static_pool;
-	}
-
 	namespace detail {
 
 		/// \brief Enum specifying the type of object
