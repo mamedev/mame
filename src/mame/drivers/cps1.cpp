@@ -13398,6 +13398,25 @@ WRITE16_MEMBER( cps_state::sf2m3_layer_w )
 }
 
 
+/*
+	A note reguarding bootlegs:
+	In order to keep the cps source in some sort of order, the idea is to group similar bootleg hardware into seperate
+	derived classes and source files.
+
+	Rom swaps, hacks etc.  (on original Capcom hardware)  ->  cps1.cpp
+	Sound: Z80, 2x YM2203, 2x m5205 ("Final Crash" h/w)   ->  fcrash.cpp
+	Sound: Z80, 1x YM2151, 2x m5205                       ->  cps1bl_5205.cpp
+	Sound: PIC, 1x M6295            *1                    ->  cps1bl_pic.cpp
+	Sound: Z80, 1x YM2151, 1x M6295 *2                    ->  fcrash.cpp      (for now...)
+
+	*1 these seem to be only CPS1.5/Q sound games?
+	*2 this is original configuration, but non-Capcom (usually single-board) hardware.
+	
+	
+	This file currently contains games in first and last catergories.
+	Eventually only official/genuine/non-bootleg Capcom-hardware games and those in first catergory will remain here.
+*/
+
 
 /*************************************************** Game Macros *****************************************************/
 
