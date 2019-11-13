@@ -34,7 +34,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(const unsigned cnt) NL_NOEXCEPT
+		void update_outputs(const unsigned cnt) noexcept
 		{
 			static constexpr const std::array<netlist_time, 14> out_delayQn = {
 					NLTIME_FROM_NS(180), NLTIME_FROM_NS(280),

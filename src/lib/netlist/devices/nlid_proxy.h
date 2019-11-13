@@ -16,8 +16,8 @@
 
 namespace netlist
 {
-	namespace devices
-	{
+namespace devices
+{
 
 	// -----------------------------------------------------------------------------
 	// nld_base_proxy
@@ -33,10 +33,17 @@ namespace netlist
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
+		detail::core_terminal_t *m_tp;
+		detail::core_terminal_t *m_tn;
 
+		plib::unique_ptr<analog_output_t> m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
+		plib::unique_ptr<analog_output_t> m_VCCHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
+
+		bool need_hack() const noexcept { return m_need_hack; }
 	private:
 		logic_t *m_term_proxied;
 		detail::core_terminal_t *m_proxy_term;
+		bool m_need_hack;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -106,15 +113,13 @@ namespace netlist
 
 		static constexpr const nl_fptype G_OFF = nlconst::magic(1e-9);
 
-		plib::unique_ptr<analog_output_t> m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
-		plib::unique_ptr<analog_output_t> m_VCCHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
 		analog::NETLIB_NAME(twoterm) m_RP;
 		analog::NETLIB_NAME(twoterm) m_RN;
 		state_var<int> m_last_state;
 		bool m_is_timestep;
-};
+	};
 
-	} //namespace devices
+} // namespace devices
 } // namespace netlist
 
 #endif /* NLD_PROXY_H_ */

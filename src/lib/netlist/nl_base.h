@@ -14,6 +14,7 @@
 
 #include "plib/palloc.h" // owned_ptr
 #include "plib/pdynlib.h"
+#include "plib/pexception.h"
 #include "plib/pfmtlog.h"
 #include "plib/pfunction.h"
 #include "plib/plists.h"
@@ -23,7 +24,6 @@
 #include "plib/pstonum.h"
 #include "plib/pstream.h"
 #include "plib/ptime.h"
-#include "plib/pexception.h"
 
 #include "nl_errstr.h"
 #include "nltypes.h"
@@ -153,15 +153,15 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_DELEGATE(chip, name) nldelegate(&NETLIB_NAME(chip) :: name, this)
 
 #define NETLIB_UPDATE_TERMINALSI() virtual void update_terminals() noexcept override
-#define NETLIB_HANDLERI(name) virtual void name() NL_NOEXCEPT
-#define NETLIB_UPDATEI() virtual void update() NL_NOEXCEPT override
+#define NETLIB_HANDLERI(name) virtual void name() noexcept
+#define NETLIB_UPDATEI() virtual void update() noexcept override
 #define NETLIB_UPDATE_PARAMI() virtual void update_param() noexcept override
 #define NETLIB_RESETI() virtual void reset() override
 
 #define NETLIB_SUB(chip) nld_ ## chip
 #define NETLIB_SUB_UPTR(ns, chip) unique_pool_ptr< ns :: nld_ ## chip >
 
-#define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() NL_NOEXCEPT
+#define NETLIB_HANDLER(chip, name) void NETLIB_NAME(chip) :: name() noexcept
 #define NETLIB_UPDATE(chip) NETLIB_HANDLER(chip, update)
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
@@ -169,19 +169,6 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param() noexcept
 
 #define NETLIB_UPDATE_TERMINALS(chip) void NETLIB_NAME(chip) :: update_terminals() noexcept
-
-//============================================================
-//  Asserts
-//============================================================
-
-#if defined(MAME_DEBUG) || (NL_DEBUG == true)
-#define nl_assert(x)    passert_always(x);
-#define NL_NOEXCEPT
-#else
-#define nl_assert(x)    do { } while (0)
-#define NL_NOEXCEPT    noexcept
-#endif
-#define nl_assert_always(x, msg) passert_always_msg(x, msg)
 
 //============================================================
 // Namespace starts
@@ -271,7 +258,8 @@ namespace netlist
 		virtual unique_pool_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_state_t &anetlist, const pstring &name,
 				logic_input_t *proxied) const = 0;
 
-		nl_fptype fixed_V() const noexcept{ return m_fixed_V; }
+		// FIXME: remove fixed_V()
+		nl_fptype fixed_V() const noexcept{return m_fixed_V; }
 		nl_fptype low_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_low_thresh_PCNT; }
 		nl_fptype high_thresh_V(nl_fptype VN, nl_fptype VP) const noexcept{ return VN + (VP - VN) * m_high_thresh_PCNT; }
 		nl_fptype low_offset_V() const noexcept{ return m_low_VO; }
@@ -678,7 +666,7 @@ namespace netlist
 			bool is_queued() const noexcept { return m_in_queue == queue_status::QUEUED; }
 
 			template <bool KEEP_STATS>
-			void update_devs() NL_NOEXCEPT;
+			void update_devs() noexcept;
 
 			netlist_time next_scheduled_time() const noexcept { return m_next_scheduled_time; }
 			void set_next_scheduled_time(netlist_time ntime) noexcept { m_next_scheduled_time = ntime; }
@@ -874,7 +862,7 @@ namespace netlist
 		logic_input_t(core_device_t &dev, const pstring &aname,
 				nldelegate delegate = nldelegate());
 
-		netlist_sig_t operator()() const NL_NOEXCEPT
+		netlist_sig_t operator()() const noexcept
 		{
 			return Q();
 		}
@@ -884,7 +872,7 @@ namespace netlist
 		void activate_hl() noexcept;
 		void activate_lh() noexcept;
 	private:
-		netlist_sig_t Q() const NL_NOEXCEPT;
+		netlist_sig_t Q() const noexcept;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1048,7 +1036,7 @@ namespace netlist
 
 		unique_pool_ptr<stats_t> m_stats;
 
-		virtual void update() NL_NOEXCEPT { }
+		virtual void update() noexcept { }
 		virtual void reset() { }
 
 	protected:
@@ -1946,7 +1934,7 @@ namespace netlist
 		return static_cast<const logic_net_t &>(core_terminal_t::net());
 	}
 
-	inline netlist_sig_t logic_input_t::Q() const NL_NOEXCEPT
+	inline netlist_sig_t logic_input_t::Q() const noexcept
 	{
 		nl_assert(terminal_state() != STATE_INP_PASSIVE);
 		//if (net().Q() != m_Q)
@@ -2056,7 +2044,7 @@ namespace netlist
 	}
 
 	template <bool KEEP_STATS>
-	inline void detail::net_t::update_devs() NL_NOEXCEPT
+	inline void detail::net_t::update_devs() noexcept
 	{
 		nl_assert(this->isRailNet());
 

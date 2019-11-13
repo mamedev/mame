@@ -19,7 +19,7 @@
 #define PERRMSGV(name, narg, str) \
 	struct name \
 	{ \
-		template<typename... Args> name(Args&&... args) \
+		template<typename... Args> explicit name(Args&&... args) \
 		: m_m(plib::pfmt(str)(std::forward<Args>(args)...)) \
 		{ static_assert(narg == sizeof...(args), "Argument count mismatch"); } \
 		operator pstring() const noexcept { return m_m; } \
@@ -116,7 +116,7 @@ namespace netlist
 
 	// nlid_proxy.cpp
 
-	PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_1,     1, "D/A Proxy: Found no valid combination of power terminals on device {1}")
+	PERRMSGV(MI_NO_POWER_TERMINALS_ON_DEVICE_2,     2, "D/A Proxy {1}: Found no valid combination of power terminals on device {2}")
 	PERRMSGV(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE, 5, "D/A Proxy: Found multiple power terminals on device {1}: {2} {3} {4} {5}")
 
 	// nld_matrix_solver.cpp

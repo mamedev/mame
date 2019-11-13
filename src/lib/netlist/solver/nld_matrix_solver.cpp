@@ -361,7 +361,7 @@ namespace solver
 		m_last_step = netlist_time::zero();
 	}
 
-	void matrix_solver_t::update() NL_NOEXCEPT
+	void matrix_solver_t::update() noexcept
 	{
 		const netlist_time new_timestep = solve(exec().time());
 		update_inputs();

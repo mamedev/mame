@@ -438,8 +438,8 @@ namespace devices
 		}
 
 		// FIXME: this will seg-fault if force_analog_input = false
-		nl_fptype VCC() const NL_NOEXCEPT { return m_VCC->Q_Analog(); }
-		nl_fptype GND() const NL_NOEXCEPT { return m_GND->Q_Analog(); }
+		nl_fptype VCC() const noexcept { return m_VCC->Q_Analog(); }
+		nl_fptype GND() const noexcept { return m_GND->Q_Analog(); }
 
 	private:
 		void noop() { }

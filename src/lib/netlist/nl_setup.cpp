@@ -590,9 +590,10 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		out.net().core_terms().clear(); // clear the list
 
 		out.net().add_terminal(new_proxy->in());
-		out_cast.set_proxy(proxy);
+		//out_cast.set_proxy(proxy); - Wrong!
 
 		proxy = new_proxy.get();
+		out_cast.set_proxy(proxy);
 
 		m_nlstate.register_device(new_proxy->name(), std::move(new_proxy));
 	}

@@ -36,7 +36,7 @@ namespace netlist
 		NETLIB_UPDATEI();
 
 	public:
-		void update_outputs(unsigned v) NL_NOEXCEPT
+		void update_outputs(unsigned v) noexcept
 		{
 			nl_assert(v<16);
 			if (v != m_state)

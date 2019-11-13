@@ -218,7 +218,7 @@ namespace analog
 			connect(m_DG.m_P, m_SD.m_N);
 
 			set_qtype((m_model.type() == "NMOS_DEFAULT") ? FET_NMOS : FET_PMOS);
-			m_polarity = qtype() == nlconst::magic((FET_NMOS ? 1.0 : -1.0));
+			m_polarity = nlconst::magic((qtype() == FET_NMOS) ? 1.0 : -1.0);
 
 			m_capmod = m_model.m_CAPMOD;
 			// printf("capmod %d %g %g\n", m_capmod, (nl_fptype)m_model.m_VTO, m_polarity);

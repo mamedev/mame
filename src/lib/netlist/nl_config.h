@@ -8,6 +8,7 @@
 #define NLCONFIG_H_
 
 #include "plib/pconfig.h"
+#include "plib/pexception.h"
 
 /// \addtogroup compiledefine
 /// \{
@@ -224,5 +225,16 @@ namespace netlist
 	};
 #endif
 } // namespace netlist
+
+//============================================================
+//  Asserts
+//============================================================
+
+#if defined(MAME_DEBUG) || (NL_DEBUG == true)
+#define nl_assert(x)    passert_always(x);
+#else
+#define nl_assert(x)    do { } while (0)
+#endif
+#define nl_assert_always(x, msg) passert_always_msg(x, msg)
 
 #endif // NLCONFIG_H_

@@ -94,7 +94,7 @@ namespace plib {
 			pstring m_token;
 		};
 
-		pstring currentline_str();
+		pstring currentline_str() const;
 
 		// tokenizer stuff follows ...
 

@@ -8,8 +8,8 @@
 /// \file pmempool.h
 ///
 
-#include "pconfig.h"
 #include "palloc.h"
+#include "pconfig.h"
 #include "pstream.h"
 #include "pstring.h"
 #include "ptypes.h"
@@ -63,13 +63,13 @@ namespace plib {
 				//::operator delete(b->m_data);
 			}
 		}
-
+#if 0
 		static inline mempool &instance()
 		{
 			static mempool s_mempool;
 			return s_mempool;
 		}
-
+#endif
 		void *allocate(size_t align, size_t size)
 		{
 			block *b = nullptr;
