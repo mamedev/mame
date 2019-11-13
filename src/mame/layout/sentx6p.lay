@@ -6,11 +6,11 @@
 			<color red="0.8" green="0.8" blue="0.0" />
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
-    <disk state ="1">
-      <color red="0.4" green="0.4" blue="0.0" />
-      <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
-    </disk>
-    
+	<disk state ="1">
+	  <color red="0.4" green="0.4" blue="0.0" />
+	  <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+	</disk>
+
 		<text string="SELECT" align="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds left="0.10" top="0.3" right="0.90" bottom="0.7" />
@@ -27,11 +27,11 @@
 			<color red="0.0" green="0.8" blue="0.0" />
 			<bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
 		</disk>
-    <disk state ="1">
-      <color red="0.0" green="0.4" blue="0.0" />
-      <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
-    </disk>
-    
+	<disk state ="1">
+	  <color red="0.0" green="0.4" blue="0.0" />
+	  <bounds left="0.1" top="0.1" right="0.9" bottom="0.9" />
+	</disk>
+
 		<text string="OK" align="0">
 			<color red="1.0" green="1.0" blue="1.0" />
 			<bounds left="0.15" top="0.3" right="0.85" bottom="0.7" />

@@ -312,7 +312,7 @@ public:
 	void sentx6p(machine_config &config);
 
 	void mem_map_2m_texas(address_map &map);
-	
+
 	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
 	{
 		if (newval == 1)
@@ -2153,8 +2153,8 @@ static INPUT_PORTS_START( sentx6p )
 	// these are presuambly read through the UART as the LCD screens are driven by it, currently not hooked up
 	// using PORT_CHANGED_MEMBER because we assume the controller latches them for sending as inputs are only read every few frames
 	PORT_START("CTRL1")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 0) 
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 0) 
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 0)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 0)
 
 	PORT_START("CTRL2")
 	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 1)
