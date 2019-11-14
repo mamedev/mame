@@ -1325,7 +1325,7 @@ namespace bimg
 		return output;
 	}
 
-	uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
+	static uint8_t bitRangeConvert(uint32_t _in, uint32_t _from, uint32_t _to)
 	{
 		using namespace bx;
 		uint32_t tmp0   = uint32_sll(1, _to);
@@ -1341,7 +1341,7 @@ namespace bimg
 		return uint8_t(result);
 	}
 
-	void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC2 || BIMG_DECODE_BC3) )
 		{
@@ -1377,7 +1377,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt1(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC1 || BIMG_DECODE_BC2 || BIMG_DECODE_BC3) )
 		{
@@ -1433,7 +1433,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockDxt23A(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt23A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC2) )
 		{
@@ -1447,7 +1447,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockDxt45A(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockDxt45A(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC3 || BIMG_DECODE_BC4 || BIMG_DECODE_BC5) )
 		{
@@ -1709,7 +1709,7 @@ namespace bimg
 		uint16_t m_bitPos;
 	};
 
-	uint16_t bc6hUnquantize(uint16_t _value, bool _signed, uint8_t _endpointBits)
+	static uint16_t bc6hUnquantize(uint16_t _value, bool _signed, uint8_t _endpointBits)
 	{
 		const uint16_t maxValue = 1<<(_endpointBits-1);
 
@@ -1759,7 +1759,7 @@ namespace bimg
 		return ( (_value<<15) + 0x4000) >> (_endpointBits-1);
 	}
 
-	uint16_t bc6hUnquantizeFinal(uint16_t _value, bool _signed)
+	static uint16_t bc6hUnquantizeFinal(uint16_t _value, bool _signed)
 	{
 		if (_signed)
 		{
@@ -1772,7 +1772,7 @@ namespace bimg
 		return (_value * 31) >> 6;
 	}
 
-	uint16_t signExtend(uint16_t _value, uint8_t _numBits)
+	static uint16_t signExtend(uint16_t _value, uint8_t _numBits)
 	{
 		const uint16_t mask   = 1 << (_numBits - 1);
 		const uint16_t result = (_value ^ mask) - mask;
@@ -1827,7 +1827,7 @@ namespace bimg
 		{ 0, 0,  0, {  0,  0,  0 } }, // -
 	};
 
-	void decodeBlockBc6h(uint16_t _dst[16*3], const uint8_t _src[16], bool _signed)
+	static void decodeBlockBc6h(uint16_t _dst[16*3], const uint8_t _src[16], bool _signed)
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC6) )
 		{
@@ -2239,7 +2239,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockBc6h(float _dst[16*4], const uint8_t _src[16])
+	static void decodeBlockBc6h(float _dst[16*4], const uint8_t _src[16])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC6) )
 		{
@@ -2292,7 +2292,7 @@ namespace bimg
 		{ 2, 6, 0, 0, 5, 5, 1, 0, { 2, 0 } }, // 7
 	};
 
-	void decodeBlockBc7(uint8_t _dst[16*4], const uint8_t _src[16])
+	static void decodeBlockBc7(uint8_t _dst[16*4], const uint8_t _src[16])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_BC7) )
 		{
@@ -2486,7 +2486,7 @@ namespace bimg
 
 	// ATC
 	//
-	void decodeBlockATC(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockATC(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_ATC) )
 		{
@@ -2559,7 +2559,7 @@ namespace bimg
 
 	static const uint8_t s_etc2Mod[] = { 3, 6, 11, 16, 23, 32, 41, 64 };
 
-	uint8_t uint8_sat(int32_t _a)
+	static uint8_t uint8_sat(int32_t _a)
 	{
 		using namespace bx;
 		const uint32_t min    = uint32_imin(_a, 255);
@@ -2567,13 +2567,13 @@ namespace bimg
 		return (uint8_t)result;
 	}
 
-	uint8_t uint8_satadd(int32_t _a, int32_t _b)
+	static uint8_t uint8_satadd(int32_t _a, int32_t _b)
 	{
 		const int32_t add = _a + _b;
 		return uint8_sat(add);
 	}
 
-	void decodeBlockEtc2ModeT(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc2ModeT(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		uint8_t rgb[16];
 
@@ -2632,7 +2632,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockEtc2ModeH(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc2ModeH(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		uint8_t rgb[16];
 
@@ -2706,7 +2706,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockEtc2ModePlanar(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc2ModePlanar(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
@@ -2798,7 +2798,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockEtc12(uint8_t _dst[16*4], const uint8_t _src[8])
+	static void decodeBlockEtc12(uint8_t _dst[16*4], const uint8_t _src[8])
 	{
 		if (!BX_ENABLED(BIMG_DECODE_ETC1 || BIMG_DECODE_ETC2) )
 		{
@@ -2973,7 +2973,7 @@ namespace bimg
 			;
 	}
 
-	void decodeBlockPtc14RgbAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
+	static void decodeBlockPtc14RgbAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<15) ) )
 		{
@@ -2989,7 +2989,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14RgbAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
+	static void decodeBlockPtc14RgbAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<31) ) )
 		{
@@ -3005,7 +3005,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
+	static void decodeBlockPtc14(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
 	{
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
@@ -3077,7 +3077,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14ARgbaAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
+	static void decodeBlockPtc14ARgbaAddA(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<15) ) )
 		{
@@ -3095,7 +3095,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14ARgbaAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
+	static void decodeBlockPtc14ARgbaAddB(uint32_t _block, uint32_t* _r, uint32_t* _g, uint32_t* _b, uint32_t* _a, uint8_t _factor)
 	{
 		if (0 != (_block & (1<<31) ) )
 		{
@@ -3113,7 +3113,7 @@ namespace bimg
 		}
 	}
 
-	void decodeBlockPtc14A(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
+	static void decodeBlockPtc14A(uint8_t _dst[16*4], const uint8_t* _src, uint32_t _x, uint32_t _y, uint32_t _width, uint32_t _height)
 	{
 		// 0       1       2       3       4       5       6       7
 		// 7654321076543210765432107654321076543210765432107654321076543210
