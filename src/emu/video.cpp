@@ -227,15 +227,18 @@ void video_manager::frame_update(bool from_debugger)
 	// draw the user interface
 	emulator_info::draw_user_interface(machine());
 
-	// if we're throttling, synchronize before rendering
-	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && effective_throttle())
-		update_throttle(current_time);
-
 	// ask the OSD to update
 	g_profiler.start(PROFILER_BLIT);
 	machine().osd().update(!from_debugger && skipped_it);
 	g_profiler.stop();
+
+	// if we're throttling, synchronize after rendering
+	attotime current_time = machine().time();
+	if (!from_debugger && !skipped_it && effective_throttle())
+		update_throttle(current_time);
+
+	// get most recent input now
+	machine().osd().input_update();
 
 	emulator_info::periodic_check();
 

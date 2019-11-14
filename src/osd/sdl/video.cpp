@@ -109,13 +109,21 @@ void sdl_osd_interface::update(bool skip_redraw)
 //      profiler_mark(PROFILER_END);
 	}
 
-	// poll the joystick values here
-	downcast<sdl_osd_interface&>(machine().osd()).poll_inputs(machine());
-
-	check_osd_inputs(machine());
 	// if we're running, disable some parts of the debugger
 	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
 		debugger_update();
+}
+
+//============================================================
+//  input_update
+//============================================================
+
+void sdl_osd_interface::input_update(void)
+{
+	// poll the joystick values here
+	downcast<sdl_osd_interface&>(machine().osd()).process_events_buf();
+	downcast<sdl_osd_interface&>(machine().osd()).poll_inputs(machine());
+	check_osd_inputs(machine());
 }
 
 //============================================================

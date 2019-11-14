@@ -604,9 +604,6 @@ void sdl_window_info::update()
 
 			// and redraw now
 
-			// Some configurations require events to be polled in the worker thread
-			downcast< sdl_osd_interface& >(machine().osd()).process_events_buf();
-
 			// Check whether window has vector screens
 
 			{
