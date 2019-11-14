@@ -474,7 +474,7 @@ void HC11OP(addd_indx)()
 {
 	uint8_t offset = FETCH();
 	uint16_t adr = m_ix + offset;
-	uint8_t i = READ8(adr);
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D + i;
 	CLEAR_NZVC();
 	SET_N16(r);
@@ -490,7 +490,7 @@ void HC11OP(addd_indy)()
 {
 	uint8_t offset = FETCH();
 	uint16_t adr = m_iy + offset;
-	uint8_t i = READ8(adr);
+	uint16_t i = READ16(adr);
 	uint32_t r = REG_D + i;
 	CLEAR_NZVC();
 	SET_N16(r);
