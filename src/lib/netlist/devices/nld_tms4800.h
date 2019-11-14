@@ -45,7 +45,9 @@
 		NET_CONNECT(name, A7,  cA7)     \
 		NET_CONNECT(name, A8,  cA8)     \
 		NET_CONNECT(name, A9,  cA9)     \
-		NET_CONNECT(name, A10, cA10)
+		NET_CONNECT(name, A10, cA10)	\
+		NET_CONNECT(name, VCC, VCC)		\
+		NET_CONNECT(name, GND, GND)
 
 #define ROM_TMS4800_DIP(name)                                 \
 		NET_REGISTER_DEV(ROM_TMS4800_DIP, name)

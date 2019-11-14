@@ -33,20 +33,31 @@ namespace netlist
 		for (auto & pwr_sym : power_syms)
 		{
 			pstring devname = inout_proxied->device().name();
-			auto tp_t = anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
-					/*detail::terminal_type::INPUT,*/ false);
-			auto tn_t = anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
-					/*detail::terminal_type::INPUT,*/ false);
-			if (f && (tp_t != nullptr && tn_t != nullptr))
-				log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
-					m_tp->name(), m_tn->name(),
-					tp_t ? tp_t->name() : "",
-					tn_t ? tn_t->name() : ""));
-			else if (tp_t != nullptr && tn_t != nullptr)
+
+			auto tp_ct(anetlist.setup().find_terminal(devname + "." + pwr_sym.first,
+					/*detail::terminal_type::INPUT,*/ false));
+			auto tp_cn(anetlist.setup().find_terminal(devname + "." + pwr_sym.second,
+				/*detail::terminal_type::INPUT,*/ false));
+			if (tp_ct && tp_cn)
 			{
-				m_tp = tp_t;
-				m_tn = tn_t;
-				f = true;
+				if (tp_ct && !tp_ct->is_analog())
+					plib::pthrow<nl_exception>(plib::pfmt("Not an analog terminal: {1}")(tp_ct->name()));
+				if (tp_cn && !tp_cn->is_analog())
+					plib::pthrow<nl_exception>(plib::pfmt("Not an analog terminal: {1}")(tp_cn->name()));
+
+				auto tp_t = static_cast<analog_t* >(tp_ct);
+				auto tn_t = static_cast<analog_t *>(tp_cn);
+				if (f && (tp_t != nullptr && tn_t != nullptr))
+					log().warning(MI_MULTIPLE_POWER_TERMINALS_ON_DEVICE(inout_proxied->device().name(),
+						m_tp->name(), m_tn->name(),
+						tp_t ? tp_t->name() : "",
+						tn_t ? tn_t->name() : ""));
+				else if (tp_t != nullptr && tn_t != nullptr)
+				{
+					m_tp = tp_t;
+					m_tn = tn_t;
+					f = true;
+				}
 			}
 		}
 		//FIXME: Use power terminals and change info to warning or error
@@ -56,7 +67,7 @@ namespace netlist
 			if (logic_family()->fixed_V() == nlconst::zero())
 				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
 			else
-				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
+				log().warning(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(inout_proxied->device().name())));
 #endif
 			m_GNDHack = plib::make_unique<analog_output_t>(*this, "_QGND");
 			m_VCCHack = plib::make_unique<analog_output_t>(*this, "_QVCC");
@@ -93,10 +104,24 @@ namespace netlist
 
 	NETLIB_RESET(a_to_d_proxy)
 	{
+		// FIXME: Variable voltage
+		nl_fptype supply_V = logic_family()->fixed_V();
+		// FIXME: comparison to zero
+		if (supply_V == nlconst::zero())
+			supply_V = nlconst::magic(5.0);
+
+		if (need_hack())
+		{
+			if (m_tn)
+				m_GNDHack->initial(0);
+			if (m_tp)
+				m_VCCHack->initial(supply_V);
+		}
 	}
 
 	NETLIB_UPDATE(a_to_d_proxy)
 	{
+#if 0
 		nl_assert(m_logic_family != nullptr);
 		// FIXME: Variable supply voltage!
 		nl_fptype supply_V = logic_family()->fixed_V();
@@ -111,6 +136,20 @@ namespace netlist
 		{
 			// do nothing
 		}
+#else
+		const auto v(m_I.Q_Analog());
+		const auto vn(m_tn->net().Q_Analog());
+		const auto vp(m_tp->net().Q_Analog());
+
+		if (logic_family()->is_above_high_thresh_V(v, vn, vp))
+			out().push(1, netlist_time::quantum());
+		else if (logic_family()->is_below_low_thresh_V(v, vn, vp))
+			out().push(0, netlist_time::quantum());
+		else
+		{
+			// do nothing
+		}
+#endif
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -133,18 +172,20 @@ namespace netlist
 	{
 		register_subalias("Q", m_RN.m_P);
 
-		//FIXME: Use power terminals and change info to warning or error
 		if (need_hack())
 		{
-#if 1
-			// FIXME: move to base proxy class
-			if (logic_family()->fixed_V() == nlconst::zero())
-				log().error(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(out_proxied->device().name())));
+			if (anetlist.setup().is_extended_validation())
+			{
+				// During validation, don't connect to terminals found
+				// This will cause terminals not connected to a rail net to
+				// fail connection stage.
+				connect(m_RN.m_N, m_RP.m_P);
+			}
 			else
-				log().info(MI_NO_POWER_TERMINALS_ON_DEVICE_2(name, anetlist.setup().de_alias(out_proxied->device().name())));
-#endif
-			connect(m_RN.m_N, *m_tn);
-			connect(m_RP.m_P, *m_tp);
+			{
+				connect(m_RN.m_N, *m_tn);
+				connect(m_RP.m_P, *m_tp);
+			}
 			connect(m_RN.m_P, m_RP.m_N);
 		}
 		else

@@ -762,7 +762,6 @@ namespace netlist
 			nldelegate delegate)
 		: core_terminal_t(dev, aname, state, delegate)
 		, logic_family_t()
-		, m_proxy(nullptr)
 	{
 	}
 

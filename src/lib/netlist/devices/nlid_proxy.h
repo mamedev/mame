@@ -33,8 +33,10 @@ namespace devices
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
-		detail::core_terminal_t *m_tp;
-		detail::core_terminal_t *m_tn;
+		// FIXME: these should be core_terminal_t and only used for connecting
+		//        inputs. Fix, once the ugly hacks have been removed
+		analog_t *m_tp;
+		analog_t *m_tn;
 
 		plib::unique_ptr<analog_output_t> m_GNDHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd
 		plib::unique_ptr<analog_output_t> m_VCCHack;  // FIXME: Long term, we need to connect proxy gnd to device gnd

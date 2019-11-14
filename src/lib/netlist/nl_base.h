@@ -267,6 +267,12 @@ namespace netlist
 		nl_fptype R_low() const noexcept{ return m_R_low; }
 		nl_fptype R_high() const noexcept{ return m_R_high; }
 
+		bool is_above_high_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
+		{ return (V - VN) > high_thresh_V(VN, VP); }
+
+		bool is_below_low_thresh_V(nl_fptype V, nl_fptype VN, nl_fptype VP) const noexcept
+		{ return (V - VN) < low_thresh_V(VN, VP); }
+
 		nl_fptype m_fixed_V;           //!< For variable voltage families, specify 0. For TTL this would be 5.
 		nl_fptype m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
 		nl_fptype m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
@@ -839,17 +845,12 @@ namespace netlist
 		logic_t(core_device_t &dev, const pstring &aname,
 				const state_e state, nldelegate delegate = nldelegate());
 
-		bool has_proxy() const noexcept { return (m_proxy != nullptr); }
-		devices::nld_base_proxy *get_proxy() const noexcept { return m_proxy; }
-		void set_proxy(devices::nld_base_proxy *proxy) noexcept { m_proxy = proxy; }
-
 		logic_net_t & net() noexcept;
 		const logic_net_t &  net() const noexcept;
 
 	protected:
 
 	private:
-		devices::nld_base_proxy *m_proxy; // FIXME: only used during setup
 	};
 
 	// -----------------------------------------------------------------------------
@@ -914,7 +915,6 @@ namespace netlist
 		using detail::net_t::set_Q_and_push;
 		using detail::net_t::set_Q_time;
 		using detail::net_t::Q_state_ptr;
-
 	};
 
 	class analog_net_t : public detail::net_t

@@ -89,8 +89,6 @@ NETLIST_END()
  * ---------------------------------------------------------------------------*/
 
 NETLIST_START(base)
-	TTL_INPUT(ttlhigh, 1)
-	TTL_INPUT(ttllow, 0)
 	NET_REGISTER_DEV(GNDA, GND)
 	NET_REGISTER_DEV(PARAMETER, NETLIST)
 

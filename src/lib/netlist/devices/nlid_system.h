@@ -10,7 +10,7 @@
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
-#include "plib/putil.h"
+#include "netlist/plib/putil.h"
 
 namespace netlist
 {
@@ -38,6 +38,50 @@ namespace devices
 		param_num_t<unsigned>   m_mos_capmodel;
 		//! How many times do we try to resolve links (connections)
 		param_num_t<unsigned>   m_max_link_loops;
+	};
+
+	// -----------------------------------------------------------------------------
+	// power pins - not a device, but a helper
+	// -----------------------------------------------------------------------------
+
+	/// \brief Power pins class.
+	///
+	/// Power Pins are passive inputs. Delegate noop will silently ignore any
+	/// updates.
+	class nld_power_pins
+	{
+	public:
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
+			const pstring &sGND = sPowerGND, bool force_analog_input = true)
+		{
+			if (owner.state().setup().is_extended_validation() || force_analog_input)
+			{
+				m_GND = owner.state().make_object<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
+				m_VCC = owner.state().make_object<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
+			}
+			else
+			{
+				owner.create_and_register_subdevice(sPowerDevRes, m_RVG);
+				owner.register_subalias(sVCC, pstring(sPowerDevRes) + ".1");
+				owner.register_subalias(sGND, pstring(sPowerDevRes) + ".2");
+			}
+		}
+
+		nl_fptype VCC() const noexcept
+		{
+			return (m_VCC ? m_VCC->Q_Analog() : m_RVG->V1P());
+		}
+		nl_fptype GND() const noexcept
+		{
+			return (m_GND ? m_GND->Q_Analog() : m_RVG->V2N());
+		}
+
+	private:
+		void noop() { }
+		unique_pool_ptr<analog_input_t> m_VCC; // only used during validation or force_analog_input
+		unique_pool_ptr<analog_input_t> m_GND; // only used during validation or force_analog_input
+
+		NETLIB_SUB_UPTR(analog, R) m_RVG; // dummy resistor between VCC and GND
 	};
 
 	// -----------------------------------------------------------------------------
@@ -188,6 +232,7 @@ namespace devices
 		, m_IN(*this, "IN", false)
 		// make sure we get the family first
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_supply(*this)
 		{
 			set_logic_family(state().setup().family_from_model(m_FAMILY()));
 			m_Q.set_logic_family(this->logic_family());
@@ -202,6 +247,7 @@ namespace devices
 
 		param_logic_t m_IN;
 		param_model_t m_FAMILY;
+		NETLIB_NAME(power_pins) m_supply;
 	};
 
 	NETLIB_OBJECT(analog_input)
@@ -408,45 +454,6 @@ namespace devices
 
 	private:
 		state_var<netlist_sig_t> m_last_state;
-	};
-
-	// -----------------------------------------------------------------------------
-	// power pins - not a device, but a helper
-	// -----------------------------------------------------------------------------
-
-	/// \brief Power pins class.
-	///
-	/// Power Pins are passive inputs. Delegate noop will silently ignore any
-	/// updates.
-	class nld_power_pins
-	{
-	public:
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
-			const pstring &sGND = sPowerGND, bool force_analog_input = false)
-		{
-			if (owner.state().setup().is_extended_validation() || force_analog_input)
-			{
-				m_GND = owner.state().make_object<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
-				m_VCC = owner.state().make_object<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
-			}
-			else
-			{
-				owner.create_and_register_subdevice(sPowerDevRes, m_RVG);
-				owner.register_subalias(sVCC, pstring(sPowerDevRes) + ".1");
-				owner.register_subalias(sGND, pstring(sPowerDevRes) + ".2");
-			}
-		}
-
-		// FIXME: this will seg-fault if force_analog_input = false
-		nl_fptype VCC() const noexcept { return m_VCC->Q_Analog(); }
-		nl_fptype GND() const noexcept { return m_GND->Q_Analog(); }
-
-	private:
-		void noop() { }
-		unique_pool_ptr<analog_input_t> m_VCC; // only used during validation or force_analog_input
-		unique_pool_ptr<analog_input_t> m_GND; // only used during validation or force_analog_input
-
-		NETLIB_SUB_UPTR(analog, R) m_RVG; // dummy resistor between VCC and GND
 	};
 
 } // namespace devices

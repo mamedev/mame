@@ -117,6 +117,13 @@ NETLIST_START(breakout)
 	ALIAS(GNDD ,GND.Q)
 	ALIAS(P ,V5.Q)
 
+	TTL_INPUT(ttlhigh, 1)
+	TTL_INPUT(ttllow, 0)
+	TTL_INPUT(antenna, 0)
+
+	NET_C(VCC, ttlhigh.VCC, ttllow.VCC, antenna.VCC)
+	NET_C(GND, ttlhigh.GND, ttllow.GND, antenna.GND)
+
 	//----------------------------------------------------------------
 	// Clock circuit
 	//----------------------------------------------------------------
@@ -167,8 +174,6 @@ NETLIST_START(breakout)
 	//----------------------------------------------------------------
 	// Startup / Antenna latch
 	//----------------------------------------------------------------
-
-	TTL_INPUT(antenna, 0)
 
 	DIODE(CR3, "1N914")
 	DIODE(CR4, "1N914")

@@ -16,6 +16,7 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
+#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
 
@@ -225,6 +226,7 @@ public:
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
+		, m_supply(*this)
 	{
 		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
 		if (nl != nullptr)
@@ -261,6 +263,7 @@ private:
 	std::unique_ptr<netlist_mame_logic_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
 	netlist::state_var<netlist::netlist_sig_t> m_last;
+	netlist::devices::NETLIB_NAME(power_pins) m_supply;
 };
 
 

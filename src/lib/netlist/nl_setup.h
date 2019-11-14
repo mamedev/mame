@@ -453,12 +453,15 @@ namespace netlist
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
+		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
+		std::unordered_map<detail::core_terminal_t *,
+			devices::nld_base_proxy *>				m_proxies;
 
 		unsigned m_proxy_cnt;
 		bool m_validation;

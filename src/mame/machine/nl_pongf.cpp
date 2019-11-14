@@ -575,4 +575,11 @@ NETLIST_START(pongf)
 
 	ALIAS(videomix, RV3.2)
 
+	// ----------------------------------------------------------------------------------------
+	// power terminals
+	// ----------------------------------------------------------------------------------------
+
+	NET_C(VCC, high.VCC, low.VCC, antenna.VCC)
+	NET_C(GND, high.GND, low.GND, antenna.GND)
+
 NETLIST_END()

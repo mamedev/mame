@@ -10,11 +10,11 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
-#include "plib/mat_cr.h"
-#include "plib/palloc.h"
-#include "plib/pmatrix2d.h"
-#include "plib/putil.h"
-#include "plib/vector_ops.h"
+#include "netlist/plib/mat_cr.h"
+#include "netlist/plib/palloc.h"
+#include "netlist/plib/pmatrix2d.h"
+#include "netlist/plib/putil.h"
+#include "netlist/plib/vector_ops.h"
 
 namespace netlist
 {

@@ -81,6 +81,7 @@ namespace netlist
 	PERRMSGV(MF_OBJECT_1_2_WRONG_TYPE,              2, "object {1}({2}) found but wrong type")
 	PERRMSGV(MF_PARAMETER_1_2_NOT_FOUND,            2, "parameter {1}({2}) not found!")
 	PERRMSGV(MF_CONNECTING_1_TO_2,                  2, "Error connecting {1} to {2}")
+	PERRMSGV(MF_DUPLICATE_PROXY_1,                  1, "Terminal {1} already has proxy")
 	PERRMSGV(MF_MERGE_RAIL_NETS_1_AND_2,            2, "Trying to merge two rail nets: {1} and {2}")
 	PERRMSGV(MF_OBJECT_INPUT_TYPE_1,                1, "Unable to determine input type of {1}")
 	PERRMSGV(MF_OBJECT_OUTPUT_TYPE_1,               1, "Unable to determine output type of {1}")

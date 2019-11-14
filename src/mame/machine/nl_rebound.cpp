@@ -81,6 +81,8 @@ static NETLIST_START(rebound_schematics)
 	SWITCH2(START_SW)
 
 	TTL_INPUT(antenna, 0)
+	NET_C(V5,  antenna.VCC)
+	NET_C(GND, antenna.GND)
 
 	// DSW1a/b are actually only a 1 contact switches.
 	// The logic is needed to force high level on
@@ -115,6 +117,12 @@ static NETLIST_START(rebound_schematics)
 	NET_C(COIN1_SW.Q, GND)
 
 	NET_C(CON15, antenna)
+
+	// Coin Counter is connected to CON10 as well. Simulate using resistor
+
+	RES(RCOINCOUNTER, 10)
+	NET_C(RCOINCOUNTER.1, CON10)
+	NET_C(RCOINCOUNTER.2, V5)
 
 	/* -----------------------------------------------------------------------
 	 * Real netlist start
@@ -1289,8 +1297,6 @@ NETLIST_START(rebound)
 
 	LOCAL_SOURCE(rebound_schematics)
 	SOLVER(Solver, 480)
-	PARAM(Solver.VNTOL, 1e-9)
-	PARAM(Solver.RELTOL, 1e-9)
 	PARAM(Solver.DYNAMIC_TS, 1)
 	PARAM(Solver.DYNAMIC_LTE, 1e-6)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 5e-7)
