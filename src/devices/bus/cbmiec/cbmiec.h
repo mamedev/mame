@@ -21,6 +21,9 @@
 #define CBM_IEC_TAG         "iec_bus"
 
 
+DECLARE_DEVICE_TYPE(CBM_IEC,      cbm_iec_device)
+DECLARE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device)
+
 void cbm_iec_devices(device_slot_interface &device);
 
 //**************************************************************************
@@ -111,8 +114,6 @@ private:
 	int m_line[SIGNAL_COUNT];
 };
 
-DECLARE_DEVICE_TYPE(CBM_IEC,      cbm_iec_device)
-
 
 // ======================> cbm_iec_slot_device
 
@@ -122,24 +123,24 @@ class cbm_iec_slot_device : public device_t,
 public:
 	// construction/destruction
 	template <typename T>
-	cbm_iec_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
+	cbm_iec_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, int address, T &&opts, char const *dflt)
 		: cbm_iec_slot_device(mconfig, tag, owner, (uint32_t)0)
 	{
 		option_reset();
 		opts(*this);
 		set_default_option(dflt);
 		set_fixed(false);
+		set_address(address);
 	}
 	cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void add_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot);
 	template <typename T> static void add(machine_config &config, T &&_bus_tag, const char *_default_drive)
 	{
-		add_slot(config, "iec4", 4, nullptr);
-		add_slot(config, "iec8", 8, _default_drive);
-		add_slot(config, "iec9", 9, nullptr);
-		add_slot(config, "iec10", 10, nullptr);
-		add_slot(config, "iec11", 11, nullptr);
+		CBM_IEC_SLOT(config, "iec4", 4, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec8", 8, cbm_iec_devices, _default_drive);
+		CBM_IEC_SLOT(config, "iec9", 9, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec10", 10, cbm_iec_devices, nullptr);
+		CBM_IEC_SLOT(config, "iec11", 11, cbm_iec_devices, nullptr);
 
 		CBM_IEC(config, std::forward<T>(_bus_tag), 0);
 	}
@@ -181,7 +182,5 @@ protected:
 	cbm_iec_device *m_bus;
 	cbm_iec_slot_device *m_slot;
 };
-
-DECLARE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device)
 
 #endif // MAME_BUS_CBMIEC_CBMIEC_H

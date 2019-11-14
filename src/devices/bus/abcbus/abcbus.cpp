@@ -112,8 +112,8 @@ void abc80_cards(device_slot_interface &device)
 	device.option_add("fd2", ABC_FD2);
 	device.option_add("memcard", ABC_MEMORY_CARD);
 	device.option_add("slow", LUXOR_55_10828);
-	device.option_add("ssa", SUPER_SMARTAID);
-	device.option_add("unidisk", UNIDISK);
+	device.option_add("ssa", ABC_SUPER_SMARTAID);
+	device.option_add("unidisk", ABC_UNIDISK);
 }
 
 
@@ -139,7 +139,7 @@ void abcbus_cards(device_slot_interface &device)
 	device.option_add("slow", LUXOR_55_10828);
 	device.option_add("slutprov", ABC_SLUTPROV);
 	device.option_add("uni800", ABC_UNI800);
-	device.option_add("unidisk", UNIDISK);
+	device.option_add("unidisk", ABC_UNIDISK);
 	device.option_add("xebec", LUXOR_55_21056);
 }
 

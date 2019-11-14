@@ -1335,7 +1335,7 @@ void ste_state::ste_map(address_map &map)
 void megaste_state::megaste_map(address_map &map)
 {
 	st_map(map);
-	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w)).umask16(0x00ff);
+	map(0xff8c80, 0xff8c87).rw(Z8530_TAG, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w)).umask16(0x00ff);
 	map(0xfffc20, 0xfffc3f).rw(RP5C15_TAG, FUNC(rp5c15_device::read), FUNC(rp5c15_device::write)).umask16(0x00ff);
 }
 

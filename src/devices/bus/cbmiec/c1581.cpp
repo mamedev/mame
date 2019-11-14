@@ -33,8 +33,8 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(C1563, c1563_device, "c1563", "Commodore 1563 3.5 Disk Drive")
-DEFINE_DEVICE_TYPE(C1581, c1581_device, "c1581", "Commodore 1581 3.5 Disk Drive")
+DEFINE_DEVICE_TYPE(C1563, c1563_device, "c1563", "Commodore 1563 3.5\" Disk Drive")
+DEFINE_DEVICE_TYPE(C1581, c1581_device, "c1581", "Commodore 1581 3.5\" Disk Drive")
 
 
 //-------------------------------------------------

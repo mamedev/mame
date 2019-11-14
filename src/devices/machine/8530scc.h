@@ -11,7 +11,7 @@
 #ifndef MAME_MACHINE_8530SCC_H
 #define MAME_MACHINE_8530SCC_H
 
-class scc8530_t : public device_t
+class scc8530_legacy_device : public device_t
 {
 public:
 	enum IRQType_t {
@@ -26,7 +26,7 @@ public:
 		IRQ_B_EXT
 	};
 
-	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	scc8530_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto intrq_callback() { return intrq_cb.bind(); }
 
@@ -98,6 +98,6 @@ private:
     MACROS
 ***************************************************************************/
 
-DECLARE_DEVICE_TYPE(SCC8530, scc8530_t)
+DECLARE_DEVICE_TYPE(SCC8530, scc8530_legacy_device)
 
 #endif // MAME_MACHINE_8530SCC_H

@@ -50,7 +50,7 @@ private:
 	optional_device<awacs_device> m_awacs;
 	required_device<cuda_device> m_cuda;
 	required_device<ram_device> m_ram;
-	optional_device<scc8530_t> m_scc;
+	optional_device<scc8530_legacy_device> m_scc;
 	optional_device<ncr539x_device> m_539x_1;
 	optional_device<ncr539x_device> m_539x_2;
 
