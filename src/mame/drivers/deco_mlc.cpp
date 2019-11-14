@@ -452,6 +452,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
+// 1bpp bitplane layout
 static const gfx_layout spritelayout_1bpp =
 {
 	16,16,
@@ -462,6 +463,20 @@ static const gfx_layout spritelayout_1bpp =
 	{ STEP16(0,16) },
 	16*16
 };
+
+/*
+// 2bpp bitplane layout (commonly used)
+static const gfx_layout spritelayout_2bpp =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	2,
+	{ 16, 0 },
+	{ STEP16(15,-1) },
+	{ STEP16(0,16*2) },
+	16*16*2
+};
+*/
 
 static const gfx_layout spritelayout_4bpp =
 {
