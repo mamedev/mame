@@ -24,7 +24,6 @@
 */
 
 #include "emu.h"
-#include "includes/cps1.h"
 #include "includes/fcrash.h"
 
 #include "cpu/m68000/m68000.h"

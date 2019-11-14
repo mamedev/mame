@@ -9,6 +9,10 @@
 #ifndef MAME_INCLUDES_FCRASH_H
 #define MAME_INCLUDES_FCRASH_H
 
+#pragma once
+
+#include "includes/cps1.h"
+
 class fcrash_state : public cps_state
 {
 public:

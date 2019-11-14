@@ -9,6 +9,8 @@
 #ifndef MAME_INCLUDES_CPS1_H
 #define MAME_INCLUDES_CPS1_H
 
+#pragma once
+
 #include "sound/msm5205.h"
 #include "sound/qsound.h"
 #include "sound/okim6295.h"

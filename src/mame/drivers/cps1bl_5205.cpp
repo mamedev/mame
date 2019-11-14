@@ -23,7 +23,6 @@
 */
 
 #include "emu.h"
-#include "includes/cps1.h"
 #include "includes/fcrash.h"
 
 #include "cpu/z80/z80.h"
