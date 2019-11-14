@@ -416,7 +416,7 @@ void alphasmart_state::machine_reset()
 void alphasmart_state::alphasmart(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11D0(config, m_maincpu, XTAL(8'000'000)/2);  // XTAL is 8 Mhz, unknown divider
+	MC68HC11D0(config, m_maincpu, XTAL(8'000'000));  // XTAL is 8 Mhz
 	m_maincpu->set_addrmap(AS_PROGRAM, &alphasmart_state::alphasmart_mem);
 	m_maincpu->in_pa_callback().set(FUNC(alphasmart_state::port_a_r));
 	m_maincpu->out_pa_callback().set(FUNC(alphasmart_state::port_a_w));

@@ -1079,7 +1079,7 @@ void taitojc_state::taitojc(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(taitojc_state::taitojc_vblank));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &taitojc_state::cpu_space_map);
 
-	mc68hc11_cpu_device &sub(MC68HC11M0(config, "sub", XTAL(16'000'000)/2)); // 8MHz, MC68HC11M0
+	mc68hc11_cpu_device &sub(MC68HC11M0(config, "sub", XTAL(16'000'000))); // MC68HC11M0CFU4
 	sub.set_addrmap(AS_PROGRAM, &taitojc_state::hc11_pgm_map);
 	sub.in_pa_callback().set_constant(0); // ?
 	sub.in_pg_callback().set(FUNC(taitojc_state::hc11_comm_r));
