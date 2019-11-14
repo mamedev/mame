@@ -55,7 +55,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="spacewar.bin" size="0x200" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb" offset="0" />
+				<rom name="spacewar.bin" size="0x200" crc="021551f2" sha1="4878ae6d313743d7e3bd45e05c6e5e0582d9febb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -69,7 +69,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="fun-with-numbers.bin" size="0x200" crc="26ebe344" sha1="ede8731283d49666ddb63c1a52d6d270973d6dc8" offset="0" />
+				<rom name="fun-with-numbers.bin" size="0x200" crc="26ebe344" sha1="ede8731283d49666ddb63c1a52d6d270973d6dc8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -83,7 +83,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="tennis-squash.bin" size="0x200" crc="a21590c8" sha1="c573e8cd7d1aa423d26e64a4da781a5989e4ed1d" offset="0" />
+				<rom name="tennis-squash.bin" size="0x200" crc="a21590c8" sha1="c573e8cd7d1aa423d26e64a4da781a5989e4ed1d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -97,7 +97,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="baseball.bin" size="0x400" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a" offset="0" />
+				<rom name="baseball.bin" size="0x400" crc="d7fdedaa" sha1="fa1e3089d05503b7b1d5e98552318d5836c1798a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,7 +111,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="speedway tag.bin" size="0x200" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5" offset="0" />
+				<rom name="speedway tag.bin" size="0x200" crc="a80379e2" sha1="5bc93a1a7ea05411f607ed56241da88b1f8468c5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -125,7 +125,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458" offset="0" />
+				<rom name="gunfighter-moonship battle.bin" size="0x400" crc="989d2c67" sha1="82f37ec5b7599e9169873da6c269c0c092395458"/>
 			</dataarea>
 		</part>
 	</software>
@@ -139,7 +139,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x200">
-				<rom name="computer quiz.bin" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a" offset="0" />
+				<rom name="computer quiz.bin" size="0x200" crc="cf08aa66" sha1="1d709a7f6b0a3d67d184ae0d94b1cb198f9c8a6a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -153,7 +153,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="math fun.bin" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94" offset="0" />
+				<rom name="math fun.bin" size="0x400" crc="9ab5af96" sha1="12a013e483af253d75845adf0d9e86672b161f94"/>
 			</dataarea>
 		</part>
 	</software>
@@ -167,7 +167,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="blackjack.bin" size="0x400" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced" offset="0" />
+				<rom name="blackjack.bin" size="0x400" crc="b30af7a9" sha1="e328791d6aa8292d1b68abe03c7ebfefa9282ced"/>
 			</dataarea>
 		</part>
 	</software>
@@ -181,7 +181,20 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c" offset="0" />
+				<rom name="biorhythm.bin" size="0x400" crc="6dcbc525" sha1="9fdab1be5d83aa0ccacf7e9ae2837b2b9e10be1c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demo">
+		<description>RCA demo</description>
+		<year>1977</year>
+		<publisher>RCA</publisher>
+		<info name="usage" value="Press 'Clear'" />
+
+		<part name="cart" interface="studio2_cart">
+			<dataarea name="rom_400" size="0x400">
+				<rom name="demo.bin" size="0x400" crc="96f9a105" sha1="0375fd680ac7332f05acb35973b8d0756916b93d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -197,11 +210,11 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="86677b" size="0x400" crc="82a2d29e" sha1="37e02089d611db10bad070d89c8801de41521189" offset="0" />
+				<rom name="86677b" size="0x400" crc="82a2d29e" sha1="37e02089d611db10bad070d89c8801de41521189"/>
 			</dataarea>
 
 			<dataarea name="rom_c00" size="0x400">
-				<rom name="87201" size="0x400" crc="8006a1e3" sha1="b67612d98231485fce55d604915abd19b6d64eac" offset="0" />
+				<rom name="87201" size="0x400" crc="8006a1e3" sha1="b67612d98231485fce55d604915abd19b6d64eac"/>
 			</dataarea>
 		</part>
 	</software>
@@ -214,7 +227,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-201-bingo.rom" size="0x400" crc="39ddc4ab" sha1="5e16b9572fda5d8b203df9318b8f1e250bea7432" offset="0" />
+				<rom name="mg-201-bingo.rom" size="0x400" crc="39ddc4ab" sha1="5e16b9572fda5d8b203df9318b8f1e250bea7432"/>
 			</dataarea>
 		</part>
 	</software>
@@ -227,7 +240,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-202-concentration-match.rom" size="0x400" crc="28e21408" sha1="df2b2c7b5ec4c2d33321934ffff29cb41c2b6f68" offset="0" />
+				<rom name="mg-202-concentration-match.rom" size="0x400" crc="28e21408" sha1="df2b2c7b5ec4c2d33321934ffff29cb41c2b6f68"/>
 			</dataarea>
 		</part>
 	</software>
@@ -240,7 +253,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-203-star-wars.rom" size="0x400" crc="92b55eb4" sha1="63ec52fdf1a5e04ced74560809de550c527ecd38" offset="0" />
+				<rom name="mg-203-star-wars.rom" size="0x400" crc="92b55eb4" sha1="63ec52fdf1a5e04ced74560809de550c527ecd38"/>
 			</dataarea>
 		</part>
 	</software>
@@ -253,7 +266,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
-				<rom name="mg-205-pinball.rom" size="0x400" crc="9f7f692e" sha1="6afd1252d72df39482699c1ee76fa28669c7db80" offset="0" />
+				<rom name="mg-205-pinball.rom" size="0x400" crc="9f7f692e" sha1="6afd1252d72df39482699c1ee76fa28669c7db80"/>
 			</dataarea>
 		</part>
 	</software>
@@ -267,7 +280,7 @@ MG-213  Gun Fight/Moon Ship                             yes
 		<part name="cart" interface="studio2_cart">
 			<dataarea name="rom_400" size="0x400">
 				<!-- same as speedway, but on a 1KB ROM instead of 512B -->
-				<rom name="mg-211-speedway-tag.rom" size="0x400" crc="b9f6ac68" sha1="4e544fb4105a45e979dd7a007da1540996300f3d" offset="0" />
+				<rom name="mg-211-speedway-tag.rom" size="0x400" crc="b9f6ac68" sha1="4e544fb4105a45e979dd7a007da1540996300f3d"/>
 			</dataarea>
 		</part>
 	</software>

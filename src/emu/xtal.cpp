@@ -169,6 +169,7 @@ const double XTAL::known_xtals[] = {
 	 11'059'200, /* 11.0592_MHz_XTAL       Used with MCS-51 to generate common baud rates */
 	 11'200'000, /* 11.2_MHz_XTAL          New York, New York */
 	 11'289'000, /* 11.289_MHz_XTAL        Vanguard */
+	 11'289'600, /* 11.2896_MHz_XTAL       Frantic Fred */
 	 11'400'000, /* 11.4_MHz_XTAL          HP 9845 */
 	 11'668'800, /* 11.6688_MHz_XTAL       Gameplan pixel clock */
 	 11'800'000, /* 11.8_MHz_XTAL          IBM PC Music Feature Card */

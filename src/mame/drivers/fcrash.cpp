@@ -116,7 +116,7 @@ dinopic3: no sound. Some minor gfx priority issues, confirmed present on real bo
 */
 
 #include "emu.h"
-#include "includes/cps1.h"
+#include "includes/fcrash.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
@@ -1295,7 +1295,7 @@ void fcrash_state::fcrash_update_transmasks()
 	}
 }
 
-void fcrash_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void fcrash_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int pos;
 	int base = m_sprite_base / 2;
@@ -1340,7 +1340,7 @@ void fcrash_state::fcrash_render_layer( screen_device &screen, bitmap_ind16 &bit
 	switch (layer)
 	{
 		case 0:
-			(this->*m_bootleg_sprite_renderer)(screen, bitmap, cliprect);
+			bootleg_render_sprites(screen, bitmap, cliprect);
 			break;
 		case 1:
 		case 2:

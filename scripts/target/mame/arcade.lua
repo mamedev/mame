@@ -1482,6 +1482,7 @@ files {
 	MAME_DIR .. "src/mame/includes/exedexes.h",
 	MAME_DIR .. "src/mame/video/exedexes.cpp",
 	MAME_DIR .. "src/mame/drivers/fcrash.cpp",
+	MAME_DIR .. "src/mame/includes/fcrash.h",
 	MAME_DIR .. "src/mame/drivers/gng.cpp",
 	MAME_DIR .. "src/mame/includes/gng.h",
 	MAME_DIR .. "src/mame/video/gng.cpp",

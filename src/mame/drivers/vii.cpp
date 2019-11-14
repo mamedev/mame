@@ -313,6 +313,24 @@ public:
 
 	void mem_map_2m_texas(address_map &map);
 
+	DECLARE_INPUT_CHANGED_MEMBER(ok_latch)
+	{
+		if (newval == 1)
+		{
+			m_inputlatches[param] |= 0x02;
+			logerror("latching OK button for Player %d\n", param+1);
+		}
+	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(select_latch)
+	{
+		if (newval == 1)
+		{
+			m_inputlatches[param] |= 0x01;
+			logerror("latching Select button for Player %d\n", param+1);
+		}
+	}
+
 protected:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -339,6 +357,10 @@ private:
 	void set_options(uint8_t value, int select_bits);
 	void set_options_select(uint8_t value, int select_bits);
 	void set_controller_led(uint8_t value, int select_bits);
+
+	void controller_send_data(int which);
+
+	uint8_t m_inputlatches[6];
 
 	uint16_t m_porta_data;
 
@@ -514,8 +536,13 @@ public:
 	void tvgogo(machine_config &config);
 
 private:
+	uint8_t m_i2cunk;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+
+	DECLARE_WRITE8_MEMBER(tvg_i2c_w);
+	DECLARE_READ8_MEMBER(tvg_i2c_r);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load_tvgogo);
 
@@ -1768,13 +1795,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( tvgogo )
 	PORT_START("P1")
-	PORT_DIPNAME( 0x0001, 0x0001, "P1" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Back")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Select")
+	PORT_DIPNAME( 0x0004, 0x0004, "P1" )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
@@ -2024,7 +2047,8 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Low Battery" )  // NOT just a battery sensor, actually needs to be high (On) in order for it to attempt to read any controllers on startup, otherwise it will hang after the VS MAXX logo with no way forward.
+	// is this really just the battery sensor, or does it have some other meaning, like data ready?
+	PORT_DIPNAME( 0x8000, 0x0000, "Low Battery" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
@@ -2127,29 +2151,30 @@ static INPUT_PORTS_START( sentx6p )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	// these are presuambly read through the UART as the LCD screens are driven by it, currently not hooked up
+	// using PORT_CHANGED_MEMBER because we assume the controller latches them for sending as inputs are only read every few frames
 	PORT_START("CTRL1")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 0)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 0)
 
 	PORT_START("CTRL2")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 1)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 1)
 
 	PORT_START("CTRL3")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 2)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 2)
 
 	PORT_START("CTRL4")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 3)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 3)
 
 	PORT_START("CTRL5")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(5)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(5)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 4)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(5) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 4)
 
 	PORT_START("CTRL6")
-	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(6)
-	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(6)
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,select_latch, 5)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(6) PORT_CHANGED_MEMBER(DEVICE_SELF, sentx6p_state,ok_latch, 5)
 
 INPUT_PORTS_END
 
@@ -2565,6 +2590,23 @@ void icanpian_state::icanpian(machine_config &config)
 	SOFTWARE_LIST(config, "icanpian_cart").set_original("icanpian");
 }
 
+WRITE8_MEMBER(tvgogo_state::tvg_i2c_w)
+{
+	// unsure what is mapped here (Camera?) but it expects to be able to read back the same byte it writes before it boots.
+	// (offset certainly isn't eeprom address as the generic spg2xx_game_state::eeprom_r / eeprom_r code expects)
+	m_i2cunk = data;
+	logerror("%s: tvg_i2c_w %04x %02x\n", machine().describe_context(), offset, data);
+	m_serial_eeprom[offset & 0x3ff] = data;
+}
+
+READ8_MEMBER(tvgogo_state::tvg_i2c_r)
+{
+	uint8_t ret = m_i2cunk;
+	logerror("%s: tvg_i2c_r %04x %02x\n", machine().describe_context(), offset, ret);
+	return ret;
+}
+
+
 void tvgogo_state::tvgogo(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -2580,6 +2622,9 @@ void tvgogo_state::tvgogo(machine_config &config)
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(tvgogo_state::cart_load_tvgogo));
 	m_cart->set_must_be_loaded(true);
+
+	m_maincpu->eeprom_w().set(FUNC(tvgogo_state::tvg_i2c_w));
+	m_maincpu->eeprom_r().set(FUNC(tvgogo_state::tvg_i2c_r));
 
 	SOFTWARE_LIST(config, "tvgogo_cart").set_original("tvgogo");
 }
@@ -2929,6 +2974,32 @@ void sentx6p_state::machine_reset()
 		m_lcd_options[i] = 0x00;
 		m_lcd_options_select[i] = 0x00;
 		m_lcd_led[i] = 0x00;
+
+		m_inputlatches[i] = 0x00;
+	}
+
+	/* HACK: this address needs to contain '1' so that it thinks the first controller
+	   is present, otherwise it hangs on boot.  How does this get set?
+	   following addresses are for the other controllers, and get set based on Port B
+	   status flags */
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
+	mem.write_word(0x1e08,0x0001);
+}
+
+void sentx6p_state::controller_send_data(int which)
+{
+	// 0x78 have to be set, this is probably because there is an unused space in the commands
+	// going the other way at 0x78 - 0x7f
+	// bit 3 (0x04) can also be set, doesn't care
+
+	uint8_t send = m_inputlatches[which] | 0x78;
+
+	m_maincpu->uart_rx( send );
+
+	if (m_inputlatches[which] & 0x03)
+	{
+		m_inputlatches[which] = 0x00;
+		logerror("clearing input latches for player %d\n", which + 1);
 	}
 }
 
@@ -2950,12 +3021,39 @@ READ16_MEMBER(sentx6p_state::sentx_porta_r)
 
 	// the code around 029811 uses a ram value shifted left 8 times as the select bits (select_bits) on write
 	// then does a mask with them on the reads from this port, without shifting, comparing with 0
+
+	// the 'select bits' must also be active when the controller wants to send data, the UART read function
+	// won't proceed if they're zero, but the port is written with 0 before that
+
+	//logerror("%08x\n", m_maincpu->pc());
+
+	// regular logic for writing to the LCDs
 	uint16_t ret = (m_io_p1->read() & 0xffc0) | select_bits;
 
-	//if (select_bits == 0x00)
-	//  ret |= 0x8000;
-	//else
-	//  ret &= ~0x8000;
+	// hacks needed for reading from the UART to work
+
+	// the select bit must be high here to read from the controller?
+	if (m_maincpu->pc() == 0x2981e)
+	{
+		ret ^= 0x3f;
+	}
+
+	// but must be low again here after writing the select bits in order to not
+	// get stuck in a timeout loop
+	if (m_maincpu->pc() == 0x29834)
+	{
+		ret &= ~0x3f;
+
+		// presumably the inputs can only be sent once the controller is actually selected, otherwise
+		// there would be competing UART sources?
+		for (int i = 0; i < 6; i++)
+		{
+			if (select_bits & (1 << i))
+			{
+				controller_send_data(i);
+			}
+		}
+	}
 
 	return ret;
 }
@@ -3151,6 +3249,8 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 		set_card2(data & 0x3f, select_bits);
 		break;
 
+	// cases 0x78 - 0x7f are transmissions in the other direction (from controller to main unit, used for sending buttons)
+
 	case 0x80: case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87: case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f: // show selection options
 	case 0x90: case 0x91: case 0x92: case 0x93: case 0x94: case 0x95: case 0x96: case 0x97: case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 	case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7: case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
@@ -3171,11 +3271,11 @@ WRITE8_MEMBER(sentx6p_state::sentx_tx_w)
 		break;
 
 	case 0x3a:
-		// reset controller?
+		// reset controller? (the input code also seems to check for 3a in one place coming in the other direction)
 		break;
 
 	default:
-		printf("unknown LCD command %02x with controller select %02x\n", data, select_bits);
+		logerror("unknown LCD command %02x with controller select %02x\n", data, select_bits);
 		break;
 	}
 
@@ -3593,7 +3693,7 @@ CONS( 2006, pvmil,       0,     0,        pvmil,        pvmil,    pvmil_state, e
 // ROM is glued on the underside and soldered to the PCB, very difficult to remove without damaging.
 CONS( 2007, taikeegr,    0,     0,        taikeegr,     taikeegr, spg2xx_game_state, init_taikeegr, "TaiKee", "Rockstar Guitar / Guitar Rock (PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad music timings (too slow)
 
-// "go 02d1d0" "do r1 = ff" to get past initial screen
+// "go 02d1d0" "do r1 = ff" to get past initial screen (currently bypassed by setting controller sense in RAM earlier, see hack in machine_reset)
 // a 'deluxe' version of this also exists with extra game modes
-CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
+CONS( 2004, sentx6p,    0,     0,        sentx6p,     sentx6p, sentx6p_state, empty_init, "Senario / Play Vision", "Vs Maxx Texas Hold'em TV Poker - 6 Player Edition (UK)", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // from a UK Play Vision branded box, values in GBP
 

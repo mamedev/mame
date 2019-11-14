@@ -150,7 +150,7 @@ Pin #11(+) | | R               |
 #define MASTER_CLOCK            XTAL(40'000'000)
 #define SOUND_CLOCK             XTAL(2'000'000)
 
-#define VIDEO_CLOCK             XTAL(11'289'000)
+#define VIDEO_CLOCK             XTAL(11'289'600)
 #define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 

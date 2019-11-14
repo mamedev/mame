@@ -248,7 +248,7 @@ void namco_30test_state::machine_start()
 void namco_30test_state::_30test(machine_config &config)
 {
 	/* basic machine hardware */
-	MC68HC11K1(config, m_maincpu, MAIN_CLOCK/4);
+	MC68HC11K1(config, m_maincpu, MAIN_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &namco_30test_state::namco_30test_map);
 	m_maincpu->in_pa_callback().set(FUNC(namco_30test_state::namco_30test_mux_r));
 	//m_maincpu->in_pd_callback().set_ram();

@@ -24,7 +24,7 @@
 */
 
 #include "emu.h"
-#include "includes/cps1.h"
+#include "includes/fcrash.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
@@ -35,6 +35,57 @@
 
 #define CPS1_ROWSCROLL_OFFS  (0x20/2)    /* base of row scroll offsets in other RAM */
 #define CODE_SIZE            0x400000
+
+
+class cps1bl_pic_state : public fcrash_state
+{
+public:
+	cps1bl_pic_state(const machine_config &mconfig, device_type type, const char *tag)
+		: fcrash_state(mconfig, type, tag)
+	{ }
+	
+	void dinopic(machine_config &config);
+	void punipic(machine_config &config);
+	void slampic(machine_config &config);
+	void slampic2(machine_config &config);
+	
+	void init_dinopic();
+	void init_punipic();
+	void init_punipic3();
+	void init_slampic();
+	void init_slampic2();
+	
+private:
+	DECLARE_MACHINE_START(dinopic);
+	DECLARE_MACHINE_START(punipic);
+	DECLARE_MACHINE_START(slampic);
+	DECLARE_MACHINE_START(slampic2);
+	
+	DECLARE_WRITE16_MEMBER(dinopic_layer_w);
+	DECLARE_WRITE16_MEMBER(dinopic_layer2_w);
+	DECLARE_WRITE16_MEMBER(punipic_layer_w);
+	DECLARE_WRITE16_MEMBER(slampic_layer_w);
+	DECLARE_WRITE16_MEMBER(slampic_layer2_w);
+	DECLARE_READ16_MEMBER(slampic2_cps_a_r);
+	DECLARE_WRITE16_MEMBER(slampic2_sound_w);
+	DECLARE_WRITE16_MEMBER(slampic2_sound2_w);
+	
+	void dinopic_map(address_map &map);
+	void punipic_map(address_map &map);
+	void slampic_map(address_map &map);
+	void slampic2_map(address_map &map);
+};
+
+class slampic2_state : public cps1bl_pic_state
+{
+public:
+	slampic2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cps1bl_pic_state(mconfig, type, tag)
+	{ }
+	
+private:
+	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+};
 
 
 WRITE16_MEMBER(cps1bl_pic_state::dinopic_layer_w)
@@ -494,9 +545,6 @@ void cps1bl_pic_state::init_punipic3()
 
 void cps1bl_pic_state::init_slampic2()
 {
-	//m_bootleg_sprite_renderer = &cps1bl_pic_state::slampic2_render_sprites;
-	m_bootleg_sprite_renderer = static_cast<void (fcrash_state::*)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)>(&cps1bl_pic_state::slampic2_render_sprites);
-	
 	m_bootleg_sprite_ram = std::make_unique<uint16_t[]>(0x2000);
 	m_maincpu->space(AS_PROGRAM).install_ram(0x930000, 0x933fff, m_bootleg_sprite_ram.get());
 	m_maincpu->space(AS_PROGRAM).install_ram(0xff0000, 0xff3fff, m_bootleg_sprite_ram.get());
@@ -654,7 +702,7 @@ INPUT_PORTS_END
 		m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, CODE, COLOR, FLIPX, FLIPY, SX, SY, screen.priority(), 2, 15);							\
 }
 
-void cps1bl_pic_state::slampic2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void slampic2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int i, j = 0;
 	int last_sprite_offset = 0;
@@ -1281,4 +1329,4 @@ GAME( 1993,  punipic2,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init
 GAME( 1993,  punipic3,  punisher,  punipic,   punisher,  cps1bl_pic_state,  init_punipic3,  ROT0,  "bootleg",  "The Punisher (bootleg with PIC16c57, set 3)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930422 ETC
 
 GAME( 1993,  slampic,   slammast,  slampic,   slampic,   cps1bl_pic_state,  init_dinopic,   ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16c57, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
-GAME( 1993,  slampic2,  0,         slampic2,  slampic2,  cps1bl_pic_state,  init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
+GAME( 1993,  slampic2,  0,         slampic2,  slampic2,  slampic2_state,    init_slampic2,  ROT0,  "bootleg",  "Saturday Night Slam Masters (bootleg with PIC16c57, set 2)",  MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )  // 930713 ETC
