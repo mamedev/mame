@@ -23,7 +23,7 @@
 */
 
 #include "emu.h"
-#include "includes/cps1.h"
+#include "includes/fcrash.h"
 
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
@@ -34,6 +34,63 @@
 
 #define CPS1_ROWSCROLL_OFFS  (0x20/2)    /* base of row scroll offsets in other RAM */
 #define CODE_SIZE            0x400000
+
+
+class cps1bl_5205_state : public fcrash_state
+{
+public:
+	cps1bl_5205_state(const machine_config &mconfig, device_type type, const char *tag)
+		: fcrash_state(mconfig, type, tag)
+		, m_msm_mux(*this, "msm_mux%u", 1)
+	{ }
+	
+	void captcommb2(machine_config &config);
+	void sf2b(machine_config &config);
+	void sf2mdt(machine_config &config);
+	
+	void init_captcommb2();
+	void init_knightsb();
+	void init_sf2b();
+	void init_sf2mdt();
+	void init_sf2mdta();
+	void init_sf2mdtb();
+	
+private:
+	DECLARE_MACHINE_START(captcommb2);
+	DECLARE_MACHINE_RESET(captcommb2);
+	DECLARE_MACHINE_START(sf2mdt);
+	
+	DECLARE_WRITE16_MEMBER(captcommb2_layer_w);
+	DECLARE_WRITE16_MEMBER(captcommb2_soundlatch_w);
+	DECLARE_READ8_MEMBER(captcommb2_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(captcommb2_snd_bankswitch_w);
+	DECLARE_WRITE_LINE_MEMBER(captcommb2_mux_select_w);
+	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2b_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
+	DECLARE_WRITE16_MEMBER(sf2mdt_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	
+	void captcommb2_map(address_map &map);
+	void sf2b_map(address_map &map);
+	void sf2mdt_map(address_map &map);
+	void captcommb2_z80map(address_map &map);
+	
+	bool m_captcommb2_mux_toggle;
+	
+	optional_device_array<ls157_device, 2> m_msm_mux;
+};
+
+class captcommb2_state : public cps1bl_5205_state
+{
+public:
+	captcommb2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cps1bl_5205_state(mconfig, type, tag)
+	{ }
+	
+private:
+	void bootleg_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+};
 
 
 WRITE16_MEMBER(cps1bl_5205_state::captcommb2_layer_w)
@@ -510,9 +567,6 @@ MACHINE_START_MEMBER(cps1bl_5205_state, sf2mdt)
 
 void cps1bl_5205_state::init_captcommb2()
 {
-	//m_bootleg_sprite_renderer = &cps1bl_5205_state::captcommb2_render_sprites;
-	m_bootleg_sprite_renderer = static_cast<void (fcrash_state::*)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)>(&cps1bl_5205_state::captcommb2_render_sprites);
-	
 	// gfx data bits 2 and 4 swapped
 	uint8_t *gfx = memregion("gfx")->base();
 	for (int i = 0; i < 0x400000; i++)
@@ -531,8 +585,6 @@ void cps1bl_5205_state::init_captcommb2()
 
 void cps1bl_5205_state::init_knightsb()
 {
-	//m_bootleg_sprite_renderer = &cps1bl_5205_state::captcommb2_render_sprites;
-	m_bootleg_sprite_renderer = static_cast<void (fcrash_state::*)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)>(&cps1bl_5205_state::captcommb2_render_sprites);
 	m_maincpu->space(AS_PROGRAM).unmap_write(0x980000, 0x980023);
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x980000, 0x980025, write16_delegate(*this, FUNC(cps1bl_5205_state::knightsb_layer_w)));
 	m_msm_1->reset_routes().add_route(ALL_OUTPUTS, "mono", 0.5);
@@ -793,7 +845,7 @@ static INPUT_PORTS_START( sf2mdtb )
 INPUT_PORTS_END
 
 
-void cps1bl_5205_state::captcommb2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void captcommb2_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int pos;
 	int last_sprite_offset = 0;
@@ -1179,10 +1231,10 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1991,  captcommb2,  0,        captcommb2,  captcommb2,  cps1bl_5205_state,  init_captcommb2,  ROT0,  "bootleg",  "Captain Commando (bootleg with 2xMSM5205)",  MACHINE_SUPPORTS_SAVE )  // 911014 ETC
+GAME( 1991,  captcommb2,  0,        captcommb2,  captcommb2,  captcommb2_state,   init_captcommb2,  ROT0,  "bootleg",  "Captain Commando (bootleg with 2xMSM5205)",  MACHINE_SUPPORTS_SAVE )  // 911014 ETC
 
-GAME( 1991,  knightsb,    knights,  captcommb2,  knights,     cps1bl_5205_state,  init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
-GAME( 1991,  knightsb3,   0,        captcommb2,  knights,     cps1bl_5205_state,  init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
+GAME( 1991,  knightsb,    knights,  captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
+GAME( 1991,  knightsb3,   0,        captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
 
 GAME( 1992,  sf2b,        sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,  init_sf2b,        ROT0,  "bootleg (Playmark)",  "Street Fighter II: The World Warrior (bootleg, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 910204 ETC
 GAME( 1992,  sf2b2,       sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )              // 910204 ETC
