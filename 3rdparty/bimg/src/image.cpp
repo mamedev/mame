@@ -3339,8 +3339,7 @@ namespace bimg
 #define DDPF_INDEXED               0x00000020
 #define DDPF_RGB                   0x00000040
 #define DDPF_YUV                   0x00000200
-#define DDPF_LUMINANCE             0x00
-020000
+#define DDPF_LUMINANCE             0x00020000
 #define DDPF_BUMPDUDV              0x00080000
 
 #define DDSCAPS_COMPLEX            0x00000008
