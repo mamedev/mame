@@ -295,6 +295,9 @@ void elan_eu3a05commonsys_device::generate_custom_interrupt(int level)
 
 READ8_MEMBER(elan_eu3a05commonsys_device::nmi_vector_r)
 {
+	if(machine().side_effects_disabled())
+		return 0x00;
+
 	if (m_custom_nmi)
 	{
 		return m_custom_nmi_vector >> (offset*8);
@@ -308,6 +311,9 @@ READ8_MEMBER(elan_eu3a05commonsys_device::nmi_vector_r)
 // not currently used
 READ8_MEMBER(elan_eu3a05commonsys_device::irq_vector_r)
 {
+	if(machine().side_effects_disabled())
+		return 0x00;
+
 	if (m_custom_irq)
 	{
 		return m_custom_irq_vector >> (offset*8);
