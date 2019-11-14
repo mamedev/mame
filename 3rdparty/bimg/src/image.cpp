@@ -3228,6 +3228,7 @@ namespace bimg
 		}
 
 		return imageContainer;
+
 	}
 
 	void imageFree(ImageContainer* _imageContainer)
@@ -3338,7 +3339,8 @@ namespace bimg
 #define DDPF_INDEXED               0x00000020
 #define DDPF_RGB                   0x00000040
 #define DDPF_YUV                   0x00000200
-#define DDPF_LUMINANCE             0x00020000
+#define DDPF_LUMINANCE             0x00
+020000
 #define DDPF_BUMPDUDV              0x00080000
 
 #define DDSCAPS_COMPLEX            0x00000008
@@ -3419,6 +3421,7 @@ namespace bimg
 		{ DDS_A1R5G5B5,              TextureFormat::RGB5A1,   false },
 		{ DDS_A2B10G10R10,           TextureFormat::RGB10A2,  false },
 	};
+
 
 	static const TranslateDdsFormat s_translateDxgiFormat[] =
 	{
@@ -4308,11 +4311,6 @@ namespace bimg
 					{
 						decodeBlockDxt1(temp, src);
 						src += 8;
-		if (!BX_ENABLED(BIMG_DECODE_ETC2) )
-		{
-			return;
-		}
-
 
 						uint8_t* block = &dst[yy*_dstPitch*4 + xx*16];
 						bx::memCopy(&block[0*_dstPitch], &temp[ 0], 16);
