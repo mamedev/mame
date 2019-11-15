@@ -185,6 +185,8 @@ elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &m
 
 /*
 
+rad_bb3 plays with address 0x5009 in this way, but never sets it, something else must set it (and 1->0 is 'activate' or 'acknowledge')
+
 lda $5009
 and #$ef
 sta $5009
@@ -193,13 +195,17 @@ lda $5009
 and #$df
 sta $5009
 
+0x5006 looks interesting too, again just seems to be masking out bits
 
+(as one block of code)
 lda $5006
 and #$f0
 sta $5006
 lda $5006
 and $#8f
 sta $5006
+
+todo: investigate rad_hnt3 which polls this address
 
 */
 
@@ -314,15 +320,15 @@ void elan_eu3a05commonsys_device::generate_custom_interrupt(int level)
 
 READ8_MEMBER(elan_eu3a05commonsys_device::nmi_vector_r)
 {
-	if(machine().side_effects_disabled())
-		return 0x00;
-
 	if (m_custom_nmi)
 	{
 		return m_custom_nmi_vector >> (offset*8);
 	}
 	else
 	{
+		if(machine().side_effects_disabled())
+			return 0x00;
+
 		fatalerror("NMI without custom vector!");
 	}
 }
@@ -339,6 +345,9 @@ READ8_MEMBER(elan_eu3a05commonsys_device::irq_vector_r)
 	}
 	else
 	{
+		if(machine().side_effects_disabled())
+			return 0x00;
+
 		fatalerror("IRQ without custom vector!");
 	}
 }
