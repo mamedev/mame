@@ -91,6 +91,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_seconds_to_run(machine.options().seconds_to_run())
 	, m_auto_frameskip(machine.options().auto_frameskip())
 	, m_speed(original_speed_setting())
+	, m_instant_blit(machine.options().instant_blit())
 	, m_empty_skip_count(0)
 	, m_frameskip_level(machine.options().frameskip())
 	, m_frameskip_counter(0)
@@ -227,14 +228,18 @@ void video_manager::frame_update(bool from_debugger)
 	// draw the user interface
 	emulator_info::draw_user_interface(machine());
 
+	// if we're throttling, synchronize before rendering
+	attotime current_time = machine().time();
+	if (!from_debugger && !skipped_it && !m_instant_blit && effective_throttle())
+		update_throttle(current_time);
+
 	// ask the OSD to update
 	g_profiler.start(PROFILER_BLIT);
 	machine().osd().update(!from_debugger && skipped_it);
 	g_profiler.stop();
 
-	// if we're throttling, synchronize after rendering
-	attotime current_time = machine().time();
-	if (!from_debugger && !skipped_it && effective_throttle())
+	// we throttle after rendering instead of before, if instant blitting is enabled
+	if (!from_debugger && !skipped_it && m_instant_blit && effective_throttle())
 		update_throttle(current_time);
 
 	// get most recent input now

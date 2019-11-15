@@ -75,6 +75,7 @@
 #define OPTION_SLEEP                "sleep"
 #define OPTION_SPEED                "speed"
 #define OPTION_REFRESHSPEED         "refreshspeed"
+#define OPTION_INSTANT_BLIT         "instant_blit"
 
 // core render options
 #define OPTION_KEEPASPECT           "keepaspect"
@@ -352,6 +353,7 @@ public:
 	bool sleep() const { return m_sleep; }
 	float speed() const { return float_value(OPTION_SPEED); }
 	bool refresh_speed() const { return m_refresh_speed; }
+	bool instant_blit() const { return bool_value(OPTION_INSTANT_BLIT); }
 
 	// core render options
 	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
