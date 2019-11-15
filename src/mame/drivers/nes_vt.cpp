@@ -86,6 +86,10 @@ public:
 		m_ppu(*this, "ppu"),
 		m_apu(*this, "apu"),
 		m_csel(*this, "CARTSEL"),
+		m_exin0(*this, "EXTRAIN0"),
+		m_exin1(*this, "EXTRAIN1"),
+		m_exin2(*this, "EXTRAIN2"),
+		m_exin3(*this, "EXTRAIN3"),
 		m_prg(*this, "prg"),
 		m_ntram(nullptr),
 		m_chrram(nullptr),
@@ -108,8 +112,7 @@ public:
 	DECLARE_READ8_MEMBER(chr_r);
 
 	/* Misc PPU */
-	DECLARE_WRITE8_MEMBER(vt_dma_ntsc_w);
-	DECLARE_WRITE8_MEMBER(vt_dma_pal_w);
+	DECLARE_WRITE8_MEMBER(vt_dma_w);
 
 	// TODO: give these better register names so it's clearer what is remapped
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
@@ -153,6 +156,11 @@ protected:
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
 
 	optional_ioport m_csel;
+	optional_ioport m_exin0;
+	optional_ioport m_exin1;
+	optional_ioport m_exin2;
+	optional_ioport m_exin3;
+
 	required_device<address_map_bank_device> m_prg;
 
 	void nes_vt_xx_map(address_map& map);
@@ -164,6 +172,10 @@ private:
 
 	/* Extra IO */
 	DECLARE_WRITE8_MEMBER(extra_io_control_w);
+	DECLARE_READ8_MEMBER(extrain_01_r);
+	DECLARE_READ8_MEMBER(extrain_23_r);	
+	DECLARE_WRITE8_MEMBER(extraout_01_w);
+	DECLARE_WRITE8_MEMBER(extraout_23_w);	
 
 	/* Misc */
 	DECLARE_READ8_MEMBER(rs232flags_region_r);
@@ -208,7 +220,7 @@ private:
 	required_region_ptr<uint8_t> m_prgrom;
 
 	uint16_t decode_nt_addr(uint16_t addr);
-	void do_dma(uint8_t data, bool broken);
+	void do_dma(uint8_t data, bool has_ntsc_bug);
 };
 
 class nes_vt_pjoy_state : public nes_vt_state
@@ -343,13 +355,16 @@ public:
 	nes_vt_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_vt_state(mconfig, type, tag),
 		m_ablpinb_in0_val(0),
-		m_ablpinb_in0_state(0),
-		m_ablpinb_in1_state(0),
 		m_io0(*this,"IO0"),
-		m_io1(*this,"IO1")
+		m_io1(*this,"IO1"),
+		m_plunger(*this,"PLUNGER")
 	{ }
 
 	void nes_vt_ablpinb(machine_config& config);
+
+protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
 
 private:
 	DECLARE_READ8_MEMBER(ablpinb_in0_r);
@@ -359,11 +374,13 @@ private:
 
 	void nes_vt_ablpinb_map(address_map& map);
 	uint8_t m_ablpinb_in0_val;
-	uint8_t m_ablpinb_in0_state;
-	uint8_t m_ablpinb_in1_state;
+
+	int m_plunger_off;
+	int m_plunger_state_count;
+
 	required_ioport m_io0;
 	required_ioport m_io1;
-
+	required_ioport m_plunger;
 };
 
 
@@ -448,6 +465,7 @@ READ8_MEMBER(nes_vt_state::vt03_410x_r)
 }
 
 // ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
+// (this is the extended IO port on VT)
 READ8_MEMBER(nes_vt_ablping_state::ablping_410f_r)
 {
 	// needs to change at least
@@ -1237,19 +1255,17 @@ WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
 	m_apu->write(0x17, data);
 }
 
-WRITE8_MEMBER(nes_vt_state::vt_dma_ntsc_w)
+WRITE8_MEMBER(nes_vt_state::vt_dma_w)
 {
-	// NTSC Palette DMA has a 'bug' where the addresses get shifted
 	do_dma(data, true);
 }
 
-WRITE8_MEMBER(nes_vt_state::vt_dma_pal_w)
+void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 {
-	do_dma(data, false);
-}
+	// only NTSC systems have 'broken' DMA which requires the DMA addresses to be shifted by 1, PAL systems work as expected
+	if (m_ppu->get_is_pal())
+		has_ntsc_bug = false;
 
-void nes_vt_state::do_dma(uint8_t data, bool broken)
-{
 	uint8_t dma_mode = m_vdma_ctrl & 0x01;
 	uint8_t dma_len  = (m_vdma_ctrl >> 1) & 0x07;
 	uint8_t src_nib_74 =  (m_vdma_ctrl >> 4) & 0x0F;
@@ -1266,7 +1282,7 @@ void nes_vt_state::do_dma(uint8_t data, bool broken)
 	if(dma_mode == 1) {
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
-	if(broken && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00)
+	if(has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00)
 		&& !(m_ppu->get_201x_reg(0x1) & 0x80)) {
 		length -= 1;
 		src_addr += 1;
@@ -1301,7 +1317,7 @@ WRITE8_MEMBER(nes_vt_state::vt03_4034_w)
 WRITE8_MEMBER(nes_vt_state::extra_io_control_w)
 {
 	/*
-	410D Extra I/O control
+	410d Extra I/O control
 
 	0x01 Extra I/O port 0 mode (1 = output, 0 = input)
 	0x02 Extra I/O port 0 enable (1 = enable, 0 = disable)
@@ -1316,7 +1332,41 @@ WRITE8_MEMBER(nes_vt_state::extra_io_control_w)
 	logerror("%s: extra_io_control_w %02x\n", data);
 }
 
+READ8_MEMBER(nes_vt_state::extrain_01_r)
+{
+	// TODO: check status of 410d port to make sure we only read from enabled ports
+	uint8_t in0 = 0x00, in1 = 0x00;
+	if (m_exin0)
+		in0 = m_exin0->read() & 0x0f;
+	if (m_exin1)
+		in1 = m_exin1->read() & 0x0f;
 
+	return in0 | (in1<<4);
+}
+
+READ8_MEMBER(nes_vt_state::extrain_23_r)
+{
+	// TODO: check status of 410d port to make sure we only read from enabled ports
+	uint8_t in2 = 0x00, in3 = 0x00;
+	if (m_exin2)
+		in2 = m_exin2->read() & 0x0f;
+	if (m_exin3)
+		in3 = m_exin3->read() & 0x0f;
+
+	return in2 | (in3<<4);
+}
+
+WRITE8_MEMBER(nes_vt_state::extraout_01_w)
+{
+	// TODO: use callbacks for this as output can be hooked up to anything
+	logerror("%s: extraout_01_w %02x\n", data);
+}
+
+WRITE8_MEMBER(nes_vt_state::extraout_23_w)
+{
+	// TODO: use callbacks for this as output can be hooked up to anything
+	logerror("%s: extraout_23_w %02x\n", data);
+}
 
 READ8_MEMBER(nes_vt_state::rs232flags_region_r)
 {
@@ -1343,70 +1393,73 @@ READ8_MEMBER(nes_vt_state::rs232flags_region_r)
 	return ret;
 }
 
-
-
-// write 0x04 to 0x4016 sets bit 0x08 in 0x4017
-// write 0x00 to 0x4016 clears bit 0x08 in 0x4017
-
-READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_410f_r)
+void nes_vt_ablpinb_state::machine_start()
 {
-	// this is the extended I/O of VT03, and used for tilt input
-	return 0x00;// machine().rand();
+	nes_vt_state::machine_start();
+
+	save_item(NAME(m_plunger_off));
+	save_item(NAME(m_plunger_state_count));
+	save_item(NAME(m_ablpinb_in0_val));
+
 }
 
-// TODO: figure out how the inputs are meant to map on this.  It should have an analog plunger and tilt mechanism
+void nes_vt_ablpinb_state::machine_reset()
+{
+	nes_vt_state::machine_reset();
+
+	m_plunger_off = 0;
+	m_plunger_state_count = 0;
+	m_ablpinb_in0_val = 0;
+}
+
+
 READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_r)
 {
-	// bit 0x01 is plunger, the bit must toggle, but the time between toggling appears to determine the plunger position and thus power
-
-	//if (!(m_ablpinb_in0_val & 0x04))
+	if (m_plunger_off)
 	{
-		uint8_t i = (m_ablpinb_in0_state & 0x08)?0:1; // machine().rand() & 0x01;
+		m_plunger_state_count++;
 
-		m_ablpinb_in0_state++;
-
-		uint8_t ret = m_io0->read() & ~0x01;
-
-		return i | ret;
+		if (m_plunger_state_count == 5) // make sure it's high for enough reads to keep the code flowing
+		{
+			m_plunger_off = 0;
+			m_plunger_state_count = 0;
+		}
 	}
-	//else
-	//{
-	//	return 0x00;
-	//}
+	else
+	{
+		m_plunger_state_count++;
+
+		if ((m_plunger_state_count >= m_plunger->read()) || (m_plunger_state_count >= 0x80)) // if it stays low for too many frames the gfx corrupt, 
+		{
+			m_plunger_off = 1;
+			m_plunger_state_count = 0;
+		}
+	}
+
+	uint8_t ret = m_io0->read() & ~0x01;
+
+	return m_plunger_off | ret;
 }
+
 
 READ8_MEMBER(nes_vt_ablpinb_state::ablpinb_in1_r)
 {
-	//if (!(m_ablpinb_in0_val & 0x04))
-	{
-		uint8_t i = machine().rand() & 0x10;
+	uint8_t i = machine().rand() & 0x10;
 
-		i |= (m_ablpinb_in0_val & 0x04) ? 0x00 : 0x08;
+	// maybe this transition takes some time in reality?
+	i |= (m_ablpinb_in0_val & 0x04) ? 0x00 : 0x08;
 
-		/*
-		switch (m_ablpinb_in1_state & 0x3)
-		{
-		case 0x0:i = 0x00; break;
-		case 0x1:i = 0x08; break;
-		case 0x2:i = 0x10; break;
-		case 0x3:i = 0x18; break;
-		}
-		*/
+	uint8_t ret = m_io1->read() & ~0x18;
 
-		uint8_t ret = m_io1->read() & ~0x18;
-
-		m_ablpinb_in1_state++;
-
-		return i | ret;
-	}
-	//else
-	//{
-	//	return 0x00;
-	//}
+	return i | ret;
 }
 
 WRITE8_MEMBER(nes_vt_ablpinb_state::ablpinb_in0_w)
 {
+	// write 0x04 to 0x4016 sets bit 0x08 in 0x4017
+	// write 0x00 to 0x4016 clears bit 0x08 in 0x4017
+	// could be related to vibration motor?
+
 	m_ablpinb_in0_val = data;
 	logerror("ablpinb_in0_w %02x\n", data);
 }
@@ -1418,7 +1471,7 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x2000, 0x3fff).mask(0x001f).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));        /* PPU registers */
 
 	map(0x4000, 0x4013).rw(m_apu, FUNC(nesapu_device::read), FUNC(nesapu_device::write));
-	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_ntsc_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_state::psg1_4014_r)).w(FUNC(nes_vt_state::vt_dma_w));
 	map(0x4015, 0x4015).rw(FUNC(nes_vt_state::psg1_4015_r), FUNC(nes_vt_state::psg1_4015_w)); /* PSG status / first control register */
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_state::nes_in0_r), FUNC(nes_vt_state::nes_in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_state::nes_in1_r)).w(FUNC(nes_vt_state::psg1_4017_w));
@@ -1426,10 +1479,18 @@ void nes_vt_state::nes_vt_map(address_map &map)
 	map(0x4034, 0x4034).w(FUNC(nes_vt_state::vt03_4034_w));
 
 	map(0x4100, 0x410b).r(FUNC(nes_vt_state::vt03_410x_r)).w(FUNC(nes_vt_state::vt03_410x_w));
-
+	// 0x410c unused
 	map(0x410d, 0x410d).w(FUNC(nes_vt_state::extra_io_control_w));
-
+	map(0x410e, 0x410e).r(FUNC(nes_vt_state::extrain_01_r));
+	map(0x410f, 0x410f).r(FUNC(nes_vt_state::extrain_23_r));	
+	// 0x4114 RS232 timer (low)
+	// 0x4115 RS232 timer (high)
+	// 0x4116 unused
+	// 0x4117 unused
+	// 0x4118 unused
 	map(0x4119, 0x4119).r(FUNC(nes_vt_state::rs232flags_region_r));	
+	// 0x411a RS232 TX data
+	// 0x411b RS232 RX data
 
 	map(0x8000, 0xffff).m(m_prg, FUNC(address_map_bank_device::amap8));
 	map(0x8000, 0xffff).w(FUNC(nes_vt_state::vt03_8000_w));
@@ -1440,14 +1501,9 @@ void nes_vt_ablpinb_state::nes_vt_ablpinb_map(address_map& map)
 {
 	nes_vt_map(map);
 
-	map(0x4014, 0x4014).w(FUNC(nes_vt_state::vt_dma_pal_w));
-
 	// override the inputs as specific non-standard 'controller' behavior is needed here and adding it to the generic NES controller bus wouldn't make sense.
 	map(0x4016, 0x4016).rw(FUNC(nes_vt_ablpinb_state::ablpinb_in0_r), FUNC(nes_vt_ablpinb_state::ablpinb_in0_w));
 	map(0x4017, 0x4017).r(FUNC(nes_vt_ablpinb_state::ablpinb_in1_r));
-
-	// 410f reads / writes
-	map(0x410f, 0x410f).r(FUNC(nes_vt_ablpinb_state::ablpinb_410f_r));
 }
 
 /* Some later VT models have more RAM */
@@ -1497,7 +1553,7 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 	map(0x8000, 0xffff).w(FUNC(nes_vt_hh_state::vt03_8000_w));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_hh_state::vt03_4034_w));
-	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_dma_pal_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_dma_w));
 
 	map(0x414A, 0x414A).r(FUNC(nes_vt_hh_state::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(nes_vt_hh_state::vtfp_411d_w));
@@ -1541,7 +1597,7 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 	map(0x8000, 0xffff).w(FUNC(nes_vt_dg_state::vt03_8000_w));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_dg_state::vt03_4034_w));
-	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_dma_ntsc_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_dma_w));
 	map(0x6000, 0x7fff).ram();
 }
 
@@ -1801,42 +1857,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ablpinb )
 	PORT_START("IO0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // has to toggle or code gets stuck in interrupt
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // (analog plunger) has to toggle or code gets stuck in interrupt and dies due to nested interrupts
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Select" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED ) // not stored
 
 	PORT_START("IO1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Right Flipper" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // has to toggle or code gets stuck on startup (maybe should cycle automatically when different inputs are available?)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ^
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // has to toggle once on the ABL logo or gets stuck in loop, checked in multiple places tho
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED ) // not stored
+
+	PORT_START("PLUNGER")
+	PORT_BIT(0x00ff, 0x0000, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0xbf) PORT_NAME("Plunger")  PORT_CENTERDELTA(255)
+
+	PORT_START("EXTRAIN3")
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("NUDGE" )
 INPUT_PORTS_END
 
 
@@ -2170,7 +2208,7 @@ CONS( 200?, vtsndtest, 0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "VRT
 CONS( 200?, vtboxing,     0,  0,  nes_vt, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
 
 // clearly started off as 'vtpinball'  050329 (29th March 2005) date on PCB
-CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_NOT_WORKING )
+CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
 // should be VT03 based
