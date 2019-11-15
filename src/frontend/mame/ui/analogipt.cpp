@@ -82,7 +82,7 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 		ui().draw_text_full(
 				container(),
 				data.field.get().name(),
-				nameleft, liney, namewidth, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
+				nameleft, liney, namewidth, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
 				mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color());
 
 		ioport_value cur(0U);
