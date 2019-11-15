@@ -17,6 +17,7 @@
 
 
 namespace ui {
+
 class menu_input_groups : public menu
 {
 public:
@@ -144,34 +145,6 @@ public:
 	virtual ~menu_settings_driver_config();
 };
 
-class menu_analog : public menu
-{
-public:
-	menu_analog(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_analog() override;
-
-private:
-	enum {
-		ANALOG_ITEM_KEYSPEED = 0,
-		ANALOG_ITEM_CENTERSPEED,
-		ANALOG_ITEM_REVERSE,
-		ANALOG_ITEM_SENSITIVITY,
-		ANALOG_ITEM_COUNT
-	};
-
-	/* internal analog menu item data */
-	struct analog_item_data {
-		ioport_field *field;
-		int                 type;
-		int                 min, max;
-		int                 cur;
-		int                 defvalue;
-	};
-
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-};
-
 } // namespace ui
 
-#endif  /* MAME_FRONTEND_UI_INPUTMAP_H */
+#endif // MAME_FRONTEND_UI_INPUTMAP_H

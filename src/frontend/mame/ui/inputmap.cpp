@@ -9,16 +9,16 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "ui/inputmap.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
-#include "ui/menu.h"
-#include "ui/inputmap.h"
 
 #include <algorithm>
 
 
 namespace ui {
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -738,198 +738,6 @@ void menu_settings_dip_switches::custom_render_one(float x1, float y1, float x2,
 		/* advance to the next switch */
 		x1 += switch_field_width;
 	}
-}
-
-
-/*-------------------------------------------------
-    menu_analog - handle the analog settings menu
--------------------------------------------------*/
-
-void menu_analog::handle()
-{
-	/* process the menu */
-	const event *menu_event = process(PROCESS_LR_REPEAT);
-
-	/* handle events */
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
-	{
-		analog_item_data *data = (analog_item_data *)menu_event->itemref;
-		int newval = data->cur;
-
-		switch (menu_event->iptkey)
-		{
-			/* if selected, reset to default value */
-			case IPT_UI_SELECT:
-				newval = data->defvalue;
-				break;
-
-			/* left decrements */
-			case IPT_UI_LEFT:
-				newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
-
-			/* right increments */
-			case IPT_UI_RIGHT:
-				newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
-		}
-
-		/* clamp to range */
-		if (newval < data->min)
-			newval = data->min;
-		if (newval > data->max)
-			newval = data->max;
-
-		/* if things changed, update */
-		if (newval != data->cur)
-		{
-			ioport_field::user_settings settings;
-
-			/* get the settings and set the new value */
-			data->field->get_user_settings(settings);
-			switch (data->type)
-			{
-				case ANALOG_ITEM_KEYSPEED:      settings.delta = newval;        break;
-				case ANALOG_ITEM_CENTERSPEED:   settings.centerdelta = newval;  break;
-				case ANALOG_ITEM_REVERSE:       settings.reverse = newval;      break;
-				case ANALOG_ITEM_SENSITIVITY:   settings.sensitivity = newval;  break;
-			}
-			data->field->set_user_settings(settings);
-
-			/* rebuild the menu */
-			reset(reset_options::REMEMBER_POSITION);
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    menu_analog_populate - populate the analog
-    settings menu
--------------------------------------------------*/
-
-menu_analog::menu_analog(mame_ui_manager &mui, render_container &container) : menu(mui, container)
-{
-}
-
-void menu_analog::populate(float &customtop, float &custombottom)
-{
-	std::string prev_owner;
-	bool first_entry = true;
-
-	/* loop over input ports and add the items */
-	for (auto &port : machine().ioport().ports())
-		for (ioport_field &field : port.second->fields())
-			if (field.is_analog() && field.enabled())
-			{
-				ioport_field::user_settings settings;
-				int use_autocenter = false;
-				int type;
-
-				/* based on the type, determine if we enable autocenter */
-				switch (field.type())
-				{
-					case IPT_POSITIONAL:
-					case IPT_POSITIONAL_V:
-						if (field.analog_wraps())
-							break;
-
-					case IPT_AD_STICK_X:
-					case IPT_AD_STICK_Y:
-					case IPT_AD_STICK_Z:
-					case IPT_PADDLE:
-					case IPT_PADDLE_V:
-					case IPT_PEDAL:
-					case IPT_PEDAL2:
-					case IPT_PEDAL3:
-						use_autocenter = true;
-						break;
-
-					default:
-						break;
-				}
-
-				/* get the user settings */
-				field.get_user_settings(settings);
-
-				/* iterate over types */
-				for (type = 0; type < ANALOG_ITEM_COUNT; type++)
-					if (type != ANALOG_ITEM_CENTERSPEED || use_autocenter)
-					{
-						analog_item_data *data;
-						uint32_t flags = 0;
-						std::string text;
-						std::string subtext;
-						if (strcmp(field.device().tag(), prev_owner.c_str()) != 0)
-						{
-							if (first_entry)
-								first_entry = false;
-							else
-								item_append(menu_item_type::SEPARATOR);
-							item_append(string_format("[root%s]", field.device().tag()), "", 0, nullptr);
-							prev_owner.assign(field.device().tag());
-						}
-
-						/* allocate a data item for tracking what this menu item refers to */
-						data = (analog_item_data *)m_pool_alloc(sizeof(*data));
-						data->field = &field;
-						data->type = type;
-
-						/* determine the properties of this item */
-						switch (type)
-						{
-							default:
-							case ANALOG_ITEM_KEYSPEED:
-								text = string_format("%s Digital Speed", field.name());
-								subtext = string_format("%d", settings.delta);
-								data->min = 0;
-								data->max = 255;
-								data->cur = settings.delta;
-								data->defvalue = field.delta();
-								break;
-
-							case ANALOG_ITEM_CENTERSPEED:
-								text = string_format("%s Autocenter Speed", field.name());
-								subtext = string_format("%d", settings.centerdelta);
-								data->min = 0;
-								data->max = 255;
-								data->cur = settings.centerdelta;
-								data->defvalue = field.centerdelta();
-								break;
-
-							case ANALOG_ITEM_REVERSE:
-								text = string_format("%s Reverse", field.name());
-								subtext.assign(settings.reverse ? "On" : "Off");
-								data->min = 0;
-								data->max = 1;
-								data->cur = settings.reverse;
-								data->defvalue = field.analog_reverse();
-								break;
-
-							case ANALOG_ITEM_SENSITIVITY:
-								text = string_format("%s Sensitivity", field.name());
-								subtext = string_format("%d", settings.sensitivity);
-								data->min = 1;
-								data->max = 255;
-								data->cur = settings.sensitivity;
-								data->defvalue = field.sensitivity();
-								break;
-						}
-
-						/* put on arrows */
-						if (data->cur > data->min)
-							flags |= FLAG_LEFT_ARROW;
-						if (data->cur < data->max)
-							flags |= FLAG_RIGHT_ARROW;
-
-						/* append a menu item */
-						item_append(std::move(text), std::move(subtext), flags, data);
-					}
-			}
-}
-
-menu_analog::~menu_analog()
-{
 }
 
 } // namespace ui

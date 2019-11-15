@@ -11,6 +11,7 @@
 #include "emu.h"
 #include "ui/mainmenu.h"
 
+#include "ui/analogipt.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/datmenu.h"
