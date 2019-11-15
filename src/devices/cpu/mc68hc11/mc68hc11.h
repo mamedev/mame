@@ -345,6 +345,7 @@ private:
 	void hc11_eorb_ext();
 	void hc11_eorb_indx();
 	void hc11_eorb_indy();
+	void hc11_fdiv();
 	void hc11_idiv();
 	void hc11_inca();
 	void hc11_incb();
