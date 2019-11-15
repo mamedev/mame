@@ -360,6 +360,12 @@ WRITE8_MEMBER(kbdc8042_device::data_w)
 
 			switch (m_data)
 			{
+				case 0xff:
+					logerror("Mouse reset command received\n");
+					m_mouse.sample_rate = 100;
+					m_mouse.received = 1;
+					m_data = 0xfa;
+					break;
 				case 0xf6:
 					m_mouse.received = 1;
 					m_data = 0xfa;
