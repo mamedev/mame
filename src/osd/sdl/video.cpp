@@ -118,11 +118,11 @@ void sdl_osd_interface::update(bool skip_redraw)
 //  input_update
 //============================================================
 
-void sdl_osd_interface::input_update(void)
+void sdl_osd_interface::input_update()
 {
 	// poll the joystick values here
-	downcast<sdl_osd_interface&>(machine().osd()).process_events_buf();
-	downcast<sdl_osd_interface&>(machine().osd()).poll_inputs(machine());
+	process_events_buf();
+	poll_inputs(machine());
 	check_osd_inputs(machine());
 }
 
