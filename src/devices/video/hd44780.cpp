@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "video/hd44780.h"
 
-//#define VERBOSE 1
+#define VERBOSE 1
 #include "logmacro.h"
 
 
@@ -475,7 +475,6 @@ void hd44780_device::control_write(u8 data)
 			return;
 		}
 
-		m_first_cmd = false;
 		m_char_size = BIT(m_ir, 2) ? 10 : 8;
 		m_data_len  = BIT(m_ir, 4) ? 8 : 4;
 		m_num_line  = BIT(m_ir, 3) + 1;
@@ -483,12 +482,6 @@ void hd44780_device::control_write(u8 data)
 		set_busy_flag(37);
 
 		LOG("HD44780: char size 5x%d, data len %d, lines %d\n", m_char_size, m_data_len, m_num_line);
-		return;
-	}
-	else if (m_first_cmd)
-	{
-		// Some machines do a "clear display" first, even though the datasheet insists "function set" must come before all else
-		LOG("HD44780: command %x ignored (function not set yet)\n", m_ir);
 		return;
 	}
 	else if (BIT(m_ir, 4))
@@ -546,7 +539,12 @@ void hd44780_device::control_write(u8 data)
 		m_disp_shift = 0;
 		memset(m_ddram, 0x20, sizeof(m_ddram));
 		set_busy_flag(1520);
+
+		// Some machines do a "clear display" first, even though the datasheet insists "function set" must come before all else
+		return;
 	}
+
+	m_first_cmd = false;
 }
 
 u8 hd44780_device::control_read()
