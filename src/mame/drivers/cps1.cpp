@@ -10714,6 +10714,8 @@ ROM_END
     MSTREET-6 repair info:
     Frequent cause of dead board is u104 (gal/palce20v8) becoming corrupted somehow. Luckily a working unsecured chip was found and dumped :)
     Likely to also work on other similar boards (reference number may vary).
+	
+	B/C sets patch pals have different equations but are logically equivalent.
 */
 
 #define SF2CEMS6_PLD_DEVICES \
@@ -10726,9 +10728,8 @@ ROM_END
 	ROM_LOAD( "ms6_pal16l8.u198",  0x000, 0x104, NO_DUMP ) \
 	ROM_LOAD( "ms6_pal16l8.u218",  0x000, 0x104, NO_DUMP ) \
 	ROM_LOAD( "ms6_pal16l8.u231",  0x000, 0x104, NO_DUMP ) \
-	/* 9x PALCE16V8H-25PC/4 */ \
+	/* 8x PALCE16V8H-25PC/4 */ \
 	ROM_LOAD( "ms6_gal16v8.u6",    0x000, 0x117, NO_DUMP ) \
-	ROM_LOAD( "ms6_gal16v8.u44",   0x000, 0x117, NO_DUMP )  /* patch mapper  (sf2cems6b + sf2cems6c, not present on sf2cems6a) */ \
 	ROM_LOAD( "ms6_gal16v8.u95",   0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u96",   0x000, 0x117, NO_DUMP ) \
 	ROM_LOAD( "ms6_gal16v8.u107",  0x000, 0x117, NO_DUMP ) \
@@ -10796,10 +10797,10 @@ ROM_END
 
 ROM_START( sf2cems6b )  /* 920322 USA */
 	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
-	ROM_LOAD16_WORD_SWAP( "ms6b.u0", 0x00000, 0x40000, CRC(b6f3724b) SHA1(aa8eea819fdaf205ca068067a4624715a8cf6c8c) )
+	ROM_LOAD16_WORD_SWAP( "ms6b.u0", 0x00000, 0x40000, CRC(b6f3724b) SHA1(aa8eea819fdaf205ca068067a4624715a8cf6c8c) )  // 27c220
 
-	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld gal16v8 */
-	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
+	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld, palce16v8, protected but bruteforced ok */
+	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(5f05a861) SHA1(26b8cab0e66b596ef54768b2811c1c1939d3135c) )
 
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
@@ -10843,10 +10844,10 @@ ROM_END
 
 ROM_START( sf2cems6c )  /* 920322 USA */
 	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
-	ROM_LOAD16_WORD_SWAP( "ms6c.u0", 0x00000, 0x40000, CRC(04088b61) SHA1(03c361a0c9c70c21ef53351d5f975b06f51ce2e0) )
+	ROM_LOAD16_WORD_SWAP( "ms6c.u0", 0x00000, 0x40000, CRC(04088b61) SHA1(03c361a0c9c70c21ef53351d5f975b06f51ce2e0) )  // 27c2048 OTP
 
-	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld palce16v8, protected, using gal dump from sf2cems6b */
-	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
+	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld, gal16v8, unprotected */
+	ROM_LOAD( "ms6c.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
 
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
