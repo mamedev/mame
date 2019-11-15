@@ -58,6 +58,16 @@ READ8_MEMBER(ppu_vt03_device::palette_read)
 	}
 }
 
+void ppu_vt03_device::set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
+{
+	m_2012_2017_descramble[0] = reg0; // TOOD: name regs
+	m_2012_2017_descramble[1] = reg1;
+	m_2012_2017_descramble[2] = reg2;
+	m_2012_2017_descramble[3] = reg3;
+	m_2012_2017_descramble[4] = reg4;
+	m_2012_2017_descramble[5] = reg5;
+}
+
 void ppu_vt03_device::set_new_pen(int i)
 {
 	if((i < 0x20) && ((i & 0x3) == 0)) {

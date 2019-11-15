@@ -32,7 +32,7 @@ public:
 	auto read_sp() { return m_read_sp.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
-	void set_201x_descramble(const uint8_t descramble[6]) { for (int i = 0; i < 6; i++) m_2012_2017_descramble[i] = descramble[i]; }
+	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
 
 	virtual DECLARE_READ8_MEMBER(read) override;
 	virtual DECLARE_WRITE8_MEMBER(write) override;

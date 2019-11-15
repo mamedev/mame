@@ -111,7 +111,14 @@ public:
 	DECLARE_WRITE8_MEMBER(vt_dma_ntsc_w);
 	DECLARE_WRITE8_MEMBER(vt_dma_pal_w);
 
+	// TODO: give these better register names so it's clearer what is remapped
+	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
+
 protected:
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
 	void nes_vt_map(address_map& map);
 
 	required_device<screen_device> m_screen;
@@ -136,8 +143,11 @@ protected:
 	uint8_t m_411d;
 	uint8_t m_413x[8]; // CY only?
 
-	void scrambled_410x_w(uint16_t offset, uint8_t data, const uint8_t* scrambled_410x_w);
-	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data, const uint8_t* scramble_table);
+	uint8_t m_8000_scramble[8];
+	uint8_t m_410x_scramble[2];
+		
+	void scrambled_410x_w(uint16_t offset, uint8_t data);
+	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data);
 
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
@@ -190,8 +200,6 @@ private:
 
 	int calculate_real_video_address(int addr, int extended, int readtype);
 
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 
 	required_memory_bank m_prgbank0;
 	required_memory_bank m_prgbank1;
@@ -203,6 +211,17 @@ private:
 	void do_dma(uint8_t data, bool broken);
 };
 
+class nes_vt_pjoy_state : public nes_vt_state
+{
+public:
+	nes_vt_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+};
+
 class nes_vt_hum_state : public nes_vt_state
 {
 public:
@@ -210,13 +229,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_hum(machine_config& config);
-
-private:
-	void nes_vt_hum_map(address_map& map);
-
-	DECLARE_WRITE8_MEMBER(vt03_410x_hum_w);
-	DECLARE_WRITE8_MEMBER(vt03_8000_hum_w);
+protected:
+	virtual void machine_reset() override;
 };
 
 class nes_vt_sp69_state : public nes_vt_state
@@ -226,14 +240,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_sp69(machine_config& config);
-
 protected:
-	void nes_vt_sp69_map(address_map& map);
-
-private:
-	DECLARE_WRITE8_MEMBER(vt03_410x_sp69_w);
-	DECLARE_WRITE8_MEMBER(vt03_8000_sp69_w);
+	virtual void machine_reset() override;
 };
 
 
@@ -251,24 +259,6 @@ private:
 
 	DECLARE_READ8_MEMBER(ablping_410f_r);
 	DECLARE_WRITE8_MEMBER(ablping_410f_w);
-};
-
-
-
-class nes_vt_pjoy_state : public nes_vt_state
-{
-public:
-	nes_vt_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt_pjoy(machine_config& config);
-
-private:
-	void nes_vt_pjoy_map(address_map& map);
-
-	DECLARE_WRITE8_MEMBER(vt03_410x_pjoy_w);
-	DECLARE_WRITE8_MEMBER(vt03_8000_pjoy_w);
 };
 
 class nes_vt_cy_state : public nes_vt_state
@@ -446,16 +436,10 @@ uint16_t nes_vt_state::decode_nt_addr(uint16_t addr) {
 	return ((vert_mirror ? a10 : a11) << 10) | base;
 }
 
-// TODO: split this into per machine configs
-static const uint8_t descram_4107_4108_noscramble[2] = { 0x7, 0x8 };
-//static const uint16_t descram_4107_4108_waixing[2]    = { 0x7, 0x8 };
-static const uint8_t descram_4107_4108_pjoy[2]       = { 0x8, 0x7 };
-static const uint8_t descram_4107_4108_hummer[2]     = { 0x7, 0x8 };
-static const uint8_t descram_4107_4108_sp69[2]       = { 0x7, 0x8 };
 
 WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
 {
-	scrambled_410x_w(offset, data, descram_4107_4108_noscramble);
+	scrambled_410x_w(offset, data);
 }
 
 READ8_MEMBER(nes_vt_state::vt03_410x_r)
@@ -475,28 +459,11 @@ WRITE8_MEMBER(nes_vt_ablping_state::ablping_410f_w)
 	popmessage("ablping_410f_w %02x", data);
 };
 
-
-
-WRITE8_MEMBER(nes_vt_hum_state::vt03_410x_hum_w)
-{
-	scrambled_410x_w(offset, data, descram_4107_4108_hummer);
-}
-
-WRITE8_MEMBER(nes_vt_pjoy_state::vt03_410x_pjoy_w)
-{
-	scrambled_410x_w(offset, data, descram_4107_4108_pjoy);
-}
-
-
-WRITE8_MEMBER(nes_vt_sp69_state::vt03_410x_sp69_w)
-{
-	scrambled_410x_w(offset, data, descram_4107_4108_sp69);
-}
 // Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
 
 
 
-void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, const uint8_t *scramble_table)
+void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -545,12 +512,12 @@ void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, const uint8_t
 		break;
 
 	case 0x7:
-		m_410x[scramble_table[0]] = data;
+		m_410x[m_410x_scramble[0]] = data;
 		update_banks();
 		break;
 
 	case 0x8:
-		m_410x[scramble_table[1]] = data;
+		m_410x[m_410x_scramble[1]] = data;
 		update_banks();
 		break;
 
@@ -865,8 +832,6 @@ void nes_vt_state::machine_start()
 //  m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(*this, FUNC(nes_vt_state::nt_r)), write8_delegate(*this, FUNC(nes_vt_state::nt_w)));
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(*this, FUNC(nes_vt_state::chr_r)), write8_delegate(*this, FUNC(nes_vt_state::chr_w)));
-
-
 }
 
 void nes_vt_state::machine_reset()
@@ -899,6 +864,19 @@ void nes_vt_state::machine_reset()
 	m_vdma_ctrl = 0;
 
 	update_banks();
+
+	// 'no scramble' configuration
+	m_8000_scramble[0x0] = 0x6;
+	m_8000_scramble[0x1] = 0x7;
+	m_8000_scramble[0x2] = 0x2;
+	m_8000_scramble[0x3] = 0x3;
+	m_8000_scramble[0x4] = 0x4;
+	m_8000_scramble[0x5] = 0x5;
+	m_8000_scramble[0x6] = 0x7;
+	m_8000_scramble[0x7] = 0x8;
+
+	m_410x_scramble[0x0] = 0x7;
+	m_410x_scramble[0x1] = 0x8;
 }
 
 int nes_vt_state::calculate_real_video_address(int addr, int extended, int readtype)
@@ -1116,7 +1094,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
      some consoles have scrambled registers for crude copy protection
 */
 
-void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data, const uint8_t* scramble_table)
+void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data)
 {
 	uint16_t addr = offset + 0x8000;
 	if((m_411d & 0x01) && (m_411d & 0x03)) {
@@ -1153,36 +1131,36 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 		} else if((addr < 0xA000) && (addr & 0x01)) {
 			switch(m_410x[0x05] & 0x07) {
 				case 0x00:
-					m_ppu->set_201x_reg(scramble_table[0], data);
+					m_ppu->set_201x_reg(m_8000_scramble[0], data);
 					break;
 
 				case 0x01:
-					m_ppu->set_201x_reg(scramble_table[1], data);
+					m_ppu->set_201x_reg(m_8000_scramble[1], data);
 					break;
 
 				case 0x02: // hand?
-					m_ppu->set_201x_reg(scramble_table[2], data);
+					m_ppu->set_201x_reg(m_8000_scramble[2], data);
 					break;
 
 				case 0x03: // dog?
-					m_ppu->set_201x_reg(scramble_table[3], data);
+					m_ppu->set_201x_reg(m_8000_scramble[3], data);
 					break;
 
 				case 0x04: // ball thrown
-					m_ppu->set_201x_reg(scramble_table[4], data);
+					m_ppu->set_201x_reg(m_8000_scramble[4], data);
 					break;
 
 				case 0x05: // ball thrown
-					m_ppu->set_201x_reg(scramble_table[5], data);
+					m_ppu->set_201x_reg(m_8000_scramble[5], data);
 					break;
 				case 0x06:
-					m_410x[scramble_table[6]] = data;
+					m_410x[m_8000_scramble[6]] = data;
 					//m_410x[0x9] = data;
 					update_banks();
 					break;
 
 				case 0x07:
-					m_410x[scramble_table[7]] = data;
+					m_410x[m_8000_scramble[7]] = data;
 					update_banks();
 					break;
 			}
@@ -1212,31 +1190,28 @@ void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8
 
 // MMC3 compatibility mode
 
-// TODO: move this into per machine configs
-static const uint8_t descram_8000_mmc3_noscramble[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8 };
-//static const uint8_t descram_8000_mmc3_waixing[8] = { 0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8 };
-static const uint8_t descram_8000_mmc3_pjoy[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7 };
-static const uint8_t descram_8000_mmc3_hummer[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8 };
-static const uint8_t descram_8000_mmc3_sp69[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8 };
+void nes_vt_state::set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7)
+{
+	m_8000_scramble[0] = reg0; // TODO: name the regs
+	m_8000_scramble[1] = reg1;
+	m_8000_scramble[2] = reg2;
+	m_8000_scramble[3] = reg3;
+	m_8000_scramble[4] = reg4;
+	m_8000_scramble[5] = reg5;
+	m_8000_scramble[6] = reg6;
+	m_8000_scramble[7] = reg7;
+}
+
+void nes_vt_state::set_410x_scramble(uint8_t reg0, uint8_t reg1)
+{
+	m_410x_scramble[0] = reg0; // TODO: name the regs
+	m_410x_scramble[1] = reg1;
+}
 
 WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 {
-	scrambled_8000_w(space, offset, data, descram_8000_mmc3_noscramble);
+	scrambled_8000_w(space, offset, data);
 	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
-}
-WRITE8_MEMBER(nes_vt_hum_state::vt03_8000_hum_w)
-{
-	scrambled_8000_w(space, offset, data, descram_8000_mmc3_hummer);
-}
-
-WRITE8_MEMBER(nes_vt_pjoy_state::vt03_8000_pjoy_w)
-{
-	scrambled_8000_w(space, offset, data, descram_8000_mmc3_pjoy);
-}
-
-WRITE8_MEMBER(nes_vt_sp69_state::vt03_8000_sp69_w)
-{
-	scrambled_8000_w(space, offset, data, descram_8000_mmc3_sp69);
 }
 
 /* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
@@ -1482,30 +1457,9 @@ void nes_vt_state::nes_vt_xx_map(address_map &map)
 	map(0x0800, 0x0fff).ram();
 }
 
-void nes_vt_hum_state::nes_vt_hum_map(address_map &map)
-{
-	nes_vt_map(map);
-	map(0x4100, 0x410b).w(FUNC(nes_vt_hum_state::vt03_410x_hum_w));
-	map(0x8000, 0xffff).w(FUNC(nes_vt_hum_state::vt03_8000_hum_w));
-}
-
-void nes_vt_pjoy_state::nes_vt_pjoy_map(address_map &map)
-{
-	nes_vt_map(map);
-	map(0x4100, 0x410b).w(FUNC(nes_vt_pjoy_state::vt03_410x_pjoy_w));
-	map(0x8000, 0xffff).w(FUNC(nes_vt_pjoy_state::vt03_8000_pjoy_w));
-}
-
-void nes_vt_sp69_state::nes_vt_sp69_map(address_map &map)
-{
-	nes_vt_map(map);
-	map(0x4100, 0x410b).w(FUNC(nes_vt_sp69_state::vt03_410x_sp69_w));
-	map(0x8000, 0xffff).w(FUNC(nes_vt_sp69_state::vt03_8000_sp69_w));
-}
-
 void nes_vt_ablping_state::nes_vt_ablping_map(address_map &map)
 {
-	nes_vt_sp69_map(map);
+	nes_vt_map(map);
 	map(0x410f, 0x410f).rw(FUNC(nes_vt_ablping_state::ablping_410f_r), FUNC(nes_vt_ablping_state::ablping_410f_w));
 }
 
@@ -1648,14 +1602,15 @@ static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
 
-
+/*
 static const uint8_t descram_ppu_2012_2017[5][6] = {
-	{0x2, 0x3, 0x4, 0x5, 0x6, 0x7},
-	{0x3, 0x2, 0x7, 0x6, 0x5, 0x4},
-	{0x2, 0x3, 0x4, 0x5, 0x6, 0x7},
-	{0x7, 0x6, 0x5, 0x4, 0x2, 0x3},
-	{0x4, 0x7, 0x2, 0x6, 0x5, 0x3},
+	{0x2, 0x3, 0x4, 0x5, 0x6, 0x7}, // 0
+	{0x3, 0x2, 0x7, 0x6, 0x5, 0x4},  // 1
+	, // 2
+	, // 3
+	,  // 4
 };
+*/
 
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
@@ -1737,33 +1692,34 @@ void nes_vt_state::nes_vt_ddr(machine_config &config)
 	m_ctrl2->set_screen_tag(m_screen);
 }
 
-void nes_vt_hum_state::nes_vt_hum(machine_config &config)
+void nes_vt_hum_state::machine_reset()
 {
-	nes_vt(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hum_state::nes_vt_hum_map);
+	nes_vt_state::machine_reset();
 
-	m_ppu->set_201x_descramble(descram_ppu_2012_2017[3]);
+	m_ppu->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
+	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
-void nes_vt_pjoy_state::nes_vt_pjoy(machine_config &config)
+void nes_vt_pjoy_state::machine_reset()
 {
-	nes_vt(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_pjoy_state::nes_vt_pjoy_map);
+	nes_vt_state::machine_reset();
 
-	m_ppu->set_201x_descramble(descram_ppu_2012_2017[2]);
+	m_ppu->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
+	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
+	set_410x_scramble(0x8, 0x7);
 }
 
-void nes_vt_sp69_state::nes_vt_sp69(machine_config &config)
+void nes_vt_sp69_state::machine_reset()
 {
-	nes_vt(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::nes_vt_sp69_map);
+	nes_vt_state::machine_reset();
 
-	m_ppu->set_201x_descramble(descram_ppu_2012_2017[4]);
+	m_ppu->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
+	set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
 }
 
 void nes_vt_ablping_state::nes_vt_ablping(machine_config &config)
 {
-	nes_vt_sp69(config);
+	nes_vt(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::nes_vt_ablping_map);
 }
 
@@ -2265,7 +2221,7 @@ CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Int
 CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
-CONS( 200?, mc_sp69,   0,  0,  nes_vt_sp69,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, mc_sp69,   0,  0,  nes_vt,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
 
 // this game was also sold by dreamGEAR and several others companies, each time with a different name and different case, although the dumped version was from ABL, and it hasn't been confirmed that the ROMs are identical for the other units
 // Super Ping Pong appears on the title screen, but not the box / product art which simply has "Ping Pong Plug & Play TV Game" on front/back/bottom/manual, and "Table Tennis Plug & Play TV Game" on left/right sides.  Product code is PP1100
@@ -2277,15 +2233,15 @@ CONS( 200?, polmega,   0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, 
 CONS( 200?, silv35,    0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 
 // Hummer systems, scrambled bank register
-CONS( 200?, mc_sam60,  0,  0,  nes_vt_hum,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, zdog,      0,  0,  nes_vt_hum,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_sam60,  0,  0,  nes_vt,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, zdog,      0,  0,  nes_vt,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
 
 // titles below don't seem to use the enhanced modes, so probably VT01 / VT02 or plain standalone famiclones?
 
 // very plain menus
 CONS( 200?, pjoyn50,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys30,    0,        0,  nes_vt,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys60,    0,        0,  nes_vt,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
 // has a non-enhanced version of 'Octopus' as game 30
 CONS( 200?, sarc110,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 1)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, sarc110a,   sarc110,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Super Arcade 110 (set 2)", MACHINE_IMPERFECT_GRAPHICS )
