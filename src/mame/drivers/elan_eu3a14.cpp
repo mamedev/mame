@@ -98,6 +98,9 @@ public:
 	void radica_eu3a14_altrambase(machine_config& config);
 	void radica_eu3a14_altrambase_adc(machine_config &config);
 
+	void radica_eu3a14_altrambase_bb3(machine_config &config);
+	void radica_eu3a14p_altrambase_bb3(machine_config &config);
+
 private:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -799,6 +802,12 @@ void elan_eu3a14_state::radica_eu3a14_altrambase(machine_config& config)
 	m_vid->set_tilerambase(0x0a00 - 0x200);
 }
 
+void elan_eu3a14_state::radica_eu3a14_altrambase_bb3(machine_config& config)
+{
+	radica_eu3a14_altrambase(config);
+	m_sys->disable_timer_irq();
+}
+
 void elan_eu3a14_state::radica_eu3a14_altrambase_adc(machine_config &config)
 {
 	radica_eu3a14_altrambase(config);
@@ -817,8 +826,13 @@ void elan_eu3a14_state::radica_eu3a14p(machine_config &config) // TODO, clocks d
 void elan_eu3a14_state::radica_eu3a14p_altrambase(machine_config& config)
 {
 	radica_eu3a14p(config);
-
 	m_vid->set_tilerambase(0x0a00 - 0x200);
+}
+
+void elan_eu3a14_state::radica_eu3a14p_altrambase_bb3(machine_config& config)
+{
+	radica_eu3a14p_altrambase(config);
+	m_sys->disable_timer_irq();
 }
 
 
@@ -882,8 +896,8 @@ CONS( 2005, rad_rsgp, rad_rsg,  0, radica_eu3a14p_altrambase,    rad_rsg,       
 // also has a Connectv Real Soccer logo in the roms, apparently unused, maybe that was to be the US title (without the logo being changed to Play TV) but Play TV Soccer ended up being a different game licensed from Epoch instead.
 CONS( 2006, rad_foot, 0,        0, radica_eu3a14p,               radica_foot,   elan_eu3a14_state, empty_init,  "Radica / Medialink",                                                "Connectv Football", MACHINE_NOT_WORKING )
 
-CONS( 2005, rad_bb3,  0,        0, radica_eu3a14_altrambase,     radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
-CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p_altrambase,    radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3,  0,        0, radica_eu3a14_altrambase_bb3,  radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Play TV Baseball 3", MACHINE_NOT_WORKING )
+CONS( 2005, rad_bb3p, rad_bb3,  0, radica_eu3a14p_altrambase_bb3, radica_bb3,    elan_eu3a14_state, empty_init,  "Radica / FarSight Studios",                                         "Connectv Baseball 3", MACHINE_NOT_WORKING )
 
 CONS( 2005, rad_hnt3, 0,        0, radica_eu3a14,                radica_hnt3,   elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Play TV Huntin' 3", MACHINE_NOT_WORKING )
 CONS( 2005, rad_hnt3p,rad_hnt3, 0, radica_eu3a14p,               radica_hnt3,   elan_eu3a14_state, empty_init,  "Radica / V-Tac Technology Co Ltd.",                                 "Connectv Huntin' 3", MACHINE_NOT_WORKING )
