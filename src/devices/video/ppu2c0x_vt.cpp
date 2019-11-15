@@ -21,6 +21,8 @@ DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PA
 
 ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)	:
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
+	m_is_pal(false),
+	m_is_50hz(false),
 	m_read_bg(*this),
 	m_read_sp(*this)
 {
@@ -39,6 +41,8 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config &mconfig, const char
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
 	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
+	m_is_pal = true;
+	m_is_50hz = true;
 }
 
 

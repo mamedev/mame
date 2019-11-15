@@ -183,6 +183,25 @@ elan_eu3a05commonsys_device::elan_eu3a05commonsys_device(const machine_config &m
 {
 }
 
+/*
+
+lda $5009
+and #$ef
+sta $5009
+
+lda $5009
+and #$df
+sta $5009
+
+
+lda $5006
+and #$f0
+sta $5006
+lda $5006
+and $#8f
+sta $5006
+
+*/
 
 void elan_eu3a05commonsys_device::map(address_map &map)
 {

@@ -62,6 +62,13 @@ public:
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
 
+	bool get_is_pal() { return m_is_pal; }
+	bool get_is_50hz() { return m_is_50hz; }
+
+protected:
+	bool m_is_pal;
+	bool m_is_50hz;
+
 private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
