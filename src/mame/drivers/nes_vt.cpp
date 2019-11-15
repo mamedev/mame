@@ -77,14 +77,6 @@
 #include "screen.h"
 #include "speaker.h"
 
-enum class vt_scramble_mode {
-	NO_SCRAMBLE = 0,
-	WAIXING = 1,
-	PJOY = 2,
-	HUMMER = 3,
-	SP69 = 4
-};
-
 class nes_vt_state : public nes_base_state
 {
 public:
@@ -144,8 +136,8 @@ protected:
 	uint8_t m_411d;
 	uint8_t m_413x[8]; // CY only?
 
-	void scrambled_410x_w(uint16_t offset, uint8_t data, vt_scramble_mode scram);
-	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data, vt_scramble_mode scram);
+	void scrambled_410x_w(uint16_t offset, uint8_t data, const uint8_t* scrambled_410x_w);
+	void scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data, const uint8_t* scramble_table);
 
 	DECLARE_WRITE8_MEMBER(vt03_8000_w);
 	DECLARE_WRITE8_MEMBER(vt03_4034_w);
@@ -454,9 +446,16 @@ uint16_t nes_vt_state::decode_nt_addr(uint16_t addr) {
 	return ((vert_mirror ? a10 : a11) << 10) | base;
 }
 
+// TODO: split this into per machine configs
+static const uint8_t descram_4107_4108_noscramble[2] = { 0x7, 0x8 };
+//static const uint16_t descram_4107_4108_waixing[2]    = { 0x7, 0x8 };
+static const uint8_t descram_4107_4108_pjoy[2]       = { 0x8, 0x7 };
+static const uint8_t descram_4107_4108_hummer[2]     = { 0x7, 0x8 };
+static const uint8_t descram_4107_4108_sp69[2]       = { 0x7, 0x8 };
+
 WRITE8_MEMBER(nes_vt_state::vt03_410x_w)
 {
-	scrambled_410x_w(offset, data, vt_scramble_mode::NO_SCRAMBLE);
+	scrambled_410x_w(offset, data, descram_4107_4108_noscramble);
 }
 
 READ8_MEMBER(nes_vt_state::vt03_410x_r)
@@ -480,31 +479,24 @@ WRITE8_MEMBER(nes_vt_ablping_state::ablping_410f_w)
 
 WRITE8_MEMBER(nes_vt_hum_state::vt03_410x_hum_w)
 {
-	scrambled_410x_w(offset, data, vt_scramble_mode::HUMMER);
+	scrambled_410x_w(offset, data, descram_4107_4108_hummer);
 }
 
 WRITE8_MEMBER(nes_vt_pjoy_state::vt03_410x_pjoy_w)
 {
-	scrambled_410x_w(offset, data, vt_scramble_mode::PJOY);
+	scrambled_410x_w(offset, data, descram_4107_4108_pjoy);
 }
 
 
 WRITE8_MEMBER(nes_vt_sp69_state::vt03_410x_sp69_w)
 {
-	scrambled_410x_w(offset, data, vt_scramble_mode::SP69);
+	scrambled_410x_w(offset, data, descram_4107_4108_sp69);
 }
 // Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
 
-// TODO: split this into per machine configs, not enum indexed table
-static const uint16_t descram_4107_4108[5][2] = {
-			{0x7, 0x8},
-			{0x7, 0x8},
-			{0x8, 0x7},
-			{0x7, 0x8},
-			{0x7, 0x8},
-};
 
-void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, vt_scramble_mode scram)
+
+void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, const uint8_t *scramble_table)
 {
 	switch (offset)
 	{
@@ -553,12 +545,12 @@ void nes_vt_state::scrambled_410x_w(uint16_t offset, uint8_t data, vt_scramble_m
 		break;
 
 	case 0x7:
-		m_410x[descram_4107_4108[(int)scram][0]] = data;
+		m_410x[scramble_table[0]] = data;
 		update_banks();
 		break;
 
 	case 0x8:
-		m_410x[descram_4107_4108[(int)scram][1]] = data;
+		m_410x[scramble_table[1]] = data;
 		update_banks();
 		break;
 
@@ -1124,16 +1116,7 @@ int nes_vt_state::calculate_real_video_address(int addr, int extended, int readt
      some consoles have scrambled registers for crude copy protection
 */
 
-// TODO: split this into per machine configs, not enum indexed table
-static const uint8_t descram_8000_mmc3[5][8] = {
-			{0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8},
-			{0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8},
-			{0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7},
-			{0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8},
-			{0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8},
-};
-
-void nes_vt_state::scrambled_8000_w(address_space &space, uint16_t offset, uint8_t data, vt_scramble_mode scram)
+void nes_vt_state::scrambled_8000_w(address_space& space, uint16_t offset, uint8_t data, const uint8_t* scramble_table)
 {
 	uint16_t addr = offset + 0x8000;
 	if((m_411d & 0x01) && (m_411d & 0x03)) {
@@ -1170,36 +1153,36 @@ void nes_vt_state::scrambled_8000_w(address_space &space, uint16_t offset, uint8
 		} else if((addr < 0xA000) && (addr & 0x01)) {
 			switch(m_410x[0x05] & 0x07) {
 				case 0x00:
-					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][0], data);
+					m_ppu->set_201x_reg(scramble_table[0], data);
 					break;
 
 				case 0x01:
-					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][1], data);
+					m_ppu->set_201x_reg(scramble_table[1], data);
 					break;
 
 				case 0x02: // hand?
-					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][2], data);
+					m_ppu->set_201x_reg(scramble_table[2], data);
 					break;
 
 				case 0x03: // dog?
-					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][3], data);
+					m_ppu->set_201x_reg(scramble_table[3], data);
 					break;
 
 				case 0x04: // ball thrown
-					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][4], data);
+					m_ppu->set_201x_reg(scramble_table[4], data);
 					break;
 
 				case 0x05: // ball thrown
-					m_ppu->set_201x_reg(descram_8000_mmc3[(int)scram][5], data);
+					m_ppu->set_201x_reg(scramble_table[5], data);
 					break;
 				case 0x06:
-					m_410x[descram_8000_mmc3[(int)scram][6]] = data;
+					m_410x[scramble_table[6]] = data;
 					//m_410x[0x9] = data;
 					update_banks();
 					break;
 
 				case 0x07:
-					m_410x[descram_8000_mmc3[(int)scram][7]] = data;
+					m_410x[scramble_table[7]] = data;
 					update_banks();
 					break;
 			}
@@ -1228,24 +1211,32 @@ void nes_vt_state::scrambled_8000_w(address_space &space, uint16_t offset, uint8
 }
 
 // MMC3 compatibility mode
+
+// TODO: move this into per machine configs
+static const uint8_t descram_8000_mmc3_noscramble[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8 };
+//static const uint8_t descram_8000_mmc3_waixing[8] = { 0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8 };
+static const uint8_t descram_8000_mmc3_pjoy[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7 };
+static const uint8_t descram_8000_mmc3_hummer[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8 };
+static const uint8_t descram_8000_mmc3_sp69[8] = { 0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8 };
+
 WRITE8_MEMBER(nes_vt_state::vt03_8000_w)
 {
-	scrambled_8000_w(space, offset, data, vt_scramble_mode::NO_SCRAMBLE);
+	scrambled_8000_w(space, offset, data, descram_8000_mmc3_noscramble);
 	//logerror("%s: vt03_8000_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 }
 WRITE8_MEMBER(nes_vt_hum_state::vt03_8000_hum_w)
 {
-	scrambled_8000_w(space, offset, data, vt_scramble_mode::HUMMER);
+	scrambled_8000_w(space, offset, data, descram_8000_mmc3_hummer);
 }
 
 WRITE8_MEMBER(nes_vt_pjoy_state::vt03_8000_pjoy_w)
 {
-	scrambled_8000_w(space, offset, data, vt_scramble_mode::PJOY);
+	scrambled_8000_w(space, offset, data, descram_8000_mmc3_pjoy);
 }
 
 WRITE8_MEMBER(nes_vt_sp69_state::vt03_8000_sp69_w)
 {
-	scrambled_8000_w(space, offset, data, vt_scramble_mode::SP69);
+	scrambled_8000_w(space, offset, data, descram_8000_mmc3_sp69);
 }
 
 /* APU plumbing, this is because we have a plain M6502 core in the VT03, otherwise this is handled in the core */
