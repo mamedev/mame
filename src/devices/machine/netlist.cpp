@@ -1089,7 +1089,7 @@ plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_ch
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		auto lnetlist = plib::make_unique<netlist::netlist_state_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
-		lnetlist->setup().set_extended_validation(false);
+		lnetlist->setup().set_extended_validation(true);
 		common_dev_start(lnetlist.get());
 
 		for (device_t &d : subdevices())

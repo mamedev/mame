@@ -88,7 +88,7 @@ namespace analog
 
 		void solve_now();
 
-		void solve_later(netlist_time delay = netlist_time::quantum());
+		void solve_later(netlist_time delay = netlist_time::quantum()) noexcept;
 
 		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept
 		{
@@ -134,7 +134,7 @@ namespace analog
 		{
 		}
 
-		void set_R(nl_fptype R)
+		void set_R(nl_fptype R) const noexcept
 		{
 			const nl_fptype G = plib::reciprocal(R);
 			set_mat( G, -G, nlconst::zero(),

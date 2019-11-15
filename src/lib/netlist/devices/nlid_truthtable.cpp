@@ -266,7 +266,7 @@ namespace devices
 			if (m_family_desc == nullptr)
 				plib::pthrow<nl_exception>("family description not found for {1}", m_family_name);
 
-			return pool.make_unique<tt_type>(anetlist, name, m_family_desc, *m_ttbl, m_desc);
+			return pool.make_unique<tt_type>(anetlist, name, *m_family_desc, *m_ttbl, m_desc);
 		}
 	private:
 		unique_pool_ptr<typename nld_truthtable_t<m_NI, m_NO>::truthtable_t> m_ttbl;
@@ -480,7 +480,8 @@ namespace factory
 
 	truthtable_base_element_t::truthtable_base_element_t(const pstring &name, const pstring &classname,
 			const pstring &def_param, const pstring &sourcefile)
-	: factory::element_t(name, classname, def_param, sourcefile), m_family_desc(family_TTL())
+	: factory::element_t(name, classname, def_param, sourcefile)
+	, m_family_desc(family_TTL())
 	{
 	}
 

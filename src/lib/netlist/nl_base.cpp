@@ -585,7 +585,7 @@ namespace netlist
 		state().setup().register_alias_nofqn(alias, aliased_fqn);
 	}
 
-	void device_t::connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
+	void device_t::connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2)
 	{
 		state().setup().register_link_fqn(t1.name(), t2.name());
 	}
@@ -621,9 +621,9 @@ namespace netlist
 		dev.set_logic_family(dev.state().setup().family_from_model(desc));
 	}
 
-	detail::family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t *desc)
+	detail::family_setter_t::family_setter_t(core_device_t &dev, const logic_family_desc_t &desc)
 	{
-		dev.set_logic_family(desc);
+		dev.set_logic_family(&desc);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -787,7 +787,7 @@ namespace netlist
 				net().solver()->update_forced();
 	}
 
-	void terminal_t::schedule_solve_after(netlist_time after)
+	void terminal_t::schedule_solve_after(netlist_time after) noexcept
 	{
 		// Nets may belong to railnets which do not have a solver attached
 		if (this->has_net())
@@ -896,14 +896,14 @@ namespace netlist
 	}
 
 
-	pstring param_t::get_initial(const device_t &dev, bool *found)
+	pstring param_t::get_initial(const device_t &dev, bool *found) const
 	{
 		pstring res = dev.state().setup().get_initial_param_val(this->name(), "");
 		*found = (res != "");
 		return res;
 	}
 
-	const pstring param_model_t::type()
+	pstring param_model_t::type()
 	{
 		return state().setup().models().type(str());
 	}

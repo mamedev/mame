@@ -165,6 +165,10 @@ namespace netlist
 		, m_device(device)
 		, m_param(param)
 		{ }
+		const pstring &name() const noexcept { return m_name; }
+		const core_device_t &device() const noexcept { return m_device; }
+		param_t *param() const noexcept { return &m_param; }
+	private:
 		pstring m_name;
 		core_device_t &m_device;
 		param_t &m_param;
@@ -317,11 +321,11 @@ namespace netlist
 
 		void add_define(const pstring &defstr);
 
-		factory::list_t &factory() { return m_factory; }
-		const factory::list_t &factory() const { return m_factory; }
+		factory::list_t &factory() noexcept { return m_factory; }
+		const factory::list_t &factory() const noexcept  { return m_factory; }
 
-		log_type &log() { return m_log; }
-		const log_type &log() const { return m_log; }
+		log_type &log() noexcept { return m_log; }
+		const log_type &log() const noexcept { return m_log; }
 
 		// FIXME: sources may need access to the netlist parent type
 		// since they may be created in a context in which they don't
@@ -330,11 +334,11 @@ namespace netlist
 		// We thus need a better approach to creating netlists in a context
 		// other than static procedures.
 
-		setup_t &setup() { return m_setup; }
-		const setup_t &setup() const { return m_setup; }
+		setup_t &setup() noexcept { return m_setup; }
+		const setup_t &setup() const noexcept { return m_setup; }
 
-		models_t &models() { return m_models; }
-		const models_t &models() const { return m_models; }
+		models_t &models() noexcept { return m_models; }
+		const models_t &models() const noexcept { return m_models; }
 
 	protected:
 		models_t                                    m_models;

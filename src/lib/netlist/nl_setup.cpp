@@ -552,8 +552,8 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 {
 	const pstring param_in_fqn = build_fqn(param_in);
 
-	const pstring &outname = resolve_alias(param_in_fqn);
-	auto ret = m_params.find(outname);
+	const pstring outname(resolve_alias(param_in_fqn));
+	auto ret(m_params.find(outname));
 	if (ret == m_params.end() && required)
 	{
 		log().fatal(MF_PARAMETER_1_2_NOT_FOUND(param_in_fqn, outname));
@@ -561,7 +561,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	}
 	if (ret != m_params.end())
 		log().debug("Found parameter {1}\n", outname);
-	return (ret == m_params.end() ? nullptr : &ret->second.m_param);
+	return (ret == m_params.end() ? nullptr : ret->second.param());
 }
 
 devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
@@ -935,8 +935,16 @@ void setup_t::resolve_inputs()
 	for (auto & i : m_terminals)
 	{
 		detail::core_terminal_t *term = i.second;
-		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
-			log().info(MI_DUMMY_1_WITHOUT_CONNECTIONS(term->name()));
+		bool is_nc(dynamic_cast< devices::NETLIB_NAME(nc_pin) *>(&term->device()) != nullptr);
+		if (term->has_net() && is_nc)
+		{
+			log().error(ME_NC_PIN_1_WITH_CONNECTIONS(term->name()));
+			err = true;
+		}
+		else if (is_nc)
+		{
+			/* ignore */
+		}
 		else if (!term->has_net())
 		{
 			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
@@ -1295,19 +1303,11 @@ void setup_t::prepare_to_run()
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{
-			// We are not interested in power terminals - This is intended behaviour
-			if (!plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
-				log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
-					t->name(), t->m_N.net().name(), t->m_P.net().name()));
+			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
+				t->name(), t->m_N.net().name(), t->m_P.net().name()));
 			t->m_N.net().remove_terminal(t->m_N);
 			t->m_P.net().remove_terminal(t->m_P);
 			m_nlstate.remove_device(t);
-		}
-		else
-		{
-			if (plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
-				log().info(MI_POWER_TERMINALS_1_CONNECTED_ANALOG_2_3(
-					t->name(), t->m_N.net().name(), t->m_P.net().name()));
 		}
 	}
 

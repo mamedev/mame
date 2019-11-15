@@ -231,7 +231,7 @@ namespace netlist
 //============================================================
 
 #if defined(MAME_DEBUG) || (NL_DEBUG == true)
-#define nl_assert(x)    passert_always(x);
+#define nl_assert(x)    passert_always(x)
 #else
 #define nl_assert(x)    do { } while (0)
 #endif

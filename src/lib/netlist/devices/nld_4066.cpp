@@ -19,7 +19,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(CD4066_GATE)
 		NETLIB_FAMILY("CD4XXX")
-		, m_supply(*this, "VDD", "VSS", true)
+		, m_supply(*this, "VDD", "VSS")
 		, m_R(*this, "R")
 		, m_control(*this, "CTL")
 		, m_base_r(*this, "BASER", nlconst::magic(270.0))
@@ -47,10 +47,10 @@ namespace netlist
 
 	NETLIB_UPDATE(CD4066_GATE)
 	{
-		nl_fptype sup = (m_supply.VCC() - m_supply.GND());
+		nl_fptype sup = (m_supply.VCC().Q_Analog() - m_supply.GND().Q_Analog());
 		nl_fptype low = nlconst::magic(0.45) * sup;
 		nl_fptype high = nlconst::magic(0.55) * sup;
-		nl_fptype in = m_control() - m_supply.GND();
+		nl_fptype in = m_control() - m_supply.GND().Q_Analog();
 		nl_fptype rON = m_base_r() * nlconst::magic(5.0) / sup;
 		nl_fptype R = -nlconst::one();
 

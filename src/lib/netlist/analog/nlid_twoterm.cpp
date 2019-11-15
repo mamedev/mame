@@ -24,7 +24,7 @@ namespace analog
 			m_N.solve_now();
 	}
 
-	void NETLIB_NAME(twoterm)::solve_later(netlist_time delay)
+	void NETLIB_NAME(twoterm)::solve_later(netlist_time delay) noexcept
 	{
 		// we only need to call the non-rail terminal
 		if (m_P.has_net() && !m_P.net().isRailNet())

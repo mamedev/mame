@@ -819,7 +819,7 @@ namespace netlist
 		}
 
 		void solve_now();
-		void schedule_solve_after(netlist_time after);
+		void schedule_solve_after(netlist_time after) noexcept;
 
 		void set_ptrs(nl_fptype *gt, nl_fptype *go, nl_fptype *Idr) noexcept(false);
 
@@ -902,7 +902,6 @@ namespace netlist
 		///  \returns voltage at terminal.
 		nl_fptype Q_Analog() const noexcept;
 	};
-
 
 	class logic_net_t : public detail::net_t
 	{
@@ -1081,7 +1080,7 @@ namespace netlist
 		void register_subalias(const pstring &name, const pstring &aliased);
 
 		void connect(const pstring &t1, const pstring &t2);
-		void connect(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
+		void connect(const detail::core_terminal_t &t1, const detail::core_terminal_t &t2);
 		void connect_post_start(detail::core_terminal_t &t1, detail::core_terminal_t &t2);
 	protected:
 
@@ -1121,7 +1120,7 @@ namespace netlist
 			device().update_param();
 		}
 
-		pstring get_initial(const device_t &dev, bool *found);
+		pstring get_initial(const device_t &dev, bool *found) const;
 
 		template<typename C>
 		void set(C &p, const C v) noexcept
@@ -1194,8 +1193,8 @@ namespace netlist
 	public:
 		param_str_t(device_t &device, const pstring &name, const pstring &val);
 
-		pstring operator()() const noexcept { return str(); }
-		void setTo(const pstring &param) noexcept
+		const pstring &operator()() const noexcept { return str(); }
+		void setTo(const pstring &param)
 		{
 			if (m_param != param)
 			{
@@ -1206,9 +1205,8 @@ namespace netlist
 		}
 	protected:
 		virtual void changed() noexcept;
-		pstring str() const noexcept { return m_param; }
+		const pstring &str() const noexcept { return m_param; }
 	private:
-		PALIGNAS_CACHELINE()
 		pstring m_param;
 	};
 
@@ -1236,15 +1234,12 @@ namespace netlist
 
 		using value_t = value_base_t<nl_fptype>;
 
-		template <typename T>
-		friend class value_base_t;
-
 		param_model_t(device_t &device, const pstring &name, const pstring &val)
 		: param_str_t(device, name, val) { }
 
 		pstring value_str(const pstring &entity);
 		nl_fptype value(const pstring &entity);
-		const pstring type();
+		pstring type();
 		// hide this
 		void setTo(const pstring &param) = delete;
 	protected:
@@ -1302,7 +1297,7 @@ namespace netlist
 			// NOLINTNEXTLINE(modernize-use-equals-default)
 			family_setter_t();
 			family_setter_t(core_device_t &dev, const pstring &desc);
-			family_setter_t(core_device_t &dev, const logic_family_desc_t *desc);
+			family_setter_t(core_device_t &dev, const logic_family_desc_t &desc);
 		};
 
 		template <class T, bool TS>
@@ -1407,7 +1402,7 @@ namespace netlist
 		/// \return vector with pointers to devices
 
 		template<class C>
-		inline std::vector<C *> get_device_list()
+		inline std::vector<C *> get_device_list() const
 		{
 			std::vector<C *> tmp;
 			for (auto &d : m_devices)
@@ -1421,18 +1416,18 @@ namespace netlist
 
 		// logging and name
 
-		pstring name() const noexcept { return m_name; }
+		const pstring &name() const noexcept { return m_name; }
 
 		log_type & log() noexcept { return m_log; }
 		const log_type &log() const noexcept { return m_log; }
 
 		plib::dynlib &lib() const noexcept { return *m_lib; }
 
-		netlist_t &exec() { return *m_netlist; }
-		const netlist_t &exec() const { return *m_netlist; }
+		netlist_t &exec() noexcept { return *m_netlist; }
+		const netlist_t &exec() const noexcept { return *m_netlist; }
 
 		// state handling
-		plib::state_manager_t &run_state_manager() { return m_state; }
+		plib::state_manager_t &run_state_manager() noexcept { return m_state; }
 
 		template<typename O, typename C>
 		void save(O &owner, C &state, const pstring &module, const pstring &stname)
@@ -1458,7 +1453,7 @@ namespace netlist
 		///
 		/// \return core_device_t pointer if device exists, else nullptr
 
-		core_device_t *find_device(const pstring &name)
+		core_device_t *find_device(const pstring &name) const
 		{
 			for (auto & d : m_devices)
 				if (d.first == name)
@@ -1745,16 +1740,6 @@ namespace netlist
 		pstring p = this->get_initial(device, &found);
 		if (found)
 		{
-#if 0
-			bool err = false;
-			auto vald = plib::pstonum_ne<T>(p, err);
-			if (err)
-			{
-				device.state().log().fatal(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
-				plib::pthrow<nl_exception>(MF_INVALID_NUMBER_CONVERSION_1_2(name, p));
-			}
-			m_param = vald;
-#else
 			plib::pfunction<nl_fptype> func;
 			func.compile_infix(p, {});
 			auto valx = func.evaluate();
@@ -1762,7 +1747,6 @@ namespace netlist
 				if (plib::abs(valx - plib::trunc(valx)) > nlconst::magic(1e-6))
 					plib::pthrow<nl_exception>(MF_INVALID_NUMBER_CONVERSION_1_2(device.name() + "." + name, p));
 			m_param = static_cast<T>(valx);
-#endif
 		}
 		else
 			m_param = val;

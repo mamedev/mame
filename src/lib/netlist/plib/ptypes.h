@@ -57,12 +57,12 @@ namespace plib
 	struct nocopyassignmove
 	{
 		nocopyassignmove(const nocopyassignmove &) = delete;
-		nocopyassignmove(nocopyassignmove &&) = delete;
+		nocopyassignmove(nocopyassignmove &&) noexcept = delete;
 		nocopyassignmove &operator=(const nocopyassignmove &) = delete;
-		nocopyassignmove &operator=(nocopyassignmove &&) = delete;
+		nocopyassignmove &operator=(nocopyassignmove &&) noexcept = delete;
 	protected:
 		nocopyassignmove() = default;
-		~nocopyassignmove() = default;
+		~nocopyassignmove() noexcept = default;
 	};
 
 	struct nocopyassign
@@ -71,9 +71,9 @@ namespace plib
 		nocopyassign &operator=(const nocopyassign &) = delete;
 	protected:
 		nocopyassign() = default;
-		~nocopyassign() = default;
-		nocopyassign(nocopyassign &&) = default;
-		nocopyassign &operator=(nocopyassign &&) = default;
+		~nocopyassign() noexcept = default;
+		nocopyassign(nocopyassign &&) noexcept = default;
+		nocopyassign &operator=(nocopyassign &&) noexcept = default;
 	};
 
 	//============================================================

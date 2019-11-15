@@ -61,7 +61,7 @@ namespace devices
 	}
 
 
-	NETLIB_DEVICE_IMPL(dummy_input,         "DUMMY_INPUT",            "")
+	NETLIB_DEVICE_IMPL(nc_pin,              "NC_PIN",                 "")
 	NETLIB_DEVICE_IMPL(frontier,            "FRONTIER_DEV",           "+I,+G,+Q")
 	NETLIB_DEVICE_IMPL(function,            "AFUNC",                  "N,FUNC")
 	NETLIB_DEVICE_IMPL(analog_input,        "ANALOG_INPUT",           "IN")

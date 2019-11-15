@@ -25,15 +25,15 @@ public:
 	~dynlib();
 	COPYASSIGNMOVE(dynlib, delete)
 
-	bool isLoaded() const;
+	bool isLoaded() const { return m_isLoaded; }
 
 	template <typename T>
-	T getsym(const pstring &name)
+	T getsym(const pstring &name) const noexcept
 	{
 		return reinterpret_cast<T>(getsym_p(name));
 	}
 private:
-	void *getsym_p(const pstring &name);
+	void *getsym_p(const pstring &name) const noexcept;
 
 	bool m_isLoaded;
 	void *m_lib;
@@ -47,12 +47,12 @@ public:
 
 	dynproc() : m_sym(nullptr) { }
 
-	dynproc(dynlib &dl, const pstring &name)
+	dynproc(dynlib &dl, const pstring &name) noexcept
 	{
 		m_sym = dl.getsym<calltype>(name);
 	}
 
-	void load(dynlib &dl, const pstring &name)
+	void load(dynlib &dl, const pstring &name) noexcept
 	{
 		m_sym = dl.getsym<calltype>(name);
 	}
@@ -63,7 +63,7 @@ public:
 		//return m_sym(args...);
 	}
 
-	bool resolved() const { return m_sym != nullptr; }
+	bool resolved() const noexcept { return m_sym != nullptr; }
 private:
 	calltype m_sym;
 };

@@ -165,9 +165,9 @@ namespace analog
 		//NETLIB_RESETI();
 		NETLIB_UPDATEI() { }
 
-		q_type qtype() const { return m_qtype; }
-		bool is_qtype(q_type atype) const { return m_qtype == atype; }
-		void set_qtype(q_type atype) { m_qtype = atype; }
+		q_type qtype() const noexcept { return m_qtype; }
+		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
+		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
 	protected:
 
 		fet_model_t m_model;

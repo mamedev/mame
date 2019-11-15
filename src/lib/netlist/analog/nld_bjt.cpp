@@ -18,22 +18,22 @@ namespace analog
 		, m_VT_inv(plib::reciprocal(m_VT))
 		{}
 
-		diode(const nl_fptype Is, const nl_fptype n)
+		diode(nl_fptype Is, nl_fptype n)
 		{
 			m_Is = Is;
 			m_VT = nlconst::magic(0.0258) * n;
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
-		void set(const nl_fptype Is, const nl_fptype n)
+		void set(nl_fptype Is, nl_fptype n) noexcept
 		{
 			m_Is = Is;
 			m_VT = nlconst::magic(0.0258) * n;
 			m_VT_inv = plib::reciprocal(m_VT);
 		}
-		nl_fptype I(const nl_fptype V) const { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }
-		nl_fptype g(const nl_fptype V) const { return m_Is * m_VT_inv * plib::exp(V * m_VT_inv); }
-		nl_fptype V(const nl_fptype I) const { return plib::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
-		nl_fptype gI(const nl_fptype I) const { return m_VT_inv * (I + m_Is); }
+		nl_fptype I(nl_fptype V) const noexcept { return m_Is * plib::exp(V * m_VT_inv) - m_Is; }
+		nl_fptype g(nl_fptype V) const noexcept { return m_Is * m_VT_inv * plib::exp(V * m_VT_inv); }
+		nl_fptype V(nl_fptype I) const noexcept { return plib::log1p(I / m_Is) * m_VT; } // log1p(x)=log(1.0 + x)
+		nl_fptype gI(nl_fptype I) const noexcept { return m_VT_inv * (I + m_Is); }
 
 	private:
 		nl_fptype m_Is;
@@ -140,9 +140,9 @@ namespace analog
 		//NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
-		q_type qtype() const { return m_qtype; }
-		bool is_qtype(q_type atype) const { return m_qtype == atype; }
-		void set_qtype(q_type atype) { m_qtype = atype; }
+		q_type qtype() const noexcept { return m_qtype; }
+		bool is_qtype(q_type atype) const noexcept { return m_qtype == atype; }
+		void set_qtype(q_type atype) noexcept { m_qtype = atype; }
 	protected:
 
 		bjt_model_t m_model;

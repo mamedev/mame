@@ -40,7 +40,7 @@ namespace devices
 		LIB_ENTRY(CCCS)
 		LIB_ENTRY(LVCCS)
 		LIB_ENTRY(opamp)
-		LIB_ENTRY(dummy_input)
+		LIB_ENTRY(nc_pin)
 		LIB_ENTRY(frontier)   // not intended to be used directly
 		LIB_ENTRY(function)   // only for macro devices - NO FEEDBACK loops
 		LIB_ENTRY(QBJT_EB)

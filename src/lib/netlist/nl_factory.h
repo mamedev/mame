@@ -64,10 +64,10 @@ namespace factory {
 			plib::unused_var(name);
 		}
 
-		const pstring &name() const { return m_name; }
-		const pstring &classname() const { return m_classname; }
-		const pstring &param_desc() const { return m_def_param; }
-		const pstring &sourcefile() const { return m_sourcefile; }
+		const pstring &name() const noexcept { return m_name; }
+		const pstring &classname() const noexcept { return m_classname; }
+		const pstring &param_desc() const noexcept { return m_def_param; }
+		const pstring &sourcefile() const noexcept { return m_sourcefile; }
 
 	private:
 		pstring m_name;                             ///< device name
@@ -115,7 +115,7 @@ namespace factory {
 		element_t * factory_by_name(const pstring &devname);
 
 		template <class C>
-		bool is_class(element_t *f)
+		bool is_class(element_t *f) noexcept
 		{
 			return dynamic_cast<device_element_t<C> *>(f) != nullptr;
 		}
