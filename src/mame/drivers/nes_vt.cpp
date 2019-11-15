@@ -1595,22 +1595,11 @@ static const gfx_layout helper2_layout =
 	4*64
 };
 
-
-
 static GFXDECODE_START( vt03_gfx_helper )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_layout,  0x0, 2  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper2_layout,  0x0, 2  )
 GFXDECODE_END
 
-/*
-static const uint8_t descram_ppu_2012_2017[5][6] = {
-	{0x2, 0x3, 0x4, 0x5, 0x6, 0x7}, // 0
-	{0x3, 0x2, 0x7, 0x6, 0x5, 0x4},  // 1
-	, // 2
-	, // 3
-	,  // 4
-};
-*/
 
 void nes_vt_state::nes_vt_base(machine_config &config)
 {
