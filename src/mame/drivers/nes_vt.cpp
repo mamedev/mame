@@ -1843,7 +1843,7 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	nes_vt_dg(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);;
+	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
 // New mystery handheld architecture, VTxx derived
@@ -1893,6 +1893,8 @@ void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
 
 	M6502_VH2009(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vh2009_state::nes_vt_map);
+
+	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
 
