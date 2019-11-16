@@ -88,6 +88,8 @@ void sbus_cgsix_device::device_start()
 	save_item(NAME(m_fbc.m_pixel_mask));
 
 	save_item(NAME(m_fbc.m_patt_align));
+	save_item(NAME(m_fbc.m_patt_align_x));
+	save_item(NAME(m_fbc.m_patt_align_y));
 	save_item(NAME(m_fbc.m_pattern));
 
 	save_item(NAME(m_fbc.m_ipoint_absx));
@@ -162,6 +164,9 @@ void sbus_cgsix_device::device_start()
 	}
 
 	save_item(NAME(m_fbc.m_curr_prim_type));
+
+	save_item(NAME(m_cursor_x));
+	save_item(NAME(m_cursor_y));
 }
 
 void sbus_cgsix_device::device_reset()
@@ -230,7 +235,7 @@ WRITE32_MEMBER(sbus_cgsix_device::vram_w)
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst)
+uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst, uint8_t mask)
 {
 	const uint32_t rops[4] = { fbc_rasterop_rop00(), fbc_rasterop_rop01(), fbc_rasterop_rop10(), fbc_rasterop_rop11() };
 
@@ -286,6 +291,9 @@ void sbus_cgsix_device::handle_font_poke()
 		return;
 	}
 
+	uint32_t pixel_mask = fbc_get_pixel_mask();
+	uint8_t plane_mask = fbc_get_plane_mask();
+
 	const uint32_t daddr = m_fbc.m_y0 * 1152;
 	uint8_t *vram = (uint8_t*)&m_vram[0];
 	vram += daddr;
@@ -293,18 +301,51 @@ void sbus_cgsix_device::handle_font_poke()
 	const uint32_t font = m_fbc.m_font;
 	uint32_t x = m_fbc.m_x0;
 	logerror("Width: %d, bits %d to %d\n", width, 31, 31 - width);
-	for (int bit = 31; bit >= (31 - width); bit--)
+	for (int bit = 31; bit >= (31 - width) && x < 1152; bit--, x++)
 	{
+		if (!BIT(pixel_mask, 31 - (x % 32)))
+			continue;
+
 		const uint8_t src = BIT(font, bit) ? 0xff : 0x00;
 		const uint8_t dst = vram[BYTE4_XOR_BE(x)];
-		vram[BYTE4_XOR_BE(x)]= perform_rasterop(src, dst);
-		x++;
-		if (x >= 1152) break;
+		vram[BYTE4_XOR_BE(x)]= perform_rasterop(src, dst, plane_mask);
 	}
 	m_fbc.m_x0 += m_fbc.m_autoincx;
 	m_fbc.m_x1 += m_fbc.m_autoincx;
 	m_fbc.m_y0 += m_fbc.m_autoincy;
 	m_fbc.m_y1 += m_fbc.m_autoincy;
+}
+
+uint32_t sbus_cgsix_device::fbc_get_pixel_mask()
+{
+	switch (fbc_rasterop_pixel())
+	{
+	default: // Ignore
+		return 0xffffffff;
+	case 1: // Zeros
+		return 0x00000000;
+	case 2: // Ones
+		return 0xffffffff;
+		break;
+	case 3: // Mask
+		return m_fbc.m_pixel_mask;
+	}
+}
+
+uint8_t sbus_cgsix_device::fbc_get_plane_mask()
+{
+	switch (fbc_rasterop_plane())
+	{
+	default: // Ignore
+		return 0xff;
+	case 1: // Zeros
+		return 0x00;
+	case 2: // Ones
+		return 0xff;
+		break;
+	case 3: // Mask
+		return (uint8_t)m_fbc.m_plane_mask;
+	}
 }
 
 // NOTE: This is basically untested, and probably full of bugs!
@@ -330,6 +371,9 @@ void sbus_cgsix_device::handle_draw_command()
 
 	uint8_t *vram = (uint8_t*)&m_vram[0];
 
+	uint32_t pixel_mask = fbc_get_pixel_mask();
+	uint8_t plane_mask = fbc_get_plane_mask();
+
 	uint32_t vindex = 0;
 	while (vindex < m_fbc.m_vertex_count)
 	{
@@ -339,12 +383,35 @@ void sbus_cgsix_device::handle_draw_command()
 		for (uint32_t y = v0.m_absy; y <= v1.m_absy; y++)
 		{
 			uint8_t *line = &vram[y * 1152];
+			const uint16_t patt_y_index = (y - m_fbc.m_patt_align_y) % 16;
 			for (uint32_t x = v0.m_absx; x <= v1.m_absx; x++)
 			{
+				if (!BIT(pixel_mask, 31 - (x % 32)))
+					continue;
+
 				const uint32_t native_x = BYTE4_XOR_BE(x);
-				const uint8_t src = line[native_x];
-				const uint8_t dst = src;
-				line[native_x] = perform_rasterop(src, dst);
+				uint8_t src = line[native_x];
+
+				switch (fbc_rasterop_pattern())
+				{
+				default: // Ignore
+					break;
+				case 1: // Zeroes
+					src = 0x00;
+					break;
+				case 2: // Ones
+					src = 0xff;
+					break;
+				case 3: // Pattern register
+				{
+					const uint16_t patt_x_index = 15 - ((x - m_fbc.m_patt_align_x) % 16);
+					src = BIT(m_fbc.m_patterns[patt_y_index], patt_x_index) ? 0xff : 0x00;
+					break;
+				}
+				}
+
+				const uint8_t dst = line[native_x];
+				line[native_x] = perform_rasterop(src, dst, plane_mask);
 			}
 		}
 	}
@@ -884,38 +951,56 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 		case FBC_PATT_ALIGN:
 			logerror("fbc_w: PATT_ALIGN = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_patt_align);
+			m_fbc.m_patt_align_x = (m_fbc.m_patt_align >> 16) & 0x000f;
+			m_fbc.m_patt_align_y = m_fbc.m_patt_align & 0x000f;
 			break;
 		case FBC_PATTERN0:
 			logerror("fbc_w: PATTERN0 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[0]);
+			m_fbc.m_patterns[0] = m_fbc.m_pattern[0] >> 16;
+			m_fbc.m_patterns[1] = (uint16_t)m_fbc.m_pattern[0];
 			break;
 		case FBC_PATTERN1:
 			logerror("fbc_w: PATTERN1 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[1]);
+			m_fbc.m_patterns[2] = m_fbc.m_pattern[1] >> 16;
+			m_fbc.m_patterns[3] = (uint16_t)m_fbc.m_pattern[1];
 			break;
 		case FBC_PATTERN2:
 			logerror("fbc_w: PATTERN2 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[2]);
+			m_fbc.m_patterns[4] = m_fbc.m_pattern[2] >> 16;
+			m_fbc.m_patterns[5] = (uint16_t)m_fbc.m_pattern[2];
 			break;
 		case FBC_PATTERN3:
 			logerror("fbc_w: PATTERN3 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[3]);
+			m_fbc.m_patterns[6] = m_fbc.m_pattern[3] >> 16;
+			m_fbc.m_patterns[7] = (uint16_t)m_fbc.m_pattern[3];
 			break;
 		case FBC_PATTERN4:
 			logerror("fbc_w: PATTERN4 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[4]);
+			m_fbc.m_patterns[8] = m_fbc.m_pattern[4] >> 16;
+			m_fbc.m_patterns[9] = (uint16_t)m_fbc.m_pattern[4];
 			break;
 		case FBC_PATTERN5:
 			logerror("fbc_w: PATTERN5 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[5]);
+			m_fbc.m_patterns[10] = m_fbc.m_pattern[5] >> 16;
+			m_fbc.m_patterns[11] = (uint16_t)m_fbc.m_pattern[5];
 			break;
 		case FBC_PATTERN6:
 			logerror("fbc_w: PATTERN6 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[6]);
+			m_fbc.m_patterns[12] = m_fbc.m_pattern[6] >> 16;
+			m_fbc.m_patterns[13] = (uint16_t)m_fbc.m_pattern[6];
 			break;
 		case FBC_PATTERN7:
 			logerror("fbc_w: PATTERN7 = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_pattern[7]);
+			m_fbc.m_patterns[14] = m_fbc.m_pattern[7] >> 16;
+			m_fbc.m_patterns[15] = (uint16_t)m_fbc.m_pattern[7];
 			break;
 
 		case FBC_IPOINT_ABSX:
