@@ -317,7 +317,6 @@ void menu::reset(reset_options options)
 		else
 			item_append(_("Return to Previous Menu"), "", 0, nullptr);
 	}
-
 }
 
 
