@@ -38,9 +38,7 @@
 
   (more)
 
-  VT1682 - NOT compatible with NES, different video system, sound CPU (4x
-           main CPU clock), optional internal ROM etc. (will need it's own
-           driver)
+
 
   todo (VT03):
 
@@ -74,7 +72,6 @@
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
-#include "machine/m6502_vt1682.h"
 #include "machine/m6502_vh2009.h"
 #include "screen.h"
 #include "speaker.h"
@@ -225,20 +222,6 @@ private:
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 };
 
-class nes_vt_vt1682_state : public nes_vt_state
-{
-public:
-	nes_vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
-	{ }
-
-	void nes_vt_vt1682(machine_config& config);
-
-protected:
-
-private:
-	void nes_vt_vt1682_map(address_map& map);
-};
 
 class nes_vt_vh2009_state : public nes_vt_state
 {
@@ -1651,11 +1634,6 @@ void nes_vt_state::prg_map(address_map &map)
 	map(0x6000, 0x7fff).bankr("prg_bank3");
 }
 
-void nes_vt_vt1682_state::nes_vt_vt1682_map(address_map &map)
-{
-	nes_vt_map(map);
-	map(0x0000, 0x1fff).ram();
-}
 
 
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
@@ -1879,13 +1857,6 @@ void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
 }
 
-void nes_vt_vt1682_state::nes_vt_vt1682(machine_config &config)
-{
-	nes_vt(config);
-
-	M6502_VT1682(config.replace(), m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vt1682_state::nes_vt_vt1682_map);
-}
 
 void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
 {
@@ -1996,15 +1967,6 @@ ROM_START( cybar120 )
 	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
 
-ROM_START( ii8in1 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "ii8in1.bin", 0x00000, 0x2000000, CRC(7aee7464) SHA1(7a9cf7f54a350f0853a17459f2dcbef34f4f7c30) ) // 2ND HALF EMPTY
-ROM_END
-
-ROM_START( ii32in1 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
-ROM_END
 
 ROM_START( mc_dg101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
@@ -2300,11 +2262,6 @@ CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "
 CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 
-// these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
-// to be emulated
-// (no visible tiles in ROM using standard decodes tho, might need moving out of here)
-CONS( 200?, ii8in1,    0,  0,  nes_vt_vt1682,    nes_vt, nes_vt_vt1682_state, empty_init, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
-CONS( 200?, ii32in1,   0,  0,  nes_vt_vt1682,    nes_vt, nes_vt_vt1682_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
 CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
