@@ -201,6 +201,7 @@ namespace netlist
 	, m_state()
 	, m_callbacks(std::move(callbacks)) // Order is important here
 	, m_log(*m_callbacks)
+	, m_extended_validation(false)
 	{
 		pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
 		m_lib = plib::make_unique<plib::dynlib>(libpath);

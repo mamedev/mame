@@ -1539,6 +1539,25 @@ namespace netlist
 		// memory pool - still needed in some places
 		nlmempool &pool() noexcept { return m_pool; }
 		const nlmempool &pool() const noexcept { return m_pool; }
+
+		/// \brief set extended validation mode.
+		///
+		/// The extended validation mode is not intended for running.
+		/// The intention is to identify power pins which are not properly
+		/// connected. The downside is that this mode creates a netlist which
+		/// is different (and not able to run).
+		///
+		/// Extended validation is supported by nltool validate option.
+		///
+		/// \param val Boolean value enabling/disabling extended validation mode
+		void set_extended_validation(bool val) { m_extended_validation = val; }
+
+		/// \brief State of extended validation mode.
+		///
+		/// \returns boolean value indicating if extended validation mode is
+		/// turned on.
+		bool is_extended_validation() const { return m_extended_validation; }
+
 	private:
 
 		void reset();
@@ -1555,6 +1574,7 @@ namespace netlist
 		nets_collection_type                m_nets;
 		// sole use is to manage lifetime of net objects
 		devices_collection_type             m_devices;
+		bool m_extended_validation;
 	};
 
 	namespace devices
@@ -1781,7 +1801,10 @@ namespace netlist
 	{
 		auto f = stream();
 		if (f != nullptr)
+		{
 			f->read(reinterpret_cast<std::istream::char_type *>(&m_data[0]),1<<AW);
+			// FIXME: check for failbit if not in validation.
+		}
 		else
 			device.state().log().warning(MW_ROM_NOT_FOUND(str()));
 	}

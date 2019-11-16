@@ -340,7 +340,6 @@ setup_t::setup_t(netlist_state_t &nlstate)
 	, m_nlstate(nlstate)
 	, m_netlist_params(nullptr)
 	, m_proxy_cnt(0)
-	, m_validation(false)
 {
 }
 

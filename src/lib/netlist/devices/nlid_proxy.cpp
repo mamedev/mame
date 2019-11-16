@@ -122,7 +122,7 @@ namespace netlist
 		register_subalias("Q", m_RN.m_P);
 
 		log().verbose("D/A Proxy: Found power terminals on device {1}", out_proxied->device().name());
-		if (anetlist.setup().is_extended_validation())
+		if (anetlist.is_extended_validation())
 		{
 			// During validation, don't connect to terminals found
 			// This will cause terminals not connected to a rail net to

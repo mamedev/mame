@@ -664,11 +664,5 @@ NETLIST_START(stuntcyc)
 		MISS_SW_B0.VCC, MISS_SW_B1.VCC, MISS_SW_B2.VCC, R38_2.VCC, R39_2.VCC)
 	NET_C(GND, high.GND, low.GND, ANTENNA.GND, FREESCORE_SW_B0.GND, FREESCORE_SW_B1.GND, FREESCORE_SW_B2.GND, FREESCORE_SW_B3.GND,
 		MISS_SW_B0.GND, MISS_SW_B1.GND, MISS_SW_B2.GND, R38_2.GND, R39_2.GND)
-
-	NET_C(VCC, OUT_probe_bit0.VCC, OUT_probe_bit1.VCC, OUT_probe_bit2.VCC, OUT_probe_bit3.VCC,
-		OUT_probe_bit4.VCC, OUT_probe_bit5.VCC, OUT_probe_bit6.VCC, OUT_probe_clock.VCC)
-	NET_C(GND, OUT_probe_bit0.GND, OUT_probe_bit1.GND, OUT_probe_bit2.GND, OUT_probe_bit3.GND,
-		OUT_probe_bit4.GND, OUT_probe_bit5.GND, OUT_probe_bit6.GND, OUT_probe_clock.GND)
-
 #endif
 NETLIST_END()

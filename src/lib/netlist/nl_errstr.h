@@ -10,22 +10,6 @@
 
 #include "plib/pfmtlog.h"
 
-#define PERRMSG(name, str) \
-	struct name \
-	{ \
-		operator pstring() const noexcept { return str; } \
-	};
-
-#define PERRMSGV(name, narg, str) \
-	struct name \
-	{ \
-		template<typename... Args> explicit name(Args&&... args) \
-		: m_m(plib::pfmt(str)(std::forward<Args>(args)...)) \
-		{ static_assert(narg == sizeof...(args), "Argument count mismatch"); } \
-		operator pstring() const { return m_m; } \
-		pstring m_m; \
-	};
-
 namespace netlist
 {
 
@@ -53,12 +37,18 @@ namespace netlist
 	// nl_base.cpp
 
 	PERRMSGV(MF_MODEL_1_CAN_NOT_BE_CHANGED_AT_RUNTIME, 1, "Model {1} can not be changed at runtime")
-	PERRMSGV(MF_MORE_THAN_ONE_1_DEVICE_FOUND,       1, "more than one {1} device found")
+	PERRMSGV(MF_MORE_THAN_ONE_1_DEVICE_FOUND,       1, "More than one {1} device found")
 
 	// nl_parser.cpp
 
 	PERRMSGV(MF_UNEXPECTED_NETLIST_END,             0, "Unexpected NETLIST_END")
+	PERRMSGV(MF_UNEXPECTED_END_OF_FILE,             0, "Unexpected end of file, missing NETLIST_END")
 	PERRMSGV(MF_UNEXPECTED_NETLIST_START,           0, "Unexpected NETLIST_START")
+	PERRMSGV(MF_EXPECTED_IDENTIFIER_GOT_1,			1, "Expected an identifier, but got {1}")
+	PERRMSGV(MF_EXPECTED_COMMA_OR_RP_1,				1, "Expected comma or right parenthesis but found <{1}>")
+	PERRMSGV(MF_DIPPINS_EQUAL_NUMBER_1,				1, "DIPPINS requires equal number of pins to DIPPINS, first pin is {}")
+	PERRMSGV(MF_PARAM_NOT_FP_1,						1, "Parameter value <{1}> not floating point")
+	PERRMSGV(MF_TT_LINE_WITHOUT_HEAD,				0, "TT_LINE found without TT_HEAD")
 
 	// nl_setup.cpp
 

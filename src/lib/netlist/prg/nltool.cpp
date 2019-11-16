@@ -482,7 +482,7 @@ void tool_app_t::validate()
 	m_errors = 0;
 	m_warnings = 0;
 
-	nt.setup().set_extended_validation(opt_extended_validation());
+	nt.set_extended_validation(opt_extended_validation());
 
 	try
 	{

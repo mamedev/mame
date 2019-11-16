@@ -425,23 +425,6 @@ namespace netlist
 
 		void prepare_to_run();
 
-		/// \brief set extended validation mode.
-		///
-		/// The extended validation mode is not intended for running.
-		/// The intention is to identify power pins which are not properly
-		/// connected. The downside is that this mode creates a netlist which
-		/// is different (and not able to run).
-		///
-		/// Extended validation is supported by nltool validate option.
-		///
-		/// \param val Boolean value enabling/disabling extended validation mode
-		void set_extended_validation(bool val) { m_validation = val; }
-
-		/// \brief State of extended validation mode.
-		///
-		/// \returns boolean value indicating if extended validation mode is
-		/// turned on.
-		bool is_extended_validation() const { return m_validation; }
 	private:
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
@@ -468,7 +451,6 @@ namespace netlist
 			devices::nld_base_proxy *>				m_proxies;
 
 		unsigned m_proxy_cnt;
-		bool m_validation;
 	};
 
 	// ----------------------------------------------------------------------------------------

@@ -61,9 +61,9 @@ namespace devices
 		nld_a_to_d_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_input_t *in_proxied);
 
-		virtual logic_output_t &out() noexcept override { return m_Q; }
+		logic_output_t &out() noexcept override { return m_Q; }
 
-		virtual detail::core_terminal_t &proxy_term() noexcept override
+		detail::core_terminal_t &proxy_term() noexcept override
 		{
 			return m_I;
 		}
@@ -99,9 +99,9 @@ namespace devices
 		nld_d_to_a_proxy(netlist_state_t &anetlist, const pstring &name,
 			logic_output_t *out_proxied);
 
-		virtual logic_input_t &in() noexcept override { return m_I; }
+		logic_input_t &in() noexcept override { return m_I; }
 
-		virtual detail::core_terminal_t &proxy_term() noexcept override
+		detail::core_terminal_t &proxy_term() noexcept override
 		{
 			return m_RN.m_P;
 		}
