@@ -637,41 +637,11 @@ btlfieldb:
 @:maincpu,program,204101,bf,00,0c
 
 
-;(paddle mania) (by GeoMan)
-paddlema:
-@:maincpu,program,801a8,28,02,03
-@:maincpu,program,82108,a0,00,20
-
-
-;(kyros) (by GeoMan)
-kyros:
-kyrosj:
-@:maincpu,program,20e00,ae,01,02
-@:maincpu,program,20020,4,00,00
-
-
-tnextspcj:
-@:maincpu,program,72b40,4f,00,43
-@:maincpu,program,70016,4,00,00
-
-
-tnextspc:
-tnextspc2:
-@:maincpu,program,72b40,4f,00,4b
-@:maincpu,program,70016,4,00,00
-
-
 ;(sky soldiers)
 skysoldr:
 skysoldrbl:
 @:maincpu,program,204100,c0,00,0c
 @:maincpu,program,40030,4,00,00
-
-
-;(super stingray) (by GeoMan)
-sstingry:
-@:maincpu,program,20028,4,00,73
-@:maincpu,program,20770,90,00,00
 
 
 gangwars:
@@ -692,6 +662,40 @@ goldmedla:
 @:maincpu,program,40a20,a0,00,00
 @:maincpu,program,40b22,46,1b,00
 @:maincpu,program,40b20,2,00,01
+
+
+;@s:alpha68k_i.cpp
+
+;(paddle mania) (by GeoMan)
+paddlema:
+@:maincpu,program,801a8,28,02,03
+@:maincpu,program,82108,a0,00,20
+
+
+tnextspcj:
+@:maincpu,program,72b40,4f,00,43
+@:maincpu,program,70016,4,00,00
+
+
+tnextspc:
+tnextspc2:
+@:maincpu,program,72b40,4f,00,4b
+@:maincpu,program,70016,4,00,00
+
+
+;@s:alpha68k_n.cpp
+
+;(kyros) (by GeoMan)
+kyros:
+kyrosj:
+@:maincpu,program,20e00,ae,01,02
+@:maincpu,program,20020,4,00,00
+
+
+;(super stingray) (by GeoMan)
+sstingry:
+@:maincpu,program,20028,4,00,73
+@:maincpu,program,20770,90,00,00
 
 
 ;@s:ambush.cpp
@@ -1414,7 +1418,7 @@ beezer:
 ;@s:berzerk.cpp
 
 berzerk:
-berzerk1:
+berzerkb:
 berzerkf:
 berzerkg:
 berzerks:
