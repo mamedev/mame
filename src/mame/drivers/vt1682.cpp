@@ -34,22 +34,133 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vt_vt1682_map(address_map &map);
 
+
+	/* Video */
+	uint8_t m_2000;
+
 	DECLARE_READ8_MEMBER(vt1682_2000_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2000_w);
 
-	uint8_t m_2000;
 
+	/* System */
+	uint8_t m_prgbank1_r0;
+	uint8_t m_prgbank1_r1;
+	uint8_t m_210c_prgbank1_r2;
+	uint8_t m_2100_prgbank1_r3;
+	uint8_t m_2118_prgbank1_r4_r5;
+
+	uint8_t m_2107_prgbank0_r0;
+	uint8_t m_2108_prgbank0_r1;
+	uint8_t m_2109_prgbank0_r2;
+	uint8_t m_210a_prgbank0_r3;
+	uint8_t m_prgbank0_r4;
+	uint8_t m_prgbank0_r5;
+
+	uint8_t m_210b_misc_cs_prg0_bank_sel;
+
+	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
+	DECLARE_READ8_MEMBER(vt1682_210c_prgbank1_r2_r);
+	DECLARE_WRITE8_MEMBER(vt1682_210c_prgbank1_r2_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2107_prgbank0_r0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2107_prgbank0_r0_w);
+	DECLARE_READ8_MEMBER(vt1682_2108_prgbank0_r1_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2108_prgbank0_r1_w);
+	DECLARE_READ8_MEMBER(vt1682_2109_prgbank0_r2_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2109_prgbank0_r2_w);
+	DECLARE_READ8_MEMBER(vt1682_210a_prgbank0_r3_r);
+	DECLARE_WRITE8_MEMBER(vt1682_210a_prgbank0_r3_w);
+
+	DECLARE_READ8_MEMBER(vt1682_prgbank0_r4_r);
+	DECLARE_READ8_MEMBER(vt1682_prgbank0_r5_r);
+	DECLARE_READ8_MEMBER(vt1682_prgbank1_r0_r);
+	DECLARE_READ8_MEMBER(vt1682_prgbank1_r1_r);
+
+	DECLARE_WRITE8_MEMBER(vt1682_prgbank1_r0_w);
+	DECLARE_WRITE8_MEMBER(vt1682_prgbank1_r1_w);
+	DECLARE_WRITE8_MEMBER(vt1682_prgbank0_r4_w);
+	DECLARE_WRITE8_MEMBER(vt1682_prgbank0_r5_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2118_prgbank1_r4_r5_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2118_prgbank1_r4_r5_w);
+
+	DECLARE_READ8_MEMBER(vt1682_210b_misc_cs_prg0_bank_sel_r);
+	DECLARE_WRITE8_MEMBER(vt1682_210b_misc_cs_prg0_bank_sel_w);
+
+	/* Support */
+	void update_banks();
 };
 
 void vt_vt1682_state::machine_start()
 {
+	/* Video */
 	save_item(NAME(m_2000));
+
+	/* System */
+
+	save_item(NAME(m_prgbank1_r0));
+	save_item(NAME(m_prgbank1_r1));
+	save_item(NAME(m_210c_prgbank1_r2));
+	save_item(NAME(m_2100_prgbank1_r3));
+	save_item(NAME(m_2118_prgbank1_r4_r5));
+
+	save_item(NAME(m_2107_prgbank0_r0));
+	save_item(NAME(m_2108_prgbank0_r1));
+	save_item(NAME(m_2109_prgbank0_r2));
+	save_item(NAME(m_210a_prgbank0_r3));
+	save_item(NAME(m_prgbank0_r4));
+	save_item(NAME(m_prgbank0_r5));
+
+	save_item(NAME(m_210b_misc_cs_prg0_bank_sel));
 }
 
 void vt_vt1682_state::machine_reset()
 {
+	/* Video */
 	m_2000 = 0;
+
+	/* System */
+	m_prgbank1_r0 = 0;
+	m_prgbank1_r1 = 0;
+	m_210c_prgbank1_r2 = 0;
+	m_2100_prgbank1_r3 = 0;
+	m_2118_prgbank1_r4_r5 = 0;
+
+	m_2107_prgbank0_r0 = 0;
+	m_2108_prgbank0_r1 = 0;
+	m_2109_prgbank0_r2 = 0;
+	m_210a_prgbank0_r3 = 0;
+	m_prgbank0_r4 = 0;
+	m_prgbank0_r5 = 0;
+
+	m_210b_misc_cs_prg0_bank_sel = 0;
+
+	update_banks();
 }
+
+void vt_vt1682_state::update_banks()
+{
+	/* must use
+
+	m_prgbank1_r0
+	m_prgbank1_r1
+	m_210c_prgbank1_r2
+	m_2100_prgbank1_r3
+	m_2118_prgbank1_r4_r5
+
+	m_2107_prgbank0_r0
+	m_2108_prgbank0_r1
+	m_2109_prgbank0_r2
+	m_210a_prgbank0_r3
+	m_prgbank0_r4
+	m_prgbank0_r5
+
+	maybe
+	m_210b_misc_cs_prg0_bank_sel
+	*/
+}
+
 
 /************************************************************************************************************************************
  VT1682 PPU Registers
@@ -71,13 +182,13 @@ void vt_vt1682_state::machine_reset()
 READ8_MEMBER(vt_vt1682_state::vt1682_2000_r)
 {
 	uint8_t ret = m_2000;
-	logerror("%s: vt1682_2000_r offset: %02x returning: %04x\n", machine().describe_context(), offset, ret);
+	logerror("%s: vt1682_2000_r offset: %02x returning: %02x\n", machine().describe_context(), offset, ret);
 	return ret;
 }
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
 {
-	logerror("%s: vt1682_2000_w offset: %02x writing: %04x\n", machine().describe_context(), offset, data);
+	logerror("%s: vt1682_2000_w offset: %02x writing: %02x\n", machine().describe_context(), offset, data);
 	m_2000 = data;
 }
 
@@ -740,6 +851,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Program Bank 1 Register 3
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_r)
+{
+	uint8_t ret = m_2100_prgbank1_r3;
+	logerror("%s: vt1682_2100_prgbank1_r3_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
+{
+	logerror("%s: vt1682_2100_prgbank1_r3_w writing: %02x (4-bits)\n", machine().describe_context(), data);
+	m_2100_prgbank1_r3 = data;
+	update_banks();
+}
+
+
 /*
     Address 0x2101 r/w (MAIN CPU)
 
@@ -831,6 +957,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Program Bank 0 Register 0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2107_prgbank0_r0_r)
+{
+	uint8_t ret = m_2107_prgbank0_r0;
+	logerror("%s: vt1682_2107_prgbank0_r0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2107_prgbank0_r0_w)
+{
+	logerror("%s: vt1682_2107_prgbank0_r0_w writing: %02x\n", machine().describe_context(), data);
+	m_2107_prgbank0_r0 = data;
+	update_banks();
+}
+
 /*
     Address 0x2108 r/w (MAIN CPU)
 
@@ -843,6 +983,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - Program Bank 0 Register 1
     0x01 - Program Bank 0 Register 1
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2108_prgbank0_r1_r)
+{
+	uint8_t ret = m_2108_prgbank0_r1;
+	logerror("%s: vt1682_2108_prgbank0_r1_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2108_prgbank0_r1_w)
+{
+	logerror("%s: vt1682_2108_prgbank0_r1_w writing: %02x\n", machine().describe_context(), data);
+	m_2108_prgbank0_r1 = data;
+	update_banks();
+}
+
 
 /*
     Address 0x2109 r/w (MAIN CPU)
@@ -857,6 +1012,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Program Bank 0 Register 2
 */
 
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2109_prgbank0_r2_r)
+{
+	uint8_t ret = m_2109_prgbank0_r2;
+	logerror("%s: vt1682_2109_prgbank0_r2_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2109_prgbank0_r2_w)
+{
+	logerror("%s: vt1682_2109_prgbank0_r2_w writing: %02x\n", machine().describe_context(), data);
+	m_2109_prgbank0_r2 = data;
+	update_banks();
+}
+
 /*
     Address 0x210a r/w (MAIN CPU)
 
@@ -869,6 +1039,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - Program Bank 0 Register 3
     0x01 - Program Bank 0 Register 3
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_210a_prgbank0_r3_r)
+{
+	uint8_t ret = m_210a_prgbank0_r3;
+	logerror("%s: vt1682_210a_prgbank0_r3_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210a_prgbank0_r3_w)
+{
+	logerror("%s: vt1682_210a_prgbank0_r3_w writing: %02x\n", machine().describe_context(), data);
+	m_210a_prgbank0_r3 = data;
+	update_banks();
+}
 
 /*
     Address 0x210b r/w (MAIN CPU)
@@ -883,6 +1067,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Program Bank 0 Select
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r)
+{
+	uint8_t ret = m_210b_misc_cs_prg0_bank_sel;
+	logerror("%s: vt1682_210b_misc_cs_prg0_bank_sel_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
+{
+	logerror("%s: vt1682_210b_misc_cs_prg0_bank_sel_w writing: %02x\n", machine().describe_context(), data);
+	m_210b_misc_cs_prg0_bank_sel = data;
+	update_banks();
+}
+
+
 /*
     Address 0x210c r/w (MAIN CPU)
 
@@ -895,6 +1094,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - Program Bank 1 Register 2
     0x01 - Program Bank 1 Register 2
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_r)
+{
+	uint8_t ret = m_210c_prgbank1_r2;
+	logerror("%s: vt1682_210c_prgbank1_r2_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
+{
+	logerror("%s: vt1682_210c_prgbank1_r2_w writing: %02x (4-bits)\n", machine().describe_context(), data);
+	m_210c_prgbank1_r2 = data;
+	update_banks();
+}
+
 
 /*
     Address 0x210d r/w (MAIN CPU)
@@ -936,7 +1150,18 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
 */
 
 /*
-    Address 0x2110 WRITE ONLY (MAIN CPU)
+   Address 0x2110 READ (MAIN CPU)
+
+    0x80 - Program Bank 0 Register 4
+    0x40 - Program Bank 0 Register 4
+    0x20 - Program Bank 0 Register 4
+    0x10 - Program Bank 0 Register 4
+    0x08 - Program Bank 0 Register 4
+    0x04 - Program Bank 0 Register 4
+    0x02 - Program Bank 0 Register 4
+    0x01 - Program Bank 0 Register 4
+
+    Address 0x2110 WRITE (MAIN CPU)
 
     0x80 - (unused)
     0x40 - (unused)
@@ -948,8 +1173,33 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Program Bank 1 Register 0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r4_r)
+{
+	uint8_t ret = m_prgbank0_r4;
+	logerror("%s: (2110) vt1682_prgbank0_r4_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r0_w)
+{
+	logerror("%s: (2110) vt1682_prgbank1_r0_w writing: %02x (4-bits)\n", machine().describe_context(), data);
+	m_prgbank1_r0 = data;
+	update_banks();
+}
+
 /*
-    Address 0x2111 WRITE ONLY (MAIN CPU)
+   Address 0x2111 READ (MAIN CPU)
+
+    0x80 - Program Bank 0 Register 5
+    0x40 - Program Bank 0 Register 5
+    0x20 - Program Bank 0 Register 5
+    0x10 - Program Bank 0 Register 5
+    0x08 - Program Bank 0 Register 5
+    0x04 - Program Bank 0 Register 5
+    0x02 - Program Bank 0 Register 5
+    0x01 - Program Bank 0 Register 5
+
+    Address 0x2111 WRITE (MAIN CPU)
 
     0x80 - (unused)
     0x40 - (unused)
@@ -961,8 +1211,24 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Program Bank 1 Register 1
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r5_r)
+{
+	uint8_t ret = m_prgbank0_r5;
+	logerror("%s: (2111) vt1682_prgbank0_r5_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r1_w)
+{
+	logerror("%s: (2111) vt1682_prgbank1_r1_w writing: %02x (4-bits)\n", machine().describe_context(), data);
+	m_prgbank1_r1 = data;
+	update_banks();
+}
+
+
 /*
-    Address 0x2112 READ ONLY (MAIN CPU)
+    Address 0x2112 READ (MAIN CPU)
 
     0x80 - (unused)
     0x40 - (unused)
@@ -972,10 +1238,37 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x04 - Program Bank 1 Register 0
     0x02 - Program Bank 1 Register 0
     0x01 - Program Bank 1 Register 0
+
+    Address 0x2112 WRITE (MAIN CPU)
+
+    0x80 - Program Bank 0 Register 4
+    0x40 - Program Bank 0 Register 4
+    0x20 - Program Bank 0 Register 4
+    0x10 - Program Bank 0 Register 4
+    0x08 - Program Bank 0 Register 4
+    0x04 - Program Bank 0 Register 4
+    0x02 - Program Bank 0 Register 4
+    0x01 - Program Bank 0 Register 4
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r0_r)
+{
+	uint8_t ret = m_prgbank1_r0;
+	logerror("%s: (2112) vt1682_prgbank1_r0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r4_w)
+{
+	logerror("%s: (2112) vt1682_prgbank0_r4_w writing: %02x (8-bits)\n", machine().describe_context(), data);
+	m_prgbank0_r4 = data;
+	update_banks();
+}
+
+
 /*
-    Address 0x2113 READ ONLY (MAIN CPU)
+    Address 0x2113 READ (MAIN CPU)
 
     0x80 - (unused)
     0x40 - (unused)
@@ -985,7 +1278,32 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x04 - Program Bank 1 Register 1
     0x02 - Program Bank 1 Register 1
     0x01 - Program Bank 1 Register 1
+
+    Address 0x2113 WRITE (MAIN CPU)
+
+    0x80 - Program Bank 0 Register 5
+    0x40 - Program Bank 0 Register 5
+    0x20 - Program Bank 0 Register 5
+    0x10 - Program Bank 0 Register 5
+    0x08 - Program Bank 0 Register 5
+    0x04 - Program Bank 0 Register 5
+    0x02 - Program Bank 0 Register 5
+    0x01 - Program Bank 0 Register 5
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_prgbank1_r1_r)
+{
+	uint8_t ret = m_prgbank1_r1;
+	logerror("%s: (2113) vt1682_prgbank1_r1_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_prgbank0_r5_w)
+{
+	logerror("%s: (2113) vt1682_prgbank0_r5_w writing: %02x (8-bits)\n", machine().describe_context(), data);
+	m_prgbank0_r5 = data;
+	update_banks();
+}
 
 /*
     Address 0x2114 r/w (MAIN CPU)
@@ -1062,6 +1380,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - Program Bank 1 Register 4
     0x01 - Program Bank 1 Register 4
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r)
+{
+	uint8_t ret = m_2118_prgbank1_r4_r5;
+	logerror("%s: vt1682_2118_prgbank1_r4_r5_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w)
+{
+	logerror("%s: vt1682_2118_prgbank1_r4_r5_w writing: %02x (2x 4-bits)\n", machine().describe_context(), data);
+	m_2118_prgbank1_r4_r5 = data;
+	update_banks();
+}
+
 
 /*
     Address 0x2119 WRITE ONLY (MAIN CPU)
@@ -2282,7 +2615,25 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 
+	/* Video */
 	map(0x2000, 0x2000).rw(FUNC(vt_vt1682_state::vt1682_2000_r), FUNC(vt_vt1682_state::vt1682_2000_w));
+
+	/* System */
+	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
+	map(0x2107, 0x2107).rw(FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_r), FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_w));
+	map(0x2108, 0x2108).rw(FUNC(vt_vt1682_state::vt1682_2108_prgbank0_r1_r), FUNC(vt_vt1682_state::vt1682_2108_prgbank0_r1_w));
+	map(0x2109, 0x2109).rw(FUNC(vt_vt1682_state::vt1682_2109_prgbank0_r2_r), FUNC(vt_vt1682_state::vt1682_2109_prgbank0_r2_w));
+	map(0x210a, 0x210a).rw(FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_r), FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_w));
+	map(0x210b, 0x210b).rw(FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r), FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w));
+	map(0x210c, 0x210c).rw(FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_r), FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_w));
+
+	// either reads/writes are on different addresses or our source info is incorrect
+	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
+	map(0x2111, 0x2111).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r5_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r1_w));
+	map(0x2112, 0x2112).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r0_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r4_w));
+	map(0x2113, 0x2113).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r1_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r5_w));
+
+	map(0x2118, 0x2118).rw(FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r), FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0xffff).rom().region("mainrom", 0x74000);
