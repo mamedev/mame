@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Vas Crabb
 /***************************************************************************
 
     ui/confswitch.h
