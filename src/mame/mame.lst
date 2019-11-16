@@ -12945,6 +12945,9 @@ promutrvb                       // (c) 1985 Enerdyne Technologies Inc
 promutrvc                       // (c) 1985 Enerdyne Technologies Inc
 strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 
+@source:eurit.cpp
+eurit30                         //
+
 @source:eurocom2.cpp
 eurocom2                        //
 waveterm                        //

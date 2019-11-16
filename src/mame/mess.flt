@@ -243,6 +243,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurit.cpp
 eurocom2.cpp
 europc.cpp
 eva.cpp

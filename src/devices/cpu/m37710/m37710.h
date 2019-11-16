@@ -2168,10 +2168,20 @@ protected:
 	void map(address_map &map);
 };
 
+class m37730s2_device : public m37710_cpu_device
+{
+public:
+	// construction/destruction
+	m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+protected:
+	void map(address_map &map);
+};
+
 DECLARE_DEVICE_TYPE(M37702M2, m37702m2_device)
 DECLARE_DEVICE_TYPE(M37702S1, m37702s1_device)
 DECLARE_DEVICE_TYPE(M37710S4, m37710s4_device)
 DECLARE_DEVICE_TYPE(M37720S1, m37720s1_device)
+DECLARE_DEVICE_TYPE(M37730S2, m37730s2_device)
 
 
 /* ======================================================================== */
