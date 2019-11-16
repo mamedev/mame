@@ -74,6 +74,8 @@
 #include "machine/bankdev.h"
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
+#include "machine/m6502_vt1682.h"
+#include "machine/m6502_vh2009.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -222,6 +224,37 @@ private:
 	uint16_t decode_nt_addr(uint16_t addr);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 };
+
+class nes_vt_vt1682_state : public nes_vt_state
+{
+public:
+	nes_vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+	void nes_vt_vt1682(machine_config& config);
+
+protected:
+
+private:
+	void nes_vt_vt1682_map(address_map& map);
+};
+
+class nes_vt_vh2009_state : public nes_vt_state
+{
+public:
+	nes_vt_vh2009_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+	void nes_vt_vh2009(machine_config& config);
+
+protected:
+
+private:
+};
+
+
 
 class nes_vt_pjoy_state : public nes_vt_state
 {
@@ -1618,6 +1651,13 @@ void nes_vt_state::prg_map(address_map &map)
 	map(0x6000, 0x7fff).bankr("prg_bank3");
 }
 
+void nes_vt_vt1682_state::nes_vt_vt1682_map(address_map &map)
+{
+	nes_vt_map(map);
+	map(0x0000, 0x1fff).ram();
+}
+
+
 WRITE_LINE_MEMBER(nes_vt_state::apu_irq)
 {
 //  set_input_line(N2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1803,7 +1843,7 @@ void nes_vt_hh_state::nes_vt_vg(machine_config &config)
 	nes_vt_dg(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_hh_state::nes_vt_hh_map);
 
-	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);;
+	m_ppu->set_palette_mode(PAL_MODE_NEW_VG);
 }
 
 // New mystery handheld architecture, VTxx derived
@@ -1837,6 +1877,24 @@ void nes_vt_dg_state::nes_vt_fa(machine_config &config)
 {
 	nes_vt_xx(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_dg_state::nes_vt_fa_map);
+}
+
+void nes_vt_vt1682_state::nes_vt_vt1682(machine_config &config)
+{
+	nes_vt(config);
+
+	M6502_VT1682(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vt1682_state::nes_vt_vt1682_map);
+}
+
+void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
+{
+	nes_vt(config);
+
+	M6502_VH2009(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vh2009_state::nes_vt_map);
+
+	//m_ppu->set_palette_mode(PAL_MODE_NEW_VG); // gives better title screens, but worse ingame, must be able to switch
 }
 
 
@@ -2241,11 +2299,17 @@ CONS( 200?, lexcyber,  0,  0,  nes_vt_cy, nes_vt, nes_vt_cy_state, empty_init, "
 // some menu gfx broken, probably because this is a bad dump
 CONS( 2015, dgun2573,  0,  0,  nes_vt_fp, nes_vt, nes_vt_hh_state, empty_init, "dreamGEAR", "dreamGEAR My Arcade Gamer V Portable Gaming System (DGUN-2573)",  MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+
 // these are VT1682 based and have scrambled CPU opcodes. Will need VT1682 CPU and PPU
 // to be emulated
 // (no visible tiles in ROM using standard decodes tho, might need moving out of here)
-CONS( 200?, ii8in1,    0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
-CONS( 200?, ii32in1,   0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, ii8in1,    0,  0,  nes_vt_vt1682,    nes_vt, nes_vt_vt1682_state, empty_init, "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, ii32in1,   0,  0,  nes_vt_vt1682,    nes_vt, nes_vt_vt1682_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
+
+// CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
+CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
+
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
 CONS( 200?, mc_sp69,   0,  0,  nes_vt,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
@@ -2255,15 +2319,9 @@ CONS( 200?, mc_sp69,   0,  0,  nes_vt,    nes_vt, nes_vt_sp69_state, empty_init,
 // PCB has PP1100-MB 061110 on it, possible date YYMMDD code? (pinball is 050329, guitar fever is 070516, air blaster 050423, kickboxing 061011 etc.)
 CONS( 2006, ablping,   0,        0,  nes_vt_ablping, nes_vt, nes_vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes?
-CONS( 200?, polmega,   0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
-CONS( 200?, silv35,    0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
-
 // Hummer systems, scrambled bank register
 CONS( 200?, mc_sam60,  0,  0,  nes_vt,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
 CONS( 200?, zdog,      0,  0,  nes_vt,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
-
-// titles below don't seem to use the enhanced modes, so probably VT01 / VT02 or plain standalone famiclones?
 
 // very plain menus
 CONS( 200?, pjoyn50,    0,        0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
