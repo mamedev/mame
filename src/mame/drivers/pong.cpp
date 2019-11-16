@@ -92,8 +92,11 @@ TODO: Volleyball...
 
  * Net at 256H alternating at 4V
  *
+ * Pong videos:
  *
- * http://www.youtube.com/watch?v=pDrRnJOCKZc
+ * https://www.youtube.com/watch?v=pDrRnJOCKZc (no longer available)
+ *
+ * https://www.youtube.com/watch?v=fiShX2pTz9A
  */
 
 static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 7159000 + 0.5);

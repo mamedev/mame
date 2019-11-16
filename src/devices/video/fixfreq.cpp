@@ -19,6 +19,8 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
+#include <algorithm>
+
 /***************************************************************************
 
     Fixed frequency monitor
@@ -46,7 +48,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	{
 		//LOG("VSYNC %d %d\n", m_last_x, m_last_y + m_sig_field);
 		m_last_y = m_desc.m_vbackporch - m_desc.m_vsync;
-		m_intf.vsync_start_cb(time - m_last_vsync_time);
+		m_intf.vsync_start_cb(std::max(time - m_last_vsync_time, m_min_frame_period));
 		m_last_vsync_time = time;
 	}
 	else if (last_vsync && !m_sig_vsync)
