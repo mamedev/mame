@@ -213,6 +213,12 @@ uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst)
 {
 	const uint32_t rops[4] = { fbc_rasterop_rop00(), fbc_rasterop_rop01(), fbc_rasterop_rop10(), fbc_rasterop_rop11() };
 
+	if (fbc_misc_data() == FBC_MISC_DATA_COLOR1)
+	{
+		src = BIT(src, 0) * 0xff;
+		dst = BIT(dst, 0) * 0xff;
+	}
+
 	uint8_t result = 0;
 	//logerror("src:%02x dst:%02x\n", src, dst);
 	for (int bit = 0; bit < 8; bit++)
