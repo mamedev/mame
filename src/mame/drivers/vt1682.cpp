@@ -1841,6 +1841,471 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - Timer A Preload:8
 */
 
+/*
+    Address 0x2102 r/w (SOUND CPU)
+
+    0x80 - (unused)
+    0x40 - (unused)
+    0x20 - (unused)
+    0x10 - (unused)
+    0x08 - (unused)
+    0x04 - (unused)
+    0x02 - TMRA IRQ
+    0x01 - TMRA EN
+*/
+
+/*
+    Address 0x2103 r/w (SOUND CPU)
+
+    0x80 - Timer A IRQ Clear
+    0x40 - Timer A IRQ Clear
+    0x20 - Timer A IRQ Clear
+    0x10 - Timer A IRQ Clear
+    0x08 - Timer A IRQ Clear
+    0x04 - Timer A IRQ Clear
+    0x02 - Timer A IRQ Clear
+    0x01 - Timer A IRQ Clear
+*/
+
+/* Address 0x2104 Unused (SOUND CPU) */
+/* Address 0x2105 Unused (SOUND CPU) */
+/* Address 0x2106 Unused (SOUND CPU) */
+/* Address 0x2107 Unused (SOUND CPU) */
+/* Address 0x2108 Unused (SOUND CPU) */
+/* Address 0x2109 Unused (SOUND CPU) */
+/* Address 0x210a Unused (SOUND CPU) */
+/* Address 0x210b Unused (SOUND CPU) */
+/* Address 0x210c Unused (SOUND CPU) */
+/* Address 0x210d Unused (SOUND CPU) */
+/* Address 0x210e Unused (SOUND CPU) */
+/* Address 0x210f Unused (SOUND CPU) */
+
+
+/*
+    Address 0x2110 r/w (SOUND CPU)
+
+    0x80 - Timer B Preload:7
+    0x40 - Timer B Preload:6
+    0x20 - Timer B Preload:5
+    0x10 - Timer B Preload:4
+    0x08 - Timer B Preload:3
+    0x04 - Timer B Preload:2
+    0x02 - Timer B Preload:1
+    0x01 - Timer B Preload:0
+*/
+
+/*
+    Address 0x2111 r/w (SOUND CPU)
+
+    0x80 - Timer B Preload:15
+    0x40 - Timer B Preload:14
+    0x20 - Timer B Preload:13
+    0x10 - Timer B Preload:12
+    0x08 - Timer B Preload:11
+    0x04 - Timer B Preload:10
+    0x02 - Timer B Preload:9
+    0x01 - Timer B Preload:8
+*/
+
+/*
+    Address 0x2112 r/w (SOUND CPU)
+
+    0x80 - (unused)
+    0x40 - (unused)
+    0x20 - (unused)
+    0x10 - (unused)
+    0x08 - (unused)
+    0x04 - (unused)
+    0x02 - TMRB IRQ
+    0x01 - TMRB EN
+*/
+
+/*
+    Address 0x2113 r/w (SOUND CPU)
+
+    0x80 - Timer B IRQ Clear
+    0x40 - Timer B IRQ Clear
+    0x20 - Timer B IRQ Clear
+    0x10 - Timer B IRQ Clear
+    0x08 - Timer B IRQ Clear
+    0x04 - Timer B IRQ Clear
+    0x02 - Timer B IRQ Clear
+    0x01 - Timer B IRQ Clear
+*/
+
+/* Address 0x2114 Unused (SOUND CPU) */
+/* Address 0x2115 Unused (SOUND CPU) */
+/* Address 0x2116 Unused (SOUND CPU) */
+/* Address 0x2117 Unused (SOUND CPU) */
+
+/*
+    Address 0x2118 r/w (SOUND CPU)
+
+    0x80 - Audio DAC Left:7
+    0x40 - Audio DAC Left:6
+    0x20 - Audio DAC Left:5
+    0x10 - Audio DAC Left:4
+    0x08 - Audio DAC Left:3
+    0x04 - Audio DAC Left:2
+    0x02 - Audio DAC Left:1
+    0x01 - Audio DAC Left:0
+*/
+
+/*
+    Address 0x2119 r/w (SOUND CPU)
+
+    0x80 - Audio DAC Left:15
+    0x40 - Audio DAC Left:14
+    0x20 - Audio DAC Left:13
+    0x10 - Audio DAC Left:12
+    0x08 - Audio DAC Left:11
+    0x04 - Audio DAC Left:10
+    0x02 - Audio DAC Left:9
+    0x01 - Audio DAC Left:8
+*/
+
+/*
+    Address 0x211a r/w (SOUND CPU)
+
+    0x80 - Audio DAC Right:7
+    0x40 - Audio DAC Right:6
+    0x20 - Audio DAC Right:5
+    0x10 - Audio DAC Right:4
+    0x08 - Audio DAC Right:3
+    0x04 - Audio DAC Right:2
+    0x02 - Audio DAC Right:1
+    0x01 - Audio DAC Right:0
+*/
+
+/*
+    Address 0x211b r/w (SOUND CPU)
+
+    0x80 - Audio DAC Right:15
+    0x40 - Audio DAC Right:14
+    0x20 - Audio DAC Right:13
+    0x10 - Audio DAC Right:12
+    0x08 - Audio DAC Right:11
+    0x04 - Audio DAC Right:10
+    0x02 - Audio DAC Right:9
+    0x01 - Audio DAC Right:8
+*/
+
+/*
+    Address 0x211c WRITE (SOUND CPU)
+
+    0x80 - (unused)
+    0x40 - (unused)
+    0x20 - (unused)
+    0x10 - IRQ_OUT
+    0x08 - SLEEP
+    0x04 - ExtIRQSel
+    0x02 - NMI_EN
+    0x01 - ExtMask
+
+    Address 0x211c READ (SOUND CPU)
+
+    0x80 - Clear_CPU_IRQ
+    0x40 - Clear_CPU_IRQ
+    0x20 - Clear_CPU_IRQ
+    0x10 - Clear_CPU_IRQ
+    0x08 - Clear_CPU_IRQ
+    0x04 - Clear_CPU_IRQ
+    0x02 - Clear_CPU_IRQ
+    0x01 - Clear_CPU_IRQ
+*/
+
+/*
+    Address 0x211d r/w (SOUND CPU)
+
+    0x80 - (unused)
+    0x40 - (unused)
+    0x20 - (unused)
+    0x10 - (unused)
+    0x08 - (unused)
+    0x04 - (unused)
+    0x02 - IIS Mode
+    0x01 - IIS EN
+*/
+
+/* Address 0x211E Unused? (maybe) (SOUND CPU) */
+/* Address 0x211F Unused (SOUND CPU) */
+/* Address 0x2120 Unused (SOUND CPU) */
+/* Address 0x2121 Unused (SOUND CPU) */
+/* Address 0x2122 Unused (SOUND CPU) */
+/* Address 0x2123 Unused (SOUND CPU) */
+/* Address 0x2124 Unused (SOUND CPU) */
+/* Address 0x2125 Unused (SOUND CPU) */
+/* Address 0x2126 Unused (SOUND CPU) */
+/* Address 0x2127 Unused (SOUND CPU) */
+/* Address 0x2128 Unused (SOUND CPU) */
+/* Address 0x2129 Unused (SOUND CPU) */
+/* Address 0x212a Unused (SOUND CPU) */
+/* Address 0x212b Unused (SOUND CPU) */
+/* Address 0x212c Unused (SOUND CPU) */
+/* Address 0x212d Unused (SOUND CPU) */
+/* Address 0x212e Unused (SOUND CPU) */
+/* Address 0x212f Unused (SOUND CPU) */
+
+/*
+    Address 0x2130 WRITE (SOUND CPU)
+
+    0x80 - ALU Oprand 1
+    0x40 - ALU Oprand 1
+    0x20 - ALU Oprand 1
+    0x10 - ALU Oprand 1
+    0x08 - ALU Oprand 1
+    0x04 - ALU Oprand 1
+    0x02 - ALU Oprand 1
+    0x01 - ALU Oprand 1
+
+    Address 0x2130 READ (SOUND CPU)
+
+    0x80 - ALU Output 1
+    0x40 - ALU Output 1
+    0x20 - ALU Output 1
+    0x10 - ALU Output 1
+    0x08 - ALU Output 1
+    0x04 - ALU Output 1
+    0x02 - ALU Output 1
+    0x01 - ALU Output 1
+*/
+
+/*
+    Address 0x2131 WRITE (SOUND CPU)
+
+    0x80 - ALU Oprand 2
+    0x40 - ALU Oprand 2
+    0x20 - ALU Oprand 2
+    0x10 - ALU Oprand 2
+    0x08 - ALU Oprand 2
+    0x04 - ALU Oprand 2
+    0x02 - ALU Oprand 2
+    0x01 - ALU Oprand 2
+
+    Address 0x2131 READ (SOUND CPU)
+
+    0x80 - ALU Output 2
+    0x40 - ALU Output 2
+    0x20 - ALU Output 2
+    0x10 - ALU Output 2
+    0x08 - ALU Output 2
+    0x04 - ALU Output 2
+    0x02 - ALU Output 2
+    0x01 - ALU Output 2
+*/
+
+/*
+    Address 0x2132 WRITE (SOUND CPU)
+
+    0x80 - ALU Oprand 3
+    0x40 - ALU Oprand 3
+    0x20 - ALU Oprand 3
+    0x10 - ALU Oprand 3
+    0x08 - ALU Oprand 3
+    0x04 - ALU Oprand 3
+    0x02 - ALU Oprand 3
+    0x01 - ALU Oprand 3
+
+    Address 0x2132 READ (SOUND CPU)
+
+    0x80 - ALU Output 3
+    0x40 - ALU Output 3
+    0x20 - ALU Output 3
+    0x10 - ALU Output 3
+    0x08 - ALU Output 3
+    0x04 - ALU Output 3
+    0x02 - ALU Output 3
+    0x01 - ALU Output 3
+*/
+
+/*
+    Address 0x2133 WRITE (SOUND CPU)
+
+    0x80 - ALU Oprand 4
+    0x40 - ALU Oprand 4
+    0x20 - ALU Oprand 4
+    0x10 - ALU Oprand 4
+    0x08 - ALU Oprand 4
+    0x04 - ALU Oprand 4
+    0x02 - ALU Oprand 4
+    0x01 - ALU Oprand 4
+
+    Address 0x2133 READ (SOUND CPU)
+
+    0x80 - ALU Output 4
+    0x40 - ALU Output 4
+    0x20 - ALU Output 4
+    0x10 - ALU Output 4
+    0x08 - ALU Output 4
+    0x04 - ALU Output 4
+    0x02 - ALU Output 4
+    0x01 - ALU Output 4
+*/
+
+/*
+    Address 0x2134 WRITE (SOUND CPU)
+
+    0x80 - ALU Mul Oprand 5
+    0x40 - ALU Mul Oprand 5
+    0x20 - ALU Mul Oprand 5
+    0x10 - ALU Mul Oprand 5
+    0x08 - ALU Mul Oprand 5
+    0x04 - ALU Mul Oprand 5
+    0x02 - ALU Mul Oprand 5
+    0x01 - ALU Mul Oprand 5
+
+    Address 0x2134 READ (SOUND CPU)
+
+    0x80 - ALU Output 5
+    0x40 - ALU Output 5
+    0x20 - ALU Output 5
+    0x10 - ALU Output 5
+    0x08 - ALU Output 5
+    0x04 - ALU Output 5
+    0x02 - ALU Output 5
+    0x01 - ALU Output 5
+*/
+
+/*
+    Address 0x2135 WRITE (SOUND CPU)
+
+    0x80 - ALU Mul Oprand 6
+    0x40 - ALU Mul Oprand 6
+    0x20 - ALU Mul Oprand 6
+    0x10 - ALU Mul Oprand 6
+    0x08 - ALU Mul Oprand 6
+    0x04 - ALU Mul Oprand 6
+    0x02 - ALU Mul Oprand 6
+    0x01 - ALU Mul Oprand 6
+
+    Address 0x2135 READ (SOUND CPU)
+
+    0x80 - ALU Output 6
+    0x40 - ALU Output 6
+    0x20 - ALU Output 6
+    0x10 - ALU Output 6
+    0x08 - ALU Output 6
+    0x04 - ALU Output 6
+    0x02 - ALU Output 6
+    0x01 - ALU Output 6
+*/
+
+/*
+    Address 0x2136 WRITE ONLY (SOUND CPU)
+
+    0x80 - ALU Div Oprand 5
+    0x40 - ALU Div Oprand 5
+    0x20 - ALU Div Oprand 5
+    0x10 - ALU Div Oprand 5
+    0x08 - ALU Div Oprand 5
+    0x04 - ALU Div Oprand 5
+    0x02 - ALU Div Oprand 5
+    0x01 - ALU Div Oprand 5
+
+*/
+
+/*
+    Address 0x2137 WRITE ONLY (SOUND CPU)
+
+    0x80 - ALU Div Oprand 6
+    0x40 - ALU Div Oprand 6
+    0x20 - ALU Div Oprand 6
+    0x10 - ALU Div Oprand 6
+    0x08 - ALU Div Oprand 6
+    0x04 - ALU Div Oprand 6
+    0x02 - ALU Div Oprand 6
+    0x01 - ALU Div Oprand 6
+*/
+
+/* Address 0x2138 Unused (SOUND CPU) */
+/* Address 0x2139 Unused (SOUND CPU) */
+/* Address 0x213a Unused (SOUND CPU) */
+/* Address 0x213b Unused (SOUND CPU) */
+/* Address 0x213c Unused (SOUND CPU) */
+/* Address 0x213d Unused (SOUND CPU) */
+/* Address 0x213e Unused (SOUND CPU) */
+/* Address 0x213f Unused (SOUND CPU) */
+
+/*
+    Address 0x2140 r/w (SOUND CPU)
+
+    0x80 - IOA DATA
+    0x40 - IOA DATA
+    0x20 - IOA DATA
+    0x10 - IOA DATA
+    0x08 - IOA DATA
+    0x04 - IOA DATA
+    0x02 - IOA DATA
+    0x01 - IOA DATA
+*/
+
+/*
+    Address 0x2141 r/w (SOUND CPU)
+
+    0x80 - IOA DIR
+    0x40 - IOA DIR
+    0x20 - IOA DIR
+    0x10 - IOA DIR
+    0x08 - IOA DIR
+    0x04 - IOA DIR
+    0x02 - IOA DIR
+    0x01 - IOA DIR
+*/
+
+/*
+    Address 0x2142 r/w (SOUND CPU)
+
+    0x80 - IOA PLH
+    0x40 - IOA PLH
+    0x20 - IOA PLH
+    0x10 - IOA PLH
+    0x08 - IOA PLH
+    0x04 - IOA PLH
+    0x02 - IOA PLH
+    0x01 - IOA PLH
+*/
+
+/* Address 0x2143 Unused (SOUND CPU) */
+
+/*
+    Address 0x2144 r/w (SOUND CPU)
+
+    0x80 - IOB DATA
+    0x40 - IOB DATA
+    0x20 - IOB DATA
+    0x10 - IOB DATA
+    0x08 - IOB DATA
+    0x04 - IOB DATA
+    0x02 - IOB DATA
+    0x01 - IOB DATA
+*/
+
+/*
+    Address 0x2145 r/w (SOUND CPU)
+
+    0x80 - IOB DIR
+    0x40 - IOB DIR
+    0x20 - IOB DIR
+    0x10 - IOB DIR
+    0x08 - IOB DIR
+    0x04 - IOB DIR
+    0x02 - IOB DIR
+    0x01 - IOB DIR
+*/
+
+/*
+    Address 0x2146 r/w (SOUND CPU)
+
+    0x80 - IOB PLH
+    0x40 - IOB PLH
+    0x20 - IOB PLH
+    0x10 - IOB PLH
+    0x08 - IOB PLH
+    0x04 - IOB PLH
+    0x02 - IOB PLH
+    0x01 - IOB PLH
+*/
+
 
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
