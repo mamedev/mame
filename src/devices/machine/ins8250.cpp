@@ -252,9 +252,11 @@ READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
 
 TIMER_CALLBACK_MEMBER(ins8250_uart_device::brg_clock)
 {
+	bool state = m_brg_clock;
 	if (!is_transmit_register_empty())
 	{
-		tx_clock_w(m_brg_clock); 
+		device_serial_interface::tx_clock_w(m_brg_clock);
+		m_brg_clock = !state;
 	}
 	if (is_receive_register_synchronized())
 	{
@@ -266,8 +268,8 @@ TIMER_CALLBACK_MEMBER(ins8250_uart_device::brg_clock)
 		{
 			m_out_baudout_cb(m_brg_clock);
 		}
+		m_brg_clock = !state;
 	}
-	m_brg_clock = !m_brg_clock;
 	m_brg->adjust(((clock() && (m_regs.dl) ? (attotime::from_hz(clock()) * m_regs.dl * 16) : attotime::never) / 2));
 }
 
@@ -275,7 +277,6 @@ TIMER_CALLBACK_MEMBER(ins8250_uart_device::brg_clock)
 void ins8250_uart_device::update_baud_rate()
 {
 	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
-
 	m_brg->adjust(((clock() && (m_regs.dl) ? (attotime::from_hz(clock()) * m_regs.dl * 16) : attotime::never) / 2));
 }
 
@@ -671,7 +672,7 @@ void ins8250_uart_device::device_start()
 	m_out_int_cb.resolve_safe();
 	m_out_out1_cb.resolve_safe();
 	m_out_out2_cb.resolve_safe();
-	m_out_baudout_cb.resolve_safe();
+	m_out_baudout_cb.resolve();
 	set_tra_rate(0);
 	set_rcv_rate(0);
 	m_brg = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ins8250_uart_device::brg_clock), this));
@@ -716,7 +717,7 @@ void ins8250_uart_device::device_reset()
 	m_out_dtr_cb(1);
 	m_out_out1_cb(1);
 	m_out_out2_cb(1);
-	m_out_baudout_cb(1);
+	if (!m_out_baudout_cb.isnull()) m_out_baudout_cb(1);
 }
 
 void ns16550_device::device_start()
