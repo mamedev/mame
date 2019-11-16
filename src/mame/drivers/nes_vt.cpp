@@ -112,6 +112,7 @@ public:
 
 	/* Misc PPU */
 	DECLARE_WRITE8_MEMBER(vt_dma_w);
+	DECLARE_WRITE8_MEMBER(vt_fixed_dma_w);
 
 	// TODO: give these better register names so it's clearer what is remapped
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
@@ -1271,10 +1272,18 @@ WRITE8_MEMBER(nes_vt_state::psg1_4017_w)
 	m_apu->write(0x17, data);
 }
 
+// early units (VT03?) have a DMA bug in NTSC mode
 WRITE8_MEMBER(nes_vt_state::vt_dma_w)
 {
 	do_dma(data, true);
 }
+
+// later units (VT09?) don't appear to have the NTSC DMA bug? (or something else is incorrectly compensating for it in our emulation)
+WRITE8_MEMBER(nes_vt_state::vt_fixed_dma_w)
+{
+	do_dma(data, false);
+}
+
 
 void nes_vt_state::do_dma(uint8_t data, bool has_ntsc_bug)
 {
@@ -1569,7 +1578,7 @@ void nes_vt_hh_state::nes_vt_hh_map(address_map &map)
 	map(0x8000, 0xffff).w(FUNC(nes_vt_hh_state::vt03_8000_w));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_hh_state::vt03_4034_w));
-	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_dma_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_hh_state::psg1_4014_r)).w(FUNC(nes_vt_hh_state::vt_fixed_dma_w));
 
 	map(0x414A, 0x414A).r(FUNC(nes_vt_hh_state::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(nes_vt_hh_state::vtfp_411d_w));
@@ -1613,7 +1622,7 @@ void nes_vt_dg_state::nes_vt_dg_map(address_map &map)
 	map(0x8000, 0xffff).w(FUNC(nes_vt_dg_state::vt03_8000_w));
 
 	map(0x4034, 0x4034).w(FUNC(nes_vt_dg_state::vt03_4034_w));
-	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_dma_w));
+	map(0x4014, 0x4014).r(FUNC(nes_vt_dg_state::psg1_4014_r)).w(FUNC(nes_vt_dg_state::vt_fixed_dma_w));
 	map(0x6000, 0x7fff).ram();
 }
 
@@ -2234,6 +2243,8 @@ CONS( 2005, ablpinb, 0,  0,  nes_vt_ablpinb,    ablpinb, nes_vt_ablpinb_state, e
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
 CONS( 200?, mc_dgear,  0,  0,  nes_vt,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
+
+
 // all software in this runs in the VT03 enhanced mode, it also includes an actual licensed VT03 port of Frogger.
 // all games work OK except Frogger which has serious graphical issues
 CONS( 2006, vgtablet,  0, 0,  nes_vt_vg,    nes_vt, nes_vt_hh_state, empty_init, "Performance Designed Products (licensed by Konami)", "VG Pocket Tablet (VG-4000)", MACHINE_NOT_WORKING )
