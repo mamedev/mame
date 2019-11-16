@@ -748,14 +748,14 @@ struct cid_record
 ROM_START(dc)
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dcus_ntsc.bin", 0x000000, 0x020000, CRC(4136c25b) SHA1(1efa00ab9d8357a9f91e5be931a3efd6236f2b79) )  // dumped from VA2.4 mobo with 1.022 BIOS
 ROM_END
 
 ROM_START( dceu )
 	DREAMCAST_COMMON_BIOS
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dceu_pal.bin",  0x000000, 0x020000, CRC(7a102d05) SHA1(13e444e613dffe0a8bce073a01efa9a1d4626ba7) ) // VA1
 	ROM_LOAD( "dceu_pala.bin", 0x000000, 0x020000, CRC(2e8dfa07) SHA1(ca5fd977bbf8f48c28c1027a023b038123d57d39) ) // from VA1 with 1.01d BIOS
 ROM_END
@@ -765,7 +765,7 @@ ROM_START( dcjp )
 	ROM_SYSTEM_BIOS(4, "1004", "v1.004 (Japan)")    // oldest known mass production version, supports Japan region only
 	ROM_LOAD_BIOS(4, "mpr-21068.ic501", 0x000000, 0x200000, CRC(5454841f) SHA1(1ea132c0fbbf07ef76789eadc07908045c089bd6) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dcjp_ntsc.bin", 0x000000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
@@ -775,7 +775,7 @@ ROM_START( dctream )
 	// uses regular mpr-21931 BIOS chip, have region-free mod-chip installed, see driver init.
 	ROM_LOAD( "mpr-21931.ic501", 0x000000, 0x200000, CRC(89f2b1a1) SHA1(8951d1bb219ab2ff8583033d2119c899cc81f18c) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "dc_flash.bin", 0x000000, 0x020000, CRC(9d5515c4) SHA1(78a86fd4e8b58fc9d3535eef6591178f1b97ecf9) ) // VA1 NTSC-US
 ROM_END
 
@@ -798,7 +798,7 @@ ROM_START( dcdev )
 	ROM_SYSTEM_BIOS(3, "041", "Katana Set5 Checker v0.41")
 	ROM_LOAD_BIOS(3, "set5v0.41.bin", 0x000000, 0x200000, CRC(485877bd) SHA1(dc1af1f1248ffa87d57bc5ef2ea41aac95ecfc5e) )
 
-	ROM_REGION(0x020000, "dcflash", 0)
+	ROM_REGION64_LE(0x020000, "dcflash", 0)
 	ROM_LOAD( "hkt-0120-flash.bin", 0x000000, 0x020000, CRC(7784c304) SHA1(31ef57f550d8cd13e40263cbc657253089e53034) ) // Dev.Boxes have empty (FF filled) flash ROM
 ROM_END
 

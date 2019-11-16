@@ -3538,7 +3538,7 @@ Region byte encoding is as follows:
    2 dumps included for reference
 */
 #define AW_BIOS \
-	ROM_REGION( 0x200000, "awflash", 0) \
+	ROM_REGION64_LE( 0x200000, "awflash", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios0.ic23", 0x000000, 0x020000, CRC(719b2b0b) SHA1(b4c1a26bc8906d5275eb28c701dff2b9365bcdfa) ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios1.ic23", 0x000000, 0x020000, CRC(d3e80a9f) SHA1(33024f9d51c04884c2b44ce146f340e7a857b959) )
