@@ -75,6 +75,7 @@
 #include "video/ppu2c0x_vt.h"
 #include "machine/m6502_vtscr.h"
 #include "machine/m6502_vt1682.h"
+#include "machine/m6502_vh2009.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -238,6 +239,21 @@ protected:
 private:
 	void nes_vt_vt1682_map(address_map& map);
 };
+
+class nes_vt_vh2009_state : public nes_vt_state
+{
+public:
+	nes_vt_vh2009_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt_state(mconfig, type, tag)
+	{ }
+
+	void nes_vt_vh2009(machine_config& config);
+
+protected:
+
+private:
+};
+
 
 
 class nes_vt_pjoy_state : public nes_vt_state
@@ -1871,6 +1887,14 @@ void nes_vt_vt1682_state::nes_vt_vt1682(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vt1682_state::nes_vt_vt1682_map);
 }
 
+void nes_vt_vh2009_state::nes_vt_vh2009(machine_config &config)
+{
+	nes_vt(config);
+
+	M6502_VH2009(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt_vh2009_state::nes_vt_map);
+}
+
 
 static INPUT_PORTS_START( nes_vt_fp )
 	PORT_START("CARTSEL")
@@ -2281,8 +2305,8 @@ CONS( 200?, ii8in1,    0,  0,  nes_vt_vt1682,    nes_vt, nes_vt_vt1682_state, em
 CONS( 200?, ii32in1,   0,  0,  nes_vt_vt1682,    nes_vt, nes_vt_vt1682_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING )
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 200?, polmega,   0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
-CONS( 200?, silv35,    0,  0,  nes_vt,        nes_vt, nes_vt_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
+CONS( 200?, polmega,   0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "Polaroid", "Megamax GPD001SDG", MACHINE_NOT_WORKING )
+CONS( 200?, silv35,    0,  0,  nes_vt_vh2009,        nes_vt, nes_vt_vh2009_state, empty_init, "SilverLit", "35 in 1 Super Twins", MACHINE_NOT_WORKING )
 
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
