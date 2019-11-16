@@ -226,12 +226,13 @@ menu_input_specific::~menu_input_specific()
 /*-------------------------------------------------
     menu_input - display a menu for inputs
 -------------------------------------------------*/
-menu_input::menu_input(mame_ui_manager &mui, render_container &container) : menu(mui, container), record_next(false)
+menu_input::menu_input(mame_ui_manager &mui, render_container &container)
+	: menu(mui, container)
+	, data()
+	, pollingitem(nullptr)
+	, lastitem(nullptr)
+	, record_next(false)
 {
-	lastitem = nullptr;
-	pollingitem = nullptr;
-	pollingref = nullptr;
-	pollingseq = SEQ_TYPE_STANDARD;
 }
 
 menu_input::~menu_input()
@@ -328,12 +329,6 @@ void menu_input::handle()
 	/* if the menu is invalidated, clear it now */
 	if (invalidate)
 	{
-		pollingref = nullptr;
-		if (pollingitem != nullptr)
-		{
-			pollingref = pollingitem->ref;
-			pollingseq = pollingitem->seqtype;
-		}
 		reset(reset_options::REMEMBER_POSITION);
 	}
 }
@@ -396,9 +391,9 @@ void menu_input::populate_sorted()
 			text = "(" + text + ")";
 
 		/* if we're polling this item, use some spaces with left/right arrows */
-		if (pollingref == item.ref && pollingseq == item.seqtype)
+		if (&item == pollingitem)
 		{
-			subtext.assign("   ");
+			subtext = "   ";
 			flags |= FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 		}
 
@@ -410,7 +405,7 @@ void menu_input::populate_sorted()
 		}
 
 		/* add the item */
-		item_append(text, subtext, flags, &item);
+		item_append(std::move(text), std::move(subtext), flags, &item);
 	}
 }
 

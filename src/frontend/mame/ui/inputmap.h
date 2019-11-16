@@ -64,8 +64,6 @@ protected:
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
 	data_vector         data;
-	const void *        pollingref;
-	input_seq_type      pollingseq;
 	input_item_data *   pollingitem;
 
 private:
