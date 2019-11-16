@@ -3027,8 +3027,10 @@ ROM_START( arescue )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14542.ic13",     0x000000, 0x020000, CRC(6d39fc18) SHA1(7fbddfb2605a020331e1e81a7bc4466196df17bd) ) /* 834-8526-05 (Export) */
@@ -3103,8 +3105,10 @@ ROM_START( arescueu )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14540.ic13",     0x000000, 0x020000, CRC(c2b4e5d0) SHA1(69f8ddded5095df9012663d0ded61b78f1692a8d) )
@@ -3179,8 +3183,10 @@ ROM_START( arescuej )
 
 	ROM_REGION( 0x20000, "mainpcb:dsp", 0 ) /* NEC uPD77P25 DSP Internal ROM */ // ONLY PRESENT ON ONE PCB STACK
 	ROM_LOAD( "d7725.01", 0x000000, 0x002800, CRC(a7ec5644) SHA1(e9b05c70b639ee289e557dfd9a6c724b36338e2b) )
-	ROM_REGION(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
-	ROM_REGION(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_REGION32_BE(0x2000, "mainpcb:dspprg", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x0000, 0x0000, 0x2000 )
+	ROM_REGION16_BE(0x800, "mainpcb:dspdata", ROMREGION_ERASEFF)
+	ROM_COPY( "mainpcb:dsp", 0x2000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x200000, "slavepcb:maincpu", 0 ) /* v60 code + data */
 	ROM_LOAD_x4( "epr-14515.ic13",     0x000000, 0x020000, CRC(fb5eefbd) SHA1(f2739ad2e168843fe992d7fb546ffd859fa6c17a) )
@@ -5695,26 +5701,6 @@ void segas32_state::init_arescue(int m_hasdsp)
 	for (auto & elem : m_arescue_dsp_io)
 		elem = 0x00;
 
-	if (m_hasdsp)
-	{
-		// massages the data from the BPMicro-compatible dump to runnable form
-		uint8_t *dspsrc = (uint8_t *)memregion("dsp")->base();
-		uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
-		uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
-
-		// copy DSP program
-		for (int i = 0; i < 0x2000; i+= 4)
-		{
-			*dspprg = dspsrc[0+i]<<24 | dspsrc[1+i]<<16 | dspsrc[2+i]<<8;
-			dspprg++;
-		}
-
-		// copy DSP data
-		for (int i = 0; i < 0x800; i+= 2)
-		{
-			*dspdata++ = dspsrc[0x2000+i]<<8 | dspsrc[0x2001+i];
-		}
-	}
 	m_sw1_output = &segas32_state::arescue_sw1_output;
 }
 
