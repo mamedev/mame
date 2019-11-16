@@ -15,13 +15,13 @@
 class vt_vt1682_state : public driver_device
 {
 public:
-	vt_vt1682_state(const machine_config &mconfig, device_type type, const char *tag) :
+	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{ }
 
-	void vt_vt1682(machine_config &config);
+	void vt_vt1682(machine_config& config);
 
 protected:
 	virtual void machine_start() override;
@@ -31,8 +31,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void vt_vt1682_map(address_map &map);
+	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void vt_vt1682_map(address_map& map);
 
 
 	/* Video */
@@ -57,6 +57,9 @@ private:
 	uint8_t m_prgbank0_r5;
 
 	uint8_t m_210b_misc_cs_prg0_bank_sel;
+
+	uint8_t m_2105_vt1682_2105_comr6_tvmodes;
+	uint8_t m_211c_regs_ext2421;
 
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
@@ -88,7 +91,12 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_210b_misc_cs_prg0_bank_sel_r);
 	DECLARE_WRITE8_MEMBER(vt1682_210b_misc_cs_prg0_bank_sel_w);
 
+	DECLARE_WRITE8_MEMBER(vt1682_2105_comr6_tvmodes_w);
+
+	DECLARE_WRITE8_MEMBER(vt1682_211c_regs_ext2421_w);
+
 	/* Support */
+
 	void update_banks();
 };
 
@@ -113,6 +121,8 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_prgbank0_r5));
 
 	save_item(NAME(m_210b_misc_cs_prg0_bank_sel));
+	save_item(NAME(m_2105_vt1682_2105_comr6_tvmodes));
+	save_item(NAME(m_211c_regs_ext2421));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -135,6 +145,8 @@ void vt_vt1682_state::machine_reset()
 	m_prgbank0_r5 = 0;
 
 	m_210b_misc_cs_prg0_bank_sel = 0;
+	m_2105_vt1682_2105_comr6_tvmodes = 0;
+	m_211c_regs_ext2421 = 0;
 
 	update_banks();
 }
@@ -156,8 +168,10 @@ void vt_vt1682_state::update_banks()
 	m_prgbank0_r4
 	m_prgbank0_r5
 
-	maybe
+	m_2105_vt1682_2105_comr6_tvmodes
+	m_211c_regs_ext2421
 	m_210b_misc_cs_prg0_bank_sel
+	
 	*/
 }
 
@@ -931,6 +945,15 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x01 - PRAM
 */
 
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w)
+{
+	// COMR6 is used for banking
+	logerror("%s: vt1682_2105_comr6_tvmodes_w writing: %02x\n", machine().describe_context(), data);
+	m_2105_vt1682_2105_comr6_tvmodes = data;
+	update_banks();
+}
+
+
 /*
     Address 0x2106 r/w (MAIN CPU)
 
@@ -1076,6 +1099,8 @@ READ8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w)
 {
+	// PQ2 Enable is also used for ROM banking along with Program Bank 0 select
+
 	logerror("%s: vt1682_210b_misc_cs_prg0_bank_sel_w writing: %02x\n", machine().describe_context(), data);
 	m_210b_misc_cs_prg0_bank_sel = data;
 	update_banks();
@@ -1469,7 +1494,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w)
     0x02 - SLEEP SEL
     0x01 - CLK SEL
 
-    Address 0x211c READ (MAIN CPU) (maybe)
+    Address 0x211c READ (MAIN CPU)
 
     0x80 - Clear_SCPU_IRQ
     0x40 - Clear_SCPU_IRQ
@@ -1480,6 +1505,15 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w)
     0x02 - Clear_SCPU_IRQ
     0x01 - Clear_SCPU_IRQ
 */
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
+{
+	// EXT2421EN is used for ROM banking
+	logerror("%s: vt1682_211c_regs_ext2421_w writing: %02x\n", machine().describe_context(), data);
+	m_211c_regs_ext2421 = data;
+	update_banks();
+}
+
 
 /*
     Address 0x211d WRITE (MAIN CPU)
@@ -2620,6 +2654,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 	/* System */
 	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
+
+	map(0x2105, 0x2105).w(FUNC(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w));
+
 	map(0x2107, 0x2107).rw(FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_r), FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_w));
 	map(0x2108, 0x2108).rw(FUNC(vt_vt1682_state::vt1682_2108_prgbank0_r1_r), FUNC(vt_vt1682_state::vt1682_2108_prgbank0_r1_w));
 	map(0x2109, 0x2109).rw(FUNC(vt_vt1682_state::vt1682_2109_prgbank0_r2_r), FUNC(vt_vt1682_state::vt1682_2109_prgbank0_r2_w));
@@ -2634,6 +2671,8 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2113, 0x2113).rw(FUNC(vt_vt1682_state::vt1682_prgbank1_r1_r), FUNC(vt_vt1682_state::vt1682_prgbank0_r5_w));
 
 	map(0x2118, 0x2118).rw(FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r), FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w));
+
+	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0xffff).rom().region("mainrom", 0x74000);
