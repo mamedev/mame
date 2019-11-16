@@ -776,6 +776,150 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
 	0x01 - Program Bank 1 Register 3 
 */
 
+/*
+	Address 0x2107 r/w (MAIN CPU)
+
+	0x80 - Program Bank 0 Register 0
+	0x40 - Program Bank 0 Register 0
+	0x20 - Program Bank 0 Register 0
+	0x10 - Program Bank 0 Register 0
+	0x08 - Program Bank 0 Register 0
+	0x04 - Program Bank 0 Register 0 
+	0x02 - Program Bank 0 Register 0 
+	0x01 - Program Bank 0 Register 0 
+*/
+
+/*
+	Address 0x2108 r/w (MAIN CPU)
+
+	0x80 - Program Bank 0 Register 1
+	0x40 - Program Bank 0 Register 1
+	0x20 - Program Bank 0 Register 1
+	0x10 - Program Bank 0 Register 1
+	0x08 - Program Bank 0 Register 1
+	0x04 - Program Bank 0 Register 1 
+	0x02 - Program Bank 0 Register 1 
+	0x01 - Program Bank 0 Register 1 
+*/
+
+/*
+	Address 0x2109 r/w (MAIN CPU)
+
+	0x80 - Program Bank 0 Register 2
+	0x40 - Program Bank 0 Register 2
+	0x20 - Program Bank 0 Register 2
+	0x10 - Program Bank 0 Register 2
+	0x08 - Program Bank 0 Register 2
+	0x04 - Program Bank 0 Register 2 
+	0x02 - Program Bank 0 Register 2 
+	0x01 - Program Bank 0 Register 2 
+*/
+
+/*
+	Address 0x210a r/w (MAIN CPU)
+
+	0x80 - Program Bank 0 Register 3
+	0x40 - Program Bank 0 Register 3
+	0x20 - Program Bank 0 Register 3
+	0x10 - Program Bank 0 Register 3
+	0x08 - Program Bank 0 Register 3
+	0x04 - Program Bank 0 Register 3 
+	0x02 - Program Bank 0 Register 3 
+	0x01 - Program Bank 0 Register 3 
+*/
+
+/*
+	Address 0x210b r/w (MAIN CPU)
+
+	0x80 - TSYSN Enable
+	0x40 - PQ2 Enable
+	0x20 - BUS Tristate
+	0x10 - CS Control:1
+	0x08 - CS Control:0
+	0x04 - Program Bank 0 Select 
+	0x02 - Program Bank 0 Select 
+	0x01 - Program Bank 0 Select 
+*/
+
+/*
+	Address 0x210c r/w (MAIN CPU)
+
+	0x80 - (unused)
+	0x40 - (unused)
+	0x20 - (unused)
+	0x10 - (unused)
+	0x08 - Program Bank 1 Register 2
+	0x04 - Program Bank 1 Register 2 
+	0x02 - Program Bank 1 Register 2 
+	0x01 - Program Bank 1 Register 2 
+*/
+
+/*
+	Address 0x2110 WRITE ONLY (MAIN CPU)
+
+	0x80 - (unused)
+	0x40 - (unused)
+	0x20 - (unused)
+	0x10 - (unused)
+	0x08 - Program Bank 1 Register 0
+	0x04 - Program Bank 1 Register 0 
+	0x02 - Program Bank 1 Register 0 
+	0x01 - Program Bank 1 Register 0 
+*/
+
+/*
+	Address 0x2111 WRITE ONLY (MAIN CPU)
+
+	0x80 - (unused)
+	0x40 - (unused)
+	0x20 - (unused)
+	0x10 - (unused)
+	0x08 - Program Bank 1 Register 1
+	0x04 - Program Bank 1 Register 1 
+	0x02 - Program Bank 1 Register 1 
+	0x01 - Program Bank 1 Register 1 
+*/
+
+/*
+	Address 0x2112 READ ONLY (MAIN CPU)
+
+	0x80 - (unused)
+	0x40 - (unused)
+	0x20 - (unused)
+	0x10 - (unused)
+	0x08 - Program Bank 1 Register 0
+	0x04 - Program Bank 1 Register 0 
+	0x02 - Program Bank 1 Register 0 
+	0x01 - Program Bank 1 Register 0 
+*/
+
+/*
+	Address 0x2113 READ ONLY (MAIN CPU)
+
+	0x80 - (unused)
+	0x40 - (unused)
+	0x20 - (unused)
+	0x10 - (unused)
+	0x08 - Program Bank 1 Register 1
+	0x04 - Program Bank 1 Register 1 
+	0x02 - Program Bank 1 Register 1 
+	0x01 - Program Bank 1 Register 1 
+*/
+
+/*
+	Address 0x2118 r/w (MAIN CPU)
+
+	0x80 - Program Bank 1 Register 5
+	0x40 - Program Bank 1 Register 5
+	0x20 - Program Bank 1 Register 5
+	0x10 - Program Bank 1 Register 5
+	0x08 - Program Bank 1 Register 4
+	0x04 - Program Bank 1 Register 4 
+	0x02 - Program Bank 1 Register 4 
+	0x01 - Program Bank 1 Register 4 
+*/
+
+
 /************************************************************************************************************************************
  VT1682 Sound CPU Registers
 ************************************************************************************************************************************/
