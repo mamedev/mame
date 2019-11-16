@@ -43,8 +43,8 @@ void cdrn820s_device::device_add_mconfig(machine_config &config)
 }
 
 ROM_START(cdrn820s)
-	ROM_REGION(0x40000, "program", 0)
-	ROM_LOAD16_WORD_SWAP("cdr_120.bin", 0x00000, 0x20000, CRC(8cac6862) SHA1(e498dcd9006d257ced6cd0b50c76608e9a8023f7)) // Caravelle CDR-N820S 1.20
+	ROM_REGION16_BE(0x40000, "program", 0)
+	ROM_LOAD("cdr_120.bin", 0x00000, 0x20000, CRC(8cac6862) SHA1(e498dcd9006d257ced6cd0b50c76608e9a8023f7)) // Caravelle CDR-N820S 1.20
 ROM_END
 
 const tiny_rom_entry *cdrn820s_device::device_rom_region() const

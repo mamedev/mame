@@ -35,9 +35,9 @@ void bbc_tube_casper_device::tube_casper_mem(address_map &map)
 //-------------------------------------------------
 
 ROM_START( tube_casper )
-	ROM_REGION(0x4000, "casper_rom", 0)
-	ROM_LOAD16_BYTE("casper.ic9",  0x0000, 0x2000, CRC(4105cbf4) SHA1(a3efeb6fb144da55b47c718239967ed0af4fff72))
-	ROM_LOAD16_BYTE("casper.ic10", 0x0001, 0x2000, CRC(f25bc320) SHA1(297db56283bb3164c31c21331837213cea426837))
+	ROM_REGION16_BE(0x4000, "casper_rom", 0)
+	ROM_LOAD16_BYTE("casper.ic9",  0x0001, 0x2000, CRC(4105cbf4) SHA1(a3efeb6fb144da55b47c718239967ed0af4fff72))
+	ROM_LOAD16_BYTE("casper.ic10", 0x0000, 0x2000, CRC(f25bc320) SHA1(297db56283bb3164c31c21331837213cea426837))
 
 	ROM_REGION(0x8000, "exp_rom", 0)
 	ROM_LOAD("rom1.rom", 0x0000, 0x4000, CRC(602b6a36) SHA1(7b24746dbcacb8772468532e92832d5c7f6648fd))

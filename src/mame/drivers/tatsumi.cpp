@@ -1074,7 +1074,7 @@ void cyclwarr_state::bigfight(machine_config &config)
 /***************************************************************************/
 
 ROM_START( apache3 )
-	ROM_REGION( 0x80000, "master_rom", 0 ) /* v30 main cpu */
+	ROM_REGION16_LE( 0x80000, "master_rom", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ap-25f.125",   0x020001, 0x10000, CRC(3c7530f4) SHA1(9f7b58a3abddbdc3081ba9dfc1732406eb8c1752) )
 	ROM_LOAD16_BYTE( "ap-26f.133",   0x020000, 0x10000, CRC(2955997f) SHA1(86e37def923d9cf4eb33e7979118ec6f1ef62678) )
 	ROM_LOAD16_BYTE( "ap-23f.110",   0x060001, 0x10000, CRC(d7077149) SHA1(b08f5a9ee03641c20bdd5e5c9671a22c740150c6) )
@@ -1126,7 +1126,7 @@ ROM_START( apache3 )
 ROM_END
 
 ROM_START( apache3a )
-	ROM_REGION( 0x80000, "master_rom", 0 ) /* v30 main cpu */
+	ROM_REGION16_LE( 0x80000, "master_rom", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ap-25c.125",   0x020001, 0x10000, CRC(7bc496a6) SHA1(5491d06181d729407e975b85a8715fdc3b489c67) )
 	ROM_LOAD16_BYTE( "ap-26c.133",   0x020000, 0x10000, CRC(9393a470) SHA1(00376f7a545629a83eb5a90b9d1685a68430e4ce) )
 	ROM_LOAD16_BYTE( "ap-23e.110",   0x060001, 0x10000, CRC(3e465b8e) SHA1(dfd009221974eb43263dd3f4f80f39bb32c30ced) ) /* hand written label:  23E   DD65 */
@@ -1178,7 +1178,7 @@ ROM_START( apache3a )
 ROM_END
 
 ROM_START( apache3b )
-	ROM_REGION( 0x80000, "master_rom", 0 ) /* v30 main cpu */
+	ROM_REGION16_LE( 0x80000, "master_rom", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ap-25c.125",   0x020001, 0x10000, CRC(7bc496a6) SHA1(5491d06181d729407e975b85a8715fdc3b489c67) )
 	ROM_LOAD16_BYTE( "ap-26c.133",   0x020000, 0x10000, CRC(9393a470) SHA1(00376f7a545629a83eb5a90b9d1685a68430e4ce) )
 	ROM_LOAD16_BYTE( "ap-23g.110",   0x060001, 0x10000, CRC(0ab485e4) SHA1(d8d0695312732c31cedcb1c298810a6793835e80) ) /* Kana Corporation license program ROMs */
@@ -1230,7 +1230,7 @@ ROM_START( apache3b )
 ROM_END
 
 ROM_START( roundup5 )
-	ROM_REGION( 0x80000, "master_rom", 0 ) /* v30 main cpu */
+	ROM_REGION16_LE( 0x80000, "master_rom", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "ru-23s",   0x000000, 0x20000, CRC(2dc8c521) SHA1(b78de101db3ef00fc4375ae32a7871e0da2dac6c) )
 	ROM_LOAD16_BYTE( "ru-26s",   0x000001, 0x20000, CRC(1e16b531) SHA1(d7badef29cf1c4a9bd262933ecd1ca3343ea94bd) )
 	ROM_LOAD16_BYTE( "ru-22t",   0x040000, 0x20000, CRC(9611382e) SHA1(c99258782dbad6d69ba7f54115ee3aa218f9b6ee) )
