@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Vas Crabb
 /*********************************************************************
 
     ui/analogipt.cpp
@@ -12,11 +12,13 @@
 #include "ui/analogipt.h"
 
 #include <algorithm>
+#include <string>
+#include <utility>
 
 
 namespace ui {
 
-inline menu_analog::item_data::item_data(ioport_field &f, int t)
+inline menu_analog::item_data::item_data(ioport_field &f, int t) noexcept
 	: field(f)
 	, type(t)
 	, min((ANALOG_ITEM_SENSITIVITY == t) ? 1 : 0)
@@ -32,9 +34,12 @@ inline menu_analog::item_data::item_data(ioport_field &f, int t)
 }
 
 
-inline menu_analog::field_data::field_data(ioport_field &f)
+inline menu_analog::field_data::field_data(ioport_field &f) noexcept
 	: field(f)
 	, range(f.maxval() - f.minval())
+	, neutral(float(f.analog_reverse() ? (f.maxval() - f.defvalue()) : (f.defvalue() - f.minval())) / range)
+	, origin((f.analog_wraps() && (f.defvalue() != f.minval()) && (f.defvalue() != f.maxval())) ? 0.0f : neutral)
+	, show_neutral((f.defvalue() != f.minval()) && (f.defvalue() != f.maxval()))
 {
 }
 
@@ -56,8 +61,9 @@ menu_analog::~menu_analog()
 void menu_analog::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
 {
 	// work out how much space to use for field names
-	float const extrawidth(0.4f + (ui().box_lr_border() * 2.0f) + (ui().get_line_height() * machine().render().ui_aspect()));
-	float const nameavail(1.0f - (ui().box_lr_border() * 2.0f) - extrawidth);
+	float const aspect(machine().render().ui_aspect(&container()));
+	float const extrawidth(0.4f + (((ui().box_lr_border() * 2.0f) + ui().get_line_height()) * aspect));
+	float const nameavail(1.0f - (ui().box_lr_border() * 2.0f * aspect) - extrawidth);
 	float namewidth(0.0f);
 	for (field_data &data : m_field_data)
 		namewidth = (std::min)((std::max)(ui().get_string_width(data.field.get().name()), namewidth), nameavail);
@@ -68,9 +74,9 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 	ui().draw_outlined_box(container(), boxleft, y2 + ui().box_tb_border(), boxright, y2 + bottom, ui().colors().background_color());
 
 	// show live fields
-	namewidth += ui().get_line_height() * machine().render().ui_aspect();
+	namewidth += ui().get_line_height() * aspect;
 	unsigned line(0U);
-	float const nameleft(boxleft + ui().box_lr_border());
+	float const nameleft(boxleft + (ui().box_lr_border() * aspect));
 	float const indleft(nameleft + namewidth);
 	float const indright(indleft + 0.4f);
 	ioport_field *const selfield(selectedref ? &reinterpret_cast<item_data *>(selectedref)->field.get() : nullptr);
@@ -82,7 +88,7 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 		ui().draw_text_full(
 				container(),
 				data.field.get().name(),
-				nameleft, liney, namewidth, ui::text_layout::LEFT, ui::text_layout::TRUNCATE,
+				nameleft, liney, namewidth, ui::text_layout::LEFT, ui::text_layout::NEVER,
 				mame_ui_manager::NORMAL, fgcolor, ui().colors().text_bg_color());
 
 		ioport_value cur(0U);
@@ -94,11 +100,16 @@ void menu_analog::custom_render(void *selectedref, float top, float bottom, floa
 
 		float const indtop(liney + (ui().get_line_height() * 0.2f));
 		float const indbottom(liney + (ui().get_line_height() * 0.8f));
-		container().add_rect(indleft, indtop, indleft + (fill * 0.4f), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		if (data.origin > fill)
+			container().add_rect(indleft + (fill * 0.4f), indtop, indleft + (data.origin * 0.4f), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		else
+			container().add_rect(indleft + (data.origin * 0.4f), indtop, indleft + (fill * 0.4f), indbottom, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		container().add_line(indleft, indtop, indright, indtop, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		container().add_line(indright, indtop, indright, indbottom, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		container().add_line(indright, indbottom, indleft, indbottom, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 		container().add_line(indleft, indbottom, indleft, indtop, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		if (data.show_neutral)
+			container().add_line(indleft + (data.neutral * 0.4f), indtop, indleft + (data.neutral * 0.4f), indbottom, UI_LINE_WIDTH, fgcolor, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 		// TODO: ensure field being configured is visible
 		if (++line >= m_visible_fields)
@@ -228,7 +239,7 @@ void menu_analog::populate(float &customtop, float &custombottom)
 		}
 
 		// put on arrows
-		uint32_t flags = 0;
+		uint32_t flags(0U);
 		if (data.cur > data.min)
 			flags |= FLAG_LEFT_ARROW;
 		if (data.cur < data.max)
@@ -245,6 +256,8 @@ void menu_analog::populate(float &customtop, float &custombottom)
 
 void menu_analog::find_fields()
 {
+	assert(m_field_data.empty());
+
 	// collect analog fields
 	for (auto &port : machine().ioport().ports())
 	{
@@ -288,9 +301,9 @@ void menu_analog::find_fields()
 		}
 	}
 
-	// restrict live display to 40% height plus borders
-	if ((ui().get_line_height() * m_field_data.size()) > 0.4f)
-		m_visible_fields = unsigned(0.4f / ui().get_line_height());
+	// restrict live display to 60% height plus borders
+	if ((ui().get_line_height() * m_field_data.size()) > 0.6f)
+		m_visible_fields = unsigned(0.6f / ui().get_line_height());
 	else
 		m_visible_fields = m_field_data.size();
 }

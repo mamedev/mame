@@ -7,7 +7,6 @@
     Internal menus for input mappings.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_INPUTMAP_H
 #define MAME_FRONTEND_UI_INPUTMAP_H
 
@@ -97,52 +96,6 @@ public:
 private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void update_input(struct input_item_data *seqchangeditem) override;
-};
-
-class menu_settings : public menu
-{
-public:
-	menu_settings(mame_ui_manager &mui, render_container &container, uint32_t type);
-	virtual ~menu_settings() override;
-
-protected:
-	/* DIP switch descriptor */
-	struct dip_descriptor
-	{
-		dip_descriptor *    next;
-		const char *        name;
-		device_t *          owner;
-		uint32_t            mask;
-		uint32_t            state;
-	};
-
-	dip_descriptor *    diplist;
-	int dipcount;
-	int type;
-
-private:
-	virtual void populate(float &customtop, float &custombottom) override;
-	virtual void handle() override;
-};
-
-class menu_settings_dip_switches : public menu_settings
-{
-public:
-	menu_settings_dip_switches(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_settings_dip_switches() override;
-
-protected:
-	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
-
-private:
-	void custom_render_one(float x1, float y1, float x2, float y2, const dip_descriptor *dip, uint32_t selectedmask);
-};
-
-class menu_settings_driver_config : public menu_settings
-{
-public:
-	menu_settings_driver_config(mame_ui_manager &mui, render_container &container);
-	virtual ~menu_settings_driver_config();
 };
 
 } // namespace ui

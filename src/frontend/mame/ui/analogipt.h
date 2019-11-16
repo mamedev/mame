@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods
+// copyright-holders:Nicola Salmoria, Aaron Giles, Nathan Woods, Vas Crabb
 /***************************************************************************
 
     ui/analogipt.h
@@ -7,7 +7,6 @@
     Analog inputs menu.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_ANALOGIPT_H
 #define MAME_FRONTEND_UI_ANALOGIPT_H
 
@@ -42,7 +41,7 @@ private:
 
 	struct item_data
 	{
-		item_data(ioport_field &f, int t);
+		item_data(ioport_field &f, int t) noexcept;
 
 		std::reference_wrapper<ioport_field> field;
 		int type;
@@ -53,10 +52,13 @@ private:
 
 	struct field_data
 	{
-		field_data(ioport_field &f);
+		field_data(ioport_field &f) noexcept;
 
 		std::reference_wrapper<ioport_field> field;
 		float range;
+		float neutral;
+		float origin;
+		bool show_neutral;
 	};
 
 	using item_data_vector = std::vector<item_data>;
