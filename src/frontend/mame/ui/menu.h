@@ -7,7 +7,6 @@
     Internal MAME menus for the user interface.
 
 ***************************************************************************/
-
 #ifndef MAME_FRONTEND_UI_MENU_H
 #define MAME_FRONTEND_UI_MENU_H
 
@@ -135,9 +134,6 @@ protected:
 	mame_ui_manager &ui() const { return m_ui; }
 	running_machine &machine() const { return m_ui.machine(); }
 	render_container &container() const { return m_container; }
-
-	// allocate temporary memory from the menu's memory pool
-	void *m_pool_alloc(size_t size);
 
 	void reset(reset_options options);
 	void reset_parent(reset_options options) { m_parent->reset(options); }
@@ -334,13 +330,6 @@ private:
 	using global_state_ptr = std::shared_ptr<global_state>;
 	using global_state_map = std::map<running_machine *, global_state_ptr>;
 
-	struct pool
-	{
-		pool       *next;    // chain to next one
-		uint8_t    *top;     // top of the pool
-		uint8_t    *end;     // end of the pool
-	};
-
 	// request the specific handling of the game selection main menu
 	bool is_special_main_menu() const;
 	void set_special_main_menu(bool disable);
@@ -381,7 +370,6 @@ private:
 	render_container        &m_container;       // render_container we render to
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu
 	event                   m_event;            // the UI event that occurred
-	pool                    *m_pool;            // list of memory pools
 
 	float                   m_customtop;        // amount of extra height to add at the top
 	float                   m_custombottom;     // amount of extra height to add at the bottom

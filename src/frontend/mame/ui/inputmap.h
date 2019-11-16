@@ -14,6 +14,8 @@
 
 #include "ui/menu.h"
 
+#include <vector>
+
 
 namespace ui {
 
@@ -31,7 +33,6 @@ private:
 class menu_input : public menu
 {
 public:
-	menu_input(mame_ui_manager &mui, render_container &container);
 	virtual ~menu_input() override;
 
 protected:
@@ -43,24 +44,26 @@ protected:
 		INPUT_TYPE_TOTAL = INPUT_TYPE_ANALOG + SEQ_TYPE_TOTAL
 	};
 
-	/* internal input menu item data */
+	// internal input menu item data
 	struct input_item_data
 	{
-		input_item_data *   next;               /* pointer to next item in the list */
-		const void *        ref;                /* reference to type description for global inputs or field for game inputs */
-		input_seq_type      seqtype;            /* sequence type */
-		input_seq           seq;                /* copy of the live sequence */
-		const input_seq *   defseq;             /* pointer to the default sequence */
-		const char *        name;               /* pointer to the base name of the item */
-		const char *        owner_name;         /* pointer to the name of the owner of the item */
-		ioport_group        group;              /* group type */
-		uint8_t               type;               /* type of port */
-		bool                is_optional;        /* true if this input is considered optional */
+		const void *        ref = nullptr;              // reference to type description for global inputs or field for game inputs
+		input_seq_type      seqtype = SEQ_TYPE_INVALID; // sequence type
+		input_seq           seq;                        // copy of the live sequence
+		const input_seq *   defseq = nullptr;           // pointer to the default sequence
+		const char *        name = nullptr;             // pointer to the base name of the item
+		const char *        owner_name = nullptr;       // pointer to the name of the owner of the item
+		ioport_group        group = IPG_INVALID;        // group type
+		uint8_t             type = 0U;                  // type of port
+		bool                is_optional = false;        // true if this input is considered optional
 	};
+	using data_vector = std::vector<input_item_data>;
 
-	void populate_sorted(std::vector<input_item_data *> &&itemarray);
+	menu_input(mame_ui_manager &mui, render_container &container);
+	void populate_sorted();
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
 
+	data_vector         data;
 	const void *        pollingref;
 	input_seq_type      pollingseq;
 	input_item_data *   pollingitem;
@@ -84,7 +87,7 @@ private:
 	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void update_input(struct input_item_data *seqchangeditem) override;
 
-	int group;
+	const int group;
 };
 
 class menu_input_specific : public menu_input
