@@ -44,6 +44,10 @@ protected:
 	DECLARE_WRITE32_MEMBER(vram_w);
 	DECLARE_READ32_MEMBER(fbc_r);
 	DECLARE_WRITE32_MEMBER(fbc_w);
+	DECLARE_READ32_MEMBER(cursor_address_r);
+	DECLARE_WRITE32_MEMBER(cursor_address_w);
+	DECLARE_READ32_MEMBER(cursor_ram_r);
+	DECLARE_WRITE32_MEMBER(cursor_ram_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t perform_rasterop(uint8_t src, uint8_t dst);
@@ -467,8 +471,12 @@ protected:
 		uint32_t m_curr_prim_type;
 	};
 
+	int16_t m_cursor_x;
+	int16_t m_cursor_y;
+
 	required_memory_region m_rom;
 	std::unique_ptr<uint32_t[]> m_vram;
+	std::unique_ptr<uint32_t[]> m_cursor_ram;
 	required_device<screen_device> m_screen;
 	required_device<bt458_device> m_ramdac;
 

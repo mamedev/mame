@@ -21,6 +21,8 @@ void sbus_cgsix_device::base_map(address_map &map)
 	map(0x00000000, 0x01ffffff).rw(FUNC(sbus_cgsix_device::unknown_r), FUNC(sbus_cgsix_device::unknown_w));
 	map(0x00000000, 0x00007fff).r(FUNC(sbus_cgsix_device::rom_r));
 	map(0x00200000, 0x0020000f).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff000000);
+	map(0x003018fc, 0x003018ff).rw(FUNC(sbus_cgsix_device::cursor_address_r), FUNC(sbus_cgsix_device::cursor_address_w));
+	map(0x00301900, 0x003019ff).rw(FUNC(sbus_cgsix_device::cursor_ram_r), FUNC(sbus_cgsix_device::cursor_ram_w));
 	map(0x00700000, 0x00700fff).rw(FUNC(sbus_cgsix_device::fbc_r), FUNC(sbus_cgsix_device::fbc_w));
 }
 
@@ -36,9 +38,11 @@ sbus_cgsix_device::sbus_cgsix_device(const machine_config &mconfig, device_type 
 void sbus_cgsix_device::device_start()
 {
 	m_vram = std::make_unique<uint32_t[]>(m_vram_size / 4);
-
 	save_pointer(NAME(m_vram), m_vram_size / 4);
 	save_item(NAME(m_vram_size));
+
+	m_cursor_ram = std::make_unique<uint32_t[]>(32 * 2);
+	save_pointer(NAME(m_cursor_ram), 32 * 2);
 
 	save_item(NAME(m_fbc.m_clip_check));
 	save_item(NAME(m_fbc.m_status));
@@ -170,11 +174,28 @@ uint32_t sbus_cgsix_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	const pen_t *pens = m_ramdac->pens();
 	uint8_t *vram = (uint8_t *)&m_vram[0];
 
-	for (int y = 0; y < 900; y++)
+	for (int16_t y = 0; y < 900; y++)
 	{
 		uint32_t *scanline = &bitmap.pix32(y);
-		for (int x = 0; x < 1152; x++)
+		const bool cursor_row_hit = (y >= m_cursor_y && y < (m_cursor_y + 32));
+		for (int16_t x = 0; x < 1152; x++)
 		{
+			uint8_t cursor_pixel = 0;
+			const bool cursor_column_hit = (x >= m_cursor_x && x < (m_cursor_x + 32));
+			if (cursor_row_hit && cursor_column_hit)
+			{
+				const int16_t cursor_row = y - m_cursor_y;
+				const uint32_t cursor_bit = 31 - (x - m_cursor_x);
+				const uint32_t cursor_plane_a = m_cursor_ram[cursor_row];
+				const uint32_t cursor_plane_b = m_cursor_ram[cursor_row + 32];
+				cursor_pixel = (BIT(cursor_plane_b, cursor_bit) << 1) | BIT(cursor_plane_a, cursor_bit);
+				if (cursor_pixel)
+				{
+					*scanline++ = pens[0x100 + cursor_pixel];
+					continue;
+				}
+			}
+
 			const uint8_t pixel = vram[y * 1152 + BYTE4_XOR_BE(x)];
 			*scanline++ = pens[pixel];
 		}
@@ -824,7 +845,7 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 			COMBINE_DATA(&m_fbc.m_clip_maxx);
 			break;
 		case FBC_CLIP_MAXY:
-			logerror("fbc_w: CLIP_MAXY (%08x & %08x\n", data, mem_mask);
+			logerror("fbc_w: CLIP_MAXY = %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_fbc.m_clip_maxy);
 			break;
 
@@ -1108,6 +1129,27 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 			logerror("fbc_w: Unknown register %08x = %08x & %08x\n", 0x00700000 | (offset << 2), data, mem_mask);
 			break;
 	}
+}
+
+READ32_MEMBER(sbus_cgsix_device::cursor_address_r)
+{
+	return (m_cursor_x << 16) | (uint16_t)m_cursor_y;
+}
+
+WRITE32_MEMBER(sbus_cgsix_device::cursor_address_w)
+{
+	m_cursor_x = (int16_t)(data >> 16);
+	m_cursor_y = (int16_t)data;
+}
+
+READ32_MEMBER(sbus_cgsix_device::cursor_ram_r)
+{
+	return m_cursor_ram[offset];
+}
+
+WRITE32_MEMBER(sbus_cgsix_device::cursor_ram_w)
+{
+	COMBINE_DATA(&m_cursor_ram[offset]);
 }
 
 //-------------------------------------------------
