@@ -275,7 +275,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit1_cb) { m_probe_bit1 = da
 NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit2_cb) { m_probe_bit2 = data; }
 NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit3_cb) { m_probe_bit3 = data; }
 NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit4_cb) { m_probe_bit4 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; printf("b0: %f\n", data);  }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; }
 NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit6_cb) { m_probe_bit6 = data; }
 NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
 {
