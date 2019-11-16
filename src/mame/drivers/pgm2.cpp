@@ -849,15 +849,15 @@ void pgm2_state::pgm2_ramrom(machine_config &config)
 */
 
 #define ORLEG2_PROGRAM_104(prefix, extension) \
-	ROM_REGION( 0x1000000, "mainrom", 0 ) \
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 ) \
 	ROM_LOAD( #prefix "_v104" #extension ".u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) ) // V104 08-03-03 13:25:37
 
 #define ORLEG2_PROGRAM_103(prefix, extension) \
-	ROM_REGION( 0x1000000, "mainrom", 0 ) \
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 ) \
 	ROM_LOAD( #prefix "_v103" #extension ".u7",  0x000000, 0x800000, CRC(21c1fae8) SHA1(36eeb7a5e8dc8ee7c834f3ff1173c28cf6c2f1a3) ) // V103 08-01-30 14:45:17
 
 #define ORLEG2_PROGRAM_101(prefix, extension) \
-	ROM_REGION( 0x1000000, "mainrom", 0 ) \
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 ) \
 	ROM_LOAD( #prefix "_v101" #extension ".u7",  0x000000, 0x800000, CRC(45805b53) SHA1(f2a8399c821b75fadc53e914f6f318707e70787c) ) // V101 07-12-24 09:32:32
 
 /*
@@ -960,15 +960,15 @@ ROM_END
 	ROM_LOAD("gsyx_nvram", 0x00000000, 0x10000, CRC(22400c16) SHA1(f775a16299c30f2ce23d683161b910e06eff37c1) )
 
 #define KOV2NL_PROGRAM_302(prefix, extension) \
-	ROM_REGION( 0x1000000, "mainrom", 0 ) \
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 ) \
 	ROM_LOAD( #prefix "_v302" #extension ".u7", 0x00000000, 0x0800000, CRC(b19cf540) SHA1(25da5804bbfd7ef2cdf5cc5aabaa803d18b98929) ) // V302 08-12-03 15:27:34
 
 #define KOV2NL_PROGRAM_301(prefix, extension) \
-	ROM_REGION( 0x1000000, "mainrom", 0 ) \
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 ) \
 	ROM_LOAD( #prefix "_v301" #extension ".u7", 0x000000, 0x800000, CRC(c4595c2c) SHA1(09e379556ef76f81a63664f46d3f1415b315f384) ) // V301 08-09-09 09:44:53
 
 #define KOV2NL_PROGRAM_300(prefix, extension) \
-	ROM_REGION( 0x1000000, "mainrom", 0 ) \
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 ) \
 	ROM_LOAD( #prefix "_v300" #extension ".u7", 0x000000, 0x800000, CRC(08da7552) SHA1(303b97d7694405474c8133a259303ccb49db48b1) ) // V300 08-08-06 18:21:23
 
 
@@ -1065,7 +1065,7 @@ ROM_START( ddpdojt )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "ddpdoj_igs036_china.rom",       0x00000000, 0x0004000, CRC(5db91464) SHA1(723d8086285805bd815e62120dfa9a4269bcd932) ) // Core V100 China
 
-	ROM_REGION( 0x0200000, "mainrom", 0 )
+	ROM_REGION32_LE( 0x0200000, "mainrom", 0 )
 	ROM_LOAD( "ddpdoj_v201cn.u4",        0x00000000, 0x0200000, CRC(89e4b760) SHA1(9fad1309da31d12a413731b416a8bbfdb304ed9e) ) // V201 10-03-27 17:45:12
 
 	DDPDOJT_VIDEO_SOUND_ROMS
@@ -1112,7 +1112,7 @@ ROM_END
 ROM_START( kov3 )
 	KOV3_INTERNAL_CHINA
 
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "kov3_v104cn_raw.bin",         0x00000000, 0x0800000, CRC(1b5cbd24) SHA1(6471d4842a08f404420dea2bd1c8b88798c80fd5) ) // V104 11-12-09 14:29:14
 
 	KOV3_VIDEO_SOUND_ROMS
@@ -1121,7 +1121,7 @@ ROM_END
 ROM_START( kov3_102 )
 	KOV3_INTERNAL_CHINA
 
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "kov3_v102cn_raw.bin",         0x00000000, 0x0800000, CRC(61d0dabd) SHA1(959b22ef4e342ca39c2386549ac7274f9d580ab8) ) // V102 11-11-01 18:56:07
 
 	KOV3_VIDEO_SOUND_ROMS
@@ -1130,7 +1130,7 @@ ROM_END
 ROM_START( kov3_101 )
 	KOV3_INTERNAL_CHINA
 
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "kov3_v101.bin",         0x00000000, 0x0800000, BAD_DUMP CRC(d6664449) SHA1(64d912425f018c3531951019b33e909657724547) ) // V101 11-10-03 14:37:29; dump was not raw, manually xored with fake value
 
 	KOV3_VIDEO_SOUND_ROMS
@@ -1139,7 +1139,7 @@ ROM_END
 ROM_START( kov3_100 )
 	KOV3_INTERNAL_CHINA
 
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "kov3_v100cn_raw.bin",         0x00000000, 0x0800000, CRC(93bca924) SHA1(ecaf2c4676eb3d9f5e4fdbd9388be41e51afa0e4) ) // V100 11-09-14 15:13:14
 
 	KOV3_VIDEO_SOUND_ROMS
@@ -1186,7 +1186,7 @@ ROM_START( kof98umh )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	ROM_LOAD( "kof98umh_internal_rom.bin",       0x00000000, 0x0004000, CRC(3ed2e50f) SHA1(35310045d375d9dda36c325e35257123a7b5b8c7) ) // Core V100 China
 
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION32_LE( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "kof98umh_v100cn.u4",        0x00000000, 0x1000000, CRC(2ea91e3b) SHA1(5a586bb99cc4f1b02e0db462d5aff721512e0640) ) // V100 09-08-23 17:52:03
 
 	KOF98UMH_VIDEO_SOUND_ROMS
