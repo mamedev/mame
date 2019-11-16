@@ -35129,7 +35129,8 @@
 		<year>1984</year>
 		<publisher>Sega Enterprises</publisher>
 		<info name="release" value="2019-09-04"/>
-		<!-- Press open-apple during boot to read a message from the programmer. -->
+		<!-- Press open-apple during boot to read a message from the
+		programmer. -->
 
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -35182,7 +35183,7 @@
 		<year>1986</year>
 		<publisher>Harcourt Brace Jovanovich</publisher>
 		<info name="release" value="2019-09-05"/>
-		<!--"Computer Preparation for the SAT" is a 1986 educational program distributed by Harcourt Brace Jovanovich. This is version 1.1A. It is preserved here for the first time.-->
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Mathematics"/>
 			<dataarea name="flop" size="143360">
