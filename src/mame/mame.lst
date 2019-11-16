@@ -31038,8 +31038,6 @@ ablpinb
 mc_dgear
 dgun2500
 dgun2561
-ii8in1
-ii32in1
 lexcyber
 cybar120
 mc_dg101
@@ -31086,6 +31084,10 @@ fcpocket
 mog_m320
 fapocket
 zdog
+
+@source:vt1682.cpp
+ii8in1
+ii32in1
 
 @source:newbrain.cpp
 newbrain                        //
