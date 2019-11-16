@@ -176,6 +176,7 @@ public:
 	void init_mschamp();
 	void init_mbrush();
 	void init_pengomc1();
+	void init_clubpacma();
 	TILEMAP_MAPPER_MEMBER(pacman_scan_rows);
 	TILE_GET_INFO_MEMBER(pacman_get_tile_info);
 	TILE_GET_INFO_MEMBER(s2650_get_tile_info);
