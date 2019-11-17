@@ -2,7 +2,9 @@
 // copyright-holders:David Haywood
 
 /*  VT1682 - NOT compatible with NES, different video system, sound CPU (4x
-             main CPU clock), optional internal ROM etc.
+             main CPU clock), optional internal ROM etc.  The design is somewhat
+			 based on the NES but the video / sound system is significantly
+			 changed
 
     Internal ROM can be mapped to Main CPU, or Sound CPU at 0x3000-0x3fff if used
     can also be configured as boot device
@@ -19,8 +21,11 @@ public:
 	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_soundcpu(*this, "soundcpu"),
 		m_screen(*this, "screen"),
-		m_fullrom(*this, "fullrom")
+		m_fullrom(*this, "fullrom"),
+		m_spriteram(*this, "spriteram"),
+		m_vram(*this, "vram")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -31,20 +36,70 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	required_device<screen_device> m_screen;
 	required_device<address_map_bank_device> m_fullrom;
+	required_device<address_map_bank_device> m_spriteram;
+	required_device<address_map_bank_device> m_vram;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void vt_vt1682_map(address_map& map);
+	void vt_vt1682_sound_map(address_map& map);
+
 	void rom_map(address_map& map);
+
+	void spriteram_map(address_map& map);
+	void vram_map(address_map& map);	
 
 
 	/* Video */
 	uint8_t m_2000;
 
+	uint8_t m_2002_sprramaddr_2_0; // address attribute
+	uint8_t m_2003_sprramaddr_10_3; // address sprite number
+	uint8_t m_2005_vramaddr_7_0;
+	uint8_t m_2006_vramaddr_15_8;
+
 	DECLARE_READ8_MEMBER(vt1682_2000_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2000_w);
 
+	DECLARE_READ8_MEMBER(vt1682_2002_sprramaddr_2_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2002_sprramaddr_2_0_w);
+	DECLARE_READ8_MEMBER(vt1682_2003_sprramaddr_10_3_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2003_sprramaddr_10_3_w);
+	DECLARE_READ8_MEMBER(vt1682_2004_sprram_data_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2004_sprram_data_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2005_vramaddr_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2005_vramaddr_7_0_w);
+	DECLARE_READ8_MEMBER(vt1682_2006_vramaddr_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2006_vramaddr_15_8_w);
+	DECLARE_READ8_MEMBER(vt1682_2007_vram_data_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2007_vram_data_w);
+
+	/* Video Helpers */
+
+	uint16_t get_spriteram_addr()
+	{
+		return (m_2002_sprramaddr_2_0 & 0x07) | (m_2003_sprramaddr_10_3 << 3);
+	}
+
+	void set_spriteram_addr(uint16_t addr)
+	{
+		m_2002_sprramaddr_2_0 = addr & 0x07;
+		m_2003_sprramaddr_10_3 = addr >> 3;
+	}
+
+	uint16_t get_vram_addr()
+	{
+		return (m_2005_vramaddr_7_0) | (m_2006_vramaddr_15_8 << 8);
+	}
+
+	void set_vram_addr(uint16_t addr)
+	{
+		m_2005_vramaddr_7_0 = addr & 0xff;
+		m_2006_vramaddr_15_8 = addr >> 8;
+	}
 
 	/* System */
 	uint8_t m_prgbank1_r0;
@@ -115,6 +170,12 @@ void vt_vt1682_state::machine_start()
 	/* Video */
 	save_item(NAME(m_2000));
 
+	save_item(NAME(m_2002_sprramaddr_2_0));
+	save_item(NAME(m_2003_sprramaddr_10_3));
+
+	save_item(NAME(m_2005_vramaddr_7_0));
+	save_item(NAME(m_2006_vramaddr_15_8));
+
 	/* System */
 
 	save_item(NAME(m_prgbank1_r0));
@@ -140,6 +201,12 @@ void vt_vt1682_state::machine_reset()
 	/* Video */
 	m_2000 = 0;
 
+	m_2002_sprramaddr_2_0 = 0;
+	m_2003_sprramaddr_10_3 = 0;
+
+	m_2005_vramaddr_7_0 = 0;
+	m_2006_vramaddr_15_8 = 0;
+
 	/* System */
 	m_prgbank1_r0 = 0;
 	m_prgbank1_r1 = 0;
@@ -159,6 +226,8 @@ void vt_vt1682_state::machine_reset()
 	m_211c_regs_ext2421 = 0;
 
 	update_banks();
+
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 /*
@@ -473,6 +542,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - SPRAM ADDR:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_r)
+{
+	uint8_t ret = m_2002_sprramaddr_2_0;
+	logerror("%s: vt1682_2002_sprramaddr_2_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_w)
+{
+	logerror("%s: vt1682_2002_sprramaddr_2_0_w writing: %02x\n", machine().describe_context(), data);
+	m_2002_sprramaddr_2_0 = data & 0x07;
+}
+
 /*
     Address 0x2003 r/w (MAIN CPU)
 
@@ -485,6 +567,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - SPRAM ADDR:4
     0x01 - SPRAM ADDR:3
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_r)
+{
+	uint8_t ret = m_2003_sprramaddr_10_3;
+	logerror("%s: vt1682_2003_sprramaddr_10_3_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_w)
+{
+	logerror("%s: vt1682_2003_sprramaddr_10_3_w writing: %02x\n", machine().describe_context(), data);
+	m_2003_sprramaddr_10_3 = data;
+}
 
 /*
     Address 0x2004 r/w (MAIN CPU)
@@ -499,6 +594,27 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - SPRAM DATA:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_r)
+{
+	uint16_t spriteram_address = get_spriteram_addr();
+	uint8_t ret = m_spriteram->read8(spriteram_address);
+	logerror("%s: vt1682_2004_sprram_data_r returning: %02x from SpriteRam Address %04x\n", machine().describe_context(), ret, spriteram_address);
+	// no increment on read?
+
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_w)
+{
+	uint16_t spriteram_address = get_spriteram_addr();
+	m_spriteram->write8(spriteram_address, data);
+
+	logerror("%s: vt1682_2004_sprram_data_w writing: %02x to SpriteRam Address %04x\n", machine().describe_context(), data, spriteram_address);
+	spriteram_address++; // auto inc
+	set_spriteram_addr(spriteram_address); // update registers
+}
+
+
 /*
     Address 0x2005 r/w (MAIN CPU)
 
@@ -511,6 +627,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - VRAM ADDR:1
     0x01 - VRAM ADDR:0
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2005_vramaddr_7_0_r)
+{
+	uint8_t ret = m_2005_vramaddr_7_0;
+	logerror("%s: vt1682_2005_vramaddr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2005_vramaddr_7_0_w)
+{
+	logerror("%s: vt1682_2005_vramaddr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_2005_vramaddr_7_0 = data;
+}
 
 /*
     Address 0x2006 r/w (MAIN CPU)
@@ -525,6 +654,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x01 - VRAM ADDR:8
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2006_vramaddr_15_8_r)
+{
+	uint8_t ret = m_2006_vramaddr_15_8;
+	logerror("%s: vt1682_2006_vramaddr_15_8 returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2006_vramaddr_15_8_w)
+{
+	logerror("%s: vt1682_2006_vramaddr_15_8 writing: %02x\n", machine().describe_context(), data);
+	m_2006_vramaddr_15_8 = data;
+}
+
+
 /*
     Address 0x2007 r/w (MAIN CPU)
 
@@ -537,6 +680,27 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x02 - VRAM DATA:1
     0x01 - VRAM DATA:0
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_r)
+{
+	uint16_t vram_address = get_vram_addr();
+	uint8_t ret = m_vram->read8(vram_address);
+	logerror("%s: vt1682_2007_vram_data_r returning: %02x from VideoRam Address %04x\n", machine().describe_context(), ret, vram_address);
+	// no increment on read?
+
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_w)
+{
+	uint16_t vram_address = get_vram_addr();
+	m_vram->write8(vram_address, data);
+
+	logerror("%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
+	vram_address++; // auto inc
+	set_vram_addr(vram_address); // update registers
+}
+
 
 /*
     Address 0x2008 r/w (MAIN CPU)
@@ -2880,6 +3044,24 @@ void vt_vt1682_state::rom_map(address_map &map)
 	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
 }
 
+// 11-bits (0x800 bytes) for sprites
+void vt_vt1682_state::spriteram_map(address_map &map)
+{
+	map(0x000, 0x7ff).ram();
+}
+
+// 16-bits (0x10000 bytes) for vram (maybe mirrors at 0x2000?)
+void vt_vt1682_state::vram_map(address_map &map)
+{
+	map(0x000, 0xffff).ram();
+}
+
+// for the 2nd, faster, CPU
+void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
+{
+
+	// 3000-3fff internal ROM if enabled
+}
 
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
@@ -2887,6 +3069,14 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 	/* Video */
 	map(0x2000, 0x2000).rw(FUNC(vt_vt1682_state::vt1682_2000_r), FUNC(vt_vt1682_state::vt1682_2000_w));
+
+	map(0x2002, 0x2002).rw(FUNC(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_r), FUNC(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_w));
+	map(0x2003, 0x2003).rw(FUNC(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_r), FUNC(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_w));
+	map(0x2004, 0x2004).rw(FUNC(vt_vt1682_state::vt1682_2004_sprram_data_r), FUNC(vt_vt1682_state::vt1682_2004_sprram_data_w));
+	map(0x2005, 0x2005).rw(FUNC(vt_vt1682_state::vt1682_2005_vramaddr_7_0_r), FUNC(vt_vt1682_state::vt1682_2005_vramaddr_7_0_w));
+	map(0x2006, 0x2006).rw(FUNC(vt_vt1682_state::vt1682_2006_vramaddr_15_8_r), FUNC(vt_vt1682_state::vt1682_2006_vramaddr_15_8_w));
+	map(0x2007, 0x2007).rw(FUNC(vt_vt1682_state::vt1682_2007_vram_data_r), FUNC(vt_vt1682_state::vt1682_2007_vram_data_w));
+
 
 	/* System */
 	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
@@ -2920,15 +3110,24 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 static INPUT_PORTS_START( intec )
 INPUT_PORTS_END
 
+
+// NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
+// PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
+
 void vt_vt1682_state::vt_vt1682(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502_VT1682(config, m_maincpu, 5000000);
+	M6502_VT1682(config, m_maincpu, XTAL(21'477'272)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
 
-	// 6502 sound CPU running at 20mhz
+	M6502(config, m_soundcpu, XTAL(21'477'272));
+	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
+
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&vt_vt1682_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
+
+	ADDRESS_MAP_BANK(config, m_spriteram).set_map(&vt_vt1682_state::spriteram_map).set_options(ENDIANNESS_NATIVE, 8, 11, 0x800);
+	ADDRESS_MAP_BANK(config, m_vram).set_map(&vt_vt1682_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
