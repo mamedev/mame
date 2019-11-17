@@ -83,25 +83,29 @@ namespace solver
 				this->m_mat_ptr[k][this->m_terms[k].railstart()] = &mat.A[mat.diag[k]];
 			}
 
-			this->log().verbose("maximum fill: {1}", gr.first);
-			this->log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
+			anetlist.log().verbose("maximum fill: {1}", gr.first);
+			anetlist.log().verbose("Post elimination occupancy ratio: {2} Ops: {1}", gr.second,
 					static_cast<nl_fptype>(mat.nz_num) / static_cast<nl_fptype>(iN * iN));
-			this->log().verbose(" Pre elimination occupancy ratio: {2}",
+			anetlist.log().verbose(" Pre elimination occupancy ratio: {2}",
 					static_cast<nl_fptype>(raw_elements) / static_cast<nl_fptype>(iN * iN));
 
 			// FIXME: Move me
+			//
 
-			if (this->state().lib().isLoaded())
+			// During extended validation there is no reason to check for
+			// differences in the generated code since during
+			// extended validation this will be different (and non-functional)
+			if (!anetlist.is_extended_validation() && anetlist.lib().isLoaded())
 			{
 				pstring symname = static_compile_name();
-				m_proc.load(this->state().lib(), symname);
+				m_proc.load(anetlist.lib(), symname);
 				if (m_proc.resolved())
 				{
-					this->log().info("External static solver {1} found ...", symname);
+					anetlist.log().info("External static solver {1} found ...", symname);
 				}
 				else
 				{
-					this->log().warning("External static solver {1} not found ...", symname);
+					anetlist.log().warning("External static solver {1} not found ...", symname);
 				}
 			}
 		}

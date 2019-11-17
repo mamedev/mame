@@ -11,8 +11,8 @@
 #include "nl_setup.h"
 #include "plib/putil.h"
 
-namespace netlist { namespace factory
-{
+namespace netlist {
+namespace factory {
 
 	class NETLIB_NAME(wrapper) : public device_t
 	{

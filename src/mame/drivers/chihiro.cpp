@@ -1949,7 +1949,7 @@ void chihiro_state::chihirogd(machine_config &config)
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x80000, "bios", 0) \
+	ROM_REGION32_LE( 0x80000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "mediaboard", 0) \

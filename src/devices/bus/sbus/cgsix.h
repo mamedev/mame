@@ -44,9 +44,13 @@ protected:
 	DECLARE_WRITE32_MEMBER(vram_w);
 	DECLARE_READ32_MEMBER(fbc_r);
 	DECLARE_WRITE32_MEMBER(fbc_w);
+	DECLARE_READ32_MEMBER(cursor_address_r);
+	DECLARE_WRITE32_MEMBER(cursor_address_w);
+	DECLARE_READ32_MEMBER(cursor_ram_r);
+	DECLARE_WRITE32_MEMBER(cursor_ram_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint8_t perform_rasterop(uint8_t src, uint8_t dst);
+	uint8_t perform_rasterop(uint8_t src, uint8_t dst, uint8_t mask = 0xff);
 	void handle_font_poke();
 	void handle_draw_command();
 	void handle_blit_command();
@@ -148,6 +152,8 @@ protected:
 	inline uint32_t fbc_misc_draw()         { return (m_fbc.m_misc >> FBC_MISC_DRAW_SHIFT) & FBC_MISC_DRAW_MASK;  }
 	inline uint32_t fbc_misc_data()         { return (m_fbc.m_misc >> FBC_MISC_DATA_SHIFT) & FBC_MISC_DATA_MASK;  }
 	inline uint32_t fbc_misc_blit()         { return (m_fbc.m_misc >> FBC_MISC_BLIT_SHIFT) & FBC_MISC_BLIT_MASK;  }
+	inline uint8_t fbc_get_plane_mask();
+	inline uint32_t fbc_get_pixel_mask();
 
 	enum
 	{
@@ -405,7 +411,10 @@ protected:
 		uint32_t m_pixel_mask;
 
 		uint32_t m_patt_align;
+		uint16_t m_patt_align_x;
+		uint16_t m_patt_align_y;
 		uint32_t m_pattern[8];
+		uint16_t m_patterns[16];
 
 		uint32_t m_ipoint_absx;
 		uint32_t m_ipoint_absy;
@@ -467,8 +476,12 @@ protected:
 		uint32_t m_curr_prim_type;
 	};
 
+	int16_t m_cursor_x;
+	int16_t m_cursor_y;
+
 	required_memory_region m_rom;
 	std::unique_ptr<uint32_t[]> m_vram;
+	std::unique_ptr<uint32_t[]> m_cursor_ram;
 	required_device<screen_device> m_screen;
 	required_device<bt458_device> m_ramdac;
 

@@ -935,10 +935,10 @@ void rastersp_state::rastersp(machine_config &config)
  *************************************/
 
 ROM_START( rotr )
-	ROM_REGION(0x100000, "bios", 0)
+	ROM_REGION32_LE(0x100000, "bios", 0)
 	ROM_LOAD( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
-	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_REGION32_LE(0x1000000, "dspboot", 0)
 	ROM_LOAD32_BYTE( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
 	ROM_REGION(0x8000, "proms", 0) /* Xilinx FPGA PROMs */
@@ -954,10 +954,10 @@ ROM_END
 
 
 ROM_START( rotra )
-	ROM_REGION(0x100000, "bios", 0)
+	ROM_REGION32_LE(0x100000, "bios", 0)
 	ROM_LOAD( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
-	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_REGION32_LE(0x1000000, "dspboot", 0)
 	ROM_LOAD32_BYTE( "rasterspeed2.1_bootrom4.u10", 0x00000, 0x10000, CRC(6da142d1) SHA1(e2dbd479034677726fc26fd1ba85c4458d89286c) )
 
 	ROM_REGION(0x8000, "proms", 0) /* Xilinx FPGA PROMs */
@@ -987,10 +987,10 @@ ROM_END
 // the rom also exists in some odd hex format like this
 // ROM_LOAD( "95751937.hex", 0x0000, 0x025f91, CRC(8f412e97) SHA1(a5ff924fbc327114e59d75de644ed0d5cd7fa6b3) )
 ROM_START( fbcrazy )
-	ROM_REGION(0x100000, "bios", 0)
+	ROM_REGION32_LE(0x100000, "bios", 0)
 	ROM_LOAD( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) )
 
-	ROM_REGION(0x1000000, "dspboot", 0)
+	ROM_REGION32_LE(0x1000000, "dspboot", 0)
 	ROM_LOAD32_BYTE( "95751937.bin", 0x0000, 0x010000, CRC(4a99ee11) SHA1(335398ebc64bbfe86e2652ac080a5943dd413928) )
 
 	ROM_REGION(0x8000, "proms", ROMREGION_ERASEFF )

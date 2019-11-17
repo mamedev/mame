@@ -155,13 +155,13 @@ public:
 	{
 	}
 
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit0_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit1_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit2_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit3_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit4_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit5_cb);
-	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit6_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit0_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit1_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit2_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit3_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit4_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit5_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit6_cb);
 	NETDEV_LOGIC_CALLBACK_MEMBER(probe_clock_cb);
 
 	uint32_t screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -270,13 +270,13 @@ void stuntcyc_state::machine_reset()
 	m_probe_bit6 = 0;
 }
 
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit0_cb) { m_probe_bit0 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit1_cb) { m_probe_bit1 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit2_cb) { m_probe_bit2 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit3_cb) { m_probe_bit3 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit4_cb) { m_probe_bit4 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; }
-NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit6_cb) { m_probe_bit6 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit0_cb) { m_probe_bit0 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit1_cb) { m_probe_bit1 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit2_cb) { m_probe_bit2 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit3_cb) { m_probe_bit3 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit4_cb) { m_probe_bit4 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; }
+NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit6_cb) { m_probe_bit6 = data; }
 NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
 {
 	synchronize();
@@ -348,13 +348,13 @@ void stuntcyc_state::stuntcyc(machine_config &config)
 	/* basic machine hardware */
 	NETLIST_CPU(config, m_maincpu, STUNTCYC_NL_CLOCK).set_source(netlist_stuntcyc);
 
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit0", 0).set_params("probe_bit0", FUNC(stuntcyc_state::probe_bit0_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit1", 0).set_params("probe_bit1", FUNC(stuntcyc_state::probe_bit1_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit2", 0).set_params("probe_bit2", FUNC(stuntcyc_state::probe_bit2_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit3", 0).set_params("probe_bit3", FUNC(stuntcyc_state::probe_bit3_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit4", 0).set_params("probe_bit4", FUNC(stuntcyc_state::probe_bit4_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit5", 0).set_params("probe_bit5", FUNC(stuntcyc_state::probe_bit5_cb));
-	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_bit6", 0).set_params("probe_bit6", FUNC(stuntcyc_state::probe_bit6_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit0", 0).set_params("probe_bit0", FUNC(stuntcyc_state::probe_bit0_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit1", 0).set_params("probe_bit1", FUNC(stuntcyc_state::probe_bit1_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit2", 0).set_params("probe_bit2", FUNC(stuntcyc_state::probe_bit2_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit3", 0).set_params("probe_bit3", FUNC(stuntcyc_state::probe_bit3_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit4", 0).set_params("probe_bit4", FUNC(stuntcyc_state::probe_bit4_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit5", 0).set_params("probe_bit5", FUNC(stuntcyc_state::probe_bit5_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:probe_bit6", 0).set_params("probe_bit6", FUNC(stuntcyc_state::probe_bit6_cb));
 	NETLIST_LOGIC_OUTPUT(config, "maincpu:probe_clock", 0).set_params("probe_clock", FUNC(stuntcyc_state::probe_clock_cb));
 
 /* video hardware */

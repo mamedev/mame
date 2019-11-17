@@ -8,6 +8,15 @@
 
 namespace plib {
 
+	PERRMSGV(MF_EXPECTED_TOKEN_1_GOT_2,         2, "Expected token <{1}>, got <{2}>")
+	PERRMSGV(MF_EXPECTED_STRING_GOT_1,          1, "Expected a string, got <{1}>")
+	PERRMSGV(MF_EXPECTED_IDENTIFIER_GOT_1,      1, "Expected an identifier, got <{1}>")
+	PERRMSGV(MF_EXPECTED_ID_OR_NUM_GOT_1,       1, "Expected an identifier or number, got <{1}>")
+	PERRMSGV(MF_EXPECTED_NUMBER_GOT_1,          1, "Expected a number, got <{1}>")
+	PERRMSGV(MF_EXPECTED_LONGINT_GOT_1,         1, "Expected a logn int, got <{1}>")
+	PERRMSGV(MF_EXPECTED_LINENUM_GOT_1,         1, "Expected line number after line marker but got <{1}>")
+	PERRMSGV(MF_EXPECTED_FILENAME_GOT_1,        1, "Expected file name after line marker but got <{1}>")
+
 	// ----------------------------------------------------------------------------------------
 	// A simple tokenizer
 	// ----------------------------------------------------------------------------------------
@@ -63,7 +72,6 @@ namespace plib {
 	{
 		require_token(get_token(), token_num);
 	}
-
 	void ptokenizer::require_token(const token_t &tok, const token_id_t &token_num)
 	{
 		if (!tok.is(token_num))
@@ -72,26 +80,27 @@ namespace plib {
 			for (auto &i : m_tokens)
 				if (i.second.id() == token_num.id())
 					val = i.first;
-			error(pfmt("Expected token <{1}> got <{2}>")(val)(tok.str()) );
+			error(MF_EXPECTED_TOKEN_1_GOT_2(val, tok.str()));
 		}
 	}
 
 	pstring ptokenizer::get_string()
 	{
 		token_t tok = get_token();
-		if (!tok.is_type(STRING))
+		if (!tok.is_type(token_type::STRING))
 		{
-			error(pfmt("Expected a string, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_STRING_GOT_1(tok.str()));
 		}
 		return tok.str();
 	}
 
+
 	pstring ptokenizer::get_identifier()
 	{
 		token_t tok = get_token();
-		if (!tok.is_type(IDENTIFIER))
+		if (!tok.is_type(token_type::IDENTIFIER))
 		{
-			error(pfmt("Expected an identifier, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_IDENTIFIER_GOT_1(tok.str()));
 		}
 		return tok.str();
 	}
@@ -99,9 +108,9 @@ namespace plib {
 	pstring ptokenizer::get_identifier_or_number()
 	{
 		token_t tok = get_token();
-		if (!(tok.is_type(IDENTIFIER) || tok.is_type(NUMBER)))
+		if (!(tok.is_type(token_type::IDENTIFIER) || tok.is_type(token_type::NUMBER)))
 		{
-			error(pfmt("Expected an identifier or number, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_ID_OR_NUM_GOT_1(tok.str()));
 		}
 		return tok.str();
 	}
@@ -110,28 +119,28 @@ namespace plib {
 	double ptokenizer::get_number_double()
 	{
 		token_t tok = get_token();
-		if (!tok.is_type(NUMBER))
+		if (!tok.is_type(token_type::NUMBER))
 		{
-			error(pfmt("Expected a number, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_NUMBER_GOT_1(tok.str()));
 		}
 		bool err(false);
 		auto ret = plib::pstonum_ne<double>(tok.str(), err);
 		if (err)
-			error(pfmt("Expected a number, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_NUMBER_GOT_1(tok.str()));
 		return ret;
 	}
 
 	long ptokenizer::get_number_long()
 	{
 		token_t tok = get_token();
-		if (!tok.is_type(NUMBER))
+		if (!tok.is_type(token_type::NUMBER))
 		{
-			error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_LONGINT_GOT_1(tok.str()) );
 		}
 		bool err(false);
 		auto ret = plib::pstonum_ne<long>(tok.str(), err);
 		if (err)
-			error(pfmt("Expected a long int, got <{1}>")(tok.str()) );
+			error(MF_EXPECTED_LONGINT_GOT_1(tok.str()) );
 		return ret;
 	}
 
@@ -140,9 +149,9 @@ namespace plib {
 		token_t ret = get_token_internal();
 		while (true)
 		{
-			if (ret.is_type(ENDOFFILE))
+			if (ret.is_type(token_type::token_type::ENDOFFILE))
 				return ret;
-			else if (m_support_line_markers && ret.is_type(LINEMARKER))
+			else if (m_support_line_markers && ret.is_type(token_type::LINEMARKER))
 			{
 				bool benter(false);
 				bool bexit(false);
@@ -150,15 +159,15 @@ namespace plib {
 				unsigned lineno;
 
 				ret = get_token_internal();
-				if (!ret.is_type(NUMBER))
-					error(pfmt("Expected line number after line marker but got <{1}>")(ret.str()) );
+				if (!ret.is_type(token_type::NUMBER))
+					error(MF_EXPECTED_LINENUM_GOT_1(ret.str()));
 				lineno = pstonum<unsigned>(ret.str());
 				ret = get_token_internal();
-				if (!ret.is_type(STRING))
-					error(pfmt("Expected file name after line marker but got <{1}>")(ret.str()) );
+				if (!ret.is_type(token_type::STRING))
+					error(MF_EXPECTED_FILENAME_GOT_1(ret.str()));
 				file = ret.str();
 				ret = get_token_internal();
-				while (ret.is_type(NUMBER))
+				while (ret.is_type(token_type::NUMBER))
 				{
 					if (ret.str() == "1")
 						benter = true;
@@ -201,20 +210,20 @@ namespace plib {
 			c = getc();
 			if (eof())
 			{
-				return token_t(ENDOFFILE);
+				return token_t(token_type::ENDOFFILE);
 			}
 		}
 		if (m_support_line_markers && c == '#')
-			return token_t(LINEMARKER, "#");
+			return token_t(token_type::LINEMARKER, "#");
 		else if (m_number_chars_start.find(c) != pstring::npos)
 		{
 			// read number while we receive number or identifier chars
 			// treat it as an identifier when there are identifier chars in it
-			token_type ret = NUMBER;
+			token_type ret = token_type::NUMBER;
 			pstring tokstr = "";
 			while (true) {
 				if (m_identifier_chars.find(c) != pstring::npos && m_number_chars.find(c) == pstring::npos)
-					ret = IDENTIFIER;
+					ret = token_type::IDENTIFIER;
 				else if (m_number_chars.find(c) == pstring::npos)
 					break;
 				tokstr += c;
@@ -237,7 +246,7 @@ namespace plib {
 			if (id != m_tokens.end())
 				return token_t(id->second, tokstr);
 			else
-				return token_t(IDENTIFIER, tokstr);
+				return token_t(token_type::IDENTIFIER, tokstr);
 		}
 		else if (c == m_string)
 		{
@@ -248,7 +257,7 @@ namespace plib {
 				tokstr += c;
 				c = getc();
 			}
-			return token_t(STRING, tokstr);
+			return token_t(token_type::STRING, tokstr);
 		}
 		else
 		{
@@ -271,17 +280,17 @@ namespace plib {
 			if (id != m_tokens.end())
 				return token_t(id->second, tokstr);
 			else
-				return token_t(UNKNOWN, tokstr);
+				return token_t(token_type::UNKNOWN, tokstr);
 		}
 	}
 
-	void ptokenizer::error(const pstring &errs)
+	void ptokenizer::error(const perrmsg &errs)
 	{
 		pstring s("");
 		pstring trail      ("                 from ");
 		pstring trail_first("In file included from ");
 		pstring e = plib::pfmt("{1}:{2}:0: error: {3}\n")
-				(m_source_location.back().file_name(), m_source_location.back().line(), errs);
+				(m_source_location.back().file_name(), m_source_location.back().line(), errs());
 		m_source_location.pop_back();
 		while (m_source_location.size() > 0)
 		{
@@ -290,7 +299,7 @@ namespace plib {
 			s = trail + plib::pfmt("{1}:{2}:0\n")(m_source_location.back().file_name(), m_source_location.back().line()) + s;
 			m_source_location.pop_back();
 		}
-	verror("\n" + s + e + " " + currentline_str() + "\n");
-}
+		verror("\n" + s + e + " " + currentline_str() + "\n");
+	}
 
 } // namespace plib

@@ -20779,7 +20779,7 @@
 	<software name="jennypr">
 		<description>Jenny of the Prairie (cleanly cracked)</description>
 		<year>1983</year>
-		<publisher>Rhiannon</publisher>
+		<publisher>Rhiannon Software</publisher>
 		<info name="release" value="2019-06-12"/>
 		<!-- No compatibility data known at this time. -->
 
@@ -35129,7 +35129,8 @@
 		<year>1984</year>
 		<publisher>Sega Enterprises</publisher>
 		<info name="release" value="2019-09-04"/>
-		<!-- Press open-apple during boot to read a message from the programmer. -->
+		<!-- Press open-apple during boot to read a message from the
+		programmer. -->
 
 		<part name="flop0" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -35182,7 +35183,7 @@
 		<year>1986</year>
 		<publisher>Harcourt Brace Jovanovich</publisher>
 		<info name="release" value="2019-09-05"/>
-		<!--"Computer Preparation for the SAT" is a 1986 educational program distributed by Harcourt Brace Jovanovich. This is version 1.1A. It is preserved here for the first time.-->
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1 - Mathematics"/>
 			<dataarea name="flop" size="143360">
@@ -35407,6 +35408,137 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="fractions- subtraction (4am crack).dsk" size="143360" crc="dc619fdd" sha1="9053d4818485f0120b0ff9d701bfcf7b3b0f0962" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mcfreedm">
+		<description>MECC-A315 Freedom! (Version 1.0) (cleanly cracked)</description>
+		<year>1992</year>
+		<publisher>MECC</publisher>
+		<info name="release" value="2019-11-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a315 freedom v1.0 (4am crack) disk 1.dsk" size="143360" crc="486566f3" sha1="7ee0fa299041f7fc485d67dccae05c927412d8e2" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="mecc-a315 freedom v1.0 (4am crack) disk 2.dsk" size="143360" crc="01525b78" sha1="0b55f67ee57d6bb0a6b87aa029a41dfb7b457767" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alabyrnt">
+		<description>Labyrinth: The Computer Game (Lucasfilm Games) (cleanly cracked)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="release" value="2019-11-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="labyrinth (activision) (4am crack) side a.dsk" size="143360" crc="680ccc3a" sha1="67e6015fa0543bd5224bae656db6e5c407c78d14" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="labyrinth (activision) (4am crack) side b.dsk" size="143360" crc="c01446c6" sha1="99869783209f7239a1608584c8460c45b6fe290e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labycret">
+		<description>Labyrinth of Crete (cleanly cracked)</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-11-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="labyrinth of crete (4am crack).dsk" size="143360" crc="cd12d96c" sha1="dab01261a4c4335acd9add607f6b920cdb15cf35" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosbalan">
+		<description>The Cosmic Balance (cleanly cracked)</description>
+		<year>1982</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2019-11-15"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the cosmic balance (4am and san inc crack).dsk" size="143360" crc="af0b221b" sha1="49f46eb5580cbb01fdcfa4ae5bfd39ea459a1b04" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frcaddit">
+		<description>Fractions: Addition (cleanly cracked)</description>
+		<year>1988</year>
+		<publisher>Houghton Mifflin</publisher>
+		<info name="release" value="2019-11-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="fractions- addition (4am crack).dsk" size="143360" crc="00d299f8" sha1="8cf165dafb3cd2ec19c70e921f92dcf30857d62f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tourmang">
+		<description>The Tournament Manager (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>DC Heath</publisher>
+		<info name="release" value="2019-11-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the tournament manager (4am crack).dsk" size="143360" crc="7119be0e" sha1="27cfd2599299804af61a486c1db11d7bdc5f1352" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="questron">
+		<description>Questron (cleanly cracked)</description>
+		<year>1984</year>
+		<publisher>Strategic Simulations</publisher>
+		<info name="release" value="2019-11-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Character Disk (Boot disk)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="questron (4am crack) character disk (boot).dsk" size="143360" crc="a5883c8c" sha1="e0808ea101c1211bd8cb072d1452427dfcb0a37b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game disk 1"/>
+			<dataarea name="flop" size="143360">
+				<rom name="questron (4am crack) game disk 1.dsk" size="143360" crc="a8655b0b" sha1="cec363e8a31984cf6edc5465244f0a2b15c3c878" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Game disk 2"/>
+			<dataarea name="flop" size="143360">
+				<rom name="questron (4am crack) game disk 2.dsk" size="143360" crc="b7229e6c" sha1="0bcb289ad32930e6e7313f1a73d1ab0c3f4450b9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advkrist">
+		<description>The Adventures of Kristen and Her Family (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Rhiannon Software</publisher>
+		<info name="release" value="2019-11-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the adventures of kristen and her family (4am crack).dsk" size="143360" crc="2d6548a4" sha1="6936919ec4cdb0cc7654f8c3d0ae0752e22c1983" />
 			</dataarea>
 		</part>
 	</software>

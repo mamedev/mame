@@ -24,14 +24,14 @@ namespace plib {
 	template <typename FT, int SIZE>
 	struct sizeabs
 	{
-		static constexpr std::size_t ABS() { return (SIZE < 0) ? static_cast<std::size_t>(0 - SIZE) : static_cast<std::size_t>(SIZE); }
+		static constexpr std::size_t ABS() noexcept { return (SIZE < 0) ? static_cast<std::size_t>(0 - SIZE) : static_cast<std::size_t>(SIZE); }
 		using container = typename std::array<FT, ABS()> ;
 	};
 
 	template <typename FT>
 	struct sizeabs<FT, 0>
 	{
-		static constexpr std::size_t ABS() { return 0; }
+		static constexpr std::size_t ABS() noexcept { return 0; }
 		//using container = typename std::vector<FT, arena_allocator<mempool, FT, 64>>;
 		using container = typename std::vector<FT, aligned_allocator<FT, PALIGN_VECTOROPT>>;
 	};
@@ -55,7 +55,7 @@ namespace plib {
 	struct parray
 	{
 	public:
-		static constexpr std::size_t SIZEABS() { return sizeabs<FT, SIZE>::ABS(); }
+		static constexpr std::size_t SIZEABS() noexcept { return sizeabs<FT, SIZE>::ABS(); }
 
 		using base_type = typename sizeabs<FT, SIZE>::container;
 		using size_type = typename base_type::size_type;

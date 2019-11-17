@@ -24,8 +24,8 @@ bool parser_t::parse(const pstring &nlname)
 		.number_chars(".0123456789", "0123456789eE-.") //FIXME: processing of numbers
 		.whitespace(pstring("") + ' ' + static_cast<char>(9) + static_cast<char>(10) + static_cast<char>(13))
 		.comment("/*", "*/", "//");
-	m_tok_param_left = register_token("(");
-	m_tok_param_right = register_token(")");
+	m_tok_paren_left = register_token("(");
+	m_tok_paren_right = register_token(")");
 	m_tok_comma = register_token(",");
 
 	m_tok_ALIAS = register_token("ALIAS");
@@ -59,29 +59,29 @@ bool parser_t::parse(const pstring &nlname)
 	while (true)
 	{
 		token_t token = get_token();
-		if (token.is_type(ENDOFFILE))
+		if (token.is_type(token_type::ENDOFFILE))
 		{
 			return false;
 		}
 
 		if (token.is(m_tok_NETLIST_END))
 		{
-			require_token(m_tok_param_left);
+			require_token(m_tok_paren_left);
 			if (!in_nl)
 				error (MF_UNEXPECTED_NETLIST_END());
 			else
 			{
 				in_nl = false;
 			}
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_NETLIST_START))
 		{
 			if (in_nl)
 				error (MF_UNEXPECTED_NETLIST_START());
-			require_token(m_tok_param_left);
+			require_token(m_tok_paren_left);
 			token_t name = get_token();
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_right);
 			if (name.str() == nlname || nlname == "")
 			{
 				parse_netlist(name.str());
@@ -98,10 +98,9 @@ void parser_t::parse_netlist(const pstring &nlname)
 	{
 		token_t token = get_token();
 
-		if (token.is_type(ENDOFFILE))
-			return;
+		if (token.is_type(token_type::ENDOFFILE))
+			error (MF_UNEXPECTED_END_OF_FILE());
 
-		require_token(m_tok_param_left);
 		m_setup.log().debug("Parser: Device: {1}\n", token.str());
 
 		if (token.is(m_tok_ALIAS))
@@ -128,14 +127,17 @@ void parser_t::parse_netlist(const pstring &nlname)
 			net_truthtable_start(nlname);
 		else if (token.is(m_tok_LOCAL_LIB_ENTRY))
 		{
+			require_token(m_tok_paren_left);
 			m_setup.register_lib_entry(get_identifier(), "parser: " + nlname);
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_NETLIST_END))
 		{
 			netdev_netlist_end();
 			return;
 		}
+		else if (!token.is_type(token_type::IDENTIFIER))
+			error(MF_EXPECTED_IDENTIFIER_GOT_1(token.str()));
 		else
 			device(token.str());
 	}
@@ -143,7 +145,8 @@ void parser_t::parse_netlist(const pstring &nlname)
 
 void parser_t::net_truthtable_start(const pstring &nlname)
 {
-	pstring name = get_identifier();
+	require_token(m_tok_paren_left);
+	pstring name(get_identifier());
 	bool head_found(false);
 
 	require_token(m_tok_comma);
@@ -152,7 +155,7 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 	long no = get_number_long();
 	require_token(m_tok_comma);
 	pstring def_param = get_string();
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 
 	netlist::tt_desc desc;
 	desc.classname = name;
@@ -168,65 +171,58 @@ void parser_t::net_truthtable_start(const pstring &nlname)
 
 		if (token.is(m_tok_TT_HEAD))
 		{
-			require_token(m_tok_param_left);
+			require_token(m_tok_paren_left);
 			desc.desc.push_back(get_string());
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_right);
 			head_found = true;
 		}
 		else if (token.is(m_tok_TT_LINE))
 		{
 			if (!head_found)
-				m_setup.log().error("TT_LINE found without TT_HEAD");
-			require_token(m_tok_param_left);
+				error(MF_TT_LINE_WITHOUT_HEAD());
+			require_token(m_tok_paren_left);
 			desc.desc.push_back(get_string());
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_right);
 		}
 		else if (token.is(m_tok_TT_FAMILY))
 		{
-			require_token(m_tok_param_left);
+			require_token(m_tok_paren_left);
 			desc.family = get_string();
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_right);
 		}
 		else
 		{
 			require_token(token, m_tok_TRUTHTABLE_END);
-			require_token(m_tok_param_left);
-			require_token(m_tok_param_right);
+			require_token(m_tok_paren_left);
+			require_token(m_tok_paren_right);
 			m_setup.truthtable_create(desc, nlname);
 			return;
 		}
 	}
 }
 
-
-void parser_t::netdev_netlist_start()
-{
-	// don't do much
-	token_t name = get_token();
-	require_token(m_tok_param_right);
-}
-
 void parser_t::netdev_netlist_end()
 {
 	// don't do much
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_left);
+	require_token(m_tok_paren_right);
 }
 
 void parser_t::net_model()
 {
-	// don't do much
+	require_token(m_tok_paren_left);
 	pstring model = get_string();
 	m_setup.register_model(model);
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 }
 
 void parser_t::net_submodel()
 {
-	// don't do much
-	pstring model = get_identifier();
+	require_token(m_tok_paren_left);
+	pstring model(get_identifier());
 	require_token(m_tok_comma);
 	pstring name = get_identifier();
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 
 	m_setup.namespace_push(name);
 	m_setup.include(model);
@@ -235,22 +231,23 @@ void parser_t::net_submodel()
 
 void parser_t::frontier()
 {
+	require_token(m_tok_paren_left);
 	// don't do much
 	pstring attachat = get_identifier();
 	require_token(m_tok_comma);
 	nl_fptype r_IN = eval_param(get_token());
 	require_token(m_tok_comma);
 	nl_fptype r_OUT = eval_param(get_token());
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 
 	m_setup.register_frontier(attachat, r_IN, r_OUT);
 }
 
 void parser_t::net_include()
 {
-	// don't do much
-	pstring name = get_identifier();
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_left);
+	pstring name(get_identifier());
+	require_token(m_tok_paren_right);
 
 	m_setup.include(name);
 }
@@ -258,20 +255,22 @@ void parser_t::net_include()
 void parser_t::net_local_source()
 {
 	// This directive is only for hardcoded netlists. Ignore it here.
-	pstring name = get_identifier();
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_left);
+	pstring name(get_identifier());
+	require_token(m_tok_paren_right);
 
 }
 
 void parser_t::net_alias()
 {
+	require_token(m_tok_paren_left);
 	pstring alias = get_identifier_or_number();
 
 	require_token(m_tok_comma);
 
 	pstring out = get_identifier();
 
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 
 	m_setup.log().debug("Parser: Alias: {1} {2}\n", alias, out);
 	m_setup.register_alias(alias, out);
@@ -279,6 +278,7 @@ void parser_t::net_alias()
 
 void parser_t::net_c()
 {
+	require_token(m_tok_paren_left);
 	pstring first = get_identifier();
 	require_token(m_tok_comma);
 
@@ -288,10 +288,10 @@ void parser_t::net_c()
 		m_setup.register_link(first , t1);
 		m_setup.log().debug("Parser: Connect: {1} {2}\n", first, t1);
 		token_t n = get_token();
-		if (n.is(m_tok_param_right))
+		if (n.is(m_tok_paren_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
+			error(MF_EXPECTED_COMMA_OR_RP_1(n.str()));
 	}
 
 }
@@ -300,6 +300,7 @@ void parser_t::dippins()
 {
 	std::vector<pstring> pins;
 
+	require_token(m_tok_paren_left);
 	pins.push_back(get_identifier());
 	require_token(m_tok_comma);
 
@@ -308,13 +309,13 @@ void parser_t::dippins()
 		pstring t1 = get_identifier();
 		pins.push_back(t1);
 		token_t n = get_token();
-		if (n.is(m_tok_param_right))
+		if (n.is(m_tok_paren_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
+			error(MF_EXPECTED_COMMA_OR_RP_1(n.str()));
 	}
 	if ((pins.size() % 2) == 1)
-		error(plib::pfmt("You must pass an equal number of pins to DIPPINS, first pin is {}")(pins[0]));
+		error(MF_DIPPINS_EQUAL_NUMBER_1(pins[0]));
 	std::size_t n = pins.size();
 	for (std::size_t i = 0; i < n / 2; i++)
 	{
@@ -325,11 +326,11 @@ void parser_t::dippins()
 
 void parser_t::netdev_param()
 {
-	pstring param;
-	param = get_identifier();
+	require_token(m_tok_paren_left);
+	pstring param(get_identifier());
 	require_token(m_tok_comma);
 	token_t tok = get_token();
-	if (tok.is_type(STRING))
+	if (tok.is_type(token_type::STRING))
 	{
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, tok.str());
 		m_setup.register_param(param, tok.str());
@@ -340,34 +341,34 @@ void parser_t::netdev_param()
 		m_setup.log().debug("Parser: Param: {1} {2}\n", param, val);
 		m_setup.register_param(param, val);
 	}
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 }
 
 void parser_t::netdev_hint()
 {
+	require_token(m_tok_paren_left);
 	pstring dev(get_identifier());
 	require_token(m_tok_comma);
 	pstring hint(get_identifier());
 	m_setup.register_param(dev + ".HINT_" + hint, 1);
-	require_token(m_tok_param_right);
+	require_token(m_tok_paren_right);
 }
 
 void parser_t::device(const pstring &dev_type)
 {
 	std::vector<pstring> params;
 
-	pstring devname = get_identifier();
+	require_token(m_tok_paren_left);
+	pstring devname(get_identifier());
 
 	m_setup.log().debug("Parser: IC: {1}\n", devname);
 
 	auto tok(get_token());
 
-	//printf("enter\n");
 	while (tok.is(m_tok_comma))
 	{
 		tok = get_token();
-		//printf("%d %s\n", tok.type(), tok.str().c_str());
-		if (tok.is_type(IDENTIFIER) || tok.is_type(STRING))
+		if (tok.is_type(token_type::IDENTIFIER) || tok.is_type(token_type::STRING))
 			params.push_back(tok.str());
 		else
 		{
@@ -382,7 +383,7 @@ void parser_t::device(const pstring &dev_type)
 		tok = get_token();
 	}
 
-	require_token(tok, m_tok_param_right);
+	require_token(tok, m_tok_paren_right);
 	m_setup.register_dev(dev_type, devname, params);
 }
 
@@ -411,16 +412,16 @@ nl_fptype parser_t::eval_param(const token_t &tok)
 			f = i;
 	if (f>0)
 	{
-		require_token(m_tok_param_left);
+		require_token(m_tok_paren_left);
 		ret = static_cast<nl_fptype>(get_number_double());
-		require_token(m_tok_param_right);
+		require_token(m_tok_paren_right);
 	}
 	else
 	{
 		bool err(false);
 		ret = plib::pstonum_ne<nl_fptype>(tok.str(), err);
 		if (err)
-			error(plib::pfmt("Parameter value <{1}> not floating point \n")(tok.str()));
+			error(MF_PARAM_NOT_FP_1(tok.str()));
 	}
 	return ret * facs[f];
 

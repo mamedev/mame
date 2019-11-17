@@ -340,7 +340,6 @@ setup_t::setup_t(netlist_state_t &nlstate)
 	, m_nlstate(nlstate)
 	, m_netlist_params(nullptr)
 	, m_proxy_cnt(0)
-	, m_validation(false)
 {
 }
 
@@ -506,7 +505,11 @@ detail::core_terminal_t *setup_t::find_terminal(const pstring &terminal_in, bool
 		plib::pthrow<nl_exception>(MF_TERMINAL_1_2_NOT_FOUND(terminal_in, tname));
 	}
 	if (term != nullptr)
+	{
 		log().debug("Found input {1}\n", tname);
+	}
+
+	// FIXME: this should resolve any proxy
 	return term;
 }
 
@@ -548,8 +551,8 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 {
 	const pstring param_in_fqn = build_fqn(param_in);
 
-	const pstring &outname = resolve_alias(param_in_fqn);
-	auto ret = m_params.find(outname);
+	const pstring outname(resolve_alias(param_in_fqn));
+	auto ret(m_params.find(outname));
 	if (ret == m_params.end() && required)
 	{
 		log().fatal(MF_PARAMETER_1_2_NOT_FOUND(param_in_fqn, outname));
@@ -557,7 +560,7 @@ param_t *setup_t::find_param(const pstring &param_in, bool required) const
 	}
 	if (ret != m_params.end())
 		log().debug("Found parameter {1}\n", outname);
-	return (ret == m_params.end() ? nullptr : &ret->second.m_param);
+	return (ret == m_params.end() ? nullptr : ret->second.param());
 }
 
 devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
@@ -565,9 +568,9 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 	nl_assert(out.is_logic());
 
 	auto &out_cast = static_cast<logic_output_t &>(out);
-	devices::nld_base_proxy *proxy = out_cast.get_proxy();
+	auto iter_proxy(m_proxies.find(&out));
 
-	if (proxy == nullptr)
+	if (iter_proxy == m_proxies.end())
 	{
 		// create a new one ...
 		pstring x = plib::pfmt("proxy_da_{1}_{2}")(out.name())(m_proxy_cnt);
@@ -587,17 +590,19 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 						new_proxy->proxy_term().name(), (*p).name()));
 			}
 		}
-		out.net().core_terms().clear(); // clear the list
+		out.net().core_terms().clear();
 
 		out.net().add_terminal(new_proxy->in());
-		//out_cast.set_proxy(proxy); - Wrong!
 
-		proxy = new_proxy.get();
-		out_cast.set_proxy(proxy);
+		auto proxy(new_proxy.get());
+		if (!m_proxies.insert({&out, proxy}).second)
+			plib::pthrow<nl_exception>(MF_DUPLICATE_PROXY_1(out.name()));
 
 		m_nlstate.register_device(new_proxy->name(), std::move(new_proxy));
+		return proxy;
 	}
-	return proxy;
+	else
+		return iter_proxy->second;
 }
 
 devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
@@ -605,20 +610,24 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 	nl_assert(inp.is_logic());
 
 	auto &incast = dynamic_cast<logic_input_t &>(inp);
-	devices::nld_base_proxy *proxy = incast.get_proxy();
 
-	if (proxy != nullptr)
-		return proxy;
+	auto iter_proxy(m_proxies.find(&inp));
+
+	if (iter_proxy != m_proxies.end())
+		return iter_proxy->second;
 	else
 	{
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
 		auto new_proxy = incast.logic_family()->create_a_d_proxy(m_nlstate, x, &incast);
 		//auto new_proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
-		incast.set_proxy(new_proxy.get());
-		m_proxy_cnt++;
 
-		auto ret = new_proxy.get();
+		auto ret(new_proxy.get());
+
+		if (!m_proxies.insert({&inp, ret}).second)
+			plib::pthrow<nl_exception>(MF_DUPLICATE_PROXY_1(inp.name()));
+
+		m_proxy_cnt++;
 
 		// connect all existing terminals to new net
 
@@ -642,6 +651,18 @@ devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
 		m_nlstate.register_device(new_proxy->name(), std::move(new_proxy));
 		return ret;
 	}
+}
+
+detail::core_terminal_t &setup_t::resolve_proxy(detail::core_terminal_t &term)
+{
+	if (term.is_logic())
+	{
+		auto &out = dynamic_cast<logic_t &>(term);
+		auto iter_proxy(m_proxies.find(&out));
+		if (iter_proxy != m_proxies.end())
+			return iter_proxy->second->proxy_term();
+	}
+	return term;
 }
 
 void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
@@ -775,17 +796,6 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	}
 }
 
-static detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term)
-{
-	if (term.is_logic())
-	{
-		auto &out = dynamic_cast<logic_t &>(term);
-		if (out.has_proxy())
-			return out.get_proxy()->proxy_term();
-	}
-	return term;
-}
-
 bool setup_t::connect_input_input(detail::core_terminal_t &t1, detail::core_terminal_t &t2)
 {
 	bool ret = false;
@@ -840,7 +850,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	}
 	else if (t1.is_type(detail::terminal_type::INPUT) && t2.is_type(detail::terminal_type::OUTPUT))
 	{
-		if (t1.has_net()  && t1.net().isRailNet())
+		if (t1.has_net() && t1.net().isRailNet())
 		{
 			log().fatal(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
 			plib::pthrow<nl_exception>(MF_INPUT_1_ALREADY_CONNECTED(t1.name()));
@@ -924,8 +934,16 @@ void setup_t::resolve_inputs()
 	for (auto & i : m_terminals)
 	{
 		detail::core_terminal_t *term = i.second;
-		if (!term->has_net() && dynamic_cast< devices::NETLIB_NAME(dummy_input) *>(&term->device()) != nullptr)
-			log().info(MI_DUMMY_1_WITHOUT_CONNECTIONS(term->name()));
+		bool is_nc(dynamic_cast< devices::NETLIB_NAME(nc_pin) *>(&term->device()) != nullptr);
+		if (term->has_net() && is_nc)
+		{
+			log().error(ME_NC_PIN_1_WITH_CONNECTIONS(term->name()));
+			err = true;
+		}
+		else if (is_nc)
+		{
+			/* ignore */
+		}
 		else if (!term->has_net())
 		{
 			log().error(ME_TERMINAL_1_WITHOUT_NET(setup().de_alias(term->name())));
@@ -1284,19 +1302,11 @@ void setup_t::prepare_to_run()
 	{
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 		{
-			// We are not interested in power terminals - This is intended behaviour
-			if (!plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
-				log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
-					t->name(), t->m_N.net().name(), t->m_P.net().name()));
+			log().info(MI_REMOVE_DEVICE_1_CONNECTED_ONLY_TO_RAILS_2_3(
+				t->name(), t->m_N.net().name(), t->m_P.net().name()));
 			t->m_N.net().remove_terminal(t->m_N);
 			t->m_P.net().remove_terminal(t->m_P);
 			m_nlstate.remove_device(t);
-		}
-		else
-		{
-			if (plib::endsWith(t->name(), pstring(".") + sPowerDevRes))
-				log().info(MI_POWER_TERMINALS_1_CONNECTED_ANALOG_2_3(
-					t->name(), t->m_N.net().name(), t->m_P.net().name()));
 		}
 	}
 

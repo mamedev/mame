@@ -39,8 +39,7 @@ namespace plib {
 
 		virtual ~ptokenizer() = default;
 
-		enum token_type
-		{
+		P_ENUM(token_type,
 			IDENTIFIER,
 			NUMBER,
 			TOKEN,
@@ -49,7 +48,7 @@ namespace plib {
 			LINEMARKER,
 			UNKNOWN,
 			ENDOFFILE
-		};
+		)
 
 		struct token_id_t
 		{
@@ -75,7 +74,7 @@ namespace plib {
 			{
 			}
 			token_t(const token_id_t &id, const pstring &str)
-			: m_type(TOKEN), m_id(id), m_token(str)
+			: m_type(token_type::TOKEN), m_id(id), m_token(str)
 			{
 			}
 
@@ -129,7 +128,7 @@ namespace plib {
 		}
 
 		token_t get_token_internal();
-		void error(const pstring &errs);
+		void error(const perrmsg &errs);
 
 		putf8_reader &stream() { return m_strm; }
 	protected:

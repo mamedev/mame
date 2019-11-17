@@ -92,8 +92,17 @@ TODO: Volleyball...
 
  * Net at 256H alternating at 4V
  *
+ * Pong videos:
  *
- * http://www.youtube.com/watch?v=pDrRnJOCKZc
+ * https://www.youtube.com/watch?v=pDrRnJOCKZc (no longer available)
+ *
+ * https://www.youtube.com/watch?v=fiShX2pTz9A
+ * https://www.youtube.com/watch?v=YmzH4E3x1_g
+ *
+ * Breakout videos:
+ *
+ * https://www.youtube.com/watch?v=NOGO49j5gCE
+ *
  */
 
 static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 7159000 + 0.5);
@@ -150,9 +159,14 @@ public:
 	required_device<fixedfreq_device> m_video;
 	required_device<dac_word_interface> m_dac; /* just to have a sound device */
 
-	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb)
+	NETDEV_ANALOG_CALLBACK_MEMBER(sound_cb_analog)
 	{
 		m_dac->write(std::round(16384 * data));
+	}
+
+	NETDEV_LOGIC_CALLBACK_MEMBER(sound_cb_logic)
+	{
+		m_dac->write(16384 * data);
 	}
 
 protected:
@@ -470,11 +484,12 @@ void pong_state::pong(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:coinsw", "coinsw.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(pong_state::sound_cb));
+	NETLIST_LOGIC_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(pong_state::sound_cb_logic));
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
 	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
@@ -514,7 +529,7 @@ void breakout_state::breakout(machine_config &config)
 
 	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(breakout_state::sound_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(breakout_state::sound_cb_analog));
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	// Leds and lamps
@@ -525,8 +540,9 @@ void breakout_state::breakout(machine_config &config)
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
@@ -573,7 +589,7 @@ void pong_state::pongd(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:antenna", "antenna.IN", 0, 0x01)
 #endif
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("AUDIO", FUNC(pong_state::sound_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("AUDIO", FUNC(pong_state::sound_cb_analog));
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	/* video hardware */
@@ -609,7 +625,7 @@ void rebound_state::rebound(machine_config &config)
 	NETLIST_LOGIC_INPUT(config, "maincpu:dsw1b", "DSW1b.POS", 0);
 	NETLIST_LOGIC_INPUT(config, "maincpu:dsw2", "DSW2.POS", 0);
 
-	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(rebound_state::sound_cb));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:snd0", 0).set_params("sound", FUNC(rebound_state::sound_cb_analog));
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:vid0", 0).set_params("videomix", "fixfreq", FUNC(fixedfreq_device::update_composite_monochrome));
 
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:led_credit", 0).set_params("CON11", FUNC(rebound_state::led_credit_cb));
@@ -645,7 +661,7 @@ void rebound_state::rebound(machine_config &config)
 
 ROM_START( pong ) /* dummy to satisfy game entry*/
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* enough for netlist */
-	ROM_LOAD( "pong.netlist", 0x000000, 0x004554, CRC(614f0e7a) SHA1(188f3ac8c23c576a357ffae4a6f57ba83ba2d194) )
+	ROM_LOAD( "pong.netlist", 0x000000, 0x00473b, CRC(eadaf087) SHA1(4cb9a79f5cb53502105974be61b99ff16ee930e9) )
 ROM_END
 
 ROM_START( breakout )

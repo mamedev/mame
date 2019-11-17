@@ -2099,6 +2099,42 @@ void HC11OP(eorb_indy)()
 	CYCLES(5);
 }
 
+/* FDIV             0x03 */
+void HC11OP(fdiv)()
+{
+	uint16_t numerator = REG_D;
+	uint16_t denominator = m_ix;
+	uint16_t remainder;
+	uint16_t result;
+
+	CLEAR_ZVC();
+	if(denominator == 0) // divide by zero behaviour
+	{
+		remainder = 0xffff; // TODO: undefined behaviour according to the docs
+		result = 0xffff;
+		logerror("HC11: divide by zero at PC=%04x\n",m_pc-1);
+		m_ccr |= CC_C | CC_V;
+	}
+	else if(denominator <= numerator)
+	{
+		remainder = 0xffff; // TODO: undefined behaviour according to the docs
+		result = 0xffff;
+		logerror("HC11: FDIV overflow at PC=%04x\n",m_pc-1);
+		m_ccr |= CC_V;
+	}
+	else
+	{
+		uint32_t scaled_numerator = numerator * 65536;
+		remainder = scaled_numerator % denominator;
+		result = scaled_numerator / denominator;
+	}
+	m_ix = result;
+	REG_D = remainder;
+	SET_Z16(result);
+
+	CYCLES(41);
+}
+
 /* IDIV             0x02 */
 void HC11OP(idiv)()
 {

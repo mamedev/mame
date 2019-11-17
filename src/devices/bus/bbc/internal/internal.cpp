@@ -204,6 +204,7 @@ void bbcb_internal_devices(device_slot_interface &device)
 void bbcbp_internal_devices(device_slot_interface &device)
 {
 	device.option_add("atplswp", BBC_ATPLSWP);          /* ATPL Sidewise+ ROM expansion */
+	device.option_add("cumana68k", BBC_CUMANA68K);      /* Cumana 68008 2nd Processor */
 }
 
 void bbcm_internal_devices(device_slot_interface &device)

@@ -148,7 +148,7 @@ void slicer_state::slicer(machine_config &config)
 }
 
 ROM_START( slicer )
-	ROM_REGION(0x8001, "bios", 0)
+	ROM_REGION16_LE(0x8001, "bios", 0)
 	// built from sources, reset.asm adds an extra byte
 	ROM_LOAD("epbios.bin", 0x0000, 0x8001, CRC(96fe9dd4) SHA1(5fc43454fe7d51f2ae97aef822155dcd28eb7f23))
 

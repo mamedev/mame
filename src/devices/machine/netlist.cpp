@@ -16,6 +16,7 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
+#include "netlist/devices/nlid_system.h"
 
 #include "netlist/plib/palloc.h"
 
@@ -215,6 +216,13 @@ private:
 
 // ----------------------------------------------------------------------------------------
 // logic_callback
+//
+// This device must be connected to a logic net. It has no power terminals
+// and conversion with proxies will not work.
+//
+// Background: This is inserted later into the driver and should not modify
+// the resulting analog representation of the netlist.
+//
 // ----------------------------------------------------------------------------------------
 
 class NETLIB_NAME(logic_callback) : public netlist::device_t
@@ -225,6 +233,7 @@ public:
 		, m_in(*this, "IN")
 		, m_cpu_device(nullptr)
 		, m_last(*this, "m_last", 0)
+//		, m_supply(*this)
 	{
 		auto *nl = dynamic_cast<netlist_mame_device::netlist_mame_t *>(&state());
 		if (nl != nullptr)
@@ -261,6 +270,7 @@ private:
 	std::unique_ptr<netlist_mame_logic_output_device::output_delegate> m_callback; // TODO: change to std::optional for C++17
 	netlist_mame_cpu_device *m_cpu_device;
 	netlist::state_var<netlist::netlist_sig_t> m_last;
+	//netlist::devices::NETLIB_NAME(power_pins) m_supply;
 };
 
 
@@ -380,6 +390,7 @@ plib::unique_ptr<std::istream> netlist_data_memregions_t::stream(const pstring &
 		/* validation */
 		if (rom_exists(m_dev.mconfig().root_device(), pstring(m_dev.tag()) + ":" + name))
 		{
+			// Create an empty stream.
 			auto ret(plib::make_unique<std::istringstream>(std::ios_base::binary));
 			ret->imbue(std::locale::classic());
 			return MOVE_UNIQUE_PTR(ret);
@@ -1086,7 +1097,7 @@ plib::unique_ptr<netlist::netlist_state_t> netlist_mame_device::base_validity_ch
 		//netlist_mame_t lnetlist(*this, "netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		auto lnetlist = plib::make_unique<netlist::netlist_state_t>("netlist", plib::make_unique<netlist_validate_callbacks_t>());
 		// enable validation mode
-		lnetlist->setup().set_extended_validation(false);
+		lnetlist->set_extended_validation(true);
 		common_dev_start(lnetlist.get());
 
 		for (device_t &d : subdevices())

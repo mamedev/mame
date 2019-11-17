@@ -14,10 +14,13 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "rendutil.h"
 #include "fixfreq.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
+
+#include <algorithm>
 
 /***************************************************************************
 
@@ -46,7 +49,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 	{
 		//LOG("VSYNC %d %d\n", m_last_x, m_last_y + m_sig_field);
 		m_last_y = m_desc.m_vbackporch - m_desc.m_vsync;
-		m_intf.vsync_start_cb(time - m_last_vsync_time);
+		m_intf.vsync_start_cb(std::max(time - m_last_vsync_time, m_min_frame_period));
 		m_last_vsync_time = time;
 	}
 	else if (last_vsync && !m_sig_vsync)
@@ -81,7 +84,7 @@ void fixedfreq_monitor_state::update_sync_channel(const time_type &time, const d
 
 void fixedfreq_monitor_state::update_bm(const time_type &time)
 {
-	const int pixels = round((time - m_line_time) * m_desc.m_hscale / m_clock_period);
+	const float pixels = (time - m_line_time) * static_cast<time_type>(m_desc.m_hscale) / m_clock_period;
 	const int has_fields = (m_desc.m_fieldcount > 1) ? 1: 0;
 
 	uint32_t col(0xffff0000); // Mark sync areas
@@ -89,7 +92,8 @@ void fixedfreq_monitor_state::update_bm(const time_type &time)
 	if (m_sync_signal >= m_desc.m_sync_threshold)
 		col = m_col;
 
-	m_intf.plot_hline(m_last_x, m_last_y + m_sig_field * has_fields, pixels - m_last_x, col);
+	m_fragments.push_back({static_cast<float>(m_last_y + m_sig_field * has_fields), m_last_x, pixels, col});
+	//m_intf.plot_hline(m_last_x, m_last_y + m_sig_field * has_fields, pixels, col);
 	m_last_x = pixels;
 }
 
@@ -155,7 +159,6 @@ void fixedfreq_monitor_state::update_sync(const time_type &time, const double da
 fixedfreq_device::fixedfreq_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
 		device_video_interface(mconfig, *this, false),
-		m_cur_bm(0),
 		m_htotal(0),
 		m_vtotal(0),
 		m_refresh_period(time_type(0)),
@@ -188,12 +191,8 @@ void fixedfreq_device::device_start()
 
 	m_refresh_period = time_type(0);
 
-	m_cur_bm = 0;
-
 	m_htotal = m_monitor.m_hbackporch;
 	m_vtotal = m_monitor.m_vbackporch;
-	m_bitmap[0] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
-	m_bitmap[1] = std::make_unique<bitmap_rgb32>(m_htotal * m_monitor.m_hscale, m_vtotal);
 
 	m_state.start();
 
@@ -207,9 +206,6 @@ void fixedfreq_device::device_start()
 	save_item(NAME(m_state.m_last_vsync_time));
 	save_item(NAME(m_refresh_period));
 	save_item(NAME(m_state.m_clock_period));
-	//save_item(NAME(m_bitmap[0]));
-	//save_item(NAME(m_bitmap[1]));
-	save_item(NAME(m_cur_bm));
 
 	/* sync separator */
 	save_item(NAME(m_state.m_vsync_filter));
@@ -233,27 +229,50 @@ void fixedfreq_device::device_post_load()
 
 uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, *m_bitmap[!m_cur_bm], 0, 0, 0, 0, cliprect);
 
+	if (screen.screen_type() == SCREEN_TYPE_RASTER)
+	{
+		for (auto &f : m_state.m_fragments)
+			if (f.y < bitmap.height())
+				bitmap.plot_box(f.x, f.y, f.xr - f.x, 1, f.col);
+	}
+	else if (screen.screen_type() == SCREEN_TYPE_VECTOR)
+	{
+		constexpr const uint32_t flags(PRIMFLAG_ANTIALIAS(1) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTOR(1));
+		const rectangle &visarea = screen.visible_area();
+		float xscale = 1.0f / visarea.width();
+		float yscale = 1.0f / visarea.height();
+		float xoffs = (float)visarea.min_x;
+		float yoffs = (float)visarea.min_y;
+		screen.container().empty();
+		screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
+
+		for (auto &f : m_state.m_fragments)
+		{
+			const float x0((f.x - xoffs) * xscale);
+			const float y0((f.y - yoffs) * yscale);
+			const float x1((f.xr - xoffs) * xscale);
+			const float y1((f.y + 1.0f - yoffs) * yscale);
+
+			screen.container().add_rect(
+				x0, y0, x1, y1,
+				(0xff << 24) | (f.col & 0xffffff),
+				flags);
+		}
+	}
+	m_state.m_fragments.clear();
 	return 0;
 }
 
 void fixedfreq_device::vsync_start_cb(double refresh_time)
 {
 	// toggle bitmap
-	m_cur_bm ^= 1;
+	//m_cur_bm ^= 1;
 
 	rectangle visarea(m_monitor.minh(), m_monitor.maxh(), m_monitor.minv(), m_monitor.maxv());
 
 	m_refresh_period = refresh_time;
 	screen().configure(m_htotal * m_monitor.m_hscale, m_vtotal, visarea, DOUBLE_TO_ATTOSECONDS(m_refresh_period));
-}
-
-void fixedfreq_device::plot_hline(int x, int y, int w, uint32_t col)
-{
-	bitmap_rgb32 *bm = m_bitmap[m_cur_bm].get();
-	if (y < bm->height())
-		bm->plot_box(x, y, w, 1, col);
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(fixedfreq_device::update_composite_monochrome)

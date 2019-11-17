@@ -81,6 +81,7 @@ DEFINE_DEVICE_TYPE(M37702M2, m37702m2_device, "m37702m2", "Mitsubishi M37702M2")
 DEFINE_DEVICE_TYPE(M37702S1, m37702s1_device, "m37702s1", "Mitsubishi M37702S1")
 DEFINE_DEVICE_TYPE(M37710S4, m37710s4_device, "m37710s4", "Mitsubishi M37710S4")
 DEFINE_DEVICE_TYPE(M37720S1, m37720s1_device, "m37720s1", "Mitsubishi M37720S1")
+DEFINE_DEVICE_TYPE(M37730S2, m37730s2_device, "m37730s2", "Mitsubishi M37730S2")
 
 
 // On-board RAM, ROM, and peripherals
@@ -221,6 +222,30 @@ void m37720s1_device::map(address_map &map)
 	map(0x000080, 0x00027f).ram();
 }
 
+// M37730S2: 1024 bytes internal RAM, no internal ROM
+void m37730s2_device::map(address_map &map)
+{
+	map(0x000002, 0x000015).rw(FUNC(m37730s2_device::port_r), FUNC(m37730s2_device::port_w)); // FIXME: P4-P6 and P8 only
+	map(0x000030, 0x000030).rw(FUNC(m37730s2_device::uart0_mode_r), FUNC(m37730s2_device::uart0_mode_w));
+	map(0x000031, 0x000031).w(FUNC(m37730s2_device::uart0_baud_w));
+	map(0x000032, 0x000033).w(FUNC(m37730s2_device::uart0_tbuf_w));
+	map(0x000034, 0x000034).rw(FUNC(m37730s2_device::uart0_ctrl_reg0_r), FUNC(m37730s2_device::uart0_ctrl_reg0_w));
+	map(0x000035, 0x000035).rw(FUNC(m37730s2_device::uart0_ctrl_reg1_r), FUNC(m37730s2_device::uart0_ctrl_reg1_w));
+	map(0x000036, 0x000037).r(FUNC(m37730s2_device::uart0_rbuf_r));
+	map(0x000040, 0x000040).rw(FUNC(m37730s2_device::count_start_r), FUNC(m37730s2_device::count_start_w));
+	map(0x000042, 0x000042).w(FUNC(m37730s2_device::one_shot_start_w));
+	map(0x000044, 0x000044).rw(FUNC(m37730s2_device::up_down_r), FUNC(m37730s2_device::up_down_w));
+	map(0x000046, 0x000051).rw(FUNC(m37730s2_device::timer_reg_r), FUNC(m37730s2_device::timer_reg_w));
+	map(0x000056, 0x00005b).rw(FUNC(m37730s2_device::timer_mode_r), FUNC(m37730s2_device::timer_mode_w));
+	map(0x00005e, 0x00005e).rw(FUNC(m37730s2_device::proc_mode_r), FUNC(m37730s2_device::proc_mode_w));
+	map(0x000060, 0x000060).w(FUNC(m37730s2_device::watchdog_timer_w));
+	map(0x000061, 0x000061).rw(FUNC(m37730s2_device::watchdog_freq_r), FUNC(m37730s2_device::watchdog_freq_w));
+	map(0x000062, 0x000062).rw(FUNC(m37730s2_device::waveform_mode_r), FUNC(m37730s2_device::waveform_mode_w));
+	map(0x000064, 0x000065).w(FUNC(m37730s2_device::pulse_output_w));
+	map(0x00006c, 0x00007f).rw(FUNC(m37730s2_device::int_control_r), FUNC(m37730s2_device::int_control_w));
+	map(0x000080, 0x00047f).ram();
+}
+
 // many other combinations of RAM and ROM size exist
 
 
@@ -259,6 +284,11 @@ m37710s4_device::m37710s4_device(const machine_config &mconfig, const char *tag,
 
 m37720s1_device::m37720s1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m37710_cpu_device(mconfig, M37720S1, tag, owner, clock, address_map_constructor(FUNC(m37720s1_device::map), this))
+{
+}
+
+m37730s2_device::m37730s2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: m37710_cpu_device(mconfig, M37730S2, tag, owner, clock, address_map_constructor(FUNC(m37730s2_device::map), this))
 {
 }
 

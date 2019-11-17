@@ -298,7 +298,7 @@ void b16_state::b16(machine_config &config)
 
 /* ROM definition */
 ROM_START( b16 )
-	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(7c1c93d5) SHA1(2a1e63a689c316ff836f21646166b38714a18e03) )
 
 	ROM_REGION( 0x4000/2, "pcg", ROMREGION_ERASE00 )

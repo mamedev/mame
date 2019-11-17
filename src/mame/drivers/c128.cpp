@@ -1803,7 +1803,7 @@ void c128_state::c128d81(machine_config &config)
 	m_iec->srq_callback().set(FUNC(c128_state::iec_srq_w));
 	m_iec->data_callback().set(FUNC(c128_state::iec_data_w));
 
-	CBM_IEC_SLOT(config.replace(), "iec8", c128d81_iec_devices, "c1563");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, c128d81_iec_devices, "c1563");
 }
 
 

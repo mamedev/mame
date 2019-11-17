@@ -12945,6 +12945,9 @@ promutrvb                       // (c) 1985 Enerdyne Technologies Inc
 promutrvc                       // (c) 1985 Enerdyne Technologies Inc
 strvmstr                        // (c) 1986 Enerdyne Technologies Inc
 
+@source:eurit.cpp
+eurit30                         //
+
 @source:eurocom2.cpp
 eurocom2                        //
 waveterm                        //
@@ -15498,6 +15501,7 @@ gnw_bsweep                      // Nintendo
 gnw_chef                        // Nintendo
 gnw_climber                     // Nintendo
 gnw_climbern                    // Nintendo
+gnw_dkcirc                      // Nintendo
 gnw_dkjr                        // Nintendo
 gnw_dkjrp                       // Nintendo
 gnw_dkong                       // Nintendo
@@ -31037,8 +31041,6 @@ ablpinb
 mc_dgear
 dgun2500
 dgun2561
-ii8in1
-ii32in1
 lexcyber
 cybar120
 mc_dg101
@@ -31085,6 +31087,10 @@ fcpocket
 mog_m320
 fapocket
 zdog
+
+@source:vt1682.cpp
+ii8in1
+ii32in1
 
 @source:newbrain.cpp
 newbrain                        //

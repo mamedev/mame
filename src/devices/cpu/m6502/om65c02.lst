@@ -163,6 +163,10 @@ bbr_zpb
 	read(TMP);
 	TMP = read_pc();
 	if(!(TMP2 & (1 << ((inst_state >> 4) & 7)))) {
+		read_pc_noinc();
+		if(page_changing(PC, int8_t(TMP))) {
+			read_arg(set_l(PC, PC+int8_t(TMP)));
+		}
 		PC += int8_t(TMP);
 	}
 	prefetch();
@@ -173,6 +177,10 @@ bbs_zpb
 	read(TMP);
 	TMP = read_pc();
 	if(TMP2 & (1 << ((inst_state >> 4) & 7))) {
+		read_pc_noinc();
+		if(page_changing(PC, int8_t(TMP))) {
+			read_arg(set_l(PC, PC+int8_t(TMP)));
+		}
 		PC += int8_t(TMP);
 	}
 	prefetch();
@@ -709,7 +717,7 @@ trb_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
@@ -721,7 +729,7 @@ trb_aba
 trb_zpg
 	TMP = read_pc();
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
@@ -734,7 +742,7 @@ tsb_aba
 	TMP = read_pc();
 	TMP = set_h(TMP, read_pc());
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	if(A & TMP2)
 		P &= ~F_Z;
 	else
@@ -746,7 +754,7 @@ tsb_aba
 tsb_zpg
 	TMP = read_pc();
 	TMP2 = read(TMP);
-	write(TMP, TMP2);
+	read(TMP);
 	if(A & TMP2)
 		P &= ~F_Z;
 	else

@@ -325,7 +325,7 @@ void fp6000_state::fp6000(machine_config &config)
 
 /* ROM definition */
 ROM_START( fp6000 )
-	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x10000, CRC(c72fe40a) SHA1(0e4c60dc27f6c7f461c4bc382b81602b3327a7a4))
 
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )

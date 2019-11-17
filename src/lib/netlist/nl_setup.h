@@ -165,6 +165,10 @@ namespace netlist
 		, m_device(device)
 		, m_param(param)
 		{ }
+		const pstring &name() const noexcept { return m_name; }
+		const core_device_t &device() const noexcept { return m_device; }
+		param_t *param() const noexcept { return &m_param; }
+	private:
 		pstring m_name;
 		core_device_t &m_device;
 		param_t &m_param;
@@ -317,11 +321,11 @@ namespace netlist
 
 		void add_define(const pstring &defstr);
 
-		factory::list_t &factory() { return m_factory; }
-		const factory::list_t &factory() const { return m_factory; }
+		factory::list_t &factory() noexcept { return m_factory; }
+		const factory::list_t &factory() const noexcept  { return m_factory; }
 
-		log_type &log() { return m_log; }
-		const log_type &log() const { return m_log; }
+		log_type &log() noexcept { return m_log; }
+		const log_type &log() const noexcept { return m_log; }
 
 		// FIXME: sources may need access to the netlist parent type
 		// since they may be created in a context in which they don't
@@ -330,11 +334,11 @@ namespace netlist
 		// We thus need a better approach to creating netlists in a context
 		// other than static procedures.
 
-		setup_t &setup() { return m_setup; }
-		const setup_t &setup() const { return m_setup; }
+		setup_t &setup() noexcept { return m_setup; }
+		const setup_t &setup() const noexcept { return m_setup; }
 
-		models_t &models() { return m_models; }
-		const models_t &models() const { return m_models; }
+		models_t &models() noexcept { return m_models; }
+		const models_t &models() const noexcept { return m_models; }
 
 	protected:
 		models_t                                    m_models;
@@ -421,23 +425,6 @@ namespace netlist
 
 		void prepare_to_run();
 
-		/// \brief set extended validation mode.
-		///
-		/// The extended validation mode is not intended for running.
-		/// The intention is to identify power pins which are not properly
-		/// connected. The downside is that this mode creates a netlist which
-		/// is different (and not able to run).
-		///
-		/// Extended validation is supported by nltool validate option.
-		///
-		/// \param val Boolean value enabling/disabling extended validation mode
-		void set_extended_validation(bool val) { m_validation = val; }
-
-		/// \brief State of extended validation mode.
-		///
-		/// \returns boolean value indicating if extended validation mode is
-		/// turned on.
-		bool is_extended_validation() const { return m_validation; }
 	private:
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
@@ -453,15 +440,17 @@ namespace netlist
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
 		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
+		detail::core_terminal_t &resolve_proxy(detail::core_terminal_t &term);
 
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
 		netlist_state_t                             &m_nlstate;
 		devices::nld_netlistparams                  *m_netlist_params;
 		std::unordered_map<pstring, param_ref_t>    m_params;
+		std::unordered_map<detail::core_terminal_t *,
+			devices::nld_base_proxy *>				m_proxies;
 
 		unsigned m_proxy_cnt;
-		bool m_validation;
 	};
 
 	// ----------------------------------------------------------------------------------------

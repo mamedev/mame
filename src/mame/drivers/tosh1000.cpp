@@ -291,11 +291,11 @@ void tosh1000_state::tosh1000(machine_config &config)
 
 
 ROM_START( tosh1000 )
-	ROM_REGION16_LE(0x8000, "bios", 0)
+	ROM_REGION(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v410", "V4.10")
 	ROMX_LOAD( "026f.27c256.ic25", 0x0000, 0x8000, CRC(a854939f) SHA1(0ff532f295a40716f53949a2fd64d02bf76d575a), ROM_BIOS(0))
 
-	ROM_REGION16_LE(0x80000, "romdos", 0)
+	ROM_REGION(0x80000, "romdos", 0)
 	ROM_LOAD("tc534000p__b004.dos.ic26", 0x0000, 0x80000, CRC(716027f6) SHA1(563e3a7e1961d4cda216169bd1ecc66925a101aa))
 
 	/* XXX IBM 1501981(CGA) and 1501985(MDA) Character rom */

@@ -233,7 +233,7 @@ ROM_START(toursol)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 
@@ -257,7 +257,7 @@ ROM_START(toursol1)
 	ROM_REGION32_LE(0x10000, "bios", 0) /* Motherboard BIOS */
 	ROM_LOAD("prom.mb", 0x000000, 0x10000, CRC(e44bfd3c) SHA1(c07ec94e11efa30e001f39560010112f73cc0016) )
 
-	ROM_REGION(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
+	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
 	ROM_CONTINUE(               0x00001, 0x04000 )
 

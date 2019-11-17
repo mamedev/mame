@@ -11,8 +11,10 @@
 #include "emu.h"
 #include "ui/mainmenu.h"
 
+#include "ui/analogipt.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
+#include "ui/confswitch.h"
 #include "ui/datmenu.h"
 #include "ui/filemngr.h"
 #include "ui/info.h"
@@ -162,7 +164,7 @@ void menu_main::handle()
 			break;
 
 		case SETTINGS_DRIVER_CONFIG:
-			menu::stack_push<menu_settings_driver_config>(ui(), container());
+			menu::stack_push<menu_settings_machine_config>(ui(), container());
 			break;
 
 		case ANALOG:

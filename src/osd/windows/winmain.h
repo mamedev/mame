@@ -280,6 +280,7 @@ public:
 	// general overridables
 	virtual void init(running_machine &machine) override;
 	virtual void update(bool skip_redraw) override;
+	virtual void input_update() override;
 
 	// input overrideables
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;

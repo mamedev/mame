@@ -6,11 +6,10 @@ VTech Genius Junior series
 
 CPU is 68HC05 derived?
 
-Other known international versions:
+Other known undumped international versions:
 - Genius 4000 (French version of Genius Leader 4000)
 - Genius 5000 (French version of Genius Leader 5000)
 - Genius PRO (French version of Genius Leader Select)
-- Pitagorín (Spanish version of Genius Leader Notebook)
 - Pitagorín Plus (Spanish version of Genius Junior Redstar 3)
 - PreComputer Notebook (alternate English version of Genius Leader Notebook)
 - Smart Start Animated (alternate English version of Genius Junior Redstar)

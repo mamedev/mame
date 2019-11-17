@@ -34,7 +34,6 @@ namespace netlist
 		void net_c();
 		void frontier();
 		void device(const pstring &dev_type);
-		void netdev_netlist_start();
 		void netdev_netlist_end();
 		void net_model();
 		void net_submodel();
@@ -47,8 +46,8 @@ namespace netlist
 
 		nl_fptype eval_param(const token_t &tok);
 
-		token_id_t m_tok_param_left;
-		token_id_t m_tok_param_right;
+		token_id_t m_tok_paren_left;
+		token_id_t m_tok_paren_right;
 		token_id_t m_tok_comma;
 		token_id_t m_tok_ALIAS;
 		token_id_t m_tok_NET_C;

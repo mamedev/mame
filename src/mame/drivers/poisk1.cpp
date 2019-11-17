@@ -701,7 +701,7 @@ void p1_state::poisk1(machine_config &config)
 }
 
 ROM_START( poisk1 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 
 	ROM_DEFAULT_BIOS("v91")
 	ROM_SYSTEM_BIOS(0, "v89r0", "1989r0")

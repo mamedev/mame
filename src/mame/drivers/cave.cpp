@@ -18,7 +18,7 @@ Other        :  93C46 EEPROM
 
 
 -----------------------------------------------------------------------------------------
-Year + Game           License       PCB         Tilemaps        Sprites         Other
+Year + Game               License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
 94 Mazinger Z             Banpresto     BP943A      038 9335EX706   013 9341E7009   Z80
 94 Power Instinct 2       Atlus         ATG02?      038 9429WX709   013 9341E7009   Z80 NMK 112
@@ -1961,6 +1961,7 @@ void cave_state::add_base_config(machine_config &config, int layer)
 
 void cave_state::add_ymz(machine_config &config)
 {
+	// TODO: all PCB versions using mono, on a YMZ chip as well? Sounds very unlikely, verify on all flavours.
 	SPEAKER(config, "mono").front_center();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", 16.9344_MHz_XTAL));

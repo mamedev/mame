@@ -37,7 +37,7 @@ void bbc_tube_arm_device::tube_arm_mem(address_map &map)
 //-------------------------------------------------
 
 ROM_START( tube_arm )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION32_LE(0x4000, "bootstrap", 0)
 	ROM_DEFAULT_BIOS("101")
 	ROM_SYSTEM_BIOS(0, "101", "Executive v1.00 (14th August 1986)")
 	ROMX_LOAD("armeval_101.rom", 0x0000, 0x4000, CRC(cab85473) SHA1(f86bbc4894e62725b8ef22d44e7f44d37c98ac14), ROM_BIOS(0))

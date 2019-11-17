@@ -10713,8 +10713,48 @@ ROM_END
 
     MSTREET-6 repair info:
     Frequent cause of dead board is u104 (gal/palce20v8) becoming corrupted somehow. Luckily a working unsecured chip was found and dumped :)
-    May also work for other bootlegs (there are many very similar bootlegs out there), in that case the reference (u104) may vary.
+    Likely to also work on other similar boards (reference number may vary).
+	
+	B/C sets patch pals have different equations but are logically equivalent.
 */
+
+#define SF2CEMS6_PLD_DEVICES \
+	/* 8x TIBPAL16L8-25CN (OTP) */ \
+	ROM_LOAD( "ms6_pal16l8.u173",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u176",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u177",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u178",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u183",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u198",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u218",  0x000, 0x104, NO_DUMP ) \
+	ROM_LOAD( "ms6_pal16l8.u231",  0x000, 0x104, NO_DUMP ) \
+	/* 8x PALCE16V8H-25PC/4 */ \
+	ROM_LOAD( "ms6_gal16v8.u6",    0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u95",   0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u96",   0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u107",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u125",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u139",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u151",  0x000, 0x117, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal16v8.u245",  0x000, 0x117, NO_DUMP ) \
+	/* 14x PALCE20V8H-25PC/4 */ \
+	ROM_LOAD( "ms6_gal20v8.u15",   0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u16",   0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u20",   0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u21",   0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u39",   0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u40",   0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u104",  0x000, 0x157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal20v8.u131",  0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u135",  0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u140",  0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u232",  0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u233",  0x000, 0x157, NO_DUMP ) \
+	ROM_LOAD( "ms6_gal20v8.u234",  0x200, 0x157, CRC(2c16b7c6) SHA1(f73ad0253a861d5306a09b1f97dfce622b19cdcf) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal20v8.u235",  0x000, 0x157, NO_DUMP ) \
+	/* 2x PALCE22V10H-25PC/4 */ \
+	ROM_LOAD( "ms6_gal22v10.u50",  0x400, 0x2e5, CRC(dc665408) SHA1(a7161a03add24a01d547189e9bfaf11474bbe878) )  /* unprotected */ \
+	ROM_LOAD( "ms6_gal22v10.u134", 0x800, 0x2e5, CRC(b66848bb) SHA1(edef02bc7fc0195f56cf815c1b862bee095951c8) )  /* unprotected */
 
 ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
@@ -10751,16 +10791,16 @@ ROM_START( sf2cems6a )  /* 920313 USA (this set matches "sf2ceuab4" in FBA) */
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
 
-	ROM_REGION( 0x0200, "plds", 0 ) /* pld devices */
-	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
+	ROM_REGION( 0x0c00, "plds", 0 ) /* pld devices */
+	SF2CEMS6_PLD_DEVICES
 ROM_END
 
 ROM_START( sf2cems6b )  /* 920322 USA */
 	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
-	ROM_LOAD16_WORD_SWAP( "ms6b.u0", 0x00000, 0x40000, CRC(b6f3724b) SHA1(aa8eea819fdaf205ca068067a4624715a8cf6c8c) )
+	ROM_LOAD16_WORD_SWAP( "ms6b.u0", 0x00000, 0x40000, CRC(b6f3724b) SHA1(aa8eea819fdaf205ca068067a4624715a8cf6c8c) )  // 27c220
 
-	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld gal16v8 */
-	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
+	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld, palce16v8, protected but bruteforced ok */
+	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(5f05a861) SHA1(26b8cab0e66b596ef54768b2811c1c1939d3135c) )
 
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
@@ -10798,16 +10838,16 @@ ROM_START( sf2cems6b )  /* 920322 USA */
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
 
-	ROM_REGION( 0x0200, "plds", 0 ) /* pld devices */
-	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
+	ROM_REGION( 0x0c00, "plds", 0 ) /* pld devices */
+	SF2CEMS6_PLD_DEVICES
 ROM_END
 
 ROM_START( sf2cems6c )  /* 920322 USA */
 	ROM_REGION( 0x40000, "patch", 0 ) /* patch rom */
-	ROM_LOAD16_WORD_SWAP( "ms6c.u0", 0x00000, 0x40000, CRC(04088b61) SHA1(03c361a0c9c70c21ef53351d5f975b06f51ce2e0) )
+	ROM_LOAD16_WORD_SWAP( "ms6c.u0", 0x00000, 0x40000, CRC(04088b61) SHA1(03c361a0c9c70c21ef53351d5f975b06f51ce2e0) )  // 27c2048 OTP
 
-	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld palce16v8, protected, using gal dump from sf2cems6b */
-	ROM_LOAD( "ms6b.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
+	ROM_REGION( 0x0200, "patchpld", 0 ) /* patch pld, gal16v8, unprotected */
+	ROM_LOAD( "ms6c.44", 0x0000, 0x0117, CRC(8ceec769) SHA1(d646ed075182f3724c0c581065665b1c99ce180d) )
 
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) /* 68k code */
 	ROM_LOAD16_WORD_SWAP( "ms6b.u196", 0x000000, 0x100000, CRC(435153d5) SHA1(3f6f318a9b3def8d62ee576dbaaef623d55c1c64) )
@@ -10845,8 +10885,8 @@ ROM_START( sf2cems6c )  /* 920322 USA */
 	ROM_REGION( 0x10000, "user1", 0 ) /* unknown, priority? */
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )
 
-	ROM_REGION( 0x0200, "plds", 0 ) /* pld devices */
-	ROM_LOAD( "ms6_gal20v8a.u104", 0x0000, 0x0157, CRC(67b56d29) SHA1(261ae6e968100d5a9c1ee68ea684bb2b1eef3cf8) )
+	ROM_REGION( 0x0c00, "plds", 0 ) /* pld devices */
+	SF2CEMS6_PLD_DEVICES
 ROM_END
 
 ROM_START( sf2ceds6 ) // 10/17/92 DSTREET-6 on PCB, labels similar to the ones used by Subsino
@@ -10899,7 +10939,7 @@ ROM_START( sf2ceds6 ) // 10/17/92 DSTREET-6 on PCB, labels similar to the ones u
 	ROM_LOAD( "ms6.u133", 0x00000, 0x10000, CRC(13ea1c44) SHA1(5b05fe4c3920e33d94fac5f59e09ff14b3e427fe) )  // == loads other bootleg sets
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal20v8a.u104", 0x0000, 0x0157, NO_DUMP )
+	ROM_LOAD( "gal20v8a.u104", 0x0000, 0x0157, NO_DUMP )  // M-STREET6 probably the same?
 ROM_END
 
 /* B-Board 89625B-1 */

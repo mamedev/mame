@@ -9,6 +9,13 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "ui/miscmenu.h"
+
+#include "ui/inifile.h"
+#include "ui/selector.h"
+#include "ui/submenu.h"
+#include "ui/ui.h"
+
 #include "mame.h"
 #include "osdnet.h"
 #include "mameopts.h"
@@ -18,16 +25,17 @@
 #include "romload.h"
 
 #include "uiinput.h"
-#include "ui/ui.h"
-#include "ui/menu.h"
-#include "ui/miscmenu.h"
-#include "../info.h"
-#include "ui/inifile.h"
-#include "ui/submenu.h"
 
+#include "../info.h"
+
+#include <algorithm>
+#include <cstring>
 #include <fstream>
+#include <iterator>
+
 
 namespace ui {
+
 /***************************************************************************
     MENU HANDLERS
 ***************************************************************************/
@@ -270,93 +278,99 @@ void menu_bookkeeping::populate(float &customtop, float &custombottom)
 
 void menu_crosshair::handle()
 {
-	/* process the menu */
-	const event *menu_event = process(PROCESS_LR_REPEAT);
+	// process the menu
+	event const *const menu_event(process(PROCESS_LR_REPEAT));
 
-	/* handle events */
-	if (menu_event != nullptr && menu_event->itemref != nullptr)
+	// handle events
+	if (menu_event && menu_event->itemref)
 	{
-		crosshair_item_data *data = (crosshair_item_data *)menu_event->itemref;
-		bool changed = false;
-		//int set_def = false;
-		int newval = data->cur;
-
-		/* retreive the user settings */
-		render_crosshair &crosshair = machine().crosshair().get_crosshair(data->player);
+		crosshair_item_data &data(*reinterpret_cast<crosshair_item_data *>(menu_event->itemref));
+		bool changed(false);
+		int newval(data.cur);
 
 		switch (menu_event->iptkey)
 		{
-			/* if selected, reset to default value */
-			case IPT_UI_SELECT:
-				newval = data->defvalue;
-				//set_def = true;
-				break;
+		// if selected, reset to default value
+		case IPT_UI_SELECT:
+			newval = data.defvalue;
+			break;
 
-			/* left decrements */
-			case IPT_UI_LEFT:
-				newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
+		// left decrements
+		case IPT_UI_LEFT:
+			newval -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
 
-			/* right increments */
-			case IPT_UI_RIGHT:
-				newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
-				break;
+		// right increments
+		case IPT_UI_RIGHT:
+			newval += machine().input().code_pressed(KEYCODE_LSHIFT) ? 10 : 1;
+			break;
 		}
 
-		/* clamp to range */
-		if (newval < data->min)
-			newval = data->min;
-		if (newval > data->max)
-			newval = data->max;
+		// clamp to range
+		if (newval < data.min)
+			newval = data.min;
+		if (newval > data.max)
+			newval = data.max;
 
-		/* if things changed, update */
-		if (newval != data->cur)
+		// if things changed, update
+		if (newval != data.cur)
 		{
-			switch (data->type)
+			switch (data.type)
 			{
-				/* visibility state */
-				case CROSSHAIR_ITEM_VIS:
-					crosshair.set_mode(newval);
-					// set visibility as specified by mode - auto mode starts with visibility off
-					crosshair.set_visible(newval == CROSSHAIR_VISIBILITY_ON);
-					changed = true;
-					break;
+			// visibility state
+			case CROSSHAIR_ITEM_VIS:
+				data.crosshair->set_mode(newval);
+				// set visibility as specified by mode - auto mode starts with visibility off
+				data.crosshair->set_visible(newval == CROSSHAIR_VISIBILITY_ON);
+				changed = true;
+				break;
 
-				/* auto time */
-				case CROSSHAIR_ITEM_AUTO_TIME:
-					machine().crosshair().set_auto_time(newval);
-					changed = true;
-					break;
+			// auto time
+			case CROSSHAIR_ITEM_AUTO_TIME:
+				machine().crosshair().set_auto_time(newval);
+				changed = true;
+				break;
 			}
 		}
 
-		/* crosshair graphic name */
-		if (data->type == CROSSHAIR_ITEM_PIC)
+		// crosshair graphic name
+		if (data.type == CROSSHAIR_ITEM_PIC)
 		{
 			switch (menu_event->iptkey)
 			{
-				case IPT_UI_SELECT:
-					crosshair.set_default_bitmap();
-					changed = true;
-					break;
+			case IPT_UI_SELECT:
+				{
+					std::vector<std::string> sel;
+					sel.reserve(m_pics.size() + 1);
+					sel.push_back("DEFAULT");
+					std::copy(m_pics.begin(), m_pics.end(), std::back_inserter(sel));
+					menu::stack_push<menu_selector>(
+							ui(), container(), std::move(sel), data.cur,
+							[this, &data] (int selection)
+							{
+								if (!selection)
+									data.crosshair->set_default_bitmap();
+								else
+									data.crosshair->set_bitmap_name(m_pics[selection - 1].c_str());
+								reset(reset_options::REMEMBER_REF);
+							});
+				}
+				break;
 
-				case IPT_UI_LEFT:
-					crosshair.set_bitmap_name(data->last_name);
-					changed = true;
-					break;
+			case IPT_UI_LEFT:
+				data.crosshair->set_bitmap_name(data.last_name.c_str());
+				changed = true;
+				break;
 
-				case IPT_UI_RIGHT:
-					crosshair.set_bitmap_name(data->next_name);
-					changed = true;
-					break;
+			case IPT_UI_RIGHT:
+				data.crosshair->set_bitmap_name(data.next_name.c_str());
+				changed = true;
+				break;
 			}
 		}
 
 		if (changed)
-		{
-			/* rebuild the menu */
-			reset(reset_options::REMEMBER_POSITION);
-		}
+			reset(reset_options::REMEMBER_REF); // rebuild the menu
 	}
 }
 
@@ -372,142 +386,165 @@ menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container
 
 void menu_crosshair::populate(float &customtop, float &custombottom)
 {
-	crosshair_item_data *data;
-	char temp_text[16];
-	int player;
-	uint8_t use_auto = false;
-	uint32_t flags = 0;
-
-	/* loop over player and add the manual items */
-	for (player = 0; player < MAX_PLAYERS; player++)
+	if (m_data.empty())
 	{
-		/* get the user settings */
-		render_crosshair &crosshair = machine().crosshair().get_crosshair(player);
-
-		/* add menu items for usable crosshairs */
-		if (crosshair.is_used())
+		// loop over player and add the manual items
+		for (int player = 0; player < MAX_PLAYERS; player++)
 		{
-			/* Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types */
-			static const char *const vis_text[] = { "Off", "On", "Auto" };
+			// get the user settings
+			render_crosshair &crosshair(machine().crosshair().get_crosshair(player));
 
-			/* track if we need the auto time menu */
-			if (crosshair.mode() == CROSSHAIR_VISIBILITY_AUTO) use_auto = true;
-
-			/* CROSSHAIR_ITEM_VIS - allocate a data item and fill it */
-			data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
-			data->type = CROSSHAIR_ITEM_VIS;
-			data->player = player;
-			data->min = CROSSHAIR_VISIBILITY_OFF;
-			data->max = CROSSHAIR_VISIBILITY_AUTO;
-			data->defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
-			data->cur = crosshair.mode();
-
-			/* put on arrows */
-			if (data->cur > data->min)
-				flags |= FLAG_LEFT_ARROW;
-			if (data->cur < data->max)
-				flags |= FLAG_RIGHT_ARROW;
-
-			/* add CROSSHAIR_ITEM_VIS menu */
-			sprintf(temp_text, "P%d Visibility", player + 1);
-			item_append(temp_text, vis_text[crosshair.mode()], flags, data);
-
-			/* CROSSHAIR_ITEM_PIC - allocate a data item and fill it */
-			data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
-			data->type = CROSSHAIR_ITEM_PIC;
-			data->player = player;
-			data->last_name[0] = 0;
-			/* other data item not used by this menu */
-
-			/* search for crosshair graphics */
-
-			/* open a path to the crosshairs */
-			file_enumerator path(machine().options().crosshair_path());
-			const osd::directory::entry *dir;
-			/* reset search flags */
-			bool using_default = false;
-			bool finished = false;
-			bool found = false;
-
-			/* if we are using the default, then we just need to find the first in the list */
-			if (*crosshair.bitmap_name() == '\0')
-				using_default = true;
-
-			/* look for the current name, then remember the name before */
-			/* and find the next name */
-			while (((dir = path.next()) != nullptr) && !finished)
+			// add menu items for usable crosshairs
+			if (crosshair.is_used())
 			{
-				int length = strlen(dir->name);
+				// CROSSHAIR_ITEM_VIS - allocate a data item and fill it
+				crosshair_item_data &visdata(*m_data.emplace(m_data.end()));
+				visdata.crosshair = &crosshair;
+				visdata.type = CROSSHAIR_ITEM_VIS;
+				visdata.player = player;
+				visdata.min = CROSSHAIR_VISIBILITY_OFF;
+				visdata.max = CROSSHAIR_VISIBILITY_AUTO;
+				visdata.defvalue = CROSSHAIR_VISIBILITY_DEFAULT;
 
-				/* look for files ending in .png with a name not larger then 9 chars*/
-				if ((length > 4) && (length <= CROSSHAIR_PIC_NAME_LENGTH + 4) && core_filename_ends_with(dir->name, ".png"))
+				// CROSSHAIR_ITEM_PIC - allocate a data item and fill it
+				crosshair_item_data &picdata(*m_data.emplace(m_data.end()));
+				picdata.crosshair = &crosshair;
+				picdata.type = CROSSHAIR_ITEM_PIC;
+				picdata.player = player;
+				// other data item not used by this menu
+			}
+		}
+
+		// CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it
+		crosshair_item_data &timedata(*m_data.emplace(m_data.end()));
+		timedata.type = CROSSHAIR_ITEM_AUTO_TIME;
+		timedata.min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
+		timedata.max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;
+		timedata.defvalue = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
+	}
+
+	if (m_pics.empty())
+	{
+		// open a path to the crosshairs
+		file_enumerator path(machine().options().crosshair_path());
+		for (osd::directory::entry const *dir = path.next(); dir; dir = path.next())
+		{
+			// look for files ending in .png
+			size_t const length(std::strlen(dir->name));
+			if ((length > 4) && core_filename_ends_with(dir->name, ".png"))
+				m_pics.emplace_back(dir->name, length - 4);
+		}
+		std::stable_sort(
+				m_pics.begin(),
+				m_pics.end(),
+				[] (std::string const &a, std::string const &b) { return 0 > core_stricmp(a.c_str(), b.c_str()); });
+	}
+
+	// Make sure to keep these matched to the CROSSHAIR_VISIBILITY_xxx types
+	static char const *const vis_text[] = { "Off", "On", "Auto" };
+
+	bool use_auto = false;
+	for (crosshair_item_data &data : m_data)
+	{
+		switch (data.type)
+		{
+		case CROSSHAIR_ITEM_VIS:
+			{
+				// track if we need the auto time menu
+				if (data.crosshair->mode() == CROSSHAIR_VISIBILITY_AUTO)
+					use_auto = true;
+
+				data.cur = data.crosshair->mode();
+
+				// put on arrows
+				uint32_t flags(0U);
+				if (data.cur > data.min)
+					flags |= FLAG_LEFT_ARROW;
+				if (data.cur < data.max)
+					flags |= FLAG_RIGHT_ARROW;
+
+				// add CROSSHAIR_ITEM_VIS menu */
+				item_append(util::string_format(_("P%d Visibility"), data.player + 1), vis_text[data.crosshair->mode()], flags, &data);
+			}
+			break;
+
+		case CROSSHAIR_ITEM_PIC:
+			// search for crosshair graphics
+			{
+				// reset search flags
+				bool const using_default(*data.crosshair->bitmap_name() == '\0');
+				bool finished(false);
+				bool found(false);
+				data.cur = using_default ? 0U : 1U;
+				data.last_name.clear();
+				data.next_name.clear();
+
+				// look for the current name, then remember the name before and find the next name
+				for (auto it = m_pics.begin(); it != m_pics.end() && !finished; ++it)
 				{
-					/* remove .png from length */
-					length -= 4;
-
+					// if we are using the default, then we just need to find the first in the list
 					if (found || using_default)
 					{
-						/* get the next name */
-						strncpy(data->next_name, dir->name, length);
-						data->next_name[length] = 0;
+						// get the next name
+						data.next_name = *it;
 						finished = true;
 					}
-					else if (!strncmp(dir->name, crosshair.bitmap_name(), length))
+					else if (data.crosshair->bitmap_name() == *it)
 					{
-						/* we found the current name */
-						/* so loop once more to find the next name */
+						// we found the current name so loop once more to find the next name
 						found = true;
 					}
 					else
-						/* remember last name */
-						/* we will do it here in case files get added to the directory */
 					{
-						strncpy(data->last_name, dir->name, length);
-						data->last_name[length] = 0;
+						// remember last name - we will do it here in case files get added to the directory
+						++data.cur;
+						data.last_name = *it;
 					}
 				}
-			}
-			/* if name not found then next item is DEFAULT */
-			if (!found && !using_default)
-			{
-				data->next_name[0] = 0;
-				finished = true;
-			}
-			/* setup the selection flags */
-			flags = 0;
-			if (finished)
-				flags |= FLAG_RIGHT_ARROW;
-			if (found)
-				flags |= FLAG_LEFT_ARROW;
 
-			/* add CROSSHAIR_ITEM_PIC menu */
-			sprintf(temp_text, "P%d Crosshair", player + 1);
-			item_append(temp_text, using_default ? "DEFAULT" : crosshair.bitmap_name(), flags, data);
+				// if name not found then next item is DEFAULT
+				if (!found && !using_default)
+				{
+					data.cur = 0U;
+					data.next_name.clear();
+					finished = true;
+				}
+
+				// set up the selection flags
+				uint32_t flags(0U);
+				if (finished)
+					flags |= FLAG_RIGHT_ARROW;
+				if (found)
+					flags |= FLAG_LEFT_ARROW;
+
+				// add CROSSHAIR_ITEM_PIC menu
+				item_append(util::string_format(_("P%d Crosshair"), data.player + 1), using_default ? "DEFAULT" : data.crosshair->bitmap_name(), flags, &data);
+			}
+			break;
+
+		case CROSSHAIR_ITEM_AUTO_TIME:
+			if (use_auto)
+			{
+				data.cur = machine().crosshair().auto_time();
+
+				// put on arrows in visible menu
+				uint32_t flags(0U);
+				if (data.cur > data.min)
+					flags |= FLAG_LEFT_ARROW;
+				if (data.cur < data.max)
+					flags |= FLAG_RIGHT_ARROW;
+
+				// add CROSSHAIR_ITEM_AUTO_TIME menu
+				item_append(_("Visible Delay"), util::string_format("%d", data.cur), flags, &data);
+			}
+			else
+			{
+				// leave a blank filler line when not in auto time so size does not rescale
+				//item_append("", "", nullptr, nullptr);
+			}
+			break;
 		}
 	}
-	if (use_auto)
-	{
-		/* CROSSHAIR_ITEM_AUTO_TIME - allocate a data item and fill it */
-		data = (crosshair_item_data *)m_pool_alloc(sizeof(*data));
-		data->type = CROSSHAIR_ITEM_AUTO_TIME;
-		data->min = CROSSHAIR_VISIBILITY_AUTOTIME_MIN;
-		data->max = CROSSHAIR_VISIBILITY_AUTOTIME_MAX;
-		data->defvalue = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
-		data->cur = machine().crosshair().auto_time();
-
-		/* put on arrows in visible menu */
-		if (data->cur > data->min)
-			flags |= FLAG_LEFT_ARROW;
-		if (data->cur < data->max)
-			flags |= FLAG_RIGHT_ARROW;
-
-		/* add CROSSHAIR_ITEM_AUTO_TIME menu */
-		sprintf(temp_text, "%d", machine().crosshair().auto_time());
-		item_append(_("Visible Delay"), temp_text, flags, data);
-	}
-//  else
-//      /* leave a blank filler line when not in auto time so size does not rescale */
-//      item_append("", "", nullptr, nullptr);
 }
 
 menu_crosshair::~menu_crosshair()

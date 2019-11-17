@@ -1572,7 +1572,7 @@ void sx64_state::ntsc_sx(machine_config &config)
 	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
 }
 
 
@@ -1585,7 +1585,7 @@ void sx64_state::ntsc_dx(machine_config &config)
 	ntsc_sx(config);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec9", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec9", 9, sx1541_iec_devices, "sx1541");
 }
 
 
@@ -1732,7 +1732,7 @@ void sx64_state::pal_sx(machine_config &config)
 	m_maincpu->set_pulls(0x07, 0xc0);
 
 	// devices
-	CBM_IEC_SLOT(config.replace(), "iec8", sx1541_iec_devices, "sx1541");
+	CBM_IEC_SLOT(config.replace(), "iec8", 8, sx1541_iec_devices, "sx1541");
 }
 
 

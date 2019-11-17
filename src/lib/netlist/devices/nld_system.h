@@ -47,8 +47,8 @@
 #define GNDA()                                                                  \
 		NET_REGISTER_DEV(GNDA, GND)
 
-#define DUMMY_INPUT(name)                                                       \
-		NET_REGISTER_DEV(DUMMY_INPUT, name)
+#define NC_PIN(name)                                                            \
+		NET_REGISTER_DEV(NC_PIN, name)
 
 //FIXME: Usage discouraged, use OPTIMIZE_FRONTIER instead
 #define FRONTIER_DEV(name, cIN, cG, cOUT)                                       \

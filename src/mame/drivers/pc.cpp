@@ -478,7 +478,7 @@ void pc_state::eagle1600(machine_config &config)
 }
 
 ROM_START( eagle1600 )
-	ROM_REGION(0x10000,"bios", 0)
+	ROM_REGION16_LE(0x10000, "bios", 0)
 	ROMX_LOAD("eagle 1600 62-2732-001 rev e u403.bin",0xe000, 0x1000, CRC(3da1e96a) SHA1(77861ba5ebd056da1daf048f5abd459e0528666d), ROM_SKIP(1))
 	ROMX_LOAD("eagle 1600 62-2732-002 rev e u404.bin",0xe001, 0x1000, CRC(be6492d4) SHA1(ef25faf33e8336121d030e38e177be39be8afb7a), ROM_SKIP(1))
 
@@ -495,7 +495,7 @@ Error message: Cannot read boot sector
 ******************************************************************************/
 
 ROM_START( eaglepc2 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("eagle_pc-2_bios_2.812_1986_u1101.bin", 0xe000, 0x2000, CRC(cd0fc034) SHA1(883cb4808c565f2582873a51cc637ab25b457f88))
 
 	ROM_REGION(0x8000,"gfx1", 0)
@@ -515,7 +515,7 @@ Mass storage: 1/2x 5.25" 360KB floppy or 1x 360KB floppy and 10MB harddisk (XL m
 ******************************************************************************/
 
 ROM_START( eaglespirit )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("u1101.bin", 0xe000, 0x2000, CRC(3fef0b0b) SHA1(fa75e90c5595b72ef33d178f1f86511cbe08191d))
 	ROM_LOAD("u1103.bin", 0xc000, 0x2000, CRC(efa2b0d9) SHA1(1fcd01dd2676539a0f6498ef866fb450caab1ac4))
 ROM_END
@@ -1227,7 +1227,7 @@ void pc_state::juko16(machine_config &config)
 }
 
 ROM_START( juko16 )
-	ROM_REGION(0x10000,"bios", 0)
+	ROM_REGION16_LE(0x10000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "v107", "v1.07")
 	ROMX_LOAD("c22.bin", 0xc000, 0x2000, BAD_DUMP CRC(e947237b) SHA1(65e84675752a4deb0d0712e2aba8c0735959b43a),ROM_BIOS(0))
 	ROMX_LOAD("c24.bin", 0xe000, 0x2000, BAD_DUMP CRC(1d3246e4) SHA1(4ff875d15b1231a2464dfe08e480c637fa0c4613),ROM_BIOS(0))
@@ -1299,7 +1299,7 @@ hangs on boot, maybe they are waiting for a serial connection
 ******************************************************************************/
 
 ROM_START( mpx16 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 	ROM_LOAD("mpx16u84.bin", 0xe000, 0x1000, CRC(8a557a25) SHA1(90f8112c094cc0ac44c2d5d43fbb577333dfc165))
 	ROM_LOAD("mpx16u85.bin", 0xf000, 0x1000, CRC(42097571) SHA1(2acaca033242e35e512b30b2233da02bde561cc3))
 ROM_END
@@ -1339,7 +1339,7 @@ ROM_END
 //    YEAR  NAME            PARENT   COMPAT  MACHINE         INPUT     CLASS     INIT           COMPANY                            FULLNAME                 FLAGS
 COMP( 1989, mk88,           ibm5150, 0,      mk88,           pccga,    pc_state, empty_init,    "<unknown>",                       "MK-88",                 MACHINE_NOT_WORKING )
 COMP( 1991, poisk2,         ibm5150, 0,      poisk2,         pccga,    pc_state, empty_init,    "<unknown>",                       "Poisk-2",               MACHINE_NOT_WORKING )
-COMP( 1990, mc1702,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
+COMP( 1990, mc1702,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "<unknown>",                       "Elektronika MC-1702",   MACHINE_NOT_WORKING )
 COMP( 198?, olytext30,      ibm5150, 0,      olytext30,      pccga,    pc_state, empty_init,    "AEG Olympia",                     "Olytext 30",            MACHINE_NOT_WORKING )
 COMP( 1987, ataripc1,       ibm5150, 0,      ataripc1,       pccga,    pc_state, empty_init,    "Atari",                           "PC1",                   0 )
 COMP( 1988, ataripc3,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Atari",                           "PC3",                   0 )
@@ -1370,7 +1370,7 @@ COMP( 1988, sx16,           ibm5150, 0,      pccga,          pccga,    pc_state,
 COMP( 198?, mbc16,          ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sanyo",                           "MBC-16",                MACHINE_NOT_WORKING )
 COMP( 1992, iskr3104,       ibm5150, 0,      iskr3104,       pccga,    pc_state, empty_init,    "Schetmash",                       "Iskra 3104",            MACHINE_NOT_WORKING )
 COMP( 1985, sicpc1605,      ibm5150, 0,      siemens,        pccga,    pc_state, empty_init,    "Siemens",                         "Sicomp PC16-05",        MACHINE_NOT_WORKING )
-COMP( 1985, pc7000,         ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
+COMP( 1985, pc7000,         ibm5150, 0,      eagle1600,      pccga,    pc_state, empty_init,    "Sharp",                           "PC-7000",               MACHINE_NOT_WORKING )
 COMP( 198?, hstrtpls,       ibm5150, 0,      pccga,          pccga,    pc_state, empty_init,    "Vendex",                          "HeadStart Plus",        MACHINE_NOT_WORKING )
 COMP( 1988, laser_turbo_xt, ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser Turbo XT",        0 )
 COMP( 1989, laser_xt3,      ibm5150, 0,      laser_turbo_xt, 0,        pc_state, empty_init,    "VTech",                           "Laser XT/3",            0 )

@@ -222,8 +222,8 @@ DEFINE_DEVICE_TYPE(CBM_IEC_SLOT, cbm_iec_slot_device, "cbm_iec_slot", "CBM IEC s
 //  device_cbm_iec_interface - constructor
 //-------------------------------------------------
 
-device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "cbmiec"), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
+device_cbm_iec_interface::device_cbm_iec_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "cbmiec"), m_next(nullptr), m_bus(nullptr), m_slot(nullptr)
 {
 }
 
@@ -247,8 +247,8 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 //-------------------------------------------------
 
 cbm_iec_slot_device::cbm_iec_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, CBM_IEC_SLOT, tag, owner, clock),
-		device_slot_interface(mconfig, *this), m_address(0)
+	device_t(mconfig, CBM_IEC_SLOT, tag, owner, clock),
+	device_slot_interface(mconfig, *this), m_address(0)
 {
 }
 
@@ -273,14 +273,6 @@ void cbm_iec_slot_device::device_start()
 	if (dev) bus->add_device(this, get_card_device());
 }
 
-void cbm_iec_slot_device::add_slot(machine_config &config, const char *_tag, int _address, const char *_def_slot)
-{
-	cbm_iec_slot_device &slot(CBM_IEC_SLOT(config, _tag, 0));
-	cbm_iec_devices(slot);
-	slot.set_default_option(_def_slot);
-	slot.set_address(_address);
-}
-
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -289,13 +281,13 @@ void cbm_iec_slot_device::add_slot(machine_config &config, const char *_tag, int
 //  cbm_iec_device - constructor
 //-------------------------------------------------
 
-cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CBM_IEC, tag, owner, clock),
-		m_write_srq(*this),
-		m_write_atn(*this),
-		m_write_clk(*this),
-		m_write_data(*this),
-		m_write_reset(*this)
+cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, CBM_IEC, tag, owner, clock),
+	m_write_srq(*this),
+	m_write_atn(*this),
+	m_write_clk(*this),
+	m_write_data(*this),
+	m_write_reset(*this)
 {
 	for (auto & elem : m_line)
 	{
@@ -359,10 +351,10 @@ void cbm_iec_device::add_device(cbm_iec_slot_device *slot, device_t *target)
 //  daisy_entry - constructor
 //-------------------------------------------------
 
-cbm_iec_device::daisy_entry::daisy_entry(device_t *device)
-	: m_next(nullptr),
-		m_device(device),
-		m_interface(nullptr)
+cbm_iec_device::daisy_entry::daisy_entry(device_t *device) :
+	m_next(nullptr),
+	m_device(device),
+	m_interface(nullptr)
 {
 	for (auto & elem : m_line)
 	{
@@ -522,9 +514,9 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("cmdhd", CMD_HD);
 	device.option_add("fd2000", FD2000);
 	device.option_add("fd4000", FD4000);
-	device.option_add("interpod", INTERPOD);
+	device.option_add("interpod", CBM_INTERPOD);
 	device.option_add("minichief", MINI_CHIEF);
-	device.option_add("serialbox", SERIAL_BOX);
+	device.option_add("serialbox", CBM_SERIAL_BOX);
 	device.option_add("diag264", DIAG264_SERIAL_LOOPBACK);
 	device.option_add("nl10", C64_NL10_INTERFACE);
 	device.option_add("vic1515", VIC1515);

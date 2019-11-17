@@ -611,7 +611,7 @@ void rc759_state::rc759(machine_config &config)
 //**************************************************************************
 
 ROM_START( rc759 )
-	ROM_REGION(0x8000, "bios", 0)
+	ROM_REGION16_LE(0x8000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "1-21", "1? Version 2.1")
 	ROMX_LOAD("rc759-1-2.1.rom", 0x0000, 0x8000, CRC(3a777d56) SHA1(a8592d61d5e1f92651a6f5e41c4ba14c9b6cc39b), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "1-51", "1? Version 5.1")

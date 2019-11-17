@@ -63,7 +63,7 @@ namespace devices
 
 		template <class C>
 		nld_truthtable_t(C &owner, const pstring &name,
-				const logic_family_desc_t *fam,
+				const logic_family_desc_t &fam,
 				truthtable_t &ttp, const std::vector<pstring> &desc)
 		: device_t(owner, name)
 		, m_fam(*this, fam)

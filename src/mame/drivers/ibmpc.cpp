@@ -455,7 +455,7 @@ ROM_END
 
 
 ROM_START( ibm5160 )
-	ROM_REGION16_LE(0x10000,"bios", 0)
+	ROM_REGION(0x10000, "bios", 0)
 //  ROM_LOAD("600963.u12", 0xc8000, 0x02000, CRC(f3daf85f) SHA1(3bd29538832d3084cbddeec92593988772755283))  /* Tandon/Western Digital Fixed Disk Adapter 600963-001__TYPE_5.U12.2764.bin */
 
 	/* PC/3270 has a 3270 keyboard controller card, plus a rom on that card to tell the pc how to run it.

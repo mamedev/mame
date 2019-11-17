@@ -471,7 +471,7 @@ void hd44780_device::control_write(u8 data)
 		// function set
 		if (!m_first_cmd && m_data_len == (BIT(m_ir, 4) ? 8 : 4) && (m_char_size != (BIT(m_ir, 2) ? 10 : 8) || m_num_line != (BIT(m_ir, 3) + 1)))
 		{
-			logerror("HD44780 '%s': function set cannot be executed after other instructions unless the interface data length is changed\n", tag());
+			logerror("HD44780: function set cannot be executed after other instructions unless the interface data length is changed\n");
 			return;
 		}
 
@@ -539,6 +539,9 @@ void hd44780_device::control_write(u8 data)
 		m_disp_shift = 0;
 		memset(m_ddram, 0x20, sizeof(m_ddram));
 		set_busy_flag(1520);
+
+		// Some machines do a "clear display" first, even though the datasheet insists "function set" must come before all else
+		return;
 	}
 
 	m_first_cmd = false;

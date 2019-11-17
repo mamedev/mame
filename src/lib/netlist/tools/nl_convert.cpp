@@ -492,7 +492,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 	tokenizer::token_t token = tok.get_token();
 	while (true)
 	{
-		if (token.is_type(tokenizer::ENDOFFILE))
+		if (token.is_type(tokenizer::token_type::ENDOFFILE))
 		{
 			dump_nl();
 			// FIXME: Parameter
@@ -563,7 +563,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 					break;
 				}
 				default:
-					tok.error("// IGNORED " + name);
+					tok.error(plib::perrmsg("// IGNORED {1}", name));
 			}
 
 		}
@@ -639,7 +639,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 	tokenizer::token_t token = tok.get_token();
 	while (true)
 	{
-		if (token.is_type(tokenizer::ENDOFFILE) || token.is(tok.m_tok_END))
+		if (token.is_type(tokenizer::token_type::ENDOFFILE) || token.is(tok.m_tok_END))
 		{
 			dump_nl();
 			// FIXME: Parameter
@@ -731,7 +731,7 @@ void nl_convert_rinf_t::convert(const pstring &contents)
 			if (token.is(tok.m_tok_TER))
 			{
 				token = tok.get_token();
-				while (token.is_type(plib::ptokenizer::IDENTIFIER))
+				while (token.is_type(plib::ptokenizer::token_type::IDENTIFIER))
 				{
 					pin = tok.get_identifier_or_number();
 					add_term(net, token.str() + "." + pin);

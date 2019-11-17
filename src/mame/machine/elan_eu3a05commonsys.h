@@ -16,6 +16,7 @@ public:
 	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_addrbank(T &&tag) { m_bank.set_tag(std::forward<T>(tag)); }
 	void set_pal(void) { m_is_pal = true; }
+	void disable_timer_irq(void) { m_allow_timer_irq = false; }
 
 	void generate_custom_interrupt(int level);
 
@@ -44,7 +45,7 @@ protected:
 	uint8_t m_rombank_lo;
 
 	bool m_is_pal; // this is usually a jumper connected to the chip that the software can read (clocks also differ on PAL units)
-
+	bool m_allow_timer_irq;
 private:
 	DECLARE_READ8_MEMBER(intmask_r);
 	DECLARE_WRITE8_MEMBER(intmask_w);

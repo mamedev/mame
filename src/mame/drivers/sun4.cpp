@@ -1897,7 +1897,7 @@ void sun4_state::sun4(machine_config &config)
 	});
 
 	// Keyboard/mouse
-	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_int_callback().set(FUNC(sun4_state::scc1_int));
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
@@ -1906,7 +1906,7 @@ void sun4_state::sun4(machine_config &config)
 	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	// RS232 serial ports
-	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_int_callback().set(FUNC(sun4_state::scc2_int));
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
@@ -1981,7 +1981,7 @@ void sun4_state::sun4c(machine_config &config)
 	});
 
 	// Keyboard/mouse
-	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	SCC85C30(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_int_callback().set(FUNC(sun4_state::scc1_int));
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
 	// no mouse TxD connection - replaced with soft power request input
@@ -1990,7 +1990,7 @@ void sun4_state::sun4c(machine_config &config)
 	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
 	// RS232 serial ports
-	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	SCC85C30(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_int_callback().set(FUNC(sun4_state::scc2_int));
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));

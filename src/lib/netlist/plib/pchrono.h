@@ -194,7 +194,7 @@ namespace plib {
 			{
 				guard_t() = delete;
 				explicit guard_t(timer &m) noexcept : m_m(m) { m_m.m_time -= T::start(); }
-				~guard_t() { m_m.m_time += T::stop(); ++m_m.m_count; }
+				~guard_t() noexcept { m_m.m_time += T::stop(); ++m_m.m_count; }
 
 				COPYASSIGNMOVE(guard_t, default)
 
@@ -208,7 +208,7 @@ namespace plib {
 
 			type operator()() const { return m_time; }
 
-			void reset() { m_time = 0; m_count = 0; }
+			void reset() noexcept { m_time = 0; m_count = 0; }
 			type average() const noexcept { return (m_count == 0) ? 0 : m_time / m_count; }
 			type total() const noexcept { return m_time; }
 			ctype count() const noexcept { return m_count; }
@@ -237,7 +237,7 @@ namespace plib {
 				// unused local variable.
 
 				// NOLINTNEXTLINE(modernize-use-equals-default)
-				~guard_t() { }
+				~guard_t() noexcept { }
 			};
 
 			constexpr type operator()() const noexcept { return 0; }

@@ -38,7 +38,7 @@
 #include "netlist/nl_setup.h"
 #include "netlist/solver/nld_solver.h"
 #include "nld_generic_models.h"
-#include "plib/pfunction.h"
+#include "netlist/plib/pfunction.h"
 
 // -----------------------------------------------------------------------------
 // Implementation
@@ -88,7 +88,7 @@ namespace analog
 
 		void solve_now();
 
-		void solve_later(netlist_time delay = netlist_time::quantum());
+		void solve_later(netlist_time delay = netlist_time::quantum()) noexcept;
 
 		void set_G_V_I(nl_fptype G, nl_fptype V, nl_fptype I) const noexcept
 		{
@@ -100,6 +100,16 @@ namespace analog
 		nl_fptype deltaV() const noexcept
 		{
 			return m_P.net().Q_Analog() - m_N.net().Q_Analog();
+		}
+
+		nl_fptype V1P() const noexcept
+		{
+			return m_P.net().Q_Analog();
+		}
+
+		nl_fptype V2N() const noexcept
+		{
+			return m_N.net().Q_Analog();
 		}
 
 		void set_mat(nl_fptype a11, nl_fptype a12, nl_fptype rhs1,
@@ -124,7 +134,7 @@ namespace analog
 		{
 		}
 
-		void set_R(nl_fptype R)
+		void set_R(nl_fptype R) const noexcept
 		{
 			const nl_fptype G = plib::reciprocal(R);
 			set_mat( G, -G, nlconst::zero(),

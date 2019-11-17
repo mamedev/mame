@@ -10,7 +10,7 @@
 #include "netlist/analog/nlid_twoterm.h"
 #include "netlist/nl_base.h"
 #include "netlist/nl_setup.h"
-#include "plib/putil.h"
+#include "netlist/plib/putil.h"
 
 namespace netlist
 {
@@ -38,6 +38,40 @@ namespace devices
 		param_num_t<unsigned>   m_mos_capmodel;
 		//! How many times do we try to resolve links (connections)
 		param_num_t<unsigned>   m_max_link_loops;
+	};
+
+	// -----------------------------------------------------------------------------
+	// power pins - not a device, but a helper
+	// -----------------------------------------------------------------------------
+
+	/// \brief Power pins class.
+	///
+	/// Power Pins are passive inputs. Delegate noop will silently ignore any
+	/// updates.
+
+	class nld_power_pins
+	{
+	public:
+		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
+			const pstring &sGND = sPowerGND)
+		: m_VCC(owner, sVCC, NETLIB_DELEGATE(power_pins, noop))
+		, m_GND(owner, sGND, NETLIB_DELEGATE(power_pins, noop))
+		{
+		}
+
+		const analog_input_t &VCC() const noexcept
+		{
+			return m_VCC;
+		}
+		const analog_input_t &GND() const noexcept
+		{
+			return m_GND;
+		}
+
+	private:
+		void noop() { }
+		analog_input_t m_VCC;
+		analog_input_t m_GND;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -188,6 +222,7 @@ namespace devices
 		, m_IN(*this, "IN", false)
 		// make sure we get the family first
 		, m_FAMILY(*this, "FAMILY", "FAMILY(TYPE=TTL)")
+		, m_supply(*this)
 		{
 			set_logic_family(state().setup().family_from_model(m_FAMILY()));
 			m_Q.set_logic_family(this->logic_family());
@@ -202,6 +237,7 @@ namespace devices
 
 		param_logic_t m_IN;
 		param_model_t m_FAMILY;
+		NETLIB_NAME(power_pins) m_supply;
 	};
 
 	NETLIB_OBJECT(analog_input)
@@ -241,19 +277,18 @@ namespace devices
 	};
 
 	// -----------------------------------------------------------------------------
-	// nld_dummy_input
+	// nld_nc_pin
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT(dummy_input)
+	NETLIB_OBJECT(nc_pin)
 	{
 	public:
-		NETLIB_CONSTRUCTOR(dummy_input)
+		NETLIB_CONSTRUCTOR(nc_pin)
 		, m_I(*this, "I")
 		{
 		}
 
 	protected:
-
 		NETLIB_RESETI() { }
 		NETLIB_UPDATEI() { }
 
@@ -335,7 +370,6 @@ namespace devices
 		}
 
 	protected:
-
 		NETLIB_RESETI()
 		{
 			//m_Q.initial(0.0);
@@ -349,8 +383,8 @@ namespace devices
 			}
 			m_Q.push(m_compiled.evaluate(m_vals));
 		}
-	private:
 
+	private:
 		param_int_t m_N;
 		param_str_t m_func;
 		analog_output_t m_Q;
@@ -358,6 +392,7 @@ namespace devices
 
 		std::vector<nl_fptype> m_vals;
 		plib::pfunction<nl_fptype> m_compiled;
+
 	};
 
 	// -----------------------------------------------------------------------------
@@ -401,6 +436,7 @@ namespace devices
 
 		//NETLIB_UPDATE_PARAMI();
 
+		// used by 74123
 		analog::NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_fp_t m_RON;
@@ -408,45 +444,6 @@ namespace devices
 
 	private:
 		state_var<netlist_sig_t> m_last_state;
-	};
-
-	// -----------------------------------------------------------------------------
-	// power pins - not a device, but a helper
-	// -----------------------------------------------------------------------------
-
-	/// \brief Power pins class.
-	///
-	/// Power Pins are passive inputs. Delegate noop will silently ignore any
-	/// updates.
-	class nld_power_pins
-	{
-	public:
-		explicit nld_power_pins(device_t &owner, const pstring &sVCC = sPowerVCC,
-			const pstring &sGND = sPowerGND, bool force_analog_input = false)
-		{
-			if (owner.state().setup().is_extended_validation() || force_analog_input)
-			{
-				m_GND = owner.state().make_object<analog_input_t>(owner, sGND, NETLIB_DELEGATE(power_pins, noop));
-				m_VCC = owner.state().make_object<analog_input_t>(owner, sVCC, NETLIB_DELEGATE(power_pins, noop));
-			}
-			else
-			{
-				owner.create_and_register_subdevice(sPowerDevRes, m_RVG);
-				owner.register_subalias(sVCC, pstring(sPowerDevRes) + ".1");
-				owner.register_subalias(sGND, pstring(sPowerDevRes) + ".2");
-			}
-		}
-
-		// FIXME: this will seg-fault if force_analog_input = false
-		nl_fptype VCC() const noexcept { return m_VCC->Q_Analog(); }
-		nl_fptype GND() const noexcept { return m_GND->Q_Analog(); }
-
-	private:
-		void noop() { }
-		unique_pool_ptr<analog_input_t> m_VCC; // only used during validation or force_analog_input
-		unique_pool_ptr<analog_input_t> m_GND; // only used during validation or force_analog_input
-
-		NETLIB_SUB_UPTR(analog, R) m_RVG; // dummy resistor between VCC and GND
 	};
 
 } // namespace devices

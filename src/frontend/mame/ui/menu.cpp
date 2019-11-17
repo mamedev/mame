@@ -33,12 +33,6 @@
 namespace ui {
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define UI_MENU_POOL_SIZE  65536
-
-/***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
@@ -242,7 +236,6 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_container(container)
 	, m_parent()
 	, m_event()
-	, m_pool(nullptr)
 	, m_customtop(0.0f)
 	, m_custombottom(0.0f)
 	, m_resetpos(0)
@@ -266,19 +259,11 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 
 menu::~menu()
 {
-	// free the pools
-	while (m_pool)
-	{
-		pool *const ppool = m_pool;
-		m_pool = m_pool->next;
-		global_free_array(ppool);
-	}
 }
 
 
 //-------------------------------------------------
-//  reset - free all items in the menu,
-//  and all memory allocated from the memory pool
+//  reset - free all items in the menu
 //-------------------------------------------------
 
 void menu::reset(reset_options options)
@@ -291,9 +276,7 @@ void menu::reset(reset_options options)
 	else if (options == reset_options::REMEMBER_REF)
 		m_resetref = get_selection_ref();
 
-	// reset all the pools and the item count back to 0
-	for (pool *ppool = m_pool; ppool != nullptr; ppool = ppool->next)
-		ppool->top = (uint8_t *)(ppool + 1);
+	// reset the item count back to 0
 	m_items.clear();
 	m_visible_items = 0;
 	m_selected = 0;
@@ -317,7 +300,6 @@ void menu::reset(reset_options options)
 		else
 			item_append(_("Return to Previous Menu"), "", 0, nullptr);
 	}
-
 }
 
 
@@ -483,38 +465,6 @@ const menu::event *menu::process(uint32_t flags, float x0, float y0)
 	{
 		return nullptr;
 	}
-}
-
-
-//-------------------------------------------------
-//  m_pool_alloc - allocate temporary memory
-//  from the menu's memory pool
-//-------------------------------------------------
-
-void *menu::m_pool_alloc(size_t size)
-{
-	assert(size < UI_MENU_POOL_SIZE);
-
-	// find a pool with enough room
-	for (pool *ppool = m_pool; ppool != nullptr; ppool = ppool->next)
-	{
-		if (ppool->end - ppool->top >= size)
-		{
-			void *result = ppool->top;
-			ppool->top += size;
-			return result;
-		}
-	}
-
-	// allocate a new pool
-	pool *ppool = (pool *)global_alloc_array_clear<uint8_t>(sizeof(*ppool) + UI_MENU_POOL_SIZE);
-
-	// wire it up
-	ppool->next = m_pool;
-	m_pool = ppool;
-	ppool->top = (uint8_t *)(ppool + 1);
-	ppool->end = ppool->top + UI_MENU_POOL_SIZE;
-	return m_pool_alloc(size);
 }
 
 

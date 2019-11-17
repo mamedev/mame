@@ -2872,6 +2872,11 @@ files {
 	MAME_DIR .. "src/mame/drivers/gamecube.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vtscr.cpp",
 	MAME_DIR .. "src/mame/machine/m6502_vtscr.h",
+	MAME_DIR .. "src/mame/machine/m6502_vh2009.cpp",
+	MAME_DIR .. "src/mame/machine/m6502_vh2009.h",
+	MAME_DIR .. "src/mame/drivers/vt1682.cpp",
+	MAME_DIR .. "src/mame/machine/m6502_vt1682.cpp",
+	MAME_DIR .. "src/mame/machine/m6502_vt1682.h",
 }
 
 createMESSProjects(_target, _subtarget, "nokia")
@@ -4039,6 +4044,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/esprit.cpp",
 	MAME_DIR .. "src/mame/drivers/eti660.cpp",
 	MAME_DIR .. "src/mame/includes/eti660.h",
+	MAME_DIR .. "src/mame/drivers/eurit.cpp",
 	MAME_DIR .. "src/mame/drivers/eurocom2.cpp",
 	MAME_DIR .. "src/mame/drivers/excali64.cpp",
 	MAME_DIR .. "src/mame/drivers/facit4440.cpp",

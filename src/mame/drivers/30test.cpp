@@ -81,9 +81,7 @@ private:
 	DECLARE_WRITE8_MEMBER(namco_30test_led_rank_w);
 	DECLARE_WRITE8_MEMBER(namco_30test_lamps_w);
 	DECLARE_READ8_MEMBER(namco_30test_mux_r);
-	DECLARE_READ8_MEMBER(hc11_mux_r);
 	DECLARE_WRITE8_MEMBER(hc11_mux_w);
-	DECLARE_READ8_MEMBER(hc11_okibank_r);
 	DECLARE_WRITE8_MEMBER(hc11_okibank_w);
 
 	void namco_30test_map(address_map &map);
@@ -130,19 +128,9 @@ READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
 	return res;
 }
 
-READ8_MEMBER(namco_30test_state::hc11_mux_r)
-{
-	return m_mux_data;
-}
-
 WRITE8_MEMBER(namco_30test_state::hc11_mux_w)
 {
 	m_mux_data = data;
-}
-
-READ8_MEMBER(namco_30test_state::hc11_okibank_r)
-{
-	return m_oki_bank;
 }
 
 WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
@@ -154,11 +142,6 @@ WRITE8_MEMBER(namco_30test_state::hc11_okibank_w)
 
 void namco_30test_state::namco_30test_map(address_map &map)
 {
-	map(0x0000, 0x003f).ram(); // internal I/O
-	map(0x0040, 0x007f).ram(); // more internal I/O, HC11 change pending
-	map(0x007c, 0x007c).rw(FUNC(namco_30test_state::hc11_mux_r), FUNC(namco_30test_state::hc11_mux_w));
-	map(0x007e, 0x007e).rw(FUNC(namco_30test_state::hc11_okibank_r), FUNC(namco_30test_state::hc11_okibank_w));
-	map(0x0080, 0x037f).ram(); // internal RAM
 	map(0x0d80, 0x0dbf).ram(); // EEPROM read-back data goes there
 	map(0x2000, 0x2000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	/* 0x401e-0x401f: time */
@@ -253,6 +236,8 @@ void namco_30test_state::_30test(machine_config &config)
 	m_maincpu->in_pa_callback().set(FUNC(namco_30test_state::namco_30test_mux_r));
 	//m_maincpu->in_pd_callback().set_ram();
 	m_maincpu->in_pe_callback().set_ioport("SYSTEM");
+	m_maincpu->out_pg_callback().set(FUNC(namco_30test_state::hc11_okibank_w));
+	m_maincpu->out_ph_callback().set(FUNC(namco_30test_state::hc11_mux_w));
 
 	/* no video hardware */
 

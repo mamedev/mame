@@ -100,6 +100,8 @@ History:
 #include <algorithm>
 
 //#define VERBOSE 1
+//#define LOG_OUTPUT_STREAM std::cout
+
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(INS8250,  ins8250_device, "ins8250",  "National Semiconductor INS8250 UART")
@@ -117,6 +119,9 @@ ins8250_uart_device::ins8250_uart_device(const machine_config &mconfig, device_t
 	, m_out_int_cb(*this)
 	, m_out_out1_cb(*this)
 	, m_out_out2_cb(*this)
+	, m_out_baudout_cb(*this)
+	, m_brg_clock(true)
+	, m_txd(1)
 	, m_rxd(1)
 	, m_dcd(1)
 	, m_dsr(1)
@@ -245,16 +250,34 @@ READ_LINE_MEMBER(ins8250_uart_device::intrpt_r)
 	return !BIT(m_regs.iir, 0);
 }
 
+TIMER_CALLBACK_MEMBER(ins8250_uart_device::brg_clock)
+{
+	bool state = m_brg_clock;
+	if (!is_transmit_register_empty())
+	{
+		device_serial_interface::tx_clock_w(m_brg_clock);
+		m_brg_clock = !state;
+	}
+	if (is_receive_register_synchronized())
+	{
+		if (m_out_baudout_cb.isnull())
+		{
+			device_serial_interface::rx_clock_w(m_brg_clock);
+		}
+		else
+		{
+			m_out_baudout_cb(m_brg_clock);
+		}
+		m_brg_clock = !state;
+	}
+	m_brg->adjust(((clock() && (m_regs.dl) ? (attotime::from_hz(clock()) * m_regs.dl * 16) : attotime::never) / 2));
+}
+
 // Baud rate generator is reset after writing to either byte of divisor latch
 void ins8250_uart_device::update_baud_rate()
 {
 	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
-	set_rate(clock(), m_regs.dl * 16);
-
-	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
-	// If the transmitter is still running at this time and we don't flush it, the shift register will never be emptied!
-	if (!(m_regs.lsr & INS8250_LSR_TSRE))
-		tra_complete();
+	m_brg->adjust(((clock() && (m_regs.dl) ? (attotime::from_hz(clock()) * m_regs.dl * 16) : attotime::never) / 2));
 }
 
 void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
@@ -604,6 +627,11 @@ void ins8250_uart_device::update_msr()
 		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 }
 
+WRITE_LINE_MEMBER(ins8250_uart_device::rclk_w)
+{
+	device_serial_interface::rx_clock_w(state);
+}
+
 WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
 {
 	m_dcd = state;
@@ -644,9 +672,10 @@ void ins8250_uart_device::device_start()
 	m_out_int_cb.resolve_safe();
 	m_out_out1_cb.resolve_safe();
 	m_out_out2_cb.resolve_safe();
+	m_out_baudout_cb.resolve();
 	set_tra_rate(0);
 	set_rcv_rate(0);
-
+	m_brg = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ins8250_uart_device::brg_clock), this));
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));
 	save_item(NAME(m_regs.ier));
@@ -659,6 +688,7 @@ void ins8250_uart_device::device_start()
 	save_item(NAME(m_regs.msr));
 	save_item(NAME(m_regs.scr));
 	save_item(NAME(m_int_pending));
+	save_item(NAME(m_brg_clock));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_dcd));
@@ -680,12 +710,14 @@ void ins8250_uart_device::device_reset()
 	update_interrupt();
 	receive_register_reset();
 	transmit_register_reset();
+	m_brg_clock = true;
 	m_txd = 1;
 	m_out_tx_cb(1);
 	m_out_rts_cb(1);
 	m_out_dtr_cb(1);
 	m_out_out1_cb(1);
 	m_out_out2_cb(1);
+	if (!m_out_baudout_cb.isnull()) m_out_baudout_cb(1);
 }
 
 void ns16550_device::device_start()

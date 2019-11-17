@@ -8590,4 +8590,120 @@
 		</part>
 	</software>
 
+	<software name="chckrkng">
+		<description>Checker King</description>
+		<year>1979</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-11-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple ][ with 16K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="35101">
+				<rom name="checker king.woz" size="35101" crc="d4430ffb" sha1="008494e5c869c2d835260fad4145be5fea2da750" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gamgmblr">
+		<description>Gammon Gambler</description>
+		<year>1979</year>
+		<publisher>Personal Software</publisher>
+		<info name="release" value="2019-11-09"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any
+		Apple ][ with 24K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="228112">
+				<rom name="gammon gambler.woz" size="228112" crc="a159448f" sha1="50cb697901df21be816e82a0d46c24e9a3eb98b3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blmurder">
+		<description>Bloody Murder</description>
+		<year>1979</year>
+		<publisher>Stoneware</publisher>
+		<info name="release" value="2019-11-12"/>
+		<sharedfeat name="compatibility" value="A2" />
+		<!-- It requires an original Apple ][ with 48K and Integer BASIC 
+		in ROM. -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234791">
+				<rom name="bloody murder.woz" size="234791" crc="647975ac" sha1="f6e5ad2dc64dd040f10d861c2c7c7af9268130ff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bestmuse">
+		<description>The Best of MUSE</description>
+		<year>1980</year>
+		<publisher>MUSE Software</publisher>
+		<info name="release" value="2019-11-12"/>
+		<sharedfeat name="compatibility" value="A2" />
+		<!-- It requires an original Apple ][ with 32K and Integer BASIC 
+		in ROM. -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234802">
+				<rom name="the best of muse.woz" size="234802" crc="e62eb84b" sha1="4af09e1386c7bd0c5f32de79d5ed91208a23718f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btpyramd">
+		<description>Beneath The Pyramids</description>
+		<year>1980</year>
+		<publisher>Crystalware</publisher>
+		<info name="release" value="2019-11-12"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any Apple ][
+		with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234787">
+				<rom name="beneath the pyramids.woz" size="234787" crc="7adcbd5c" sha1="106e77c00ce9b64047399474b88158d65efc8f59" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aiasterd">
+		<description>Asteroid</description>
+		<year>1980</year>
+		<publisher>Adventure International</publisher>
+		<info name="release" value="2019-11-12"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 13-sector drive but otherwise runs on any Apple ][
+		with 48K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="234776">
+				<rom name="asteroid.woz" size="234776" crc="48edee28" sha1="d3f67ba5f93d134dce711229039aa771a112155c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rdwr2k11">
+		<description>Roadwar 2000 (Version 1.1)</description>
+		<year>1986</year>
+		<publisher>Strategic Simulations, Inc</publisher>
+		<info name="release" value="2019-11-15"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 48K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="242138">
+				<rom name="roadwar 2000 v1.1 side a.woz" size="242138" crc="b736b731" sha1="209f6e08fc2ea20f496668dab3e3f42b70dcc39b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="241455">
+				<rom name="roadwar 2000 v1.1 side b.woz" size="241455" crc="c01131ed" sha1="917e8ace92e9422641a78ad088e1d7990c329c56" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

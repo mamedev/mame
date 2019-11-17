@@ -10,11 +10,11 @@
 
 #include "netlist/nl_base.h"
 #include "netlist/nl_errstr.h"
-#include "plib/mat_cr.h"
-#include "plib/palloc.h"
-#include "plib/pmatrix2d.h"
-#include "plib/putil.h"
-#include "plib/vector_ops.h"
+#include "netlist/plib/mat_cr.h"
+#include "netlist/plib/palloc.h"
+#include "netlist/plib/pmatrix2d.h"
+#include "netlist/plib/putil.h"
+#include "netlist/plib/vector_ops.h"
 
 namespace netlist
 {
@@ -186,7 +186,7 @@ namespace solver
 		bool has_timestep_devices() const noexcept { return m_step_devices.size() > 0; }
 
 		void update_forced();
-		void update_after(const netlist_time after)
+		void update_after(netlist_time after) noexcept
 		{
 			m_Q_sync.net().toggle_and_push_to_queue(after);
 		}

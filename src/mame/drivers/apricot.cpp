@@ -495,13 +495,13 @@ void apricot_state::apricotxi(machine_config &config)
 //**************************************************************************
 
 ROM_START( apricot )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("pc_bios_lo_001.bin", 0x0000, 0x2000, CRC(0c217cc2) SHA1(0d7a2b61e17966462b555115f962a175fadcf72a))
 	ROM_LOAD16_BYTE("pc_bios_hi_001.bin", 0x0001, 0x2000, CRC(7c27f36c) SHA1(c801bbf904815f76ec6463e948f57e0118a26292))
 ROM_END
 
 ROM_START( apricotxi )
-	ROM_REGION(0x4000, "bootstrap", 0)
+	ROM_REGION16_LE(0x4000, "bootstrap", 0)
 	ROM_LOAD16_BYTE("lo_ve007.u11", 0x0000, 0x2000, CRC(e74e14d1) SHA1(569133b0266ce3563b21ae36fa5727308797deee)) // LO Ve007 03.04.84
 	ROM_LOAD16_BYTE("hi_ve007.u9",  0x0001, 0x2000, CRC(b04fb83e) SHA1(cc2b2392f1b4c04bb6ec8ee26f8122242c02e572)) // HI Ve007 03.04.84
 ROM_END

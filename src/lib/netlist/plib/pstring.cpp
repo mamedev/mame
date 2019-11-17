@@ -10,7 +10,7 @@
 #include <stack>
 
 template<typename F>
-int pstring_t<F>::compare(const pstring_t &right) const
+int pstring_t<F>::compare(const pstring_t &right) const noexcept
 {
 	if (mem_t_size() == 0 && right.mem_t_size() == 0)
 		return 0;
@@ -54,7 +54,7 @@ pstring_t<F> pstring_t<F>::substr(size_type start, size_type nlen) const
 }
 
 template<typename F>
-typename pstring_t<F>::size_type pstring_t<F>::find(const pstring_t &search, size_type start) const
+typename pstring_t<F>::size_type pstring_t<F>::find(const pstring_t &search, size_type start) const noexcept
 {
 	auto istart = std::next(begin(), static_cast<difference_type>(start));
 	for (; istart != end(); ++istart)
@@ -74,7 +74,7 @@ typename pstring_t<F>::size_type pstring_t<F>::find(const pstring_t &search, siz
 }
 
 template<typename F>
-typename pstring_t<F>::size_type pstring_t<F>::find(code_t search, size_type start) const
+typename pstring_t<F>::size_type pstring_t<F>::find(code_t search, size_type start) const noexcept
 {
 	pstring_t ss;
 	traits_type::encode(search, ss.m_str);

@@ -243,6 +243,7 @@ esqkt.cpp
 esqmr.cpp
 et3400.cpp
 eti660.cpp
+eurit.cpp
 eurocom2.cpp
 europc.cpp
 eva.cpp
@@ -563,6 +564,7 @@ nds.cpp
 neogeocd.cpp
 nes.cpp
 nes_vt.cpp
+vt1682.cpp
 newbrain.cpp
 next.cpp
 nforcepc.cpp
