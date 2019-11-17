@@ -214,6 +214,7 @@ public:
 		, m_vu0_dmem(*this, "vu0dmem")
 		, m_vu1_imem(*this, "vu1imem")
 		, m_vu1_dmem(*this, "vu1dmem")
+		, m_bios(*this, "bios")
 		, m_vblank_timer(nullptr)
 	{ }
 
@@ -277,6 +278,7 @@ protected:
 	required_shared_ptr<uint64_t>   m_vu0_dmem;
 	required_shared_ptr<uint64_t>   m_vu1_imem;
 	required_shared_ptr<uint64_t>   m_vu1_dmem;
+	required_region_ptr<uint32_t>   m_bios;
 
 	uint32_t m_unk_f430_reg;
 	uint32_t m_unk_f440_counter;
@@ -707,7 +709,7 @@ void ps2sony_state::mem_map(address_map &map)
 	map(0x12001000, 0x120013ff).mirror(0xc00).rw(m_gs, FUNC(ps2_gs_device::priv_regs1_r), FUNC(ps2_gs_device::priv_regs1_w));
 	map(0x1c000000, 0x1c1fffff).rw(FUNC(ps2sony_state::ee_iop_ram_r), FUNC(ps2sony_state::ee_iop_ram_w)); // IOP has 2MB EDO RAM per Wikipedia, and writes go up to this point
 	map(0x1f803800, 0x1f803807).r(FUNC(ps2sony_state::board_id_r));
-	map(0x1fc00000, 0x1fffffff).rom().region("bios", 0);
+	map(0x1fc00000, 0x1fffffff).lr32([this] (offs_t offset) { return m_bios[offset]; }, "bios_r");
 
 	map(0x70000000, 0x70003fff).ram().share(m_sp_ram); // 16KB Scratchpad RAM
 }
@@ -786,7 +788,7 @@ void ps2sony_state::ps2sony(machine_config &config)
 
 ROM_START( ps2 )
 	// These came from the redump.org "Sony - PlayStation 2 - BIOS Datfile" (version 2017-10-26)
-	ROM_REGION(0x400000, "bios", 0)
+	ROM_REGION32_LE(0x400000, "bios", 0)
 	ROM_DEFAULT_BIOS( "scph10000_t" )
 	ROM_SYSTEM_BIOS( 0, "scph10000_t", "SCPH-10000 (Version 5.0 01/17/00 T)" )
 	ROMX_LOAD( "ps2-0100j-20000117.bin", 0x0000, 0x400000, CRC(b7ef81a9) SHA1(aea061e6e263fdcc1c4fdbd68553ef78dae74263), ROM_BIOS(0) )
