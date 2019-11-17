@@ -3,8 +3,8 @@
 
 /*  VT1682 - NOT compatible with NES, different video system, sound CPU (4x
              main CPU clock), optional internal ROM etc.  The design is somewhat
-			 based on the NES but the video / sound system is significantly
-			 changed
+             based on the NES but the video / sound system is significantly
+             changed
 
     Internal ROM can be mapped to Main CPU, or Sound CPU at 0x3000-0x3fff if used
     can also be configured as boot device
@@ -54,7 +54,7 @@ private:
 	void rom_map(address_map& map);
 
 	void spriteram_map(address_map& map);
-	void vram_map(address_map& map);	
+	void vram_map(address_map& map);
 
 
 	/* Video */
@@ -191,13 +191,13 @@ private:
 		return (m_2002_sprramaddr_2_0 & 0x07) | (m_2003_sprramaddr_10_3 << 3);
 	}
 
-	
+
 	void set_spriteram_addr(uint16_t addr)
 	{
 		m_2002_sprramaddr_2_0 = addr & 0x07;
 		m_2003_sprramaddr_10_3 = addr >> 3;
 	}
-	
+
 
 	void inc_spriteram_addr()
 	{
@@ -416,33 +416,33 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_201f_bk2_segment_11_8));
 
 	save_item(NAME(m_2013_bk1_main_control));
-	save_item(NAME(m_2017_bk2_main_control));	
+	save_item(NAME(m_2017_bk2_main_control));
 
-	save_item(NAME(m_2012_bk1_scroll_control));	
-	save_item(NAME(m_2016_bk2_scroll_control));	
+	save_item(NAME(m_2012_bk1_scroll_control));
+	save_item(NAME(m_2016_bk2_scroll_control));
 
-	save_item(NAME(m_2010_bk1_xscroll_7_0));	
-	save_item(NAME(m_2011_bk1_yscoll_7_0));	
-	save_item(NAME(m_2014_bk2_xscroll_7_0));	
-	save_item(NAME(m_2015_bk2_yscoll_7_0));	
+	save_item(NAME(m_2010_bk1_xscroll_7_0));
+	save_item(NAME(m_2011_bk1_yscoll_7_0));
+	save_item(NAME(m_2014_bk2_xscroll_7_0));
+	save_item(NAME(m_2015_bk2_yscoll_7_0));
 
-	save_item(NAME(m_200e_blend_pal_sel));	
-	save_item(NAME(m_200f_bk_pal_sel));	
+	save_item(NAME(m_200e_blend_pal_sel));
+	save_item(NAME(m_200f_bk_pal_sel));
 
-	save_item(NAME(m_2008_lcd_vs_delay));	
-	save_item(NAME(m_2009_lcd_hs_delay_7_0));	
-	save_item(NAME(m_200a_lcd_fr_delay_7_0));	
+	save_item(NAME(m_2008_lcd_vs_delay));
+	save_item(NAME(m_2009_lcd_hs_delay_7_0));
+	save_item(NAME(m_200a_lcd_fr_delay_7_0));
 
-	save_item(NAME(m_200d_misc_vregs2));	
-	save_item(NAME(m_200c_misc_vregs1));	
-	save_item(NAME(m_200b_misc_vregs0)); 
+	save_item(NAME(m_200d_misc_vregs2));
+	save_item(NAME(m_200c_misc_vregs1));
+	save_item(NAME(m_200b_misc_vregs0));
 
-	save_item(NAME(m_2018_spregs)); 
-	save_item(NAME(m_2019_bkgain)); 	
+	save_item(NAME(m_2018_spregs));
+	save_item(NAME(m_2019_bkgain));
 
-	save_item(NAME(m_2020_bk_linescroll)); 	
-	save_item(NAME(m_2021_lum_offset)); 	
-	save_item(NAME(m_2022_saturation_misc)); 	
+	save_item(NAME(m_2020_bk_linescroll));
+	save_item(NAME(m_2021_lum_offset));
+	save_item(NAME(m_2022_saturation_misc));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -495,7 +495,7 @@ void vt_vt1682_state::machine_reset()
 
 	m_2012_bk1_scroll_control = 0;
 	m_2016_bk2_scroll_control = 0;
-	
+
 	m_2010_bk1_xscroll_7_0 = 0;
 	m_2011_bk1_yscoll_7_0 = 0;
 	m_2014_bk2_xscroll_7_0 = 0;
@@ -1285,7 +1285,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 {
 	logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x scrollen:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
-	
+
 	m_2012_bk1_scroll_control = data;
 }
 
@@ -1314,7 +1314,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 {
 	logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x colour:%01x linemode:%01x size:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
-	
+
 	m_2013_bk1_main_control = data;
 }
 
@@ -1397,7 +1397,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 {
 	logerror("%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x scrollen:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
-	
+
 	m_2016_bk2_scroll_control = data;
 }
 
@@ -1426,7 +1426,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
 {
 	logerror("%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x colour:%01x (invalid):%01x size:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
-	
+
 	m_2017_bk2_main_control = data;
 }
 
@@ -2905,7 +2905,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 				count = 0x200;
 
 			do_dma_external_to_internal(dstaddr, count, get_dma_dt_is_video());
-	
+
 			return;
 		}
 	}
@@ -4005,11 +4005,11 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
-	
+
 	map(0x2122, 0x2122).rw(FUNC(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r), FUNC(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w));
 	map(0x2123, 0x2123).rw(FUNC(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r), FUNC(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w));
 	map(0x2124, 0x2124).rw(FUNC(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r), FUNC(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w));
-	map(0x2125, 0x2125).rw(FUNC(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r), FUNC(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w));	
+	map(0x2125, 0x2125).rw(FUNC(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r), FUNC(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w));
 	map(0x2126, 0x2126).rw(FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r), FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w));
 	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
 	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
