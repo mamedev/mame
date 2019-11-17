@@ -10,7 +10,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="371742">
-				<rom name="pt68k-2_skdos.imd" size="371742" crc="3112e58e" sha1="69613c2aded6d3c2cf7837b724c1d6e0297266f3" offset="0x0000" />
+				<rom name="pt68k-2_skdos.imd" size="371742" crc="3112e58e" sha1="69613c2aded6d3c2cf7837b724c1d6e0297266f3"/>
 			</dataarea>
 		</part>
 	</software>

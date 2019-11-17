@@ -52,7 +52,7 @@ public:
 	// osd_output interface
 
 protected:
-	virtual void output_callback(osd_output_channel channel, const char *msg, va_list args) override;
+	virtual void output_callback(osd_output_channel channel, const util::format_argument_pack<std::ostream> &args) override;
 
 private:
 	// internal map types
@@ -82,8 +82,8 @@ private:
 	void validate_device_types();
 
 	// output helpers
-	void build_output_prefix(std::string &str);
-	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
+	void build_output_prefix(std::ostream &str) const;
+	template <typename Format, typename... Params> void output_via_delegate(osd_output_channel channel, Format &&fmt, Params &&...args);
 	void output_indented_errors(std::string &text, const char *header);
 
 	// random number generation

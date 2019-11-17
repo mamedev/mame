@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "a2cffa.h"
-#include "machine/ataintf.h"
 #include "imagedev/harddriv.h"
 #include "softlist.h"
 

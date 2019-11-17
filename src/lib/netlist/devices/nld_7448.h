@@ -27,7 +27,7 @@
 #include "netlist/nl_setup.h"
 
 #ifndef NL_AUTO_DEVICES
-#if !(USE_TRUTHTABLE_7448)
+#if !(NL_USE_TRUTHTABLE_7448)
 #define TTL_7448(name, cA0, cA1, cA2, cA3, cLTQ, cBIQ, cRBIQ)                  \
 		NET_REGISTER_DEV(TTL_7448, name)                                       \
 		NET_CONNECT(name, VCC, VCC)                                            \

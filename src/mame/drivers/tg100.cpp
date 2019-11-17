@@ -62,7 +62,7 @@ void tg100_state::tg100_map(address_map &map)
 
 void tg100_state::tg100_io_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( tg100 )

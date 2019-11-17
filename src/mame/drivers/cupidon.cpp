@@ -88,14 +88,13 @@ void cupidon_state::cupidon_map(address_map &map)
 	map(0x1800000, 0x1800003).r(FUNC(cupidon_state::cupidon_return_ffffffff));
 	map(0x2000074, 0x2000077).ram(); // port
 
-//  AM_RANGE(0x2000040, 0x200004f) AM_RAM
-
+//  map(0x2000040, 0x200004f).ram();
 
 // might just be 4mb of VRAM
 	map(0x3000000, 0x33bffff).ram();
 	map(0x33c0000, 0x33fffff).ram().share("gfxram"); // seems to upload graphics to here, tiles etc. if you skip the loop after the romtest in funnyfm
-//  AM_RANGE(0x3400000, 0x3400fff) AM_RAM
-//  AM_RANGE(0x3F80000, 0x3F80003) AM_RAM
+//  map(0x3400000, 0x3400fff).ram();
+//  map(0x3F80000, 0x3F80003).ram();
 	map(0x3FF0400, 0x3FF0403).ram(); // register? gangrose likes to read this?
 }
 

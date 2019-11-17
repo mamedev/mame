@@ -54,9 +54,20 @@
 			if a.onsolution then
 				a.onsolution(sln)
 			end
+			if sln.postsolutioncallbacks then
+				for _,cb in ipairs(sln.postsolutioncallbacks) do
+					cb(sln)
+				end
+			end
+
 			for prj in premake.solution.eachproject(sln) do
 				if a.onproject then
 					a.onproject(prj)
+				end
+				if prj.postprojectcallbacks then
+					for _,cb in ipairs(prj.postprojectcallbacks) do
+						cb(prj)
+					end
 				end
 			end
 		end

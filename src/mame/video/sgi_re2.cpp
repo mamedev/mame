@@ -93,6 +93,9 @@ void sgi_re2_device::device_reset()
 	set_rdy(true);
 	set_drq(false);
 
+	for (u32 &reg : m_reg)
+		reg = 0;
+
 	// reset register values indicate presence of RE2
 	m_reg[REG_DZF] = 0;
 	m_reg[REG_DZF] = ~u32(0);
@@ -139,10 +142,10 @@ void sgi_re2_device::reg_w(offs_t offset, u32 data)
 {
 	if (regmask[offset])
 	{
-		if (offset != REG_RWDATA)
-			LOGMASKED(LOG_REG, "reg_w register 0x%02x (%s) data 0x%x\n", offset, regname[offset], data);
-
 		m_reg[offset] = data & regmask[offset];
+
+		if (offset != REG_RWDATA)
+			LOGMASKED(LOG_REG, "reg_w register 0x%02x (%s) data 0x%x\n", offset, regname[offset], m_reg[offset]);
 
 		// special case register handling
 		switch (offset)
@@ -272,12 +275,12 @@ void sgi_re2_device::execute()
 		break;
 
 	case IR_READBUF:
-		LOG("ri read buffer\n");
+		LOG("ri read buffer rwmode %d\n", m_reg[REG_RWMODE]);
 		read_buffer();
 		break;
 
 	case IR_WRITEBUF:
-		LOG("write buffer\n");
+		LOG("write buffer rwmode %d\n", m_reg[REG_RWMODE]);
 		write_buffer();
 		break;
 	}

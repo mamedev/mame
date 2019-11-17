@@ -138,10 +138,10 @@ Keyboard Mania 2nd Mix - dongle, program CD, audio CD
 
 #include "emu.h"
 
+#include "bus/ata/ataintf.h"
+#include "bus/ata/atapicdr.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/atapicdr.h"
 #include "machine/ins8250.h"
 #include "machine/intelfsh.h"
 #include "machine/midikbd.h"

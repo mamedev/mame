@@ -23,11 +23,16 @@ TIDY_FLAGSX += -cppcoreguidelines-avoid-magic-numbers,
 TIDY_FLAGSX += -cppcoreguidelines-macro-usage,
 TIDY_FLAGSX += -cppcoreguidelines-non-private-member-variables-in-classes,-misc-non-private-member-variables-in-classes,
 TIDY_FLAGSX += -bugprone-macro-parentheses,-misc-macro-parentheses,
-TIDY_FLAGSX += -modernize-use-trailing-return-type
+TIDY_FLAGSX += -bugprone-too-small-loop-variable,
+TIDY_FLAGSX += -modernize-use-trailing-return-type,
+TIDY_FLAGSX += -cppcoreguidelines-pro-bounds-array-to-pointer-decay
 
 space := 
 space += 
 TIDY_FLAGS = $(subst $(space),,$(TIDY_FLAGSX))
+TIDY_SOURCES = $(SOURCES)
+
+#TIDY_SOURCES = $(SRC)/solver/nld_solver.cpp
 
 #TIDY_FLAGS = -checks=llvm-include-order,llvm-namespace-comment,modernize-use-override,modernize-use-using -fix
 #TIDY_FLAGS = -checks=llvm-include-order -fix
@@ -45,8 +50,8 @@ endif
 
 # LTO = -flto=4  -fuse-linker-plugin -flto-partition=balanced -Wodr
 
-CFLAGS =  $(LTO) -g -O3 -std=c++11 -I$(CURDIR)/.. -I$(CURDIR)/../.. $(CEXTRAFLAGS)
-LDFLAGS = $(LTO) -g -O3 -std=c++11 $(LDEXTRAFLAGS)
+CFLAGS =  $(LTO) -g -O3 -std=c++14 -I$(CURDIR)/.. -I$(CURDIR)/../.. $(CEXTRAFLAGS)
+LDFLAGS = $(LTO) -g -O3 -std=c++14 $(LDEXTRAFLAGS)
 LIBS = -lpthread -ldl
 
 CC = g++
@@ -76,15 +81,12 @@ OBJS = $(POBJS) $(NLOBJS)
 
 POBJS := \
 	$(POBJ)/pstring.o \
-	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
 	$(POBJ)/pexception.o \
 	$(POBJ)/pfunction.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \
-	$(POBJ)/pstate.o \
-	$(POBJ)/pstream.o \
 	$(POBJ)/putil.o \
 
 PMAIN := $(POBJ)/pmain.o
@@ -295,7 +297,7 @@ endif
 #-------------------------------------------------
 tidy: tidy_db
 	@echo running tidy
-	@for i in $(SOURCES); do \
+	@for i in $(TIDY_SOURCES); do \
 		$(CLANG_TIDY) $$i $(TIDY_FLAGS) -header-filter=.*; \
 	done
 

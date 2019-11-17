@@ -112,7 +112,7 @@ enum
 void dsp56156_device::dsp56156_program_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("dsk56156_program_ram");   /* 1-5 */
-//  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
+//  map(0x2f00, 0x2fff).rom();                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
 }
 
 void dsp56156_device::dsp56156_x_data_map(address_map &map)

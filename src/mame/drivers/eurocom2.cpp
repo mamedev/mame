@@ -350,7 +350,7 @@ void waveterm_state::waveterm_map(address_map &map)
 	map(0xfd08, 0xfd0f).rw(m_ptm, FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0xfd10, 0xfd17).unmaprw();
 	map(0xfd18, 0xfd18).r(FUNC(waveterm_state::waveterm_adc));  //  AD558 ADC
-//  AM_RANGE(0xfd20, 0xfd20) AM_READ(waveterm_dac)  //  ZN432 DAC ??
+//  map(0xfd20, 0xfd20).r(FUNC(waveterm_state::waveterm_dac));  //  ZN432 DAC ??
 }
 
 static INPUT_PORTS_START(eurocom2)

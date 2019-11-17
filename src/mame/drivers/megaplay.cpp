@@ -103,7 +103,6 @@ private:
 	uint32_t m_bios_bank_addr;
 
 	uint32_t m_bios_width;  // determines the way the game info ROM is read
-	uint8_t m_bios_ctrl[6];
 	uint8_t m_bios_6600;
 	uint8_t m_bios_6403;
 	uint8_t m_bios_6404;
@@ -472,7 +471,7 @@ READ8_MEMBER(mplay_state::bank_r)
 		}
 		else
 		{
-			return memregion("maincpu")->base()[fulladdress ^ 1];
+			return memregion("maincpu")->as_u8(BYTE_XOR_BE(fulladdress));
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO access
@@ -630,7 +629,7 @@ uint32_t mplay_state::screen_update_megplay(screen_device &screen, bitmap_rgb32 
 	//m_vdp1->screen_update(screen, bitmap, cliprect);
 
 	// TODO : the overlay (256 pixels wide) is actually stretched over the 320 resolution genesis output, reference is https://youtu.be/Oir1Wp6yOq0.
-	// if it's meant to be stretched we'll have to multiply the entire outut x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
+	// if it's meant to be stretched we'll have to multiply the entire output x4 for the Genesis VDP and x5 for the SMS VDP to get a common 1280 pixel wide image
 
 	// overlay, only drawn for pixels != 0
 	for (int y = 0; y < 224; y++)
@@ -675,14 +674,14 @@ void mplay_state::megaplay(machine_config &config)
 
 	config.m_minimum_quantum = attotime::from_hz(6000);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_porta_cb().set_ioport("DSW0");
 	io1.in_portb_cb().set_ioport("DSW1");
 	io1.out_portd_cb().set(FUNC(mplay_state::bios_banksel_w));
 	io1.in_porte_cb().set(FUNC(mplay_state::bios_6204_r));
 	io1.out_porte_cb().set(FUNC(mplay_state::bios_width_w));
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("TEST");
 	io2.in_portb_cb().set_ioport("COIN");
 	io2.in_portc_cb().set(FUNC(mplay_state::bios_6402_r));
@@ -986,11 +985,3 @@ didn't have original Sega part numbers it's probably a converted TWC cart
 /* 11 */ GAME( 1993, mp_mazin, megaplay, megaplay, mp_mazin, mplay_state, init_megaplay, ROT0, "Sega",                  "Mazin Wars / Mazin Saga (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /* ?? */ GAME( 1993, mp_col3,  megaplay, megaplay, megaplay, mplay_state, init_megaplay, ROT0, "Sega",                  "Columns III (Mega Play)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-
-/* Not confirmed to exist:
-
-system16.com lists 'Streets of Rage' but this seems unlikely, there are no gaps in
-the numbering prior to 'Streets of Rage 2'
-
-*/

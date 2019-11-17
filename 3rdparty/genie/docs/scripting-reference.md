@@ -16,6 +16,7 @@
     * [configuration](#configurationkeywords)
     * [configurations](#configurationsnames)
     * [custombuildtask](#custombuildtasktask)
+    * [debugcmd](#debugcmdcmd)
     * [debugargs](#debugargsargs)
     * [debugdir](#debugdirpath)
     * [defines](#definessymbols)
@@ -46,6 +47,7 @@
     * [newoption](#newoptionsdescription)
     * [nopch](#nopch)
     * [objdir](#objdirpath)
+    * [options](#optionsoptions)
     * [pchheader](#pchheaderfile)
     * [pchsource](#pchsourcefile)
     * [platforms](#platformsidentifiers)
@@ -63,6 +65,7 @@
     * [resoptions](#resoptionsoptions)
     * [solution](#solutionname)
     * [startproject](#startprojectname)
+    * [systemincludedirs](#systemincludedirspaths)
     * [targetdir](#targetdirpath)
     * [targetextension](#targetextensionext)
     * [targetname](#targetnamename)
@@ -72,6 +75,12 @@
     * [userincludedirs](#userincludedirspaths)
     * [uuid](#uuidprojectuuid)
     * [vpaths](#vpathsgroup--pattern)
+    * [xcodeprojectopts](#xcodeprojectoptskey--value-)
+    * [xcodetargetopts](#xcodetargetoptskey--value-)
+    * [xcodescriptphases](#xcodescriptphasescmd-inputpaths-)
+    * [xcodecopyresources](#xcodecopyresourcestargetpath-inputfiles-)
+    * [xcodecopyframeworks](#xcodecopyframeworksinputframeworks-)
+    * [wholearchive](#wholearchivereferences)
 * Utility functions
     * [iif](#iifcondition-trueval-falseval)
     * [os.chdir](#oschdirpath)
@@ -204,6 +213,7 @@ Specifies what action should be performed on a set of files during compilation. 
 
 #### Arguments
 _action_ - the action to be performed. One of:
+
 * "Compile" - treat the file as source code: compile and run it
 * "Embed" - embed the file into the target binary as a resource
 * "Copy" - copy the file to the target directory
@@ -211,10 +221,12 @@ _action_ - the action to be performed. One of:
 
 #### Examples
 Embed all PNGs into the target binary
+
 ```lua
 configuration "**.png"
     buildaction "Embed"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -238,10 +250,12 @@ _options_ - list of compiler flags
 
 #### Examples
 Add some GCC-specific options
+
 ```lua
 configuration {"linux", "gmake"}
     buildoptions {"-ansi", "-pedantic"}
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -252,6 +266,7 @@ Limits subsequent build settings to a particular environment. Acts as a filter, 
 _keywords_ - list of identifiers to compare to the current runtime environment
 
 Possible values:
+
 * Configuration names - configuration names passed to [configurations](#configurations)
 * Action names - "vs2015", "gmake", etc.
 * Operating system names - "windows", "macosx", etc.
@@ -263,6 +278,7 @@ You may also use "*" and "**" wildcards, as well as "not" and "or".
 
 #### Return
 Current configuration object with the following fields:
+
 * _buildaction_       - build action.
 * _buildoptions_      - list of compiler options.
 * _defines_           - list of compiler symbols.
@@ -298,33 +314,76 @@ Current configuration object with the following fields:
 
 #### Examples
 Define debug symbol for debug configurations
+
 ```lua
 configuration "Debug"
     defines { "DEBUG" }
 ```
 
 Define a symbol based on a wildcard
+
 ```lua
 configuration "vs*"
     defines { "VISUAL_STUDIO_2005" }
 ```
 
 Define a symbol based on an "or"
+
 ```lua
 configuration "linux or macosx"
     defines { "LINUX_OR_MACOSX" }
 ```
 
 Define a symbol based on a "not"
+
 ```lua
 configuration "not windows"
     defines { "NOT_WINDOWS" }
 ```
 
 Reset the configuration filter
+
 ```lua
 configuration {}
 ```
+
+#### Caveats
+
+- Argument chaining:
+  `configuration` can take multiple arguments, e.g.,
+  ```lua
+  configuration {"StaticLib", "xcode*", "osx or ios*"}
+  ```
+  These arguments will be combined as an `AND` clause,
+  i.e. if one of the keywords does _not_ match the actual configuration terms,
+  the following settings will not be applied.
+
+- Condition evaluation:
+  The arguments are **not** evaluated as Lua. They are merely regex-matched against the configuration terms.
+  The implications of this are that parentheses have no effect outside of regular expression groups.
+  A condition like `"not (osx or ios*)"` will not be equivalent to `{"not osx", "not ios*}"`.
+  Furthermore, a condition like `"not osx or ios*"` will be evaluated as the negation of `"osx or ios*"`.
+
+- `and` is **not** a valid keyword for configuration combinations.
+  However, several keywords will be combined as an `AND` clause.
+
+- Limits of Lua's regular expressions:
+  Each passed keyword is matched against each configuration terms from the project/solution type being built
+  using [Lua's regular expression mechanism](https://www.lua.org/manual/5.3/manual.html#6.4).
+  This means that keyword matching is subject to the same limits as regular Lua regex matching.
+  This implies that regexes like `"(osx|ios)"` do not work.
+
+- Wildcard expansion:
+  Wildcards will get expanded following the same rules as paths.
+  Similarly, special characters such as `()` will get escaped (i.e. converted to `%(%)`) before being matched.
+  This means that `"not (osx or ios*)"` will in fact get expanded to `"not %(osx or ios[^/]*)"` and then checked as
+  `not` _result of_ `"%(osx or ios[^/]*)"`, which in turn gets broken down to `"%(osx"` and `"ios[^/]*)"`.
+
+- `"win*"` matchings:
+  Intuitively, the configuration keyword to match "Windows" ("Win32", "Win64" or "WinCE") configuration would be
+  `"win*"`. However **`"win*"` also matches "WindowedApp"**. Prefer using the term `"vs*"` to check for configurations
+  targeting Windows.
+
 [Back to top](#table-of-contents)
 
 ---
@@ -341,34 +400,38 @@ When called with no arguments - list of current configuration names
 
 #### Examples
 Specify configurations for a solution
+
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
 ```
 
 Add additional configurations
+
 ```lua
 configurations{ "Debug", "Release", "DebugDLL", "ReleaseDLL" }
 ```
 
 Retrieve current list of configurations
+
 ```lua
 local cfgs = configurations()
 ```
+
 [Back to top](#table-of-contents)
 
 ---
-### custombuildtask({_input_file_, _output_file_, {_dependency_,...},{_command_,...}},...)
+### custombuildtask({*input_file*, *output_file*, {*dependency*, ...}, {*command*, ...}}, ...)
 Defines custom build task for specific input file, that generates output file, there can be additional dependencies, and 
 for rule listed commands are executed.
 
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_input_file_ - source file that should be "compiled" with custom task  
-_output_file_ - generated file name  
-_dependency_ - additional dependencies, that can be used as parameters to commands  
-_command_ - command list, special functions in commands are :  
+*input_file* - source file that should be "compiled" with custom task
+*output_file* - generated file name
+*dependency* - additional dependencies, that can be used as parameters to commands
+*command* - command list, special functions in commands are :
     $(<) - input file  
     $(@) - output file  
     $(1) - $(9) - additional dependencies
@@ -384,10 +447,28 @@ custombuildtask {
 [Back to top](#table-of-contents)
 
 ---
+### debugcmd(cmd)
+Specifies a command to execute when running under the debugger instead of the build target.
+
+**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_cmd_ - the command to execute when starting with the debugger
+
+#### Examples
+
+```lua
+configuration 'TestConfig'
+    debugcmd 'D:\\Apps\\Test.exe'
+```
+
+[Back to top](#table-of-contents)
+
+---
 ### debugargs({_args_...})
 Specifies a list of arguments to pas to the application when run under the debugger.
-
-**Note:** Not implemented for Xcode 3, where it must be configured in a per-user config file.
 
 **Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
 
@@ -397,17 +478,17 @@ Specifies a list of arguments to pas to the application when run under the debug
 _args_ - list of arguments to pass to the executable while debugging
 
 #### Examples
+
 ```lua
 configuration "Debug"
     debugargs { "--append", "somefile.txt" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
 ### debugdir(_path_)
 Sets the working directory for the integrated debugger.
-
-**Note:** Not implemented for Xcode 3, where it must be configured in a per-user config file.
 
 **Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
 
@@ -417,10 +498,12 @@ Sets the working directory for the integrated debugger.
 _path_ - path to the working directory, relative to the currently-executing script file
 
 #### Examples
+
 ```lua
 configuration "Debug"
     debugdir "bin/debug"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -434,27 +517,31 @@ _symbols_ - list of symbols
 
 #### Examples
 Define two new symbols
+
 ```lua
 defines { "DEBUG", "TRACE" }
 ```
 
 Assign a symbol value
+
 ```lua
 defines { "CALLSPEC=__dllexport" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
-### dependency({_main_file_, _depending_of_}...)
-GMAKE specific adds dependency between source file and any other file.
+### dependency({*main_file*, *depending_of*} ...)
+GMAKE specific. Adds dependency between source file and any other file.
 
 **Scope:** solutions, projects, configurations
 
 #### Arguments
-_main_file_ - name of source file that depends of other file  
-_depending_of_ - name of dependency file
+*main_file* - name of source file that depends of other file
+*depending_of* - name of dependency file
 
 #### Examples
+
 ```lua
 dependency { { ROOT_DIR .. "src/test.c", ROOT_DIR .. "verion.txt" } }
 ```
@@ -487,16 +574,19 @@ _files_ - List of files to exclude. Paths should be relative to the currently-ex
 
 #### Examples
 Add all c files in a directory, then exclude a specific file
+
 ```lua
 files { "*.c" }
 excludes { "a_file.c" }
 ```
 
 Add an entire directory of C files, then exclude one directory
+
 ```lua
 files { "*.c" }
 excludes { "tests/*.c" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -512,19 +602,23 @@ _files_ - List of files to include. Paths should be relative to the currently-ex
 
 #### Examples
 Add two files to the current project
+
 ```lua
 files { "hello.cpp", "goodbye.cpp" }
 ```
 
 Add all C++ files from the "src/" directory to the project
+
 ```lua
 files { "src/*.cpp" }
 ```
 
 Add all C++ files from the "src/" directory and any subdirectories
+
 ```lua
 files { "src/**.cpp" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -542,6 +636,8 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _FatalWarnings_ - Treat warnings as errors.
 * _FloatFast_ - Enable floating point optimizations at the expense of accuracy.
 * _FloatStrict_ - Improve floating point consistency at the expense of performance.
+* _FullSymbols_ - Use together with _Symbols_ to generate full debug symbols with Visual Studio.
+* _LinkSupportCircularDependencies_ - Enables the linker to iterate over provided libs in order to resolve circular dependencies (make and ninja only).
 * _Managed_ - Enable Managed C++ (.NET).
 * _MinimumWarnings_ - - Sets compiler's minimum warning level (Visual Studio only).
 * _MFC_ - Enable support for Microsoft Foundation Classes.
@@ -555,6 +651,7 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _NoImportLib_ - Prevent the generation of an import library for a Windows DLL.
 * _NoManifest_ - Prevent the generation of a manifest for Windows executables and shared libraries.
 * _NoMultiProcessorCompilation_ - Disables Visual Studio's and FastBuild's multiprocessor compilation.
+* _NoRuntimeChecks_ - Disable Visual Studio's Basic Runtime Checks in Debug builds.
 * _EnableMinimalRebuild_ - Enable Visual Studio's minimal rebuild feature.
 * _NoPCH_ - Disable precompiled headers.
 * _NoRTTI_ - Disable C++ runtime type information.
@@ -572,6 +669,8 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _Unicode_ - Enable Unicode strings. If not specified, the default toolset behavior is used.
 * _Unsafe_ - Enable the use of unsafe code in .NET applications.
 * _UseFullPaths_ - Enable absolute paths for `__FILE__`. 
+* _UseLDResponseFile_ - Enable use of response file (aka @file) for linking lib dependencies (make only).
+* _UseObjectResponseFile_ - Enable use of response file (aka @file) for linking objects (make only).
 * _UnsignedChar_ - Force `char`s to be `unsigned` by default.
 * _WinMain_ - Use WinMain() as the entry point for Windows applications, rather than main().
 
@@ -581,6 +680,7 @@ Additional tool-specific arguments can be passed with [`buildoptions`](#buildopt
 
 #### Examples
 Enable debugging symbols in the Debug configuration and optimize the Release configuration
+
 ```lua
 configuration "Debug"
     flags { "Symbols" }
@@ -588,6 +688,7 @@ configuration "Debug"
 configuration "Release"
     flags { "OptimizeSpeed", "No64BitChecks" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -610,9 +711,11 @@ _version_ - one of the following:
 
 #### Examples
 Use the .NET 3.0 framework
+
 ```lua
 framework "3.0"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -625,6 +728,7 @@ Creates a solution folder for Visual Studio solutions.
 _name_ - the name of the solution folder
 
 #### Examples
+
 ```lua
 solution "MySolution"
     group "MyGroup1"
@@ -636,6 +740,7 @@ solution "MySolution"
         project "Project3"
         -- ...
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -670,9 +775,11 @@ Specifies the import library output directory. Import libraries are generated fo
 _path_ - the output directory for the library, relative to the currently-executing script file
 
 #### Examples
+
 ```lua
 implibdir "../Libraries"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -707,14 +814,17 @@ Specifies the import library file name prefix. Import libraries are generated fo
 _prefix_ - new file name prefix
 
 #### Examples
+
 ```lua
 implibprefix "plugin"
 ```
 
 The prefix may also be set to an empty string for no prefix
+
 ```lua
 implibprefix ""
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -727,11 +837,13 @@ Specifies the file name suffix for the import library base file name. Import lib
 _suffix_ - the new filename suffix
 
 #### Examples
+
 ```lua
 -- Add "-d" to debug versions of files
 configuration "Debug"
     implibsuffix "-d"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -745,6 +857,7 @@ _directory_ - path to the included directory, relative to the currently-executin
 Any values returned by the script are passed through to the caller
 
 #### Examples
+
 ```lua
 -- runs "src/MyApplication/premake4.lua"
 include "src/MyApplication"
@@ -752,6 +865,7 @@ include "src/MyApplication"
 -- runs "src/MyLibrary/premake4.lua"
 include "src/MyLibrary"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -765,13 +879,17 @@ _paths_ - list of include file search directories, relative to the currently-exe
 
 #### Examples
 Define two include file search paths
+
 ```lua
 includedirs { "../lua/include", "../zlib" }
 ```
+
 You can also use [wildcards](#wildcards) to match multiple directories.
+
 ```lua
 includedirs { "../includes/**" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -790,10 +908,13 @@ _kind_ - project kind identifier. One of:
 * _Bundle_ - Xcode: Cocoa Bundle, everywhere else: alias to _SharedLib_
 
 #### Examples
+
 ```lua
 kind "ConsoleApp"
 ```
+
 You can also set different kinds for each configuration. **Not supported by XCode.**
+
 ```lua
 solution "MySolution"
     configurations { "DebugLib", "ReleaseLib", "DebugDLL", "ReleaseDLL" }
@@ -805,6 +926,7 @@ project "MyProject"
     configuration "*DLL"
         kind "SharedLib"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -817,9 +939,11 @@ Sets the programming language used by a project. GENie currently supports C, C++
 _lang_ - language identifier string ("C", "C++", "C#" or "Vala"). Case insensitive.
 
 #### Examples
+
 ```lua
 language "C++"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -834,13 +958,17 @@ Multiple calls are concatenated.
 _paths_ - list of library search directories, relative to the currently-executing script file
 
 #### Examples
+
 ```lua
 libdirs { "../lua/libs", "../zlib" }
 ```
+
 You can also use [wildcards](#wildcards) to match multiple directories.
+
 ```lua
 libdirs { "../libs/**" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -854,10 +982,12 @@ _options_ - list of flags and options to pass
 
 #### Examples
 Use `pkg-config`-style configuration when building on Linux with GCC.
+
 ```lua
 configuration { "linux", "gmake" }
     linkoptions { "`wx-config --libs`"}
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -875,6 +1005,7 @@ When linking against system libraries, do not include any prefix or file extensi
 
 #### Examples
 Link against some system libraries
+
 ```lua
 configuration "windows"
     links { "user32", "gdi32" }
@@ -886,7 +1017,9 @@ configuration "macosx"
 --- OS X frameworks need the extension to be handled properly
     links { "Cocoa.framework", "png" }
 ```
+
 In a solution with two projects, link the library into the executable. Note that the project name is used to specify the link. GENie will automatically figure out the correct library file name and directory and create a project dependency.
+
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
@@ -901,7 +1034,9 @@ solution "MySolution"
         kind "SharedLib"
         files "**.cpp"
 ```
+
 You may also create links between non-library projects. In this case, GENie will generate a build dependency (the linked project will build first) but not an actual link. In this example, MyProject uses a build dependency to ensure that MyTool gets built first. It then uses MyTool as part of its build process
+
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
@@ -917,6 +1052,7 @@ solution "MySolution"
         kind "ConsoleApp"
         files "**.cpp"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -931,14 +1067,18 @@ Sets the destination directory for a generated solution or project file. By defa
 _path_ - directory into which files should be generated, relative to the currently-executing script file.
 
 #### Examples
+
 ```lua
 solution "MySolution"
     location "../build"
 ```
+
 If you plan to build with multiple tools from the same source tree, you might want to split up the project files by toolset. The _ACTION global variable contains the current toolset identifier, as specified on the command line. Note that Lua syntax requires parentheses around the function parameters in this case.
+
 ```lua
 location ("../build/" .. _ACTION)
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -951,9 +1091,11 @@ Skips certain messages in ninja and Makefile generated projects.
 _options_ - one or several of "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage"
 
 #### Examples
+
 ```lua
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -968,6 +1110,7 @@ _description_ - a table describing the new action with the following fields:
 * _execute_ - Function to be executed when the action is fired
 
 #### Examples
+
 ```lua
 newaction {
     trigger     = "install",
@@ -977,6 +1120,7 @@ newaction {
     end
 }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -994,6 +1138,7 @@ _description_ - a table describing the new option with the following fields:
 * _allowed_ - (optional) list of key-value pairs listing the allowed values for the option
 
 #### Examples
+
 ```lua
 newoption {
     trigger     = "gfxapi",
@@ -1006,6 +1151,7 @@ newoption {
     }
 }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1021,16 +1167,19 @@ _files_ - List of files to not use the precompiled header. Paths should be relat
 
 #### Examples
 Add all c files in a directory, then set a specific file to not use precompiled headers.
+
 ```lua
 files { "*.c" }
 nopch { "a_file.c" }
 ```
 
 Add an entire directory of C files, then set one directory to not use precompiled headers
+
 ```lua
 files { "*.c" }
 nopch { "tests/*.c" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1043,11 +1192,14 @@ Sets an object and intermediate file directory for a project. By default, object
 _path_ - directory where the object and intermediate files should be stored, relative to the currently-executing script file.
 
 #### Examples
+
 ```lua
 project "MyProject"
     objdir "objects"
 ```
+
 Set object directories per configuration
+
 ```lua
 configuration "Debug"
     objdir "../obj_debug"
@@ -1055,6 +1207,25 @@ configuration "Debug"
 configuration "Release"
     objdir "../obj_release"
 ```
+
+[Back to top](#table-of-contents)
+
+---
+### options({_options_...})
+Specifies build flags to modify the compiling or linking process. This differs from `flags` in
+that these are set per project rather than per configuration.
+
+**Scope:** solutions, projects
+
+#### Arguments
+_options_ - List of option names from list below. Names are case-insensitive and ignored if not supported on a platform.
+
+* _ArchiveSplit_ - Split arguments to the gmake archiver across multiple invocations, if there are too many of them.
+* _ForceCPP_ - Force compiling source as C++ despite the file extension suggesting otherwise.
+* _SkipBundling_ - Disable generating bundles for Apple platforms.
+* _XcodeLibrarySchemes_ - Generate XCode schemes for libraries too. (By default schemes are only created for runnable apps.)
+* _XcodeSchemeNoConfigs_ - Generate a single scheme per project, rather than one per project config.
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1067,10 +1238,12 @@ Sets the main header file for precompiled header support.
 _file_ - name of the header file, as it is specified in your `#include` statements
 
 #### Examples
+
 ```lua
 pchheader "afxwin.h"
 pchsource "afxwin.cpp"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1083,10 +1256,12 @@ Sets the main source file for precompiled header support. Only used by Visual St
 _file_ - name of the source file, relative to the currently-executing script file
 
 #### Examples
+
 ```lua
 pchheader "afxwin.h"
 pchsource "afxwin.cpp"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1119,12 +1294,15 @@ Current list of target platforms for the active solution
 
 #### Examples
 Generic build, as well as OS X Universal build
+
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
     platforms { "native", "universal" }
 ```
+
 Prove 32- and 64-bit specific build targets. No generic build is provided so one of these two platforms must always be used. Do this only if your software requires knowledge of the underlying architecture at build time; otherwise, include _native_ to provide a generic build.
+
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
@@ -1132,11 +1310,13 @@ solution "MySolution"
 ```
 
 You can retrieve the current list of platforms by calling the function with no parameters
+
 ```lua
 local p = platforms()
 ```
 
 Once you have defined a list of platforms, you may use those identifiers to set up configuration filters and apply platform-specific settings.
+
 ```lua
 configuration "x64"
     defines "IS_64BIT"
@@ -1145,6 +1325,7 @@ configuration "x64"
 configuration { "Debug", "x64" }
     defines "IS_64BIT_DEBUG"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1157,6 +1338,7 @@ Specifies shell commands to run after build is finished
 _commands_ - one or more shell commands
 
 #### Examples
+
 ```lua
 configuration "windows"
     postbuildcommands { "copy default.config bin\\project.config" }
@@ -1164,6 +1346,7 @@ configuration "windows"
 configuration "not windows"
     postbuildcommands { "cp default.config bin/project.config" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1177,9 +1360,11 @@ Specifies shell commands to run after compile of file is finished
 _commands_ - one or more shell commands
 
 #### Examples
+
 ```lua
     postcompiletasks { "rm $(@:%.o=%.d)" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1192,6 +1377,7 @@ Specifies shell commands to run before each build
 _commands_ - one or more shell commands
 
 #### Examples
+
 ```lua
 configuration "windows"
     prebuildcommands { "copy default.config bin\\project.config" }
@@ -1199,6 +1385,7 @@ configuration "windows"
 configuration "not windows"
     prebuildcommands { "cp default.config bin/project.config" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1211,6 +1398,7 @@ Specifies shell commands to run after source files have been compiled, but befor
 _commands_ - one or more shell commands
 
 #### Examples
+
 ```lua
 configuration "windows"
     prelinkcommands { "copy default.config bin\\project.config" }
@@ -1218,6 +1406,7 @@ configuration "windows"
 configuration "not windows"
     prelinkcommands { "cp default.config bin/project.config" }
 ```
+
 [Back to top](#table-of-contents)
 
 
@@ -1246,6 +1435,7 @@ Every project is represented in Lua as a table of key-value pairs. You should tr
 
 #### Examples
 Create a new project named "MyProject". Note that a solution must exist to contain the project. The indentation is for readability and is optional.
+
 ```lua
 solution "MySolution"
     configurations { "Debug", "Release" }
@@ -1254,17 +1444,20 @@ solution "MySolution"
 ```
 
 You can retrieve the currently active project by calling `project` with no parameters.
+
 ```lua
 local prj = project()
 ```
 
 You can retrieve the list of projects associated with a solution using the `projects` field of the solution object, which may then be iterated over.
+
 ```lua
 local prjs = solution().projects
 for i, prj in ipairs(prjs) do
     print(prj.name)
 end
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1323,6 +1516,7 @@ Specifies preprocessor symbols for the resource compiler. Multiple calls are con
 _symbols_ - list of symbols to be defined
 
 #### Examples
+
 ```lua
 resdefines { "DEBUG", "TRACE" }
 ```
@@ -1330,6 +1524,7 @@ resdefines { "DEBUG", "TRACE" }
 ```lua
 resdefines { "CALLSPEC=__dllexport" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1342,14 +1537,17 @@ Specifies the include file search paths for the resource compiler. Multiple call
 _paths_ - list of include file search directories, relative to the currently executing script file
 
 #### Examples
+
 ```lua
 resincludedirs { "../lua/include", "../zlib" }
 ```
 
 May use wildcards
+
 ```lua
 resincludedirs { "../includes/**" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1362,10 +1560,12 @@ Passes arguments directly to the resource compiler. Multiple calls are concatena
 _options_ - list of resource compiler flags and options
 
 #### Examples
+
 ```lua
 configuration { "linux", "gmake" }
     resoptions { "`wx-config --cxxflags`", "-ansi", "-pedantic" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1391,21 +1591,25 @@ Represented as a Lua table key-value pairs, containing the following values. You
 * _projects_       - list of projects contained by the solution
 
 #### Examples
+
 ```lua
 solution "MySolution"
 ```
 
 You can retrieve the currently active solution object by calling `solution` with no parameters.
+
 ```lua
 local sln = solution()
 ```
 
 You can use the global variable `_SOLUTIONS` to list out all of the currently defined solutions.
+
 ```lua
 for i, sln in ipairs(_SOLUTIONS) do
     print(sln.name)
 end
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1418,6 +1622,7 @@ Sets the start (default) project for the solution. Works for VS, QBS and Xcode.
 _name_ - name of the project to set as the start project.
 
 ### Examples
+
 ```lua
 solution "MySolution"
     startproject "MyProjectFoo"
@@ -1429,6 +1634,36 @@ project "MyProjectFoo"
 project "MyProjectBar"
 -- [...]
 ```
+
+[Back to top](#table-of-contents)
+
+---
+### systemincludedirs({_paths_...})
+Specifies the system include file search paths. Multiple calls are concatenated.
+
+For clang/gcc, it maps to setting the include directory using the `-isystem` option.
+
+On the other build systems, it behaves like [includedirs](#includedirspaths),
+but is always searched after directories specified using includedirs.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_paths_ - list of system include file search directories, relative to the currently-executing script file.
+
+#### Examples
+Define two include file search paths
+
+```lua
+systemincludedirs { "../lua/include", "../zlib" }
+```
+
+You can also use [wildcards](#wildcards) to match multiple directories.
+
+```lua
+systemincludedirs { "../includes/**" }
+```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1441,6 +1676,7 @@ Sets the destination directory for the compiled binary target. By default, gener
 _path_ - file system path to the directory where the compiled target file should be stored, relative to the currently executing script file.
 
 #### Examples
+
 ```lua
 project "MyProject"
 
@@ -1450,6 +1686,7 @@ project "MyProject"
     configuration "Release"
         targetdir "bin/release"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1462,9 +1699,11 @@ Specifies the file extension for the compiled binary target. By default, the pro
 _ext_ - new file extension, including leading dot
 
 #### Examples
+
 ```lua
 targetextension ".zmf"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1477,9 +1716,11 @@ Specifies the base file name for the compiled binary target. By default, the pro
 _name_ - new base file name
 
 #### Examples
+
 ```lua
 targetname "mytarget"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1492,14 +1733,17 @@ Specifies the file name prefix for the compiled binary target. By default, syste
 _prefix_ - new file name prefix
 
 #### Examples
+
 ```lua
 targetprefix "plugin"
 ```
 
 The prefix may also be set to an empty string for no prefix
+
 ```lua
 targetprefix ""
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1523,11 +1767,13 @@ Specifies a file name suffix for the compiled binary target.
 _suffix_ - new filename suffix
 
 #### Examples
+
 ```lua
 --- Add "-d" to debug versions of files
 configuration "Debug"
     targetsuffix "-d"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1543,9 +1789,11 @@ _projectuuid_ - UUID for the current project
 Current project UUID or `nil` if no UUID has been set
 
 #### Examples
+
 ```lua
 uuid "XXXXXXXX-XXXX-XXXX-XXXXXXXXXXXX"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1565,11 +1813,13 @@ _pattern_ - file system pattern for matching file names
 #### Examples
 
 Place all header files into a virtual path called "Headers". Any directory information is removed, "src/lua/lua.h" will appear in the IDE as "Headers/lua.h"
+
 ```lua
 vpaths { ["Headers"] = "**.h" }
 ```
 
 You may specify multiple file patterns using table syntax
+
 ```lua
 vpaths {
     ["Headers"] = { "**.h", "**.hxx", "**.hpp" }
@@ -1577,21 +1827,25 @@ vpaths {
 ```
 
 It is also possible to include the file's path in the virtual group. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/src/lua/lua.h".
+
 ```lua
 vpaths { ["Headers/*"] = "**.h" }
 ```
 
 Any directory information explicitly provided in the pattern will be removed from the replacement. Using this rule, "src/lua/lua.h" will appear in the IDE as "Headers/lua/lua.h".
+
 ```lua
 vpaths { ["Headers/*"] = "src/**.h" }
 ```
 
 You can also use virtual paths to remove extra directories from the IDE. Using this rule, "src/lua/lua.h" will appear in the IDE as "lua/lua.h".
+
 ```lua
 vpaths { ["*"] = "src" }
 ```
 
 You may specify more than one rule at a time
+
 ```lua
 vpaths {
     ["Headers"]   = "**.h",
@@ -1599,7 +1853,185 @@ vpaths {
     ["Docs"]      = "**.txt"
 }
 ```
+
 [Back to top](#table-of-contents)
+
+---
+### xcodeprojectopts({[_key_] = _value_, ...})
+#### XCode only
+Sets XCode project options in the generated project files. [List of options.](https://gist.github.com/tkersey/39b4fe69e14b859889ffadccb009e397)
+
+#### Arguments
+_key_ - Name of the option to set
+_value_ - Value to set it to
+
+#### Examples
+
+```lua
+xcodeprojectopts {
+    ENABLE_BITCODE = "NO",
+    GCC_ENABLE_TRIGRAPHS = "YES",
+}
+```
+
+[Back to top](#table-of-contents)
+
+---
+### xcodetargetopts({[_key_] = _value_, ...})
+#### XCode only
+Sets XCode target options in the generated project files. [List of options.](https://gist.github.com/tkersey/39b4fe69e14b859889ffadccb009e397)
+
+#### Arguments
+_key_ - Name of the option to set
+_value_ - Value to set it to
+
+#### Examples
+
+```lua
+xcodetargetopts {
+    ALWAYS_SEARCH_USER_PATHS = "YES",
+}
+```
+
+[Back to top](#table-of-contents)
+
+---
+### xcodescriptphases({{_cmd_, {_inputpaths_, ...}}})
+#### XCode only
+Adds a script phase to the generated XCode project file.
+One tag can contain several commands with different inputpaths.
+
+#### Arguments
+_cmd_ - The actual command to run. (This can be a shell script file or direct shell code).
+_inputpaths_ - The paths passed to the command
+
+#### Examples
+_Building shader files_
+
+```lua
+xcodescriptphases {
+    {"shaderc_xcode.sh", {
+        os.matchfiles("**.shader")}
+    },
+}
+```
+
+_Copying, trimming and signing frameworks by relying on [carthage](https://github.com/Carthage/Carthage)_
+
+```lua
+xcodescriptphases {
+    {"carthage copy-frameworks", {
+        os.matchdirs("**.frameworks")}
+    },
+}
+```
+
+#### Caveats
+- Script phases are added in their order of declaration inside the project,
+  and in their order of declaration inside the tag.
+- The input paths are used as passed to the tag.
+  If relative paths are required, you have to rebase them beforehand using `path.getrelative()`.
+- For commands/scripts: You can iterate over the input paths using the following XCode variables:
+  `${SCRIPT_INPUT_FILE_COUNT}`: The number of input paths provided to the script
+  `${SCRIPT_INPUT_FILE_0}` ...: The input paths at index 0 and so on.
+  **NOTE**: You can construct the indexed variable as in the example below:
+```bash
+for (( i = 0; i < ${SCRIPT_INPUT_FILE_COUNT}; ++i )); do
+    varname=SCRIPT_INPUT_FILE_$i
+    echo ${!varname}
+done
+```
+
+[Back to top](#table-of-contents)
+
+---
+### xcodecopyresources({{_targetpath_, {_inputfiles_, ...}}})
+#### XCode only
+Adds a 'Copy Files' phase to the generated XCode project file.
+One tag can contain several target paths with different input files.
+
+#### Arguments
+_targetpath_ - The target path relative to the _Resource_ folder in the resulting `.app` structure.
+_inputfiles_ - The input files to be copied.
+
+#### Examples
+
+```lua
+xcodecopyresources {
+    { ".", {
+        "GameResources", -- a folder
+    }},
+    { "shaders", {
+         os.matchfiles("**.shader"), -- sparse files
+    }},
+}
+```
+
+#### Caveats
+- The target path is only handled as relative to the _Resource_ folder. No other folder can be indicated at the moment.
+  If you need support for other targets, please file an issue on Github.
+- `xcodecopyresources` can only be set _per project_, not _per configuration_.
+
+
+[Back to top](#table-of-contents)
+
+---
+### xcodecopyframeworks({_inputframeworks_, ...})
+#### XCode only
+Adds a 'Copy Files' phase to the generated XCode project file that will copy and sign the provided frameworks.
+
+#### Arguments
+_inputframeworks_ - A list of frameworks to be copied to the `.app` structure, with the `SignOnCopy` flag set.
+
+#### Examples
+
+```lua
+links { -- frameworks have to be linked with the .app first
+    "GTLR.framework",
+    "BGFX.framework",
+}
+xcodecopyframeworks {
+    "GTLR.framework",
+    "BGFX.framework",
+}
+```
+
+#### Caveats
+- Frameworks must be known to the project to be copyable: set the link dependency accordingly using `links {}`.
+- `xcodecopyframeworks` can only be set _per project_, not _per configuration_.
+
+[Back to top](#table-of-contents)
+
+---
+
+---
+### wholearchive({_references_...})
+Specifies a list of libraries to link without stripping unreferenced object files. The libraries must have already been added using `links`, and the same identifier must be specified.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_references_ - list of library and project names
+
+#### Examples
+
+```lua
+project "static_lib"
+    kind "StaticLib"
+
+project "console_app"
+    kind "ConsoleApp"
+    links { "static_lib" }
+    wholearchive { "static_lib" }
+```
+
+#### References
+* [Clang documentation](https://clang.llvm.org/docs/ClangCommandLineReference.html#cmdoption-clang2-force-load)
+* [GNU documentation](https://ftp.gnu.org/old-gnu/Manuals/ld-2.9.1/html_node/ld_3.html#IDX183)
+* [Microsoft documentation](https://docs.microsoft.com/en-us/cpp/build/reference/wholearchive-include-all-library-object-files?view=vs-2017)
+
+[Back to top](#table-of-contents)
+
 
 ---
 ## Utility functions
@@ -1613,14 +2045,17 @@ _trueval_ - value to return if _condition_ evaluates to `true`
 _falseval_ - value to return if _condition_ evaluates to `false`
 
 #### Examples
+
 ```lua
 result = iif(os.is("windows"), "is windows", "is not windows")
 ```
 
 Note that all expressions are evaluated before the condition is checked. The following expression cannot be implemented with an `iif` because it may try to concatenate a string value.
+
 ```lua
 result = iif(x -= nil, "x is " .. x, "x is nil")
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1670,11 +2105,13 @@ One of "bsd", "linux", "macosx", "solaris", or "windows"
 **Note:** This function returns the OS being targeted, which is not necessarily the same as the OS on which GENie is being run.
 
 #### Example
+
 ```lua
 if os.get() == "windows" then
     -- do something windows-specific
 end
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1702,7 +2139,9 @@ Table containing the following key-value pairs:
 | revision     | bug fix release or service pack number       |
 | description  | human-readable description of the OS version |
 
+
 #### Examples
+
 ```lua
 local ver = os.getversion()
 print(string.format(" %d.%d.%d (%s)",
@@ -1712,6 +2151,7 @@ print(string.format(" %d.%d.%d (%s)",
 -- On Windows XP: "5.1.3 (Windows XP)"
 -- On OSX: "10.6.6 (Mac OS X Snow Leopard)"
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1737,6 +2177,7 @@ Determines if the host is using a 64-bit processor.
 `false` otherwise
 
 #### Examples
+
 ```lua
 if os.is64bit() then
     print("This is a 64-bit system")
@@ -1744,6 +2185,7 @@ else
     print("This is NOT a 64-bit system")
 end
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1783,11 +2225,13 @@ _pattern_ - file system path to search. May [wildcard](#wildcard) patterns.
 List of directories which match the specified pattern. May be empty.
 
 #### Examples
+
 ```lua
 matches = os.matchdirs("src/*")     -- non-recursive match
 matches = os.matchdirs("src/**")    -- recursive match
 matches = os.matchdirs("src/test*") -- may also match partial name
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1801,10 +2245,12 @@ _pattern_ - file system path to search. May contain [wildcard](#wildcard) patter
 List of files which match the specified pattern. May be empty.
 
 #### Examples
+
 ```lua
 matches = os.matchfiles("src/*.c")  -- non-recursive match
 matches = os.matchfiles("src/**.c") -- recursive match
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1831,10 +2277,12 @@ _command_ - shell command to run
 The output of the command
 
 #### Examples
+
 ```lua
 -- Get the ID for the host processor architecture
 local proc = os.outputof("uname -p")
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1852,9 +2300,11 @@ Path to the directory which contains the file, if found
 `nil` otherwise
 
 #### Examples
+
 ```lua
 local p = os.pathsearch("mysystem.config", "./config:/usr/local/etc:/etc")
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -1904,13 +2354,17 @@ _paths_ - list of user include file search directories, relative to the currentl
 
 #### Examples
 Define two include file search paths
+
 ```lua
 userincludedirs { "../lua/include", "../zlib" }
 ```
+
 You can also use [wildcards](#wildcards) to match multiple directories.
+
 ```lua
 userincludedirs { "../includes/**" }
 ```
+
 [Back to top](#table-of-contents)
 
 ---
@@ -2076,6 +2530,7 @@ _trailing_ - ending portion of the path
 Merged path
 
 #### Examples
+
 ```lua
 -- returns "MySolution/MyProject"
 p = path.join("MySolution", "MyProject")
@@ -2086,6 +2541,7 @@ p = path.join("MySolution", "/usr/bin")
 -- tokens are assumed to be absolute. This returns `${ProjectDir}`
 p = path.join("MySolution", "$(ProjectDir)")
 ```
+
 [Back to top](#table-of-contents)
 
 ---

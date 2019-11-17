@@ -71,7 +71,7 @@ void amico2k_state::amico2k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x03ff).ram();
-//  AM_RANGE(0x0400, 0x07ff) AM_RAM // optional expansion RAM
+//  map(0x0400, 0x07ff).ram(); // optional expansion RAM
 	map(0xfb00, 0xfcff).rom();
 	map(0xfd00, 0xfd03).rw("i8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xfe00, 0xffff).rom();

@@ -280,7 +280,7 @@ void exctsccr_state::exctsccr_sound_map(address_map &map)
 	map(0xc009, 0xc009).w("dac2", FUNC(dac_byte_interface::data_w));
 	map(0xc00c, 0xc00c).w("soundlatch", FUNC(generic_latch_8_device::clear_w));
 	map(0xc00d, 0xc00d).r("soundlatch", FUNC(generic_latch_8_device::read));
-//  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ?
+//  map(0xc00f, 0xc00f).nopw(); // ?
 }
 
 void exctsccr_state::exctsccr_sound_io_map(address_map &map)

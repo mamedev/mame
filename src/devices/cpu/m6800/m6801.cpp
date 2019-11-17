@@ -10,8 +10,10 @@
 #define LOG_RX      (1U << 3)
 #define LOG_RXTICK  (1U << 4)
 #define LOG_PORT    (1U << 5)
+#define LOG_SER     (1U << 6)
 
-//#define VERBOSE (LOG_GENERAL | LOG_TX | LOG_RX | LOG_PORT)
+//#define VERBOSE (LOG_SER)
+//#define LOG_OUTPUT_STREAM std::cout
 //#define LOG_OUTPUT_STREAM std::cerr
 #include "logmacro.h"
 
@@ -20,6 +22,7 @@
 #define LOGRX(...)      LOGMASKED(LOG_RX, __VA_ARGS__)
 #define LOGRXTICK(...)  LOGMASKED(LOG_RXTICK, __VA_ARGS__)
 #define LOGPORT(...)    LOGMASKED(LOG_PORT, __VA_ARGS__)
+#define LOGSER(...)     LOGMASKED(LOG_SER, __VA_ARGS__)
 
 
 #define CT      m_counter.w.l
@@ -262,8 +265,8 @@ void m6801_cpu_device::m6803_mem(address_map &map)
 }
 
 
-DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola M6801")
-DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola M6803")
+DEFINE_DEVICE_TYPE(M6801, m6801_cpu_device, "m6801", "Motorola MC6801")
+DEFINE_DEVICE_TYPE(M6803, m6803_cpu_device, "m6803", "Motorola MC6803")
 DEFINE_DEVICE_TYPE(HD6301, hd6301_cpu_device, "hd6301", "Hitachi HD6301")
 DEFINE_DEVICE_TYPE(HD63701, hd63701_cpu_device, "hd63701", "Hitachi HD63701")
 DEFINE_DEVICE_TYPE(HD6303R, hd6303r_cpu_device, "hd6303r", "Hitachi HD6303R")
@@ -413,11 +416,13 @@ void m6801_cpu_device::set_rmcr(uint8_t data)
 	switch ((m_rmcr & M6801_RMCR_CC_MASK) >> 2)
 	{
 	case 0:
+		LOGSER("6801: Using external serial clock: false\n");
 		m_sci_timer->enable(false);
 		m_use_ext_serclock = false;
 		break;
 
 	case 3: // external clock
+		LOGSER("6801: Using external serial clock: true\n");
 		m_use_ext_serclock = true;
 		m_sci_timer->enable(false);
 		break;
@@ -427,7 +432,7 @@ void m6801_cpu_device::set_rmcr(uint8_t data)
 		{
 			int divisor = M6801_RMCR_SS[m_rmcr & M6801_RMCR_SS_MASK];
 			attotime period = cycles_to_attotime(divisor);
-
+			LOGSER("6801: Setting serial rate, Divisor: %d Hz: %d\n", divisor, period.as_hz());
 			m_sci_timer->adjust(period, 0, period);
 			m_use_ext_serclock = false;
 		}
@@ -442,10 +447,12 @@ int m6801_cpu_device::m6800_rx()
 
 void m6801_cpu_device::serial_transmit()
 {
-	LOGTXTICK("Tx Tick\n");
+	LOGTXTICK("6801 Tx Tick presenting: %d\n", m_tx);
 
 	if (m_trcsr & M6801_TRCSR_TE)
 	{
+		int old_m_tx = m_tx; // Detect line change
+
 		// force Port 2 bit 4 as output
 		m_port_ddr[1] |= M6801_PORT2_IO4;
 
@@ -486,7 +493,7 @@ void m6801_cpu_device::serial_transmit()
 
 					m_txbits++;
 
-					LOGTX("Transmit START Data %02x\n", m_tsr);
+					LOGTX("6801 Transmit START Data %02x\n", m_tsr);
 				}
 				break;
 
@@ -498,7 +505,7 @@ void m6801_cpu_device::serial_transmit()
 
 				m_txbits = M6801_SERIAL_START;
 
-				LOGTX("Transmit STOP\n");
+				LOGTX("6801 Transmit STOP\n");
 				break;
 
 			default:
@@ -508,7 +515,7 @@ void m6801_cpu_device::serial_transmit()
 				// shift transmit register
 				m_tsr >>= 1;
 
-				LOGTX("Transmit Bit %u: %u\n", m_txbits, m_tx);
+				LOGTX("6801 Tx Present Bit %u: %u\n", m_txbits, m_tx);
 
 				m_txbits++;
 				break;
@@ -516,7 +523,10 @@ void m6801_cpu_device::serial_transmit()
 			break;
 		}
 
-		m_out_sertx_func((m_tx == 1) ? ASSERT_LINE : CLEAR_LINE);
+		if (old_m_tx != m_tx) // call callback only if line has changed
+		{
+			m_out_sertx_func((m_tx == 1) ? ASSERT_LINE : CLEAR_LINE);
+		}
 		m_port2_written = 1;
 		write_port2();
 	}
@@ -524,7 +534,7 @@ void m6801_cpu_device::serial_transmit()
 
 void m6801_cpu_device::serial_receive()
 {
-	LOGRXTICK("Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
+	LOGRXTICK("6801 Rx Tick TRCSR %02x bits %u check %02x\n", m_trcsr, m_rxbits, m_trcsr & M6801_TRCSR_RE);
 
 	if (m_trcsr & M6801_TRCSR_RE)
 	{
@@ -535,11 +545,11 @@ void m6801_cpu_device::serial_receive()
 			{
 				m_rxbits++;
 
-				LOGRX("Received WAKE UP bit %u\n", m_rxbits);
+				LOGRX("6801 Received WAKE UP bit %u\n", m_rxbits);
 
 				if (m_rxbits == 10)
 				{
-					LOGRX("Receiver Wake Up\n");
+					LOGRX("6801 Receiver Wake Up\n");
 
 					m_trcsr &= ~M6801_TRCSR_WU;
 					m_rxbits = M6801_SERIAL_START;
@@ -547,7 +557,7 @@ void m6801_cpu_device::serial_receive()
 			}
 			else
 			{
-				LOGRX("Receiver Wake Up interrupted\n");
+				LOGRX("6801 Receiver Wake Up interrupted\n");
 
 				m_rxbits = M6801_SERIAL_START;
 			}
@@ -563,21 +573,21 @@ void m6801_cpu_device::serial_receive()
 					// start bit found
 					m_rxbits++;
 
-					LOGRX("Received START bit\n");
+					LOGRX("6801 Received START bit\n");
 				}
 				break;
 
 			case M6801_SERIAL_STOP:
 				if (m6800_rx() == 1)
 				{
-					LOGRX("Received STOP bit\n");
+					LOGRX("6801 Received STOP bit\n");
 
 					if (m_trcsr & M6801_TRCSR_RDRF)
 					{
 						// overrun error
 						m_trcsr |= M6801_TRCSR_ORFE;
 
-						LOGRX("Receive Overrun Error\n");
+						LOGRX("6801 Receive Overrun Error\n");
 
 						CHECK_IRQ_LINES();
 					}
@@ -588,7 +598,7 @@ void m6801_cpu_device::serial_receive()
 							// transfer data into receive register
 							m_rdr = m_rsr;
 
-							LOGRX("Receive Data Register: %02x\n", m_rdr);
+							LOGRX("6801 Receive Data Register: %02x\n", m_rdr);
 
 							// set RDRF flag
 							m_trcsr |= M6801_TRCSR_RDRF;
@@ -609,7 +619,7 @@ void m6801_cpu_device::serial_receive()
 					m_trcsr |= M6801_TRCSR_ORFE;
 					m_trcsr &= ~M6801_TRCSR_RDRF;
 
-					LOGRX("Receive Framing Error\n");
+					LOGRX("6801 Receive Framing Error\n");
 
 					CHECK_IRQ_LINES();
 				}
@@ -624,7 +634,7 @@ void m6801_cpu_device::serial_receive()
 				// receive bit into register
 				m_rsr |= (m6800_rx() << 7);
 
-				LOGRX("Received DATA bit %u: %u\n", m_rxbits, BIT(m_rsr, 7));
+				LOGRX("6801 RX sampled DATA bit %u: %u\n", m_rxbits, BIT(m_rsr, 7));
 
 				m_rxbits++;
 				break;
@@ -1192,13 +1202,13 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_RMCR:
-		LOG("Rate and Mode Control Register: %02x\n", data);
+		LOGSER("Rate and Mode Control Register: %02x\n", data);
 
 		set_rmcr(data);
 		break;
 
 	case IO_TRCSR:
-		LOG("Transmit/Receive Control and Status Register: %02x\n", data);
+		LOGSER("Transmit/Receive Control and Status Register: %02x\n", data);
 
 		if ((data & M6801_TRCSR_TE) && !(m_trcsr & M6801_TRCSR_TE))
 		{
@@ -1216,7 +1226,7 @@ WRITE8_MEMBER( m6801_cpu_device::m6801_io_w )
 		break;
 
 	case IO_TDR:
-		LOGTX("Transmit Data Register: %02x\n", data);
+		LOGSER("6801 Transmit Data Register: $%02x/%d\n", data, data);
 
 		if (m_trcsr_read_tdre)
 		{

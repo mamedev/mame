@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -29,6 +29,23 @@ namespace bx
 	inline float fromSnorm(int32_t _value, float _scale)
 	{
 		return max(-1.0f, float(_value) / _scale);
+	}
+
+	// A8
+	inline void packA8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(toUnorm(_src[3], 255.0f) );
+	}
+
+	inline void unpackA8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		const float aa = fromUnorm(src[0], 255.0f);
+		_dst[0] = aa;
+		_dst[1] = aa;
+		_dst[2] = aa;
+		_dst[3] = aa;
 	}
 
 	// R8

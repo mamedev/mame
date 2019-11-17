@@ -184,7 +184,7 @@ void dblewing_state::dblewing_map(address_map &map)
 	map(0x104000, 0x104fff).ram().share("pf1_rowscroll");
 	map(0x106000, 0x106fff).ram().share("pf2_rowscroll");
 
-//  AM_RANGE(0x280000, 0x2807ff) AM_DEVREADWRITE("ioprot104", deco104_device, dblewing_prot_r, dblewing_prot_w) AM_SHARE("prot16ram")
+//  map(0x280000, 0x2807ff).rw("ioprot104", FUNC(deco104_device::dblewing_prot_r), FUNC(deco104_device::dblewing_prot_w)).share("prot16ram");
 	map(0x280000, 0x283fff).rw(FUNC(dblewing_state::wf_protection_region_0_104_r), FUNC(dblewing_state::wf_protection_region_0_104_w)).share("prot16ram"); /* Protection device */
 
 

@@ -469,7 +469,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( i8275_device::read )
+uint8_t i8275_device::read(offs_t offset)
 {
 	if (offset & 0x01)
 	{
@@ -510,7 +510,7 @@ READ8_MEMBER( i8275_device::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8275_device::write )
+void i8275_device::write(offs_t offset, uint8_t data)
 {
 	if (offset & 0x01)
 	{
@@ -624,9 +624,9 @@ WRITE8_MEMBER( i8275_device::write )
 //  dack_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( i8275_device::dack_w )
+void i8275_device::dack_w(uint8_t data)
 {
-	//LOG("I8275 y %u x %u DACK %04x:%02x %u (%u)\n", screen().vpos(), screen().hpos(), offset, data, m_buffer_idx, m_dma_idx);
+	//LOG("I8275 y %u x %u DACK %02x %u (%u)\n", screen().vpos(), screen().hpos(), data, m_buffer_idx, m_dma_idx);
 
 	m_write_drq(0);
 

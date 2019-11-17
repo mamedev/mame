@@ -77,8 +77,8 @@ void ht68k_state::ht68k_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000000, 0x0007ffff).ram().share("p_ram"); // 512 KB RAM / ROM at boot
-	//AM_RANGE(0x00080000, 0x000fffff) // Expansion
-	//AM_RANGE(0x00d80000, 0x00d8ffff) // Printer
+	//map(0x00080000, 0x000fffff) // Expansion
+	//map(0x00d80000, 0x00d8ffff) // Printer
 	map(0x00e00000, 0x00e00007).mirror(0xfff8).rw(m_fdc, FUNC(wd1770_device::read), FUNC(wd1770_device::write)).umask16(0x00ff); // FDC WD1770
 	map(0x00e80000, 0x00e800ff).mirror(0xff00).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x00f00000, 0x00f07fff).rom().mirror(0xf8000).region("user1", 0);

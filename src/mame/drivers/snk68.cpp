@@ -78,7 +78,7 @@ void snk68_state::pow_map(address_map &map)
 //  map(0x0f0008, 0x0f0009).nopw();    /* ?? */
 	map(0x100000, 0x100fff).rw(FUNC(snk68_state::fg_videoram_r), FUNC(snk68_state::fg_videoram_w)).mirror(0x1000).share("fg_videoram");   // 8-bit
 	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
-	map(0x400000, 0x400fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 }
 
 /*******************************************************************************/
@@ -129,7 +129,7 @@ void searchar_state::searchar_map(address_map &map)
 	map(0x100000, 0x107fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
 	map(0x200000, 0x200fff).ram().w(FUNC(searchar_state::fg_videoram_w)).mirror(0x1000).share("fg_videoram"); /* Mirror is used by Ikari 3 */
 	map(0x300000, 0x33ffff).rom().region("maincpu", 0x40000); /* Extra code bank */
-	map(0x400000, 0x400fff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x400000, 0x400fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 }
 
 /******************************************************************************/
@@ -592,14 +592,18 @@ void snk68_state::pow(machine_config &config)
 	// rate on a SAR board is 59.16Hz.
 	m_screen->set_raw(XTAL(24'000'000)/4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(snk68_state::screen_update));
-	m_screen->set_palette("palette");
+	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, "palette", gfx_pow);
-	PALETTE(config, "palette").set_format(2, &raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder, 0x800);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pow);
+
+	ALPHA68K_PALETTE(config, m_palette, 0);
+	m_palette->set_entries(2048);
 
 	SNK68_SPR(config, m_sprites, 0);
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
 	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow), this);
+	m_sprites->set_xpos_shift(12);
+	m_sprites->set_color_entry_mask(0x7f);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

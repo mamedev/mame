@@ -16,8 +16,7 @@
 #define xstr(s) # s
 
 #define NETLIB_DEVICE_DECL(chip) extern factory::constructor_ptr_t decl_ ## chip
-
-#define LIB_DECL(nic, decl) factory.register_device( decl ( pstring(xstr(nic))) );
+#define LIB_DECL(nic, decl) factory.register_device( decl ( xstr(nic)) );
 #define LIB_ENTRY(nic) { NETLIB_DEVICE_DECL(nic); LIB_DECL(NETLIB_NAME(nic), decl_ ## nic) }
 
 namespace netlist
@@ -67,7 +66,7 @@ namespace devices
 		LIB_ENTRY(2102A_dip)
 		LIB_ENTRY(2716)
 		LIB_ENTRY(2716_dip)
-#if !(USE_TRUTHTABLE_7448)
+#if !(NL_USE_TRUTHTABLE_7448)
 		LIB_ENTRY(7448)
 		LIB_ENTRY(7448_dip)
 #endif
@@ -93,7 +92,7 @@ namespace devices
 		LIB_ENTRY(7493_dip)
 		LIB_ENTRY(7497)
 		LIB_ENTRY(7497_dip)
-#if (!USE_TRUTHTABLE_74107)
+#if (!NL_USE_TRUTHTABLE_74107)
 		LIB_ENTRY(74107)
 		LIB_ENTRY(74107_dip)
 #endif

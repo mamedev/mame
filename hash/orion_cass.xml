@@ -8,7 +8,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="15464">
-				<rom name="21$.rko" size="15464" crc="bf670dbf" sha1="32e0eab8d830f5b9b419c0323333030ef5de5ca5" offset="0" />
+				<rom name="21$.rko" size="15464" crc="bf670dbf" sha1="32e0eab8d830f5b9b419c0323333030ef5de5ca5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -19,7 +19,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="32872">
-				<rom name="adventr$.rko" size="32872" crc="bd9e4871" sha1="03f49725523bb52200e7b6d71cdec44666ecb8e8" offset="0" />
+				<rom name="adventr$.rko" size="32872" crc="bd9e4871" sha1="03f49725523bb52200e7b6d71cdec44666ecb8e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -30,7 +30,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="10083">
-				<rom name="airfght$.rko" size="10083" crc="415a4002" sha1="616e912cb39b050b4bfa95fab4a6df98c98855be" offset="0" />
+				<rom name="airfght$.rko" size="10083" crc="415a4002" sha1="616e912cb39b050b4bfa95fab4a6df98c98855be"/>
 			</dataarea>
 		</part>
 	</software>
@@ -41,7 +41,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="23251">
-				<rom name="almaz$.rko" size="23251" crc="76562a35" sha1="15dd352a4086c3b8cb03d370f54949c3da7ecce9" offset="0" />
+				<rom name="almaz$.rko" size="23251" crc="76562a35" sha1="15dd352a4086c3b8cb03d370f54949c3da7ecce9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -52,7 +52,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="22627">
-				<rom name="almaz2$.rko" size="22627" crc="a7d108f0" sha1="e16caad145b31491839a0a748ed1596241210ad2" offset="0" />
+				<rom name="almaz2$.rko" size="22627" crc="a7d108f0" sha1="e16caad145b31491839a0a748ed1596241210ad2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -63,7 +63,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="10707">
-				<rom name="almazh$.rko" size="10707" crc="c1aa6568" sha1="0c6ebcbd30ea8e6d14f0b9c8a3093fb31550dee4" offset="0" />
+				<rom name="almazh$.rko" size="10707" crc="c1aa6568" sha1="0c6ebcbd30ea8e6d14f0b9c8a3093fb31550dee4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -74,7 +74,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4899">
-				<rom name="bomber$.rko" size="4899" crc="7fa2b2fc" sha1="ba832dff2b6bd5e557afffcf43f5f100f01cae5f" offset="0" />
+				<rom name="bomber$.rko" size="4899" crc="7fa2b2fc" sha1="ba832dff2b6bd5e557afffcf43f5f100f01cae5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -85,7 +85,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="15443">
-				<rom name="boulder$.rko" size="15443" crc="9c7790e8" sha1="306c404a944076b9638e4a659de7f26f8cf31f6d" offset="0" />
+				<rom name="boulder$.rko" size="15443" crc="9c7790e8" sha1="306c404a944076b9638e4a659de7f26f8cf31f6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -96,7 +96,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="5907">
-				<rom name="buran$.rko" size="5907" crc="161dcf1d" sha1="514f1870147a7bcf3d04fc50a3045ffec857d28a" offset="0" />
+				<rom name="buran$.rko" size="5907" crc="161dcf1d" sha1="514f1870147a7bcf3d04fc50a3045ffec857d28a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -107,7 +107,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="17539">
-				<rom name="cave$.rko" size="17539" crc="0949fc15" sha1="d92180a479d891f4c5f87bcc0eaca3a53218e505" offset="0" />
+				<rom name="cave$.rko" size="17539" crc="0949fc15" sha1="d92180a479d891f4c5f87bcc0eaca3a53218e505"/>
 			</dataarea>
 		</part>
 	</software>
@@ -118,7 +118,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="8371">
-				<rom name="chess$.rko" size="8371" crc="7ce3e18c" sha1="687407e5e6cdb91beb47f172b63496548913fc17" offset="0" />
+				<rom name="chess$.rko" size="8371" crc="7ce3e18c" sha1="687407e5e6cdb91beb47f172b63496548913fc17"/>
 			</dataarea>
 		</part>
 	</software>
@@ -129,7 +129,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="9299">
-				<rom name="chess2$.rko" size="9299" crc="308f3ead" sha1="e135b21e02d51599a5c76767a2b151ea65ed42e6" offset="0" />
+				<rom name="chess2$.rko" size="9299" crc="308f3ead" sha1="e135b21e02d51599a5c76767a2b151ea65ed42e6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -140,7 +140,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="28696">
-				<rom name="chess3$.rko" size="28696" crc="8a67b3c2" sha1="32517aab85e0492f44caec60132d54162a24b9d9" offset="0" />
+				<rom name="chess3$.rko" size="28696" crc="8a67b3c2" sha1="32517aab85e0492f44caec60132d54162a24b9d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -151,7 +151,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="29075">
-				<rom name="chess4$.rko" size="29075" crc="3f4bf881" sha1="26953f0f0cf6c351917df1d9a18fe14ac946df31" offset="0" />
+				<rom name="chess4$.rko" size="29075" crc="3f4bf881" sha1="26953f0f0cf6c351917df1d9a18fe14ac946df31"/>
 			</dataarea>
 		</part>
 	</software>
@@ -162,7 +162,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="2440">
-				<rom name="copter$.rko" size="2440" crc="a2c7e905" sha1="6d4667aee3447062aa692a0516ee476cb75060ff" offset="0" />
+				<rom name="copter$.rko" size="2440" crc="a2c7e905" sha1="6d4667aee3447062aa692a0516ee476cb75060ff"/>
 			</dataarea>
 		</part>
 	</software>
@@ -173,7 +173,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="11336">
-				<rom name="digger$.rko" size="11336" crc="a1d36188" sha1="f843955e79c7f9bdcfaf39fbd76c98118fef288c" offset="0" />
+				<rom name="digger$.rko" size="11336" crc="a1d36188" sha1="f843955e79c7f9bdcfaf39fbd76c98118fef288c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -184,7 +184,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="21859">
-				<rom name="dinamit$.rko" size="21859" crc="ab333404" sha1="e96e4c5821dd022a955cb09ab7e699d2ace11384" offset="0" />
+				<rom name="dinamit$.rko" size="21859" crc="ab333404" sha1="e96e4c5821dd022a955cb09ab7e699d2ace11384"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,7 +195,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="19800">
-				<rom name="dolt$.rko" size="19800" crc="30fc05d8" sha1="b181421b9d986095318f36dfcd5bbd64b6874cb0" offset="0" />
+				<rom name="dolt$.rko" size="19800" crc="30fc05d8" sha1="b181421b9d986095318f36dfcd5bbd64b6874cb0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -206,7 +206,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="32867">
-				<rom name="downear$.rko" size="32867" crc="88f1a0c2" sha1="634bda446e9e85ed524259dc839a644ae491c308" offset="0" />
+				<rom name="downear$.rko" size="32867" crc="88f1a0c2" sha1="634bda446e9e85ed524259dc839a644ae491c308"/>
 			</dataarea>
 		</part>
 	</software>
@@ -217,7 +217,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="22856">
-				<rom name="durant$.rko" size="22856" crc="83e18460" sha1="240e1cca909c2b8773577658e47f91ab971eabb4" offset="0" />
+				<rom name="durant$.rko" size="22856" crc="83e18460" sha1="240e1cca909c2b8773577658e47f91ab971eabb4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -228,7 +228,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="29843">
-				<rom name="faeton$.rko" size="29843" crc="259ef6dd" sha1="c64bffd7df2741b6b6bbc52cb8c8547e3a05e51d" offset="0" />
+				<rom name="faeton$.rko" size="29843" crc="259ef6dd" sha1="c64bffd7df2741b6b6bbc52cb8c8547e3a05e51d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -239,7 +239,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="34899">
-				<rom name="fisher$.rko" size="34899" crc="28d38419" sha1="e86b2b3b1607c18f8793e1add6686ecbb2ea90e7" offset="0" />
+				<rom name="fisher$.rko" size="34899" crc="28d38419" sha1="e86b2b3b1607c18f8793e1add6686ecbb2ea90e7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -250,7 +250,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="6024">
-				<rom name="gran$.rko" size="6024" crc="8b6ceff9" sha1="5f3398105a40f063408468733720247e48f0ebb6" offset="0" />
+				<rom name="gran$.rko" size="6024" crc="8b6ceff9" sha1="5f3398105a40f063408468733720247e48f0ebb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -261,7 +261,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="24947">
-				<rom name="handicr$.rko" size="24947" crc="70a5381e" sha1="15f404458868ceaa4f4dcfd7e2548d967f001d20" offset="0" />
+				<rom name="handicr$.rko" size="24947" crc="70a5381e" sha1="15f404458868ceaa4f4dcfd7e2548d967f001d20"/>
 			</dataarea>
 		</part>
 	</software>
@@ -272,7 +272,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="32867">
-				<rom name="jet-set$.rko" size="32867" crc="8ff25f3d" sha1="7c97f03c889767dcc0c3e059b9f5af0445a59245" offset="0" />
+				<rom name="jet-set$.rko" size="32867" crc="8ff25f3d" sha1="7c97f03c889767dcc0c3e059b9f5af0445a59245"/>
 			</dataarea>
 		</part>
 	</software>
@@ -283,7 +283,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="26984">
-				<rom name="klad$.rko" size="26984" crc="6ca8462d" sha1="426d0d8e54dc71d523b36dce4c8851d3d1c50642" offset="0" />
+				<rom name="klad$.rko" size="26984" crc="6ca8462d" sha1="426d0d8e54dc71d523b36dce4c8851d3d1c50642"/>
 			</dataarea>
 		</part>
 	</software>
@@ -294,7 +294,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="34307">
-				<rom name="kort$.rko" size="34307" crc="0e678a05" sha1="d79344f4f893b010c1ec97f1e0e6efee7a4bfd72" offset="0" />
+				<rom name="kort$.rko" size="34307" crc="0e678a05" sha1="d79344f4f893b010c1ec97f1e0e6efee7a4bfd72"/>
 			</dataarea>
 		</part>
 	</software>
@@ -305,7 +305,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4771">
-				<rom name="krest1$.rko" size="4771" crc="c050e199" sha1="1efe13de48e1e95815043b8f23e59afd06a1638c" offset="0" />
+				<rom name="krest1$.rko" size="4771" crc="c050e199" sha1="1efe13de48e1e95815043b8f23e59afd06a1638c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -316,7 +316,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="2067">
-				<rom name="krest2$.rko" size="2067" crc="9b867add" sha1="2ed85e501b014fb0a5a64f63a6c5e5440d63da65" offset="0" />
+				<rom name="krest2$.rko" size="2067" crc="9b867add" sha1="2ed85e501b014fb0a5a64f63a6c5e5440d63da65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -327,7 +327,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4723">
-				<rom name="krot$.rko" size="4723" crc="a38cbcf3" sha1="a3333225589e5b022ace9dfe3b1821dbb59701f6" offset="0" />
+				<rom name="krot$.rko" size="4723" crc="a38cbcf3" sha1="a3333225589e5b022ace9dfe3b1821dbb59701f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -338,7 +338,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="15331">
-				<rom name="kznva$.rko" size="15331" crc="69d0cfdf" sha1="36d84cc3f49eed402af942f5d8edcb5253619c3b" offset="0" />
+				<rom name="kznva$.rko" size="15331" crc="69d0cfdf" sha1="36d84cc3f49eed402af942f5d8edcb5253619c3b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -349,7 +349,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="6995">
-				<rom name="ladder$.rko" size="6995" crc="0423cd07" sha1="efab64e4f3d9b23405c9843efaba119a54643978" offset="0" />
+				<rom name="ladder$.rko" size="6995" crc="0423cd07" sha1="efab64e4f3d9b23405c9843efaba119a54643978"/>
 			</dataarea>
 		</part>
 	</software>
@@ -360,7 +360,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="16723">
-				<rom name="land$.rko" size="16723" crc="b7b7c32e" sha1="41d617e6c451d7920f061169a0f2c31b1ffa9b47" offset="0" />
+				<rom name="land$.rko" size="16723" crc="b7b7c32e" sha1="41d617e6c451d7920f061169a0f2c31b1ffa9b47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -371,7 +371,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4200">
-				<rom name="land2$.rko" size="4200" crc="e343761f" sha1="24bac0798e2cd1fde31aa407890a598e7850b8d7" offset="0" />
+				<rom name="land2$.rko" size="4200" crc="e343761f" sha1="24bac0798e2cd1fde31aa407890a598e7850b8d7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -382,7 +382,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="21864">
-				<rom name="land3$.rko" size="21864" crc="a15f2662" sha1="2c42504acd6606327a99aa0bcf9788205f9462d9" offset="0" />
+				<rom name="land3$.rko" size="21864" crc="a15f2662" sha1="2c42504acd6606327a99aa0bcf9788205f9462d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -393,7 +393,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="10531">
-				<rom name="land5$.rko" size="10531" crc="c0fcfdf7" sha1="be3992abeb9c94894f2bd66a1a191e5f1aaa3886" offset="0" />
+				<rom name="land5$.rko" size="10531" crc="c0fcfdf7" sha1="be3992abeb9c94894f2bd66a1a191e5f1aaa3886"/>
 			</dataarea>
 		</part>
 	</software>
@@ -404,7 +404,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="21843">
-				<rom name="lk-lend$.rko" size="21843" crc="edcb3691" sha1="a8cbe889c2ec8e477b6ebf506067b05a1baba7f2" offset="0" />
+				<rom name="lk-lend$.rko" size="21843" crc="edcb3691" sha1="a8cbe889c2ec8e477b6ebf506067b05a1baba7f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -415,7 +415,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="30312">
-				<rom name="loderun$.rko" size="30312" crc="ae4fdf7e" sha1="43b8b05d3a086545cc09fc0c4450bc1ffdf8ab8f" offset="0" />
+				<rom name="loderun$.rko" size="30312" crc="ae4fdf7e" sha1="43b8b05d3a086545cc09fc0c4450bc1ffdf8ab8f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -426,7 +426,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="32915">
-				<rom name="m_miner$.rko" size="32915" crc="b7be5a44" sha1="afdc0f843e918f2aa47b24143a336de91cda215c" offset="0" />
+				<rom name="m_miner$.rko" size="32915" crc="b7be5a44" sha1="afdc0f843e918f2aa47b24143a336de91cda215c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -437,7 +437,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="32248">
-				<rom name="magie$.rko" size="32248" crc="28619969" sha1="7268d6582352ee4c5a31903e82057d7227946680" offset="0" />
+				<rom name="magie$.rko" size="32248" crc="28619969" sha1="7268d6582352ee4c5a31903e82057d7227946680"/>
 			</dataarea>
 		</part>
 	</software>
@@ -448,7 +448,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="39411">
-				<rom name="manner$.rko" size="39411" crc="fcc68aa7" sha1="4a568d3bd95b3e83c63d0d3183ce9e51bc90ec65" offset="0" />
+				<rom name="manner$.rko" size="39411" crc="fcc68aa7" sha1="4a568d3bd95b3e83c63d0d3183ce9e51bc90ec65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -459,7 +459,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="5203">
-				<rom name="mars$.rko" size="5203" crc="fbe74c91" sha1="980d6e358a37ab84d2fc431f3193d9590d9b94c0" offset="0" />
+				<rom name="mars$.rko" size="5203" crc="fbe74c91" sha1="980d6e358a37ab84d2fc431f3193d9590d9b94c0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -470,7 +470,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="18003">
-				<rom name="mole$.rko" size="18003" crc="49a745c3" sha1="a1bfe63dba8a5bf19e0620905b5ec86e8aeba974" offset="0" />
+				<rom name="mole$.rko" size="18003" crc="49a745c3" sha1="a1bfe63dba8a5bf19e0620905b5ec86e8aeba974"/>
 			</dataarea>
 		</part>
 	</software>
@@ -481,7 +481,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="15331">
-				<rom name="moonfox$.rko" size="15331" crc="7db14c5d" sha1="2024111644a20ce7bbb2a3dd0f74f99c1cf2ec33" offset="0" />
+				<rom name="moonfox$.rko" size="15331" crc="7db14c5d" sha1="2024111644a20ce7bbb2a3dd0f74f99c1cf2ec33"/>
 			</dataarea>
 		</part>
 	</software>
@@ -492,7 +492,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="6483">
-				<rom name="nardy$.rko" size="6483" crc="79ab8890" sha1="b10ff556dbbd1c233f0e46f21d2028b825fccfa5" offset="0" />
+				<rom name="nardy$.rko" size="6483" crc="79ab8890" sha1="b10ff556dbbd1c233f0e46f21d2028b825fccfa5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -503,7 +503,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="26707">
-				<rom name="otello$.rko" size="26707" crc="737b11e4" sha1="b2fe87673765e83660b3cff581eb23953e99f6dd" offset="0" />
+				<rom name="otello$.rko" size="26707" crc="737b11e4" sha1="b2fe87673765e83660b3cff581eb23953e99f6dd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -514,7 +514,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="14435">
-				<rom name="pacman$.rko" size="14435" crc="c5568c14" sha1="a61f9e6af8c9a1de45b5f359e39266856e9e194b" offset="0" />
+				<rom name="pacman$.rko" size="14435" crc="c5568c14" sha1="a61f9e6af8c9a1de45b5f359e39266856e9e194b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -525,7 +525,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4760">
-				<rom name="pauk$.rko" size="4760" crc="a25dee87" sha1="0dfe62b23534014c3abe26ccb8ee7c042ca806f3" offset="0" />
+				<rom name="pauk$.rko" size="4760" crc="a25dee87" sha1="0dfe62b23534014c3abe26ccb8ee7c042ca806f3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -536,7 +536,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="13395">
-				<rom name="pingvin$.rko" size="13395" crc="1245a324" sha1="6845653a23c8b6c89b5c83a1d4d73ad0e52e4bb6" offset="0" />
+				<rom name="pingvin$.rko" size="13395" crc="1245a324" sha1="6845653a23c8b6c89b5c83a1d4d73ad0e52e4bb6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -547,7 +547,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="14568">
-				<rom name="piton$.rko" size="14568" crc="0df08e01" sha1="75b0390d40779b680a953a5a9119c277d642ad5f" offset="0" />
+				<rom name="piton$.rko" size="14568" crc="0df08e01" sha1="75b0390d40779b680a953a5a9119c277d642ad5f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -558,7 +558,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="9299">
-				<rom name="poker$.rko" size="9299" crc="f68dfde6" sha1="0d95e2c9ad5dd668f44e11b99102facdb4b2c3d1" offset="0" />
+				<rom name="poker$.rko" size="9299" crc="f68dfde6" sha1="0d95e2c9ad5dd668f44e11b99102facdb4b2c3d1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -569,7 +569,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4435">
-				<rom name="pool$.rko" size="4435" crc="0a01adb7" sha1="5b868ddb45dbab2720bdb20cfca231577f81b61d" offset="0" />
+				<rom name="pool$.rko" size="4435" crc="0a01adb7" sha1="5b868ddb45dbab2720bdb20cfca231577f81b61d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -580,7 +580,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="11832">
-				<rom name="races$.rko" size="11832" crc="2d523118" sha1="6a0cff31aaa28d3259639c084b232eaf1c426a69" offset="0" />
+				<rom name="races$.rko" size="11832" crc="2d523118" sha1="6a0cff31aaa28d3259639c084b232eaf1c426a69"/>
 			</dataarea>
 		</part>
 	</software>
@@ -591,7 +591,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="10995">
-				<rom name="rally$.rko" size="10995" crc="3dffecb3" sha1="d2156117d48664341eb1e441e29e04231100e1d3" offset="0" />
+				<rom name="rally$.rko" size="10995" crc="3dffecb3" sha1="d2156117d48664341eb1e441e29e04231100e1d3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -602,7 +602,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="31827">
-				<rom name="ranger$.rko" size="31827" crc="baab4bf8" sha1="0c6791705ebf76a885f8fd959fd83117279cd8f2" offset="0" />
+				<rom name="ranger$.rko" size="31827" crc="baab4bf8" sha1="0c6791705ebf76a885f8fd959fd83117279cd8f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -613,7 +613,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="23635">
-				<rom name="reversi$.rko" size="23635" crc="008060c1" sha1="026950064a3c3d86e10ffecc80843eb63a2d162c" offset="0" />
+				<rom name="reversi$.rko" size="23635" crc="008060c1" sha1="026950064a3c3d86e10ffecc80843eb63a2d162c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -624,7 +624,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="7011">
-				<rom name="ricos$.rko" size="7011" crc="304d3beb" sha1="1da34c25f55a63b8c7daa92ebb0c7efb95753663" offset="0" />
+				<rom name="ricos$.rko" size="7011" crc="304d3beb" sha1="1da34c25f55a63b8c7daa92ebb0c7efb95753663"/>
 			</dataarea>
 		</part>
 	</software>
@@ -635,7 +635,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="32787">
-				<rom name="saboter$.rko" size="32787" crc="11fc8565" sha1="9a81ed84fffbc1294607ba57647cdddd5ec37ba7" offset="0" />
+				<rom name="saboter$.rko" size="32787" crc="11fc8565" sha1="9a81ed84fffbc1294607ba57647cdddd5ec37ba7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -646,7 +646,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="931">
-				<rom name="scdl$.rko" size="931" crc="80cad3f0" sha1="8f9ef4620f6feecc7f346c10bccd833a87b12c65" offset="0" />
+				<rom name="scdl$.rko" size="931" crc="80cad3f0" sha1="8f9ef4620f6feecc7f346c10bccd833a87b12c65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -657,7 +657,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="3427">
-				<rom name="shar$.rko" size="3427" crc="02362801" sha1="94ed63e25f2fe63897e118d54b11ecc36a464dbd" offset="0" />
+				<rom name="shar$.rko" size="3427" crc="02362801" sha1="94ed63e25f2fe63897e118d54b11ecc36a464dbd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -668,7 +668,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4360">
-				<rom name="shashki$.rko" size="4360" crc="f4c25fc8" sha1="0363a9fd9caa28fae468e68aef4d30f96cdeab2f" offset="0" />
+				<rom name="shashki$.rko" size="4360" crc="f4c25fc8" sha1="0363a9fd9caa28fae468e68aef4d30f96cdeab2f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -679,7 +679,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="14184">
-				<rom name="sokoban$.rko" size="14184" crc="19ddc428" sha1="51fc403b234dbc2457794296bfea14bf3b0be9a3" offset="0" />
+				<rom name="sokoban$.rko" size="14184" crc="19ddc428" sha1="51fc403b234dbc2457794296bfea14bf3b0be9a3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -690,7 +690,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="2643">
-				<rom name="speaker$.rko" size="2643" crc="882a2796" sha1="0d44b7273ec8cb8e4a8809617acd6e79697d83ad" offset="0" />
+				<rom name="speaker$.rko" size="2643" crc="882a2796" sha1="0d44b7273ec8cb8e4a8809617acd6e79697d83ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -701,7 +701,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4835">
-				<rom name="spking$.rko" size="4835" crc="1f614369" sha1="b9a3ada73bdd01eea30beac21fbd849094dd21cb" offset="0" />
+				<rom name="spking$.rko" size="4835" crc="1f614369" sha1="b9a3ada73bdd01eea30beac21fbd849094dd21cb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -712,7 +712,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="3411">
-				<rom name="starwar$.rko" size="3411" crc="7a278dba" sha1="7a95af5714e34657953e11160f49107c908c76b1" offset="0" />
+				<rom name="starwar$.rko" size="3411" crc="7a278dba" sha1="7a95af5714e34657953e11160f49107c908c76b1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -723,7 +723,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="5331">
-				<rom name="striker$.rko" size="5331" crc="2da5c1f2" sha1="bca3f448eefbdc1dca86869e15316137d86ae1e8" offset="0" />
+				<rom name="striker$.rko" size="5331" crc="2da5c1f2" sha1="bca3f448eefbdc1dca86869e15316137d86ae1e8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -734,7 +734,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="1875">
-				<rom name="synt$.rko" size="1875" crc="f47a717b" sha1="313002ea7e1c481f789c493f2f1b86de7cd849a4" offset="0" />
+				<rom name="synt$.rko" size="1875" crc="f47a717b" sha1="313002ea7e1c481f789c493f2f1b86de7cd849a4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -745,7 +745,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="2920">
-				<rom name="tennis$.rko" size="2920" crc="cb649594" sha1="27fc02cdc34b7c17d6fc5fc1538d47df6dfd3f47" offset="0" />
+				<rom name="tennis$.rko" size="2920" crc="cb649594" sha1="27fc02cdc34b7c17d6fc5fc1538d47df6dfd3f47"/>
 			</dataarea>
 		</part>
 	</software>
@@ -756,7 +756,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4883">
-				<rom name="tetris$.rko" size="4883" crc="8a63a7e6" sha1="a821318d998ab9ef846ec880413cf5659b3f65a7" offset="0" />
+				<rom name="tetris$.rko" size="4883" crc="8a63a7e6" sha1="a821318d998ab9ef846ec880413cf5659b3f65a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -767,7 +767,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="2776">
-				<rom name="tetris2$.rko" size="2776" crc="a1fb7b2a" sha1="fd4359f230e5e7e06974c96c951a396327125ae0" offset="0" />
+				<rom name="tetris2$.rko" size="2776" crc="a1fb7b2a" sha1="fd4359f230e5e7e06974c96c951a396327125ae0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -778,7 +778,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="1944">
-				<rom name="tetris3$.rko" size="1944" crc="2ee5b0a9" sha1="4e3d31c810f9638cb8ca4d42e5bd0c8beefaad99" offset="0" />
+				<rom name="tetris3$.rko" size="1944" crc="2ee5b0a9" sha1="4e3d31c810f9638cb8ca4d42e5bd0c8beefaad99"/>
 			</dataarea>
 		</part>
 	</software>
@@ -789,7 +789,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="20579">
-				<rom name="thrusta$.rko" size="20579" crc="bc2e4443" sha1="0793c791a90bff343213f3a52f1bc58461fb6976" offset="0" />
+				<rom name="thrusta$.rko" size="20579" crc="bc2e4443" sha1="0793c791a90bff343213f3a52f1bc58461fb6976"/>
 			</dataarea>
 		</part>
 	</software>
@@ -800,7 +800,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="12371">
-				<rom name="tutan$.rko" size="12371" crc="f876d7b2" sha1="2b3d7c94a7a32a48103617a4fcce2555eb5340d9" offset="0" />
+				<rom name="tutan$.rko" size="12371" crc="f876d7b2" sha1="2b3d7c94a7a32a48103617a4fcce2555eb5340d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -811,7 +811,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="4248">
-				<rom name="udav$.rko" size="4248" crc="7a8d63f0" sha1="bfab2ce9f1328a4d416098af77c8687957866618" offset="0" />
+				<rom name="udav$.rko" size="4248" crc="7a8d63f0" sha1="bfab2ce9f1328a4d416098af77c8687957866618"/>
 			</dataarea>
 		</part>
 	</software>
@@ -822,7 +822,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="9160">
-				<rom name="us_07_9$.rko" size="9160" crc="9a7d19ad" sha1="a964f983b3410af91c3f1d4039be62cc3ceb747e" offset="0" />
+				<rom name="us_07_9$.rko" size="9160" crc="9a7d19ad" sha1="a964f983b3410af91c3f1d4039be62cc3ceb747e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -833,7 +833,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="23635">
-				<rom name="valley$.rko" size="23635" crc="9055ff7d" sha1="3caa9c8b905aa9f2a769f42255a825fa26064458" offset="0" />
+				<rom name="valley$.rko" size="23635" crc="9055ff7d" sha1="3caa9c8b905aa9f2a769f42255a825fa26064458"/>
 			</dataarea>
 		</part>
 	</software>
@@ -844,7 +844,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="21843">
-				<rom name="vavilon$.rko" size="21843" crc="b0600b26" sha1="8c887e6feb917c328e6a7c7b112a9778473d5838" offset="0" />
+				<rom name="vavilon$.rko" size="21843" crc="b0600b26" sha1="8c887e6feb917c328e6a7c7b112a9778473d5838"/>
 			</dataarea>
 		</part>
 	</software>
@@ -855,7 +855,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="9576">
-				<rom name="vitamin$.rko" size="9576" crc="b4df3f6f" sha1="5112a728acc0c70075c9669adeaab7ee8915dc53" offset="0" />
+				<rom name="vitamin$.rko" size="9576" crc="b4df3f6f" sha1="5112a728acc0c70075c9669adeaab7ee8915dc53"/>
 			</dataarea>
 		</part>
 	</software>
@@ -866,7 +866,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="8531">
-				<rom name="war$.rko" size="8531" crc="27f22685" sha1="ce1a7f8a869060fd0bc1a2bacf95f0bebc4a6e6b" offset="0" />
+				<rom name="war$.rko" size="8531" crc="27f22685" sha1="ce1a7f8a869060fd0bc1a2bacf95f0bebc4a6e6b"/>
 			</dataarea>
 		</part>
 	</software>
@@ -877,7 +877,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="7763">
-				<rom name="xonix$.rko" size="7763" crc="b69b140d" sha1="d5c9059387cee54c5cac74a9553d2eb8f5930a2e" offset="0" />
+				<rom name="xonix$.rko" size="7763" crc="b69b140d" sha1="d5c9059387cee54c5cac74a9553d2eb8f5930a2e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -888,7 +888,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="14931">
-				<rom name="zoo$.rko" size="14931" crc="713710a8" sha1="2b42d2290a09c6e50a442142445693ec846d3d44" offset="0" />
+				<rom name="zoo$.rko" size="14931" crc="713710a8" sha1="2b42d2290a09c6e50a442142445693ec846d3d44"/>
 			</dataarea>
 		</part>
 	</software>
@@ -899,7 +899,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="orion_cass">
 			<dataarea name="cass" size="8083">
-				<rom name="zoo2$.rko" size="8083" crc="6f0db0e3" sha1="c3829eabbe7859baa774d405ab227052d00681ed" offset="0" />
+				<rom name="zoo2$.rko" size="8083" crc="6f0db0e3" sha1="c3829eabbe7859baa774d405ab227052d00681ed"/>
 			</dataarea>
 		</part>
 	</software>

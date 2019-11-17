@@ -1017,13 +1017,13 @@ void cyclwarr_state::cyclwarr(machine_config &config)
 	// saner sync value (avoids crashing after crediting)
 	config.m_minimum_quantum = attotime::from_hz(CLOCK_2 / 1024);
 
-	cxd1095_device &io1(CXD1095(config, "io1", 0));
+	cxd1095_device &io1(CXD1095(config, "io1"));
 	io1.in_portb_cb().set_ioport("SERVICE");
 	io1.in_portc_cb().set_ioport("P1");
 	io1.in_portd_cb().set_ioport("P2");
 	io1.in_porte_cb().set_ioport("DSW3");
 
-	cxd1095_device &io2(CXD1095(config, "io2", 0));
+	cxd1095_device &io2(CXD1095(config, "io2"));
 	io2.in_porta_cb().set_ioport("DSW1");
 	io2.in_portb_cb().set_ioport("DSW2");
 	io2.in_portc_cb().set_ioport("P3");

@@ -499,7 +499,7 @@ void c65_state::c65_map(address_map &map)
 	// 0x0d440, 0x0d4*f Left  SID
 	map(0x0d600, 0x0d6ff).rw(FUNC(c65_state::uart_r), FUNC(c65_state::uart_w));
 	map(0x0d700, 0x0d702).w(FUNC(c65_state::DMAgic_w)).share("dmalist"); // 0x0d700, 0x0d7** DMAgic
-	//AM_RANGE(0x0d703, 0x0d703) AM_READ(DMAgic_r)
+	//map(0x0d703, 0x0d703).r(FUNC(c65_state::DMAgic_r));
 	// 0x0d800, 0x0d8** Color matrix
 	map(0x0d800, 0x0dfff).rw(FUNC(c65_state::CIASelect_r), FUNC(c65_state::CIASelect_w)).share("cram");
 	// 0x0dc00, 0x0dc** CIA-1

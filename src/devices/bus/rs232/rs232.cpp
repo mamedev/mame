@@ -93,6 +93,16 @@ void rs232_port_device::device_resolve_objects()
 	m_txc_handler.resolve_safe();
 }
 
+void rs232_port_device::device_reset()
+{
+	m_rxd_handler(m_rxd);
+	m_dcd_handler(m_dcd);
+	m_dsr_handler(m_dsr);
+	m_ri_handler(m_ri);
+	m_si_handler(m_si);
+	m_cts_handler(m_cts);
+}
+
 void rs232_port_device::device_start()
 {
 	save_item(NAME(m_rxd));
@@ -110,13 +120,6 @@ void rs232_port_device::device_start()
 	m_ri = 1;
 	m_si = 1;
 	m_cts = 1;
-
-	m_rxd_handler(1);
-	m_dcd_handler(1);
-	m_dsr_handler(1);
-	m_ri_handler(1);
-	m_si_handler(1);
-	m_cts_handler(1);
 }
 
 WRITE_LINE_MEMBER( rs232_port_device::write_txd )

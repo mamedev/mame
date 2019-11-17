@@ -8,10 +8,15 @@
 
 #ifndef NLTOOL_VERSION
 #define USE_FRONTIERS 1
-#define USE_FIXED_STV 0
 #else
-#define USE_FRONTIERS 0
+#define USE_FRONTIERS 1
+#endif
+
+/* if we use frontiers, use fixed STV for smaller matrix sizes */
+#if (USE_FRONTIERS)
 #define USE_FIXED_STV 1
+#else
+#define USE_FIXED_STV 0
 #endif
 
 /*
@@ -32,10 +37,30 @@
  * nlwav -o x.wav log_XU1.14.log
  * play x.wav
  *
+ * VERIFICATION NEEDED: Are D4 and D5 Cathodes connected?
+ *
+ * This has quite some impact on the drums.
+ *
  */
 
 #define FIX_SCHEMATIC_ERRORS (1)
+#define D4_AND_D5_CONNECTED (1)
 
+/* On M62 boards with pcb pictures available
+ * D6 is missing, although the pcb print exists.
+ * We are replacing this with a 10m Resistor.
+ */
+
+#define D6_EXISTS (0)
+
+/*
+ * J4 connects channel C either to sound_ic or sound.
+ *
+ * 1: Connect C to channel to sound_ic
+ *
+ */
+
+#define J4  (1)
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -71,7 +96,7 @@ NETLIST_START(kidniki_schematics)
 	CAP(C33, CAP_U(1))
 	CAP(C34, CAP_N(1))
 	CAP(C35, CAP_N(1))
-	CAP(C36, CAP_N(6.5))
+	CAP(C36, CAP_N(6.8))
 	CAP(C37, CAP_N(22))
 	CAP(C38, CAP_N(1))
 	CAP(C39, CAP_N(1))
@@ -143,7 +168,6 @@ NETLIST_START(kidniki_schematics)
 	RES(R29, RES_K(2.7))
 	RES(R30, RES_K(10))
 	RES(R31, RES_K(5.1))
-	//RES(R32, RES_K(1))
 	RES(R32, RES_K(4.7))
 	RES(R34, RES_K(100))
 	RES(R35, RES_K(100))
@@ -157,7 +181,6 @@ NETLIST_START(kidniki_schematics)
 	RES(R43, 470)
 	RES(R44, RES_K(100))
 	RES(R45, RES_K(1))
-	//RES(R45, RES_K(10000000))
 	RES(R46, RES_K(12))
 	RES(R48, 470)
 	RES(R48_2, RES_K(100))
@@ -166,7 +189,7 @@ NETLIST_START(kidniki_schematics)
 	RES(R51, RES_K(150))
 	RES(R52, RES_K(100))
 	RES(R53, RES_K(100))
-	RES(R54, RES_K(680))
+	RES(R54, 680)
 	RES(R55, RES_K(510))
 	RES(R57, 560)
 	RES(R58, RES_K(39))
@@ -187,7 +210,7 @@ NETLIST_START(kidniki_schematics)
 	RES(R73, RES_K(10))
 	RES(R74, RES_K(10))
 	RES(R75, RES_K(10))
-	RES(R76, RES_K(10))
+	RES(R76, RES_K(47))
 	RES(R81, 220)
 	RES(R82, RES_M(2.2))
 	RES(R83, RES_K(12))
@@ -204,7 +227,7 @@ NETLIST_START(kidniki_schematics)
 	RES(R95, RES_K(330))
 	RES(R96, RES_K(150))
 	RES(R97, RES_K(150))
-	RES(R98, RES_K(650))
+	RES(R98, RES_K(680))
 
 	#if USE_FIXED_STV
 	ANALOG_INPUT(STV, 2)
@@ -212,6 +235,8 @@ NETLIST_START(kidniki_schematics)
 	RES(R78, RES_K(3.3))
 	RES(R77, RES_K(2.2))
 	CAP(C58, CAP_U(47))
+	NET_C(R77.2, C58.1, I_V0.Q)
+	NET_C(R78.1, I_V5.Q)
 	#endif
 
 	NET_C(R95.1, XU3.2, R96.2)
@@ -220,28 +245,19 @@ NETLIST_START(kidniki_schematics)
 	NET_C(XU3.4, R103.1, R102.2)
 	NET_C(XU3.5, R105.2, C72.1)
 	NET_C(XU3.6, R105.1, R106.2)
-	#if USE_FIXED_STV
-	//FIXME: We should have a NET_C_REMOVE
-	NET_C(XU3.7, C69.2, C73.2, C72.2, C77.2, C67.2, C68.2, R65.2, R38.2, XU1.11, R54.2, Q4.E, R63.2, C47.2, R72.2, R67.2, R71.2, R68.2, C48.2, R46.2, C28.1, C32.1, R43.2, XU2.4, C56.1, C52.1,/* R77.2, C58.1, */ R48.2, R93.2, R94.2, R119.2, R104.2, R53.2, R34.2, R81.2, R92.2, R89.2, C33.1, R37.2, R36.1, R91.1, I_V0.Q, RV1.3)
-	#else
-	NET_C(XU3.7, C69.2, C73.2, C72.2, C77.2, C67.2, C68.2, R65.2, R38.2, XU1.11, R54.2, Q4.E, R63.2, C47.2, R72.2, R67.2, R71.2, R68.2, C48.2, R46.2, C28.1, C32.1, R43.2, XU2.4, C56.1, C52.1, R77.2, C58.1, R48.2, R93.2, R94.2, R119.2, R104.2, R53.2, R34.2, R81.2, R92.2, R89.2, C33.1, R37.2, R36.1, R91.1, I_V0.Q, RV1.3)
-	#endif
+	NET_C(XU3.7, C69.2, C73.2, C72.2, C77.2, C67.2, C68.2, R65.2, R38.2, XU1.11, R54.2, Q4.E, R63.2, C47.2, R72.2, R67.2, R71.2, R68.2, C48.2, R46.2, C28.1, C32.1, R43.2, XU2.4, C56.1, C52.1, R48.2, R93.2, R94.2, R119.2, R104.2, R53.2, R34.2, R81.2, R92.2, R89.2, C33.1, R37.2, R36.1, R91.1, I_V0.Q, RV1.3)
 	NET_C(XU3.8, R108.1, R107.2)
 	NET_C(XU3.9, R108.2, C77.1)
 	NET_C(XU3.10, R100.1, R101.2)
 	NET_C(XU3.11, R100.2, C67.1)
 	NET_C(XU3.12, R98.1, R97.2)
 	NET_C(XU3.13, R98.2, C68.1)
-	#if USE_FIXED_STV
-	NET_C(XU3.14, XU1.4, R66.1, R70.1, Q6.C, Q5.C, XU2.8, /* R78.1, */ R86.1, R83.1, Q3.C, I_V5.Q)
-	#else
-	NET_C(XU3.14, XU1.4, R66.1, R70.1, Q6.C, Q5.C, XU2.8, R78.1, R86.1, R83.1, Q3.C, I_V5.Q)
-	#endif
+	NET_C(XU3.14, XU1.4, R66.1, R70.1, Q6.C, Q5.C, XU2.8, R86.1, R83.1, Q3.C, I_V5.Q)
 	NET_C(R96.1, R102.1, R106.1, R107.1, R101.1, R97.1, R65.1, C63.2)
 	NET_C(C63.1, R65_1.2)
 	NET_C(R65_1.1, R44.2, C38.2, C40.2, XU1.6)
 	#if USE_FIXED_STV
-	NET_C(R30.1, R41.1, R40.1, STV, R76.2, /* R78.2, R77.1, C58.2*/ STV)
+	NET_C(R30.1, R41.1, R40.1, R76.2, /* R78.2, R77.1, C58.2*/ STV)
 	#else
 	NET_C(R30.1, R41.1, R40.1, R76.2, R78.2, R77.1, C58.2)
 	#endif
@@ -262,8 +278,14 @@ NETLIST_START(kidniki_schematics)
 	NET_C(R45.1, C44.2)
 	NET_C(C44.1, R66.2, Q4.B)
 #if FIX_SCHEMATIC_ERRORS
+#if D4_AND_D5_CONNECTED
+	/* needs verification */
 	NET_C(Q4.C, D4.K, D5.K)
 	NET_C(C42.1, C43.1, R46.1, C35.2)
+#else
+	NET_C(Q4.C, D5.K)
+	NET_C(C42.1, C43.1, R46.1, C35.2, D4.K)
+#endif
 #else
 	NET_C(Q4.C, C42.1, C43.1, R46.1, C35.2, D4.K, D5.K)
 #endif
@@ -340,9 +362,9 @@ NETLIST_END()
 NETLIST_START(kidniki)
 
 #if (0 || USE_FRONTIERS)
-	SOLVER(Solver, 18000)
+	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 100)
+	PARAM(Solver.NR_LOOPS, 300)
 	PARAM(Solver.GS_LOOPS, 10)
 	//PARAM(Solver.METHOD, "SOR")
 	PARAM(Solver.METHOD, "MAT_CR")
@@ -352,15 +374,16 @@ NETLIST_START(kidniki)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	PARAM(Solver.DYNAMIC_LTE, 5e-4)
 	PARAM(Solver.DYNAMIC_MIN_TIMESTEP, 20e-6)
+	PARAM(Solver.SORT_TYPE, "PREFER_IDENTITY_TOP_LEFT")
+	//PARAM(Solver.SORT_TYPE, "PREFER_BAND_MATRIX")
 #else
-	SOLVER(Solver, 18000)
+	//PARAM(Solver.SORT_TYPE, "PREFER_BAND_MATRIX")
+	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-7)
-	PARAM(Solver.NR_LOOPS, 100)
-	PARAM(Solver.GS_LOOPS, 300)
+	PARAM(Solver.NR_LOOPS, 10000)
+	PARAM(Solver.GS_LOOPS, 100)
 	//PARAM(Solver.METHOD, "MAT_CR")
 	PARAM(Solver.METHOD, "GMRES")
-	//PARAM(Solver.SOR_FACTOR, 1.73)
-	//PARAM(Solver.METHOD, "SOR")
 #endif
 
 #if (USE_FRONTIERS)
@@ -388,15 +411,17 @@ NETLIST_START(kidniki)
 	NET_C(I_V5, R_AY45L_A.1, R_AY45L_B.1, R_AY45L_C.1, R_AY45M_A.1, R_AY45M_B.1, R_AY45M_C.1)
 	NET_C(R_AY45L_A.2, R_AY45L_B.2, R_AY45M_A.2, R_AY45M_B.2, R_AY45M_C.2)
 
+#if (J4)
 	ALIAS(I_SOUNDIC0, R_AY45L_C.2)
+#else
+	NET_C(R_AY45L_A.2, R_AY45L_C.2)
+	ALIAS(I_SOUNDIC0, I_V0.Q)
+#endif
+
 	ALIAS(I_SOUND0, R_AY45L_A.2)
 
-	/* On M62 boards with pcb pictures available
-	 * D6 is missing, although the pcb print exists.
-	 * We are replacing this with a 10m Resistor.
-	 */
 	TTL_INPUT(SINH, 1)
-#if 0
+#if (D6_EXISTS)
 	DIODE(D6, "1N914")
 	NET_C(D6.K, SINH)
 	ALIAS(I_SINH0, D6.A)
@@ -425,9 +450,8 @@ NETLIST_START(kidniki)
 	OPTIMIZE_FRONTIER(R87.2, RES_K(68), 50)
 
 	OPTIMIZE_FRONTIER(R50.1, RES_K(2.2), 50)
-	OPTIMIZE_FRONTIER(R55.1, RES_K(510), 50)
+	OPTIMIZE_FRONTIER(R55.2, RES_K(1000), 50)
 	OPTIMIZE_FRONTIER(R84.2, RES_K(50), RES_K(5))
-
 	#endif
 
 NETLIST_END()

@@ -30,6 +30,59 @@
 
 */
 
+/*
+
+Regular models:
+
+             Model              | Form factor |     CPU    |        Standard RAM          | Max RAM |      Standard FDDs     |         Standard HDD
+FM Towns 1/2                    | Tower       | 386DX-16   | 1 MB (1) or 2 MB (2)         | 6 MB    | 1 or 2                 | No SCSI controller
+FM Towns 1F/2F/1H/2H            | Tower       | 386DX-16   | 1 MB (1F/1H) or 2 MB (2F/2H) | 8 MB    | 1 (1F) or 2 (others)   | 20 or 40 MB (H models only)
+FM Towns 10F/20F/40H/80H        | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (10F) or 2 (others)  | 40 or 85 MB (H models only)
+FM Towns II CX10/20/40/100      | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 1 (CX10) or 2 (others) | No (CX10/20), 40 or 100 MB
+FM Towns II UX10/20/40          | All-in-one  | 386SX-16   | 2 MB                         | 10 MB   | 1 (UX10) or 2 (others) | No (UX10/20) or 40 MB
+FM Towns II HG20/40/100         | Desktop     | 386DX-20   | 2 MB                         | 26 MB   | 2                      | No (HG20), 40 or 80 MB
+FM Towns II HR20/100/200        | Desktop     | 486SX-20   | 4 MB                         | 28 MB   | 2                      | No (HR20) 100 or 200 MB
+FM Towns II UG10/20/40/80       | All-in-one  | 386SX-20   | 2 MB                         | 10 MB   | 1 (UG10) or 2 (others) | No (UG10/20), 40 or 80 MB
+FM Towns II UR20/40/80          | All-in-one  | 486SX-20   | 2 MB                         | 10 MB   | 2                      | No (UG20), 40 or 80 MB
+FM Towns II ME20/170            | Desktop     | 486SX-25   | 2 MB                         | 66 MB   | 2                      | No (ME20) or 170 MB
+FM Towns II MA170/340           | Desktop     | 486SX-33   | 4 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II MX20/170/340        | Desktop     | 486DX2-66  | 4 MB                         | 100 MB  | 2                      | No (MX20), 170 or 340 MB
+FM Towns II Fresh/MF20/MF170W   | Desktop     | 486SX-33   | 4 MB (MF20) or 6 MB (others) | 68 MB   | 2                      | No (MF20), or 170 (others)
+FM Towns II MA170W/MA340W       | Desktop     | 486SX-33   | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II MX170W/MA340W       | Desktop     | 486DX2-66  | 8 MB                         | 100 MB  | 2                      | 170 or 340 MB
+FM Towns II Fresh-TV            | Desktop     | 486SX-33   | 6 MB                         | 68 MB   | 2                      | 170 MB
+FM Towns II Fresh-E             | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 2                      | 260 MB
+FM Towns II Fresh-T             | Desktop     | 486SX-33   | 8 MB                         | 72 MB   | 2                      | 260 MB
+FM Towns II EA2                 | Desktop     | 486SX-33   | 4 MB                         | 68 MB   | 2                      | No
+FM Towns II HA2/HA53            | Desktop     | 486DX2-66  | 4 MB (HA2) or 8 MB (HA53)    | 100 MB  | 2                      | No (HA2) or 530 MB
+FM Towns II HB2/HB53/HB53M      | Desktop     | Pentium-60 | 8 MB                         | 136 MB  | 2                      | No (HB2) or 530 MB
+FM Towns II Fresh-ES/Fresh-ET   | Desktop     | 486DX2-66  | 8 MB                         | 72 MB   | 1                      | 360 MB
+FM Towns II HC53/HC53M          | Desktop     | Pentium-90 | 8 MB                         | 136 MB  | 1                      | 540 MB
+FM Towns II Fresh-FS/Fresh-FT   | Desktop     | 486DX4-100 | 8 MB                         | 72 MB   | 1                      | 540 MB
+FM Towns Marty/Marty 2/TC Marty | Console     | 386SX-16   | 2 MB                         | 4 MB    | 1                      | No SCSI controller
+Car Marty                       | Car-mounted | 386SX-16   | 2 MB                         | ?       | No                     | No SCSI controller
+
+Education models:
+
+         Model          | Form factor |     CPU    |        Standard RAM          | Max RAM |      Standard FDDs     |         Standard HDD
+FM Towns S1/S2          | Tower       | 386DX-16   | 1 MB (S1) or 2 MB (S2)       | 6 MB    | 1 or 2                 | No SCSI controller
+FM Towns SF/SH          | Tower       | 386DX-16   | 1 MB (1F/1H) or 2 MB (2F/2H) | 8 MB    | 2                      | No (SF) or 40 MB
+FM Towns SF2/SH2        | Tower       | 386DX-16   | 2 MB                         | 26 MB   | 2                      | No (SF2) or 40 MB
+FM Towns II SG20/40     | Desktop     | 386DX-20   | 2 MB                         | 26 MB   | 2                      | No (SG20) or 40 MB
+FM Towns II SR20/100    | Desktop     | 486SX-20   | 4 MB                         | 28 MB   | 2                      | No (SR20) or 100 MB
+FM Towns II SE          | Desktop     | 486SX-25   | 2 MB                         | 66 MB   | 2                      | No
+FM Towns II SA          | Desktop     | 486SX-33   | 4 MB                         | 100 MB  | 2                      | No
+FM Towns II SF20/SF170W | Desktop     | 486SX-33   | 4 MB (SF20) or 6 MB (SF170W) | 100 MB  | 2                      | No (SF20) or 170 MB
+FM Towns II SA170W      | Desktop     | 486SX-33   | 8 MB                         | 100 MB  | 2                      | 170 MB
+FM Towns II SI2/SI26    | Desktop     | 486SX-33   | 4 MB (SI2) or 8 MB (SI26)    | 68 MB   | 2                      | No (SI2) or 260 MB
+FM Towns II SJ2/SJ26    | Desktop     | 486DX2-66  | 4 MB (SJ2) or 8 MB (SJ26)    | 68 MB   | 2                      | No (SJ2) or 260 MB
+FM Towns II SK53        | Desktop     | Pentium-60 | 8 MB                         | 136 MB  | 2                      | 530 MB
+FM Towns II SN          | Laptop      | 486DX2-66  | 4 MB                         | 36 MB   | 1                      | 340 MB
+FM Towns II SJ2A/SJ53   | Desktop     | 486DX2-66  | 4 MB (SJ2A) or 8 MB (SJ53)   | 68 MB   | 2                      | No (SJ2A) or 530 MB
+FM Towns II SL53        | Desktop     | Pentium-90 | 8 MB                         | 136 MB  | 2                      | 530 MB
+
+*/
+
 /* I/O port map (incomplete, could well be incorrect too)
  *
  * 0x0000   : Master 8259 PIC
@@ -492,12 +545,12 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 			{
 			case 1:
 				ret |= 0x0c;
-				if(m_flop[0]->get_device()->exists())
+				if(m_flop[0]->get_device() && m_flop[0]->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 2:
 				ret |= 0x0c;
-				if(m_flop[1]->get_device()->exists())
+				if(m_flop[1]->get_device() && m_flop[1]->get_device()->exists())
 					ret |= 0x03;
 				break;
 			case 3:
@@ -510,9 +563,11 @@ READ8_MEMBER(towns_state::towns_floppy_r)
 		case 0x0e: // DRVCHG
 			logerror("FDC: read from offset 0x0e\n");
 			if(m_towns_selected_drive == 1)
-				return m_flop[0]->get_device()->dskchg_r();
+				if (m_flop[0]->get_device())
+					return m_flop[0]->get_device()->dskchg_r();
 			if(m_towns_selected_drive == 2)
-				return m_flop[1]->get_device()->dskchg_r();
+				if (m_flop[1]->get_device())
+					return m_flop[1]->get_device()->dskchg_r();
 			return 0x00;
 		default:
 			logerror("FDC: read from invalid or unimplemented register %02x\n",offset);
@@ -2181,7 +2236,6 @@ void towns_state::towns_mem(address_map &map)
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
-//  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
 	map(0x80000000, 0x8007ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x80000); // VRAM
 	map(0x80100000, 0x8017ffff).rw(FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
 	map(0x81000000, 0x8101ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
@@ -2209,11 +2263,10 @@ void towns_state::marty_mem(address_map &map)
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
-//  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
 	map(0x00600000, 0x0067ffff).rom().region("user", 0x000000);  // OS
 	map(0x00680000, 0x0087ffff).rom().region("user", 0x280000);  // EX ROM
 	map(0x00a00000, 0x00a7ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
-	map(0x00b00000, 0x00b7ffff).rom().region("user", 0x180000);  // FONT
+	map(0x00b00000, 0x00b7ffff).rw(FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
 	map(0x00c00000, 0x00c1ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
 	map(0x00d00000, 0x00dfffff).rw(m_icmemcard, FUNC(fmt_icmem_device::mem_read), FUNC(fmt_icmem_device::mem_write));
 	map(0x00e80000, 0x00efffff).rom().region("user", 0x100000);  // DIC ROM
@@ -2235,9 +2288,9 @@ void towns_state::ux_mem(address_map &map)
 	map(0x000da000, 0x000effff).ram(); //READWRITE(SMH_BANK(11),SMH_BANK(11))
 	map(0x000f0000, 0x000f7fff).ram(); //READWRITE(SMH_BANK(12),SMH_BANK(12))
 	map(0x000f8000, 0x000fffff).bankr("bank_f8000_r").bankw("bank_f8000_w");
-//  AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
+//  map(0x00680000, 0x0087ffff).rom().region("user",0x280000);  // EX ROM
 	map(0x00a00000, 0x00a7ffff).rw(FUNC(towns_state::towns_gfx_high_r), FUNC(towns_state::towns_gfx_high_w)).mirror(0x180000); // VRAM
-	map(0x00b00000, 0x00b7ffff).rom().region("user", 0x180000);  // FONT
+	map(0x00b00000, 0x00b7ffff).rw(FUNC(towns_state::towns_gfx_packed_r), FUNC(towns_state::towns_gfx_packed_w)).mirror(0x80000); // VRAM
 	map(0x00c00000, 0x00c1ffff).rw(FUNC(towns_state::towns_spriteram_r), FUNC(towns_state::towns_spriteram_w)); // Sprite RAM
 	map(0x00d00000, 0x00dfffff).rw(m_icmemcard, FUNC(fmt_icmem_device::mem_read), FUNC(fmt_icmem_device::mem_write));
 	map(0x00e00000, 0x00e7ffff).rom().region("user", 0x000000);  // OS
@@ -2296,15 +2349,20 @@ void towns_state::towns_io(address_map &map)
 	map(0x0600, 0x0607).rw(FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask32(0x00ff00ff);
 	// RS-232C interface
 	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask32(0x00ff00ff);
-	// SCSI controller
-	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask32(0x00ff00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
-	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+	//map(0x41fc,0x41ff).r(FUNC(towns_state::towns_41ff_r)).umask32(0xff000000);
 	// CRTC / Video (again)
 	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
 	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
+}
+
+void towns_state::towns2_io(address_map &map)
+{
+	// For FM Towns II models with integrated SCSI controller
+	towns_io(map);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
 }
 
 void towns_state::towns16_io(address_map &map)
@@ -2355,15 +2413,20 @@ void towns_state::towns16_io(address_map &map)
 	map(0x0600, 0x0607).rw(FUNC(towns_state::towns_keyboard_r), FUNC(towns_state::towns_keyboard_w)).umask16(0x00ff);
 	// RS-232C interface
 	map(0x0a00, 0x0a0b).rw(FUNC(towns_state::towns_serial_r), FUNC(towns_state::towns_serial_w)).umask16(0x00ff);
-	// SCSI controller
-	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
 	// CMOS
 	map(0x3000, 0x4fff).rw(FUNC(towns_state::towns_cmos_r), FUNC(towns_state::towns_cmos_w)).umask16(0x00ff);
 	// Something (MS-DOS wants this 0x41ff to be 1)
-	//AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
+	//map(0x41fc,0x41ff).r(FUNC(towns_state::towns_41ff_r)).umask32(0xff000000);
 	// CRTC / Video (again)
 	map(0xfd90, 0xfda3).rw(FUNC(towns_state::towns_video_fd90_r), FUNC(towns_state::towns_video_fd90_w));
 	map(0xff80, 0xffff).rw(FUNC(towns_state::towns_video_cff80_r), FUNC(towns_state::towns_video_cff80_w));
+}
+
+void towns_state::townsux_io(address_map &map)
+{
+	// For FM Towns II UX
+	towns16_io(map);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
 }
 
 void towns_state::pcm_mem(address_map &map)
@@ -2652,7 +2715,8 @@ void towns_state::driver_start()
 	save_pointer(m_video.towns_crtc_reg,"CRTC registers",32);
 	save_pointer(m_video.towns_video_reg,"Video registers",2);
 
-	m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
+	if (m_ram->size() > 0x100000)
+		m_maincpu->space(AS_PROGRAM).install_ram(0x100000,m_ram->size()-1,nullptr);
 }
 
 void marty_state::driver_start()
@@ -2664,8 +2728,10 @@ void marty_state::driver_start()
 
 void towns_state::machine_start()
 {
-	m_flop[0]->get_device()->set_rpm(360);
-	m_flop[1]->get_device()->set_rpm(360);
+	if (m_flop[0]->get_device())
+		m_flop[0]->get_device()->set_rpm(360);
+	if (m_flop[1]->get_device())
+		m_flop[1]->get_device()->set_rpm(360);
 }
 
 void towns_state::machine_reset()
@@ -2822,34 +2888,18 @@ void towns_state::towns_base(machine_config &config)
 	CDROM(config, m_cdrom, 0).set_interface("fmt_cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("fmtowns_cd");
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-
-	FMSCSI(config, m_scsi, 0);
-	m_scsi->set_scsi_port("scsi");
-	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
-	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
-
 	UPD71071(config, m_dma[0], 0);
 	m_dma[0]->set_cpu_tag("maincpu");
 	m_dma[0]->set_clock(4000000);
 	m_dma[0]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
-	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
 	m_dma[0]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[0]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
-	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
 	UPD71071(config, m_dma[1], 0);
 	m_dma[1]->set_cpu_tag("maincpu");
 	m_dma[1]->set_clock(4000000);
 	m_dma[1]->dma_read_callback<0>().set(FUNC(towns_state::towns_fdc_dma_r));
-	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
 	m_dma[1]->dma_read_callback<3>().set(FUNC(towns_state::towns_state::towns_cdrom_dma_r));
 	m_dma[1]->dma_write_callback<0>().set(FUNC(towns_state::towns_fdc_dma_w));
-	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
 
@@ -2868,8 +2918,9 @@ void towns_state::towns_base(machine_config &config)
 
 	FMT_ICMEM(config, m_icmemcard, 0);
 
-	/* internal ram */
-	RAM(config, m_ram).set_default_size("6M").set_extra_options("2M,4M,8M,16M,32M,64M,96M");
+	/* First-generation models: 1 MB onboard, 3 SIMM slots with 1 or 2 MB each, except slot 1 (limited to 1 MB).
+	   Model 2 comes with a 1 MB SIMM preinstalled on slot 1, Model 1 doesn't. */
+	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M");
 
 	MSM58321(config, m_rtc, 32768_Hz_XTAL);
 	m_rtc->d0_handler().set(FUNC(towns_state::rtc_d0_w));
@@ -2893,11 +2944,29 @@ void towns16_state::townsux(machine_config &config)
 
 	I386SX(config.replace(), m_maincpu, 16000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns16_state::ux_mem);
-	m_maincpu->set_addrmap(AS_IO, &towns16_state::towns16_io);
+	m_maincpu->set_addrmap(AS_IO, &towns16_state::townsux_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ram->set_default_size("2M").set_extra_options("10M");
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
+	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
+	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+
+	FMSCSI(config, m_scsi, 0);
+	m_scsi->set_scsi_port("scsi");
+	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
+	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
+
+	m_dma[0]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
+	m_dma[0]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
+	m_dma[1]->dma_read_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_r));
+	m_dma[1]->dma_write_callback<1>().set(FUNC(towns16_state::towns_scsi_dma_w));
+
+	// 2 MB onboard, one SIMM slot with 2-8 MB
+	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
 
 	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 }
@@ -2906,37 +2975,65 @@ void towns_state::townssj(machine_config &config)
 {
 	towns(config);
 
-	PENTIUM(config.replace(), m_maincpu, 66000000);
+	I486(config.replace(), m_maincpu, 66000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
-	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_io);
+	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ram->set_default_size("8M").set_extra_options("40M,72M");
+	scsi_port_device &scsi(SCSI_PORT(config, "scsi", 0));
+	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
+	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
+	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
+	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+
+	FMSCSI(config, m_scsi, 0);
+	m_scsi->set_scsi_port("scsi");
+	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
+	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
+
+	m_dma[0]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[0]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+	m_dma[1]->dma_read_callback<1>().set(FUNC(towns_state::towns_scsi_dma_r));
+	m_dma[1]->dma_write_callback<1>().set(FUNC(towns_state::towns_scsi_dma_w));
+
+	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
+	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");
 }
 
 void towns_state::townshr(machine_config &config)
 {
-	towns(config);
+	townssj(config);
 	I486(config.replace(), m_maincpu, 20000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
-	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_io);
+	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ram->set_default_size("4M").set_extra_options("12M,20M,28M");
+	// 4 MB onboard, 3 SIMM slots with 2-8 MB each
+	m_ram->set_default_size("4M").set_extra_options("6M,8M,10M,12M,14M,16M,18M,20M,22M,24M,28M");
+}
+
+void towns_state::townsmx(machine_config &config)
+{
+	townssj(config);
+
+	// 4 MB onboard, 3 SIMM slots with 2-32 MB each, MX170W/MX340W models come with a 4 MB SIMM preinstalled
+	m_ram->set_default_size("8M").set_extra_options("4M,6M,8M,10M,12M,14M,16M,18M,20M,22M,24M,26M,28M,30M,32M,36M,38M,40M,42M,44M,46M,48M,52M,53M,54M,56M,60M,68M,70M,72M,76M,84M,100M");
 }
 
 void towns_state::townsftv(machine_config &config)
 {
-	towns(config);
+	townssj(config);
 	I486(config.replace(), m_maincpu, 33000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &towns_state::towns_mem);
-	m_maincpu->set_addrmap(AS_IO, &towns_state::towns_io);
+	m_maincpu->set_addrmap(AS_IO, &towns_state::towns2_io);
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ram->set_default_size("6M").set_extra_options("32M,68M");
+	// 4 MB onboard, 2 SIMM slots with 2-32 MB each, one of them with a 2 MB SIMM preinstalled
+	m_ram->set_default_size("6M").set_extra_options("4M,8M,10M,12M,14M,16M,20M,22M,24M,28M,36M,38M,40M,44M,52M,68M");
 }
 
 void marty_state::marty(machine_config &config)
@@ -2949,30 +3046,36 @@ void marty_state::marty(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	m_ram->set_default_size("6M");
+	FLOPPY_CONNECTOR(config.replace(), m_flop[1], towns_floppies, nullptr, towns_state::floppy_formats);
+
+	// 2 MB onboard, expandable to 4 MB with a Marty-only expansion card
+	m_ram->set_default_size("2M").set_extra_options("4M");
 
 	NVRAM(config, "nvram16", nvram_device::DEFAULT_ALL_0);
 }
 
 /* ROM definitions */
-/* It is unknown exactly what model these ROM were dumped from, but it is certainly a newer model, as it won't
- * boot without the freerun timer, which was added in the FM-Towns II HG, HR, UG and later. */
+
+/* These ROMs were dumped from an FM Towns Model 2. Model 1 is assumed to use the same ROMs, since they were
+   released at the same time, and the only differences are the amount of RAM and floppy drives.
+
+   The ROM is physically contained in three 4 Mbit chips: two MB834200-20 (DIP40) and one MB834200-25 (QFP44) */
 ROM_START( fmtowns )
 	ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos.rom",  0x000000, 0x080000, CRC(112872ee) SHA1(57fd146478226f7f215caf63154c763a6d52165e) )
-	ROM_LOAD("fmt_f20.rom",  0x080000, 0x080000, CRC(9f55a20c) SHA1(1920711cb66340bb741a760de187de2f76040b8c) )
-	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(82d1daa2) SHA1(7564020dba71deee27184824b84dbbbb7c72aa4e) )
-	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(dd6fd544) SHA1(a216482ea3162f348fcf77fea78e0b2e4288091a) )
-	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(afe4ebcf) SHA1(4cd51de4fca9bd7a3d91d09ad636fa6b47a41df5) )
+	ROM_LOAD("fmt_dic.rom",  0x100000, 0x080000, CRC(b314c659) SHA1(3959c4c6be540252cabea06847bcd408f1911cfb) )
+	ROM_LOAD("fmt_fnt.rom",  0x180000, 0x040000, CRC(955c6b75) SHA1(fa5f7a18060afa35678dcbdc3589a1455aba26dc) )
+	ROM_LOAD("fmt_sys.rom",  0x200000, 0x040000, CRC(53319e23) SHA1(15d9cc705f3534fe97a2386e4d4848a1602cc534) )
 ROM_END
 
-/* likely an older set, as it runs without needing the freerun timer.  Font ROM appears to be corrupt, though. */
-ROM_START( fmtownsa )
+/* System ROM has a date of 91/07/09 and matches the UX set, but the dictionary ROM is completely different. It could be from an FM Towns II CX.
+   Font ROM appears to be corrupt, though. */
+ROM_START( fmtownsv03 )
 	ROM_REGION32_LE( 0x280000, "user", 0)
 	ROM_LOAD("fmt_dos_a.rom",  0x000000, 0x080000, CRC(22270e9f) SHA1(a7e97b25ff72b14121146137db8b45d6c66af2ae) )
 	ROM_LOAD("fmt_f20_a.rom",  0x080000, 0x080000, CRC(75660aac) SHA1(6a521e1d2a632c26e53b83d2cc4b0edecfc1e68c) )
 	ROM_LOAD("fmt_dic_a.rom",  0x100000, 0x080000, CRC(74b1d152) SHA1(f63602a1bd67c2ad63122bfb4ffdaf483510f6a8) )
-	ROM_LOAD("fmt_fnt_a.rom",  0x180000, 0x040000, CRC(0108a090) SHA1(1b5dd9d342a96b8e64070a22c3a158ca419894e1) )
+	ROM_LOAD("fmt_fnt_a.rom",  0x180000, 0x040000, CRC(0108a090) SHA1(1b5dd9d342a96b8e64070a22c3a158ca419894e1) BAD_DUMP )
 	ROM_LOAD("fmt_sys_a.rom",  0x200000, 0x040000, CRC(92f3fa67) SHA1(be21404098b23465d24c4201a81c96ac01aff7ab) )
 ROM_END
 
@@ -3078,14 +3181,14 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY    FULLNAME                FLAGS */
-COMP( 1989, fmtowns,    0,        0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns",             MACHINE_NOT_WORKING)
-COMP( 1989, fmtownsa,   fmtowns,  0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (alternate)", MACHINE_NOT_WORKING)
-COMP( 1991, fmtownsux,  fmtowns,  0,      townsux,  towns, towns16_state, empty_init, "Fujitsu", "FM-Towns II UX",       MACHINE_NOT_WORKING)
-COMP( 1992, fmtownshr,  fmtowns,  0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II HR",       MACHINE_NOT_WORKING)
-COMP( 1993, fmtownsmx,  fmtowns,  0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II MX",       MACHINE_NOT_WORKING)
-COMP( 1994, fmtownsftv, fmtowns,  0,      townsftv, towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II FreshTV",  MACHINE_NOT_WORKING)
-COMP( 19??, fmtownssj,  fmtowns,  0,      townssj,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II SJ",       MACHINE_NOT_WORKING)
-CONS( 1993, fmtmarty,   0,        0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty",       MACHINE_NOT_WORKING)
-CONS( 1993, fmtmarty2,  fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty 2",     MACHINE_NOT_WORKING)
-CONS( 1994, carmarty,   fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Car Marty",   MACHINE_NOT_WORKING)
+/*    YEAR  NAME        PARENT    COMPAT  MACHINE   INPUT  CLASS          INIT        COMPANY    FULLNAME                                   FLAGS */
+COMP( 1989, fmtowns,    0,        0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (Model 1 / 2)",                  MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsv03, fmtowns,  0,      towns,    towns, towns_state,   empty_init, "Fujitsu", "FM-Towns (unknown, V03 L01 00 91/07/09)", MACHINE_NOT_WORKING)
+COMP( 1991, fmtownsux,  fmtowns,  0,      townsux,  towns, towns16_state, empty_init, "Fujitsu", "FM-Towns II UX",                          MACHINE_NOT_WORKING)
+COMP( 1992, fmtownshr,  fmtowns,  0,      townshr,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II HR",                          MACHINE_NOT_WORKING)
+COMP( 1993, fmtownsmx,  fmtowns,  0,      townsmx,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II MX",                          MACHINE_NOT_WORKING)
+COMP( 1994, fmtownsftv, fmtowns,  0,      townsftv, towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II FreshTV",                     MACHINE_NOT_WORKING)
+COMP( 19??, fmtownssj,  fmtowns,  0,      townssj,  towns, towns_state,   empty_init, "Fujitsu", "FM-Towns II SJ",                          MACHINE_NOT_WORKING)
+CONS( 1993, fmtmarty,   0,        0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty",                          MACHINE_NOT_WORKING)
+CONS( 1993, fmtmarty2,  fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Marty 2",                        MACHINE_NOT_WORKING)
+CONS( 1994, carmarty,   fmtmarty, 0,      marty,    marty, marty_state,   empty_init, "Fujitsu", "FM-Towns Car Marty",                      MACHINE_NOT_WORKING)

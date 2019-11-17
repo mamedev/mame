@@ -79,7 +79,8 @@ void NETLIST_NAME(name)(netlist::nlparse_t &setup)                             \
 
 #define SUBMODEL(model, name)                                                  \
 		setup.namespace_push(# name);                                          \
-		NETLIST_NAME(model)(setup);                                            \
+		setup.include(# model);                                                \
+		/*NETLIST_NAME(model)(setup);*/                                        \
 		setup.namespace_pop();
 
 #define OPTIMIZE_FRONTIER(attach, r_in, r_out)                                 \
@@ -166,42 +167,38 @@ namespace netlist
 	};
 
 	// ----------------------------------------------------------------------------------------
-	// A Generic netlist sources implementation
+	// Specific netlist psource_t implementations
 	// ----------------------------------------------------------------------------------------
 
-	class source_t
+	class source_netlist_t : public plib::psource_t
 	{
 	public:
 
 		friend class setup_t;
 
-		enum type_t
-		{
-			SOURCE,
-			DATA
-		};
-
-		using list_t = std::vector<plib::unique_ptr<source_t>>;
-
-		source_t(const type_t type = SOURCE)
-		: m_type(type)
+		source_netlist_t()
+		: plib::psource_t()
 		{}
 
-		COPYASSIGNMOVE(source_t, delete)
-
-		virtual ~source_t() noexcept = default;
+		COPYASSIGNMOVE(source_netlist_t, delete)
+		virtual ~source_netlist_t() noexcept = default;
 
 		virtual bool parse(nlparse_t &setup, const pstring &name);
-
-		type_t type() const { return m_type; }
-
-	protected:
-		virtual plib::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
-
-	private:
-		const type_t m_type;
 	};
 
+	class source_data_t : public plib::psource_t
+	{
+	public:
+
+		friend class setup_t;
+
+		source_data_t()
+		: plib::psource_t()
+		{}
+
+		COPYASSIGNMOVE(source_data_t, delete)
+		virtual ~source_data_t() noexcept = default;
+	};
 
 	// ----------------------------------------------------------------------------------------
 	// Collection of models
@@ -223,7 +220,7 @@ namespace netlist
 		using model_map_t = std::unordered_map<pstring, pstring>;
 
 		void model_parse(const pstring &model, model_map_t &map);
-		pstring model_string(model_map_t &map);
+		pstring model_string(const model_map_t &map) const;
 
 		std::unordered_map<pstring, pstring> m_models;
 		std::unordered_map<pstring, model_map_t> m_cache;
@@ -252,9 +249,9 @@ namespace netlist
 		void register_frontier(const pstring &attach, const double r_IN, const double r_OUT);
 
 		/* register a source */
-		void register_source(plib::unique_ptr<source_t> &&src)
+		void register_source(plib::unique_ptr<plib::psource_t> &&src)
 		{
-			m_sources.push_back(std::move(src));
+			m_sources.add_source(std::move(src));
 		}
 
 		void tt_factory_create(tt_desc &desc, const pstring &sourcefile);
@@ -278,7 +275,12 @@ namespace netlist
 		bool device_exists(const pstring &name) const;
 
 		/* FIXME: used by source_t - need a different approach at some time */
-		bool parse_stream(plib::unique_ptr<plib::pistream> &&istrm, const pstring &name);
+		bool parse_stream(plib::psource_t::stream_ptr &&istrm, const pstring &name);
+
+		void add_include(plib::unique_ptr<plib::psource_t> &&inc)
+		{
+			m_includes.add_source(std::move(inc));
+		}
 
 		void add_define(const pstring &def, const pstring &val)
 		{
@@ -313,7 +315,7 @@ namespace netlist
 		std::vector<link_t>                         m_links;
 		std::unordered_map<pstring, pstring>        m_param_values;
 
-		source_t::list_t                            m_sources;
+		plib::psource_collection_t<>                m_sources;
 
 		factory::list_t                             m_factory;
 
@@ -323,6 +325,7 @@ namespace netlist
 
 	private:
 		plib::ppreprocessor::defines_map_type       m_defines;
+		plib::psource_collection_t<>                m_includes;
 
 		setup_t  &m_setup;
 		log_type &m_log;
@@ -363,7 +366,7 @@ namespace netlist
 		void register_dynamic_log_devices();
 		void resolve_inputs();
 
-		plib::unique_ptr<plib::pistream> get_data_stream(const pstring &name);
+		plib::psource_t::stream_ptr get_data_stream(const pstring &name);
 
 		factory::list_t &factory() { return m_factory; }
 		const factory::list_t &factory() const { return m_factory; }
@@ -392,8 +395,15 @@ namespace netlist
 
 		/* validation */
 
-		void enable_validation() { m_validation = true; }
-		bool is_validation() const { return m_validation; }
+		/* The extended validation mode is not intended for running.
+		 * The intention is to identify power pins which are not properly
+		 * connected. The downside is that this mode creates a netlist which
+		 * is different (and not able to run).
+		 *
+		 * Extended validation is supported by nltool validate option.
+		 */
+		void set_extended_validation(bool val) { m_validation = val; }
+		bool is_extended_validation() const { return m_validation; }
 	private:
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
@@ -424,58 +434,58 @@ namespace netlist
 	// base sources
 	// ----------------------------------------------------------------------------------------
 
-	class source_string_t : public source_t
+	class source_string_t : public source_netlist_t
 	{
 	public:
 
 		source_string_t(const pstring &source)
-		: source_t(), m_str(source)
+		: source_netlist_t(), m_str(source)
 		{
 		}
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		stream_ptr stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
 	};
 
-	class source_file_t : public source_t
+	class source_file_t : public source_netlist_t
 	{
 	public:
 
 		source_file_t(const pstring &filename)
-		: source_t(), m_filename(filename)
+		: source_netlist_t(), m_filename(filename)
 		{
 		}
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		stream_ptr stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
 	};
 
-	class source_mem_t : public source_t
+	class source_mem_t : public source_netlist_t
 	{
 	public:
 		source_mem_t(const char *mem)
-		: source_t(), m_str(mem)
+		: source_netlist_t(), m_str(mem)
 		{
 		}
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		stream_ptr stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
 	};
 
-	class source_proc_t : public source_t
+	class source_proc_t : public source_netlist_t
 	{
 	public:
 		source_proc_t(const pstring &name, void (*setup_func)(nlparse_t &))
-		: source_t(),
+		: source_netlist_t(),
 			m_setup_func(setup_func),
 			m_setup_func_name(name)
 		{
@@ -484,7 +494,7 @@ namespace netlist
 		bool parse(nlparse_t &setup, const pstring &name) override;
 
 	protected:
-		plib::unique_ptr<plib::pistream> stream(const pstring &name) override;
+		stream_ptr stream(const pstring &name) override;
 
 	private:
 		void (*m_setup_func)(nlparse_t &);

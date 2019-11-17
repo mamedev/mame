@@ -232,7 +232,7 @@ void arcadia_amiga_state::argh_map(address_map &map)
 {
 	a500_mem(map);
 	map(0x800000, 0x97ffff).bankr("bank2").region("user3", 0);
-//  AM_RANGE(0x980000, 0x9fefff) AM_ROM AM_REGION("user3", 0)
+//  map(0x980000, 0x9fefff).rom().region("user3", 0);
 	map(0x9ff000, 0x9fffff).ram().share("nvram");
 	map(0xf00000, 0xf7ffff).rom().region("user3", 0);
 }

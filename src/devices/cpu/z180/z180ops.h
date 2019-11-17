@@ -81,13 +81,13 @@ void z180_device::z180_mmu()
 inline u8 z180_device::RM(offs_t addr)
 {
 	m_extra_cycles += memory_wait_states();
-	return m_program->read_byte(MMU_REMAP_ADDR(addr));
+	return z180_read_memory(MMU_REMAP_ADDR(addr));
 }
 
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(addr,value) m_extra_cycles += memory_wait_states(); m_program->write_byte(MMU_REMAP_ADDR(addr),value)
+#define WM(addr,value) m_extra_cycles += memory_wait_states(); z180_write_memory(MMU_REMAP_ADDR(addr),value)
 
 /***************************************************************
  * Read a word from given memory location

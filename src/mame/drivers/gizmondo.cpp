@@ -211,7 +211,7 @@ void gizmondo_state::gizmondo(machine_config &config)
 	m_s3c2440->gpio_port_r_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_r));
 	m_s3c2440->gpio_port_w_callback().set(FUNC(gizmondo_state::s3c2440_gpio_port_w));
 
-	DISKONCHIP_G3(config, "diskonchip", 64);
+	DISKONCHIP_G3(config, "diskonchip").set_size(64);
 
 #if 0
 	QUICKLOAD(config, "quickload", "bin", 0).set_load_callback(FUNC(gizmondo_state::quickload_cb), this);

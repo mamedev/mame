@@ -1108,6 +1108,7 @@ void mindset_state::blit(u16 packet_seg, u16 packet_adr)
 					u16 tmask;
 					switch((mode >> 11) & 3) {
 					case 0:
+					default:
 						tmask = src;
 						break;
 					case 1:

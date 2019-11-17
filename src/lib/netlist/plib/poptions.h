@@ -184,7 +184,7 @@ public:
 protected:
 	int parse(const pstring &argument) override
 	{
-		bool err;
+		bool err(false);
 		m_val = pstonum_ne<T, true>(argument, err);
 		return (err ? 1 : (m_val < m_min || m_val > m_max));
 	}

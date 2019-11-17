@@ -175,12 +175,12 @@ void diverboy_state::diverboy_map(address_map &map)
 	map(0x180000, 0x180001).portr("P1_P2");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("COINS");
-//  AM_RANGE(0x18000a, 0x18000b) AM_READNOP
-//  AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
+//  map(0x18000a, 0x18000b).nopr();
+//  map(0x18000c, 0x18000d).nopw();
 	map(0x320000, 0x3207ff).writeonly(); /* ?? */
 	map(0x322000, 0x3227ff).writeonly(); /* ?? */
-//  AM_RANGE(0x340000, 0x340001) AM_WRITENOP
-//  AM_RANGE(0x340002, 0x340003) AM_WRITENOP
+//  map(0x340000, 0x340001).nopw();
+//  map(0x340002, 0x340003).nopw();
 }
 
 void diverboy_state::snd_map(address_map &map)

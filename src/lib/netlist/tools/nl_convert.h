@@ -103,7 +103,7 @@ private:
 		const pstring &name() { return m_name;}
 		const pstring &type() { return m_type;}
 		const pstring &model() { return m_model;}
-		const double &value() { return m_val;}
+		double value() { return m_val;}
 
 		bool has_model() { return m_model != ""; }
 		bool has_value() { return m_has_val; }
@@ -139,7 +139,7 @@ private:
 
 	void add_device(plib::unique_ptr<dev_t> dev);
 
-	plib::postringstream m_buf;
+	std::stringstream m_buf;
 
 	std::vector<plib::unique_ptr<dev_t>> m_devs;
 	std::unordered_map<pstring, plib::unique_ptr<net_t> > m_nets;

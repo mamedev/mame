@@ -24,7 +24,6 @@ GP1 HDD data contents:
 #include "includes/qdrmfgp.h"
 
 #include "cpu/m68000/m68000.h"
-#include "machine/ataintf.h"
 #include "machine/nvram.h"
 #include "sound/k054539.h"
 #include "speaker.h"

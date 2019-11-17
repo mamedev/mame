@@ -172,10 +172,10 @@ Notes:
 */
 
 #include "emu.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tlcs900.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
 

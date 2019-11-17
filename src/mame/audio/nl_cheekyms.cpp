@@ -1,7 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Vas Crabb
 
-#include "audio/nl_cheekyms.h"
 #include "netlist/devices/net_lib.h"
 
 

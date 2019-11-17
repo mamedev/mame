@@ -93,7 +93,7 @@ void ppu2c0x_device::ppu2c0x(address_map &map)
 	{
 		map(0x0000, 0x3eff).ram();
 		map(0x3f00, 0x3fff).rw(FUNC(ppu2c0x_device::palette_read), FUNC(ppu2c0x_device::palette_write));
-//  AM_RANGE(0x0000, 0x3fff) AM_RAM
+//  map(0x0000, 0x3fff).ram();
 	}
 }
 

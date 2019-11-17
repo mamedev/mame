@@ -1407,8 +1407,7 @@ void a7800_state::a7800_ntsc(machine_config &config)
 	A78_CART_SLOT(config, "cartslot", a7800_cart, nullptr);
 
 	/* software lists */
-	SOFTWARE_LIST(config, "cart_list").set_original("a7800");
-	subdevice<software_list_device>("cart_list")->set_filter("NTSC");
+	SOFTWARE_LIST(config, "cart_list").set_original("a7800").set_filter("NTSC");
 }
 
 void a7800_pal_state::a7800_pal(machine_config &config)

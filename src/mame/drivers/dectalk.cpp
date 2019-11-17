@@ -816,7 +816,7 @@ void dectalk_state::tms32010_io(address_map &map)
 {
 	map(0, 0).w(FUNC(dectalk_state::spc_latch_outfifo_error_stats)); // *set* the outfifo_status_r semaphore, and also latch the error bit at D0.
 	map(1, 1).rw(FUNC(dectalk_state::spc_infifo_data_r), FUNC(dectalk_state::spc_outfifo_data_w)); //read from input fifo, write to sound fifo
-	//AM_RANGE(8, 8) //the newer firmware seems to want something mapped here?
+	//map(8, 8) //the newer firmware seems to want something mapped here?
 }
 
 /******************************************************************************

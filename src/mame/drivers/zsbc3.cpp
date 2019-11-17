@@ -71,7 +71,7 @@ void zsbc3_state::zsbc3_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
-	map(0x08, 0x0b); //AM_DEVREADWRITE("pio", z80pio_device, read, write) // the control bytes appear to be for a PIO
+	map(0x08, 0x0b); //.rw("pio", FUNC(z80pio_device::read), FUNC(z80pio_device::write)); // the control bytes appear to be for a PIO
 	map(0x28, 0x2b).rw("sio", FUNC(z80sio_device::cd_ba_r), FUNC(z80sio_device::cd_ba_w));
 	map(0x30, 0x33).rw("ctc", FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x38, 0x38); // unknown device, init byte = C3

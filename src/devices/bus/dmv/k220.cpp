@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
+// thanks-to:rfka01
 /***************************************************************************
 
     NCR DMV K220 Diagnostic module
@@ -143,6 +144,10 @@ void dmv_k220_device::device_start()
 	space.install_readwrite_handler(0x0c, 0x0f, read8sm_delegate(FUNC(i8255_device::read), &(*m_ppi)), write8sm_delegate(FUNC(i8255_device::write), &(*m_ppi)), 0);
 
 	m_digits.resolve();
+
+	// register for state saving
+	save_item(NAME(m_portc));
+	save_pointer(NAME(m_ram->base()), m_ram->bytes());
 }
 
 //-------------------------------------------------

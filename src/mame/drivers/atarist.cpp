@@ -1233,7 +1233,7 @@ void st_state::st_map(address_map &map)
 	map(0x000008, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
 	map(0x400000, 0xf9ffff).rw(FUNC(st_state::berr_r), FUNC(st_state::berr_w));
-	//AM_RANGE(0xfa0000, 0xfbffff)      // mapped by the cartslot
+	//map(0xfa0000, 0xfbffff)      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(FUNC(st_state::berr_w));
 	map(0xff8001, 0xff8001).rw(FUNC(st_state::mmu_r), FUNC(st_state::mmu_w));
 	map(0xff8200, 0xff8203).rw(FUNC(st_state::shifter_base_r), FUNC(st_state::shifter_base_w)).umask16(0x00ff);
@@ -1348,47 +1348,47 @@ void stbook_state::stbook_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).ram();
 	map(0x200000, 0x3fffff).ram();
-//  AM_RANGE(0xd40000, 0xd7ffff) AM_ROM
+//  map(0xd40000, 0xd7ffff).rom();
 	map(0xe00000, 0xe3ffff).rom().region(M68000_TAG, 0);
-//  AM_RANGE(0xe80000, 0xebffff) AM_ROM
-//  AM_RANGE(0xfa0000, 0xfbffff) AM_ROM // cartridge
+//  map(0xe80000, 0xebffff).rom();
+//  map(0xfa0000, 0xfbffff).rom(); // cartridge
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
-/*  AM_RANGE(0xf00000, 0xf1ffff) AM_READWRITE(stbook_ide_r, stbook_ide_w)
-    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(stbook_mmu_r, stbook_mmu_w)
-    AM_RANGE(0xff8200, 0xff8203) AM_READWRITE(stbook_shifter_base_r, stbook_shifter_base_w)
-    AM_RANGE(0xff8204, 0xff8209) AM_READWRITE(stbook_shifter_counter_r, stbook_shifter_counter_w)
-    AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(stbook_shifter_sync_r, stbook_shifter_sync_w, 0xff00)
-    AM_RANGE(0xff820c, 0xff820d) AM_READWRITE(stbook_shifter_base_low_r, stbook_shifter_base_low_w)
-    AM_RANGE(0xff820e, 0xff820f) AM_READWRITE(stbook_shifter_lineofs_r, stbook_shifter_lineofs_w)
-    AM_RANGE(0xff8240, 0xff8241) AM_READWRITE(stbook_shifter_palette_r, stbook_shifter_palette_w)
-    AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(stbook_shifter_mode_r, stbook_shifter_mode_w, 0xff00)
-    AM_RANGE(0xff8264, 0xff8265) AM_READWRITE(stbook_shifter_pixelofs_r, stbook_shifter_pixelofs_w)
-    AM_RANGE(0xff827e, 0xff827f) AM_WRITE(lcd_control_w)*/
+/*  map(0xf00000, 0xf1ffff).rw(FUNC(stbook_state::stbook_ide_r), FUNC(stbook_state::stbook_ide_w));
+    map(0xff8000, 0xff8001).rw(FUNC(stbook_state::stbook_mmu_r), FUNC(stbook_state::stbook_mmu_w));
+    map(0xff8200, 0xff8203).rw(FUNC(stbook_state::stbook_shifter_base_r), FUNC(stbook_state::stbook_shifter_base_w));
+    map(0xff8204, 0xff8209).rw(FUNC(stbook_state::stbook_shifter_counter_r), FUNC(stbook_state::stbook_shifter_counter_w));
+    map(0xff820a, 0xff820a).rw(FUNC(stbook_state::stbook_shifter_sync_r), FUNC(stbook_state::stbook_shifter_sync_w));
+    map(0xff820c, 0xff820d).rw(FUNC(stbook_state::stbook_shifter_base_low_r), FUNC(stbook_state::stbook_shifter_base_low_w));
+    map(0xff820e, 0xff820f).rw(FUNC(stbook_state::stbook_shifter_lineofs_r), FUNC(stbook_state::stbook_shifter_lineofs_w));
+    map(0xff8240, 0xff8241).rw(FUNC(stbook_state::stbook_shifter_palette_r), FUNC(stbook_state::stbook_shifter_palette_w));
+    map(0xff8260, 0xff8260).rw(FUNC(stbook_state::stbook_shifter_mode_r), FUNC(stbook_state::stbook_shifter_mode_w));
+    map(0xff8264, 0xff8265).rw(FUNC(stbook_state::stbook_shifter_pixelofs_r), FUNC(stbook_state::stbook_shifter_pixelofs_w));
+    map(0xff827e, 0xff827f).w(FUNC(stbook_state::lcd_control_w));*/
 	map(0xff8800, 0xff8800).rw(YM3439_TAG, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
 	map(0xff8802, 0xff8802).w(YM3439_TAG, FUNC(ay8910_device::data_w));
-/*  AM_RANGE(0xff8900, 0xff8901) AM_READWRITE8(sound_dma_control_r, sound_dma_control_w, 0x00ff)
-    AM_RANGE(0xff8902, 0xff8907) AM_READWRITE8(sound_dma_base_r, sound_dma_base_w, 0x00ff)
-    AM_RANGE(0xff8908, 0xff890d) AM_READ8(sound_dma_counter_r, 0x00ff)
-    AM_RANGE(0xff890e, 0xff8913) AM_READWRITE8(sound_dma_end_r, sound_dma_end_w, 0x00ff)
-    AM_RANGE(0xff8920, 0xff8921) AM_READWRITE8(sound_mode_r, sound_mode_w, 0x00ff)
-    AM_RANGE(0xff8922, 0xff8923) AM_READWRITE(microwire_data_r, microwire_data_w)
-    AM_RANGE(0xff8924, 0xff8925) AM_READWRITE(microwire_mask_r, microwire_mask_w)
-    AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
-    AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
-    AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
-    AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
-    AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
-    AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-    AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-    AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
-    AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
-    AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
-    AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
-    AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
-    AM_RANGE(0xff9200, 0xff9201) AM_READ(config_r)
-    AM_RANGE(0xff9202, 0xff9203) AM_READWRITE(lcd_contrast_r, lcd_contrast_w)
-    AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(power_r, power_w)
-    AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(reference_r, reference_w)*/
+/*  map(0xff8901, 0xff8901).rw(FUNC(stbook_state::sound_dma_control_r), FUNC(stbook_state::sound_dma_control_w));
+    map(0xff8902, 0xff8907).rw(FUNC(stbook_state::sound_dma_base_r), FUNC(stbook_state::sound_dma_base_w)).umask16(0x00ff);
+    map(0xff8908, 0xff890d).r(FUNC(stbook_state::sound_dma_counter_r)).umask16(0x00ff);
+    map(0xff890e, 0xff8913).rw(FUNC(stbook_state::sound_dma_end_r), FUNC(stbook_state::sound_dma_end_w)).umask16(0x00ff);
+    map(0xff8921, 0xff8921).rw(FUNC(stbook_state::sound_mode_r), FUNC(stbook_state::sound_mode_w));
+    map(0xff8922, 0xff8923).rw(FUNC(stbook_state::microwire_data_r), FUNC(stbook_state::microwire_data_w));
+    map(0xff8924, 0xff8925).rw(FUNC(stbook_state::microwire_mask_r), FUNC(stbook_state::microwire_mask_w));
+    map(0xff8a00, 0xff8a1f).rw(FUNC(stbook_state::blitter_halftone_r), FUNC(stbook_state::blitter_halftone_w));
+    map(0xff8a20, 0xff8a21).rw(FUNC(stbook_state::blitter_src_inc_x_r), FUNC(stbook_state::blitter_src_inc_x_w));
+    map(0xff8a22, 0xff8a23).rw(FUNC(stbook_state::blitter_src_inc_y_r), FUNC(stbook_state::blitter_src_inc_y_w));
+    map(0xff8a24, 0xff8a27).rw(FUNC(stbook_state::blitter_src_r), FUNC(stbook_state::blitter_src_w));
+    map(0xff8a28, 0xff8a2d).rw(FUNC(stbook_state::blitter_end_mask_r), FUNC(stbook_state::blitter_end_mask_w));
+    map(0xff8a2e, 0xff8a2f).rw(FUNC(stbook_state::blitter_dst_inc_x_r), FUNC(stbook_state::blitter_dst_inc_x_w));
+    map(0xff8a30, 0xff8a31).rw(FUNC(stbook_state::blitter_dst_inc_y_r), FUNC(stbook_state::blitter_dst_inc_y_w));
+    map(0xff8a32, 0xff8a35).rw(FUNC(stbook_state::blitter_dst_r), FUNC(stbook_state::blitter_dst_w));
+    map(0xff8a36, 0xff8a37).rw(FUNC(stbook_state::blitter_count_x_r), FUNC(stbook_state::blitter_count_x_w));
+    map(0xff8a38, 0xff8a39).rw(FUNC(stbook_state::blitter_count_y_r), FUNC(stbook_state::blitter_count_y_w));
+    map(0xff8a3a, 0xff8a3b).rw(FUNC(stbook_state::blitter_op_r), FUNC(stbook_state::blitter_op_w));
+    map(0xff8a3c, 0xff8a3d).rw(FUNC(stbook_state::blitter_ctrl_r), FUNC(stbook_state::blitter_ctrl_w));
+    map(0xff9200, 0xff9201).r(FUNC(stbook_state::config_r));
+    map(0xff9202, 0xff9203).rw(FUNC(stbook_state::lcd_contrast_r), FUNC(stbook_state::lcd_contrast_w));
+    map(0xff9210, 0xff9211).rw(FUNC(stbook_state::power_r), FUNC(stbook_state::power_w));
+    map(0xff9214, 0xff9215).rw(FUNC(stbook_state::reference_r), FUNC(stbook_state::reference_w));*/
 }
 #endif
 

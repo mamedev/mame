@@ -790,6 +790,16 @@ ROM_START(comeback)
 ROM_END
 
 
+// Terrific Lake (Sport Matic)
+ROM_START(terrlake)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("jtl_2a3.u9", 0x0000, 0x2000, CRC(f6d3cedd) SHA1(31e0daac1e9215ad0e1557d31d520745ead0f396))
+
+	ROM_REGION(0x28000, "zsu:soundcpu", 0)
+	ROM_LOAD("stl_1a0.u3", 0x00000, 0x8000, CRC(b5afdc39) SHA1(fb74de453dfc66b87f3d64508802b3de46d14631))
+	ROM_LOAD("stl_1b0.u4", 0x08000, 0x8000, CRC(3bbdd791) SHA1(68cd86cb96a278538d18ca0a77b372309829edf4))
+ROM_END
+
 GAME(1982,  spain82,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Spain '82",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1983,  megaaton,  0,        megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton",                    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1983,  megaatona, megaaton, megaaton, megaaton, play_3_state, empty_init, ROT0, "Playmatic", "Meg-Aaton (alternate set)",    MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -811,6 +821,7 @@ GAME(1987,  ironball,  0,        play_3,   play_3,   play_3_state, empty_init, R
 // "Z-Pinball" hardware, Z80 main and sound CPUs - to be split (?)
 GAME(1986,  eballchps, eballchp, sklflite, play_3,   play_3_state, empty_init, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  cobrapb,   0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Playbar",   "Cobra (Playbar)",              MACHINE_IS_SKELETON_MECHANICAL)
-GAME(198?,  comeback, 0,         sklflite, play_3,   play_3_state, empty_init, ROT0, "Nondum / CIFA", "Come Back",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  comeback,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Nondum / CIFA", "Come Back",                MACHINE_IS_SKELETON_MECHANICAL)
+GAME(198?,  terrlake,  0,        sklflite, play_3,   play_3_state, empty_init, ROT0, "Sport Matic", "Terrific Lake",              MACHINE_IS_SKELETON_MECHANICAL)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   play_3_state, empty_init, ROT0, "Playmatic", "Miss Disco (Bingo)",           MACHINE_IS_SKELETON_MECHANICAL)

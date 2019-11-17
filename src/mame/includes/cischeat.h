@@ -48,13 +48,13 @@ public:
 	DECLARE_WRITE16_MEMBER(scudhamm_oki_bank_w);
 	DECLARE_READ16_MEMBER(armchmp2_motor_status_r);
 	DECLARE_WRITE16_MEMBER(armchmp2_motor_command_w);
-	DECLARE_READ16_MEMBER(armchmp2_analog_r);
+	uint8_t armchmp2_analog_r();
 	DECLARE_READ16_MEMBER(armchmp2_buttons_r);
 	DECLARE_WRITE16_MEMBER(armchmp2_leds_w);
 	DECLARE_WRITE16_MEMBER(bigrun_soundbank_w);
 	DECLARE_READ16_MEMBER(scudhamm_motor_status_r);
 	DECLARE_READ16_MEMBER(scudhamm_motor_pos_r);
-	DECLARE_READ16_MEMBER(scudhamm_analog_r);
+	uint8_t scudhamm_analog_r();
 	DECLARE_READ16_MEMBER(bigrun_ip_select_r);
 	DECLARE_WRITE16_MEMBER(leds_out_w);
 	DECLARE_WRITE16_MEMBER(unknown_out_w);

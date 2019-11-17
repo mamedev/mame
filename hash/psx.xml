@@ -1332,7 +1332,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<description>Arc the Lad Collection - Arc the Lad II (USA)</description>
 		<year>2002</year>
 		<publisher>Working Designs</publisher>
-		<info name="serial" value=" SLUS-01252, SLUS-01252B"/>
+		<info name="serial" value="SLUS-01252, SLUS-01252B"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="psx_cdrom">
 			<diskarea name="cdrom">
@@ -57677,7 +57677,7 @@ A few comments on these:
 
 <!-- Prototype discs -->
 
-	<software name="bublbob2" >
+	<software name="bublbob2">
 		<!-- Original images
 		<rom name="bb2.bin" size="62620864" crc="1c2c9f63" sha1="2d9cf9e34057c93fe1d40940428c463a7224444e"/>
 		<rom name="bb2.cue" size="69" crc="096e5077" sha1="a56c5425f32b5ead296ecd4d3b1ac909d8144972"/>

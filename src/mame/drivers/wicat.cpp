@@ -551,9 +551,9 @@ READ8_MEMBER(wicat_state::video_r)
 	switch(offset)
 	{
 	case 0x00:
-		return m_crtc->read(space,0);
+		return m_crtc->read(0);
 	case 0x02:
-		return m_crtc->read(space,1);
+		return m_crtc->read(1);
 	default:
 		return 0xff;
 	}
@@ -564,10 +564,10 @@ WRITE8_MEMBER(wicat_state::video_w)
 	switch(offset)
 	{
 	case 0x00:
-		m_crtc->write(space,0,data);
+		m_crtc->write(0,data);
 		break;
 	case 0x02:
-		m_crtc->write(space,1,data);
+		m_crtc->write(1,data);
 		break;
 	}
 }

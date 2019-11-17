@@ -12,7 +12,7 @@ BASIC-52 is an official Intel release.
 
 BASIC-31 (and variants) as found on the below url, are homebrews.
 
-http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
+https://web.archive.org/web/20110908004037/http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
 
 
 The driver is working, however there are issues with the cpu serial code.
@@ -67,9 +67,9 @@ void basic52_state::basic52_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x7fff).ram();
-	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
-	//AM_RANGE(0xc000, 0xdfff) // Expansion block
-	//AM_RANGE(0xe000, 0xffff) // Expansion block
+	//map(0x8000, 0x9fff).rom(); // EPROM
+	//map(0xc000, 0xdfff) // Expansion block
+	//map(0xe000, 0xffff) // Expansion block
 }
 
 void basic52_state::basic52_io(address_map &map)
@@ -78,8 +78,8 @@ void basic52_state::basic52_io(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0x8000, 0x9fff).rom(); // EPROM
 	map(0xa000, 0xa003).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));  // PPI-8255
-	//AM_RANGE(0xc000, 0xdfff) // Expansion block
-	//AM_RANGE(0xe000, 0xffff) // Expansion block
+	//map(0xc000, 0xdfff) // Expansion block
+	//map(0xe000, 0xffff) // Expansion block
 }
 
 /* Input ports */

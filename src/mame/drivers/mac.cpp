@@ -1509,7 +1509,7 @@ void mac_state::macpb180c(machine_config &config)
 	m_screen->set_size(800, 525);
 	m_screen->set_visarea(0, 640-1, 0, 480-1);
 	m_screen->set_screen_update(FUNC(mac_state::screen_update_macpbwd));
-	m_screen->set_palette(finder_base::DUMMY_TAG);
+	m_screen->set_no_palette();
 }
 
 void mac_state::macpd210(machine_config &config)

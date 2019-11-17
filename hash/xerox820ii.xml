@@ -11,7 +11,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="61108">
-				<rom name="130s22110_820-ii_diag.imd" size="61108" crc="d72828ed" sha1="d0c87714e9fca19ad75b8fc6db8de5825b1f474c" offset="0" />
+				<rom name="130s22110_820-ii_diag.imd" size="61108" crc="d72828ed" sha1="d0c87714e9fca19ad75b8fc6db8de5825b1f474c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -24,14 +24,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Work Disk"/>
 			<dataarea name="flop" size="138643">
-				<rom name="820-ii_cpm22.imd" size="138643" crc="60e99303" sha1="85730f4d31aaed44755056d9c6c164df854b4fac" offset="0" />
+				<rom name="820-ii_cpm22.imd" size="138643" crc="60e99303" sha1="85730f4d31aaed44755056d9c6c164df854b4fac"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Diagnostic Work Copy"/>
 			<dataarea name="flop" size="38342">
-				<rom name="diag_820-ii.imd" size="38342" crc="61639171" sha1="ba3a4491fa28f2a152a6409f93e3faa16fca32a5" offset="0" />
+				<rom name="diag_820-ii.imd" size="38342" crc="61639171" sha1="ba3a4491fa28f2a152a6409f93e3faa16fca32a5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -44,42 +44,42 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="338050">
-				<rom name="bootdisk.imd" size="338050" crc="f11a529a" sha1="f0f85d2afca5a16caec0a788a9baaba53d877432" offset="0" />
+				<rom name="bootdisk.imd" size="338050" crc="f11a529a" sha1="f0f85d2afca5a16caec0a788a9baaba53d877432"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Utility and Macro Asm"/>
 			<dataarea name="flop" size="288789">
-				<rom name="dos_util_asm.imd" size="288789" crc="00a3a9c6" sha1="b427cfbd249a792f880b237650b506d25dd64b36" offset="0" />
+				<rom name="dos_util_asm.imd" size="288789" crc="00a3a9c6" sha1="b427cfbd249a792f880b237650b506d25dd64b36"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Util Macro Asssmb DSDD"/>
 			<dataarea name="flop" size="289509">
-				<rom name="msdutil.imd" size="289509" crc="3a9a74f9" sha1="bc4196d7ccd1fb5c4aaf5f5b1bcd5682b8a1744a" offset="0" />
+				<rom name="msdutil.imd" size="289509" crc="3a9a74f9" sha1="bc4196d7ccd1fb5c4aaf5f5b1bcd5682b8a1744a"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="MS-Load Boot CP/M Boot Track"/>
 			<dataarea name="flop" size="266065">
-				<rom name="msload.imd" size="266065" crc="0be6d91d" sha1="6bda99437cc072505ab4d3b9e65a836bea2a8e97" offset="0" />
+				<rom name="msload.imd" size="266065" crc="0be6d91d" sha1="6bda99437cc072505ab4d3b9e65a836bea2a8e97"/>
 			</dataarea>
 		</part>
 
 		<part name="flop5" interface="floppy_5_25">
 			<feature name="part_id" value="Sys Disk"/>
 			<dataarea name="flop" size="344492">
-				<rom name="mssys.imd" size="344492" crc="7e452981" sha1="48fcf83199b452b869c2eb37b29b7783010e5da0" offset="0" />
+				<rom name="mssys.imd" size="344492" crc="7e452981" sha1="48fcf83199b452b869c2eb37b29b7783010e5da0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop6" interface="floppy_5_25">
 			<feature name="part_id" value="Utilities"/>
 			<dataarea name="flop" size="306651">
-				<rom name="utils.imd" size="306651" crc="146ff7de" sha1="7e087276443677d9115336d2f8f7a63dfe02b37d" offset="0" />
+				<rom name="utils.imd" size="306651" crc="146ff7de" sha1="7e087276443677d9115336d2f8f7a63dfe02b37d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -91,7 +91,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="186220">
-				<rom name="util.imd" size="186220" crc="08423a20" sha1="3119a440cc3e8f55e9a06ef18c63d8d2d09980d5" offset="0" />
+				<rom name="util.imd" size="186220" crc="08423a20" sha1="3119a440cc3e8f55e9a06ef18c63d8d2d09980d5"/>
 			</dataarea>
 		</part>
 	</software>
@@ -103,7 +103,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="288277">
-				<rom name="wstar.imd" size="288277" crc="084fff81" sha1="79f007b806f60480248db97a84e36be7b9405c62" offset="0" />
+				<rom name="wstar.imd" size="288277" crc="084fff81" sha1="79f007b806f60480248db97a84e36be7b9405c62"/>
 			</dataarea>
 		</part>
 	</software>
@@ -115,7 +115,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="200512">
-				<rom name="x820ii.imd" size="200512" crc="08dae2a4" sha1="d264656785d9fc43fe83ddde310294271c2ff88d" offset="0" />
+				<rom name="x820ii.imd" size="200512" crc="08dae2a4" sha1="d264656785d9fc43fe83ddde310294271c2ff88d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -128,14 +128,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="DOSPlus 3.4"/>
 			<dataarea name="flop" size="159100">
-				<rom name="xpro.imd" size="159100" crc="2761eeae" sha1="9f8942123ddfdc77f190ae55d792cbe789f89467" offset="0" />
+				<rom name="xpro.imd" size="159100" crc="2761eeae" sha1="9f8942123ddfdc77f190ae55d792cbe789f89467"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="XPro Source List"/>
 			<dataarea name="flop" size="198224">
-				<rom name="xprolst.imd" size="198224" crc="d1f0c635" sha1="fa193fd3e48db8c5b3ad1e303dfd580acb1b8307" offset="0" />
+				<rom name="xprolst.imd" size="198224" crc="d1f0c635" sha1="fa193fd3e48db8c5b3ad1e303dfd580acb1b8307"/>
 			</dataarea>
 		</part>
 	</software>

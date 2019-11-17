@@ -218,9 +218,10 @@
 
 MACHINE_START_MEMBER(_8080bw_state,extra_8080bw)
 {
+	mw8080bw_state::machine_start();
+
 	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
 	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 /*******************************************************/
@@ -396,11 +397,11 @@ static INPUT_PORTS_START( invadpt2 )
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
-	/* SW1:2 doesn't seem to work? */
-	PORT_DIPNAME( 0x02, 0x00, "Rotate Images" ) PORT_DIPLOCATION("SW1:2") /* "When ON, the images on screen will be rotated. Default is ON." */
+	// SW1:2 doesn't seem to work?
+	PORT_DIPNAME( 0x02, 0x00, "Rotate Images" ) PORT_DIPLOCATION("SW1:2") // "When ON, the images on screen will be rotated. Default is ON."
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Preset Mode" ) PORT_DIPLOCATION("SW1:4") /* Preset Mode: "Switch for checking, when OFF checking can be done." */
+	PORT_DIPNAME( 0x08, 0x00, "Preset Mode" ) PORT_DIPLOCATION("SW1:4") // Preset Mode: "Switch for checking, when OFF checking can be done."
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -562,8 +563,8 @@ void _8080bw_state::astropal_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x03, 0x03).mirror(0x04).portr("IN3");
 
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invaders_audio_1_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
+	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -812,8 +813,8 @@ void _8080bw_state::spacecom_map(address_map &map)
 void _8080bw_state::spacecom_io_map(address_map &map)
 {
 	map(0x41, 0x41).portr("IN0");
-	map(0x42, 0x42).portr("IN1").w(FUNC(_8080bw_state::invaders_audio_1_w));
-	map(0x44, 0x44).portr("IN2").w(FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x42, 0x42).portr("IN1").w("soundboard", FUNC(invaders_audio_device::p1_w));
+	map(0x44, 0x44).portr("IN2").w("soundboard", FUNC(invaders_audio_device::p2_w));
 }
 
 void _8080bw_state::spacecom(machine_config &config)
@@ -825,7 +826,6 @@ void _8080bw_state::spacecom(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::spacecom_io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(_8080bw_state::interrupt_vector));
 
-	MCFG_MACHINE_START_OVERRIDE(mw8080bw_state, mw8080bw)
 	MCFG_MACHINE_RESET_OVERRIDE(mw8080bw_state, mw8080bw)
 
 	/* video hardware */
@@ -836,7 +836,8 @@ void _8080bw_state::spacecom(machine_config &config)
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	/* sound hardware */
-	invaders_audio(config);
+	INVADERS_AUDIO(config, "soundboard").  // the flip screen line is only connected on the cocktail PCB
+			flip_screen_out().set([this] (int state) { if (invaders_is_cabinet_cocktail()) m_flip_screen = state ? 1 : 0; });
 }
 
 void _8080bw_state::init_spacecom()
@@ -1236,12 +1237,6 @@ static INPUT_PORTS_START( cosmicmo )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-WRITE8_MEMBER(_8080bw_state::cosmicmo_05_w)
-{
-	invaders_audio_2_w(space, offset, data);
-	m_flip_screen = BIT(data, 5) & BIT(ioport("IN2")->read(), 2);
-}
-
 void _8080bw_state::cosmicmo_io_map(address_map &map)
 {
 	map.global_mask(0x7);
@@ -1251,9 +1246,9 @@ void _8080bw_state::cosmicmo_io_map(address_map &map)
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w(FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w(FUNC(_8080bw_state::cosmicmo_05_w));
+	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -1261,18 +1256,19 @@ void _8080bw_state::cosmicmo(machine_config &config)
 {
 	mw8080bw_root(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_IO, &_8080bw_state::cosmicmo_io_map);
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 255);
 
-	/* add shifter */
+	// add shifter
 	MB14241(config, m_mb14241);
 
-	/* sound hardware */
-	invaders_audio(config);
+	// sound hardware
+	INVADERS_AUDIO(config, "soundboard").
+			flip_screen_out().set([this] (int state) { m_flip_screen = (state && BIT(ioport("IN2")->read(), 2)) ? 1 : 0; });
 
 	/* video hardware */
 	m_screen->set_screen_update(FUNC(_8080bw_state::screen_update_invaders));
@@ -1399,12 +1395,12 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,rollingc)
 {
+	mw8080bw_state::machine_start();
+
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x400);
 	m_scattered_colorram2 = std::make_unique<uint8_t []>(0x400);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x400);
 	save_pointer(&m_scattered_colorram2[0], "m_scattered_colorram2", 0x400);
-
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 void _8080bw_state::rollingc(machine_config &config)
@@ -1535,11 +1531,12 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,schaser)
 {
+	mw8080bw_state::machine_start();
+
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	MACHINE_START_CALL_MEMBER(schaser_sh);
 	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 MACHINE_RESET_MEMBER(_8080bw_state,schaser)
@@ -1676,12 +1673,13 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,schasercv)
 {
+	mw8080bw_state::machine_start();
+
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 
 	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
 	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 void _8080bw_state::schasercv(machine_config &config)
@@ -1784,10 +1782,10 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,sflush)
 {
+	mw8080bw_state::machine_start();
+
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
-
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 void _8080bw_state::sflush(machine_config &config)
@@ -1977,12 +1975,12 @@ WRITE_LINE_MEMBER(_8080bw_state::polaris_60hz_w)
 
 MACHINE_START_MEMBER(_8080bw_state,polaris)
 {
+	mw8080bw_state::machine_start();
+
 	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
 	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
-
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 READ8_MEMBER(_8080bw_state::polaris_port00_r)
@@ -2940,9 +2938,9 @@ void _8080bw_state::vortex_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x00, 0x00).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x01, 0x01).w(FUNC(_8080bw_state::invaders_audio_1_w));
+	map(0x01, 0x01).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x06, 0x06).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x07, 0x07).w(FUNC(_8080bw_state::invaders_audio_2_w));
+	map(0x07, 0x07).w("soundboard", FUNC(invaders_audio_device::p2_w));
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -2990,7 +2988,8 @@ void _8080bw_state::vortex(machine_config &config)
 	MB14241(config, m_mb14241);
 
 	/* audio hardware */
-	invaders_audio(config);
+	INVADERS_AUDIO(config, "soundboard").  // the flip screen line is only connected on the cocktail PCB
+			flip_screen_out().set([this] (int state) { if (invaders_is_cabinet_cocktail()) m_flip_screen = state ? 1 : 0; });
 }
 
 /* decrypt function for vortex */
@@ -3219,12 +3218,12 @@ READ8_MEMBER(_8080bw_state::claybust_gun_hi_r)
 
 void _8080bw_state::claybust_io_map(address_map &map)
 {
-	//AM_RANGE(0x00, 0x00) AM_WRITENOP // ?
+	//map(0x00, 0x00).nopw(); // ?
 	map(0x01, 0x01).portr("IN1").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
 	map(0x02, 0x02).r(FUNC(_8080bw_state::claybust_gun_lo_r)).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)); //AM_WRITENOP // port3 write looks sound-related
+	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)); //.nopw(); // port3 write looks sound-related
 	map(0x04, 0x04).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
-	//AM_RANGE(0x05, 0x05) AM_WRITENOP // ?
+	//map(0x05, 0x05).nopw(); // ?
 	map(0x06, 0x06).r(FUNC(_8080bw_state::claybust_gun_hi_r));
 }
 
@@ -3273,10 +3272,10 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state, claybust)
 {
+	mw8080bw_state::machine_start();
+
 	m_claybust_gun_pos = 0;
 	save_item(NAME(m_claybust_gun_pos));
-
-	MACHINE_START_CALL_MEMBER(mw8080bw);
 }
 
 void _8080bw_state::claybust(machine_config &config)
@@ -3452,7 +3451,7 @@ static INPUT_PORTS_START( invmulti )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_sw5_r)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_coin_input_r)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mw8080bw_state, direct_coin_count, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
@@ -3466,11 +3465,6 @@ static INPUT_PORTS_START( invmulti )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW:2" )
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(mw8080bw_state, invaders_in2_control_r)
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW:1" )
-
-	/* fake port for reading the coin input */
-	PORT_START(INVADERS_COIN_INPUT_PORT_TAG)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* fake port for cabinet type */
 	PORT_START(INVADERS_CAB_TYPE_PORT_TAG)

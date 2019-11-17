@@ -1850,7 +1850,7 @@ void sun4_state::sun4(machine_config &config)
 {
 	/* basic machine hardware */
 	MB86901(config, m_maincpu, 16'670'000);
-		m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
+	m_maincpu->add_asi_desc([](sparc_disassembler *dasm) { dasm->add_asi_desc(sun4_asi_desc); });
 	m_maincpu->set_addrmap(0, &sun4_state::sun4c_debugger_map);
 
 	// TODO: MMU for sun4 hardware

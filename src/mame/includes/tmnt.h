@@ -52,9 +52,7 @@ public:
 	void tmnt2(machine_config &config);
 	void lgtnfght(machine_config &config);
 	void thndrx2(machine_config &config);
-	void prmrsocr(machine_config &config);
 	void sunsetbl(machine_config &config);
-	void glfgreat(machine_config &config);
 	void tmnt(machine_config &config);
 	void mia(machine_config &config);
 	void punkshot(machine_config &config);
@@ -63,7 +61,9 @@ public:
 	void init_tmnt();
 	void init_cuebrick();
 
-private:
+protected:
+	virtual void machine_start() override;
+
 	enum
 	{
 		TIMER_NMI
@@ -82,11 +82,7 @@ private:
 	int        m_sorted_layer[3];   // this might not be necessary, but tmnt2 uses it in a strange way...
 
 	tilemap_t  *m_roz_tilemap;
-	int        m_glfgreat_roz_rom_bank;
-	int        m_glfgreat_roz_char_bank;
-	int        m_glfgreat_roz_rom_mode;
 	int        m_glfgreat_pixel;
-	int        m_prmrsocr_sprite_bank;
 	int        m_blswhstl_rombank;
 	int        m_tmnt_priorityflag;
 	int        m_lastdim;
@@ -129,8 +125,6 @@ private:
 	DECLARE_WRITE16_MEMBER(k053245_scattered_word_w);
 	DECLARE_READ16_MEMBER(k053244_word_noA1_r);
 	DECLARE_WRITE16_MEMBER(k053244_word_noA1_w);
-	DECLARE_WRITE16_MEMBER(prmrsocr_sound_irq_w);
-	DECLARE_WRITE8_MEMBER(prmrsocr_audio_bankswitch_w);
 	DECLARE_READ8_MEMBER(tmnt_sres_r);
 	DECLARE_WRITE8_MEMBER(tmnt_sres_w);
 	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
@@ -143,30 +137,19 @@ private:
 	DECLARE_WRITE16_MEMBER(blswhstl_eeprom_w);
 	DECLARE_READ16_MEMBER(thndrx2_eeprom_r);
 	DECLARE_WRITE16_MEMBER(thndrx2_eeprom_w);
-	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
 	DECLARE_WRITE8_MEMBER(cuebrick_nvbank_w);
 	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
-	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
 	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
 	DECLARE_WRITE16_MEMBER(tmnt_0a0000_w);
 	DECLARE_WRITE16_MEMBER(punkshot_0a0020_w);
 	DECLARE_WRITE16_MEMBER(lgtnfght_0a0018_w);
 	DECLARE_WRITE16_MEMBER(blswhstl_700300_w);
-	DECLARE_READ16_MEMBER(glfgreat_rom_r);
-	DECLARE_WRITE16_MEMBER(glfgreat_122000_w);
 	DECLARE_WRITE16_MEMBER(ssriders_eeprom_w);
 	DECLARE_WRITE16_MEMBER(ssriders_1c0300_w);
-	DECLARE_WRITE16_MEMBER(prmrsocr_122000_w);
-	DECLARE_READ16_MEMBER(prmrsocr_rom_r);
 	DECLARE_WRITE16_MEMBER(tmnt_priority_w);
-	DECLARE_READ16_MEMBER(glfgreat_ball_r);
-	DECLARE_WRITE8_MEMBER(glfgreat_sound_w);
 	DECLARE_WRITE8_MEMBER(tmnt_upd_start_w);
 	DECLARE_READ8_MEMBER(tmnt_upd_busy_r);
 
-	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
-	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
-	DECLARE_MACHINE_START(common);
 	DECLARE_MACHINE_RESET(common);
 	DECLARE_VIDEO_START(cuebrick);
 	DECLARE_VIDEO_START(mia);
@@ -174,9 +157,6 @@ private:
 	DECLARE_VIDEO_START(tmnt);
 	DECLARE_VIDEO_START(lgtnfght);
 	DECLARE_VIDEO_START(blswhstl);
-	DECLARE_VIDEO_START(glfgreat);
-	DECLARE_MACHINE_START(prmrsocr);
-	DECLARE_VIDEO_START(prmrsocr);
 	uint32_t screen_update_mia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tmnt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -197,7 +177,6 @@ private:
 	K051960_CB_MEMBER(thndrx2_sprite_callback);
 	K05324X_CB_MEMBER(lgtnfght_sprite_callback);
 	K05324X_CB_MEMBER(blswhstl_sprite_callback);
-	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
 	K052109_CB_MEMBER(mia_tile_callback);
 	K052109_CB_MEMBER(cuebrick_tile_callback);
 	K052109_CB_MEMBER(tmnt_tile_callback);
@@ -207,14 +186,10 @@ private:
 
 	void blswhstl_main_map(address_map &map);
 	void cuebrick_main_map(address_map &map);
-	void glfgreat_audio_map(address_map &map);
-	void glfgreat_main_map(address_map &map);
 	void lgtnfght_audio_map(address_map &map);
 	void lgtnfght_main_map(address_map &map);
 	void mia_audio_map(address_map &map);
 	void mia_main_map(address_map &map);
-	void prmrsocr_audio_map(address_map &map);
-	void prmrsocr_main_map(address_map &map);
 	void punkshot_audio_map(address_map &map);
 	void punkshot_main_map(address_map &map);
 	void ssriders_audio_map(address_map &map);
@@ -227,6 +202,68 @@ private:
 	void tmnt_main_map(address_map &map);
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+};
+
+class glfgreat_state : public tmnt_state
+{
+public:
+	glfgreat_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tmnt_state(mconfig, type, tag),
+		m_analog_controller(*this, "CONTROL%c", 'A')
+	{ }
+
+	void glfgreat(machine_config &config);
+
+private:
+	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
+	uint8_t controller_r();
+	DECLARE_READ16_MEMBER(glfgreat_rom_r);
+	DECLARE_WRITE16_MEMBER(glfgreat_122000_w);
+	DECLARE_READ16_MEMBER(glfgreat_ball_r);
+	DECLARE_WRITE8_MEMBER(glfgreat_sound_w);
+
+	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
+	DECLARE_VIDEO_START(glfgreat);
+
+	void glfgreat_audio_map(address_map &map);
+	void glfgreat_main_map(address_map &map);
+
+	required_ioport_array<4> m_analog_controller;
+
+	uint8_t    m_controller_select;
+	int        m_roz_rom_bank;
+	int        m_roz_char_bank;
+	int        m_roz_rom_mode;
+};
+
+class prmrsocr_state : public tmnt_state
+{
+public:
+	prmrsocr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tmnt_state(mconfig, type, tag)
+	{ }
+
+	void prmrsocr(machine_config &config);
+
+protected:
+	virtual void machine_start() override;
+
+private:
+	DECLARE_WRITE16_MEMBER(prmrsocr_sound_irq_w);
+	DECLARE_WRITE8_MEMBER(prmrsocr_audio_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_122000_w);
+	DECLARE_READ16_MEMBER(prmrsocr_rom_r);
+
+	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
+	DECLARE_VIDEO_START(prmrsocr);
+	K05324X_CB_MEMBER(prmrsocr_sprite_callback);
+
+	void prmrsocr_audio_map(address_map &map);
+	void prmrsocr_main_map(address_map &map);
+
+	int        m_sprite_bank;
+	int        m_roz_char_bank;
 };
 
 #endif // MAME_INCLUDES_TMNT_H

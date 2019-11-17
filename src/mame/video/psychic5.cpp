@@ -207,7 +207,7 @@ VIDEO_START_MEMBER(psychic5_state,bombsa)
 	save_item(NAME(m_bombsa_unknown));
 }
 
-VIDEO_RESET_MEMBER(psychic5_state,psychic5)
+void psychic5_state::video_reset()
 {
 	m_bg_clip_mode = 0;
 	m_ps5_vram_page = 0;

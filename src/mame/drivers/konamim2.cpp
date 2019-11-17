@@ -217,9 +217,9 @@ Notes:
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/cr589.h"
 #include "machine/3dom2.h"
-#include "machine/ataintf.h"
-#include "machine/cr589.h"
 #include "machine/eepromser.h"
 #include "machine/timekpr.h"
 #include "sound/dac.h"
@@ -688,12 +688,8 @@ void konamim2_state::machine_start()
 	m_ppc1->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 	m_ppc2->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
-	// Breakpoints don't work with fast RAM
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
-	{
-		m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
-		m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
-	}
+	m_ppc1->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
+	m_ppc2->ppcdrc_add_fastram(m_bda->ram_start(), m_bda->ram_end(), false, m_bda->ram_ptr());
 
 	m_available_cdroms = cdrom_open(machine().rom_load().get_disk_handle(":cdrom"));
 

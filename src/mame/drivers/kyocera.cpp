@@ -564,10 +564,10 @@ void tandy200_state::tandy200_mem(address_map &map)
 void kc85_state::kc85_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional RAM unit
-//  AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) optional I/O controller unit
-//  AM_RANGE(0x90, 0x90) AM_MIRROR(0x0f) optional answering telephone unit
-//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) optional modem
+//  map(0x70, 0x70).mirror(0x0f); optional RAM unit
+//  map(0x80, 0x80).mirror(0x0f); optional I/O controller unit
+//  map(0x90, 0x90).mirror(0x0f); optional answering telephone unit
+//  map(0xa0, 0xa0).mirror(0x0f); optional modem
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc0, 0xc0).mirror(0x0f).rw(m_uart, FUNC(im6402_device::read), FUNC(im6402_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(kc85_state::uart_status_r), FUNC(kc85_state::uart_ctrl_w));
@@ -584,7 +584,7 @@ void kc85_state::trsm100_io(address_map &map)
 void pc8201_state::pc8201_io(address_map &map)
 {
 	map.unmap_value_high();
-//  AM_RANGE(0x70, 0x70) AM_MIRROR(0x0f) optional video interface 8255
+//  map(0x70, 0x70).mirror(0x0f); optional video interface 8255
 	map(0x80, 0x80).mirror(0x03).w(FUNC(pc8201_state::romah_w));
 	map(0x84, 0x84).mirror(0x03).w(FUNC(pc8201_state::romal_w));
 	map(0x88, 0x88).mirror(0x03).w(FUNC(pc8201_state::romam_w));
@@ -602,7 +602,7 @@ void tandy200_state::tandy200_io(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x90, 0x9f).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
-//  AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_DEVWRITE(TCM5089_TAG, write)
+//  map(0xa0, 0xa0).mirror(0x0f).w(TCM5089_TAG, FUNC(tcm5089_device::write));
 	map(0xb0, 0xb7).mirror(0x08).rw(I8155_TAG, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xc0, 0xc1).mirror(0x0e).rw(I8251_TAG, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xd0, 0xd0).mirror(0x0f).rw(FUNC(tandy200_state::bank_r), FUNC(tandy200_state::bank_w));
@@ -1497,7 +1497,7 @@ void tandy200_state::tandy200(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker);
 	m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
-//  MCFG_TCM5089_ADD(TCM5089_TAG, XTAL(3'579'545))
+//  TCM5089(config, TCM5089_TAG, XTAL(3'579'545));
 
 	/* devices */
 	i8155_device &i8155(I8155(config, I8155_TAG, XTAL(4'915'200)/2));

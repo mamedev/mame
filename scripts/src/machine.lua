@@ -65,6 +65,8 @@ files {
 	MAME_DIR .. "src/devices/imagedev/snapquik.h",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.cpp",
 	MAME_DIR .. "src/devices/imagedev/wafadrive.h",
+	MAME_DIR .. "src/devices/imagedev/avivideo.cpp",
+	MAME_DIR .. "src/devices/imagedev/avivideo.h",
 }
 
 
@@ -573,6 +575,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/adc0804.h,MACHINES["ADC0804"] = true
+---------------------------------------------------
+
+if (MACHINES["ADC0804"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/adc0804.cpp",
+		MAME_DIR .. "src/devices/machine/adc0804.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/adc0808.h,MACHINES["ADC0808"] = true
 ---------------------------------------------------
 
@@ -781,7 +795,6 @@ end
 ---------------------------------------------------
 
 if (MACHINES["ATAFLASH"]~=null) then
-	MACHINES["IDE"] = true
 	MACHINES["PCCARD"] = true
 	files {
 		MAME_DIR .. "src/devices/machine/ataflash.cpp",
@@ -896,18 +909,6 @@ if (MACHINES["COM8116"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/com8116.cpp",
 		MAME_DIR .. "src/devices/machine/com8116.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/cr589.h,MACHINES["CR589"] = true
----------------------------------------------------
-
-if (MACHINES["CR589"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/cr589.cpp",
-		MAME_DIR .. "src/devices/machine/cr589.h",
 	}
 end
 
@@ -1422,27 +1423,14 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/atadev.h,MACHINES["IDE"] = true
---@src/devices/machine/ataintf.h,MACHINES["IDE"] = true
+--@src/devices/machine/idectrl.h,MACHINES["IDECTRL"] = true
+--@src/devices/machine/vt83c461.h,MACHINES["IDECTRL"] = true
 ---------------------------------------------------
 
-if (MACHINES["IDE"]~=null) then
-	MACHINES["T10"] = true
+if (MACHINES["IDECTRL"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/machine/atadev.cpp",
-		MAME_DIR .. "src/devices/machine/atadev.h",
-		MAME_DIR .. "src/devices/machine/atahle.cpp",
-		MAME_DIR .. "src/devices/machine/atahle.h",
-		MAME_DIR .. "src/devices/machine/ataintf.cpp",
-		MAME_DIR .. "src/devices/machine/ataintf.h",
-		MAME_DIR .. "src/devices/machine/atapicdr.cpp",
-		MAME_DIR .. "src/devices/machine/atapicdr.h",
-		MAME_DIR .. "src/devices/machine/atapihle.cpp",
-		MAME_DIR .. "src/devices/machine/atapihle.h",
 		MAME_DIR .. "src/devices/machine/idectrl.cpp",
 		MAME_DIR .. "src/devices/machine/idectrl.h",
-		MAME_DIR .. "src/devices/machine/idehd.cpp",
-		MAME_DIR .. "src/devices/machine/idehd.h",
 		MAME_DIR .. "src/devices/machine/vt83c461.cpp",
 		MAME_DIR .. "src/devices/machine/vt83c461.h",
 	}
@@ -2828,7 +2816,7 @@ end
 --
 ---------------------------------------------------
 
-if (BUSES["SCSI"]~=null) then
+if (BUSES["ATA"]~=null) or (BUSES["SCSI"]~=null) then
 	MACHINES["T10"] = true
 end
 
@@ -4087,6 +4075,18 @@ if (MACHINES["AIC565"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/aic565.cpp",
 		MAME_DIR .. "src/devices/machine/aic565.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/aic580.h,MACHINES["AIC580"] = true
+---------------------------------------------------
+
+if (MACHINES["AIC580"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/aic580.cpp",
+		MAME_DIR .. "src/devices/machine/aic580.h",
 	}
 end
 

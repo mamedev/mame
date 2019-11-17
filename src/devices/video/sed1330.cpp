@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sed1330.h"
+#include "screen.h"
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -33,9 +34,9 @@
 #define INSTRUCTION_HDOT_SCR        0x5a
 #define INSTRUCTION_OVLAY           0x5b
 #define INSTRUCTION_CSRW            0x46
-#define INSTRUCTION_CSRR            0x47    // unimplemented
+#define INSTRUCTION_CSRR            0x47
 #define INSTRUCTION_MWRITE          0x42
-#define INSTRUCTION_MREAD           0x43    // unimplemented
+#define INSTRUCTION_MREAD           0x43
 
 
 #define CSRDIR_RIGHT                0x00
@@ -51,9 +52,15 @@
 
 
 #define FC_OFF                      0x00
-#define FC_SOLID                    0x01    // unimplemented
+#define FC_SOLID                    0x01
 #define FC_FLASH_32                 0x02    // unimplemented
 #define FC_FLASH_64                 0x03    // unimplemented
+
+
+#define FP_OFF                      0x00
+#define FP_SOLID                    0x01
+#define FP_FLASH_32                 0x02    // unimplemented
+#define FP_FLASH_4                  0x03    // unimplemented
 
 
 
@@ -167,6 +174,8 @@ const tiny_rom_entry *sed1330_device::device_rom_region() const
 
 void sed1330_device::device_start()
 {
+	m_cache = space().cache<0, 0, ENDIANNESS_LITTLE>();
+
 	// register for state saving
 	save_item(NAME(m_bf));
 	save_item(NAME(m_ir));
@@ -235,7 +244,8 @@ device_memory_interface::space_config_vector sed1330_device::memory_space_config
 
 READ8_MEMBER( sed1330_device::status_r )
 {
-	LOG("SED1330 Status Read: %s\n", m_bf ? "busy" : "ready");
+	if (!machine().side_effects_disabled())
+		LOG("SED1330 Status Read: %s\n", m_bf ? "busy" : "ready");
 
 	return m_bf << 6;
 }
@@ -280,11 +290,44 @@ WRITE8_MEMBER( sed1330_device::command_w )
 
 READ8_MEMBER( sed1330_device::data_r )
 {
-	uint8_t data = readbyte(m_csr);
+	uint8_t data = 0;
 
-	LOG("SED1330 Memory Read %02x from %04x\n", data, m_csr);
+	switch (m_ir)
+	{
+	case INSTRUCTION_MREAD:
+		data = readbyte(m_csr);
+		if (!machine().side_effects_disabled())
+		{
+			LOG("SED1330 Memory Read %02x from %04x\n", data, m_csr);
+			increment_csr();
+		}
+		break;
 
-	increment_csr();
+	case INSTRUCTION_CSRR:
+		switch (m_pbc)
+		{
+		case 0:
+			data = m_csr & 0xff;
+			break;
+
+		case 1:
+			data = (m_csr & 0xff00) >> 8;
+			break;
+
+		default:
+			logerror("SED1330 Invalid parameter byte %02x\n", data);
+		}
+		if (!machine().side_effects_disabled())
+		{
+			LOG("SED1330 Cursor Byte %d Read %02x\n", m_pbc, data);
+			m_pbc++;
+		}
+		break;
+
+	default:
+		logerror("SED1330 Unsupported instruction %02x\n", m_ir);
+		break;
+	}
 
 	return data;
 }
@@ -341,6 +384,12 @@ WRITE8_MEMBER( sed1330_device::data_w )
 		case 5:
 			m_lf = data + 1;
 			LOG("SED1330 Frame Height: %u\n", m_lf);
+			if (clock() != 0)
+			{
+				attotime fr = clocks_to_attotime(m_tcr * m_lf * 9);
+				screen().configure(m_tcr * m_fx, m_lf, screen().visible_area(), fr.as_attoseconds());
+				LOG("SED1330 Frame Rate: %.1f Hz\n", fr.as_hz());
+			}
 			break;
 
 		case 6:
@@ -359,10 +408,10 @@ WRITE8_MEMBER( sed1330_device::data_w )
 
 	case INSTRUCTION_DISP_ON:
 	case INSTRUCTION_DISP_OFF:
-		m_d = BIT(data, 0);
+		m_d = BIT(m_ir, 0);
 		m_fc = data & 0x03;
 		m_fp = data >> 2;
-		LOG("SED1330 Display: %s\n", BIT(data, 0) ? "enabled" : "disabled");
+		LOG("SED1330 Display: %s\n", BIT(m_ir, 0) ? "enabled" : "disabled");
 
 		switch (m_fc)
 		{
@@ -374,26 +423,26 @@ WRITE8_MEMBER( sed1330_device::data_w )
 
 		switch (m_fp & 0x03)
 		{
-		case FC_OFF:        LOG("SED1330 Display Page 1: disabled\n");     break;
-		case FC_SOLID:      LOG("SED1330 Display Page 1: enabled\n");      break;
-		case FC_FLASH_32:   LOG("SED1330 Display Page 1: flash fFR/32\n"); break;
-		case FC_FLASH_64:   LOG("SED1330 Display Page 1: flash fFR/64\n"); break;
+		case FP_OFF:        LOG("SED1330 Display Page 1: disabled\n");     break;
+		case FP_SOLID:      LOG("SED1330 Display Page 1: enabled\n");      break;
+		case FP_FLASH_32:   LOG("SED1330 Display Page 1: flash fFR/32\n"); break;
+		case FP_FLASH_4:    LOG("SED1330 Display Page 1: flash fFR/4\n");  break;
 		}
 
 		switch ((m_fp >> 2) & 0x03)
 		{
-		case FC_OFF:        LOG("SED1330 Display Page 2/4: disabled\n");       break;
-		case FC_SOLID:      LOG("SED1330 Display Page 2/4: enabled\n");        break;
-		case FC_FLASH_32:   LOG("SED1330 Display Page 2/4: flash fFR/32\n");   break;
-		case FC_FLASH_64:   LOG("SED1330 Display Page 2/4: flash fFR/64\n");   break;
+		case FP_OFF:        LOG("SED1330 Display Page 2/4: disabled\n");       break;
+		case FP_SOLID:      LOG("SED1330 Display Page 2/4: enabled\n");        break;
+		case FP_FLASH_32:   LOG("SED1330 Display Page 2/4: flash fFR/32\n");   break;
+		case FP_FLASH_4:    LOG("SED1330 Display Page 2/4: flash fFR/4\n");    break;
 		}
 
 		switch ((m_fp >> 4) & 0x03)
 		{
-		case FC_OFF:        LOG("SED1330 Display Page 3: disabled\n");     break;
-		case FC_SOLID:      LOG("SED1330 Display Page 3: enabled\n");      break;
-		case FC_FLASH_32:   LOG("SED1330 Display Page 3: flash fFR/32\n"); break;
-		case FC_FLASH_64:   LOG("SED1330 Display Page 3: flash fFR/64\n"); break;
+		case FP_OFF:        LOG("SED1330 Display Page 3: disabled\n");     break;
+		case FP_SOLID:      LOG("SED1330 Display Page 3: enabled\n");      break;
+		case FP_FLASH_32:   LOG("SED1330 Display Page 3: flash fFR/32\n"); break;
+		case FP_FLASH_4:    LOG("SED1330 Display Page 3: flash fFR/4\n");  break;
 		}
 		break;
 
@@ -554,36 +603,37 @@ WRITE8_MEMBER( sed1330_device::data_w )
 //  draw_text_scanline -
 //-------------------------------------------------
 
-void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va)
+void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int r, uint16_t va, bool cursor)
 {
-	int sx, x;
+	uint16_t *p = &bitmap.pix16(y, 0);
 
-	for (sx = 0; sx < m_cr; sx++)
+	for (int sx = 0; sx < m_cr; sx++, p += m_fx)
 	{
-		if ((va + sx) == m_csr)
+		if (m_m0 && !m_m1)
 		{
-			if (m_fc == FC_OFF) continue;
+			uint8_t c = m_cache->read_byte(va + sx);
+			uint8_t data = m_cache->read_byte(0xf000 | (m_m2 ? u16(c) << 4 | r : u16(c) << 3 | (r & 7)));
+			for (int x = 0; x < m_fx; x++, data <<= 1)
+				if (BIT(data, 7))
+					p[x] = 1;
+		}
 
+		if (cursor && (va + sx) == m_csr)
+		{
 			if (m_cm)
 			{
 				// block cursor
-				if (y % m_fy < m_cry)
+				if (r < m_cry)
 				{
-					for (x = 0; x < m_crx; x++)
-					{
-						bitmap.pix16(y, (sx * m_fx) + x) = 1;
-					}
+					std::fill_n(p, m_crx, 1);
 				}
 			}
 			else
 			{
 				// underscore cursor
-				if (y % m_fy == m_cry)
+				if (r == m_cry)
 				{
-					for (x = 0; x < m_crx; x++)
-					{
-						bitmap.pix16(y, (sx * m_fx) + x) = 1;
-					}
+					std::fill_n(p, m_crx, 1);
 				}
 			}
 		}
@@ -597,13 +647,11 @@ void sed1330_device::draw_text_scanline(bitmap_ind16 &bitmap, const rectangle &c
 
 void sed1330_device::draw_graphics_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t va)
 {
-	int sx, x;
-
-	for (sx = 0; sx < m_cr; sx++)
+	for (int sx = 0; sx < m_cr; sx++)
 	{
 		uint8_t data = readbyte(va++);
 
-		for (x = 0; x < m_fx; x++)
+		for (int x = 0; x < m_fx; x++)
 		{
 			bitmap.pix16(y, (sx * m_fx) + x) = BIT(data, 7);
 			data <<= 1;
@@ -627,28 +675,49 @@ void sed1330_device::update_graphics(bitmap_ind16 &bitmap, const rectangle &clip
 
 void sed1330_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int y;
+	uint8_t attr1 = m_fp & 0x03;
+	uint8_t attr2 = (m_fp >> 2) & 0x03;
+	uint8_t attr3 = (m_fp >> 4) & 0x03;
 
-	if (m_ws)
+	for (int y = 0; y < m_lf; y++)
 	{
-		for (y = 0; y < m_sl1; y++)
+		if (y >= m_sl1)
 		{
-			uint16_t sad1 = m_sad1 + ((y / m_fy) * m_ap);
-			uint16_t sad2 = m_sad2 + (y * m_ap);
-			uint16_t sad3 = m_sad3 + ((y / m_fy) * m_ap);
-			uint16_t sad4 = m_sad4 + (y * m_ap);
+			if (attr3 != FP_OFF)
+			{
+				uint16_t sad3 = m_sad3 + (((y - m_sl1) / m_fy) * m_ap);
 
-			// draw graphics display page 2 scanline
-			draw_graphics_scanline(bitmap, cliprect, y, sad2);
+				// draw text display page 3 scanline
+				draw_text_scanline(bitmap, cliprect, y, (y - m_sl1) % m_fy, sad3, m_ov && m_fc != FC_OFF);
+			}
+		}
+		else
+		{
+			if (attr1 != FP_OFF)
+			{
+				uint16_t sad1 = m_sad1 + ((y / m_fy) * m_ap);
 
-			// draw text display page 1 scanline
-			draw_text_scanline(bitmap, cliprect, y, sad1);
+				// draw text display page 1 scanline
+				draw_text_scanline(bitmap, cliprect, y, y % m_fy, sad1, !m_ov && m_fc != FC_OFF);
+			}
+		}
 
-			// draw graphics display page 4 scanline
-			draw_graphics_scanline(bitmap, cliprect, y + m_sl1, sad4);
+		if (attr2 != FP_OFF)
+		{
+			if (m_ws && y >= m_sl2)
+			{
+				uint16_t sad4 = m_sad4 + ((y - m_sl2) * m_ap);
 
-			// draw text display page 3 scanline
-			draw_text_scanline(bitmap, cliprect, y + m_sl1, sad3);
+				// draw graphics display page 4 scanline
+				draw_graphics_scanline(bitmap, cliprect, y, sad4);
+			}
+			else
+			{
+				uint16_t sad2 = m_sad2 + (y * m_ap);
+
+				// draw graphics display page 2 scanline
+				draw_graphics_scanline(bitmap, cliprect, y, sad2);
+			}
 		}
 	}
 }
@@ -660,6 +729,7 @@ void sed1330_device::update_text(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t sed1330_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0, cliprect);
 	if (m_d)
 	{
 		if (m_dm)

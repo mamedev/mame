@@ -509,6 +509,8 @@ void blackt96_state::blackt96(machine_config &config)
 	m_sprites->set_gfxdecode_tag(m_gfxdecode);
 	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback), this);
 	m_sprites->set_no_partial();
+	m_sprites->set_xpos_shift(12);
+	m_sprites->set_color_entry_mask(0x7f);
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();

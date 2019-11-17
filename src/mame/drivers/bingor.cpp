@@ -731,7 +731,7 @@ void bingor_state::vip2000_map(address_map &map)
 	map(0x00000, 0x0ffff).ram();
 	map(0x40000, 0x4ffff).ram().share("blit_ram");
 	map(0x40300, 0x4031f).w(m_palette, FUNC(palette_device::write16)); //wrong
-	//AM_RANGE(0x50000, 0x5ffff) AM_ROM AM_REGION("gfx", 0)
+	//map(0x50000, 0x5ffff).rom().region("gfx", 0);
 	map(0x60000, 0x60003).w("ymz", FUNC(ymz284_device::address_data_w)).umask16(0x00ff);
 	map(0x80000, 0xeffff).rw("flash", FUNC(intelfsh16_device::read), FUNC(intelfsh16_device::write));
 	map(0xf0000, 0xfffff).rom().region("boot_prg", 0);

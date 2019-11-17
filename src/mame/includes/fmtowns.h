@@ -93,15 +93,16 @@ class towns_state : public driver_device
 		: driver_device(mconfig, type, tag)
 		, m_ram(*this, RAM_TAG)
 		, m_maincpu(*this, "maincpu")
+		, m_dma(*this, "dma_%u", 1U)
+		, m_scsi(*this, "fmscsi")
+		, m_flop(*this, "fdc:%u", 0U)
 		, m_speaker(*this, "speaker")
 		, m_pic_master(*this, "pic8259_master")
 		, m_pic_slave(*this, "pic8259_slave")
 		, m_pit(*this, "pit")
-		, m_dma(*this, "dma_%u", 1U)
 		, m_palette(*this, "palette256")
 		, m_palette16(*this, "palette16_%u", 0U)
 		, m_fdc(*this, "fdc")
-		, m_flop(*this, "fdc:%u", 0U)
 		, m_icmemcard(*this, "icmemcard")
 		, m_i8251(*this, "i8251")
 		, m_rs232(*this, "rs232c")
@@ -110,7 +111,6 @@ class towns_state : public driver_device
 		, m_dma_1(*this, "dma_1")
 		, m_cdrom(*this, "cdrom")
 		, m_cdda(*this, "cdda")
-		, m_scsi(*this, "fmscsi")
 		, m_bank_cb000_r(*this, "bank_cb000_r")
 		, m_bank_cb000_w(*this, "bank_cb000_w")
 		, m_bank_f8000_r(*this, "bank_f8000_r")
@@ -138,6 +138,7 @@ class towns_state : public driver_device
 	void towns(machine_config &config);
 	void townsftv(machine_config &config);
 	void townshr(machine_config &config);
+	void townsmx(machine_config &config);
 	void townssj(machine_config &config);
 
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
@@ -149,6 +150,8 @@ protected:
 	void pcm_mem(address_map &map);
 	void towns16_io(address_map &map);
 	void towns_io(address_map &map);
+	void towns2_io(address_map &map);
+	void townsux_io(address_map &map);
 	void towns_mem(address_map &map);
 	void ux_mem(address_map &map);
 
@@ -157,17 +160,25 @@ protected:
 	required_device<ram_device> m_ram;
 	required_device<cpu_device> m_maincpu;
 
+	required_device_array<upd71071_device, 2> m_dma;
+	optional_device<fmscsi_device> m_scsi;
+	required_device_array<floppy_connector, 2> m_flop;
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
+
+	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
+	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
+	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
+	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
+
 private:
 	/* devices */
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pic8259_device> m_pic_master;
 	required_device<pic8259_device> m_pic_slave;
 	required_device<pit8253_device> m_pit;
-	required_device_array<upd71071_device, 2> m_dma;
 	required_device<palette_device> m_palette;
 	required_device_array<palette_device, 2> m_palette16;
 	required_device<mb8877_device> m_fdc;
-	required_device_array<floppy_connector, 2> m_flop;
 	required_device<fmt_icmem_device> m_icmemcard;
 	required_device<i8251_device> m_i8251;
 	required_device<rs232_port_device> m_rs232;
@@ -176,7 +187,6 @@ private:
 	required_device<upd71071_device> m_dma_1;
 	required_device<cdrom_image_device> m_cdrom;
 	required_device<cdda_device> m_cdda;
-	required_device<fmscsi_device> m_scsi;
 
 	required_memory_bank m_bank_cb000_r;
 	required_memory_bank m_bank_cb000_w;
@@ -400,14 +410,11 @@ private:
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit2_out1_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
-	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();
 	void towns_update_palette();
@@ -428,8 +435,6 @@ private:
 	void towns_cdrom_set_irq(int line,int state);
 	uint8_t towns_cd_get_track();
 	DECLARE_READ16_MEMBER(towns_cdrom_dma_r);
-	DECLARE_READ16_MEMBER(towns_scsi_dma_r);
-	DECLARE_WRITE16_MEMBER(towns_scsi_dma_w);
 };
 
 class towns16_state : public towns_state

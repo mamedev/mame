@@ -143,7 +143,7 @@ void tk80_state::tk85_mem(address_map &map)
 void tk80_state::ics8080_mem(address_map &map)
 {
 	map.unmap_value_high();
-	//ADDRESS_MAP_GLOBAL_MASK(0x87ff) // A10-14 not connected
+	//map.global_mask(0x87ff); // A10-14 not connected
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x83f7).ram();
 	map(0x83f8, 0x83ff).ram().rw(FUNC(tk80_state::display_r), FUNC(tk80_state::display_w));

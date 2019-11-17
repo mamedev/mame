@@ -140,7 +140,7 @@
 
      Timing
 
-     - HD647180 runs at 12.000 / 2 MHz
+     - HD647180 runs at 12.000 / 2 MHz (divider is internal)
      - SAA1099 PSG runs at 6.000 MHz
      - Display pixel clock is 6.000 MHz
      - Oki MSM5205 has a 384 KHz oscillator, this is the standard setup
@@ -439,7 +439,7 @@
 */
 
 #include "emu.h"
-#include "cpu/z180/z180.h"
+#include "cpu/z180/hd647180x.h"
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
 #include "machine/74259.h"
@@ -622,7 +622,6 @@ WRITE_LINE_MEMBER(mastboy_state::vblank_irq)
 
 void mastboy_state::mastboy_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom(); // Internal ROM
 	map(0x4000, 0x7fff).rom(); // External ROM
 
 	map(0x8000, 0x8fff).ram().share("workram");// work ram
@@ -642,8 +641,6 @@ void mastboy_state::mastboy_map(address_map &map)
 	map(0xff828, 0xff829).w("saa", FUNC(saa1099_device::write));
 	map(0xff830, 0xff830).w(FUNC(mastboy_state::msm5205_data_w));
 	map(0xff838, 0xff83f).w(m_outlatch, FUNC(ls259_device::write_d0));
-
-	map(0xffc00, 0xfffff).ram(); // Internal RAM
 }
 
 // TODO : banked map is mirrored?
@@ -808,7 +805,7 @@ void mastboy_state::machine_reset()
 
 void mastboy_state::mastboy(machine_config &config)
 {
-	Z180(config, m_maincpu, 12000000/2);   /* HD647180X0CP6-1M1R */
+	HD647180X(config, m_maincpu, 24_MHz_XTAL / 2);   /* HD647180X0CP6-1M1R */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mastboy_state::mastboy_map);
 	m_maincpu->set_addrmap(AS_IO, &mastboy_state::mastboy_io_map);
 

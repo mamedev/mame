@@ -298,7 +298,7 @@ void gaplus_base_state::cpu2_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().w(FUNC(gaplus_base_state::videoram_w)).share("videoram");   /* tilemap RAM (shared with CPU #1) */
 	map(0x0800, 0x1fff).ram().share("spriteram");                           /* shared RAM with CPU #1 */
-//  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
+//  map(0x500f, 0x500f).nopw();                                            /* ??? written 256 times on startup */
 	map(0x6000, 0x6fff).w(FUNC(gaplus_base_state::irq_2_ctrl_w));                          /* IRQ 2 control */
 	map(0xa000, 0xffff).rom();                                                 /* ROM */
 }

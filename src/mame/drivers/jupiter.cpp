@@ -116,21 +116,21 @@ void jupiter2_state::jupiter2_mem(address_map &map)
 	map(0x0000, 0x7fff).ram();
 	map(0xc000, 0xcfff).ram();  // Video RAM
 	map(0xf000, 0xff00).rom().region(MCM6571AP_TAG, 0);
-//  AM_RANGE(0xff58, 0xff5c) Cartridge Disk Controller PIA
-//  AM_RANGE(0xff60, 0xff76) DMA Controller
-//  AM_RANGE(0xff80, 0xff83) Floppy PIA
+//  map(0xff58, 0xff5c) Cartridge Disk Controller PIA
+//  map(0xff60, 0xff76) DMA Controller
+//  map(0xff80, 0xff83) Floppy PIA
 	map(0xff84, 0xff87).rw(INS1771N1_TAG, FUNC(wd_fdc_device_base::read), FUNC(wd_fdc_device_base::write));
-//  AM_RANGE(0xff90, 0xff93) Hytype Parallel Printer PIA
-//  AM_RANGE(0xffa0, 0xffa7) Persci Floppy Disk Controller
-//  AM_RANGE(0xffb0, 0xffb3) Video PIA
+//  map(0xff90, 0xff93) Hytype Parallel Printer PIA
+//  map(0xffa0, 0xffa7) Persci Floppy Disk Controller
+//  map(0xffb0, 0xffb3) Video PIA
 	map(0xffc0, 0xffc1).rw(m_acia0, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Serial Port 0 ACIA
 	map(0xffc4, 0xffc5).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write)); // Serial Port 1 ACIA
-//  AM_RANGE(0xffc8, 0xffc9) Serial Port 2 ACIA
-//  AM_RANGE(0xffcc, 0xffcd) Serial Port 3 ACIA
-//  AM_RANGE(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
-//  AM_RANGE(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
-//  AM_RANGE(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
-//  AM_RANGE(0xffdc, 0xffdd) Serial Port 7 ACIA
+//  map(0xffc8, 0xffc9) Serial Port 2 ACIA
+//  map(0xffcc, 0xffcd) Serial Port 3 ACIA
+//  map(0xffd0, 0xffd1) Serial Port 4 ACIA / Cassette
+//  map(0xffd4, 0xffd5) Serial Port 5 ACIA / EPROM Programmer (2704/2708)
+//  map(0xffd8, 0xffd9) Serial Port 6 ACIA / Hardware Breakpoint Registers
+//  map(0xffdc, 0xffdd) Serial Port 7 ACIA
 	map(0xfff8, 0xffff).rom().region(MCM6571AP_TAG, 0x0ff8); // vectors
 }
 

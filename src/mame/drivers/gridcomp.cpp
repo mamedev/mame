@@ -318,9 +318,9 @@ void gridcomp_state::grid1121_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x90000, 0x97fff).unmaprw(); // ?? ROM slot
-	map(0x9ff00, 0x9ff0f).unmaprw(); // AM_READ(grid_9ff0_r) // ?? ROM?
+	map(0x9ff00, 0x9ff0f).unmaprw(); // .r(FUNC(gridcomp_state::grid_9ff0_r)); // ?? ROM?
 	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
-	map(0xdfe00, 0xdfe1f).unmaprw(); // AM_DEVREADWRITE8("uart8274", i8274_new_device, ba_cd_r, ba_cd_w, 0x00ff)
+	map(0xdfe00, 0xdfe1f).unmaprw(); // .rw("uart8274", FUNC(i8274_new_device::ba_cd_r), FUNC(i8274_new_device::ba_cd_w)).umask16(0x00ff);
 	map(0xdfe40, 0xdfe4f).unmaprw(); // ?? diagnostic 8274
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??

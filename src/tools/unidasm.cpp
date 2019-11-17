@@ -49,6 +49,7 @@ using util::BIT;
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16dasm.h"
 #include "cpu/f8/f8dasm.h"
+#include "cpu/fr/frdasm.h"
 #include "cpu/g65816/g65816ds.h"
 #include "cpu/h6280/6280dasm.h"
 #include "cpu/h8/h8d.h"
@@ -354,10 +355,12 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
 	{ "dsp56156",        le, -1, []() -> util::disasm_interface * { return new dsp56156_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
+	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
+	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
 	{ "g65816",          le,  0, []() -> util::disasm_interface * { return new g65816_disassembler(&g65816_unidasm); } },
 	{ "h6280",           le,  0, []() -> util::disasm_interface * { return new h6280_disassembler; } },
 	{ "h8",              be,  0, []() -> util::disasm_interface * { return new h8_disassembler; } },
@@ -448,7 +451,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
 	{ "psxcpu",          le,  0, []() -> util::disasm_interface * { return new psxcpu_disassembler; } },
 	{ "r65c02",          le,  0, []() -> util::disasm_interface * { return new r65c02_disassembler; } },
-	{ "rii",             le, -1, []() -> util::disasm_interface * { return new riscii_disassembler; } },
 	{ "rsp",             le,  0, []() -> util::disasm_interface * { return new rsp_disassembler; } },
 	{ "s2650",           le,  0, []() -> util::disasm_interface * { return new s2650_disassembler(&s2650_unidasm); } },
 	{ "saturn",          le,  0, []() -> util::disasm_interface * { return new saturn_disassembler(&saturn_unidasm); } },
@@ -483,8 +485,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
-	{ "tlcs90",          le,  0, []() -> util::disasm_interface * { return new tlcs90_disassembler; } },
 	{ "tlcs900",         le,  0, []() -> util::disasm_interface * { return new tlcs900_disassembler; } },
+	{ "tmp90840",        le,  0, []() -> util::disasm_interface * { return new tmp90840_disassembler; } },
+	{ "tmp90844",        le,  0, []() -> util::disasm_interface * { return new tmp90844_disassembler; } },
 	{ "tms0980",         be,  0, []() -> util::disasm_interface * { return new tms0980_disassembler; } },
 	{ "tms1000",         le,  0, []() -> util::disasm_interface * { return new tms1000_disassembler; } },
 	{ "tms1100",         le,  0, []() -> util::disasm_interface * { return new tms1100_disassembler; } },

@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+  <element name="shifter" defstate="0">
+	  <rect>
+		  <bounds left="0" right="32" top="0" bottom="64" />
+		  <color red="0.85" green="0.4" blue="0.3" />
+	  </rect>
+	  <rect>
+		  <bounds left="2" right="30" top="2" bottom="62" />
+		  <color red="0.14" green="0.17" blue="0.2" />
+	  </rect>
+	  <rect>
+		  <bounds left="14" right="18" top="15" bottom="49" />
+		  <color red="0.44" green="0.47" blue="0.5" />
+	  </rect>
+	  <disk>
+		  <bounds left="14" right="18" top="13" bottom="17" />
+		  <color red="0.44" green="0.47" blue="0.5" />
+	  </disk>
+	  <disk>
+		  <bounds left="14" right="18" top="47" bottom="51" />
+		  <color red="0.44" green="0.47" blue="0.5" />
+	  </disk>
+	  <text string="LOW" state="0">
+		  <bounds left="3" right="29" top="2" bottom="12" />
+		  <color red="1.0" green="1.0" blue="0.4" />
+	  </text>
+	  <text string="LOW" state="1">
+		  <bounds left="3" right="29" top="2" bottom="12" />
+		  <color red="1.0" green="1.0" blue="1.0" />
+	  </text>
+
+	  <text string="HIGH" state="0">
+		  <bounds left="3" right="29" top="52" bottom="62" />
+		  <color red="1.0" green="1.0" blue="1.0" />
+	  </text>
+	  <text string="HIGH" state="1">
+		  <bounds left="3" right="29" top="52" bottom="62" />
+		  <color red="1.0" green="1.0" blue="0.4" />
+	  </text>
+	  <disk state="0">
+		  <bounds left="9" right="23" top="14" bottom="28" />
+		  <color red="0.85" green="0.4" blue="0.3" />
+	  </disk>
+	  <disk state="1">
+		  <bounds left="9" right="23" top="36" bottom="50" />
+		  <color red="0.85" green="0.4" blue="0.3" />
+	  </disk>
+  </element>
+
+  <view name="Quadruple (with shifters)">
+	  <screen index="0">
+		<bounds x="0" y="3.25" width="4" height="3" />
+	  </screen>
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0001" >
+		  <bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+	  </bezel>
+	  <screen index="1">
+		  <bounds x="4.25" y="3.25" width="4" height="3" />
+	  </screen>
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0010">
+		  <bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+	  </bezel>
+	  <screen index="2">
+		<bounds x="0" y="0" width="4" height="3" />
+	  </screen>
+	  <bezel element="shifter" inputtag="IN1" inputmask="0x0001" >
+		  <bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+		  <orientation rotate="180" />
+	  </bezel>
+	  <screen index="3">
+		  <bounds x="4.25" y="0" width="4" height="3" />
+	  </screen>
+	  <bezel element="shifter" inputtag="IN1" inputmask="0x0010" >
+		  <bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+		  <orientation rotate="180" />
+	  </bezel>
+  </view>
+
+  <view name="Quadruple (with shifters, opposite side)">
+	  <screen index="0">
+		  <bounds x="4.25" y="0" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+	  <bezel element="shifter" inputtag="IN0" inputmask="0x0001" >
+		  <bounds x="4.2625" y="0.0125" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+		<orientation rotate="180" />
+	  </bezel>
+	  <screen index="1">
+		  <bounds x="0" y="0" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+		<bezel element="shifter" inputtag="IN0" inputmask="0x0010">
+		  <bounds x="0.0125" y="0.0125" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+		<orientation rotate="180" />
+	  </bezel>
+	  <screen index="2">
+		  <bounds x="4.25" y="3.25" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+	  <bezel element="shifter" inputtag="IN1" inputmask="0x0001" >
+		  <bounds x="8.0375" y="5.8375" width="0.2" height="0.4" />
+		  <color alpha="0.6" />
+	  </bezel>
+	  <screen index="3">
+		  <bounds x="0" y="3.25" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+	  <bezel element="shifter" inputtag="IN1" inputmask="0x0010" >
+		  <bounds x="3.7875" y="5.8375" width="0.2" height="0.4" />
+		<color alpha="0.6" />
+	</bezel>
+  </view>
+
+  <view name="Quadruple">
+	  <screen index="0">
+		  <bounds x="0" y="3.25" width="4" height="3" />
+	  </screen>
+	  <screen index="1">
+		  <bounds x="4.25" y="3.25" width="4" height="3" />
+	  </screen>
+	  <screen index="2">
+		  <bounds x="0" y="0" width="4" height="3" />
+	  </screen>
+		<screen index="3">
+		  <bounds x="4.25" y="0" width="4" height="3" />
+	  </screen>
+  </view>
+
+  <view name="Quadruple (opposite side)">
+	  <screen index="0">
+		  <bounds x="4.25" y="0" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+	  <screen index="1">
+		  <bounds x="0" y="0" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+	  <screen index="2">
+		  <bounds x="4.25" y="3.25" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+	  <screen index="3">
+		  <bounds x="0" y="3.25" width="4" height="3" />
+		  <orientation rotate="180" />
+	  </screen>
+  </view>
+</mamelayout>

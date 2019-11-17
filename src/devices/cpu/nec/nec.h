@@ -21,6 +21,8 @@ enum
 
 class nec_common_device : public cpu_device
 {
+	friend class device_v5x_interface;
+
 protected:
 	// construction/destruction
 	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, address_map_constructor internal_port_map = address_map_constructor());
@@ -48,6 +50,10 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	void set_int_line(int state);
+	void set_nmi_line(int state);
+	void set_poll_line(int state);
 
 private:
 	address_space_config m_program_config;

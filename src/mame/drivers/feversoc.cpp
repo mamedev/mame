@@ -209,7 +209,7 @@ void feversoc_state::feversoc_map(address_map &map)
 	map(0x06000006, 0x06000007).w(FUNC(feversoc_state::feversoc_irq_ack));
 	map(0x06000008, 0x0600000b).r(FUNC(feversoc_state::in_r));
 	map(0x0600000d, 0x0600000d).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	//AM_RANGE(0x06010000, 0x0601007f) AM_DEVREADWRITE("obj", seibu_encrypted_sprite_device, read, write) AM_RAM
+	//map(0x06010000, 0x0601007f).rw("obj", FUNC(seibu_encrypted_sprite_device::read), FUNC(seibu_encrypted_sprite_device::write));
 	map(0x06010060, 0x06010063).nopw(); // sprite buffering
 	map(0x06018000, 0x06019fff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");
 }

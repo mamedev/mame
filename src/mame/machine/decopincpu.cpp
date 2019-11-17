@@ -31,7 +31,7 @@ void decocpu_type1_device::decocpu1_map(address_map &map)
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
 	map(0x3000, 0x3003).rw("pia30", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
 	map(0x3400, 0x3403).rw("pia34", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
-	//AM_RANGE(0x4000, 0xffff) AM_ROM
+	//map(0x4000, 0xffff).rom();
 }
 
 void decocpu_type2_device::decocpu2_map(address_map &map)
@@ -44,7 +44,7 @@ void decocpu_type2_device::decocpu2_map(address_map &map)
 	map(0x2c00, 0x2c03).rw("pia2c", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // alphanumeric display
 	map(0x3000, 0x3003).rw("pia30", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // inputs
 	map(0x3400, 0x3403).rw("pia34", FUNC(pia6821_device::read), FUNC(pia6821_device::write)); // widget
-	//AM_RANGE(0x4000, 0xffff) AM_ROM
+	//map(0x4000, 0xffff).rom();
 }
 
 static INPUT_PORTS_START( decocpu1 )

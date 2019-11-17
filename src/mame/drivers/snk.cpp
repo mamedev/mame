@@ -1413,7 +1413,7 @@ void snk_state::hal21_sound_map(address_map &map)
 	map(0xa000, 0xa000).r(FUNC(snk_state::sgladiat_soundlatch_r));
 	map(0xc000, 0xc000).r(FUNC(snk_state::sgladiat_sound_nmi_ack_r));
 	map(0xe000, 0xe001).w("ay1", FUNC(ay8910_device::address_data_w));
-//  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
+//  map(0xe002, 0xe002).nopw();    // bitfielded(0-5) details unknown. Filter enable?
 	map(0xe008, 0xe009).w("ay2", FUNC(ay8910_device::address_data_w));
 }
 
@@ -1442,7 +1442,7 @@ void snk_state::aso_YM3526_sound_map(address_map &map)
 	map(0xd000, 0xd000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe000).r(FUNC(snk_state::tnk3_busy_clear_r));
 	map(0xf000, 0xf001).rw("ym1", FUNC(ym3526_device::read), FUNC(ym3526_device::write));
-//  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
+//  map(0xf002, 0xf002).nopr(); unknown
 	map(0xf004, 0xf004).r(FUNC(snk_state::tnk3_cmdirq_ack_r));
 	map(0xf006, 0xf006).r(FUNC(snk_state::tnk3_ymirq_ack_r));
 }

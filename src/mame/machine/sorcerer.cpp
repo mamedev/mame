@@ -491,7 +491,7 @@ void sorcerer_state::machine_reset()
 	m_wait = false;
 	m_fe = 0xff;
 	m_2c = 0;
-	port_fe_w(space, 0, 0, 0xff);
+	port_fe_w(space, 0, 0, 0);
 
 	membank("boot")->set_entry(1);
 	timer_set(attotime::from_usec(10), TIMER_RESET);

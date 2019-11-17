@@ -371,7 +371,6 @@ private:
 
 protected: // TODO: remove need to expose these
 	int top_line;           // main box top line
-	int skip_main_items;
 	int m_visible_lines;    // main box visible lines
 	int m_visible_items;    // number of visible items
 

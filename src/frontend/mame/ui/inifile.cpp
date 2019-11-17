@@ -64,7 +64,7 @@ void inifile_manager::load_ini_category(size_t file, size_t category, std::unord
 	emu_file fp(m_options.categoryini_path(), OPEN_FLAG_READ);
 	if (fp.open(filename) != osd_file::error::NONE)
 	{
-		osd_printf_error("Failed to open category file %s for reading\n", filename.c_str());
+		osd_printf_error("Failed to open category file %s for reading\n", filename);
 		return;
 	}
 
@@ -72,7 +72,7 @@ void inifile_manager::load_ini_category(size_t file, size_t category, std::unord
 	if (fp.seek(offset, SEEK_SET) || (fp.tell() != offset))
 	{
 		fp.close();
-		osd_printf_error("Failed to seek to category offset in file %s\n", filename.c_str());
+		osd_printf_error("Failed to seek to category offset in file %s\n", filename);
 		return;
 	}
 

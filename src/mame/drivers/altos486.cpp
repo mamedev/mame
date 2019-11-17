@@ -122,14 +122,14 @@ void altos486_state::altos486_z80_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0x0fff).rom().region("iocpu", 0);
 	map(0x2000, 0x27ff).ram();
-	//AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_shared_r, z80_shared_w)
+	//map(0x8000, 0xffff).rw(FUNC(altos486_state::z80_shared_r), FUNC(altos486_state::z80_shared_w)):
 }
 
 void altos486_state::altos486_z80_io(address_map &map)
 {
-	//AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("sio0", z80sio0_device, read, write)
-	//AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("sio1", z80sio0_device, read, write)
-	//AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("sio2", z80sio0_device, read, write)
+	//map(0x00, 0x03).rw("sio0", FUNC(z80sio0_device::read), FUNC(z80sio0_device::write));
+	//map(0x04, 0x07).rw("sio1", FUNC(z80sio0_device::read), FUNC(z80sio0_device::write));
+	//map(0x08, 0x0b).rw("sio2", FUNC(z80sio0_device::read), FUNC(z80sio0_device::write));
 }
 
 void altos486_state::altos486(machine_config &config)

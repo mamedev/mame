@@ -141,6 +141,7 @@ protected:
 	rs232_port_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_resolve_objects() override;
+	virtual void device_reset() override;
 	virtual void device_start() override;
 	virtual void device_config_complete() override;
 

@@ -9,7 +9,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="superpetwcs.d80" size="533248" crc="fa6c2120" sha1="222cbc6b295c8c3193fe821c8d9ca81e34140a7e" offset="0" />
+				<rom name="superpetwcs.d80" size="533248" crc="fa6c2120" sha1="222cbc6b295c8c3193fe821c8d9ca81e34140a7e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -22,21 +22,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Language Disk 1"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo-language-1.d64" size="174848" crc="bdafde99" sha1="390bdfd05a3df41e01aa22f4e0e88e693201a69f" offset="0" />
+				<rom name="waterloo-language-1.d64" size="174848" crc="bdafde99" sha1="390bdfd05a3df41e01aa22f4e0e88e693201a69f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Language Disk 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo-language-2.d64" size="174848" crc="cad09315" sha1="7873c7afc983a09dc33163a7f42cc4a1ab7c9112" offset="0" />
+				<rom name="waterloo-language-2.d64" size="174848" crc="cad09315" sha1="7873c7afc983a09dc33163a7f42cc4a1ab7c9112"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Tutorial Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo-tutorial.d64" size="174848" crc="598ec059" sha1="0fe09d80c9469ce8744a42f002fea1a249bcae06" offset="0" />
+				<rom name="waterloo-tutorial.d64" size="174848" crc="598ec059" sha1="0fe09d80c9469ce8744a42f002fea1a249bcae06"/>
 			</dataarea>
 		</part>
 	</software>
@@ -49,21 +49,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Language Disk 1"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo2-language-1.d64" size="174848" crc="76a7323c" sha1="9fe6df6f4ceb90e513709f116dd21bc14a27a89f" offset="0" />
+				<rom name="waterloo2-language-1.d64" size="174848" crc="76a7323c" sha1="9fe6df6f4ceb90e513709f116dd21bc14a27a89f"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Language Disk 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo2-language-2.d64" size="174848" crc="caf417df" sha1="2f2bcc97d1b7bd2be19b6d112e0c0af5225a0514" offset="0" />
+				<rom name="waterloo2-language-2.d64" size="174848" crc="caf417df" sha1="2f2bcc97d1b7bd2be19b6d112e0c0af5225a0514"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Tutorial Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo2-tutorial.d64" size="174848" crc="cdc2bc2c" sha1="5ebc3ef769e7a0ea0d1ab1b33fa1a5f4612fce3f" offset="0" />
+				<rom name="waterloo2-tutorial.d64" size="174848" crc="cdc2bc2c" sha1="5ebc3ef769e7a0ea0d1ab1b33fa1a5f4612fce3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -76,21 +76,21 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Language Disk 1"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo2-language-no6702-1.d64" size="174848" crc="eb076ea0" sha1="eb4330a02a844a47fea9b73e7597a6780e002d52" offset="0" />
+				<rom name="waterloo2-language-no6702-1.d64" size="174848" crc="eb076ea0" sha1="eb4330a02a844a47fea9b73e7597a6780e002d52"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Language Disk 2"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo2-language-no6702-2.d64" size="174848" crc="5e49633b" sha1="5f8d774449cf5fbe8a3c354f0bea4d4c0713fda1" offset="0" />
+				<rom name="waterloo2-language-no6702-2.d64" size="174848" crc="5e49633b" sha1="5f8d774449cf5fbe8a3c354f0bea4d4c0713fda1"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Tutorial Disk"/>
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo2-tutorial.d64" size="174848" crc="cdc2bc2c" sha1="5ebc3ef769e7a0ea0d1ab1b33fa1a5f4612fce3f" offset="0" />
+				<rom name="waterloo2-tutorial.d64" size="174848" crc="cdc2bc2c" sha1="5ebc3ef769e7a0ea0d1ab1b33fa1a5f4612fce3f"/>
 			</dataarea>
 		</part>
 	</software>
@@ -102,7 +102,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="waterloo-development.d64" size="174848" crc="4effcde8" sha1="ddc1d03fb70d5084bb19e4472cf1ea3c2c6053f2" offset="0" />
+				<rom name="waterloo-development.d64" size="174848" crc="4effcde8" sha1="ddc1d03fb70d5084bb19e4472cf1ea3c2c6053f2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -115,28 +115,28 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="OS Source Paged with Peterson's Patches (2 Jan 83)"/>
 			<dataarea name="flop" size="533248">
-				<rom name="ospeter1.d80" size="533248" crc="1f05e848" sha1="1656cc3b1e91628d06e8adf7b472798db9f1e203" offset="0" />
+				<rom name="ospeter1.d80" size="533248" crc="1f05e848" sha1="1656cc3b1e91628d06e8adf7b472798db9f1e203"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="OS Source Paged w/Patches Working (5 Jan 83)"/>
 			<dataarea name="flop" size="533248">
-				<rom name="ospaged1.d80" size="533248" crc="64ae4c58" sha1="9f17beb6e65b9c5db018d9142bbbda3557551346" offset="0" />
+				<rom name="ospaged1.d80" size="533248" crc="64ae4c58" sha1="9f17beb6e65b9c5db018d9142bbbda3557551346"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="OS Source I/O Breakups #D000 Range (2 Jan 83)"/>
 			<dataarea name="flop" size="533248">
-				<rom name="osiobreakup.d80" size="533248" crc="e17c704b" sha1="bae13621b844fa53bb0f51cc7ffb69891ec1e825" offset="0" />
+				<rom name="osiobreakup.d80" size="533248" crc="e17c704b" sha1="bae13621b844fa53bb0f51cc7ffb69891ec1e825"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
 			<feature name="part_id" value="Stuff from Dick"/>
 			<dataarea name="flop" size="533248">
-				<rom name="dickbarnes.d80" size="533248" crc="c5fa9fd1" sha1="ceae4df77da4cc4a651da4d92d129a0e4c799356" offset="0" />
+				<rom name="dickbarnes.d80" size="533248" crc="c5fa9fd1" sha1="ceae4df77da4cc4a651da4d92d129a0e4c799356"/>
 			</dataarea>
 		</part>
 	</software>
@@ -149,14 +149,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="APL Disasm Part 1"/>
 			<dataarea name="flop" size="533248">
-				<rom name="apldisasm.d80" size="533248" crc="73942042" sha1="29b24f6cf119f687e280e36be9e443027c51ed5c" offset="0" />
+				<rom name="apldisasm.d80" size="533248" crc="73942042" sha1="29b24f6cf119f687e280e36be9e443027c51ed5c"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Bank 2 &amp; Bank 8 Brad Bjorndahl (16 Jul 85)"/>
 			<dataarea name="flop" size="533248">
-				<rom name="bjorndahl.d80" size="533248" crc="8504e3d8" sha1="30365e2d8020c24f89abcbcec4143962e395cc55" offset="0" />
+				<rom name="bjorndahl.d80" size="533248" crc="8504e3d8" sha1="30365e2d8020c24f89abcbcec4143962e395cc55"/>
 			</dataarea>
 		</part>
 	</software>
@@ -168,7 +168,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="os9-systemdisk.d80" size="533248" crc="8e831bba" sha1="3f2d050ffd7a28f590cdaab57f79e5b035324164" offset="0" />
+				<rom name="os9-systemdisk.d80" size="533248" crc="8e831bba" sha1="3f2d050ffd7a28f590cdaab57f79e5b035324164"/>
 			</dataarea>
 		</part>
 	</software>
@@ -181,7 +181,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="ASTRO DRIVER SPMON L0 DOC"/>
 			<dataarea name="flop" size="533248">
-				<rom name="astro.d80" size="533248" crc="bd4fcdd9" sha1="5a536d050ba8d13bdd641c837a9d83c202b4c367" offset="0" />
+				<rom name="astro.d80" size="533248" crc="bd4fcdd9" sha1="5a536d050ba8d13bdd641c837a9d83c202b4c367"/>
 			</dataarea>
 		</part>
 	</software>
@@ -194,7 +194,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Basic Disassembly Aids: PIP SPMON BREAKER mEDIT 1.3 FBREAKER mBASIC 1.1 (w/o Patches)"/>
 			<dataarea name="flop" size="533248">
-				<rom name="basicdisasm.d80" size="533248" crc="64f37084" sha1="12dec3d1aefaf7e4ab8fb083a11ce9e9363a9082" offset="0" />
+				<rom name="basicdisasm.d80" size="533248" crc="64f37084" sha1="12dec3d1aefaf7e4ab8fb083a11ce9e9363a9082"/>
 			</dataarea>
 		</part>
 	</software>
@@ -207,7 +207,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="BEDCALC 6.2 DEVCALC 6.3 INSTRUCTIONS &amp; TUTORIALS APRIL 3, '85"/>
 			<dataarea name="flop" size="533248">
-				<rom name="bdc62.d80" size="533248" crc="5b4fe331" sha1="322c1ca121c7abbe712f5dd8f2b7c3e568d91e1c" offset="0" />
+				<rom name="bdc62.d80" size="533248" crc="5b4fe331" sha1="322c1ca121c7abbe712f5dd8f2b7c3e568d91e1c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -220,7 +220,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="BEDCALC 10 BEDIT 10 ALL SOURCE &amp; .MOD SPMON 1 &amp; INSTR. 15 MAY 85-FINAL FULL!"/>
 			<dataarea name="flop" size="533248">
-				<rom name="bedcalc10.d80" size="533248" crc="38963602" sha1="5f89bb31dc495bb3d129b77886a91da150339950" offset="0" />
+				<rom name="bedcalc10.d80" size="533248" crc="38963602" sha1="5f89bb31dc495bb3d129b77886a91da150339950"/>
 			</dataarea>
 		</part>
 	</software>
@@ -233,7 +233,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Bedit Source"/>
 			<dataarea name="flop" size="533248">
-				<rom name="besrc.d80" size="533248" crc="a66a8053" sha1="68eec3ff522d420e0e1af2528e17a6b97c0efacb" offset="0" />
+				<rom name="besrc.d80" size="533248" crc="a66a8053" sha1="68eec3ff522d420e0e1af2528e17a6b97c0efacb"/>
 			</dataarea>
 		</part>
 	</software>
@@ -246,7 +246,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Edit 8050 John Toebes"/>
 			<dataarea name="flop" size="533248">
-				<rom name="bostic.d80" size="533248" crc="e4512abb" sha1="657fa24544d6991d8946087ba6162ccc5750bbd2" offset="0" />
+				<rom name="bostic.d80" size="533248" crc="e4512abb" sha1="657fa24544d6991d8946087ba6162ccc5750bbd2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -259,7 +259,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="DIR DIRECTORY NEWTERM 2.4 SETTABS MACROS 10"/>
 			<dataarea name="flop" size="533248">
-				<rom name="dir-newterm.d80" size="533248" crc="ae1d272c" sha1="5f6e0eef76756baee98f46851175e09dfd6f8c05" offset="0" />
+				<rom name="dir-newterm.d80" size="533248" crc="ae1d272c" sha1="5f6e0eef76756baee98f46851175e09dfd6f8c05"/>
 			</dataarea>
 		</part>
 	</software>
@@ -272,7 +272,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="PIP HELP"/>
 			<dataarea name="flop" size="533248">
-				<rom name="piphelp.d80" size="533248" crc="3969e3eb" sha1="6dbc1d8dbff51062afde8b23ae790a7dda917d4c" offset="0" />
+				<rom name="piphelp.d80" size="533248" crc="3969e3eb" sha1="6dbc1d8dbff51062afde8b23ae790a7dda917d4c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -285,7 +285,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="V5.1 SuperPET SuperFORTH Copyright 1985 John A. Toebes"/>
 			<dataarea name="flop" size="533248">
-				<rom name="superforth51.d80" size="533248" crc="b63d49f7" sha1="31f9bb695f2972a5d567ce5389058c12b7eb7fe7" offset="0" />
+				<rom name="superforth51.d80" size="533248" crc="b63d49f7" sha1="31f9bb695f2972a5d567ce5389058c12b7eb7fe7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -298,7 +298,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="ISPUG master telecom disk, V1.0. Read note:e, index:e in microEDITOR, loaded alone. 8050. 6809/6502"/>
 			<dataarea name="flop" size="533248">
-				<rom name="telecom.d80" size="533248" crc="4949abd3" sha1="4710080cf6801b6032f5d85958fa66b18e35537e" offset="0" />
+				<rom name="telecom.d80" size="533248" crc="4949abd3" sha1="4710080cf6801b6032f5d85958fa66b18e35537e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -311,7 +311,7 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="TERM PKG 8050"/>
 			<dataarea name="flop" size="533248">
-				<rom name="termpkg.d80" size="533248" crc="8c0ccb33" sha1="5b838d39072d3d22539fb1bf224cc933e124f007" offset="0" />
+				<rom name="termpkg.d80" size="533248" crc="8c0ccb33" sha1="5b838d39072d3d22539fb1bf224cc933e124f007"/>
 			</dataarea>
 		</part>
 	</software>
@@ -323,7 +323,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="pascaldemo.d80" size="533248" crc="2b47eff8" sha1="61711ea4d8ad5030e376ef0401e89d77c1e3f515" offset="0" />
+				<rom name="pascaldemo.d80" size="533248" crc="2b47eff8" sha1="61711ea4d8ad5030e376ef0401e89d77c1e3f515"/>
 			</dataarea>
 		</part>
 	</software>
@@ -335,7 +335,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="spetwcscobol.d80" size="533248" crc="8a793365" sha1="76ce7b57982a7c6dcf6534125dc87d61b3ae9c63" offset="0" />
+				<rom name="spetwcscobol.d80" size="533248" crc="8a793365" sha1="76ce7b57982a7c6dcf6534125dc87d61b3ae9c63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -347,7 +347,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="spetwcstutor.d80" size="533248" crc="35b06d83" sha1="e2788f6c3f7c18da03b77296de0da4b546a8b05a" offset="0" />
+				<rom name="spetwcstutor.d80" size="533248" crc="35b06d83" sha1="e2788f6c3f7c18da03b77296de0da4b546a8b05a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -359,7 +359,7 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="vcfequiz.d80" size="533248" crc="b2dab26e" sha1="5e6ccce55c804213c155129f176ab6803ac691a4" offset="0" />
+				<rom name="vcfequiz.d80" size="533248" crc="b2dab26e" sha1="5e6ccce55c804213c155129f176ab6803ac691a4"/>
 			</dataarea>
 		</part>
 	</software>

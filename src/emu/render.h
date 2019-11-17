@@ -218,6 +218,7 @@ struct render_texinfo
 	u64                 unique_id;          // unique identifier to pass to osd
 	u64                 old_id;             // previously allocated id, if applicable
 	const rgb_t *       palette;            // palette for PALETTE16 textures, bcg lookup table for RGB32/YUY16
+	u32                 palette_length;
 };
 
 
@@ -436,7 +437,7 @@ public:
 private:
 	// internal helpers
 	void get_scaled(u32 dwidth, u32 dheight, render_texinfo &texinfo, render_primitive_list &primlist, u32 flags = 0);
-	const rgb_t *get_adjusted_palette(render_container &container);
+	const rgb_t *get_adjusted_palette(render_container &container, u32 &out_length);
 
 	static const int MAX_TEXTURE_SCALES = 16;
 
@@ -527,7 +528,7 @@ public:
 	bool has_brightness_contrast_gamma_changes() const { return (m_user.m_brightness != 1.0f || m_user.m_contrast != 1.0f || m_user.m_gamma != 1.0f); }
 	u8 apply_brightness_contrast_gamma(u8 value);
 	float apply_brightness_contrast_gamma_fp(float value);
-	const rgb_t *bcg_lookup_table(int texformat, palette_t *palette = nullptr);
+	const rgb_t *bcg_lookup_table(int texformat, u32 &out_length, palette_t *palette = nullptr);
 
 private:
 	// an item describes a high level primitive that is added to a container

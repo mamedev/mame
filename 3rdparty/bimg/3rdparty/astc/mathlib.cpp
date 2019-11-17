@@ -61,7 +61,7 @@ float nan(int p)
 	return v.q;
 }
 
-#if !defined(_MSC_VER) && (__cplusplus < 201103L)
+#if !_MSC_VER && !__clang__ && (__cplusplus < 201103L)
 float fmax(float p, float q)
 {
 	if (p != p)

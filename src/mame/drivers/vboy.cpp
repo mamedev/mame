@@ -223,8 +223,8 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 
 			if (dat)
 			{
-				uint8_t const res_x = x + xi;
-				uint8_t const res_y = y + yi;
+				uint16_t const res_x = x + xi;
+				uint16_t const res_y = y + yi;
 
 				if (cliprect.contains(res_x, res_y))
 				{
@@ -1063,7 +1063,7 @@ void vboy_state::vboy_mem(address_map &map)
 
 	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
-	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
+	//map(0x00040000, 0x0005ffff).ram(); // VIPC
 	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
 	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
@@ -1073,10 +1073,10 @@ void vboy_state::vboy_mem(address_map &map)
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
 	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
-	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
+	//map(0x04000000, 0x04ffffff) // Expansion area
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram");// Main RAM - 64K mask 0xffff
 	map(0x06000000, 0x06003fff).rw(m_cart, FUNC(vboy_cart_slot_device::read_eeprom), FUNC(vboy_cart_slot_device::write_eeprom)); // Cart RAM - 8K NVRAM
-//  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+//  map(0x07000000, 0x071fffff).mirror(0x0e00000).r("cartslot", FUNC(vboy_cart_slot_device::read_cart)); /* ROM */
 }
 
 void vboy_state::vboy_io(address_map &map)
@@ -1093,7 +1093,7 @@ void vboy_state::vboy_io(address_map &map)
 
 	map(0x00020000, 0x0003ffff).rw(FUNC(vboy_state::vboy_bgmap_r), FUNC(vboy_state::vboy_bgmap_w)); // VIPC memory
 
-	//AM_RANGE( 0x00040000, 0x0005ffff ) AM_RAM // VIPC
+	//map(0x00040000, 0x0005ffff).ram(); // VIPC
 	map(0x0005f800, 0x0005f87f).rw(FUNC(vboy_state::vip_r), FUNC(vboy_state::vip_w));
 
 	map(0x00078000, 0x00079fff).rw(FUNC(vboy_state::font0_r), FUNC(vboy_state::font0_w)); // Font 0-511 mirror
@@ -1103,10 +1103,10 @@ void vboy_state::vboy_io(address_map &map)
 
 	map(0x01000000, 0x010005ff).rw("vbsnd", FUNC(vboysnd_device::read), FUNC(vboysnd_device::write));
 	map(0x02000000, 0x0200002b).mirror(0x0ffff00).rw(FUNC(vboy_state::io_r), FUNC(vboy_state::io_w)); // Hardware control registers mask 0xff
-//  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
+//  map(0x04000000, 0x04ffffff) // Expansion area
 	map(0x05000000, 0x0500ffff).mirror(0x0ff0000).ram().share("wram"); // Main RAM - 64K mask 0xffff
 	map(0x06000000, 0x06003fff).noprw(); // Cart RAM - 8K NVRAM ?
-//  AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_DEVREAD("cartslot", vboy_cart_slot_device, read_cart) /* ROM */
+//  map(0x07000000, 0x071fffff).mirror(0x0e00000).r("cartslot", FUNC(vboy_cart_slot_device::read_cart)); /* ROM */
 }
 
 /* Input ports */

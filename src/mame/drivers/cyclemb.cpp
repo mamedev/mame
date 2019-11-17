@@ -592,9 +592,9 @@ void cyclemb_state::cyclemb_map(address_map &map)
 
 void cyclemb_state::cyclemb_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
-	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
+	//map(0xc020, 0xc020).nopw(); // ?
 	map(0xc09e, 0xc09f).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
 	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
@@ -602,11 +602,11 @@ void cyclemb_state::cyclemb_io(address_map &map)
 
 void cyclemb_state::skydest_io(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 	map(0xc000, 0xc000).w(FUNC(cyclemb_state::cyclemb_bankswitch_w));
-	//AM_RANGE(0xc020, 0xc020) AM_WRITENOP // ?
+	//map(0xc020, 0xc020).nopw(); // ?
 	map(0xc080, 0xc081).rw(FUNC(cyclemb_state::skydest_i8741_0_r), FUNC(cyclemb_state::skydest_i8741_0_w));
-	//AM_RANGE(0xc0a0, 0xc0a0) AM_WRITENOP // ?
+	//map(0xc0a0, 0xc0a0).nopw(); // ?
 	map(0xc0bf, 0xc0bf).w(FUNC(cyclemb_state::cyclemb_flip_w)); //flip screen
 }
 

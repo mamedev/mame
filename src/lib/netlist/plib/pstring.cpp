@@ -1,7 +1,7 @@
 // license:GPL-2.0+
 // copyright-holders:Couriersud
 /*
- * nl_string.c
+ * pstring.cpp
  *
  */
 
@@ -55,50 +55,6 @@ pstring_t<F> pstring_t<F>::substr(size_type start, size_type nlen) const
 		ret.m_str.assign(ps.p, pe.p);
 	}
 	return ret;
-}
-
-template<typename F>
-typename pstring_t<F>::size_type pstring_t<F>::find_first_not_of(const pstring_t &no) const
-{
-	size_type pos = 0;
-	for (auto it = begin(); it != end(); ++it, ++pos)
-	{
-		bool f = true;
-		for (code_t const jt : no)
-		{
-			if (*it == jt)
-			{
-				f = false;
-				break;
-			}
-		}
-		if (f)
-			return pos;
-	}
-	return npos;
-}
-
-template<typename F>
-typename pstring_t<F>::size_type pstring_t<F>::find_last_not_of(const pstring_t &no) const
-{
-	/* FIXME: reverse iterator */
-	size_type last_found = npos;
-	size_type pos = 0;
-	for (auto it = begin(); it != end(); ++it, ++pos)
-	{
-		bool f = true;
-		for (code_t const jt : no)
-		{
-			if (*it == jt)
-			{
-				f = false;
-				break;
-			}
-		}
-		if (f)
-			last_found = pos;
-	}
-	return last_found;
 }
 
 template<typename F>

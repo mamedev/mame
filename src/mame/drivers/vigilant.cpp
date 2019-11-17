@@ -116,7 +116,7 @@ void vigilant_state::kikcubic_io_map(address_map &map)
 	map(0x03, 0x03).portr("IN1");
 	map(0x04, 0x04).portr("IN2").w(FUNC(vigilant_state::bank_select_w));
 	map(0x06, 0x06).w("soundlatch", FUNC(generic_latch_8_device::write));
-//  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
+//  map(0x07, 0x07).nopw(); /* ?? */
 }
 
 void vigilant_state::sound_map(address_map &map)

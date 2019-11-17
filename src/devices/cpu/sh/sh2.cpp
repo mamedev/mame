@@ -129,7 +129,7 @@ void sh2_device::sh7604_map(address_map &map)
 	map(0x40000000, 0xbfffffff).r(FUNC(sh2_device::sh2_internal_a5));
 
 //  TODO: cps3boot breaks with this enabled. Needs callback
-//  AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM // cache data array
+//  map(0xc0000000, 0xc0000fff).ram(); // cache data array
 
 //  map(0xe0000000, 0xe00001ff).mirror(0x1ffffe00).rw(FUNC(sh2_device::sh7604_r), FUNC(sh2_device::sh7604_w));
 	// TODO: internal map takes way too much resources if mirrored with 0x1ffffe00
@@ -223,8 +223,8 @@ void sh2a_device::sh7021_map(address_map &map)
 	map(0x05ffff48, 0x05ffff49).rw(FUNC(sh2a_device::dmaor_r), FUNC(sh2a_device::dmaor_w));
 	map(0x05ffff4a, 0x05ffff4b).rw(FUNC(sh2a_device::dma_tcr0_r), FUNC(sh2a_device::dma_tcr0_w));
 	map(0x05ffff4e, 0x05ffff4f).rw(FUNC(sh2a_device::dma_chcr0_r), FUNC(sh2a_device::dma_chcr0_w));
-//  AM_RANGE(0x07000000, 0x070003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
-//  AM_RANGE(0x0f000000, 0x0f0003ff) AM_RAM AM_SHARE("oram")// on-chip RAM, actually at 0xf000000 (1 kb)
+//  map(0x07000000, 0x070003ff).ram().share("oram"); // on-chip RAM, actually at 0xf000000 (1 kb)
+//  map(0x0f000000, 0x0f0003ff).ram().share("oram"); // on-chip RAM, actually at 0xf000000 (1 kb)
 }
 
 void sh1_device::sh7032_map(address_map &map)
@@ -1058,61 +1058,64 @@ void sh2_device::static_generate_memory_accessor(int size, int iswrite, const ch
 
 	UML_LABEL(block, label++);              // label:
 
-	for (auto & elem : m_fastram)
+	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
-		if (elem.base != nullptr && (!iswrite || !elem.readonly))
+		for (auto & elem : m_fastram)
 		{
-			void *fastbase = (uint8_t *)elem.base - elem.start;
-			uint32_t skip = label++;
-			if (elem.end != 0xffffffff)
+			if (elem.base != nullptr && (!iswrite || !elem.readonly))
 			{
-				UML_CMP(block, I0, elem.end);   // cmp     i0,end
-				UML_JMPc(block, COND_A, skip);                                      // ja      skip
-			}
-			if (elem.start != 0x00000000)
-			{
-				UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
-				UML_JMPc(block, COND_B, skip);                                      // jb      skip
-			}
+				void *fastbase = (uint8_t *)elem.base - elem.start;
+				uint32_t skip = label++;
+				if (elem.end != 0xffffffff)
+				{
+					UML_CMP(block, I0, elem.end);   // cmp     i0,end
+					UML_JMPc(block, COND_A, skip);                                      // ja      skip
+				}
+				if (elem.start != 0x00000000)
+				{
+					UML_CMP(block, I0, elem.start);// cmp     i0,fastram_start
+					UML_JMPc(block, COND_B, skip);                                      // jb      skip
+				}
 
-			if (!iswrite)
-			{
-				if (size == 1)
+				if (!iswrite)
 				{
-					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+					if (size == 1)
+					{
+						UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+					}
+					else if (size == 2)
+					{
+						UML_XOR(block, I0, I0, WORD_XOR_BE(0));
+						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+					}
+					else if (size == 4)
+					{
+						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+					}
+					UML_RET(block);                                                     // ret
 				}
-				else if (size == 2)
+				else
 				{
-					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
-					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+					if (size == 1)
+					{
+						UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+					}
+					else if (size == 2)
+					{
+						UML_XOR(block, I0, I0, WORD_XOR_BE(0));
+						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+					}
+					else if (size == 4)
+					{
+						UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+					}
+					UML_RET(block);                                                     // ret
 				}
-				else if (size == 4)
-				{
-					UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
-				}
-				UML_RET(block);                                                     // ret
-			}
-			else
-			{
-				if (size == 1)
-				{
-					UML_XOR(block, I0, I0, BYTE4_XOR_BE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
-				}
-				else if (size == 2)
-				{
-					UML_XOR(block, I0, I0, WORD_XOR_BE(0));
-					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
-				}
-				else if (size == 4)
-				{
-					UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
-				}
-				UML_RET(block);                                                     // ret
-			}
 
-			UML_LABEL(block, skip);                                             // skip:
+				UML_LABEL(block, skip);                                             // skip:
+			}
 		}
 	}
 

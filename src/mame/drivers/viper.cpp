@@ -350,8 +350,8 @@ some other components. It will be documented at a later date.
 
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
-#include "machine/ataintf.h"
-#include "machine/idehd.h"
+#include "bus/ata/ataintf.h"
+#include "bus/ata/idehd.h"
 #include "machine/lpci.h"
 #include "machine/timekpr.h"
 #include "machine/timer.h"
@@ -2101,7 +2101,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 void viper_state::viper_map(address_map &map)
 {
-//  ADDRESS_MAP_UNMAP_HIGH
+//  map.unmap_value_high();
 	map(0x00000000, 0x00ffffff).mirror(0x1000000).ram().share("workram");
 	map(0x80000000, 0x800fffff).rw(FUNC(viper_state::epic_r), FUNC(viper_state::epic_w));
 	map(0x82000000, 0x83ffffff).rw(FUNC(viper_state::voodoo3_r), FUNC(viper_state::voodoo3_w));
@@ -2112,7 +2112,7 @@ void viper_state::viper_map(address_map &map)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
-//  AM_RANGE(0xff400xxx, 0xff400xxx) ppp2nd sense device
+//  map(0xff400xxx, 0xff400xxx) ppp2nd sense device
 	map(0xffe00000, 0xffe00007).r(FUNC(viper_state::e00000_r));
 	map(0xffe00008, 0xffe0000f).rw(FUNC(viper_state::e00008_r), FUNC(viper_state::e00008_w));
 	map(0xffe08000, 0xffe08007).noprw();

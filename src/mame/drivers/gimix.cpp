@@ -152,9 +152,9 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x00000, 0x0dfff).bankrw("lower_ram");
 	map(0x0e000, 0x0e001).rw(m_acia1, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
 	map(0x0e004, 0x0e005).rw(m_acia2, FUNC(acia6850_device::read), FUNC(acia6850_device::write));
-	//AM_RANGE(0x0e018, 0x0e01b) AM_READWRITE(fdc_r, fdc_w)  // FD1797 FDC (PIO)
+	//map(0x0e018, 0x0e01b).rw(FUNC(gimix_state::fdc_r), FUNC(gimix_state::fdc_w));  // FD1797 FDC (PIO)
 	map(0x0e100, 0x0e1ff).ram();
-	//AM_RANGE(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
+	//map(0x0e200, 0x0e20f) // 9511A / 9512 Arithmetic Processor
 	map(0x0e210, 0x0e21f).rw("timer", FUNC(ptm6840_device::read), FUNC(ptm6840_device::write));
 	map(0x0e220, 0x0e23f).rw("rtc", FUNC(mm58167_device::read), FUNC(mm58167_device::write));
 	map(0x0e240, 0x0e3af).ram();
@@ -164,7 +164,7 @@ void gimix_state::gimix_banked_mem(address_map &map)
 	map(0x0e800, 0x0efff).ram();
 	map(0x0f000, 0x0f7ff).bankr("rombank2");
 	map(0x0f800, 0x0ffff).bankr("rombank1");
-	//AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	//map(0x10000, 0x1ffff).ram();
 }
 
 void gimix_state::gimix_mem(address_map &map)

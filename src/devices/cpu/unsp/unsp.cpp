@@ -59,6 +59,7 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 	, m_mem_write(nullptr)
 	, m_enable_drc(false)
 {
+	m_iso = 10;
 }
 
 unsp_device::unsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

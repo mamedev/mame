@@ -60,7 +60,7 @@ void picno_state::mem_map(address_map &map)
 
 void picno_state::io_map(address_map &map)
 {
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
+//  map.global_mask(0xff);
 }
 
 static INPUT_PORTS_START( picno )

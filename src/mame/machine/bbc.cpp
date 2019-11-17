@@ -1316,7 +1316,7 @@ void bbc_state::insert_device_rom(memory_region *rom)
 		/* compare first 1K of bank with what we want to insert */
 		if (!memcmp(rom->base(), m_region_swr->base() + (bank * 0x4000), 0x400))
 		{
-			osd_printf_verbose("Found '%s' in romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+			osd_printf_verbose("Found '%s' in romslot%d\n", get_rom_name(rom->base()), bank);
 			return;
 		}
 	}
@@ -1335,8 +1335,8 @@ void bbc_state::insert_device_rom(memory_region *rom)
 				if (swr[0x0006] == 0xff && swr[0x4006] == 0xff)
 				{
 					memcpy(m_region_swr->base() + (bank * 0x4000), rom->base(), rom->bytes());
-					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base() + 0x4000).c_str(), bank + 1);
-					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base() + 0x4000), bank + 1);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()), bank);
 					return;
 				}
 				break;
@@ -1346,7 +1346,7 @@ void bbc_state::insert_device_rom(memory_region *rom)
 				if (swr[0x0006] == 0xff)
 				{
 					memcpy(m_region_swr->base() + (bank * 0x4000), rom->base(), rom->bytes());
-					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()).c_str(), bank);
+					osd_printf_verbose("Inserting '%s' into romslot%d\n", get_rom_name(rom->base()), bank);
 					return;
 				}
 				break;
@@ -1478,7 +1478,7 @@ void bbc_state::setup_device_roms()
 	/* list all inserted ROMs */
 	for (int i = 15; i >= 0; i--)
 	{
-		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)).c_str());
+		osd_printf_info("ROM %X : %s\n", i, get_rom_name(m_region_swr->base() + (i * 0x4000)));
 	}
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -7,6 +7,7 @@
 #define DEBUGDRAW_H_HEADER_GUARD
 
 #include <bx/allocator.h>
+#include <bgfx/bgfx.h>
 #include "../bounds.h"
 
 struct Axis
@@ -50,7 +51,7 @@ GeometryHandle ddCreateGeometry(uint32_t _numVertices, const DdVertex* _vertices
 ///
 void ddDestroy(GeometryHandle _handle);
 
-
+///
 struct DebugDrawEncoder
 {
 	///
@@ -108,13 +109,13 @@ struct DebugDrawEncoder
 	void moveTo(float _x, float _y, float _z = 0.0f);
 
 	///
-	void moveTo(const void* _pos);
+	void moveTo(const bx::Vec3& _pos);
 
 	///
 	void lineTo(float _x, float _y, float _z = 0.0f);
 
 	///
-	void lineTo(const void* _pos);
+	void lineTo(const bx::Vec3& _pos);
 
 	///
 	void close();
@@ -138,6 +139,9 @@ struct DebugDrawEncoder
 	void draw(const Sphere& _sphere);
 
 	///
+	void draw(const Triangle& _triangle);
+
+	///
 	void draw(const Cone& _cone);
 
 	///
@@ -156,42 +160,56 @@ struct DebugDrawEncoder
 	void drawArc(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _degrees);
 
 	///
-	void drawCircle(const void* _normal, const void* _center, float _radius, float _weight = 0.0f);
+	void drawCircle(const bx::Vec3& _normal, const bx::Vec3& _center, float _radius, float _weight = 0.0f);
 
 	///
 	void drawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight = 0.0f);
 
 	///
-	void drawQuad(const float* _normal, const float* _center, float _size);
+	void drawQuad(const bx::Vec3& _normal, const bx::Vec3& _center, float _size);
 
 	///
-	void drawQuad(SpriteHandle _handle, const float* _normal, const float* _center, float _size);
+	void drawQuad(SpriteHandle _handle, const bx::Vec3& _normal, const bx::Vec3& _center, float _size);
 
 	///
-	void drawQuad(bgfx::TextureHandle _handle, const float* _normal, const float* _center, float _size);
+	void drawQuad(bgfx::TextureHandle _handle, const bx::Vec3& _normal, const bx::Vec3& _center, float _size);
 
 	///
-	void drawCone(const void* _from, const void* _to, float _radius);
+	void drawCone(const bx::Vec3& _from, const bx::Vec3& _to, float _radius);
 
 	///
-	void drawCylinder(const void* _from, const void* _to, float _radius);
+	void drawCylinder(const bx::Vec3& _from, const bx::Vec3& _to, float _radius);
 
 	///
-	void drawCapsule(const void* _from, const void* _to, float _radius);
+	void drawCapsule(const bx::Vec3& _from, const bx::Vec3& _to, float _radius);
 
 	///
 	void drawAxis(float _x, float _y, float _z, float _len = 1.0f, Axis::Enum _highlight = Axis::Count, float _thickness = 0.0f);
 
 	///
-	void drawGrid(const void* _normal, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+	void drawGrid(const bx::Vec3& _normal, const bx::Vec3& _center, uint32_t _size = 20, float _step = 1.0f);
 
 	///
-	void drawGrid(Axis::Enum _axis, const void* _center, uint32_t _size = 20, float _step = 1.0f);
+	void drawGrid(Axis::Enum _axis, const bx::Vec3& _center, uint32_t _size = 20, float _step = 1.0f);
 
 	///
 	void drawOrb(float _x, float _y, float _z, float _radius, Axis::Enum _highlight = Axis::Count);
 
 	BX_ALIGN_DECL_CACHE_LINE(uint8_t) m_internal[50<<10];
+};
+
+///
+class DebugDrawEncoderScopePush
+{
+public:
+	///
+	DebugDrawEncoderScopePush(DebugDrawEncoder& _dde);
+
+	///
+	~DebugDrawEncoderScopePush();
+
+private:
+	DebugDrawEncoder& m_dde;
 };
 
 #endif // DEBUGDRAW_H_HEADER_GUARD

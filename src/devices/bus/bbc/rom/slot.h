@@ -117,7 +117,7 @@ public:
 
 	// reading and writing
 	virtual uint8_t read(offs_t offset) { return 0xff; }
-	virtual void write(offs_t offset, uint8_t data) { m_device.logerror("unhandled ROM write to %04X = %02X\n", offset | 0x8000, data); }
+	virtual void write(offs_t offset, uint8_t data) { device().logerror("unhandled ROM write to %04X = %02X\n", offset | 0x8000, data); }
 
 	void rom_alloc(uint32_t size, const char *tag);
 	void ram_alloc(uint32_t size);

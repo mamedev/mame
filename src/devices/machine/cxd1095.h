@@ -48,7 +48,7 @@ class cxd1095_device : public device_t
 {
 public:
 	// construction/destruction
-	cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cxd1095_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// configuration
 	template <std::size_t Port> auto in_port_cb() { static_assert(Port >= 0 && Port < 5, "invalid port"); return m_input_cb[Port].bind(); }

@@ -111,7 +111,7 @@ namespace netlist
 	NETLIB_DEVICE_IMPL(clock,               "CLOCK",                  "FREQ")
 	NETLIB_DEVICE_IMPL(varclock,            "VARCLOCK",               "FUNC")
 	NETLIB_DEVICE_IMPL(extclock,            "EXTCLOCK",               "FREQ,PATTERN")
-	NETLIB_DEVICE_IMPL(res_sw,              "RES_SWITCH",             "+IN,+P1,+P2")
+	NETLIB_DEVICE_IMPL(res_sw,              "RES_SWITCH",             "+I,+1,+2")
 	NETLIB_DEVICE_IMPL(mainclock,           "MAINCLOCK",              "FREQ")
 	NETLIB_DEVICE_IMPL(gnd,                 "GND",                    "")
 	NETLIB_DEVICE_IMPL(netlistparams,       "PARAMETER",              "")

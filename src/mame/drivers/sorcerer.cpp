@@ -493,13 +493,13 @@ void sorcerer_state::sorcerer(machine_config &config)
 
 	CASSETTE(config, m_cassette1);
 	m_cassette1->set_formats(sorcerer_cassette_formats);
-	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette1->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette1->add_route(ALL_OUTPUTS, "mono", 0.05); // cass1 speaker
 	m_cassette1->set_interface("sorcerer_cass");
 
 	CASSETTE(config, m_cassette2);
 	m_cassette2->set_formats(sorcerer_cassette_formats);
-	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette2->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette2->add_route(ALL_OUTPUTS, "mono", 0.05); // cass2 speaker
 	m_cassette2->set_interface("sorcerer_cass");
 
@@ -667,6 +667,11 @@ ROM_START(sorcererb)
 	ROM_IGNORE(0x800)
 	ROMX_LOAD("scua1.2e",    0xe800, 0x0800, CRC(aa9a6ca6) SHA1(bcaa7457a1b892ed82c1a04ee21a619faa7c1a16), ROM_BIOS(1) )
 	ROM_IGNORE(0x800)
+	ROM_SYSTEM_BIOS(2, "scuamon64dd", "SCUAMON64DD")
+	ROMX_LOAD("devinb.1e",   0xe000, 0x0800, CRC(a2ea2f93) SHA1(8f9298f1641806dfba819ead318a4838385223fe), ROM_BIOS(2) )
+	ROM_CONTINUE(0xe000, 0x800)
+	ROMX_LOAD("devinb.2e",   0xe800, 0x0800, CRC(4d9ea9a5) SHA1(1a3c8cf98d4caed6044b1b01cd79dcd9c61dc1e1), ROM_BIOS(2) )
+	ROM_CONTINUE(0xe800, 0x800)
 ROM_END
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT     STATE           INIT           COMPANY      FULLNAME */

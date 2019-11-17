@@ -449,9 +449,9 @@ inline void ppc_device::set_decrementer(uint32_t newdec)
 	if (PRINTF_DECREMENTER)
 	{
 		uint64_t total = total_cycles();
-		osd_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
+		osd_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%016X timer=%016X\n",
 				curdec, newdec, m_tb_divisor,
-				(uint32_t)(total >> 32), (uint32_t)total, (uint32_t)(cycles_until_done >> 32), (uint32_t)cycles_until_done);
+				total, cycles_until_done);
 	}
 
 	m_dec_zero_cycles = total_cycles() + cycles_until_done;

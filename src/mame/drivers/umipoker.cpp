@@ -357,8 +357,8 @@ void umipoker_state::umipoker_map(address_map &map)
 	map(0xe00004, 0xe00005).portr("IN1"); // unused?
 	map(0xe00008, 0xe00009).portr("IN2");
 	map(0xe00010, 0xe00011).w(FUNC(umipoker_state::umi_counters_w));
-//  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
-//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
+//  map(0xe0000c, 0xe0000d).w(FUNC(umipoker_state::lamps_w)); -----> lamps only for saiyukip.
+//  map(0xe00010, 0xe00011).w(FUNC(umipoker_state::counters_w)); --> coin counters for both games.
 	map(0xe00014, 0xe00015).portr("DSW1-2");
 	map(0xe00018, 0xe00019).portr("DSW3-4");
 	map(0xe00020, 0xe00021).w(FUNC(umipoker_state::umipoker_scrolly_0_w));

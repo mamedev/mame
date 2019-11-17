@@ -511,9 +511,9 @@ if (++reps % 100 == 99)
 {
 	osd_printf_debug("---\nBlitter stats:\n");
 	for (i = 0; i < blitter_count; i++)
-		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %08X%08X pixels\n",
+		osd_printf_debug("  CMD=%08X A1=%08X A2=%08X %6d times, %016X pixels\n",
 				blitter_stats[i][0], blitter_stats[i][1], blitter_stats[i][2],
-				blitter_stats[i][3], (uint32_t)(blitter_pixels[i] >> 32), (uint32_t)(blitter_pixels[i]));
+				blitter_stats[i][3], blitter_pixels[i]);
 	osd_printf_debug("---\n");
 }
 }

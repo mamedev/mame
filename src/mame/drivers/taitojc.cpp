@@ -62,7 +62,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
 |E23-27.13  TC0780FPA                                                             |
-|           (QFP240)                                        ENSONIC               |
+|           (QFP240)                                        ENSONIQ               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
 |4218160               D482445                                                    |
@@ -70,7 +70,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                      D482445    (QFP144)                                        |
 |4218160                                      16MHz         MB87078               |
 |           TC0780FPA  D482445           30.4761MHz                               |
-|           (QFP240)              ENSONIC                                         |
+|           (QFP240)              ENSONIQ                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
 |---------------------------------------------------------------------------------|
@@ -197,7 +197,7 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |                              E07-07.49    CY7B991                               |
 |TC528257   TC514260           E07-03.50                     TC511664             |
 |                     TC0780FPA                                                   |
-|TC528257   TC514260  (QFP240)           10MHz   MC68EC000   ENSONIC              |
+|TC528257   TC514260  (QFP240)           10MHz   MC68EC000   ENSONIQ              |
 |                                 CY7B991                    ESPR6 ES5510         |
 |TC528257   TC514260                                                              |
 |                                                                                 |
@@ -206,7 +206,7 @@ Top board: MOTHER PCB  K11X0835A  M43E0304A
 |TC528257   TC514260                             16MHz      MB87078               |
 |                     TC0780FPA          30.4761MHz                               |
 |TC528257   TC514260  (QFP240)                                                    |
-|                                           ENSONIC                               |
+|                                           ENSONIQ                               |
 |TC528257             E07-05.22             OTISR2                                |
 |---------------------------------------------------------------------------------|
 
@@ -290,7 +290,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |4218160                 (QFP208)                                                 |
 |                                    10MHz    MC68EC000     LC321664AJ-80         |
 |E23-27.13  TC0780FPA  D482445                                                    |
-|           (QFP240)                                        ENSONIC               |
+|           (QFP240)                                        ENSONIQ               |
 |                      D482445                TC51832       ESPR6 ES5510          |
 |                                             TC51832                             |
 |4218160                                                                          |
@@ -298,7 +298,7 @@ Top board: MOTHER PCB-C K11X0838A  M43E0325A
 |                                 (QFP144)                                        |
 |4218160               D482445                16MHz         MB87078               |
 |           TC0780FPA                    30.4761MHz                               |
-|           (QFP240)   D482445    ENSONIC                                         |
+|           (QFP240)   D482445    ENSONIQ                                         |
 |E23-28.18                        OTISR2                                          |
 |                                                                                 |
 |---------------------------------------------------------------------------------|
@@ -324,6 +324,10 @@ Notes:
                    OTISR2 - 3.80950MHz (pin12)
                    ES5510 - 2.22MHz, 2.666MHz, 3.8095125MHz (30.4761/8), 8.000MHz (16/2)
 
+      X1 is labeled "54/33.333MHz" on MOTHER PCB-C, but only 54 MHz appears to have been used.
+
+      X3 is labeled "30.47610MHz" on MOTHER PCB-C and "30.4762MHz" on at least one actual XTAL. Both of these values
+      are likely rounded off from the 30.47618 MHz frequency used with the same Ensoniq chips in other Taito games.
 
 Bottom board: JCG DAUGHTERL PCB-C K9100633A J9100434A (Sticker K91J0633A)
 |---------------------------------------------------------------------------------|
@@ -1135,7 +1139,7 @@ void taitojc_state::dendego(machine_config &config)
 	m_screen->set_screen_update(FUNC(taitojc_state::screen_update_dendego));
 
 	/* sound hardware */
-	SPEAKER(config, "vibration").subwoofer();
+	SPEAKER(config, "vibration").seat();
 
 	/* clock frequency & pin 7 not verified */
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);

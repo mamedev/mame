@@ -2062,7 +2062,7 @@ void debugger_commands::execute_dump(int ref, const std::vector<std::string> &pa
 	}
 	if (rowsize == 0 || (rowsize % space->byte_to_address(width)) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", space->byte_to_address(width));
 		return;
 	}
 

@@ -470,7 +470,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if (m_errors != 0)
 	{
 		/* create the error message and exit fatally */
-		osd_printf_error("%s", m_errorstring.c_str());
+		osd_printf_error("%s", m_errorstring);
 		fatalerror_exitcode(machine(), EMU_ERR_MISSING_FILES, "Required files are missing, the machine cannot be run.");
 	}
 
@@ -478,7 +478,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 	if ((m_warnings) || (m_knownbad))
 	{
 		m_errorstring.append("WARNING: the machine might not run correctly.");
-		osd_printf_warning("%s\n", m_errorstring.c_str());
+		osd_printf_warning("%s\n", m_errorstring);
 	}
 }
 

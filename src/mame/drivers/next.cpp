@@ -899,38 +899,38 @@ void next_state::next_mem(address_map &map)
 	map(0x02000000, 0x020001ff).mirror(0x300200).rw(FUNC(next_state::dma_ctrl_r), FUNC(next_state::dma_ctrl_w));
 	map(0x02004000, 0x020041ff).mirror(0x300200).rw(FUNC(next_state::dma_regs_r), FUNC(next_state::dma_regs_w));
 	map(0x02006000, 0x0200600f).mirror(0x300000).m(net, FUNC(mb8795_device::map));
-//  AM_RANGE(0x02006010, 0x02006013) AM_MIRROR(0x300000) memory timing
+//  map(0x02006010, 0x02006013).mirror(0x300000); memory timing
 	map(0x02007000, 0x02007003).mirror(0x300000).r(FUNC(next_state::irq_status_r));
 	map(0x02007800, 0x02007803).mirror(0x300000).rw(FUNC(next_state::irq_mask_r), FUNC(next_state::irq_mask_w));
 	map(0x02008000, 0x02008003).mirror(0x300000).r(FUNC(next_state::dsp_r));
 	map(0x0200c000, 0x0200c003).mirror(0x300000).r(FUNC(next_state::scr1_r));
 	map(0x0200c800, 0x0200c803).mirror(0x300000).r(FUNC(next_state::rom_map_r));
 	map(0x0200d000, 0x0200d003).mirror(0x300000).rw(FUNC(next_state::scr2_r), FUNC(next_state::scr2_w));
-//  AM_RANGE(0x0200d800, 0x0200d803) AM_MIRROR(0x300000) RMTINT
+//  map(0x0200d800, 0x0200d803).mirror(0x300000); RMTINT
 	map(0x0200e000, 0x0200e00b).mirror(0x300000).m(keyboard, FUNC(nextkbd_device::amap));
-//  AM_RANGE(0x0200f000, 0x0200f003) AM_MIRROR(0x300000) printer
-//  AM_RANGE(0x02010000, 0x02010003) AM_MIRROR(0x300000) brightness
+//  map(0x0200f000, 0x0200f003).mirror(0x300000); printer
+//  map(0x02010000, 0x02010003).mirror(0x300000); brightness
 	map(0x02012000, 0x0201201f).mirror(0x300000).m(mo, FUNC(nextmo_device::map));
 	map(0x02014000, 0x0201400f).mirror(0x300000).m(scsi, FUNC(ncr5390_device::map));
 	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
 	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
 	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
 	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_t::reg_r), FUNC(scc8530_t::reg_w));
-//  AM_RANGE(0x02018004, 0x02018007) AM_MIRROR(0x300000) SCC CLK
-//  AM_RANGE(0x02018190, 0x02018197) AM_MIRROR(0x300000) warp 9c DRAM timing
-//  AM_RANGE(0x02018198, 0x0201819f) AM_MIRROR(0x300000) warp 9c VRAM timing
+//  map(0x02018004, 0x02018007).mirror(0x300000); SCC CLK
+//  map(0x02018190, 0x02018197).mirror(0x300000); warp 9c DRAM timing
+//  map(0x02018198, 0x0201819f).mirror(0x300000); warp 9c VRAM timing
 	map(0x0201a000, 0x0201a003).mirror(0x300000).r(FUNC(next_state::event_counter_r)); // EVENTC
-//  AM_RANGE(0x020c0000, 0x020c0004) AM_MIRROR(0x300000) BMAP
+//  map(0x020c0000, 0x020c0004).mirror(0x300000); BMAP
 	map(0x020c0030, 0x020c0037).mirror(0x300000).rw(FUNC(next_state::phy_r), FUNC(next_state::phy_w));
 	map(0x04000000, 0x07ffffff).ram(); //work ram
-//  AM_RANGE(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
-//  AM_RANGE(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
-//  AM_RANGE(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
-//  AM_RANGE(0x0f000000, 0x0f03ffff) video RAM w AB function
-//  AM_RANGE(0x10000000, 0x1003ffff) main RAM w A+B-AB function
-//  AM_RANGE(0x14000000, 0x1403ffff) main RAM w (1-A)B function
-//  AM_RANGE(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
-//  AM_RANGE(0x1c000000, 0x1c03ffff) main RAM w AB function
+//  map(0x0c000000, 0x0c03ffff) video RAM w A+B-AB function
+//  map(0x0d000000, 0x0d03ffff) video RAM w (1-A)B function
+//  map(0x0e000000, 0x0e03ffff) video RAM w ceil(A+B) function
+//  map(0x0f000000, 0x0f03ffff) video RAM w AB function
+//  map(0x10000000, 0x1003ffff) main RAM w A+B-AB function
+//  map(0x14000000, 0x1403ffff) main RAM w (1-A)B function
+//  map(0x18000000, 0x1803ffff) main RAM w ceil(A+B) function
+//  map(0x1c000000, 0x1c03ffff) main RAM w AB function
 }
 
 void next_state::next_0b_m_nofdc_mem(address_map &map)
@@ -1056,7 +1056,8 @@ void next_state::next(machine_config &config)
 void next_state::next_fdc_base(machine_config &config)
 {
 	next_base(config);
-	N82077AA(config, fdc, n82077aa_device::MODE_PS2);
+
+	N82077AA(config, fdc, n82077aa_device::mode_t::PS2);
 	fdc->intrq_wr_callback().set(FUNC(next_state::fdc_irq));
 	fdc->drq_wr_callback().set(FUNC(next_state::fdc_drq));
 	FLOPPY_CONNECTOR(config, "fdc:0", next_floppies, "35ed", next_state::floppy_formats);

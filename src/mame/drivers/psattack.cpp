@@ -126,11 +126,11 @@ GUN_xP are 6 pin gun connectors (pins 3-6 match the UNICO sytle guns):
 ****************************************************************************/
 
 #include "emu.h"
+#include "bus/ata/ataintf.h"
 #include "cpu/se3208/se3208.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
 #include "machine/vrender0.h"
-#include "machine/ataintf.h"
 #include "emupal.h"
 
 

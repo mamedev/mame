@@ -2601,7 +2601,7 @@ static INPUT_PORTS_START( sci )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON4 ) PORT_NAME("Turbo")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_TILT )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE2 ) PORT_NAME("Center")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
@@ -3181,7 +3181,7 @@ void taitoz_state::contcirc(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3248,7 +3248,7 @@ void taitoz_state::chasehq(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3533,7 +3533,7 @@ void taitoz_state::nightstr(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").subwoofer();
+	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this located in the cabinet?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);

@@ -115,7 +115,7 @@ void tk80bs_state::tk80bs_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x07ff).rom();
-//  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
+//  map(0x0c00, 0x7bff).rom(); // ext
 	map(0x7df8, 0x7df9).noprw(); // i8251 sio
 	map(0x7dfc, 0x7dff).rw(FUNC(tk80bs_state::ppi_custom_r), FUNC(tk80bs_state::ppi_custom_w));
 	map(0x7e00, 0x7fff).ram().share("videoram"); // video ram

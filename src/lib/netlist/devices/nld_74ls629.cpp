@@ -175,8 +175,6 @@ namespace netlist
 	{
 		{
 			// recompute
-			nl_double  freq;
-			nl_double  v_freq_2, v_freq_3, v_freq_4;
 			nl_double  v_freq = m_FC();
 			nl_double  v_rng = m_RNG();
 
@@ -196,10 +194,10 @@ namespace netlist
 
 			/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
 
-			v_freq_2 = v_freq * v_freq;
-			v_freq_3 = v_freq_2 * v_freq;
-			v_freq_4 = v_freq_3 * v_freq;
-			freq = k1;
+			nl_double v_freq_2 = v_freq * v_freq;
+			nl_double v_freq_3 = v_freq_2 * v_freq;
+			nl_double v_freq_4 = v_freq_3 * v_freq;
+			nl_double freq = k1;
 			freq += k2 * v_freq;
 			freq += k3 * v_freq_2;
 			freq += k4 * v_freq_3;

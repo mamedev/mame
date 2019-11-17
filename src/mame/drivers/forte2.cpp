@@ -84,8 +84,8 @@ void forte2_state::io_mem(address_map &map)
 	map(0x98, 0x99).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
 	map(0xa0, 0xa1).w("aysnd", FUNC(ay8910_device::address_data_w));
 	map(0xa2, 0xa2).r("aysnd", FUNC(ay8910_device::data_r));
-//  AM_RANGE(0xa8, 0xa8) AM_RAM // Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
-//  AM_RANGE(0xa9, 0xab) AM_NOP // Since this arcade board doesn't have one, those ports should be unmapped.
+//  map(0xa8, 0xa8).ram(); // Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
+//  map(0xa9, 0xab).noprw(); // Since this arcade board doesn't have one, those ports should be unmapped.
 }
 
 static INPUT_PORTS_START( pesadelo )

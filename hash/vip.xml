@@ -16,14 +16,14 @@
 		<part name="cass1" interface="vip_cass">
 			<feature name="part_id" value="1-PAGE BOOTSTRAP"/>
 			<dataarea name="cass" size="1432236">
-				<rom name="bootstrap.wav" size="1432236" crc="c3a18ac7" sha1="ab8aac817ca0d9e30fc0d345af11e21fdd0eb5d2" offset="0"/>
+				<rom name="bootstrap.wav" size="1432236" crc="c3a18ac7" sha1="ab8aac817ca0d9e30fc0d345af11e21fdd0eb5d2"/>
 			</dataarea>
 		</part>
 
 		<part name="cass2" interface="vip_cass">
 			<feature name="part_id" value="BASIC"/>
 			<dataarea name="cass" size="24276228">
-				<rom name="vipgendsthpall.wav" size="24276228" crc="8d1a65bb" sha1="700e46957887b43eb38c66ca504721f176690673" offset="0"/>
+				<rom name="vipgendsthpall.wav" size="24276228" crc="8d1a65bb" sha1="700e46957887b43eb38c66ca504721f176690673"/>
 			</dataarea>
 		</part>
 	</software>

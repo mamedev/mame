@@ -12,16 +12,13 @@
 
 class sns_rom_superfx_device : public sns_rom_device
 {
-public:
-	// construction/destruction
-	sns_rom_superfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 protected:
+	// construction/destruction
+	sns_rom_superfx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	virtual void device_add_mconfig(machine_config &config) override;
 
 	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 
@@ -40,7 +37,6 @@ protected:
 	void superfx_w_bank2(offs_t offset, uint8_t data);
 	void superfx_w_bank3(offs_t offset, uint8_t data);
 
-private:
 	required_device<superfx_device> m_superfx;
 
 	uint8_t sfx_ram[0x200000];
@@ -48,8 +44,28 @@ private:
 	void sfx_map(address_map &map);
 };
 
+class sns_rom_superfx1_device : public sns_rom_superfx_device
+{
+public:
+	// construction/destruction
+	sns_rom_superfx1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
+
+class sns_rom_superfx2_device : public sns_rom_superfx_device
+{
+public:
+	// construction/destruction
+	sns_rom_superfx2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override;
+};
 
 // device type definition
-DECLARE_DEVICE_TYPE(SNS_LOROM_SUPERFX, sns_rom_superfx_device)
+DECLARE_DEVICE_TYPE(SNS_LOROM_SUPERFX1, sns_rom_superfx1_device)
+DECLARE_DEVICE_TYPE(SNS_LOROM_SUPERFX2, sns_rom_superfx2_device)
 
 #endif // MAME_BUS_SNES_SFX_H

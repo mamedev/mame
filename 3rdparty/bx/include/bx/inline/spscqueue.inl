@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2018 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2019 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -9,7 +9,10 @@
 
 namespace bx
 {
-	// http://drdobbs.com/article/print?articleId=210604448&siteSectionName=
+	// Reference(s):
+	// - Writing Lock-Free Code: A Corrected Queue
+	//   https://web.archive.org/web/20190207230604/http://www.drdobbs.com/parallel/writing-lock-free-code-a-corrected-queue/210604448
+	//
 	inline SpScUnboundedQueue::SpScUnboundedQueue(AllocatorI* _allocator)
 		: m_allocator(_allocator)
 		, m_first(BX_NEW(m_allocator, Node)(NULL) )

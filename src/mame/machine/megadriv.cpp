@@ -463,7 +463,7 @@ void md_base_state::megadriv_map(address_map &map)
 	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w));
 	map(0xd00000, 0xd0001f).rw(m_vdp, FUNC(sega315_5313_device::vdp_r), FUNC(sega315_5313_device::vdp_w)); // the earth defend
 	map(0xe00000, 0xe0ffff).ram().mirror(0x1f0000).share("megadrive_ram");
-//  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
+//  map(0xff0000, 0xffffff).readonly();
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 }
 

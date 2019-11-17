@@ -236,10 +236,7 @@ void driver_device::device_start()
 	else
 		machine_start();
 
-	if (!m_callbacks[CB_SOUND_START].isnull())
-		m_callbacks[CB_SOUND_START]();
-	else
-		sound_start();
+	sound_start();
 
 	if (!m_callbacks[CB_VIDEO_START].isnull())
 		m_callbacks[CB_VIDEO_START]();
@@ -268,10 +265,7 @@ void driver_device::device_reset_after_children()
 	else
 		machine_reset();
 
-	if (!m_callbacks[CB_SOUND_RESET].isnull())
-		m_callbacks[CB_SOUND_RESET]();
-	else
-		sound_reset();
+	sound_reset();
 
 	if (!m_callbacks[CB_VIDEO_RESET].isnull())
 		m_callbacks[CB_VIDEO_RESET]();

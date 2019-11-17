@@ -4927,7 +4927,7 @@ primella:
 flytiger:
 flytigera:
 @:maincpu,program,d244,34,88,48
-@:maincpu,program,d235,1,03,03
+@delay=1.5
 
 
 ;@s:dorachan.cpp

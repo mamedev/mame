@@ -30,8 +30,10 @@ enum ASTC_DECODE_MODE
 
 enum ASTC_CHANNELS
 {
-    ASTC_RGBA,
-    ASTC_BGRA
+    ASTC_RGBA,               // Encode/decode into RGBA
+    ASTC_BGRA,               // Encode/decode into BGRA
+    ASTC_ENC_NORMAL_RA,      // Encode normal XYZ as XY in RA with reconstructed Z
+    ASTC_DEC_RA_NORMAL,      // Decode RA into XY and reconstructed Z
 };
 
 

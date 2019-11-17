@@ -2449,7 +2449,7 @@ almost nothing like the prototype.
 			</part>
 		</software>
 
-		<software name="dkongxmou" cloneof="dkongxm" supported="no" >
+		<software name="dkongxmou" cloneof="dkongxm" supported="no">
 			<description>Donkey Kong (NTSC, Demo, XM enhanced, older)</description>
 			<year>2012</year>
 			<publisher>&lt;homebrew&gt;</publisher>

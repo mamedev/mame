@@ -9,7 +9,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="6665">
-				<rom name="basic80.rku" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d" offset="0" />
+				<rom name="basic80.rku" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -20,7 +20,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="777">
-				<rom name="ch$com.rku" size="777" crc="f2a598f4" sha1="62b200759ac8d7af0ba9ce8f90235de616a86e9d" offset="0" />
+				<rom name="ch$com.rku" size="777" crc="f2a598f4" sha1="62b200759ac8d7af0ba9ce8f90235de616a86e9d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -31,7 +31,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="6239">
-				<rom name="cpm35.rku" size="6239" crc="655a749b" sha1="e46527bf8eb4e63a090a9161fa88243efd0f40c9" offset="0" />
+				<rom name="cpm35.rku" size="6239" crc="655a749b" sha1="e46527bf8eb4e63a090a9161fa88243efd0f40c9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,7 +42,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="7945">
-				<rom name="cpm64.rku" size="7945" crc="8041af21" sha1="19e7378328e0bbfe1303225099842fd377ccf5d2" offset="0" />
+				<rom name="cpm64.rku" size="7945" crc="8041af21" sha1="19e7378328e0bbfe1303225099842fd377ccf5d2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,7 +53,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="1641">
-				<rom name="tetris.rku" size="1641" crc="e7373ec6" sha1="7786302a63bf882060a883434cbfba24ad8022ac" offset="0" />
+				<rom name="tetris.rku" size="1641" crc="e7373ec6" sha1="7786302a63bf882060a883434cbfba24ad8022ac"/>
 			</dataarea>
 		</part>
 	</software>

@@ -191,7 +191,7 @@ void stactics_state::main_map(address_map &map)
 	map(0x6050, 0x6050).mirror(0x0f0f).w(FUNC(stactics_state::shot_flag_clear_w));
 	map(0x6060, 0x606f).mirror(0x0f00).writeonly().share("display_buffer");
 	map(0x6070, 0x609f).mirror(0x0f00).nopw();
-	/* AM_RANGE(0x60a0, 0x60ef) AM_MIRROR(0x0f00) AM_WRITE(sound2_w) */
+	/* map(0x60a0, 0x60ef).mirror(0x0f00).w(FUNC(stactics_state::sound2_w)); */
 	map(0x60f0, 0x60ff).mirror(0x0f00).nopw();
 	map(0x7000, 0x7000).mirror(0x0fff).portr("IN2");
 	map(0x8000, 0x8000).mirror(0x0fff).portr("IN3");

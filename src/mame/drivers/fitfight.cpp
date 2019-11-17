@@ -152,7 +152,7 @@ void fitfight_state::fitfight_main_map(address_map &map)
 	//      @0x000036bc/?: 0xF0FD when inserting coin
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
-//  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
+//  map(0x700000, 0x700001).r(FUNC(fitfight_state::xxxx)); /* see init */
 	map(0x700000, 0x700001).w(FUNC(fitfight_state::fitfight_700000_w)).share("fof_700000");
 	//  kept at 0xe07900/0xe04c56
 

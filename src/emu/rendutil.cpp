@@ -605,7 +605,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 				bitmap.pix32(j, i) = rgb_t(0xFF, buffer[0][i * s], buffer[0][i * s + 1], buffer[0][i * s + 2]);
 		else
 		{
-			osd_printf_error("Cannot read JPEG data from %s file.\n", fname.c_str());
+			osd_printf_error("Cannot read JPEG data from %s file.\n", fname);
 			bitmap.reset();
 			break;
 		}

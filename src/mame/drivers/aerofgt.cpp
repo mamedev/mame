@@ -2601,7 +2601,6 @@ Toushin Blazers title:
    V2 with 1V1   "original" non Tecmo verions??
 
 Karate Blazers title
-  1V2 with V1   US??
   3V2 with 1V1  Euro, current parent??
 
 Note: It's unknown what if any difference there is between V1 and 1V1 ROMs
@@ -2702,7 +2701,7 @@ ROM_END
 
 ROM_START( karatblzu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "v2.u14",  0x00000, 0x40000, CRC(202e6220) SHA1(2605511a0574cbc39fdf3d8ae27a0aa9b43345fb) ) // need to verify correct "region" stamped number
+	ROM_LOAD16_WORD_SWAP( "1v2.u14", 0x00000, 0x40000, CRC(202e6220) SHA1(2605511a0574cbc39fdf3d8ae27a0aa9b43345fb) ) // 1 stamped on chip with VideoSystem logo V and 2
 	ROM_LOAD16_WORD_SWAP( "v1.u15",  0x40000, 0x40000, CRC(d16ee21b) SHA1(d454cdf22b72a537b9d7ae73deb8136a4f09da47) ) // chip with VideoSystem logo V and 1
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */

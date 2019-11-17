@@ -155,7 +155,7 @@ void cd2650_state::cd2650_mem(address_map &map)
 void cd2650_state::cd2650_io(address_map &map)
 {
 	map.unmap_value_high();
-	//AM_RANGE(0x80, 0x84) disk i/o
+	//map(0x80, 0x84) disk i/o
 }
 
 void cd2650_state::cd2650_data(address_map &map)

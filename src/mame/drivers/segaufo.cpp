@@ -496,8 +496,8 @@ void ufo_state::ex_ufo21_portmap(address_map &map)
 void ufo_state::ex_ufo800_portmap(address_map &map)
 {
 	ufo_portmap(map);
-//  AM_RANGE(0x60, 0x67) AM_NOP // unused?
-//  AM_RANGE(0x68, 0x68) AM_WRITENOP // ?
+//  map(0x60, 0x67).noprw(); // unused?
+//  map(0x68, 0x68).nopw(); // ?
 }
 
 
