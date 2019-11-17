@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- ZX Spectrum MGT Disciple / Plus D disk images
+    
+	images for the "Disciple" and "Plus D" ZX Spectrum fdd interfaces produced by MGT (Miles Gordan Technology)
+	
+	insert system disk,
+	'RUN'      boots the main DOS from disk
+	'CAT 1/2'  lists disk 1/2 catalogue
+	'LOAD Pn'  loads program #n
+	
+	more commands listed in devices\bus\spectrum\plusd.cpp
+-->
+
+<softwarelist name="spectrum_mgt_flop" description="ZX Spectrum MGT Disciple / Plus D disk images">
+
+	<!-- system disk created from MGT system tape -->
+	<software name="system">
+		<description>System Disk</description>
+		<year>1986</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="System Disk.mgt" size="819200" crc="abaeb064" sha1="d98dbf3bbdecd48e33a5c191ecaca29358984394"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- alternate DOS system disk for use with uni-dos bios rom -->
+	<software name="unidos">
+		<description>Uni-Dos</description>
+		<year>1991</year>
+		<publisher>S.D. Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Uni-Dos.mgt" size="819200" crc="bfa654cd" sha1="1fafbdfdfe608bf20585fe46eace2eede3a95a6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- hacker utility by MGT -->
+	<software name="pickpoke">
+		<description>Pick-Poke-It</description>
+		<year>1989</year>
+		<publisher>Miles Gordon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Pick-POKE-It.mgt" size="819200" crc="9efa0d0c" sha1="489a48fc842e79531b1a06c4f0c269ca696acccc"/>
+			</dataarea>
+		</part>
+	</software>
+	
+</softwarelist>

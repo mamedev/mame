@@ -180,7 +180,7 @@ void spectrum_expansion_devices(device_slot_interface &device)
 	device.option_add("betav3", SPECTRUM_BETAV3);
 	device.option_add("betaplus", SPECTRUM_BETAPLUS);
 	device.option_add("beta128", SPECTRUM_BETA128);
-	//device.option_add("disciple", SPECTRUM_DISCIPLE);
+	device.option_add("disciple", SPECTRUM_DISCIPLE);
 	device.option_add("intf1", SPECTRUM_INTF1);
 	device.option_add("intf2", SPECTRUM_INTF2);
 	device.option_add("fuller", SPECTRUM_FULLER);
@@ -211,6 +211,7 @@ void spec128_expansion_devices(device_slot_interface &device)
 	device.option_add("mikroplus", SPECTRUM_MIKROPLUS);
 	device.option_add("mprint", SPECTRUM_MPRINT);
 	device.option_add("opus", SPECTRUM_OPUS);
+	//device.option_add("plusd", SPECTRUM_PLUSD);
 	device.option_add("plus2test", SPECTRUM_PLUS2TEST);
 	device.option_add("protek", SPECTRUM_PROTEK);
 	device.option_add("specdrum", SPECTRUM_SPECDRUM);

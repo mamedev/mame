@@ -89,7 +89,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(SPECTRUM_PLUSD, spectrum_plusd_device, "spectrum_plusd", "MGT +D")
+DEFINE_DEVICE_TYPE(SPECTRUM_PLUSD, spectrum_plusd_device, "spectrum_plusd", "MGT DISCiPLE")
 
 
 //-------------------------------------------------
