@@ -25,7 +25,8 @@ public:
 		m_screen(*this, "screen"),
 		m_fullrom(*this, "fullrom"),
 		m_spriteram(*this, "spriteram"),
-		m_vram(*this, "vram")
+		m_vram(*this, "vram"),
+		m_sound_share(*this, "sound_share")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -41,6 +42,7 @@ private:
 	required_device<address_map_bank_device> m_fullrom;
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
+	required_shared_ptr<uint8_t> m_sound_share;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void vt_vt1682_map(address_map& map);
@@ -120,6 +122,15 @@ private:
 	uint8_t m_2105_vt1682_2105_comr6_tvmodes;
 	uint8_t m_211c_regs_ext2421;
 
+	uint8_t m_2122_dma_dt_addr_7_0;
+	uint8_t m_2123_dma_dt_addr_15_8;
+
+	uint8_t m_2124_dma_sr_addr_7_0;
+	uint8_t m_2125_dma_sr_addr_15_8;
+
+	uint8_t m_2126_dma_sr_bank_addr_22_15;
+	uint8_t m_2128_dma_sr_bank_addr_24_23;
+
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
 	DECLARE_READ8_MEMBER(vt1682_210c_prgbank1_r2_r);
@@ -153,6 +164,65 @@ private:
 	DECLARE_WRITE8_MEMBER(vt1682_2105_comr6_tvmodes_w);
 
 	DECLARE_WRITE8_MEMBER(vt1682_211c_regs_ext2421_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2122_dma_dt_addr_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2122_dma_dt_addr_7_0_w);
+	DECLARE_READ8_MEMBER(vt1682_2123_dma_dt_addr_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2123_dma_dt_addr_15_8_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2124_dma_sr_addr_7_0_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2124_dma_sr_addr_7_0_w);
+	DECLARE_READ8_MEMBER(vt1682_2125_dma_sr_addr_15_8_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2125_dma_sr_addr_15_8_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2126_dma_sr_bank_addr_22_15_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2126_dma_sr_bank_addr_22_15_w);
+	DECLARE_READ8_MEMBER(vt1682_2128_dma_sr_bank_addr_24_23_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2128_dma_sr_bank_addr_24_23_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2127_dma_status_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2127_dma_size_trigger_w);
+
+	/* System Helpers */
+
+	uint16_t get_dma_sr_addr()
+	{
+		return ((m_2124_dma_sr_addr_7_0 ) | (m_2125_dma_sr_addr_15_8 << 8)) & 0x7fff;
+	}
+
+	uint16_t get_dma_dt_addr()
+	{
+		return ((m_2122_dma_dt_addr_7_0 ) | (m_2123_dma_dt_addr_15_8 << 8)) & 0x7fff;
+	}
+
+	bool get_dma_sr_isext()
+	{
+		return m_2125_dma_sr_addr_15_8 & 0x80 ? true : false;
+	}
+
+	bool get_dma_dt_isext()
+	{
+		return m_2123_dma_dt_addr_15_8 & 0x80 ? true : false;
+	}
+
+	bool get_dma_dt_is_video()
+	{
+		if (get_dma_dt_isext())
+			return false;
+
+		if (get_dma_dt_addr() == 0x2004)
+			return true;
+
+		if (get_dma_dt_addr() == 0x2007)
+			return true;
+
+		return false;
+	}
+
+	uint16_t get_dma_sr_bank_ddr()
+	{
+		return ((m_2126_dma_sr_bank_addr_22_15 ) | (m_2128_dma_sr_bank_addr_24_23 << 8)) & 0x3ff;
+	}
 
 	/* Support */
 
@@ -194,6 +264,14 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_210b_misc_cs_prg0_bank_sel));
 	save_item(NAME(m_2105_vt1682_2105_comr6_tvmodes));
 	save_item(NAME(m_211c_regs_ext2421));
+
+	save_item(NAME(m_2122_dma_dt_addr_7_0));
+	save_item(NAME(m_2123_dma_dt_addr_15_8));
+	save_item(NAME(m_2124_dma_sr_addr_7_0));
+	save_item(NAME(m_2125_dma_sr_addr_15_8));
+
+	save_item(NAME(m_2126_dma_sr_bank_addr_22_15));
+	save_item(NAME(m_2128_dma_sr_bank_addr_24_23));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -224,6 +302,15 @@ void vt_vt1682_state::machine_reset()
 	m_210b_misc_cs_prg0_bank_sel = 0;
 	m_2105_vt1682_2105_comr6_tvmodes = 0;
 	m_211c_regs_ext2421 = 0;
+
+	m_2122_dma_dt_addr_7_0 = 0;
+	m_2123_dma_dt_addr_15_8 = 0;
+
+	m_2124_dma_sr_addr_7_0 = 0;
+	m_2125_dma_sr_addr_15_8 = 0;
+
+	m_2126_dma_sr_bank_addr_22_15 = 0;
+	m_2128_dma_sr_bank_addr_24_23 = 0;
 
 	update_banks();
 
@@ -2019,6 +2106,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x01 - DMA DT ADDR:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r)
+{
+	uint8_t ret = m_2122_dma_dt_addr_7_0;
+	logerror("%s: vt1682_2122_dma_dt_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w)
+{
+	logerror("%s: vt1682_2122_dma_dt_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_2122_dma_dt_addr_7_0 = data;
+}
+
+
 /*
     Address 0x2123 r/w (MAIN CPU)
 
@@ -2031,6 +2132,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x02 - DMA DT ADDR:9
     0x01 - DMA DT ADDR:8
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r)
+{
+	uint8_t ret = m_2123_dma_dt_addr_15_8;
+	logerror("%s: vt1682_2123_dma_dt_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w)
+{
+	logerror("%s: vt1682_2123_dma_dt_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
+	m_2123_dma_dt_addr_15_8 = data;
+}
+
 
 /*
     Address 0x2124 r/w (MAIN CPU)
@@ -2045,6 +2160,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x01 - DMA SR ADDR:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r)
+{
+	uint8_t ret = m_2124_dma_sr_addr_7_0;
+	logerror("%s: vt1682_2124_dma_sr_addr_7_0_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w)
+{
+	logerror("%s: vt1682_2124_dma_sr_addr_7_0_w writing: %02x\n", machine().describe_context(), data);
+	m_2124_dma_sr_addr_7_0 = data;
+}
+
+
 /*
     Address 0x2125 r/w (MAIN CPU)
 
@@ -2058,6 +2187,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x01 - DMA SR ADDR:8
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r)
+{
+	uint8_t ret = m_2125_dma_sr_addr_15_8;
+	logerror("%s: vt1682_2125_dma_sr_addr_15_8_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w)
+{
+	logerror("%s: vt1682_2125_dma_sr_addr_15_8_w writing: %02x\n", machine().describe_context(), data);
+	m_2125_dma_sr_addr_15_8 = data;
+}
+
+
+
 /*
     Address 0x2126 r/w (MAIN CPU)
 
@@ -2070,6 +2214,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x02 - DMA SR BANK:16
     0x01 - DMA SR BANK:15
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r)
+{
+	uint8_t ret = m_2126_dma_sr_bank_addr_22_15;
+	logerror("%s: vt1682_2126_dma_sr_bank_addr_22_15_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w)
+{
+	logerror("%s: vt1682_2126_dma_sr_bank_addr_22_15_w writing: %02x\n", machine().describe_context(), data);
+	m_2126_dma_sr_bank_addr_22_15 = data;
+}
 
 /*
     Address 0x2127 WRITE (MAIN CPU)
@@ -2095,6 +2252,64 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x01 - DMA Status
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2127_dma_status_r)
+{
+	uint8_t ret = 0x00;
+
+	int dma_status = 0; // 1 would be 'busy'
+	ret |= dma_status;
+
+	logerror("%s: vt1682_2127_dma_status_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
+{
+	logerror("%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
+
+	// hw waits until VBLANK before actually doing the DMA! (TODO)
+
+	if (get_dma_sr_isext())
+	{
+		if (get_dma_dt_isext())
+		{
+			// Source External
+			// Dest External
+			logerror("Invalid DMA, both Source and Dest are 'External'\n");
+			return;
+		}
+		else
+		{
+			// Source External
+			// Dest Internal
+			logerror("Unhandled DMA, Source is 'External'\n");
+			return;
+		}
+	}
+	else
+	{
+		if (get_dma_dt_isext())
+		{
+			// Source Internal
+			// Dest External
+			logerror("Unhandled DMA, Dest is 'External'\n");
+			return;
+		}
+		else
+		{
+			// Source Internal
+			// Dest Internal
+
+			uint16_t srcaddr = get_dma_sr_addr();
+			uint16_t dstaddr = get_dma_dt_addr();
+			int count = data;
+
+			logerror("DMA with Params src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count );
+			return;
+		}
+	}
+}
+
 /*
     Address 0x2128 r/w (MAIN CPU)
 
@@ -2107,6 +2322,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_211c_regs_ext2421_w)
     0x02 - DMA SR BANK:24
     0x01 - DMA SR BANK:23
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r)
+{
+	uint8_t ret = m_2128_dma_sr_bank_addr_24_23;
+	logerror("%s: vt1682_2128_dma_sr_bank_addr_24_23_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
+{
+	logerror("%s: vt1682_2128_dma_sr_bank_addr_24_23_w writing: %02x\n", machine().describe_context(), data);
+	m_2128_dma_sr_bank_addr_24_23 = data & 0x03;
+}
+
 
 /*
     Address 0x2129 READ (MAIN CPU)
@@ -3059,13 +3288,18 @@ void vt_vt1682_state::vram_map(address_map &map)
 // for the 2nd, faster, CPU
 void vt_vt1682_state::vt_vt1682_sound_map(address_map& map)
 {
-
+	map(0x0000, 0x0fff).ram().share("sound_share");
+	map(0x1000, 0x1fff).ram().share("sound_share");
 	// 3000-3fff internal ROM if enabled
+
+
+	map(0xf000, 0xffff).ram().share("sound_share"); // doesn't actually map here, the CPU fetches vectors from 0x0ff0 - 0x0fff!
 }
 
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
-	map(0x0000, 0x1fff).ram();
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).ram().share("sound_share");
 
 	/* Video */
 	map(0x2000, 0x2000).rw(FUNC(vt_vt1682_state::vt1682_2000_r), FUNC(vt_vt1682_state::vt1682_2000_w));
@@ -3099,6 +3333,14 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2118, 0x2118).rw(FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_r), FUNC(vt_vt1682_state::vt1682_2118_prgbank1_r4_r5_w));
 
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
+	
+	map(0x2122, 0x2122).rw(FUNC(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_r), FUNC(vt_vt1682_state::vt1682_2122_dma_dt_addr_7_0_w));
+	map(0x2123, 0x2123).rw(FUNC(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_r), FUNC(vt_vt1682_state::vt1682_2123_dma_dt_addr_15_8_w));
+	map(0x2124, 0x2124).rw(FUNC(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_r), FUNC(vt_vt1682_state::vt1682_2124_dma_sr_addr_7_0_w));
+	map(0x2125, 0x2125).rw(FUNC(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_r), FUNC(vt_vt1682_state::vt1682_2125_dma_sr_addr_15_8_w));	
+	map(0x2126, 0x2126).rw(FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_r), FUNC(vt_vt1682_state::vt1682_2126_dma_sr_bank_addr_22_15_w));
+	map(0x2127, 0x2127).rw(FUNC(vt_vt1682_state::vt1682_2127_dma_status_r), FUNC(vt_vt1682_state::vt1682_2127_dma_size_trigger_w));
+	map(0x2128, 0x2128).rw(FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_r), FUNC(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
