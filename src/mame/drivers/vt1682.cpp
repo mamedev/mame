@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
 #include "machine/bankdev.h"
+#include "emupal.h"
 #include "screen.h"
 
 class vt_vt1682_state : public driver_device
@@ -86,10 +87,28 @@ private:
 		return (m_2002_sprramaddr_2_0 & 0x07) | (m_2003_sprramaddr_10_3 << 3);
 	}
 
+	
 	void set_spriteram_addr(uint16_t addr)
 	{
 		m_2002_sprramaddr_2_0 = addr & 0x07;
 		m_2003_sprramaddr_10_3 = addr >> 3;
+	}
+	
+
+	void inc_spriteram_addr()
+	{
+		// there is some strange logic here, sources state on DMA only so this might not be correct
+		// it is unclear what happens if an address where the lower bits are 0x6/0x7 is set directly
+		// the ii8in1 set clearly only writes 0x600 bytes worth of data, without using DMA suggesting
+		// that this 'skipping' applies to non-DMA writes too.
+		int addr = get_spriteram_addr();
+		addr++;
+		if ((addr & 0x07) >= 0x6)
+		{
+			addr += 0x8;
+			addr &= ~0x7;
+		}
+		set_spriteram_addr(addr);
 	}
 
 	uint16_t get_vram_addr()
@@ -190,6 +209,14 @@ private:
 		return ((m_2124_dma_sr_addr_7_0 ) | (m_2125_dma_sr_addr_15_8 << 8)) & 0x7fff;
 	}
 
+	void set_dma_sr_addr(uint16_t addr)
+	{
+		addr &= 0x7fff;
+
+		m_2124_dma_sr_addr_7_0 = addr & 0xff;
+		m_2125_dma_sr_addr_15_8 = (m_2125_dma_sr_addr_15_8 & 0x80) | (addr >> 8); // don't change the external flag
+	}
+
 	uint16_t get_dma_dt_addr()
 	{
 		return ((m_2122_dma_dt_addr_7_0 ) | (m_2123_dma_dt_addr_15_8 << 8)) & 0x7fff;
@@ -223,6 +250,8 @@ private:
 	{
 		return ((m_2126_dma_sr_bank_addr_22_15 ) | (m_2128_dma_sr_bank_addr_24_23 << 8)) & 0x3ff;
 	}
+
+	void do_dma_external_to_internal(uint16_t dstaddr, int count, bool is_video);
 
 	/* Support */
 
@@ -697,8 +726,9 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_w)
 	m_spriteram->write8(spriteram_address, data);
 
 	logerror("%s: vt1682_2004_sprram_data_w writing: %02x to SpriteRam Address %04x\n", machine().describe_context(), data, spriteram_address);
-	spriteram_address++; // auto inc
-	set_spriteram_addr(spriteram_address); // update registers
+	//spriteram_address++; // auto inc
+	inc_spriteram_addr();
+	//set_spriteram_addr(spriteram_address); // update registers
 }
 
 
@@ -2263,6 +2293,34 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2127_dma_status_r)
 	return ret;
 }
 
+void vt_vt1682_state::do_dma_external_to_internal(uint16_t dstaddr, int count, bool is_video)
+{
+	int srcbank = get_dma_sr_bank_ddr();
+	int srcaddr = get_dma_sr_addr();
+
+	if (is_video)
+		logerror("Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
+	else
+		logerror("Doing DMA, External to Internal src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
+
+	for (int i = 0; i < count; i++)
+	{
+		srcaddr = get_dma_sr_addr();
+		uint8_t dat = m_fullrom->read8(srcaddr | srcbank<<15);
+		srcaddr++;
+
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
+		mem.write_byte(dstaddr, dat);
+
+		if (!is_video)
+			dstaddr++;
+
+		// update registers
+		set_dma_sr_addr(srcaddr);
+	}
+}
+
+
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 {
 	logerror("%s: vt1682_2127_dma_size_trigger_w writing: %02x\n", machine().describe_context(), data);
@@ -2282,7 +2340,22 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 		{
 			// Source External
 			// Dest Internal
-			logerror("Unhandled DMA, Source is 'External'\n");
+
+			uint16_t dstaddr = get_dma_dt_addr();
+			int srcaddr = get_dma_sr_addr();
+
+			if ((srcaddr & 1) || ((dstaddr & 1) && (!get_dma_dt_is_video())) )
+			{
+				logerror("Invalid DMA, low bit of address set\n");
+				return;
+			}
+
+			int count = data * 2;
+			if (count == 0)
+				count = 0x200;
+
+			do_dma_external_to_internal(dstaddr, count, get_dma_dt_is_video());
+	
 			return;
 		}
 	}
@@ -2292,6 +2365,16 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 		{
 			// Source Internal
 			// Dest External
+			int dstbank = get_dma_sr_bank_ddr();
+			int dstaddr = get_dma_dt_addr() | (dstbank << 15);
+			uint16_t srcaddr = get_dma_sr_addr();
+
+			if ((srcaddr & 1) || (dstaddr & 1))
+			{
+				logerror("Invalid DMA, low bit of address set\n");
+				return;
+			}
+
 			logerror("Unhandled DMA, Dest is 'External'\n");
 			return;
 		}
@@ -2302,9 +2385,18 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 
 			uint16_t srcaddr = get_dma_sr_addr();
 			uint16_t dstaddr = get_dma_dt_addr();
-			int count = data;
 
-			logerror("DMA with Params src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count );
+			if ((srcaddr & 1) || ((dstaddr & 1) && (!get_dma_dt_is_video())) )
+			{
+				logerror("Invalid DMA, low bit of address set\n");
+				return;
+			}
+
+			int count = data * 2;
+			if (count == 0)
+				count = 0x200;
+
+			logerror("Unhandled DMA with Params src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count );
 			return;
 		}
 	}
@@ -3282,7 +3374,10 @@ void vt_vt1682_state::spriteram_map(address_map &map)
 // 16-bits (0x10000 bytes) for vram (maybe mirrors at 0x2000?)
 void vt_vt1682_state::vram_map(address_map &map)
 {
-	map(0x000, 0xffff).ram();
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1bff).ram(); // this gets cleared, but apparently is 'reserved'
+	map(0x1c00, 0x1dff).ram().w("palette2", FUNC(palette_device::write8)).share("palette2"); // palette 2
+	map(0x1e00, 0x1fff).ram().w("palette1", FUNC(palette_device::write8)).share("palette1"); // palette 1
 }
 
 // for the 2nd, faster, CPU
@@ -3370,6 +3465,9 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 	ADDRESS_MAP_BANK(config, m_spriteram).set_map(&vt_vt1682_state::spriteram_map).set_options(ENDIANNESS_NATIVE, 8, 11, 0x800);
 	ADDRESS_MAP_BANK(config, m_vram).set_map(&vt_vt1682_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
+
+	PALETTE(config, "palette2").set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
+	PALETTE(config, "palette1").set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
