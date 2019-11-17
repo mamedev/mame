@@ -368,7 +368,6 @@ enum ioport_type
 		IPT_UI_EXPORT,
 		IPT_UI_AUDIT_FAST,
 		IPT_UI_AUDIT_ALL,
-		IPT_UI_TOGGLE_AUTOFIRE,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -1095,7 +1094,6 @@ public:
 	struct user_settings
 	{
 		ioport_value    value;                  // for DIP switches
-		bool            autofire;               // for autofire settings
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
 		s32             sensitivity;            // for analog controls
 		s32             delta;                  // for analog controls
@@ -1171,8 +1169,6 @@ struct ioport_field_live
 	bool                    last;               // were we pressed last time?
 	bool                    toggle;             // current toggle setting
 	digital_joystick::direction_t joydir;       // digital joystick direction index
-	bool                    autofire;           // autofire
-	int                     autopressed;        // autofire status
 	bool                    lockout;            // user lockout
 	std::string             name;               // overridden name
 };
@@ -1406,12 +1402,6 @@ public:
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
 
-	// autofire
-	bool get_autofire_toggle() { return m_autofire_toggle; }
-	void set_autofire_toggle(bool toggle) { m_autofire_toggle = toggle; }
-	int get_autofire_delay() { return m_autofire_delay; }
-	void set_autofire_delay(int delay) { m_autofire_delay = delay; }
-
 private:
 	// internal helpers
 	void init_port_types();
@@ -1477,10 +1467,6 @@ private:
 	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
 	int                     m_timecode_count;
 	attotime                m_timecode_last_time;
-
-	// autofire
-	bool                    m_autofire_toggle;      // autofire toggle
-	int                     m_autofire_delay;       // autofire delay
 };
 
 
