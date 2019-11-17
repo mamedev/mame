@@ -70,10 +70,10 @@ void dual68_state::dual68_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x00ffff).ram().share("ram");
-	map(0x080000, 0x081fff).rom().region("user1", 0);
+	map(0x080000, 0x081fff).rom().region("mainbios", 0);
 	map(0x7f0000, 0x7f0001).rw(FUNC(dual68_state::sio_direct_r), FUNC(dual68_state::sio_direct_w));
 	map(0x7f00c0, 0x7f00c0).r(FUNC(dual68_state::fdc_status_r));
-	map(0x800000, 0x801fff).rom().region("user1", 0);
+	map(0x800000, 0x801fff).rom().region("mainbios", 0);
 }
 
 void dual68_state::sio4_mem(address_map &map)
@@ -106,9 +106,9 @@ DEVICE_INPUT_DEFAULTS_END
 
 void dual68_state::machine_reset()
 {
-	uint8_t* user1 = memregion("user1")->base();
+	uint8_t *mainbios = memregion("mainbios")->base();
 
-	memcpy((uint8_t*)m_p_ram.target(),user1,0x2000);
+	memcpy((uint8_t*)m_p_ram.target(),mainbios,0x2000);
 }
 
 void dual68_state::dual68(machine_config &config)
@@ -143,14 +143,14 @@ void dual68_state::dual68(machine_config &config)
 
 /* ROM definition */
 ROM_START( dual68 )
-	ROM_REGION( 0x2000, "user1", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x2000, "mainbios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "v1", "2 * 4KB" )
-	ROMX_LOAD("dual_cpu68000_1.bin", 0x0001, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f),ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("dual_cpu68000_2.bin", 0x0000, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec),ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("dual_cpu68000_1.bin", 0x0000, 0x1000, CRC(d1785c08) SHA1(73c1f68875f1d8eb5e92f4347f509c61103da90f),ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("dual_cpu68000_2.bin", 0x0001, 0x1000, CRC(b9f1ba3c) SHA1(8fd02936ad06d5a22d435d96f06e2442fc7d00ec),ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS( 1, "v2", "2 * 2KB" )
-	ROMX_LOAD("dual.u2.bin", 0x0001, 0x0800, CRC(e9c44fcd) SHA1(d5cc609d6f5e6745d5f0af1aa6dc66012333ed60),ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("dual.u3.bin", 0x0000, 0x0800, CRC(827b049f) SHA1(8209f8ab3d1068e5bab51e7eb12be46d4ea28354),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("dual.u2.bin", 0x0000, 0x0800, CRC(e9c44fcd) SHA1(d5cc609d6f5e6745d5f0af1aa6dc66012333ed60),ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("dual.u3.bin", 0x0001, 0x0800, CRC(827b049f) SHA1(8209f8ab3d1068e5bab51e7eb12be46d4ea28354),ROM_SKIP(1) | ROM_BIOS(1))
 
 	ROM_REGION( 0x10000, "siocpu", ROMREGION_ERASEFF )
 	ROM_LOAD("dual_sio4.bin", 0x0000, 0x0800, CRC(6b0a1965) SHA1(5d2dc6c6a315293ded4b9fc95c8ac1599bf31dd3))

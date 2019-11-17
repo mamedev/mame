@@ -446,7 +446,7 @@ void duet16_state::duet16(machine_config &config)
 }
 
 ROM_START(duet16)
-	ROM_REGION(0x2000, "rom", 0)
+	ROM_REGION16_LE(0x2000, "rom", 0)
 	ROM_LOAD16_BYTE("duet16_h516a_3.bin", 0x0001, 0x1000, CRC(936706aa) SHA1(412ff9c7bf4443d2ed29a8d792fc3c849c9393cc))
 	ROM_LOAD16_BYTE("duet16_h517a_z.bin", 0x0000, 0x1000, CRC(1633cce8) SHA1(5145d04a48921cacfed17a94873e8988772fc8d4))
 

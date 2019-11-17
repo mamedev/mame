@@ -1162,7 +1162,7 @@ void ngen386_state::_386i(machine_config &config)
 }
 
 ROM_START( ngen )
-	ROM_REGION32_LE( 0x2000, "bios", 0)
+	ROM_REGION16_LE( 0x2000, "bios", 0)
 	ROM_LOAD16_BYTE( "72-00414_80186_cpu.bin",  0x000000, 0x001000, CRC(e1387a03) SHA1(ddca4eba67fbf8b731a8009c14f6b40edcbc3279) )  // bootstrap ROM v8.4
 	ROM_LOAD16_BYTE( "72-00415_80186_cpu.bin",  0x000001, 0x001000, CRC(a6dde7d9) SHA1(b4d15c1bce31460ab5b92ff43a68c15ac5485816) )
 

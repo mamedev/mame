@@ -362,8 +362,8 @@ void invqix_state::invqix(machine_config &config)
 }
 
 ROM_START( invqix )
-	ROM_REGION(0x200000, "program", 0)
-	ROM_LOAD( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) )
+	ROM_REGION16_BE(0x200000, "program", 0)
+	ROM_LOAD16_WORD_SWAP( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) )
 
 	ROM_REGION(0x1000000, "oki", 0)
 	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) /* Can also be labeled F34-03 based on ROM chip type */

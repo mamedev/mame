@@ -186,7 +186,7 @@ void multi16_state::multi16(machine_config &config)
 
 // MULTI16MODEL2-24
 ROM_START( multi16 )
-	ROM_REGION( 0x4000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD("ipl.rom", 0x0000, 0x4000, CRC(5beb5e94) SHA1(d3b9dc9a08995a0f26af9671893417e795370306))
 
 	ROM_REGION(0x20000, "kanji", 0)
