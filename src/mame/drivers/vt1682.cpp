@@ -59,6 +59,7 @@ private:
 
 	/* Video */
 	uint8_t m_2000;
+	uint8_t m_2001;
 
 	uint8_t m_2002_sprramaddr_2_0; // address attribute
 	uint8_t m_2003_sprramaddr_10_3; // address sprite number
@@ -112,8 +113,19 @@ private:
 	uint8_t m_2032_green_dac;
 	uint8_t m_2033_blue_dac;
 
+	uint8_t m_2028;
+	uint8_t m_2029;
+	uint8_t m_202a;
+	uint8_t m_202b;
+	uint8_t m_202e;
+	uint8_t m_2030;
+
+
 	DECLARE_READ8_MEMBER(vt1682_2000_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2000_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2001_vblank_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2001_w);
 
 	DECLARE_READ8_MEMBER(vt1682_2002_sprramaddr_2_0_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2002_sprramaddr_2_0_w);
@@ -210,6 +222,19 @@ private:
 	DECLARE_WRITE8_MEMBER(vt1682_2032_green_dac_w);
 	DECLARE_READ8_MEMBER(vt1682_2033_blue_dac_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2033_blue_dac_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2028_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2028_w);
+	DECLARE_READ8_MEMBER(vt1682_2029_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2029_w);
+	DECLARE_READ8_MEMBER(vt1682_202a_r);
+	DECLARE_WRITE8_MEMBER(vt1682_202a_w);
+	DECLARE_READ8_MEMBER(vt1682_202b_r);
+	DECLARE_WRITE8_MEMBER(vt1682_202b_w);
+	DECLARE_READ8_MEMBER(vt1682_202e_r);
+	DECLARE_WRITE8_MEMBER(vt1682_202e_w);
+	DECLARE_READ8_MEMBER(vt1682_2030_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2030_w);
 
 	/* Video Helpers */
 
@@ -408,6 +433,7 @@ void vt_vt1682_state::machine_start()
 {
 	/* Video */
 	save_item(NAME(m_2000));
+	save_item(NAME(m_2001));
 
 	save_item(NAME(m_2002_sprramaddr_2_0));
 	save_item(NAME(m_2003_sprramaddr_10_3));
@@ -461,6 +487,13 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_2032_green_dac));
 	save_item(NAME(m_2033_blue_dac));
 
+	save_item(NAME(m_2028));
+	save_item(NAME(m_2029));
+	save_item(NAME(m_202a));
+	save_item(NAME(m_202b));
+	save_item(NAME(m_202e));
+	save_item(NAME(m_2030));
+
 	/* System */
 
 	save_item(NAME(m_prgbank1_r0));
@@ -495,6 +528,7 @@ void vt_vt1682_state::machine_reset()
 {
 	/* Video */
 	m_2000 = 0;
+	m_2001 = 0;
 
 	m_2002_sprramaddr_2_0 = 0;
 	m_2003_sprramaddr_10_3 = 0;
@@ -547,6 +581,13 @@ void vt_vt1682_state::machine_reset()
 	m_2031_red_dac = 0;
 	m_2032_green_dac = 0;
 	m_2033_blue_dac = 0;
+
+	m_2028 = 0;
+	m_2029 = 0;
+	m_202a = 0;
+	m_202b = 0;
+	m_202e = 0;
+	m_2030 = 0;
 
 	/* System */
 	m_prgbank1_r0 = 0;
@@ -877,9 +918,31 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2000_w)
     0x10 - (unused)
     0x08 - EXT CLK DIV
     0x04 - EXT CLK DIV
-    0x02 - SP INI
-    0x01 - BK INI
+    0x02 - SP INI (blank sprites on left 8 pixels)
+    0x01 - BK INI (blank bg on left 8 pixels)
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
+{
+	uint8_t ret = 0x00;
+
+	int sp_err = 0; // too many sprites per lien
+	int vblank = 0; // in vblank?
+
+	ret |= sp_err << 6;
+	ret |= vblank << 7;
+
+	logerror("%s: vt1682_2001_vblank_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2001_w)
+{
+	logerror("%s: vt1682_2001_w writing: %02x (ext_clk_div:%1x sp_ini:%1x bk_ini:%1x)\n", machine().describe_context(), data,
+		(data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
+
+	m_2001 = data;
+}
 
 
 /*
@@ -1925,6 +1988,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x01 - CCIR Y
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2028_r)
+{
+	uint8_t ret = m_2028;
+	logerror("%s: vt1682_2028_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2028_w)
+{
+	logerror("%s: vt1682_2028_w writing: %02x\n", machine().describe_context(), data);
+	m_2028 = data;
+}
+
 /*
     Address 0x2029 r/w (MAIN CPU)
 
@@ -1937,6 +2013,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x02 - CCIR X
     0x01 - CCIR X
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2029_r)
+{
+	uint8_t ret = m_2029;
+	logerror("%s: vt1682_2029_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2029_w)
+{
+	logerror("%s: vt1682_2029_w writing: %02x\n", machine().describe_context(), data);
+	m_2029 = data;
+}
+
 
 /*
     Address 0x202a r/w (MAIN CPU)
@@ -1951,6 +2041,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x01 - Field On
 */
 
+
+READ8_MEMBER(vt_vt1682_state::vt1682_202a_r)
+{
+	uint8_t ret = m_202a;
+	logerror("%s: vt1682_202a_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_202a_w)
+{
+	logerror("%s: vt1682_202a_w writing: %02x\n", machine().describe_context(), data);
+	m_202a = data;
+}
+
+
 /*
     Address 0x202b r/w (MAIN CPU)
 
@@ -1963,6 +2068,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x02 - CCIR Depth
     0x01 - CCIR Depth
 */
+
+
+READ8_MEMBER(vt_vt1682_state::vt1682_202b_r)
+{
+	uint8_t ret = m_202b;
+	logerror("%s: vt1682_202b_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_202b_w)
+{
+	logerror("%s: vt1682_202b_w writing: %02x\n", machine().describe_context(), data);
+	m_202b = data;
+}
+
 
 /* Address 0x202c Unused */
 /* Address 0x202d Unused */
@@ -1980,6 +2100,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x01 - CCIR TH
 */
 
+
+READ8_MEMBER(vt_vt1682_state::vt1682_202e_r)
+{
+	uint8_t ret = m_202e;
+	logerror("%s: vt1682_202e_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_202e_w)
+{
+	logerror("%s: vt1682_202e_w writing: %02x\n", machine().describe_context(), data);
+	m_202e = data;
+}
+
+
 /* Address 0x202f Unused */
 
 /*
@@ -1994,6 +2129,21 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
     0x02 - VDACOUT:1
     0x01 - VDACOUT:0
 */
+
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2030_r)
+{
+	uint8_t ret = m_2030;
+	logerror("%s: vt1682_2030_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2030_w)
+{
+	logerror("%s: vt1682_2030_w writing: %02x\n", machine().describe_context(), data);
+	m_2030 = data;
+}
+
 
 /*
     Address 0x2031 r/w (MAIN CPU)
@@ -4130,7 +4280,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 	/* Video */
 	map(0x2000, 0x2000).rw(FUNC(vt_vt1682_state::vt1682_2000_r), FUNC(vt_vt1682_state::vt1682_2000_w));
-
+	map(0x2001, 0x2001).rw(FUNC(vt_vt1682_state::vt1682_2001_vblank_r), FUNC(vt_vt1682_state::vt1682_2001_w));
 	map(0x2002, 0x2002).rw(FUNC(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_r), FUNC(vt_vt1682_state::vt1682_2002_sprramaddr_2_0_w));
 	map(0x2003, 0x2003).rw(FUNC(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_r), FUNC(vt_vt1682_state::vt1682_2003_sprramaddr_10_3_w));
 	map(0x2004, 0x2004).rw(FUNC(vt_vt1682_state::vt1682_2004_sprram_data_r), FUNC(vt_vt1682_state::vt1682_2004_sprram_data_w));
@@ -4169,7 +4319,15 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2025, 0x2025).rw(FUNC(vt_vt1682_state::vt1682_2025_lightgun1_x_r), FUNC(vt_vt1682_state::vt1682_2025_lightgun1_x_w));
 	map(0x2026, 0x2026).rw(FUNC(vt_vt1682_state::vt1682_2026_lightgun2_y_r), FUNC(vt_vt1682_state::vt1682_2026_lightgun2_y_w));
 	map(0x2027, 0x2027).rw(FUNC(vt_vt1682_state::vt1682_2027_lightgun2_x_r), FUNC(vt_vt1682_state::vt1682_2027_lightgun2_x_w));
-
+	map(0x2028, 0x2028).rw(FUNC(vt_vt1682_state::vt1682_2028_r), FUNC(vt_vt1682_state::vt1682_2028_w));
+	map(0x2029, 0x2029).rw(FUNC(vt_vt1682_state::vt1682_2029_r), FUNC(vt_vt1682_state::vt1682_2029_w));
+	map(0x202a, 0x202a).rw(FUNC(vt_vt1682_state::vt1682_202a_r), FUNC(vt_vt1682_state::vt1682_202a_w));
+	map(0x202b, 0x202b).rw(FUNC(vt_vt1682_state::vt1682_202b_r), FUNC(vt_vt1682_state::vt1682_202b_w));
+	// 202c unused
+	// 202d unused
+	map(0x202e, 0x202e).rw(FUNC(vt_vt1682_state::vt1682_202e_r), FUNC(vt_vt1682_state::vt1682_202e_w));
+	// 202f unused
+	map(0x2030, 0x2030).rw(FUNC(vt_vt1682_state::vt1682_2030_r), FUNC(vt_vt1682_state::vt1682_2030_w));
 	map(0x2031, 0x2031).rw(FUNC(vt_vt1682_state::vt1682_2031_red_dac_r), FUNC(vt_vt1682_state::vt1682_2031_red_dac_w));
 	map(0x2032, 0x2032).rw(FUNC(vt_vt1682_state::vt1682_2032_green_dac_r), FUNC(vt_vt1682_state::vt1682_2032_green_dac_w));
 	map(0x2033, 0x2033).rw(FUNC(vt_vt1682_state::vt1682_2033_blue_dac_r), FUNC(vt_vt1682_state::vt1682_2033_blue_dac_w));
