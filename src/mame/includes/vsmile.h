@@ -40,7 +40,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_bankdev(*this, "bank")
 		, m_cart(*this, "cartslot")
-		, m_system_region(*this, "bios")
+		, m_system_region(*this, "sysrom")
 	{ }
 
 	void vsmile_base(machine_config &config);

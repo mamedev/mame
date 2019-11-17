@@ -70,9 +70,9 @@ template <uint16_t V> INPUT_CHANGED_MEMBER(vsmileb_state::sw_mode)
 
 void vsmileb_state::banked_map(address_map &map)
 {
-	map(0x0000000, 0x03fffff).rom().region("bios", 0);
-	map(0x0400000, 0x07fffff).rom().region("bios", 0);
-	map(0x0800000, 0x0bfffff).rom().region("bios", 0);
+	map(0x0000000, 0x03fffff).rom().region("sysrom", 0);
+	map(0x0400000, 0x07fffff).rom().region("sysrom", 0);
+	map(0x0800000, 0x0bfffff).rom().region("sysrom", 0);
 
 	map(0x1000000, 0x13fffff).rw(m_cart, FUNC(vsmile_cart_slot_device::bank0_r), FUNC(vsmile_cart_slot_device::bank0_w));
 
@@ -152,12 +152,12 @@ void vsmileb_state::vsmilebp(machine_config &config)
 
 // TODO: decide on a dump endian, these likely differ in endianess due to different dumping technqiues
 ROM_START( vsmileb )
-	ROM_REGION16_LE( 0x800000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD( "vbabybios.bin", 0x000000, 0x800000, CRC(ddc7f845) SHA1(2c17d0f54200070176d03d44a40c7923636e596a) )
 ROM_END
 
 ROM_START( vsmilebsw )
-	ROM_REGION16_LE( 0x800000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION16_BE( 0x800000, "sysrom", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "vsmileswedenbios.bin", 0x000000, 0x800000, CRC(8b464b19) SHA1(cea304ba886c39e86906aad3dce17d5fff7cfcbe) )
 ROM_END
 
