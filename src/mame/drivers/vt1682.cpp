@@ -4290,13 +4290,13 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 		
 			int count = 0;
 
-			int tilebase = segment / 64;
-			int gfxregion = 3;
+			int tilebase = segment / (bk1_tilesize ? 256 : 64);
+			int gfxregion = bk1_tilesize ? 4 : 3;
 			gfx_element *gfx = m_gfxdecode1->gfx(gfxregion);
 
-			for (int y = 0; y < 32; y++)
+			for (int y = 0; y < (bk1_tilesize ? 16 : 32); y++)
 			{
-				for (int x = 0; x < 32; x++)
+				for (int x = 0; x < (bk1_tilesize ? 16 : 32); x++)
 				{
 					uint16_t word = m_vram->read8(count);
 					count++;
@@ -4306,7 +4306,7 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 					int pal = 0;
 					int tile = word & 0x0fff;
 
-					gfx->transpen(bitmap,cliprect,tilebase + tile,pal,0,0,x*8,y*8,0);
+					gfx->transpen(bitmap,cliprect,tilebase + tile,pal,0,0,x*(bk1_tilesize ? 16 : 8),y*(bk1_tilesize ? 16 : 8),0);
 					
 				}
 			}
@@ -4502,6 +4502,18 @@ static const gfx_layout helper_8bpp_8x8_layout =
 	8 * 8 * 8
 };
 
+static const gfx_layout helper_8bpp_16x16_layout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP16(0,8) },
+	{ STEP16(0,16*8) },
+	16 * 16 * 8
+};
+
+
 // hardware has line modes, so these views might be useful
 static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
 static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
@@ -4538,6 +4550,7 @@ static GFXDECODE_START( gfx_test )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
