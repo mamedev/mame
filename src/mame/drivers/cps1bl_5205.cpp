@@ -1231,10 +1231,10 @@ ROM_END
 
 // ************************************************************************* DRIVER MACROS
 
-GAME( 1991,  captcommb2,  0,        captcommb2,  captcommb2,  captcommb2_state,   init_captcommb2,  ROT0,  "bootleg",  "Captain Commando (bootleg with 2xMSM5205)",  MACHINE_SUPPORTS_SAVE )  // 911014 ETC
+GAME( 1991,  captcommb2,  captcomm, captcommb2,  captcommb2,  captcommb2_state,   init_captcommb2,  ROT0,  "bootleg",  "Captain Commando (bootleg with 2xMSM5205)",  MACHINE_SUPPORTS_SAVE )  // 911014 ETC
 
 GAME( 1991,  knightsb,    knights,  captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 1)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
-GAME( 1991,  knightsb3,   0,        captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
+GAME( 1991,  knightsb3,   knights,  captcommb2,  knights,     captcommb2_state,   init_knightsb,    ROT0,  "bootleg",  "Knights of the Round (bootleg with 2xMSM5205, set 2)",  MACHINE_SUPPORTS_SAVE )  // 911127 ETC
 
 GAME( 1992,  sf2b,        sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,  init_sf2b,        ROT0,  "bootleg (Playmark)",  "Street Fighter II: The World Warrior (bootleg, set 1)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )  // 910204 ETC
 GAME( 1992,  sf2b2,       sf2,      sf2b,        sf2mdt,      cps1bl_5205_state,  init_sf2mdtb,     ROT0,  "bootleg", "Street Fighter II: The World Warrior (bootleg, set 2)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )              // 910204 ETC
