@@ -6990,10 +6990,10 @@ Currently errors out with CCOM LINK DOWN as CCOM linking is not supported
 	ROM_LOAD( "pp0596_a41-a5y.u68",   0x00000, 0x10000, CRC(18475dfe) SHA1(98b8dfd98ce163e78e5c6e80b31dcc58d3ee74e6) ) /* Game Version: A45, Library Version: A5Y, Video Lib Ver: A4N - 09/05/95   @ IGT NJ */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2093.u72",   0x00000, 0x8000, BAD_DUMP CRC(1380bfa6) SHA1(4c3512770afee29d1d9b384a2ea2ad59018f1d4e) ) /* corruption in some graphics */
-	ROM_LOAD( "mgo-cg2093.u73",   0x08000, 0x8000, BAD_DUMP CRC(8bf73e80) SHA1(25ee0a6fe61d1f92a47fd9408c36111b1ed73a56) )
-	ROM_LOAD( "mbo-cg2093.u74",   0x10000, 0x8000, BAD_DUMP CRC(907400f2) SHA1(56ceb960a08b2d3f87e4acb720675cbbfb39d012) )
-	ROM_LOAD( "mxo-cg2093.u75",   0x18000, 0x8000, BAD_DUMP CRC(b6c3e987) SHA1(97f71792cb584a659615d1fe78228ac11fe32571) )
+	ROM_LOAD( "mro-cg2093.u72",   0x00000, 0x8000, CRC(1380bfa6) SHA1(4c3512770afee29d1d9b384a2ea2ad59018f1d4e) ) /*   09/02/94   @ IGT  NJ  */
+	ROM_LOAD( "mgo-cg2093.u73",   0x08000, 0x8000, CRC(8bf73e80) SHA1(25ee0a6fe61d1f92a47fd9408c36111b1ed73a56) )
+	ROM_LOAD( "mbo-cg2093.u74",   0x10000, 0x8000, CRC(907400f2) SHA1(56ceb960a08b2d3f87e4acb720675cbbfb39d012) )
+	ROM_LOAD( "mxo-cg2093.u75",   0x18000, 0x8000, CRC(04712ef6) SHA1(8dde637baa31b17d2949cb2006123e70b32b8f48) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap779.u50", 0x0000, 0x0100, CRC(b04a98fd) SHA1(4788c7cb88aa692a55855ca65e092df43506e55a) )
@@ -7016,10 +7016,10 @@ Currently errors out with CCOM LINK DOWN as CCOM linking is not supported
 	ROM_LOAD( "pp0598_a41-a96.u68",   0x00000, 0x10000, CRC(075295db) SHA1(7cb238d4df7be7e393dcfe7102aeffa13b1454d9) ) /* Game Version: A45, Library Version: A96, Video Lib Ver: A4N - 12/21/95   @ IGT MS */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2093.u72",   0x00000, 0x8000, BAD_DUMP CRC(1380bfa6) SHA1(4c3512770afee29d1d9b384a2ea2ad59018f1d4e) ) /* corruption in some graphics */
-	ROM_LOAD( "mgo-cg2093.u73",   0x08000, 0x8000, BAD_DUMP CRC(8bf73e80) SHA1(25ee0a6fe61d1f92a47fd9408c36111b1ed73a56) )
-	ROM_LOAD( "mbo-cg2093.u74",   0x10000, 0x8000, BAD_DUMP CRC(907400f2) SHA1(56ceb960a08b2d3f87e4acb720675cbbfb39d012) )
-	ROM_LOAD( "mxo-cg2093.u75",   0x18000, 0x8000, BAD_DUMP CRC(b6c3e987) SHA1(97f71792cb584a659615d1fe78228ac11fe32571) )
+	ROM_LOAD( "mro-cg2093.u72",   0x00000, 0x8000, CRC(1380bfa6) SHA1(4c3512770afee29d1d9b384a2ea2ad59018f1d4e) ) /*   09/02/94   @ IGT  NJ  */
+	ROM_LOAD( "mgo-cg2093.u73",   0x08000, 0x8000, CRC(8bf73e80) SHA1(25ee0a6fe61d1f92a47fd9408c36111b1ed73a56) )
+	ROM_LOAD( "mbo-cg2093.u74",   0x10000, 0x8000, CRC(907400f2) SHA1(56ceb960a08b2d3f87e4acb720675cbbfb39d012) )
+	ROM_LOAD( "mxo-cg2093.u75",   0x18000, 0x8000, CRC(04712ef6) SHA1(8dde637baa31b17d2949cb2006123e70b32b8f48) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap779.u50", 0x0000, 0x0100, CRC(b04a98fd) SHA1(4788c7cb88aa692a55855ca65e092df43506e55a) )
@@ -7034,7 +7034,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
      Programs Available: PP0451, X000451P & PP0711 - Non Double-up Only
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0713_a45-a74.u68",   0x00000, 0x10000, CRC(d3cfa1f2) SHA1(ddab79f559c33d7e2774c29dad12008df1343025) ) /* Game Version: A45, Library Version: A74 */
+	ROM_LOAD( "pp0711_a45-a74.u68",   0x00000, 0x10000, CRC(d3cfa1f2) SHA1(ddab79f559c33d7e2774c29dad12008df1343025) ) /* Game Version: A45, Library Version: A74 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
