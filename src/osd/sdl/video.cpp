@@ -203,13 +203,13 @@ void sdl_osd_interface::extract_video_config()
 	// default to working video please
 	video_config.novideo = 0;
 
-	// d3d options: extract the data
+	// video options: extract the data
 	stemp = options().video();
 	if (strcmp(stemp, "auto") == 0)
 	{
-#if (defined SDLMAME_MACOSX || defined SDLMAME_WIN32)
+#if (defined SDLMAME_WIN32)
 		stemp = "opengl";
-#elif (defined __STEAMLINK__)
+#elif (defined SDLMAME_MACOSX || defined __STEAMLINK__)
 		stemp = "bgfx";
 #else
 		stemp = "soft";
