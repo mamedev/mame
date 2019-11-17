@@ -151,6 +151,96 @@ void vt_vt1682_state::machine_reset()
 	update_banks();
 }
 
+/*
+
+Address tranlsation
+
+----------------------------------------------------------------
+
+First table uses bits from PB0r0, PB0r1, PB0r2 (0x8000 and above) or PB0r4, PB0r5 (below 0x8000)
+
+PB0r0 = Program Bank 0 Register 0
+PB0r1 = Program Bank 0 Register 1
+PB0r2 = Program Bank 0 Register 2
+
+PB0r4 = Program Bank 0 Register 4
+PB0r5 = Program Bank 0 Register 5
+
+PQ2EN   COMR6   A:15    A:14    A:13    |   TP:20   TP:19   TP:18   TP:17   TP:16   TP:15   TP:14   TP:13
+-----------------------------------------------------------------------------------------------------------
+0       0       1       0       0       |   PB0r0:7 PB0r0:6 PB0r0:5 PB0r0:4 PB0r0:3 PB0r0:2 PB0r0:1 PB0r0:0   (all PB0r0)
+0       0       1       0       1       |   PB0r1:7 PB0r1:6 PB0r1:5 PB0r1:4 PB0r1:3 PB0r1:2 PB0r1:1 PB0r1:0   (all PB0r1)
+0       0       1       1       0       |   1       1       1       1       1       1       1       0
+0       0       1       1       1       |   1       1       1       1       1       1       1       1
+0       1       1       0       0       |   1       1       1       1       1       1       1       0
+0       1       1       0       1       |   PB0r1:7 PB0r1:6 PB0r1:5 PB0r1:4 PB0r1:3 PB0r1:2 PB0r1:1 PB0r1:0   (all PB0r1)
+0       1       1       1       0       |   PB0r0:7 PB0r0:6 PB0r0:5 PB0r0:4 PB0r0:3 PB0r0:2 PB0r0:1 PB0r0:0   (all PB0r0)
+0       1       1       1       1       |   1       1       1       1       1       1       1       1
+1       0       1       0       0       |   PB0r0:7 PB0r0:6 PB0r0:5 PB0r0:4 PB0r0:3 PB0r0:2 PB0r0:1 PB0r0:0   (all PB0r0)
+1       0       1       0       1       |   PB0r1:7 PB0r1:6 PB0r1:5 PB0r1:4 PB0r1:3 PB0r1:2 PB0r1:1 PB0r1:0   (all PB0r1)
+1       0       1       1       0       |   PB0r2:7 PB0r2:6 PB0r2:5 PB0r2:4 PB0r2:3 PB0r2:2 PB0r2:1 PB0r2:0   (all PB0r2)
+1       0       1       1       1       |   1       1       1       1       1       1       1       1
+1       1       1       0       0       |   PB0r2:7 PB0r2:6 PB0r2:5 PB0r2:4 PB0r2:3 PB0r2:2 PB0r2:1 PB0r2:0   (all PB0r2)
+1       1       1       0       1       |   PB0r1:7 PB0r1:6 PB0r1:5 PB0r1:4 PB0r1:3 PB0r1:2 PB0r1:1 PB0r1:0   (all PB0r1)
+1       1       1       1       0       |   PB0r0:7 PB0r0:6 PB0r0:5 PB0r0:4 PB0r0:3 PB0r0:2 PB0r0:1 PB0r0:0   (all PB0r0)
+1       1       1       1       1       |   1       1       1       1       1       1       1       1
+-       -       0       1       1       |   PB0r5:7 PB0r5:6 PB0r5:5 PB0r5:4 PB0r5:3 PB0r5:2 PB0r5:1 PB0r5:0   (all PB0r5)
+-       -       0       1       0       |   PB0r4:7 PB0r4:6 PB0r4:5 PB0r4:4 PB0r4:3 PB0r4:2 PB0r4:1 PB0r4:0   (all PB0r4)
+
+----------------------------------------------------------------
+
+second table uses bits from above, and PB0r3
+
+Program Bank 0 Select   |   PA:20   PA:19   PA:18   PA:17   PA:16   PA:15   PA:14   PA:13
+-------------------------------------------------------------------------------------------
+0       0       0       |   PB0r3:7 PB0r3:6 TP:18   TP:17   TP:16   TP:15   TP:14   TP:13
+0       0       1       |   PB0r3:7 PB0r3:6 PB0r3:5 TP:17   TP:16   TP:15   TP:14   TP:13
+0       1       0       |   PB0r3:7 PB0r3:6 PB0r3:5 PB0r3:4 TP:16   TP:15   TP:14   TP:13
+0       1       1       |   PB0r3:7 PB0r3:6 PB0r3:5 PB0r3:4 PB0r3:3 TP:15   TP:14   TP:13
+1       0       0       |   PB0r3:7 PB0r3:6 PB0r3:5 PB0r3:4 PB0r3:3 PB0r3:2 TP:14   TP:13
+1       0       1       |   PB0r3:7 PB0r3:6 PB0r3:5 PB0r3:4 PB0r3:3 PB0r3:2 PB0r3:1 TP:13
+1       1       0       |   PB0r3:7 PB0r3:6 PB0r3:5 PB0r3:4 PB0r3:3 PB0r3:2 PB0r3:1 PB0r3:0
+1       1       1       |   TP:20   TP:19   TP:18   TP:17   TP:16   TP:15   TP:14   TP:13
+
+PB0r3 = Program Bank 0 Register 3
+TP = Address translated by 1st table
+
+----------------------------------------------------------------
+
+third table uses bits from PB1r0, PB1r1, PB1r2, PB1r3 (0x8000 and above) or PB1r4, PB1r5 (below 0x8000)
+
+PB1r0 = Program Bank 1 Register 0
+PB1r1 = Program Bank 1 Register 1
+PB1r2 = Program Bank 1 Register 2
+PB1r3 = Program Bank 1 Register 3
+
+PB1r4 = Program Bank 1 Register 4
+PB1r5 = Program Bank 1 Register 5
+
+EXT2421 PQ2EN   COMR6   A:15    A:14    A:13    |   PA:24   PA:23   PA:22   PA:21
+------------------------------------------------------------------------------------
+1       -       -       1       -       -       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+0       0       0       1       0       0       |   PB1r0:3 PB1r0:2 PB1r0:1 PB1r0:0    (all PB1r0)
+0       0       0       1       0       1       |   PB1r1:3 PB1r1:2 PB1r1:1 PB1r1:0    (all PB1r1)
+0       0       0       1       1       0       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+0       0       0       1       1       1       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+0       0       1       1       0       0       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+0       0       1       1       0       1       |   PB1r1:3 PB1r1:2 PB1r1:1 PB1r1:0    (all PB1r1)
+0       0       1       1       1       0       |   PB1r0:3 PB1r0:2 PB1r0:1 PB1r0:0    (all PB1r0)
+0       0       1       1       1       1       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+0       1       0       1       0       0       |   PB1r0:3 PB1r0:2 PB1r0:1 PB1r0:0    (all PB1r0)
+0       1       0       1       0       1       |   PB1r1:3 PB1r1:2 PB1r1:1 PB1r1:0    (all PB1r1)
+0       1       0       1       1       0       |   PB1r2:3 PB1r2:2 PB1r2:1 PB1r2:0    (all PB1r2)
+0       1       0       1       1       1       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+0       1       1       1       0       0       |   PB1r2:3 PB1r2:2 PB1r2:1 PB1r2:0    (all PB1r2)
+0       1       1       1       0       1       |   PB1r1:3 PB1r1:2 PB1r1:1 PB1r1:0    (all PB1r1)
+0       1       1       1       1       0       |   PB1r0:3 PB1r0:2 PB1r0:1 PB1r0:0    (all PB1r0)
+0       1       1       1       1       1       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+-       -       -       0       1       1       |   PB1r5:3 PB1r5:2 PB1r5:1 PB1r5:0    (all PB1r5)
+-       -       -       0       1       0       |   PB1r4:3 PB1r4:2 PB1r4:1 PB1r4:0    (all PB1r4)
+
+
+*/
 void vt_vt1682_state::update_banks()
 {
 	/* must use
@@ -171,7 +261,7 @@ void vt_vt1682_state::update_banks()
 	m_2105_vt1682_2105_comr6_tvmodes
 	m_211c_regs_ext2421
 	m_210b_misc_cs_prg0_bank_sel
-	
+
 	*/
 }
 
