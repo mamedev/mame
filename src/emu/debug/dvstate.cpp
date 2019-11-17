@@ -55,7 +55,7 @@ debug_view_state::debug_view_state(running_machine &machine, debug_view_osd_upda
 {
 	// fail if no available sources
 	enumerate_sources();
-	if (m_source_list.count() == 0)
+	if (m_source_list.empty())
 		throw std::bad_alloc();
 }
 
@@ -78,18 +78,19 @@ debug_view_state::~debug_view_state()
 void debug_view_state::enumerate_sources()
 {
 	// start with an empty list
-	m_source_list.reset();
+	m_source_list.clear();
 
 	// iterate over devices that have state interfaces
 	std::string name;
 	for (device_state_interface &state : state_interface_iterator(machine().root_device()))
 	{
 		name = string_format("%s '%s'", state.device().name(), state.device().tag());
-		m_source_list.append(*global_alloc(debug_view_state_source(name.c_str(), state.device())));
+		m_source_list.emplace_back(std::make_unique<debug_view_state_source>(name.c_str(), state.device()));
 	}
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.first());
+	if (!m_source_list.empty())
+		set_source(*m_source_list[0]);
 }
 
 

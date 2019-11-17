@@ -118,16 +118,16 @@
 - (int)selectedSubviewIndex {
 	const debug_view_source *source = view->source();
 	if (source != nullptr)
-		return view->source_list().indexof(*source);
+		return view->source_index(*source);
 	else
 		return -1;
 }
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int   selected = view->source_list().indexof(*view->source());
+	const int   selected = view->source_index(*view->source());
 	if (selected != index) {
-		view->set_source(*view->source_list().find(index));
+		view->set_source(*view->source(index));
 		if ([[self window] firstResponder] != self)
 			view->set_cursor_visible(false);
 	}
@@ -256,12 +256,12 @@
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	for (const debug_view_source *source = view->source_list().first(); source != nullptr; source = source->next())
+	for (auto &source : view->source_list())
 	{
 		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL
 					 keyEquivalent:@""
-						   atIndex:index++] setTag:view->source_list().indexof(*source)];
+						   atIndex:index++] setTag:view->source_index(*source)];
 	}
 	if (index < [menu numberOfItems])
 		[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];

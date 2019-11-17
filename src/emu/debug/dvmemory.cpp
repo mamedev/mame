@@ -119,7 +119,7 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 
 	// fail if no available sources
 	enumerate_sources();
-	if (m_source_list.count() == 0)
+	if (m_source_list.empty())
 		throw std::bad_alloc();
 
 	// configure the view
@@ -135,7 +135,7 @@ debug_view_memory::debug_view_memory(running_machine &machine, debug_view_osd_up
 void debug_view_memory::enumerate_sources()
 {
 	// start with an empty list
-	m_source_list.reset();
+	m_source_list.clear();
 	std::string name;
 
 	// first add all the devices' address spaces
@@ -145,14 +145,14 @@ void debug_view_memory::enumerate_sources()
 			{
 				address_space &space = memintf.space(spacenum);
 				name = string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), space.name());
-				m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), space)));
+				m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(name.c_str(), space));
 			}
 
 	// then add all the memory regions
 	for (auto &region : machine().memory().regions())
 	{
 		name = string_format("Region '%s'", region.second->name());
-		m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), *region.second.get())));
+		m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(name.c_str(), *region.second.get()));
 	}
 
 	// finally add all global array symbols in alphabetical order
@@ -174,10 +174,11 @@ void debug_view_memory::enumerate_sources()
 	std::sort(itemnames.begin(), itemnames.end(), [] (auto const &x, auto const &y) { return std::get<0>(x) < std::get<0>(y); });
 
 	for (auto const &item : itemnames)
-		m_source_list.append(*global_alloc(debug_view_memory_source(std::get<0>(item).c_str(), std::get<1>(item), std::get<2>(item), std::get<3>(item))));
+		m_source_list.emplace_back(std::make_unique<debug_view_memory_source>(std::get<0>(item).c_str(), std::get<1>(item), std::get<2>(item), std::get<3>(item)));
 
 	// reset the source to a known good entry
-	set_source(*m_source_list.first());
+	if (!m_source_list.empty())
+		set_source(*m_source_list[0]);
 }
 
 
