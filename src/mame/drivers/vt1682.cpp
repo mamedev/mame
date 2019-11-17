@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "machine/m6502_vt1682.h"
+#include "machine/bankdev.h"
 #include "screen.h"
 
 class vt_vt1682_state : public driver_device
@@ -18,7 +19,8 @@ public:
 	vt_vt1682_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_fullrom(*this, "fullrom")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -30,9 +32,11 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	required_device<address_map_bank_device> m_fullrom;
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void vt_vt1682_map(address_map& map);
+	void rom_map(address_map& map);
 
 
 	/* Video */
@@ -102,6 +106,8 @@ private:
 	uint32_t translate_address_4000_to_7fff(uint16_t address);
 	uint32_t translate_address_8000_to_ffff(uint16_t address);
 
+	DECLARE_READ8_MEMBER(rom_4000_to_7fff_r);
+	DECLARE_READ8_MEMBER(rom_8000_to_ffff_r);
 };
 
 void vt_vt1682_state::machine_start()
@@ -141,7 +147,7 @@ void vt_vt1682_state::machine_reset()
 	m_2100_prgbank1_r3 = 0;
 	m_2118_prgbank1_r4_r5 = 0;
 
-	m_2107_prgbank0_r0 = 0;
+	m_2107_prgbank0_r0 = 0x3f;
 	m_2108_prgbank0_r1 = 0;
 	m_2109_prgbank0_r2 = 0;
 	m_210a_prgbank0_r3 = 0;
@@ -349,22 +355,22 @@ uint32_t vt_vt1682_state::translate_address_8000_to_ffff(uint16_t address)
 
 	switch (lookup)
 	{
-	// PQ2EN disabled, COMR6 disabled
+	// PQ2EN disabled, COMR6 disabled (0,1,2,3 order)
 	case 0x0: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
 	case 0x1: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
 	case 0x2: tp20_tp13 = 0xfe;                 pa24_pa21 = m_2100_prgbank1_r3; break;
 	case 0x3: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
-	// PQ2EN disabled, COMR6 enabled
+	// PQ2EN disabled, COMR6 enabled (2,1,0,3 order)
 	case 0x4: tp20_tp13 = 0xfe;                 pa24_pa21 = m_2100_prgbank1_r3; break;
 	case 0x5: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
 	case 0x6: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
 	case 0x7: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
-	// PQ2EN enabled, COMR6 disabled,
+	// PQ2EN enabled, COMR6 disabled (0,1,2,3 order) (2 is now m_2109_prgbank0_r2, not 0xfe)
 	case 0x8: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
 	case 0x9: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
 	case 0xa: tp20_tp13 = m_2109_prgbank0_r2;   pa24_pa21 = m_210c_prgbank1_r2; break;
 	case 0xb: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
-	// PQ2EN enabled, COMR6 enabled,
+	// PQ2EN enabled, COMR6 enabled (2,1,0,3 order) (2 is now m_2109_prgbank0_r2, not 0xfe)
 	case 0xc: tp20_tp13 = m_2109_prgbank0_r2;   pa24_pa21 = m_210c_prgbank1_r2; break;
 	case 0xd: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
 	case 0xe: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
@@ -387,7 +393,17 @@ uint32_t vt_vt1682_state::translate_address_8000_to_ffff(uint16_t address)
 	return realaddress;
 }
 
+READ8_MEMBER(vt_vt1682_state::rom_4000_to_7fff_r)
+{
+	const uint32_t address = translate_address_4000_to_7fff(offset + 0x4000);
+	return m_fullrom->read8(address);
+}
 
+READ8_MEMBER(vt_vt1682_state::rom_8000_to_ffff_r)
+{
+	const uint32_t address = translate_address_8000_to_ffff(offset + 0x8000);
+	return m_fullrom->read8(address);
+}
 
 /************************************************************************************************************************************
  VT1682 PPU Registers
@@ -2858,6 +2874,13 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 	return 0;
 }
 
+// VT1682 can address 25-bit address space (32MB of ROM)
+void vt_vt1682_state::rom_map(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).rom().region("mainrom", 0);
+}
+
+
 void vt_vt1682_state::vt_vt1682_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
@@ -2888,8 +2911,11 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
 
 	// 3000-3fff internal ROM if enabled
-	map(0x4000, 0xffff).rom().region("mainrom", 0x74000);
+	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
+	map(0x8000, 0xffff).r(FUNC(vt_vt1682_state::rom_8000_to_ffff_r));
 }
+
+
 
 static INPUT_PORTS_START( intec )
 INPUT_PORTS_END
@@ -2901,6 +2927,8 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_map);
 
 	// 6502 sound CPU running at 20mhz
+
+	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&vt_vt1682_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
