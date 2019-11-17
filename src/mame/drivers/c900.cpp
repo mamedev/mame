@@ -156,9 +156,9 @@ void c900_state::c900(machine_config &config)
 }
 
 ROM_START( c900 )
-	ROM_REGION16_LE( 0x8000, "roms", 0 )
-	ROM_LOAD16_BYTE( "c 900 boot-h v 1.0.bin.u17", 0x0001, 0x4000, CRC(c3aa7fc1) SHA1(ff12dd100fa7b1e7e931e9a8ef4c4f5cc056e099) )
-	ROM_LOAD16_BYTE( "c 900 boot-l v 1.0.bin.u18", 0x0000, 0x4000, CRC(0aa39272) SHA1(b2c5da4586d38fc66bb33aafeae4dbda36080f1e) )
+	ROM_REGION16_BE( 0x8000, "roms", 0 )
+	ROM_LOAD16_BYTE( "c 900 boot-h v 1.0.bin.u17", 0x0000, 0x4000, CRC(c3aa7fc1) SHA1(ff12dd100fa7b1e7e931e9a8ef4c4f5cc056e099) )
+	ROM_LOAD16_BYTE( "c 900 boot-l v 1.0.bin.u18", 0x0001, 0x4000, CRC(0aa39272) SHA1(b2c5da4586d38fc66bb33aafeae4dbda36080f1e) )
 
 	ROM_REGION( 0x2000, "fdc", 0 )
 	ROM_LOAD( "s41_6-20-85.bin", 0x0000, 0x2000, CRC(ec245721) SHA1(4cc19014b4887833a56b1236dc5fe39cc5d7b5c3) )
