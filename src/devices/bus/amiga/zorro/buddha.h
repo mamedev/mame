@@ -18,6 +18,8 @@
 #include "bus/ata/ataintf.h"
 
 
+namespace bus { namespace amiga { namespace zorro {
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -32,10 +34,10 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	virtual void device_start() override;
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override;
 
 	// device_zorro2_card_interface overrides
@@ -66,7 +68,7 @@ private:
 	DECLARE_WRITE_LINE_MEMBER( ide_0_interrupt_w );
 	DECLARE_WRITE_LINE_MEMBER( ide_1_interrupt_w );
 
-	void mmio_map(address_map &map);
+	void mmio_map(address_map &map) ATTR_COLD;
 
 	required_device<ata_interface_device> m_ata_0;
 	required_device<ata_interface_device> m_ata_1;
@@ -76,7 +78,9 @@ private:
 	int m_ide_1_interrupt;
 };
 
+} } } // namespace bus::amiga::zorro
+
 // device type definition
-DECLARE_DEVICE_TYPE(BUDDHA, buddha_device)
+DECLARE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_BUDDHA_H

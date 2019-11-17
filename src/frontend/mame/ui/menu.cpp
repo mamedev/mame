@@ -228,7 +228,9 @@ void menu::exit(running_machine &machine)
 //-------------------------------------------------
 
 menu::menu(mame_ui_manager &mui, render_container &container)
-	: m_visible_lines(0)
+	: m_selected(0)
+	, m_items()
+	, m_visible_lines(0)
 	, m_visible_items(0)
 	, m_global_state(get_global_state(mui.machine()))
 	, m_special_main_menu(false)

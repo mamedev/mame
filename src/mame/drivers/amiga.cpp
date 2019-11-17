@@ -33,7 +33,6 @@
 //**************************************************************************
 
 #define EXP_SLOT_TAG "exp"
-#define ZORROBUS_TAG "zorrobus"
 
 
 //**************************************************************************
@@ -260,7 +259,7 @@ public:
 	a2000_state(const machine_config &mconfig, device_type type, const char *tag) :
 		amiga_state(mconfig, type, tag),
 		m_rtc(*this, "u65"),
-		m_zorro(*this, ZORROBUS_TAG),
+		m_zorro(*this, "zorrobus"),
 		m_zorro2_int2(0),
 		m_zorro2_int6(0)
 	{ }
@@ -287,7 +286,7 @@ protected:
 private:
 	// devices
 	required_device<msm6242_device> m_rtc;
-	required_device<zorro2_device> m_zorro;
+	required_device<zorro2_bus_device> m_zorro;
 
 	// internal state
 	int m_zorro2_int2;

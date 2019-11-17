@@ -22,9 +22,12 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK1, action_replay_mk1_device, "amiga_ar1", "Datel Action Replay MK-I")
-DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK2, action_replay_mk2_device, "amiga_ar2", "Datel Action Replay MK-II")
-DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK3, action_replay_mk3_device, "amiga_ar3", "Datel Action Replay MK-III")
+DEFINE_DEVICE_TYPE_NS(ZORRO_ACTION_REPLAY_MK1, bus::amiga::zorro, action_replay_mk1_device, "zorro_ar1", "Datel Action Replay MK-I")
+DEFINE_DEVICE_TYPE_NS(ZORRO_ACTION_REPLAY_MK2, bus::amiga::zorro, action_replay_mk2_device, "zorro_ar2", "Datel Action Replay MK-II")
+DEFINE_DEVICE_TYPE_NS(ZORRO_ACTION_REPLAY_MK3, bus::amiga::zorro, action_replay_mk3_device, "zorro_ar3", "Datel Action Replay MK-III")
+
+
+namespace bus { namespace amiga { namespace zorro {
 
 //-------------------------------------------------
 //  input_ports - device-specific input ports
@@ -32,10 +35,10 @@ DEFINE_DEVICE_TYPE(ACTION_REPLAY_MK3, action_replay_mk3_device, "amiga_ar3", "Da
 
 static INPUT_PORTS_START( ar_button )
 	PORT_START("freeze")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, action_replay_device, freeze, 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, action_replay_device_base, freeze, 0)
 INPUT_PORTS_END
 
-ioport_constructor action_replay_device::device_input_ports() const
+ioport_constructor action_replay_device_base::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( ar_button );
 }
@@ -95,10 +98,10 @@ const tiny_rom_entry *action_replay_mk3_device::device_rom_region() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  action_replay_device - constructor
+//  action_replay_device_base - constructor
 //-------------------------------------------------
 
-action_replay_device::action_replay_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+action_replay_device_base::action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_exp_card_interface(mconfig, *this),
 	m_button(*this, "freeze")
@@ -106,17 +109,17 @@ action_replay_device::action_replay_device(const machine_config &mconfig, device
 }
 
 action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK1, tag, owner, clock)
+	action_replay_device_base(mconfig, ZORRO_ACTION_REPLAY_MK1, tag, owner, clock)
 {
 }
 
 action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK2, tag, owner, clock)
+	action_replay_device_base(mconfig, ZORRO_ACTION_REPLAY_MK2, tag, owner, clock)
 {
 }
 
 action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device(mconfig, ACTION_REPLAY_MK3, tag, owner, clock)
+	action_replay_device_base(mconfig, ZORRO_ACTION_REPLAY_MK3, tag, owner, clock)
 {
 }
 
@@ -124,16 +127,15 @@ action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void action_replay_device::device_start()
+void action_replay_device_base::device_start()
 {
-	set_zorro_device();
 }
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void action_replay_device::device_reset()
+void action_replay_device_base::device_reset()
 {
 }
 
@@ -142,8 +144,10 @@ void action_replay_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-INPUT_CHANGED_MEMBER( action_replay_device::freeze )
+INPUT_CHANGED_MEMBER( action_replay_device_base::freeze )
 {
 	// pushing the freeze button generates an nmi
 	m_slot->ipl_w(newval == 1 ? 7 : 0);
 }
+
+} } } // namespace bus::amiga::zorro
