@@ -97,6 +97,12 @@ TODO: Volleyball...
  * https://www.youtube.com/watch?v=pDrRnJOCKZc (no longer available)
  *
  * https://www.youtube.com/watch?v=fiShX2pTz9A
+ * https://www.youtube.com/watch?v=YmzH4E3x1_g
+ *
+ * Breakout videos:
+ *
+ * https://www.youtube.com/watch?v=NOGO49j5gCE
+ *
  */
 
 static const int NS_PER_CLOCK_PONG  = static_cast<int>((double) NETLIST_INTERNAL_RES / (double) 7159000 + 0.5);
@@ -483,6 +489,7 @@ void pong_state::pong(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
 	FIXFREQ(config, m_video).set_screen("screen");
 	m_video->set_monitor_clock(MASTER_CLOCK_PONG);
 	m_video->set_horz_params(H_TOTAL_PONG-67,H_TOTAL_PONG-40,H_TOTAL_PONG-8,H_TOTAL_PONG);
@@ -533,8 +540,9 @@ void breakout_state::breakout(machine_config &config)
 	NETLIST_ANALOG_OUTPUT(config, "maincpu:coin_counter", 0).set_params("CON_T", FUNC(breakout_state::coin_counter_cb));
 
 	/* video hardware */
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 	FIXFREQ(config, m_video).set_screen("screen");
+	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	//SCREEN(config, "screen", SCREEN_TYPE_VECTOR);
 	/* The Pixel width is a 2,1,2,1,2,1,1,1 repeating pattern
 	 * Thus we must use double resolution horizontally
 	 */
