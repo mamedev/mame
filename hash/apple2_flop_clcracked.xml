@@ -35543,4 +35543,17 @@
 		</part>
 	</software>
 
+	<software name="leadshtr">
+		<description>Leadsheeter (cleanly cracked)</description>
+		<year>1985</year>
+		<publisher>Passport Designs, Inc</publisher>
+		<info name="release" value="2019-11-16"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="leadsheeter (4am and san inc crack).dsk" size="143360" crc="1f890162" sha1="d91cc98035f67461d92490f9a1d7912d00823bfc" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

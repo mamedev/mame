@@ -8706,4 +8706,41 @@
 		</part>
 	</software>
 
+	<software name="a2fs1">
+		<description>Flight Simulator I (A2-FS1)</description>
+		<year>1980</year>
+		<publisher>subLOGIC</publisher>
+		<info name="release" value="2019-11-16"/>
+		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It runs on any Apple II with 32K. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="169627">
+				<rom name="flight simulator i.woz" size="169627" crc="cd1b69f1" sha1="80f44956c5b7c8e3aec1e2e2b5a0418dfea192c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lordconq">
+		<description>Lords of Conquest</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="release" value="2019-11-16"/>
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- It requires a 64K Apple ][+ or later. -->
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="228156">
+				<rom name="lords of conquest side a.woz" size="228156" crc="e7e05231" sha1="a4a36db90cda59a64a7baac4c03d665926c351a0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="234812">
+				<rom name="lords of conquest side b.woz" size="234812" crc="de46bf70" sha1="1a53fa03180075727451c56326a4deb1d2c363bb" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
