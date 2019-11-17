@@ -27,7 +27,11 @@ public:
 		m_fullrom(*this, "fullrom"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
-		m_sound_share(*this, "sound_share")
+		m_sound_share(*this, "sound_share"),
+		m_gfxdecode1(*this, "gfxdecode1"),
+		m_gfxdecode2(*this, "gfxdecode2"),
+		m_palette1(*this, "palette1"),
+		m_palette2(*this, "palette2")
 	{ }
 
 	void vt_vt1682(machine_config& config);
@@ -46,6 +50,12 @@ private:
 	required_device<address_map_bank_device> m_spriteram;
 	required_device<address_map_bank_device> m_vram;
 	required_shared_ptr<uint8_t> m_sound_share;
+	required_device<gfxdecode_device> m_gfxdecode1;
+	required_device<gfxdecode_device> m_gfxdecode2;
+	required_device<palette_device> m_palette1;
+	required_device<palette_device> m_palette2;
+
+
 
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void vt_vt1682_map(address_map& map);
@@ -1389,8 +1399,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2011_bk1_yscoll_7_0_w)
     0x40 - (unused)
     0x20 - (unused)
     0x10 - BK1 HCLR
-    0x08 - BK1 Scroll Enable
-    0x04 - BK1 Scroll Enable
+    0x08 - BK1 Scroll Enable (page layout)
+    0x04 - BK1 Scroll Enable (page layout)
     0x02 - BK1Y:8
     0x01 - BK1X:8
 */
@@ -1405,7 +1415,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
 {
-	logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x scrollen:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
+	logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
 	m_2012_bk1_scroll_control = data;
@@ -1419,8 +1429,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2012_bk1_scroll_control_w)
     0x40 - BK1 Palette
     0x20 - BK1 Depth
     0x10 - BK1 Depth
-    0x08 - BK1 Colour
-    0x04 - BK1 Colour
+    0x08 - BK1 Colour (bpp)
+    0x04 - BK1 Colour (bpp)
     0x02 - BK1 Line
     0x01 - BK1 Size
 */
@@ -1434,7 +1444,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2013_bk1_main_control_w)
 {
-	logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x colour:%01x linemode:%01x size:%01x)\n", machine().describe_context(), data,
+	logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
 	m_2013_bk1_main_control = data;
@@ -1501,8 +1511,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2015_bk2_yscoll_7_0_w)
     0x40 - (unused)
     0x20 - (unused)
     0x10 - (unused)
-    0x08 - BK2 Scroll Enable
-    0x04 - BK2 Scroll Enable
+    0x08 - BK2 Scroll Enable (page layout)
+    0x04 - BK2 Scroll Enable (page layout)
     0x02 - BK2Y:8
     0x01 - BK2X:8
 */
@@ -1517,7 +1527,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
 {
-	logerror("%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x scrollen:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
+	logerror("%s: vt1682_2016_bk2_scroll_control_w writing: %02x ((invalid): %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
 		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
 	m_2016_bk2_scroll_control = data;
@@ -1531,8 +1541,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2016_bk2_scroll_control_w)
     0x40 - BK2 Palette
     0x20 - BK2 Depth
     0x10 - BK2 Depth
-    0x08 - BK2 Colour
-    0x04 - BK2 Colour
+    0x08 - BK2 Colour (bpp)
+    0x04 - BK2 Colour (bpp)
     0x02 - (unused)
     0x01 - BK2 Size
 */
@@ -1546,7 +1556,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_r)
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2017_bk2_main_control_w)
 {
-	logerror("%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x colour:%01x (invalid):%01x size:%01x)\n", machine().describe_context(), data,
+	logerror("%s: vt1682_2017_bk2_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x (invalid):%01x tilesize:%01x)\n", machine().describe_context(), data,
 		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
 	m_2017_bk2_main_control = data;
@@ -2353,7 +2363,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_r)
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
 {
 	// COMR6 is used for banking
-	logerror("%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1 scpuon:%1 spion:%1 uarton:%1 tvon:%1 lcdon:%1)\n", machine().describe_context(), data,
+	logerror("%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context(), data,
 		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
 	m_2106_enable_reg = data;
 }
@@ -4238,6 +4248,82 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
 
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
+
+// m_2013_bk1_main_control
+// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
+//		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
+
+// m_2012_bk1_scroll_control
+// logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
+//		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
+
+	int bk1_tilesize = (m_2013_bk1_main_control & 0x01);
+	int bk1_line =     (m_2013_bk1_main_control & 0x02) >> 1;
+	int bk1_tilebpp =  (m_2013_bk1_main_control & 0x0c) >> 2;
+	int bk1_depth =    (m_2013_bk1_main_control & 0x30) >> 4;
+	int bk1_palette =  (m_2013_bk1_main_control & 0x40) >> 5;
+	int bk1_enable =   (m_2013_bk1_main_control & 0x80) >> 7;
+
+
+	if (bk1_enable)
+	{
+		
+		int xscroll = m_2010_bk1_xscroll_7_0;
+		int yscroll = m_2011_bk1_yscoll_7_0;
+		int xscrollmsb =  (m_2012_bk1_scroll_control & 0x01);
+		int yscrollmsb =  (m_2012_bk1_scroll_control & 0x02) >> 1;
+		int page_layout = (m_2012_bk1_scroll_control & 0x0c) >> 2;;
+		int high_color =  (m_2012_bk1_scroll_control & 0x10) >> 4;
+
+		int segment = m_201c_bk1_segment_7_0;
+		segment |= m_201d_bk1_segment_11_8 << 8;
+
+		segment = segment * 0x2000;
+
+		xscroll |= xscrollmsb << 8;
+		yscroll |= yscrollmsb << 8;
+
+		if (!bk1_line)
+		{
+			// Character Mode
+			logerror("DRAWING ----- BK1, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout:%1x XScroll %04x YScroll %04x\n", segment, bk1_tilesize, bk1_tilebpp, bk1_depth, bk1_palette, page_layout, xscroll, yscroll);
+		
+			int count = 0;
+
+			int tilebase = segment / 64;
+			int gfxregion = 3;
+			gfx_element *gfx = m_gfxdecode1->gfx(gfxregion);
+
+			for (int y = 0; y < 32; y++)
+			{
+				for (int x = 0; x < 32; x++)
+				{
+					uint16_t word = m_vram->read8(count);
+					count++;
+					word |= m_vram->read8(count) << 8;
+					count++;
+					
+					int pal = 0;
+					int tile = word & 0x0fff;
+
+					gfx->transpen(bitmap,cliprect,tilebase + tile,pal,0,0,x*8,y*8,0);
+					
+				}
+			}
+		
+		}
+		else
+		{
+			// Line Mode
+			
+
+			if (high_color)
+			{
+
+			}
+		}
+	}
+
 	return 0;
 }
 
@@ -4383,6 +4469,80 @@ INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 }
 
 
+static const gfx_layout helper_4bpp_8_layout =
+{
+	8,1,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ STEP8(0,4) },
+	{ 0 },
+	8 * 4
+};
+
+static const gfx_layout helper_8bpp_8_layout =
+{
+	8,1,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,8) },
+	{ 0 },
+	8 * 8
+};
+
+static const gfx_layout helper_8bpp_8x8_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	{ STEP8(0,8) },
+	{ STEP8(0,8*8) },
+	8 * 8 * 8
+};
+
+// hardware has line modes, so these views might be useful
+static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
+static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
+static const gfx_layout texture_helper_8bpp_layout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	8,
+	{ 0,1,2,3,4,5,6,7 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*8,
+	texlayout_xoffset_8bpp,
+	texlayout_yoffset_8bpp
+};
+
+static const uint32_t texlayout_xoffset_4bpp[256] = { STEP256(0,4) };
+static const uint32_t texlayout_yoffset_4bpp[256] = { STEP256(0,256*4) };
+static const gfx_layout texture_helper_4bpp_layout =
+{
+	256, 256,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	EXTENDED_XOFFS,
+	EXTENDED_YOFFS,
+	256*256*4,
+	texlayout_xoffset_4bpp,
+	texlayout_yoffset_4bpp
+};
+
+static GFXDECODE_START( gfx_test )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_4bpp_8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_4bpp_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 1  )
+	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 1  )
+GFXDECODE_END
+
+
+
 // NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
 // PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
 
@@ -4402,8 +4562,11 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	ADDRESS_MAP_BANK(config, m_spriteram).set_map(&vt_vt1682_state::spriteram_map).set_options(ENDIANNESS_NATIVE, 8, 11, 0x800);
 	ADDRESS_MAP_BANK(config, m_vram).set_map(&vt_vt1682_state::vram_map).set_options(ENDIANNESS_NATIVE, 8, 16, 0x10000);
 
-	PALETTE(config, "palette2").set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
-	PALETTE(config, "palette1").set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
+	PALETTE(config, m_palette2).set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
+	PALETTE(config, m_palette1).set_format(palette_device::xRGB_555, 0x100).set_endianness(ENDIANNESS_LITTLE);
+
+	GFXDECODE(config, m_gfxdecode2, m_palette2, gfx_test);
+	GFXDECODE(config, m_gfxdecode1, m_palette1, gfx_test);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -4438,7 +4601,7 @@ ROM_END
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
-
+	                                    
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
 
