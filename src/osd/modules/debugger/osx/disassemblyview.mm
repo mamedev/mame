@@ -46,7 +46,7 @@
 - (NSSize)maximumFrameSize {
 	debug_view_xy           max(0, 0);
 	debug_view_source const *source = view->source();
-	for (debug_view_source const *source = view->first_source(); source != nullptr; source = source->next())
+	for (auto &source : view->source_list())
 	{
 		view->set_source(*source);
 		debug_view_xy const current = view->total_size();
@@ -155,23 +155,21 @@
 
 - (BOOL)selectSubviewForSpace:(address_space *)space {
 	if (space == nullptr) return NO;
-	debug_view_disasm_source const *source = downcast<debug_view_disasm_source const *>(view->first_source());
-	while ((source != nullptr) && (&source->space() != space))
-		source = downcast<debug_view_disasm_source *>(source->next());
-	if (source != nullptr)
+	for (auto &ptr : view->source_list())
 	{
-		if (view->source() != source)
+		debug_view_disasm_source const *const source = downcast<debug_view_disasm_source const *>(ptr.get());
+		if (&source->space() == space)
 		{
-			view->set_source(*source);
-			if ([[self window] firstResponder] != self)
-				view->set_cursor_visible(false);
+			if (view->source() != source)
+			{
+				view->set_source(*source);
+				if ([[self window] firstResponder] != self)
+					view->set_cursor_visible(false);
+			}
+			return YES;
 		}
-		return YES;
 	}
-	else
-	{
-		return NO;
-	}
+	return NO;
 }
 
 
