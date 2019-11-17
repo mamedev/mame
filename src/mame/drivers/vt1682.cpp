@@ -339,65 +339,46 @@ uint32_t vt_vt1682_state::translate_address_8000_to_ffff(uint16_t address)
 {
 	uint32_t realaddress = 0x00000000;
 
-	int pq2en = (m_210b_misc_cs_prg0_bank_sel & 0x40)>>6;
-	int comr6 = (m_2105_vt1682_2105_comr6_tvmodes & 0x40)>>6;
-	int a14_a13 = (address & 0x6000) >> 13;
-
 	int tp20_tp13 = 0;
-	int lookup = a14_a13 | (comr6 << 2) | (pq2en << 3);
+	int pa24_pa21 = 0;
+
+	const int pq2en = (m_210b_misc_cs_prg0_bank_sel & 0x40)>>6;
+	const int comr6 = (m_2105_vt1682_2105_comr6_tvmodes & 0x40)>>6;
+	const int a14_a13 = (address & 0x6000) >> 13;
+	const int lookup = a14_a13 | (comr6 << 2) | (pq2en << 3);
 
 	switch (lookup)
 	{
-	case 0x0: tp20_tp13 = m_2107_prgbank0_r0; break;
-	case 0x1: tp20_tp13 = m_2108_prgbank0_r1; break;
-	case 0x2: tp20_tp13 = 0xfe; break;
-	case 0x3: tp20_tp13 = 0xff; break;
-	case 0x4: tp20_tp13 = 0xfe; break;
-	case 0x5: tp20_tp13 = m_2108_prgbank0_r1; break;
-	case 0x6: tp20_tp13 = m_2107_prgbank0_r0; break;
-	case 0x7: tp20_tp13 = 0xff; break;
-	case 0x8: tp20_tp13 = m_2107_prgbank0_r0; break;
-	case 0x9: tp20_tp13 = m_2108_prgbank0_r1; break;
-	case 0xa: tp20_tp13 = m_2109_prgbank0_r2; break;
-	case 0xb: tp20_tp13 = 0xff; break;
-	case 0xc: tp20_tp13 = m_2109_prgbank0_r2; break;
-	case 0xd: tp20_tp13 = m_2108_prgbank0_r1; break;
-	case 0xe: tp20_tp13 = m_2107_prgbank0_r0; break;
-	case 0xf: tp20_tp13 = 0xff; break;
+	// PQ2EN disabled, COMR6 disabled
+	case 0x0: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
+	case 0x1: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
+	case 0x2: tp20_tp13 = 0xfe;                 pa24_pa21 = m_2100_prgbank1_r3; break;
+	case 0x3: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
+	// PQ2EN disabled, COMR6 enabled
+	case 0x4: tp20_tp13 = 0xfe;                 pa24_pa21 = m_2100_prgbank1_r3; break;
+	case 0x5: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
+	case 0x6: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
+	case 0x7: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
+	// PQ2EN enabled, COMR6 disabled,
+	case 0x8: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
+	case 0x9: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
+	case 0xa: tp20_tp13 = m_2109_prgbank0_r2;   pa24_pa21 = m_210c_prgbank1_r2; break;
+	case 0xb: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
+	// PQ2EN enabled, COMR6 enabled,
+	case 0xc: tp20_tp13 = m_2109_prgbank0_r2;   pa24_pa21 = m_210c_prgbank1_r2; break;
+	case 0xd: tp20_tp13 = m_2108_prgbank0_r1;   pa24_pa21 = m_prgbank1_r1;      break;
+	case 0xe: tp20_tp13 = m_2107_prgbank0_r0;   pa24_pa21 = m_prgbank1_r0;      break;
+	case 0xf: tp20_tp13 = 0xff;                 pa24_pa21 = m_2100_prgbank1_r3; break;
 	}
 
-	int pa20_pa13 = translate_prg0select(tp20_tp13);
-
-	int pa24_pa21 = 0;
-
-	int ext2421 = (m_211c_regs_ext2421 & 0x20) >> 5;
-
+	// override selection above
+	const int ext2421 = (m_211c_regs_ext2421 & 0x20) >> 5;
 	if (ext2421)
 	{
 		pa24_pa21 = m_2100_prgbank1_r3;
 	}
-	else
-	{
-		switch (lookup)
-		{
-		case 0x0: pa24_pa21 = m_prgbank1_r0; break;
-		case 0x1: pa24_pa21 = m_prgbank1_r1; break;
-		case 0x2: pa24_pa21 = m_2100_prgbank1_r3; break;
-		case 0x3: pa24_pa21 = m_2100_prgbank1_r3;  break;
-		case 0x4: pa24_pa21 = m_2100_prgbank1_r3; break;
-		case 0x5: pa24_pa21 = m_prgbank1_r1; break;
-		case 0x6: pa24_pa21 = m_prgbank1_r0; break;
-		case 0x7: pa24_pa21 = m_2100_prgbank1_r3; break;
-		case 0x8: pa24_pa21 = m_prgbank1_r0; break;
-		case 0x9: pa24_pa21 = m_prgbank1_r1; break;
-		case 0xa: pa24_pa21 = m_210c_prgbank1_r2; break;
-		case 0xb: pa24_pa21 = m_2100_prgbank1_r3; break;
-		case 0xc: pa24_pa21 = m_210c_prgbank1_r2; break;
-		case 0xd: pa24_pa21 = m_prgbank1_r1; break;
-		case 0xe: pa24_pa21 = m_prgbank1_r0; break;
-		case 0xf: pa24_pa21 = m_2100_prgbank1_r3; break;
-		}
-	}
+
+	const int pa20_pa13 = translate_prg0select(tp20_tp13);
 
 	realaddress = address & 0x1fff;
 	realaddress |= pa20_pa13 << 13;
