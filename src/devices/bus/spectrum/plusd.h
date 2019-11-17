@@ -2,7 +2,7 @@
 // copyright-holders:Twisted Tom
 /**********************************************************************
 
-    MGT Plus D Disc and Printer Interface
+    MGT +D Disk and Printer Interface
 
 **********************************************************************/
 

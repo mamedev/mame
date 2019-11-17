@@ -2,11 +2,18 @@
 // copyright-holders:Twisted Tom
 /**********************************************************************
 
-    Plus D Fdd and Printer Interface
-	-------------------------------------
+    MGT +D Disk and Printer Interface
+	---------------------------------
 	
 	Produced by Miles Gordon Technology, UK, 1986-1990, who also produced the Sam Coupé home computer.
-	Provides one floppy disk interface, Centronics parallel interface, and a "magic button" style memory snapshot grabber.
+	
+	Features:
+	8KB ROM
+	8KB RAM
+	single floppy disk interface (2 drives)
+	Centronics parallel interface
+	"magic button" style memory snapshot grabber
+	
 	It is a cost and feature reduced version of MGT's earlier "Disciple" unit.
 	A second "official" version exists which was licensed and produced by Datel following MGT's demise.
 	Also, many "unofficial" versions remain available today as both DIY-style projects/kits and some even commercially!
@@ -68,7 +75,7 @@
 	issues with wd_fdc.cpp  see https://github.com/mamedev/mame/issues/5893
 	currently patching ROM to skip index pulse check which otherwise gives no disc error
 	
-	GDOS:
+	G+DOS:
 	disk read/write  ok
 	snapshot save/load  ok
 	disk format  ng
@@ -138,8 +145,8 @@ ROM_START(plusd)
 	
 	ROM_SYSTEM_BIOS(0, "gdos", "G+DOS v1a")
 	ROMX_LOAD("plusd_g.rom", 0x0000, 0x2000, CRC(569f7e55) SHA1(6b841dc5797ef7eb219ad455cd1e434ca3b9d30d), ROM_BIOS(0))
-	ROM_FILL(0x6c8, 1, 0x18)
-	ROM_FILL(0x6c9, 1, 0x11)  // jr $06db
+	ROM_FILL(0x06c8, 1, 0x18)
+	ROM_FILL(0x06c9, 1, 0x11)  // jr $06db
 	
 	ROM_SYSTEM_BIOS(1, "unidos", "UNI-DOS")
 	ROMX_LOAD("plusd_uni.rom", 0x0000, 0x2000, CRC(60920496) SHA1(399c8c7c8335bc59849a2182c32347603fd0288a), ROM_BIOS(1))
@@ -260,7 +267,7 @@ uint8_t spectrum_plusd_device::iorq_r(offs_t offset)
 		case 0xe7: // page in
 			m_romcs = 1;
 			break;
-		case 0xf7: // bit 7 printer busy
+		case 0xf7: // bit 7: printer busy
 			data = m_centronics_busy << 7;
 			break;
 		}

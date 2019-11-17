@@ -2,12 +2,12 @@
 // copyright-holders:Twisted Tom
 /**********************************************************************
 
-    MGT Plus D Disc and Printer Interface
+    MGT DISCiPLE Multi-purpose Interface
 
 **********************************************************************/
 
-#ifndef MAME_BUS_SPECTRUM_PLUSD_H
-#define MAME_BUS_SPECTRUM_PLUSD_H
+#ifndef MAME_BUS_SPECTRUM_DISCIPLE_H
+#define MAME_BUS_SPECTRUM_DISCIPLE_H
 
 #pragma once
 
@@ -22,11 +22,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class spectrum_plusd_device: public device_t, public device_spectrum_expansion_interface
+class spectrum_disciple_device: public device_t, public device_spectrum_expansion_interface
 {
 public:
 	// construction/destruction
-	spectrum_plusd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	spectrum_disciple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	DECLARE_INPUT_CHANGED_MEMBER(snapshot_button);
@@ -55,14 +55,16 @@ private:
 	required_device<wd_fdc_device_base> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_device<centronics_device> m_centronics;
+	required_device<spectrum_expansion_slot_device> m_exp;
 
 	int m_romcs;
 	uint8_t m_ram[8 * 1024];
 	bool m_centronics_busy;
+	bool m_map;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(SPECTRUM_PLUSD, spectrum_plusd_device)
+DECLARE_DEVICE_TYPE(SPECTRUM_DISCIPLE, spectrum_disciple_device)
 
-#endif // MAME_BUS_SPECTRUM_PLUSD_H
+#endif // MAME_BUS_SPECTRUM_DISCIPLE_H

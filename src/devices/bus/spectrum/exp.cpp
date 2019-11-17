@@ -156,7 +156,7 @@ void spectrum_expansion_slot_device::mreq_w(offs_t offset, uint8_t data)
 // slot devices
 #include "beta.h"
 #include "beta128.h"
-//#include "disciple.h"
+#include "disciple.h"
 #include "intf1.h"
 #include "intf2.h"
 #include "fuller.h"
