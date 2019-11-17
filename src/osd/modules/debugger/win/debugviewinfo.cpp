@@ -264,7 +264,7 @@ HWND debugview_info::create_source_combobox(HWND parent, LONG_PTR userdata)
 	// populate the combobox
 	debug_view_source const *const cursource = m_view->source();
 	int maxlength = 0;
-	for (debug_view_source const *source = m_view->first_source(); source != nullptr; source = source->next())
+	for (auto &source : m_view->source_list())
 	{
 		int const length = strlen(source->name());
 		if (length > maxlength)
