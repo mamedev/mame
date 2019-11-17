@@ -102,6 +102,15 @@ private:
 	uint8_t m_2021_lum_offset;
 	uint8_t m_2022_saturation_misc;
 
+	uint8_t m_2023_lightgun_reset;
+	uint8_t m_2024_lightgun1_y;
+	uint8_t m_2025_lightgun1_x;
+	uint8_t m_2026_lightgun2_y;
+	uint8_t m_2027_lightgun2_x;
+
+	uint8_t m_2031_red_dac;
+	uint8_t m_2032_green_dac;
+	uint8_t m_2033_blue_dac;
 
 	DECLARE_READ8_MEMBER(vt1682_2000_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2000_w);
@@ -184,6 +193,24 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_2022_saturation_misc_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2022_saturation_misc_w);
 
+	DECLARE_READ8_MEMBER(vt1682_2023_lightgun_reset_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2023_lightgun_reset_w);
+	DECLARE_READ8_MEMBER(vt1682_2024_lightgun1_y_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2024_lightgun1_y_w);
+	DECLARE_READ8_MEMBER(vt1682_2025_lightgun1_x_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2025_lightgun1_x_w);
+	DECLARE_READ8_MEMBER(vt1682_2026_lightgun2_y_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2026_lightgun2_y_w);
+	DECLARE_READ8_MEMBER(vt1682_2027_lightgun2_x_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2027_lightgun2_x_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2031_red_dac_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2031_red_dac_w);
+	DECLARE_READ8_MEMBER(vt1682_2032_green_dac_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2032_green_dac_w);
+	DECLARE_READ8_MEMBER(vt1682_2033_blue_dac_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2033_blue_dac_w);
+
 	/* Video Helpers */
 
 	uint16_t get_spriteram_addr()
@@ -254,6 +281,9 @@ private:
 	uint8_t m_2126_dma_sr_bank_addr_22_15;
 	uint8_t m_2128_dma_sr_bank_addr_24_23;
 
+	uint8_t m_2106_enable_reg;
+
+
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
 	DECLARE_READ8_MEMBER(vt1682_210c_prgbank1_r2_r);
@@ -305,6 +335,10 @@ private:
 
 	DECLARE_READ8_MEMBER(vt1682_2127_dma_status_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2127_dma_size_trigger_w);
+
+	DECLARE_READ8_MEMBER(vt1682_2106_enable_regs_r);
+	DECLARE_WRITE8_MEMBER(vt1682_2106_enable_regs_w);
+
 
 	/* System Helpers */
 
@@ -381,33 +415,6 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_2005_vramaddr_7_0));
 	save_item(NAME(m_2006_vramaddr_15_8));
 
-	/* System */
-
-	save_item(NAME(m_prgbank1_r0));
-	save_item(NAME(m_prgbank1_r1));
-	save_item(NAME(m_210c_prgbank1_r2));
-	save_item(NAME(m_2100_prgbank1_r3));
-	save_item(NAME(m_2118_prgbank1_r4_r5));
-
-	save_item(NAME(m_2107_prgbank0_r0));
-	save_item(NAME(m_2108_prgbank0_r1));
-	save_item(NAME(m_2109_prgbank0_r2));
-	save_item(NAME(m_210a_prgbank0_r3));
-	save_item(NAME(m_prgbank0_r4));
-	save_item(NAME(m_prgbank0_r5));
-
-	save_item(NAME(m_210b_misc_cs_prg0_bank_sel));
-	save_item(NAME(m_2105_vt1682_2105_comr6_tvmodes));
-	save_item(NAME(m_211c_regs_ext2421));
-
-	save_item(NAME(m_2122_dma_dt_addr_7_0));
-	save_item(NAME(m_2123_dma_dt_addr_15_8));
-	save_item(NAME(m_2124_dma_sr_addr_7_0));
-	save_item(NAME(m_2125_dma_sr_addr_15_8));
-
-	save_item(NAME(m_2126_dma_sr_bank_addr_22_15));
-	save_item(NAME(m_2128_dma_sr_bank_addr_24_23));
-
 	save_item(NAME(m_201a_sp_segment_7_0));
 	save_item(NAME(m_201b_sp_segment_11_8));
 	save_item(NAME(m_201c_bk1_segment_7_0));
@@ -443,6 +450,45 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_2020_bk_linescroll));
 	save_item(NAME(m_2021_lum_offset));
 	save_item(NAME(m_2022_saturation_misc));
+
+	save_item(NAME(m_2023_lightgun_reset));
+	save_item(NAME(m_2024_lightgun1_y));
+	save_item(NAME(m_2025_lightgun1_x));
+	save_item(NAME(m_2026_lightgun2_y));
+	save_item(NAME(m_2027_lightgun2_x));
+
+	save_item(NAME(m_2031_red_dac));
+	save_item(NAME(m_2032_green_dac));
+	save_item(NAME(m_2033_blue_dac));
+
+	/* System */
+
+	save_item(NAME(m_prgbank1_r0));
+	save_item(NAME(m_prgbank1_r1));
+	save_item(NAME(m_210c_prgbank1_r2));
+	save_item(NAME(m_2100_prgbank1_r3));
+	save_item(NAME(m_2118_prgbank1_r4_r5));
+
+	save_item(NAME(m_2107_prgbank0_r0));
+	save_item(NAME(m_2108_prgbank0_r1));
+	save_item(NAME(m_2109_prgbank0_r2));
+	save_item(NAME(m_210a_prgbank0_r3));
+	save_item(NAME(m_prgbank0_r4));
+	save_item(NAME(m_prgbank0_r5));
+
+	save_item(NAME(m_210b_misc_cs_prg0_bank_sel));
+	save_item(NAME(m_2105_vt1682_2105_comr6_tvmodes));
+	save_item(NAME(m_211c_regs_ext2421));
+
+	save_item(NAME(m_2122_dma_dt_addr_7_0));
+	save_item(NAME(m_2123_dma_dt_addr_15_8));
+	save_item(NAME(m_2124_dma_sr_addr_7_0));
+	save_item(NAME(m_2125_dma_sr_addr_15_8));
+
+	save_item(NAME(m_2126_dma_sr_bank_addr_22_15));
+	save_item(NAME(m_2128_dma_sr_bank_addr_24_23));
+
+	save_item(NAME(m_2106_enable_reg));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -455,33 +501,6 @@ void vt_vt1682_state::machine_reset()
 
 	m_2005_vramaddr_7_0 = 0;
 	m_2006_vramaddr_15_8 = 0;
-
-	/* System */
-	m_prgbank1_r0 = 0;
-	m_prgbank1_r1 = 0;
-	m_210c_prgbank1_r2 = 0;
-	m_2100_prgbank1_r3 = 0;
-	m_2118_prgbank1_r4_r5 = 0;
-
-	m_2107_prgbank0_r0 = 0x3f;
-	m_2108_prgbank0_r1 = 0;
-	m_2109_prgbank0_r2 = 0;
-	m_210a_prgbank0_r3 = 0;
-	m_prgbank0_r4 = 0;
-	m_prgbank0_r5 = 0;
-
-	m_210b_misc_cs_prg0_bank_sel = 0;
-	m_2105_vt1682_2105_comr6_tvmodes = 0;
-	m_211c_regs_ext2421 = 0;
-
-	m_2122_dma_dt_addr_7_0 = 0;
-	m_2123_dma_dt_addr_15_8 = 0;
-
-	m_2124_dma_sr_addr_7_0 = 0;
-	m_2125_dma_sr_addr_15_8 = 0;
-
-	m_2126_dma_sr_bank_addr_22_15 = 0;
-	m_2128_dma_sr_bank_addr_24_23 = 0;
 
 	m_201a_sp_segment_7_0 = 0;
 	m_201b_sp_segment_11_8 = 0;
@@ -518,6 +537,46 @@ void vt_vt1682_state::machine_reset()
 	m_2020_bk_linescroll = 0;
 	m_2021_lum_offset = 0;
 	m_2022_saturation_misc = 0;
+
+	m_2023_lightgun_reset = 0;
+	m_2024_lightgun1_y = 0;
+	m_2025_lightgun1_x = 0;
+	m_2026_lightgun2_y = 0;
+	m_2027_lightgun2_x = 0;
+
+	m_2031_red_dac = 0;
+	m_2032_green_dac = 0;
+	m_2033_blue_dac = 0;
+
+	/* System */
+	m_prgbank1_r0 = 0;
+	m_prgbank1_r1 = 0;
+	m_210c_prgbank1_r2 = 0;
+	m_2100_prgbank1_r3 = 0;
+	m_2118_prgbank1_r4_r5 = 0;
+
+	m_2107_prgbank0_r0 = 0x3f;
+	m_2108_prgbank0_r1 = 0;
+	m_2109_prgbank0_r2 = 0;
+	m_210a_prgbank0_r3 = 0;
+	m_prgbank0_r4 = 0;
+	m_prgbank0_r5 = 0;
+
+	m_210b_misc_cs_prg0_bank_sel = 0;
+	m_2105_vt1682_2105_comr6_tvmodes = 0;
+	m_211c_regs_ext2421 = 0;
+
+	m_2122_dma_dt_addr_7_0 = 0;
+	m_2123_dma_dt_addr_15_8 = 0;
+
+	m_2124_dma_sr_addr_7_0 = 0;
+	m_2125_dma_sr_addr_15_8 = 0;
+
+	m_2126_dma_sr_bank_addr_22_15 = 0;
+	m_2128_dma_sr_bank_addr_24_23 = 0;
+
+	m_2106_enable_reg = 0;
+
 
 	update_banks();
 
@@ -1734,6 +1793,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x01 - Light Gun Reset
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2023_lightgun_reset_r)
+{
+	uint8_t ret = m_2023_lightgun_reset;
+	logerror("%s: vt1682_2023_lightgun_reset_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2023_lightgun_reset_w)
+{
+	logerror("%s: vt1682_2023_lightgun_reset_w writing: %02x\n", machine().describe_context(), data);
+	m_2023_lightgun_reset = data;
+}
+
 /*
     Address 0x2024 r/w (MAIN CPU)
 
@@ -1746,6 +1818,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x02 - Light Gun 1 Y
     0x01 - Light Gun 1 Y
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2024_lightgun1_y_r)
+{
+	uint8_t ret = m_2024_lightgun1_y;
+	logerror("%s: vt1682_2024_lightgun1_y_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2024_lightgun1_y_w)
+{
+	logerror("%s: vt1682_2024_lightgun1_y_w writing: %02x\n", machine().describe_context(), data);
+	m_2024_lightgun1_y = data;
+}
 
 /*
     Address 0x2025 r/w (MAIN CPU)
@@ -1760,6 +1845,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x01 - Light Gun 1 X
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2025_lightgun1_x_r)
+{
+	uint8_t ret = m_2025_lightgun1_x;
+	logerror("%s: vt1682_2025_lightgun1_x_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2025_lightgun1_x_w)
+{
+	logerror("%s: vt1682_2025_lightgun1_x_w writing: %02x\n", machine().describe_context(), data);
+	m_2025_lightgun1_x = data;
+}
+
 /*
     Address 0x2026 r/w (MAIN CPU)
 
@@ -1773,6 +1871,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x01 - Light Gun 2 Y
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2026_lightgun2_y_r)
+{
+	uint8_t ret = m_2026_lightgun2_y;
+	logerror("%s: vt1682_2026_lightgun2_y_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2026_lightgun2_y_w)
+{
+	logerror("%s: vt1682_2026_lightgun2_y_w writing: %02x\n", machine().describe_context(), data);
+	m_2026_lightgun2_y = data;
+}
+
+
 /*
     Address 0x2027 r/w (MAIN CPU)
 
@@ -1785,6 +1897,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x02 - Light Gun 2 X
     0x01 - Light Gun 2 X
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_r)
+{
+	uint8_t ret = m_2027_lightgun2_x;
+	logerror("%s: vt1682_2027_lightgun2_x_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2027_lightgun2_x_w)
+{
+	logerror("%s: vt1682_2027_lightgun2_x_w writing: %02x\n", machine().describe_context(), data);
+	m_2027_lightgun2_x = data;
+}
+
 
 /*
     Address 0x2028 r/w (MAIN CPU)
@@ -1882,6 +2008,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x01 - R DAC OUT:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2031_red_dac_r)
+{
+	uint8_t ret = m_2031_red_dac;
+	logerror("%s: vt1682_2031_red_dac_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2031_red_dac_w)
+{
+	logerror("%s: vt1682_2031_red_dac_w writing: %02x\n", machine().describe_context(), data);
+	m_2031_red_dac = data;
+}
+
 /*
     Address 0x2032 r/w (MAIN CPU)
 
@@ -1895,6 +2034,19 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x01 - G DAC OUT:0
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_2032_green_dac_r)
+{
+	uint8_t ret = m_2032_green_dac;
+	logerror("%s: vt1682_2032_green_dac_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2032_green_dac_w)
+{
+	logerror("%s: vt1682_2032_green_dac_w writing: %02x\n", machine().describe_context(), data);
+	m_2032_green_dac = data;
+}
+
 /*
     Address 0x2033 r/w (MAIN CPU)
 
@@ -1907,6 +2059,20 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2022_saturation_misc_w)
     0x02 - B DAC OUT:1
     0x01 - B DAC OUT:0
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2033_blue_dac_r)
+{
+	uint8_t ret = m_2033_blue_dac;
+	logerror("%s: vt1682_2033_blue_dac_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2033_blue_dac_w)
+{
+	logerror("%s: vt1682_2033_blue_dac_w writing: %02x\n", machine().describe_context(), data);
+	m_2033_blue_dac = data;
+}
+
 
 /************************************************************************************************************************************
  VT1682 Sys Registers
@@ -2019,13 +2185,29 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w)
 
     0x80 - (unused)
     0x40 - (unused)
-    0x20 - SCPURN
-    0x10 - SCPU ON
+    0x20 - SCPU RN (Sound CPU Reset Line Control)
+    0x10 - SCPU ON (Sound CPU Enable)
     0x08 - SPI ON
     0x04 - UART ON
-    0x02 - TV ON
-    0x01 - LCD ON
+    0x02 - TV ON (TV display encoder enable)
+    0x01 - LCD ON (LCD display controller enable)
 */
+
+READ8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_r)
+{
+	uint8_t ret = m_2106_enable_reg;
+	logerror("%s: vt1682_2106_enable_regs_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_2106_enable_regs_w)
+{
+	// COMR6 is used for banking
+	logerror("%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1 scpuon:%1 spion:%1 uarton:%1 tvon:%1 lcdon:%1)\n", machine().describe_context(), data,
+		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
+	m_2106_enable_reg = data;
+}
+
 
 /*
     Address 0x2107 r/w (MAIN CPU)
@@ -3982,12 +4164,21 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x2020, 0x2020).rw(FUNC(vt_vt1682_state::vt1682_2020_bk_linescroll_r), FUNC(vt_vt1682_state::vt1682_2020_bk_linescroll_w));
 	map(0x2021, 0x2021).rw(FUNC(vt_vt1682_state::vt1682_2021_lum_offset_r), FUNC(vt_vt1682_state::vt1682_2021_lum_offset_w));
 	map(0x2022, 0x2022).rw(FUNC(vt_vt1682_state::vt1682_2022_saturation_misc_r), FUNC(vt_vt1682_state::vt1682_2022_saturation_misc_w));
+	map(0x2023, 0x2023).rw(FUNC(vt_vt1682_state::vt1682_2023_lightgun_reset_r), FUNC(vt_vt1682_state::vt1682_2023_lightgun_reset_w));
+	map(0x2024, 0x2024).rw(FUNC(vt_vt1682_state::vt1682_2024_lightgun1_y_r), FUNC(vt_vt1682_state::vt1682_2024_lightgun1_y_w));
+	map(0x2025, 0x2025).rw(FUNC(vt_vt1682_state::vt1682_2025_lightgun1_x_r), FUNC(vt_vt1682_state::vt1682_2025_lightgun1_x_w));
+	map(0x2026, 0x2026).rw(FUNC(vt_vt1682_state::vt1682_2026_lightgun2_y_r), FUNC(vt_vt1682_state::vt1682_2026_lightgun2_y_w));
+	map(0x2027, 0x2027).rw(FUNC(vt_vt1682_state::vt1682_2027_lightgun2_x_r), FUNC(vt_vt1682_state::vt1682_2027_lightgun2_x_w));
+
+	map(0x2031, 0x2031).rw(FUNC(vt_vt1682_state::vt1682_2031_red_dac_r), FUNC(vt_vt1682_state::vt1682_2031_red_dac_w));
+	map(0x2032, 0x2032).rw(FUNC(vt_vt1682_state::vt1682_2032_green_dac_r), FUNC(vt_vt1682_state::vt1682_2032_green_dac_w));
+	map(0x2033, 0x2033).rw(FUNC(vt_vt1682_state::vt1682_2033_blue_dac_r), FUNC(vt_vt1682_state::vt1682_2033_blue_dac_w));
 
 	/* System */
 	map(0x2100, 0x2100).rw(FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_r), FUNC(vt_vt1682_state::vt1682_2100_prgbank1_r3_w));
 
 	map(0x2105, 0x2105).w(FUNC(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w));
-
+	map(0x2106, 0x2106).rw(FUNC(vt_vt1682_state::vt1682_2106_enable_regs_r), FUNC(vt_vt1682_state::vt1682_2106_enable_regs_w));
 	map(0x2107, 0x2107).rw(FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_r), FUNC(vt_vt1682_state::vt1682_2107_prgbank0_r0_w));
 	map(0x2108, 0x2108).rw(FUNC(vt_vt1682_state::vt1682_2108_prgbank0_r1_r), FUNC(vt_vt1682_state::vt1682_2108_prgbank0_r1_w));
 	map(0x2109, 0x2109).rw(FUNC(vt_vt1682_state::vt1682_2109_prgbank0_r2_r), FUNC(vt_vt1682_state::vt1682_2109_prgbank0_r2_w));
@@ -4093,9 +4284,10 @@ ROM_START( ii32in1 )
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
 
+// TODO: this is a cartridge based system, move these to SL
 CONS( 200?, ii8in1,    0,  0,  vt_vt1682,    intec, vt_vt1682_state, init_8in1,  "Intec", "InterAct 8-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 200?, ii32in1,   0,  0,  vt_vt1682,    intec, vt_vt1682_state, empty_init, "Intec", "InterAct 32-in-1", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
 // a 40-in-1 also exists which combines the above
 
-// Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games should run here too
+// Intec Interact Infrazone 15 Shooting Games, 42 Mi kara, 96 Arcade Games + more should run here too
+// MiWi(2?) and other Mi Kara units should fit here as well
