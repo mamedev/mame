@@ -198,7 +198,7 @@
  *   U119  Zilog Z85230 ESCC         Serial controller for serial port 0 and 1
  *   U130  Intel N28F010             128Kx8 flash memory (Y226 0C40 6280)
  *   U136  NCR 53C94                 SCSI controller
- *   U144  27C1024 (MPRGZ530A)       128Kx8 Boot EPROM
+ *   U144  27C1024 (MPRGZ530A)       64Kx16 Boot EPROM
  *   U145  Dallas DS12887            RTC and NVRAM
  *   U159  Intel 82596SX-20          Ethernet controller
  *   U164  Intel N82077SL-1?         Floppy drive controller
@@ -575,7 +575,7 @@ void emerald_state::emerald_main_map(address_map &map)
 	emerald_base_map(map);
 
 	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
-	map(0x7f100000, 0x7f13ffff).rom().region(INTERPRO_EPROM_TAG, 0);
+	map(0x7f100000, 0x7f13ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, INTERPRO_EPROM_TAG);
 }
 
 void turquoise_state::turquoise_base_map(address_map &map)
@@ -610,7 +610,7 @@ void turquoise_state::turquoise_main_map(address_map &map)
 	turquoise_base_map(map);
 
 	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
-	map(0x7f100000, 0x7f13ffff).rom().region(INTERPRO_EPROM_TAG, 0);
+	map(0x7f100000, 0x7f13ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, INTERPRO_EPROM_TAG);
 }
 
 void sapphire_state::sapphire_base_map(address_map &map)
@@ -646,7 +646,7 @@ void sapphire_state::sapphire_main_map(address_map &map)
 	sapphire_base_map(map);
 
 	map(0x00000000, 0x00ffffff).ram().share(RAM_TAG);
-	map(0x7f100000, 0x7f11ffff).rom().region(INTERPRO_EPROM_TAG, 0);
+	map(0x7f100000, 0x7f11ffff).lr16([this] (offs_t offset) { return m_eprom[offset]; }, INTERPRO_EPROM_TAG);
 	map(0x7f180000, 0x7f1fffff).rw(m_flash_lsb, FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).umask32(0x00ff00ff).mask(0x3ffff);
 	map(0x7f180000, 0x7f1fffff).rw(m_flash_msb, FUNC(intel_28f010_device::read), FUNC(intel_28f010_device::write)).umask32(0xff00ff00).mask(0x3ffff);
 
@@ -1232,13 +1232,13 @@ void srx_sapphire_state::ip6800(machine_config &config)
 }
 
 ROM_START(ip2000)
-	ROM_REGION(0x80, INTERPRO_NODEID_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_NODEID_TAG, 0)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("mpcb962a.bin", 0x0, 0x20, CRC(e391342c) SHA1(02e03aad760b6651b8599c3a41c7c457983ee97d))
 
-	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x40000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2000", "InterPro/InterServe 20x0 EPROM")
 	ROMX_LOAD("mprgm530e__26_apr_91k.u171", 0x00001, 0x20000, CRC(e4c470cb) SHA1(ff1917bfa963988d739a9dbf0b8f034fe49f2f8c), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgm540e__06_may_91k.u172", 0x00000, 0x20000, CRC(03225843) SHA1(03cfcd5b8ae0057240ef808a40108cb5d082eb63), ROM_SKIP(1) | ROM_BIOS(0))
@@ -1246,10 +1246,10 @@ ROM_END
 
 ROM_START(ip2400)
 	// feature[0] & 0x02: C4I cammu if set
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt0470.bin", 0x0, 0x20, CRC(498c80df) SHA1(18a49732ac9d04b20a77747c1b946c2e88abb087))
 
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2400", "InterPro/InterServe 24x0 EPROM")
 	ROMX_LOAD("mprgw510b__05_16_92.u35", 0x00000, 0x20000, CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
@@ -1261,10 +1261,10 @@ ROM_START(ip2400)
 ROM_END
 
 ROM_START(ip2500)
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt1000.bin", 0x0, 0x20, CRC(548046c0) SHA1(ce7646e868f3aa35642d7f9348f6b9e91693918e))
 
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2500", "InterPro/InterServe 25x0 EPROM")
 	ROMX_LOAD("ip2500_eprom.bin", 0x00000, 0x20000, NO_DUMP, ROM_BIOS(0))
 
@@ -1277,10 +1277,10 @@ ROM_END
 
 ROM_START(ip2700)
 	// feature[0] & 0x04: supports RETRY if clear
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt1280.bin", 0x0, 0x20, CRC(32d833af) SHA1(7225c5f5670fe49d86556a2cb453ae6fe09e3e19))
 
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2700", "InterPro/InterServe 27x0 EPROM")
 	ROMX_LOAD("mprgz530a__9405181.u35", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
@@ -1292,10 +1292,10 @@ ROM_START(ip2700)
 ROM_END
 
 ROM_START(ip2800)
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt1450.bin", 0x0, 0x20, CRC(61c7a305) SHA1(efcd045cbdfda8df44eaad761b0ba99367973cd7))
 
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip2800", "InterPro/InterServe 28x0 EPROM")
 	ROMX_LOAD("ip2800_eprom.bin", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
@@ -1307,26 +1307,26 @@ ROM_START(ip2800)
 ROM_END
 
 ROM_START(ip6000)
-	ROM_REGION(0x80, INTERPRO_NODEID_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_NODEID_TAG, 0)
 	ROM_LOAD32_BYTE("nodeid.bin", 0x0, 0x20, CRC(a38397a6) SHA1(9f45fb932bbe231c95b3d5470dcd1fa1c846486f))
 
 	// feature[0] & 0x01: 1/4 bus clock if clear
 	// feature[0] & 0x02: configurable console port if clear
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("mpcb765b.bin", 0x0, 0x20, CRC(6da05794) SHA1(fef8a9c17491f3d3ceb35c56a628f47d49166b57))
 
-	ROM_REGION(0x40000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x40000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6000", "InterPro/InterServe 60x0 EPROM")
 	ROMX_LOAD("mprgg360f__04_may_90v.u336", 0x00001, 0x20000, CRC(9e8b798b) SHA1(54412e26a468e038fb44ffa322ed3ddfae423c17), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("mprgg350f__04_may_90v.u349", 0x00000, 0x20000, CRC(32ab99fd) SHA1(202a6082bade8a084b8cd25109daff8443f6a5c7), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
 ROM_START(ip6400)
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt046b.bin", 0x0, 0x20, CRC(3e8ffc77) SHA1(719a3f8b01bb506c9cb876506d63d167550bcd0a))
 
 	// FIXME: use 2400 eprom until we have a 6400 dump
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6400", "InterPro/InterServe 64x0 EPROM")
 	ROMX_LOAD("ip6400_eprom.bin", 0x00000, 0x20000, BAD_DUMP CRC(3b2c4545) SHA1(4e4c98d1cd1035a04be8527223f44d0b687ec3ef), ROM_BIOS(0))
 
@@ -1338,10 +1338,10 @@ ROM_START(ip6400)
 ROM_END
 
 ROM_START(ip6700)
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6700", "InterPro/InterServe 67x0 EPROM")
 	ROMX_LOAD("mprgz530a.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
@@ -1353,10 +1353,10 @@ ROM_START(ip6700)
 ROM_END
 
 ROM_START(ip6800)
-	ROM_REGION(0x80, INTERPRO_IDPROM_TAG, 0)
+	ROM_REGION32_LE(0x80, INTERPRO_IDPROM_TAG, 0)
 	ROM_LOAD32_BYTE("msmt127b.bin", 0x0, 0x20, CRC(cc112f65) SHA1(8533a31b4733fd91bb87effcd276fc93f2858629))
 
-	ROM_REGION(0x20000, INTERPRO_EPROM_TAG, 0)
+	ROM_REGION16_LE(0x20000, INTERPRO_EPROM_TAG, 0)
 	ROM_SYSTEM_BIOS(0, "ip6800", "InterPro/InterServe 68x0 EPROM")
 	ROMX_LOAD("mprgz530a__9406270.u144", 0x00000, 0x20000, CRC(467ce7bd) SHA1(53faee40d5df311f53b24c930e434cbf94a5c4aa), ROM_BIOS(0))
 
