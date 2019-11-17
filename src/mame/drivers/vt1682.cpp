@@ -98,6 +98,10 @@ private:
 	/* Support */
 
 	void update_banks();
+	uint8_t translate_prg0select(uint8_t tp20_tp13);
+	uint32_t translate_address_4000_to_7fff(uint16_t address);
+	uint32_t translate_address_8000_to_ffff(uint16_t address);
+
 };
 
 void vt_vt1682_state::machine_start()
@@ -184,6 +188,7 @@ PQ2EN   COMR6   A:15    A:14    A:13    |   TP:20   TP:19   TP:18   TP:17   TP:1
 1       1       1       0       1       |   PB0r1:7 PB0r1:6 PB0r1:5 PB0r1:4 PB0r1:3 PB0r1:2 PB0r1:1 PB0r1:0   (all PB0r1)
 1       1       1       1       0       |   PB0r0:7 PB0r0:6 PB0r0:5 PB0r0:4 PB0r0:3 PB0r0:2 PB0r0:1 PB0r0:0   (all PB0r0)
 1       1       1       1       1       |   1       1       1       1       1       1       1       1
+-----------------------------------------------------------------------------------------------------------
 -       -       0       1       1       |   PB0r5:7 PB0r5:6 PB0r5:5 PB0r5:4 PB0r5:3 PB0r5:2 PB0r5:1 PB0r5:0   (all PB0r5)
 -       -       0       1       0       |   PB0r4:7 PB0r4:6 PB0r4:5 PB0r4:4 PB0r4:3 PB0r4:2 PB0r4:1 PB0r4:0   (all PB0r4)
 
@@ -220,6 +225,7 @@ PB1r5 = Program Bank 1 Register 5
 EXT2421 PQ2EN   COMR6   A:15    A:14    A:13    |   PA:24   PA:23   PA:22   PA:21
 ------------------------------------------------------------------------------------
 1       -       -       1       -       -       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+------------------------------------------------------------------------------------
 0       0       0       1       0       0       |   PB1r0:3 PB1r0:2 PB1r0:1 PB1r0:0    (all PB1r0)
 0       0       0       1       0       1       |   PB1r1:3 PB1r1:2 PB1r1:1 PB1r1:0    (all PB1r1)
 0       0       0       1       1       0       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
@@ -236,6 +242,7 @@ EXT2421 PQ2EN   COMR6   A:15    A:14    A:13    |   PA:24   PA:23   PA:22   PA:2
 0       1       1       1       0       1       |   PB1r1:3 PB1r1:2 PB1r1:1 PB1r1:0    (all PB1r1)
 0       1       1       1       1       0       |   PB1r0:3 PB1r0:2 PB1r0:1 PB1r0:0    (all PB1r0)
 0       1       1       1       1       1       |   PB1r3:3 PB1r3:2 PB1r3:1 PB1r3:0    (all PB1r3)
+------------------------------------------------------------------------------------
 -       -       -       0       1       1       |   PB1r5:3 PB1r5:2 PB1r5:1 PB1r5:0    (all PB1r5)
 -       -       -       0       1       0       |   PB1r4:3 PB1r4:2 PB1r4:1 PB1r4:0    (all PB1r4)
 
@@ -262,8 +269,143 @@ void vt_vt1682_state::update_banks()
 	m_211c_regs_ext2421
 	m_210b_misc_cs_prg0_bank_sel
 
+	everything that changes these calls here, so if we wanted to do this with actual
+	banks then here would be the place
+
 	*/
 }
+
+uint8_t vt_vt1682_state::translate_prg0select(uint8_t tp20_tp13)
+{
+	uint8_t bank = m_210b_misc_cs_prg0_bank_sel & 0x07;
+
+	uint8_t ret = 0x00;
+
+	switch (bank)
+	{
+	case 0x0: ret = (m_210a_prgbank0_r3 & 0xc0) | (tp20_tp13 & 0x3f); break;
+	case 0x1: ret = (m_210a_prgbank0_r3 & 0xe0) | (tp20_tp13 & 0x1f); break;
+	case 0x2: ret = (m_210a_prgbank0_r3 & 0xf0) | (tp20_tp13 & 0x0f); break;
+	case 0x3: ret = (m_210a_prgbank0_r3 & 0xf8) | (tp20_tp13 & 0x07); break;
+	case 0x4: ret = (m_210a_prgbank0_r3 & 0xfc) | (tp20_tp13 & 0x03); break;
+	case 0x5: ret = (m_210a_prgbank0_r3 & 0xfe) | (tp20_tp13 & 0x01); break;
+	case 0x6: ret = m_210a_prgbank0_r3; break;
+	case 0x7: ret = tp20_tp13;  break;
+	}
+
+	return ret;
+}
+
+uint32_t vt_vt1682_state::translate_address_4000_to_7fff(uint16_t address)
+{
+	uint32_t realaddress = 0x00000000;
+
+	uint8_t prgbank1_r4 = (m_2118_prgbank1_r4_r5 & 0x0f);
+	uint8_t prgbank1_r5 = (m_2118_prgbank1_r4_r5 & 0xf0)>>4;
+
+	int tp20_tp13 = 0;
+	int pa24_pa21 = 0;
+
+	switch (address & 0x6000)
+	{
+	case 0x4000:
+		tp20_tp13 = m_prgbank0_r4;
+		pa24_pa21 = prgbank1_r4;
+		break;
+
+	case 0x6000:
+		tp20_tp13 = m_prgbank0_r5;
+		pa24_pa21 = prgbank1_r5;
+		break;
+
+	// invalid cases
+	default:
+	case 0x0000:
+	case 0x2000:
+		break;
+
+	}
+
+	int pa20_pa13 = translate_prg0select(tp20_tp13);
+
+	realaddress = address & 0x1fff;
+	realaddress |= pa20_pa13 << 13;
+	realaddress |= pa24_pa21 << 21;
+
+	return realaddress;
+}
+
+uint32_t vt_vt1682_state::translate_address_8000_to_ffff(uint16_t address)
+{
+	uint32_t realaddress = 0x00000000;
+
+	int pq2en = (m_210b_misc_cs_prg0_bank_sel & 0x40)>>6;
+	int comr6 = (m_2105_vt1682_2105_comr6_tvmodes & 0x40)>>6;
+	int a14_a13 = (address & 0x6000) >> 13;
+
+	int tp20_tp13 = 0;
+	int lookup = a14_a13 | (comr6 << 2) | (pq2en << 3);
+
+	switch (lookup)
+	{
+	case 0x0: tp20_tp13 = m_2107_prgbank0_r0; break;
+	case 0x1: tp20_tp13 = m_2108_prgbank0_r1; break;
+	case 0x2: tp20_tp13 = 0xfe; break;
+	case 0x3: tp20_tp13 = 0xff; break;
+	case 0x4: tp20_tp13 = 0xfe; break;
+	case 0x5: tp20_tp13 = m_2108_prgbank0_r1; break;
+	case 0x6: tp20_tp13 = m_2107_prgbank0_r0; break;
+	case 0x7: tp20_tp13 = 0xff; break;
+	case 0x8: tp20_tp13 = m_2107_prgbank0_r0; break;
+	case 0x9: tp20_tp13 = m_2108_prgbank0_r1; break;
+	case 0xa: tp20_tp13 = m_2109_prgbank0_r2; break;
+	case 0xb: tp20_tp13 = 0xff; break;
+	case 0xc: tp20_tp13 = m_2109_prgbank0_r2; break;
+	case 0xd: tp20_tp13 = m_2108_prgbank0_r1; break;
+	case 0xe: tp20_tp13 = m_2107_prgbank0_r0; break;
+	case 0xf: tp20_tp13 = 0xff; break;
+	}
+
+	int pa20_pa13 = translate_prg0select(tp20_tp13);
+
+	int pa24_pa21 = 0;
+
+	int ext2421 = (m_211c_regs_ext2421 & 0x20) >> 5;
+
+	if (ext2421)
+	{
+		pa24_pa21 = m_2100_prgbank1_r3;
+	}
+	else
+	{
+		switch (lookup)
+		{
+		case 0x0: pa24_pa21 = m_prgbank1_r0; break;
+		case 0x1: pa24_pa21 = m_prgbank1_r1; break;
+		case 0x2: pa24_pa21 = m_2100_prgbank1_r3; break;
+		case 0x3: pa24_pa21 = m_2100_prgbank1_r3;  break;
+		case 0x4: pa24_pa21 = m_2100_prgbank1_r3; break;
+		case 0x5: pa24_pa21 = m_prgbank1_r1; break;
+		case 0x6: pa24_pa21 = m_prgbank1_r0; break;
+		case 0x7: pa24_pa21 = m_2100_prgbank1_r3; break;
+		case 0x8: pa24_pa21 = m_prgbank1_r0; break;
+		case 0x9: pa24_pa21 = m_prgbank1_r1; break;
+		case 0xa: pa24_pa21 = m_210c_prgbank1_r2; break;
+		case 0xb: pa24_pa21 = m_2100_prgbank1_r3; break;
+		case 0xc: pa24_pa21 = m_210c_prgbank1_r2; break;
+		case 0xd: pa24_pa21 = m_prgbank1_r1; break;
+		case 0xe: pa24_pa21 = m_prgbank1_r0; break;
+		case 0xf: pa24_pa21 = m_2100_prgbank1_r3; break;
+		}
+	}
+
+	realaddress = address & 0x1fff;
+	realaddress |= pa20_pa13 << 13;
+	realaddress |= pa24_pa21 << 21;
+
+	return realaddress;
+}
+
 
 
 /************************************************************************************************************************************
