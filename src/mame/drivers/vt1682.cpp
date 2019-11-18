@@ -4404,10 +4404,12 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 						if (which == 0) palbase = 0x100;
 						else palbase = 0x000;
 
+						int tilesize = bk_tilesize ? 16 : 8;
 						int currentadddress = startaddress;
-						for (int yy = 0; yy < (bk_tilesize ? 16 : 8); yy++)
+
+						for (int yy = 0; yy < tilesize; yy++) // tile y lines
 						{
-							int line = y * (bk_tilesize ? 16 : 8) + yy;
+							int line = y * tilesize + yy;
 
 							uint32_t* dstptr = &bitmap.pix32(line);
 							uint8_t* priptr = &m_priority_bitmap.pix8(line);
@@ -4432,9 +4434,9 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 								bytes_in = 2;
 							}
 
-							int xbase = x * (bk_tilesize ? 16 : 8);
+							int xbase = x * tilesize;
 
-							for (int xx = 0; xx < (bk_tilesize ? 16 : 8); xx += 4)
+							for (int xx = 0; xx < tilesize; xx += 4) // tile x pixels
 							{
 								int xdraw = xbase + xx; // tile position
 
