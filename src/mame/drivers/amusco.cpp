@@ -64,7 +64,6 @@
   - Determine PIT clocks for proper IRQ timing.
   - Make the 6845 transparent videoram addressing actually transparent.
     (IRQ1 changes the 6845 address twice but neither reads nor writes data?)
-  - Add NVRAM in a way that won't trigger POST error message (needs NMI on shutdown?)
   - Identify remaining outputs from first PPI (button lamps are identified and implemented)
   - Draw 88 Poker fails POST memory test for some weird reason (IRQ interference?)
 
@@ -75,6 +74,7 @@
 #include "machine/i8155.h"
 #include "machine/i8255.h"
 #include "machine/msm5832.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ticket.h"
@@ -124,6 +124,7 @@ public:
 protected:
 	virtual void video_start() override;
 	virtual void machine_start() override;
+	virtual void device_power_fail() override;
 
 private:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -205,6 +206,11 @@ void amusco_state::machine_start()
 	m_lamps.resolve();
 }
 
+void amusco_state::device_power_fail()
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+}
+
 
 /*************************
 * Memory Map Information *
@@ -212,7 +218,7 @@ void amusco_state::machine_start()
 
 void amusco_state::mem_map(address_map &map)
 {
-	map(0x00000, 0x0ffff).ram();
+	map(0x00000, 0x01fff).ram().share("nvram");
 	map(0xf8000, 0xfffff).rom().region("maincpu", 0);
 }
 
@@ -541,10 +547,12 @@ void amusco_state::amusco(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &amusco_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, m_pic, 0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8253(config, m_pit, 0);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(PIT_CLOCK0);
 	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->set_clk<1>(PIT_CLOCK1);
