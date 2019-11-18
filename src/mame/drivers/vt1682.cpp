@@ -417,7 +417,8 @@ private:
 		return ((m_2126_dma_sr_bank_addr_22_15 ) | (m_2128_dma_sr_bank_addr_24_23 << 8)) & 0x3ff;
 	}
 
-	void do_dma_external_to_internal(uint16_t dstaddr, int count, bool is_video);
+	void do_dma_external_to_internal(int data, bool is_video);
+	void do_dma_internal_to_internal(int data, bool is_video);
 
 	/* Support */
 
@@ -935,7 +936,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
 	uint8_t ret = 0x00;
 
 	int sp_err = 0; // too many sprites per lien
-	int vblank = 0; // in vblank?
+	int vblank = m_screen->vpos() > 240 ? 1 : 0; // in vblank?
 
 	ret |= sp_err << 6;
 	ret |= vblank << 7;
@@ -3206,10 +3207,15 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2127_dma_status_r)
 	return ret;
 }
 
-void vt_vt1682_state::do_dma_external_to_internal(uint16_t dstaddr, int count, bool is_video)
+void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 {
+	int count = data * 2;
+	if (count == 0)
+		count = 0x200;
+
 	int srcbank = get_dma_sr_bank_ddr();
 	int srcaddr = get_dma_sr_addr();
+	uint16_t dstaddr = get_dma_dt_addr();
 
 	if (is_video)
 		logerror("Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
@@ -3232,6 +3238,39 @@ void vt_vt1682_state::do_dma_external_to_internal(uint16_t dstaddr, int count, b
 		set_dma_sr_addr(srcaddr);
 	}
 }
+
+void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
+{
+	int count = data * 2;
+	if (count == 0)
+		count = 0x200;
+
+	int srcaddr = get_dma_sr_addr();
+	uint16_t dstaddr = get_dma_dt_addr();
+
+	if (is_video)
+		logerror("Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+	else
+		logerror("Doing DMA, Internal to Internal src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+
+	for (int i = 0; i < count; i++)
+	{
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
+
+		srcaddr = get_dma_sr_addr();
+		uint8_t dat = mem.read_byte(srcaddr);
+		srcaddr++;
+
+		mem.write_byte(dstaddr, dat);
+
+		if (!is_video)
+			dstaddr++;
+
+		// update registers
+		set_dma_sr_addr(srcaddr);
+	}
+}
+
 
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
@@ -3263,11 +3302,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 				return;
 			}
 
-			int count = data * 2;
-			if (count == 0)
-				count = 0x200;
 
-			do_dma_external_to_internal(dstaddr, count, get_dma_dt_is_video());
+			do_dma_external_to_internal(data, get_dma_dt_is_video());
 
 			return;
 		}
@@ -3276,6 +3312,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 	{
 		if (get_dma_dt_isext())
 		{
+			// this is only likely if there is RAM in the usual ROM space
+
 			// Source Internal
 			// Dest External
 			int dstbank = get_dma_sr_bank_ddr();
@@ -3305,11 +3343,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 				return;
 			}
 
-			int count = data * 2;
-			if (count == 0)
-				count = 0x200;
-
-			logerror("Unhandled DMA with Params src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count );
+			do_dma_internal_to_internal(data, get_dma_dt_is_video());
 			return;
 		}
 	}
@@ -4378,61 +4412,63 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 							uint32_t* dstptr = &bitmap.pix32(line);
 							uint8_t* priptr = &m_priority_bitmap.pix8(line);
 
+							int shift_amount, mask, bytes_in;
+							if (bk_tilebpp == 3) // (8bpp)
+							{
+								shift_amount = 8;
+								mask = 0xff;
+								bytes_in = 4;
+							}
+							else if (bk_tilebpp == 2) // (6bpp)
+							{
+								shift_amount = 6;
+								mask = 0x3f;
+								bytes_in = 3;
+							}
+							else // 1 / 0 (4bpp)
+							{
+								shift_amount = 4;
+								mask = 0x0f;
+								bytes_in = 2;
+							}
+
+							int xbase = x * (bk_tilesize ? 16 : 8);
+
 							for (int xx = 0; xx < (bk_tilesize ? 16 : 8); xx += 4)
 							{
-								uint32_t pixdata;
-								if (bk_tilebpp == 3)
-								{
-									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 24; currentadddress++;
+								int xdraw = xbase + xx; // tile position
 
-									uint8_t pen;
-									int xdraw = x * (bk_tilesize ? 16 : 8);
-									int shift = 0;
-									for (int ii = 0; ii < 4; ii++)
-									{
-										pen = (pixdata >> shift) & 0xff;
-										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + pen]; priptr[xoff] = bk_depth; } }
-										shift += 8;
-									}
+								// draw 4 pixels
+								uint32_t pixdata = 0;
+
+								int shift = 0;
+								for (int i = 0; i < bytes_in; i++)
+								{
+									pixdata |= m_fullrom->read8(currentadddress) << shift; currentadddress++;
+									shift += 8;
 								}
-								else if (bk_tilebpp == 2)
-								{
-									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
 
-									uint8_t pen;
-									int xdraw = x * (bk_tilesize ? 16 : 8);
-									int shift = 0;
-									for (int ii = 0; ii < 4; ii++)
-									{
-										pen = ((pixdata >> shift) & 0x3f);
-										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + (pen | (pal << 4))]; priptr[xoff] = bk_depth; } }
-										shift += 6;
-									}
-								}
-								else //if (bk_tilebpp == 1)// or 0
+								shift = 0;
+								for (int ii = 0; ii < 4; ii++)
 								{
-									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
-
-									uint8_t pen;
-									int xdraw = x * (bk_tilesize ? 16 : 8);
-									int shift = 0;
-									for (int ii = 0; ii < 4; ii++)
+									uint8_t pen = (pixdata >> shift)& mask;
+									if (opaque || pen)
 									{
-										pen = ((pixdata >> shift) & 0x0f);
-										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + (pen | (pal << 4))]; priptr[xoff] = bk_depth; } }
-										shift += 4;
+										int xdraw_real = xdraw + ii; // pixel position
+										if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
+										{
+											if (bk_depth < priptr[xdraw_real])
+											{
+												dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
+												priptr[xdraw_real] = bk_depth;
+											}
+										}
 									}
+									shift += shift_amount;
 								}
 							}
 						}
 					}
-
 				}
 			}
 		}
