@@ -3,6 +3,14 @@
 
 #include "machine/vt1682_io.h"
 
+#define LOG_IO     (1U << 1)
+
+#define LOG_ALL           ( LOG_IO )
+
+#define VERBOSE             (0)
+#include "logmacro.h"
+
+
 DEFINE_DEVICE_TYPE(VT_VT1682_IO, vrt_vt1682_io_device, "vt1682io", "VRT VT1682 I/O")
 
 vrt_vt1682_io_device::vrt_vt1682_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -54,13 +62,13 @@ void vrt_vt1682_io_device::device_reset()
 READ8_MEMBER(vrt_vt1682_io_device::vt1682_210d_ioconfig_r)
 {
 	uint8_t ret = m_210d_ioconfig;
-	logerror("%s: vt1682_210d_ioconfig_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_IO, "%s: vt1682_210d_ioconfig_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 WRITE8_MEMBER(vrt_vt1682_io_device::vt1682_210d_ioconfig_w)
 {
-	logerror("%s: vt1682_210d_ioconfig_w writing: %02x ( IOD_ENB:%1x IOD_OE:%1x | IOC_ENB:%1x IOC_OE:%1x | IOB_ENB:%1x IOB_OE:%1x | IOA_ENB:%1x IOA_OE:%1x )\n", machine().describe_context(), data,
+	LOGMASKED(LOG_IO, "%s: vt1682_210d_ioconfig_w writing: %02x ( IOD_ENB:%1x IOD_OE:%1x | IOC_ENB:%1x IOC_OE:%1x | IOB_ENB:%1x IOB_OE:%1x | IOA_ENB:%1x IOA_OE:%1x )\n", machine().describe_context(), data,
 		(data & 0x80) ? 1 : 0,
 		(data & 0x40) ? 1 : 0,
 		(data & 0x20) ? 1 : 0,
@@ -88,15 +96,14 @@ WRITE8_MEMBER(vrt_vt1682_io_device::vt1682_210d_ioconfig_w)
 
 READ8_MEMBER(vrt_vt1682_io_device::vt1682_210e_io_ab_r)
 {
-	//uint8_t ret = ioport("IN0")->read();
 	uint8_t ret = (m_porta_in(0, 0x0f) & 0x0f) | ((m_portb_in(0, 0x0f) & 0x0f)<<4);
-	logerror("%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_IO, "%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 WRITE8_MEMBER(vrt_vt1682_io_device::vt1682_210e_io_ab_w)
 {
-	logerror("%s: vt1682_210e_io_ab_w writing: %02x (portb: %1x porta: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
+	LOGMASKED(LOG_IO, "%s: vt1682_210e_io_ab_w writing: %02x (portb: %1x porta: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
 	m_porta_out(0, (data & 0x0f), 0x0f);
 	m_portb_out(0, ((data & 0xf0)>>4), 0x0f);
 }
@@ -116,15 +123,14 @@ WRITE8_MEMBER(vrt_vt1682_io_device::vt1682_210e_io_ab_w)
 
 READ8_MEMBER(vrt_vt1682_io_device::vt1682_210f_io_cd_r)
 {
-	//uint8_t ret = ioport("IN1")->read();
 	uint8_t ret = (m_portc_in(0, 0x0f) & 0x0f) | ((m_portd_in(0, 0x0f) & 0x0f)<<4);
-//  logerror("%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
+	LOGMASKED(LOG_IO, "%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 WRITE8_MEMBER(vrt_vt1682_io_device::vt1682_210f_io_cd_w)
 {
-	logerror("%s: vt1682_210f_io_cd_w writing: %02x (portd: %1x portc: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
+	LOGMASKED(LOG_IO, "%s: vt1682_210f_io_cd_w writing: %02x (portd: %1x portc: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
 	m_portc_out(0, (data & 0x0f), 0x0f);
 	m_portd_out(0, ((data & 0xf0)>>4), 0x0f);
 }

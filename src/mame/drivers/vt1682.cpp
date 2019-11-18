@@ -25,9 +25,6 @@
 #define VERBOSE             (0)
 #include "logmacro.h"
 
-
-
-
 class vt_vt1682_state : public driver_device
 {
 public:
