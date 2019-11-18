@@ -320,6 +320,7 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
+	uint8_t m_210d_ioconfig;
 
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
@@ -378,6 +379,12 @@ private:
 
 	DECLARE_READ8_MEMBER(vt1682_210e_io_ab_r);
 	DECLARE_READ8_MEMBER(vt1682_210f_io_cd_r);
+
+	DECLARE_WRITE8_MEMBER(vt1682_210e_io_ab_w);
+	DECLARE_WRITE8_MEMBER(vt1682_210f_io_cd_w);
+
+	DECLARE_READ8_MEMBER(vt1682_210d_ioconfig_r);
+	DECLARE_WRITE8_MEMBER(vt1682_210d_ioconfig_w);
 
 	/* System Helpers */
 
@@ -544,6 +551,8 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_2128_dma_sr_bank_addr_24_23));
 
 	save_item(NAME(m_2106_enable_reg));
+
+	save_item(NAME(m_210d_ioconfig));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -640,6 +649,7 @@ void vt_vt1682_state::machine_reset()
 
 	m_2106_enable_reg = 0;
 
+	m_210d_ioconfig = 0;
 
 	update_banks();
 
@@ -2574,6 +2584,30 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
     0x01 - IOA OE
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_r)
+{
+	uint8_t ret = m_210d_ioconfig;
+	logerror("%s: vt1682_210d_ioconfig_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_w)
+{
+	logerror("%s: vt1682_210d_ioconfig_w writing: %02x ( IOD_ENB:%1x IOD_OE:%1x | IOC_ENB:%1x IOC_OE:%1x | IOB_ENB:%1x IOB_OE:%1x | IOA_ENB:%1x IOA_OE:%1x )\n", machine().describe_context(), data,
+		(data & 0x80) ? 1 : 0,
+		(data & 0x40) ? 1 : 0,
+		(data & 0x20) ? 1 : 0,
+		(data & 0x10) ? 1 : 0,
+		(data & 0x08) ? 1 : 0,
+		(data & 0x04) ? 1 : 0,
+		(data & 0x02) ? 1 : 0,
+		(data & 0x01) ? 1 : 0);
+
+	m_210d_ioconfig = data;
+}
+
+
 /*
     Address 0x210e r/w (MAIN CPU)
 
@@ -2589,10 +2623,17 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
 {
+	//uint8_t ret = ioport("IN0")->read();
 	uint8_t ret = machine().rand();
 //	logerror("%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_w)
+{
+	logerror("%s: vt1682_210e_io_ab_w writing: %02x (portb: %1x porta: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
+}
+
 
 
 /*
@@ -2610,10 +2651,17 @@ READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_r)
 {
+	//uint8_t ret = ioport("IN1")->read();
 	uint8_t ret = machine().rand();
 //	logerror("%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_w)
+{
+	logerror("%s: vt1682_210f_io_cd_w writing: %02x (portd: %1x portc: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
+}
+
 
 /*
    Address 0x2110 READ (MAIN CPU)
@@ -4717,9 +4765,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x210a, 0x210a).rw(FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_r), FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_w));
 	map(0x210b, 0x210b).rw(FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r), FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w));
 	map(0x210c, 0x210c).rw(FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_r), FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_w));
-
-	map(0x210e, 0x210e).r(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r));
-	map(0x210f, 0x210f).r(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r));
+	map(0x210d, 0x210d).rw(FUNC(vt_vt1682_state::vt1682_210d_ioconfig_r),FUNC(vt_vt1682_state::vt1682_210d_ioconfig_w));
+	map(0x210e, 0x210e).rw(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r),FUNC(vt_vt1682_state::vt1682_210e_io_ab_w));
+	map(0x210f, 0x210f).rw(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r),FUNC(vt_vt1682_state::vt1682_210f_io_cd_w));
 
 	// either reads/writes are on different addresses or our source info is incorrect
 	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
@@ -4748,6 +4796,57 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 
 static INPUT_PORTS_START( intec )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
