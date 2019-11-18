@@ -16,6 +16,17 @@
 #include "emupal.h"
 #include "screen.h"
 
+#define LOG_VRAM_WRITES      (1U << 1)
+#define LOG_SRAM_WRITES      (1U << 2)
+
+#define LOG_ALL           ( LOG_VRAM_WRITES | LOG_SRAM_WRITES )
+
+#define VERBOSE             (0)
+#include "logmacro.h"
+
+
+
+
 class vt_vt1682_state : public driver_device
 {
 public:
@@ -433,6 +444,7 @@ private:
 	INTERRUPT_GEN_MEMBER(nmi);
 
 	bitmap_ind8 m_priority_bitmap;
+	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix, int bpp, int depth, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 };
 
@@ -1034,10 +1046,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_w)
 	uint16_t spriteram_address = get_spriteram_addr();
 	m_spriteram->write8(spriteram_address, data);
 
-	logerror("%s: vt1682_2004_sprram_data_w writing: %02x to SpriteRam Address %04x\n", machine().describe_context(), data, spriteram_address);
-	//spriteram_address++; // auto inc
+	LOGMASKED(LOG_SRAM_WRITES, "%s: vt1682_2004_sprram_data_w writing: %02x to SpriteRam Address %04x\n", machine().describe_context(), data, spriteram_address);
 	inc_spriteram_addr();
-	//set_spriteram_addr(spriteram_address); // update registers
 }
 
 
@@ -1121,7 +1131,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_w)
 {
 	uint16_t vram_address = get_vram_addr();
 	m_vram->write8(vram_address, data);
-	//logerror("%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
+	LOGMASKED(LOG_VRAM_WRITES, "%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
 	vram_address++; // auto inc
 	set_vram_addr(vram_address); // update registers
 }
@@ -4300,6 +4310,128 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - IOB PLH
 */
 
+
+void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix, int bpp, int depth, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+
+	if (bpp == 3) pal = 0x0;
+	if (bpp == 2) pal &= 0xc;
+
+	{
+		int startaddress = segment;
+		int linebytes;
+
+		if (bpp == 3)
+		{
+			if (is16pix)
+			{
+				linebytes = 16;
+			}
+			else
+			{
+				linebytes = 8;
+			}
+		}
+		else if (bpp == 2)
+		{
+			if (is16pix)
+			{
+				linebytes = 12;
+			}
+			else
+			{
+				linebytes = 6;
+			}
+		}
+		else //if (bpp == 1) // or 0
+		{
+			if (is16pix)
+			{
+				linebytes = 8;
+			}
+			else
+			{
+				linebytes = 4;
+			}
+		}
+		int tilesize = is16pix ? 16 : 8;
+
+		int tilebytes = linebytes * tilesize;
+
+		startaddress += tilebytes * tile;
+
+		for (int yy = 0; yy < tilesize; yy++) // tile y lines
+		{
+			int currentadddress = startaddress + yy * linebytes;
+
+			int line = y + yy;
+
+			if (line >= cliprect.min_y && line <= cliprect.max_y)
+			{
+				uint32_t* dstptr = &bitmap.pix32(line);
+				uint8_t* priptr = &m_priority_bitmap.pix8(line);
+
+				int shift_amount, mask, bytes_in;
+				if (bpp == 3) // (8bpp)
+				{
+					shift_amount = 8;
+					mask = 0xff;
+					bytes_in = 4;
+				}
+				else if (bpp == 2) // (6bpp)
+				{
+					shift_amount = 6;
+					mask = 0x3f;
+					bytes_in = 3;
+				}
+				else // 1 / 0 (4bpp)
+				{
+					shift_amount = 4;
+					mask = 0x0f;
+					bytes_in = 2;
+				}
+
+				int xbase = x;// *tilesize;
+
+				for (int xx = 0; xx < tilesize; xx += 4) // tile x pixels
+				{
+					int xdraw = xbase + xx; // tile position
+
+					// draw 4 pixels
+					uint32_t pixdata = 0;
+
+					int shift = 0;
+					for (int i = 0; i < bytes_in; i++)
+					{
+						pixdata |= m_fullrom->read8(currentadddress) << shift; currentadddress++;
+						shift += 8;
+					}
+
+					shift = 0;
+					for (int ii = 0; ii < 4; ii++)
+					{
+						uint8_t pen = (pixdata >> shift)& mask;
+						if (opaque || pen)
+						{
+							int xdraw_real = xdraw + ii; // pixel position
+							if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
+							{
+								if (depth < priptr[xdraw_real])
+								{
+									const pen_t* paldata = m_palette->pens();
+									dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
+									priptr[xdraw_real] = depth;
+								}
+							}
+						}
+						shift += shift_amount;
+					}
+				}
+			}
+		}
+	}
+}
+
 void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	// m_main_control_bk[0]
@@ -4358,124 +4490,14 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
-					if (bk_tilebpp == 3) pal = 0x0;
-					if (bk_tilebpp == 2) pal &= 0xc;
+					int palbase;
+					if (which == 0) palbase = 0x100;
+					else palbase = 0x000;
 
-					{
-						int startaddress = segment;
-						int linebytes;
+					int xpos = x * (bk_tilesize ? 16 : 8);
+					int ypos = y * (bk_tilesize ? 16 : 8);
 
-						if (bk_tilebpp == 3)
-						{
-							if (bk_tilesize)
-							{
-								linebytes = 16;
-							}
-							else
-							{
-								linebytes = 8;
-							}
-						}
-						else if (bk_tilebpp == 2)
-						{
-							if (bk_tilesize)
-							{	
-								linebytes = 12;
-							}
-							else
-							{
-								linebytes = 6;
-							}
-						}
-						else //if (bk_tilebpp == 1) // or 0
-						{
-							if (bk_tilesize)
-							{
-								linebytes = 8;
-							}
-							else
-							{
-								linebytes = 4;
-							}
-						}
-						int tilesize = bk_tilesize ? 16 : 8;
-
-						int tilebytes = linebytes * tilesize;
-
-						startaddress += tilebytes * tile;
-
-						int palbase;
-						
-						if (which == 0) palbase = 0x100;
-						else palbase = 0x000;
-
-						for (int yy = 0; yy < tilesize; yy++) // tile y lines
-						{
-							int currentadddress = startaddress + yy * linebytes;
-
-							int line = y * tilesize + yy;
-
-							uint32_t* dstptr = &bitmap.pix32(line);
-							uint8_t* priptr = &m_priority_bitmap.pix8(line);
-
-							int shift_amount, mask, bytes_in;
-							if (bk_tilebpp == 3) // (8bpp)
-							{
-								shift_amount = 8;
-								mask = 0xff;
-								bytes_in = 4;
-							}
-							else if (bk_tilebpp == 2) // (6bpp)
-							{
-								shift_amount = 6;
-								mask = 0x3f;
-								bytes_in = 3;
-							}
-							else // 1 / 0 (4bpp)
-							{
-								shift_amount = 4;
-								mask = 0x0f;
-								bytes_in = 2;
-							}
-
-							int xbase = x * tilesize;
-
-							for (int xx = 0; xx < tilesize; xx += 4) // tile x pixels
-							{
-								int xdraw = xbase + xx; // tile position
-
-								// draw 4 pixels
-								uint32_t pixdata = 0;
-
-								int shift = 0;
-								for (int i = 0; i < bytes_in; i++)
-								{
-									pixdata |= m_fullrom->read8(currentadddress) << shift; currentadddress++;
-									shift += 8;
-								}
-
-								shift = 0;
-								for (int ii = 0; ii < 4; ii++)
-								{
-									uint8_t pen = (pixdata >> shift)& mask;
-									if (opaque || pen)
-									{
-										int xdraw_real = xdraw + ii; // pixel position
-										if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
-										{
-											if (bk_depth < priptr[xdraw_real])
-											{
-												const pen_t* paldata = m_palette->pens();
-												dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
-												priptr[xdraw_real] = bk_depth;
-											}
-										}
-									}
-									shift += shift_amount;
-								}
-							}
-						}
-					}
+					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilebpp, bk_depth, opaque, screen, bitmap, cliprect);
 				}
 			}
 		}
@@ -4725,6 +4747,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	M6502(config, m_soundcpu, XTAL(21'477'272));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
 
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&vt_vt1682_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
 
