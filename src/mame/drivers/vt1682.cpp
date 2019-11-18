@@ -4363,52 +4363,56 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 
 					{
 						int startaddress = segment;
+						int linebytes;
 
 						if (bk_tilebpp == 3)
 						{
 							if (bk_tilesize)
 							{
-								startaddress += 256 * tile;
+								linebytes = 16;
 							}
 							else
 							{
-								startaddress += 64 * tile;
+								linebytes = 8;
 							}
 						}
 						else if (bk_tilebpp == 2)
 						{
 							if (bk_tilesize)
-							{
-								startaddress += 192 * tile;
+							{	
+								linebytes = 12;
 							}
 							else
 							{
-								startaddress += 48 * tile;
+								linebytes = 6;
 							}
 						}
 						else //if (bk_tilebpp == 1) // or 0
 						{
 							if (bk_tilesize)
 							{
-								startaddress += 128 * tile;
+								linebytes = 8;
 							}
 							else
 							{
-								startaddress += 32 * tile;
+								linebytes = 4;
 							}
 						}
+						int tilesize = bk_tilesize ? 16 : 8;
 
-						const pen_t* paldata = m_palette->pens();
+						int tilebytes = linebytes * tilesize;
+
+						startaddress += tilebytes * tile;
+
 						int palbase;
 						
 						if (which == 0) palbase = 0x100;
 						else palbase = 0x000;
 
-						int tilesize = bk_tilesize ? 16 : 8;
-						int currentadddress = startaddress;
-
 						for (int yy = 0; yy < tilesize; yy++) // tile y lines
 						{
+							int currentadddress = startaddress + yy * linebytes;
+
 							int line = y * tilesize + yy;
 
 							uint32_t* dstptr = &bitmap.pix32(line);
@@ -4461,6 +4465,7 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 										{
 											if (bk_depth < priptr[xdraw_real])
 											{
+												const pen_t* paldata = m_palette->pens();
 												dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
 												priptr[xdraw_real] = bk_depth;
 											}
