@@ -373,10 +373,6 @@ void menu_select_game::handle()
 				m_filter_highlight = machine_filter::LAST;
 			break;
 
-		case IPT_UI_CONFIGURE:
-			inkey_navigation();
-			break;
-
 		case IPT_UI_EXPORT:
 			inkey_export();
 			break;
