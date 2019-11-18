@@ -2,11 +2,8 @@
 // copyright-holders:Ryan Holtz
 //================================================================
 //
-//  mb86901.cpp - Emulation for the Fujitsu MB86901 / LSI L64801
-//                processors. Both chips are identical both
-//                electrically and functionally, and implement
-//                the integer instructions in a SPARC v7
-//                compatible instruction set.
+//  sparcv7v8.cpp - Emulation for the SPARCv7/v8 line of
+//                  processors.
 //
 //  Notes:
 //      - The CPU core implementation has been simplified
@@ -16,9 +13,8 @@
 //        ever be.
 //
 //  To-Do:
-//      - Ops: FBFcc, LDF, STF
 //      - Test: SPARCv8 ops are untested
-//      - FPU support
+//      - Extended-precision FPU support
 //      - Coprocessor support
 //
 //================================================================
@@ -29,10 +25,11 @@
 
 #include "debugger.h"
 
+#include "softfloat3/source/include/softfloat.h"
 
-DEFINE_DEVICE_TYPE(MB86901, mb86901_device, "mb86901", "Fujitsu MB86901")
+DEFINE_DEVICE_TYPE(SPARCV7, sparcv7_device, "sparcv7", "Sun SPARC v7")
 
-const int mb86901_device::NWINDOWS = 7;
+const int sparcv7_device::NWINDOWS = 7;
 
 #if LOG_FCODES
 #include "ss1fcode.ipp"
@@ -43,18 +40,18 @@ const int mb86901_device::NWINDOWS = 7;
 #endif
 
 //-------------------------------------------------
-//  mb86901_device - constructor
+//  sparcv7_device - constructor
 //-------------------------------------------------
 
-mb86901_device::mb86901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, MB86901, tag, owner, clock)
+sparcv7_device::sparcv7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, SPARCV7, tag, owner, clock)
 	, m_mmu(*this, finder_base::DUMMY_TAG)
 {
 	m_default_config = address_space_config("program", ENDIANNESS_BIG, 32, 32);
 }
 
 
-void mb86901_device::device_start()
+void sparcv7_device::device_start()
 {
 #if LOG_FCODES
 	m_ss1_fcode_table.clear();
@@ -139,7 +136,7 @@ void mb86901_device::device_start()
 #endif
 
 	m_bp_reset_in = false;
-	m_bp_fpu_present = false;
+	m_bp_fpu_present = true;
 	m_bp_cp_present = false;
 	m_pb_error = false;
 	m_pb_block_ldst_byte = false;
@@ -289,31 +286,18 @@ void mb86901_device::device_start()
 	state_add(SPARC_ANNUL,      "ANNUL",    m_no_annul).formatstr("%01u");
 	state_add(SPARC_ICC,        "icc",      m_icc).formatstr("%4s");
 	state_add(SPARC_CWP,        "CWP",      m_cwp).formatstr("%2d");
-	char regname[3] = "g0";
-	for (int i = 0; i < 8; i++)
-	{
-		regname[1] = 0x30 + i;
-		state_add(SPARC_G0 + i, regname, m_r[i]).formatstr("%08X");
-	}
-	regname[0] = 'o';
-	for (int i = 0; i < 8; i++)
-	{
-		regname[1] = 0x30 + i;
-		state_add(SPARC_O0 + i, regname, m_dbgregs[i]).formatstr("%08X");
-	}
 
-	regname[0] = 'l';
 	for (int i = 0; i < 8; i++)
-	{
-		regname[1] = 0x30 + i;
-		state_add(SPARC_L0 + i, regname, m_dbgregs[8+i]).formatstr("%08X");
-	}
-	regname[0] = 'i';
+		state_add(SPARC_G0 + i, util::string_format("g%d", i).c_str(), m_r[i]).formatstr("%08X");
+
 	for (int i = 0; i < 8; i++)
-	{
-		regname[1] = 0x30 + i;
-		state_add(SPARC_I0 + i, regname, m_dbgregs[16+i]).formatstr("%08X");
-	}
+		state_add(SPARC_O0 + i, util::string_format("o%d", i).c_str(), m_dbgregs[i]).formatstr("%08X");
+
+	for (int i = 0; i < 8; i++)
+		state_add(SPARC_L0 + i, util::string_format("l%d", i).c_str(), m_dbgregs[8+i]).formatstr("%08X");
+
+	for (int i = 0; i < 8; i++)
+		state_add(SPARC_I0 + i, util::string_format("i%d", i).c_str(), m_dbgregs[16+i]).formatstr("%08X");
 
 	state_add(SPARC_EC,     "EC",       m_ec).formatstr("%1u");
 	state_add(SPARC_EF,     "EF",       m_ef).formatstr("%1u");
@@ -321,13 +305,13 @@ void mb86901_device::device_start()
 	state_add(SPARC_PIL,    "PIL",      m_pil).formatstr("%2d");
 	state_add(SPARC_S,      "S",        m_s).formatstr("%1u");
 	state_add(SPARC_PS,     "PS",       m_ps).formatstr("%1u");
+	state_add(SPARC_FSR,    "FSR",      m_fsr).formatstr("%08X");
 
-	char rname[5];
+	for (int i = 0; i < 32; i++)
+		state_add(SPARC_F0 + i, util::string_format("f%d", i).c_str(), m_fpr[i]);
+
 	for (int i = 0; i < 120; i++)
-	{
-		sprintf(rname, "r%d", i);
-		state_add(SPARC_R0 + i, rname, m_r[i]).formatstr("%08X");
-	}
+		state_add(SPARC_R0 + i, util::string_format("r%d", i).c_str(), m_r[i]).formatstr("%08X");
 
 	save_item(NAME(m_r));
 	save_item(NAME(m_fpr));
@@ -413,16 +397,16 @@ void mb86901_device::device_start()
 }
 
 
-void mb86901_device::device_stop()
+void sparcv7_device::device_stop()
 {
 }
 
-void mb86901_device::device_resolve_objects()
+void sparcv7_device::device_resolve_objects()
 {
 	m_mmu->set_host(this);
 }
 
-void mb86901_device::device_reset()
+void sparcv7_device::device_reset()
 {
 	m_trap = 0;
 	m_tt = 0;
@@ -487,7 +471,7 @@ void mb86901_device::device_reset()
 //  after loading a savestate
 //-------------------------------------------------
 
-void mb86901_device::device_post_load()
+void sparcv7_device::device_post_load()
 {
 	update_gpr_pointers();
 }
@@ -499,7 +483,7 @@ void mb86901_device::device_post_load()
 //  the space doesn't exist
 //-------------------------------------------------
 
-device_memory_interface::space_config_vector mb86901_device::memory_space_config() const
+device_memory_interface::space_config_vector sparcv7_device::memory_space_config() const
 {
 	space_config_vector config_vector;
 	config_vector.push_back(std::make_pair(AS_PROGRAM, &m_default_config));
@@ -514,7 +498,7 @@ device_memory_interface::space_config_vector mb86901_device::memory_space_config
 //  a 32-bit word in a big-endian system.
 //-------------------------------------------------
 
-uint32_t mb86901_device::read_sized_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask)
+uint32_t sparcv7_device::read_sized_word(const uint8_t asi, const uint32_t address, const uint32_t mem_mask)
 {
 	assert(asi < 0x20); // We do not currently support ASIs outside the range used by actual Sun machines.
 	return m_mmu->read_asi(asi, address >> 2, mem_mask);
@@ -530,7 +514,7 @@ uint32_t mb86901_device::read_sized_word(const uint8_t asi, const uint32_t addre
 //  size handlers
 //-------------------------------------------------
 
-void mb86901_device::write_sized_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask)
+void sparcv7_device::write_sized_word(const uint8_t asi, const uint32_t address, const uint32_t data, const uint32_t mem_mask)
 {
 	assert(asi < 0x20); // We do not currently support ASIs outside the range used by actual Sun machines.
 	m_mmu->write_asi(asi, address >> 2, data, mem_mask);
@@ -542,7 +526,7 @@ void mb86901_device::write_sized_word(const uint8_t asi, const uint32_t address,
 //  for the debugger
 //-------------------------------------------------
 
-void mb86901_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void sparcv7_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -592,7 +576,7 @@ void mb86901_device::state_string_export(const device_state_entry &entry, std::s
 //  helper function
 //-------------------------------------------------
 
-std::unique_ptr<util::disasm_interface> mb86901_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> sparcv7_device::create_disassembler()
 {
 	auto dasm = std::make_unique<sparc_disassembler>(static_cast<sparc_disassembler::config const *>(this), 7);
 	m_asi_desc_adder(dasm.get());
@@ -609,7 +593,7 @@ std::unique_ptr<util::disasm_interface> mb86901_device::create_disassembler()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t mb86901_device::execute_min_cycles() const noexcept
+uint32_t sparcv7_device::execute_min_cycles() const noexcept
 {
 	return 1;
 }
@@ -620,7 +604,7 @@ uint32_t mb86901_device::execute_min_cycles() const noexcept
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-uint32_t mb86901_device::execute_max_cycles() const noexcept
+uint32_t sparcv7_device::execute_max_cycles() const noexcept
 {
 	return 4;
 }
@@ -631,7 +615,7 @@ uint32_t mb86901_device::execute_max_cycles() const noexcept
 //  input/interrupt lines
 //-------------------------------------------------
 
-uint32_t mb86901_device::execute_input_lines() const noexcept
+uint32_t sparcv7_device::execute_input_lines() const noexcept
 {
 	return 16;
 }
@@ -642,7 +626,7 @@ uint32_t mb86901_device::execute_input_lines() const noexcept
 //  line during execution
 //-------------------------------------------------
 
-void mb86901_device::execute_set_input(int inputnum, int state)
+void sparcv7_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
@@ -699,7 +683,7 @@ void mb86901_device::execute_set_input(int inputnum, int state)
 //  execute_add - execute an add-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_add(uint32_t op)
+void sparcv7_device::execute_add(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Add Instructions" (SPARCv8.pdf, pg. 170)
 
@@ -756,7 +740,7 @@ void mb86901_device::execute_add(uint32_t op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_taddcc(uint32_t op)
+void sparcv7_device::execute_taddcc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 173, "Appendix C - ISP Descriptions - Tagged Add Instructions" (SPARCv8.pdf, pg. 170)
 
@@ -821,7 +805,7 @@ void mb86901_device::execute_taddcc(uint32_t op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_sub(uint32_t op)
+void sparcv7_device::execute_sub(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
@@ -878,7 +862,7 @@ void mb86901_device::execute_sub(uint32_t op)
 //  opcode
 //--------------------------------------------------
 
-void mb86901_device::execute_tsubcc(uint32_t op)
+void sparcv7_device::execute_tsubcc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 174, "Appendix C - ISP Descriptions - Tagged Subtract Instructions" (SPARCv8.pdf, pg. 171)
 
@@ -961,8 +945,8 @@ if (ANDcccc or ANDNcc or ORcc or ORNcc or XORcc or XNORcc) then (
 );
 */
 
-template <mb86901_device::set_cc SETCC>
-void mb86901_device::execute_and(const uint32_t op)
+template <sparcv7_device::set_cc SETCC>
+void sparcv7_device::execute_and(const uint32_t op)
 {
 	const uint32_t result = RS1REG & (USEIMM ? SIMM13 : RS2REG);
 	if (RDBITS) RDREG = result;
@@ -979,8 +963,8 @@ void mb86901_device::execute_and(const uint32_t op)
 	nPC = nPC + 4;
 }
 
-template <mb86901_device::set_cc SETCC>
-void mb86901_device::execute_or(const uint32_t op)
+template <sparcv7_device::set_cc SETCC>
+void sparcv7_device::execute_or(const uint32_t op)
 {
 	const uint32_t result = RS1REG | (USEIMM ? SIMM13 : RS2REG);
 	if (RDBITS) RDREG = result;
@@ -997,8 +981,8 @@ void mb86901_device::execute_or(const uint32_t op)
 	nPC = nPC + 4;
 }
 
-template <mb86901_device::set_cc SETCC>
-void mb86901_device::execute_xor(const uint32_t op)
+template <sparcv7_device::set_cc SETCC>
+void sparcv7_device::execute_xor(const uint32_t op)
 {
 	const uint32_t result = RS1REG ^ (USEIMM ? SIMM13 : RS2REG);
 	if (RDBITS) RDREG = result;
@@ -1015,8 +999,8 @@ void mb86901_device::execute_xor(const uint32_t op)
 	nPC = nPC + 4;
 }
 
-template <mb86901_device::set_cc SETCC>
-void mb86901_device::execute_andn(const uint32_t op)
+template <sparcv7_device::set_cc SETCC>
+void sparcv7_device::execute_andn(const uint32_t op)
 {
 	const uint32_t result = RS1REG & ~(USEIMM ? SIMM13 : RS2REG);
 	if (RDBITS) RDREG = result;
@@ -1033,8 +1017,8 @@ void mb86901_device::execute_andn(const uint32_t op)
 	nPC = nPC + 4;
 }
 
-template <mb86901_device::set_cc SETCC>
-void mb86901_device::execute_orn(const uint32_t op)
+template <sparcv7_device::set_cc SETCC>
+void sparcv7_device::execute_orn(const uint32_t op)
 {
 	const uint32_t result = RS1REG | ~(USEIMM ? SIMM13 : RS2REG);
 	if (RDBITS) RDREG = result;
@@ -1051,8 +1035,8 @@ void mb86901_device::execute_orn(const uint32_t op)
 	nPC = nPC + 4;
 }
 
-template <mb86901_device::set_cc SETCC>
-void mb86901_device::execute_xnor(const uint32_t op)
+template <sparcv7_device::set_cc SETCC>
+void sparcv7_device::execute_xnor(const uint32_t op)
 {
 	const uint32_t result = RS1REG ^ ~(USEIMM ? SIMM13 : RS2REG);
 	if (RDBITS) RDREG = result;
@@ -1074,7 +1058,7 @@ void mb86901_device::execute_xnor(const uint32_t op)
 //  sll/srl/sra
 //-------------------------------------------------
 
-void mb86901_device::execute_shift(uint32_t op)
+void sparcv7_device::execute_shift(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 172, "Appendix C - ISP Descriptions - Shift Instructions" (SPARCv8.pdf, pg. 169)
 
@@ -1108,7 +1092,7 @@ void mb86901_device::execute_shift(uint32_t op)
 //  execute_mulscc - execute a multiply step opcode
 //--------------------------------------------------
 
-void mb86901_device::execute_mulscc(uint32_t op)
+void sparcv7_device::execute_mulscc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 175, "Appendix C - ISP Descriptions - Multiply Step Instruction" (SPARCv8.pdf, pg. 172)
 
@@ -1161,7 +1145,7 @@ void mb86901_device::execute_mulscc(uint32_t op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_rdsr(uint32_t op)
+void sparcv7_device::execute_rdsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Read State Register Instructions" (SPARCv8.pdf, pg. 179)
 
@@ -1227,7 +1211,7 @@ void mb86901_device::execute_rdsr(uint32_t op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_wrsr(uint32_t op)
+void sparcv7_device::execute_wrsr(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 183, "Appendix C - ISP Descriptions - Write State Register Instructions" (SPARCv8.pdf, pg. 180)
 
@@ -1382,7 +1366,7 @@ void mb86901_device::execute_wrsr(uint32_t op)
 //  opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_rett(uint32_t op)
+void sparcv7_device::execute_rett(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 181, "Appendix C - ISP Descriptions - Return from Trap Instructions" (SPARCv8.pdf, pg. 178)
 
@@ -1502,7 +1486,7 @@ void mb86901_device::execute_rett(uint32_t op)
 // opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_saverestore(uint32_t op)
+void sparcv7_device::execute_saverestore(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 177, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 174)
 
@@ -1585,7 +1569,7 @@ void mb86901_device::execute_saverestore(uint32_t op)
 //  execute_jmpl - execute a jump and link opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_jmpl(uint32_t op)
+void sparcv7_device::execute_jmpl(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 180, "Appendix C - ISP Descriptions - SAVE and RESTORE Instructions" (SPARCv8.pdf, pg. 177)
 
@@ -1620,12 +1604,14 @@ void mb86901_device::execute_jmpl(uint32_t op)
 }
 
 
+execute_extra_group2
+
 //-------------------------------------------------
 //  execute_group2 - execute an opcode in group 2,
 //  mostly ALU ops
 //-------------------------------------------------
 
-inline void mb86901_device::execute_group2(uint32_t op)
+inline void sparcv7_device::execute_group2(uint32_t op)
 {
 	switch (OP3)
 	{
@@ -1718,7 +1704,6 @@ inline void mb86901_device::execute_group2(uint32_t op)
 		case OP3_FPOP2:
 			if (!(PSR & PSR_EF_MASK) || !m_bp_fpu_present)
 			{
-				//printf("fpop @ %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_fp_disabled = 1;
 				m_stashed_icount = m_icount;
@@ -1776,11 +1761,14 @@ inline void mb86901_device::execute_group2(uint32_t op)
 #endif
 
 		default:
-			logerror("illegal instruction at %08x: %08x\n", PC, op);
-			m_trap = 1;
-			m_illegal_instruction = 1;
-			m_stashed_icount = m_icount;
-			m_icount = 0;
+			if (!execute_extra_group2(op))
+			{
+				logerror("illegal instruction at %08x: %08x\n", PC, op);
+				m_trap = 1;
+				m_illegal_instruction = 1;
+				m_stashed_icount = m_icount;
+				m_icount = 0;
+			}
 			break;
 	}
 }
@@ -1792,7 +1780,7 @@ inline void mb86901_device::execute_group2(uint32_t op)
 //  the registers in our current window
 //-------------------------------------------------
 
-void mb86901_device::update_gpr_pointers()
+void sparcv7_device::update_gpr_pointers()
 {
 	int cwp = PSR & PSR_CWP_MASK;
 	for (int i = 0; i < 8; i++)
@@ -1808,7 +1796,7 @@ void mb86901_device::update_gpr_pointers()
 //  execute_store - execute a store-type opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_store(uint32_t op)
+void sparcv7_device::execute_store(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 165, "Appendix C - ISP Descriptions - Store Instructions" (SPARCv8.pdf, pg. 162)
 
@@ -2275,7 +2263,7 @@ if (((trap = 0) and (LDD or LDDA or LDDF or LDDC)) then (
 );
 */
 
-inline void mb86901_device::execute_ldd(uint32_t op)
+inline void sparcv7_device::execute_ldd(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2317,7 +2305,7 @@ inline void mb86901_device::execute_ldd(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ld(uint32_t op)
+inline void sparcv7_device::execute_ld(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2348,7 +2336,7 @@ inline void mb86901_device::execute_ld(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldsh(uint32_t op)
+inline void sparcv7_device::execute_ldsh(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2383,7 +2371,7 @@ inline void mb86901_device::execute_ldsh(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_lduh(uint32_t op)
+inline void sparcv7_device::execute_lduh(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2418,7 +2406,7 @@ inline void mb86901_device::execute_lduh(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldsb(uint32_t op)
+inline void sparcv7_device::execute_ldsb(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2446,7 +2434,7 @@ inline void mb86901_device::execute_ldsb(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldub(uint32_t op)
+inline void sparcv7_device::execute_ldub(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2473,7 +2461,7 @@ inline void mb86901_device::execute_ldub(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_lddfpr(uint32_t op)
+inline void sparcv7_device::execute_lddfpr(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2544,7 +2532,7 @@ inline void mb86901_device::execute_lddfpr(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldfpr(uint32_t op)
+inline void sparcv7_device::execute_ldfpr(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2593,7 +2581,7 @@ inline void mb86901_device::execute_ldfpr(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldfsr(uint32_t op)
+inline void sparcv7_device::execute_ldfsr(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2636,13 +2624,21 @@ inline void mb86901_device::execute_ldfsr(uint32_t op)
 		return;
 	}
 
-	FSR = data;
+	FSR = (data & ~FSR_RESV_MASK) | FSR_VER;
+
+	switch (FSR & FSR_RD_MASK)
+	{
+	case FSR_RD_NEAR: softfloat_roundingMode = softfloat_round_near_even; break;
+	case FSR_RD_ZERO: softfloat_roundingMode = softfloat_round_minMag; break;
+	case FSR_RD_UP:   softfloat_roundingMode = softfloat_round_max; break;
+	case FSR_RD_DOWN: softfloat_roundingMode = softfloat_round_min; break;
+	}
 
 	PC = nPC;
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_lddcpr(uint32_t op)
+inline void sparcv7_device::execute_lddcpr(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2702,7 +2698,7 @@ inline void mb86901_device::execute_lddcpr(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldcpr(uint32_t op)
+inline void sparcv7_device::execute_ldcpr(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2751,7 +2747,7 @@ inline void mb86901_device::execute_ldcpr(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldcsr(uint32_t op)
+inline void sparcv7_device::execute_ldcsr(uint32_t op)
 {
 	const uint32_t address = RS1REG + (USEIMM ? SIMM13 : RS2REG);
 
@@ -2800,7 +2796,7 @@ inline void mb86901_device::execute_ldcsr(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldda(uint32_t op)
+inline void sparcv7_device::execute_ldda(uint32_t op)
 {
 	if (IS_USER)
 	{
@@ -2861,7 +2857,7 @@ inline void mb86901_device::execute_ldda(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_lda(uint32_t op)
+inline void sparcv7_device::execute_lda(uint32_t op)
 {
 	if (IS_USER)
 	{
@@ -2909,7 +2905,7 @@ inline void mb86901_device::execute_lda(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldsha(uint32_t op)
+inline void sparcv7_device::execute_ldsha(uint32_t op)
 {
 	if (IS_USER)
 	{
@@ -2961,7 +2957,7 @@ inline void mb86901_device::execute_ldsha(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_lduha(uint32_t op)
+inline void sparcv7_device::execute_lduha(uint32_t op)
 {
 	if (IS_USER)
 	{
@@ -3012,7 +3008,7 @@ inline void mb86901_device::execute_lduha(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_ldsba(uint32_t op)
+inline void sparcv7_device::execute_ldsba(uint32_t op)
 {
 	if (IS_USER)
 	{
@@ -3056,7 +3052,7 @@ inline void mb86901_device::execute_ldsba(uint32_t op)
 	nPC = nPC + 4;
 }
 
-inline void mb86901_device::execute_lduba(uint32_t op)
+inline void sparcv7_device::execute_lduba(uint32_t op)
 {
 	if (IS_USER)
 	{
@@ -3106,7 +3102,7 @@ inline void mb86901_device::execute_lduba(uint32_t op)
 //  instruction
 //-------------------------------------------------
 
-void mb86901_device::execute_ldstub(uint32_t op)
+void sparcv7_device::execute_ldstub(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 169, "Appendix C - ISP Descriptions - Atomic Load-Store Unsigned Byte Instructions" (SPARCv8.pdf, pg. 166)
 
@@ -3201,12 +3197,12 @@ void mb86901_device::execute_ldstub(uint32_t op)
 	}
 
 	uint32_t data(0);
-	while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
-	{
+	//while (m_pb_block_ldst_byte || m_pb_block_ldst_word)
+	//{
 		// { wait for lock(s) to be lifted }
 		// { an implementation actually need only block when another LDSTUB or SWAP
 		//   is pending on the same byte in memory as the one addressed by this LDSTUB }
-	}
+	//}
 
 	m_pb_block_ldst_byte = 1;
 
@@ -3265,7 +3261,7 @@ void mb86901_device::execute_ldstub(uint32_t op)
 //  (load/store)
 //-------------------------------------------------
 
-inline void mb86901_device::execute_group3(uint32_t op)
+inline void sparcv7_device::execute_group3(uint32_t op)
 {
 	static const int ldst_cycles[64] = {
 		1, 1, 1, 2, 2, 2, 2, 3,
@@ -3367,6 +3363,7 @@ inline void mb86901_device::execute_group3(uint32_t op)
 #endif
 
 		default:
+			if (!execute_extended_Op(
 			logerror("illegal instruction at %08x: %08x\n", PC, op);
 			m_trap = 1;
 			m_illegal_instruction = 1;
@@ -3383,11 +3380,84 @@ inline void mb86901_device::execute_group3(uint32_t op)
 
 
 //-------------------------------------------------
+//  evaluate_fp_condition - evaluate a given fp
+//  condition code
+//-------------------------------------------------
+
+bool sparcv7_device::evaluate_fp_condition(uint32_t op)
+{
+	// COND     & 8
+	// 0        8
+	// fbn      fba
+	// fbne     fbe
+	// fblg     fbue
+	// fbul     fbge
+	// fbl      fbuge
+	// fbug     fble
+	// fbg      fbule
+	// fbu      fbo
+
+	static const uint32_t EQ_BIT = (1 << (FSR_FCC_EQ >> FSR_FCC_SHIFT));
+	static const uint32_t LT_BIT = (1 << (FSR_FCC_LT >> FSR_FCC_SHIFT));
+	static const uint32_t GT_BIT = (1 << (FSR_FCC_GT >> FSR_FCC_SHIFT));
+	static const uint32_t UO_BIT = (1 << (FSR_FCC_UO >> FSR_FCC_SHIFT));
+	const uint32_t fcc_bit = 1 << ((m_fsr & FSR_FCC_MASK) >> FSR_FCC_SHIFT);
+
+	switch(COND)
+	{
+		case 0:     return false;
+		case 1:     return fcc_bit & (LT_BIT | GT_BIT | UO_BIT);
+		case 2:     return fcc_bit & (LT_BIT | GT_BIT);
+		case 3:     return fcc_bit & (LT_BIT | UO_BIT);
+		case 4:     return fcc_bit & (LT_BIT);
+		case 5:     return fcc_bit & (GT_BIT | UO_BIT);
+		case 6:     return fcc_bit & (GT_BIT);
+		case 7:     return fcc_bit & (UO_BIT);
+
+		case 8:     return true;
+		case 9:     return fcc_bit & (EQ_BIT);
+		case 10:    return fcc_bit & (EQ_BIT | UO_BIT);
+		case 11:    return fcc_bit & (EQ_BIT | GT_BIT);
+		case 12:    return fcc_bit & (EQ_BIT | GT_BIT | UO_BIT);
+		case 13:    return fcc_bit & (EQ_BIT | LT_BIT);
+		case 14:    return fcc_bit & (EQ_BIT | LT_BIT | UO_BIT);
+		case 15:    return fcc_bit & (EQ_BIT | LT_BIT | GT_BIT);
+	}
+
+	return false;
+}
+
+
+//-------------------------------------------------
+//  execute_fbfcc - execute an fp branch opcode
+//-------------------------------------------------
+
+void sparcv7_device::execute_fbfcc(uint32_t op)
+{
+	bool branch_taken = evaluate_fp_condition(op);
+	uint32_t pc = PC;
+	PC = nPC;
+	if (branch_taken)
+	{
+		nPC = pc + DISP22;
+		if (COND == COND_BA && ANNUL)
+			m_no_annul = false;
+	}
+	else
+	{
+		nPC = nPC + 4;
+		if (ANNUL)
+			m_no_annul = false;
+	}
+}
+
+
+//-------------------------------------------------
 //  evaluate_condition - evaluate a given integer
 //  condition code
 //-------------------------------------------------
 
-bool mb86901_device::evaluate_condition(uint32_t op)
+bool sparcv7_device::evaluate_condition(uint32_t op)
 {
 	// COND     & 8
 	// 0        8
@@ -3429,7 +3499,7 @@ bool mb86901_device::evaluate_condition(uint32_t op)
 //  execute_bicc - execute a branch opcode
 //-------------------------------------------------
 
-void mb86901_device::execute_bicc(uint32_t op)
+void sparcv7_device::execute_bicc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 178, "Appendix C - ISP Descriptions - Branch on Integer Condition Instructions" (SPARCv8.pdf, pg. 175)
 
@@ -3485,7 +3555,7 @@ void mb86901_device::execute_bicc(uint32_t op)
 //  execute_ticc - execute a conditional trap
 //-------------------------------------------------
 
-void mb86901_device::execute_ticc(uint32_t op)
+void sparcv7_device::execute_ticc(uint32_t op)
 {
 	/* The SPARC Instruction Manual: Version 8, page 182, "Appendix C - ISP Descriptions - Trap on Integer Condition Instructions" (SPARCv8.pdf, pg. 179)
 
@@ -3551,7 +3621,7 @@ void mb86901_device::execute_ticc(uint32_t op)
 //  additional functions from taking them
 //-------------------------------------------------
 
-void mb86901_device::select_trap()
+void sparcv7_device::select_trap()
 {
 	if (!m_trap)
 		return;
@@ -3636,7 +3706,7 @@ void mb86901_device::select_trap()
 //  instructions, if any.
 //-------------------------------------------------
 
-void mb86901_device::execute_trap()
+void sparcv7_device::execute_trap()
 {
 	/* The SPARC Instruction Manual: Version 8, page 161, "Appendix C - C.8. Traps" (SPARCv8.pdf, pg. 158)
 
@@ -3804,7 +3874,7 @@ if (trap = 0) then (
 );
 */
 
-inline void mb86901_device::dispatch_instruction(uint32_t op)
+inline void sparcv7_device::dispatch_instruction(uint32_t op)
 {
 	const uint8_t op_type = OP;
 	switch (op_type)
@@ -3819,7 +3889,6 @@ inline void mb86901_device::dispatch_instruction(uint32_t op)
 			execute_bicc(op);
 			break;
 		case OP2_SETHI: // sethi
-			//SET_RDREG(IMM22);
 			*m_regs[RD] = op << 10;
 			m_r[0] = 0;
 			PC = nPC;
@@ -3828,13 +3897,13 @@ inline void mb86901_device::dispatch_instruction(uint32_t op)
 		case OP2_FBFCC: // branch on floating-point condition codes
 			if (!(PSR & PSR_EF_MASK) || !m_bp_fpu_present)
 			{
-				logerror("fbfcc at %08x: %08x\n", PC, op);
 				m_trap = 1;
 				m_fp_disabled = 1;
 				m_stashed_icount = m_icount;
 				m_icount = 0;
 				return;
 			}
+			execute_fbfcc(op);
 			break;
 #if SPARCV8
 		case OP2_CBCCC: // branch on coprocessor condition codes, SPARCv8
@@ -3880,13 +3949,487 @@ inline void mb86901_device::dispatch_instruction(uint32_t op)
 	}
 }
 
+void sparcv7_device::check_fdiv_zero_exception()
+{
+	m_fsr |= FSR_CEXC_DZC;
+	if (m_fsr & FSR_TEM_DZM)
+	{
+		m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
+		m_trap = 1;
+		m_fp_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return;
+	}
+	m_fsr |= FSR_AEXC_DZA;
+}
+
+bool sparcv7_device::check_fp_exceptions()
+{
+	if (softfloat_exceptionFlags & softfloat_flag_inexact)
+		m_fsr |= FSR_CEXC_NXC;
+	if (softfloat_exceptionFlags & softfloat_flag_underflow)
+		m_fsr |= FSR_CEXC_UFC;
+	if (softfloat_exceptionFlags & softfloat_flag_overflow)
+		m_fsr |= FSR_CEXC_OFC;
+	if (softfloat_exceptionFlags & softfloat_flag_invalid)
+		m_fsr |= FSR_CEXC_NVC;
+
+	// accrue disabled exceptions
+	const uint32_t cexc = m_fsr & FSR_CEXC_MASK;
+	const uint32_t tem = (m_fsr & FSR_TEM_MASK) >> FSR_TEM_SHIFT;
+	m_fsr |= (~tem & cexc) << FSR_AEXC_SHIFT;
+
+	// check if exception is enabled
+	if (tem & cexc)
+	{
+		m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
+		m_trap = 1;
+		m_fp_exception = 1;
+		m_stashed_icount = m_icount;
+		m_icount = 0;
+		return true;
+	}
+	return false;
+}
+
+bool sparcv7_device::set_fpr32(const uint32_t rd, const uint32_t data)
+{
+	if (softfloat_exceptionFlags && check_fp_exceptions())
+		return true;
+
+	m_fpr[rd] = data;
+	return false;
+}
+
+bool sparcv7_device::set_fpr64(const uint32_t rd, const uint64_t data)
+{
+	if (softfloat_exceptionFlags && check_fp_exceptions())
+		return true;
+
+	m_fpr[rd]     = (uint32_t)(data >> 32);
+	m_fpr[rd + 1] = (uint32_t)data;
+	return false;
+}
+
 //-------------------------------------------------
 //  complete_fp_execution - completes execution
 //  of a floating-point operation
 //-------------------------------------------------
 
-void mb86901_device::complete_fp_execution(uint32_t /*op*/)
+void sparcv7_device::complete_fp_execution(uint32_t op)
 {
+	softfloat_exceptionFlags = 0;
+
+	const uint32_t fpop = (op >> 5) & 0x1ff;
+	switch (fpop)
+	{
+	case FPOP_FMOVS:
+		FDREG = FREG(RS2);
+		printf("FMOVs %08x\n", FDREG);
+		break;
+	case FPOP_FNEGS:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_mul(fs2, i32_to_f32(-1)).v))
+		{
+			printf("FNEGs %08x -> Exception\n", rs2);
+			return;
+		}
+		printf("FNEGs %08x = %08x\n", rs2, FDREG);
+		break;
+	}
+	case FPOP_FABSS:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs2 = float32_t{ rs2 };
+		if (f32_lt(fs2, float32_t{0}))
+		{
+			if (set_fpr32(RD, f32_mul(fs2, i32_to_f32(-1)).v))
+			{
+				printf("FABSs %08x -> Exception\n", rs2);
+				return;
+			}
+		}
+		else if (set_fpr32(RD, rs2))
+		{
+			printf("FABSs %08x -> Exception\n", rs2);
+			return;
+		}
+
+		printf("FABSs %08x = %08x\n", rs2, FDREG);
+		break;
+	}
+	case FPOP_FSQRTS:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_sqrt(fs2).v))
+		{
+			printf("FSQRTs %08x -> Exception\n", rs2);
+			return;
+		}
+		printf("FSQRTs %08x -> %08x\n", rs2, FDREG);
+		break;
+	}
+	case FPOP_FSQRTD:
+	{
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr64(RD_D, f64_sqrt(fs2).v))
+		{
+			printf("FSQRTd %08x%08x -> Exception\n", (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FSQRTd %08x%08x -> %08x%08x\n", (uint32_t)(rs2 >> 32), (uint32_t)rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FSQRTX:
+		fatalerror("Unimplemented FPop: FSQRTx\n");
+		break;
+	case FPOP_FADDS:
+	{
+		const uint32_t rs1 = FREG(RS1);
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_add(fs1, fs2).v))
+		{
+			printf("FADDs %08x + %08x -> Exception\n", rs1, rs2);
+			return;
+		}
+		printf("FADDs %08x + %08x = %08x\n", rs1, rs2, FDREG);
+		break;
+	}
+	case FPOP_FADDD:
+	{
+		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs1 = float64_t{ rs1 };
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr64(RD_D, f64_add(fs1, fs2).v))
+		{
+			printf("FADDd %08x%08x + %08x%08x -> Exception\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FADDd %08x%08x + %08x%08x = %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FADDX:
+		fatalerror("Unimplemented FPop: FADDx\n");
+		break;
+	case FPOP_FSUBS:
+	{
+		const uint32_t rs1 = FREG(RS1);
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_sub(fs1, fs2).v))
+		{
+			printf("FSUBs %08x - %08x -> Exception\n", rs1, rs2);
+			return;
+		}
+		printf("FSUBs %08x - %08x = %08x\n", rs1, rs2, FDREG);
+		break;
+	}
+	case FPOP_FSUBD:
+	{
+		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs1 = float64_t{ rs1 };
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr64(RD_D, f64_sub(fs1, fs2).v))
+		{
+			printf("FSUBd %08x%08x - %08x%08x -> Exception\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FSUBd %08x%08x - %08x%08x = %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FSUBX:
+		fatalerror("Unimplemented FPop: FSUBx\n");
+		break;
+	case FPOP_FMULS:
+	{
+		const uint32_t rs1 = FREG(RS1);
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_mul(fs1, fs2).v))
+		{
+			printf("FMULs %08x * %08x -> Exception\n", rs1, rs2);
+			return;
+		}
+		printf("FMULs %08x * %08x = %08x\n", rs1, rs2, FDREG);
+		break;
+	}
+	case FPOP_FMULD:
+	{
+		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs1 = float64_t{ rs1 };
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr64(RD_D, f64_mul(fs1, fs2).v))
+		{
+			printf("FMULd %08x%08x * %08x%08x -> Exception\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FMULd %08x%08x * %08x%08x = %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FMULX:
+		fatalerror("Unimplemented FPop: FMULx\n");
+		break;
+	case FPOP_FDIVS:
+	{
+		const uint32_t rs1 = FREG(RS1);
+		const uint32_t rs2 = FREG(RS2);
+		if (rs2 == 0)
+		{
+			check_fdiv_zero_exception();
+			printf("FDIVs %08x / %08x -> divide by zero\n", rs1, rs2);
+			return;
+		}
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_div(fs1, fs2).v))
+		{
+			printf("FDIVs %08x / %08x -> Exception\n", rs1, rs2);
+			return;
+		}
+		printf("FDIVs %08x / %08x = %08x\n", rs1, rs2, FDREG);
+		break;
+	}
+	case FPOP_FDIVD:
+	{
+		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		if (rs2 == 0)
+		{
+			check_fdiv_zero_exception();
+			printf("FDIVd %08x%08x / %08x%08x -> divide by zero\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		const float64_t fs1 = float64_t{ rs1 };
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr64(RD_D, f64_div(fs1, fs2).v))
+		{
+			printf("FDIVd %08x%08x / %08x%08x -> Exception\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FDIVd %08x%08x / %08x%08x = %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FDIVX:
+		fatalerror("Unimplemented FPop: FDIVx\n");
+		break;
+	case FPOP_FITOS:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		if (set_fpr32(RD, i32_to_f32(int32_t(rs2)).v))
+		{
+			printf("FiTOs %08x -> Exception\n", rs2);
+			return;
+		}
+		printf("FiTOs %08x -> %08x\n", rs2, FDREG);
+		break;
+	}
+	case FPOP_FDTOS:
+	{
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr32(RD, f64_to_f32(fs2).v))
+		{
+			printf("FdTOs %08x%08x -> Exception\n", (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FdTOs %08x%08x -> %08x\n", (uint32_t)(rs2 >> 32), (uint32_t)rs2, FDREG);
+		break;
+	}
+	case FPOP_FXTOS:
+		fatalerror("Unimplemented FPop: FxTOs\n");
+		break;
+	case FPOP_FITOD:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		if (set_fpr64(RD_D, i32_to_f64(int32_t(rs2)).v))
+		{
+			printf("FiTOd %08x -> Exception\n", rs2);
+			return;
+		}
+		printf("FiTOd %08x -> %08x%08x\n", rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FSTOD:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs = float32_t{ rs2 };
+		if (set_fpr64(RD_D, f32_to_f64(fs).v))
+		{
+			printf("FsTOd %08x -> Exception\n", rs2);
+			return;
+		}
+		printf("FsTOd %08x -> %08x%08x\n", rs2, FREG(RD_D), FREG(RD_D + 1));
+		break;
+	}
+	case FPOP_FXTOD:
+		fatalerror("Unimplemented FPop: FxTOd\n");
+		break;
+	case FPOP_FITOX:
+		fatalerror("Unimplemented FPop: FiTOx\n");
+		break;
+	case FPOP_FSTOX:
+		fatalerror("Unimplemented FPop: FsTOx\n");
+		break;
+	case FPOP_FDTOX:
+		fatalerror("Unimplemented FPop: FdTOx\n");
+		break;
+	case FPOP_FSTOI:
+	{
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs2 = float32_t{ rs2 };
+		if (set_fpr32(RD, f32_to_i32(fs2, softfloat_roundingMode, true)))
+		{
+			printf("FsTOi %08x -> Exception\n", rs2);
+			return;
+		}
+		printf("FsTOi %08x -> %08x\n", rs2, FDREG);
+		break;
+	}
+	case FPOP_FDTOI:
+	{
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs2 = float64_t{ rs2 };
+		if (set_fpr32(RD, f64_to_i32(fs2, softfloat_roundingMode, true)))
+		{
+			printf("FdTOi %08x%08x -> Exception\n", (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			return;
+		}
+		printf("FdTOi %08x%08x -> %08x\n", (uint32_t)(rs2 >> 32), (uint32_t)rs2, FDREG);
+		break;
+	}
+	case FPOP_FXTOI:
+		fatalerror("Unimplemented FPop: FxTOi\n");
+		break;
+	case FPOP_FCMPS:
+	{
+		const uint32_t rs1 = FREG(RS1);
+		const uint32_t rs2 = FREG(RS2);
+		const float32_t fs1 = float32_t{ rs1 };
+		const float32_t fs2 = float32_t{ rs2 };
+		bool equal = f32_eq(fs1, fs2);
+		if (softfloat_exceptionFlags & softfloat_flag_invalid)
+		{
+			printf("FCMPs %08x ? %08x\n", rs1, rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_UO;
+		}
+		else if (equal)
+		{
+			printf("FCMPs %08x = %08x\n", rs1, rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_EQ;
+		}
+		else if (f32_lt(fs1, fs2))
+		{
+			printf("FCMPs %08x < %08x\n", rs1, rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_LT;
+		}
+		else
+		{
+			printf("FCMPs %08x > %08x\n", rs1, rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_GT;
+		}
+		break;
+	}
+	case FPOP_FCMPD:
+	{
+		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs1 = float64_t{ rs1 };
+		const float64_t fs2 = float64_t{ rs2 };
+		bool equal = f64_eq(fs1, fs2);
+		if (softfloat_exceptionFlags & softfloat_flag_invalid)
+		{
+			printf("FCMPd %08x%08x ? %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_UO;
+		}
+		else if (equal)
+		{
+			printf("FCMPd %08x%08x = %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_EQ;
+		}
+		else if (f64_lt(fs1, fs2))
+		{
+			printf("FCMPd %08x%08x < %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_LT;
+		}
+		else
+		{
+			printf("FCMPd %08x%08x > %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_GT;
+		}
+		break;
+	}
+	case FPOP_FCMPX:
+		fatalerror("Unimplemented FPop: FCMPx\n");
+		break;
+	case FPOP_FCMPES:
+		fatalerror("Unimplemented FPop: FCMPEs\n");
+		break;
+	case FPOP_FCMPED:
+	{
+		const uint64_t rs1 = ((uint64_t)FREG(RS1_D) << 32) | FREG(RS1_D + 1);
+		const uint64_t rs2 = ((uint64_t)FREG(RS2_D) << 32) | FREG(RS2_D + 1);
+		const float64_t fs1 = float64_t{ rs1 };
+		const float64_t fs2 = float64_t{ rs2 };
+		bool equal = f64_eq(fs1, fs2);
+		if (softfloat_exceptionFlags & softfloat_flag_invalid)
+		{
+			printf("FCMPEd %08x%08x ? %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_UO;
+			m_fsr |= FSR_CEXC_NVC;
+			if (m_fsr & FSR_TEM_NVM)
+			{
+				m_fsr = (m_fsr & ~FSR_FTT_MASK) | FSR_FTT_IEEE;
+				m_trap = 1;
+				m_fp_exception = 1;
+				m_stashed_icount = m_icount;
+				m_icount = 0;
+				return;
+			}
+			m_fsr |= FSR_AEXC_NVA;
+			break;
+		}
+		else if (equal)
+		{
+			printf("FCMPEd %08x%08x = %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_EQ;
+			break;
+		}
+		else if (f64_lt(fs1, fs2))
+		{
+			printf("FCMPEd %08x%08x < %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_LT;
+			break;
+		}
+		else
+		{
+			printf("FCMPEd %08x%08x > %08x%08x\n", (uint32_t)(rs1 >> 32), (uint32_t)rs1, (uint32_t)(rs2 >> 32), (uint32_t)rs2);
+			m_fsr = (m_fsr & ~FSR_FCC_MASK) | FSR_FCC_GT;
+			break;
+		}
+		break;
+	}
+	case FPOP_FCMPEX:
+		fatalerror("Unimplemented FPop: FCMPEx\n");
+		break;
+	default:
+		fatalerror("Unknown FPop: %03x\n", fpop);
+		break;
+	}
+
+	PC = nPC;
+	nPC = nPC + 4;
 }
 
 //-------------------------------------------------
@@ -3894,7 +4437,7 @@ void mb86901_device::complete_fp_execution(uint32_t /*op*/)
 //  mode (versus error or reset modes)
 //-------------------------------------------------
 
-inline void mb86901_device::execute_step()
+inline void sparcv7_device::execute_step()
 {
 	/* The SPARC Instruction Manual: Version 8, page 156, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 153)
 
@@ -3985,7 +4528,7 @@ inline void mb86901_device::execute_step()
 //  reset_step - step one cycle in reset mode
 //-------------------------------------------------
 
-void mb86901_device::reset_step()
+void sparcv7_device::reset_step()
 {
 	/* The SPARC Instruction Manual: Version 8, page 156, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 153)
 
@@ -4015,7 +4558,7 @@ void mb86901_device::reset_step()
 //  error_step - step one cycle in error mode
 //-------------------------------------------------
 
-void mb86901_device::error_step()
+void sparcv7_device::error_step()
 {
 	/* The SPARC Instruction Manual: Version 8, page 157, "Appendix C - ISP Descriptions - C.5. Processor States and Instruction Dispatch" (SPARCv8.pdf, pg. 154)
 
@@ -4038,8 +4581,8 @@ void mb86901_device::error_step()
 	}
 }
 
-template <bool CHECK_DEBUG, mb86901_device::running_mode MODE>
-void mb86901_device::run_loop()
+template <bool CHECK_DEBUG, sparcv7_device::running_mode MODE>
+void sparcv7_device::run_loop()
 {
 	do
 	{
@@ -4083,7 +4626,7 @@ void mb86901_device::run_loop()
 //  opcodes
 //-------------------------------------------------
 
-void mb86901_device::execute_run()
+void sparcv7_device::execute_run()
 {
 	bool debug = machine().debug_flags & DEBUG_FLAG_ENABLED;
 
@@ -4142,7 +4685,7 @@ void mb86901_device::execute_run()
 //  disassembler
 //-------------------------------------------------
 
-uint64_t mb86901_device::get_reg_r(unsigned index) const
+uint64_t sparcv7_device::get_reg_r(unsigned index) const
 {
 	return REG(index & 31);
 }
@@ -4153,7 +4696,7 @@ uint64_t mb86901_device::get_reg_r(unsigned index) const
 //  disassembler
 //-------------------------------------------------
 
-uint64_t mb86901_device::get_translated_pc() const
+uint64_t sparcv7_device::get_translated_pc() const
 {
 	// FIXME: how do we apply translation to the address so it's in the same space the disassembler sees?
 	return m_pc;
@@ -4165,7 +4708,7 @@ uint64_t mb86901_device::get_translated_pc() const
 //  disassembler
 //-------------------------------------------------
 
-uint8_t mb86901_device::get_icc() const
+uint8_t sparcv7_device::get_icc() const
 {
 	return (m_psr & PSR_ICC_MASK) >> PSR_ICC_SHIFT;
 }
@@ -4176,7 +4719,7 @@ uint8_t mb86901_device::get_icc() const
 //  for disassembler
 //-------------------------------------------------
 
-uint8_t mb86901_device::get_xcc() const
+uint8_t sparcv7_device::get_xcc() const
 {
 	// not present before SPARCv9
 	return 0;
@@ -4188,7 +4731,7 @@ uint8_t mb86901_device::get_xcc() const
 //  for disassembler
 //-------------------------------------------------
 
-uint8_t mb86901_device::get_fcc(unsigned index) const
+uint8_t sparcv7_device::get_fcc(unsigned index) const
 {
 	// only one fcc instance before SPARCv9
 	return (m_fsr >> 10) & 3;

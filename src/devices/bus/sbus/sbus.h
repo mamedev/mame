@@ -103,7 +103,7 @@ protected:
 	virtual void device_start() override;
 
 	// internal state
-	required_device<mb86901_device> m_maincpu;
+	required_device<sparc_base_device> m_maincpu;
 	required_device<address_map_bank_device> m_type1space;
 	address_space *m_space;
 

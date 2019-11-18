@@ -21,6 +21,8 @@ void sbus_cgsix_device::base_map(address_map &map)
 	map(0x00000000, 0x01ffffff).rw(FUNC(sbus_cgsix_device::unknown_r), FUNC(sbus_cgsix_device::unknown_w));
 	map(0x00000000, 0x00007fff).r(FUNC(sbus_cgsix_device::rom_r));
 	map(0x00200000, 0x0020000f).m(m_ramdac, FUNC(bt458_device::map)).umask32(0xff000000);
+	map(0x00300000, 0x00300fff).rw(FUNC(sbus_cgsix_device::fbc_r), FUNC(sbus_cgsix_device::fbc_w));
+	map(0x00301818, 0x0030181b).rw(FUNC(sbus_cgsix_device::thc_misc_r), FUNC(sbus_cgsix_device::thc_misc_w));
 	map(0x003018fc, 0x003018ff).rw(FUNC(sbus_cgsix_device::cursor_address_r), FUNC(sbus_cgsix_device::cursor_address_w));
 	map(0x00301900, 0x003019ff).rw(FUNC(sbus_cgsix_device::cursor_ram_r), FUNC(sbus_cgsix_device::cursor_ram_w));
 	map(0x00700000, 0x00700fff).rw(FUNC(sbus_cgsix_device::fbc_r), FUNC(sbus_cgsix_device::fbc_w));
@@ -44,6 +46,8 @@ void sbus_cgsix_device::device_start()
 	m_cursor_ram = std::make_unique<uint32_t[]>(32 * 2);
 	save_pointer(NAME(m_cursor_ram), 32 * 2);
 
+	save_item(NAME(m_fbc.m_config));
+	save_item(NAME(m_fbc.m_misc));
 	save_item(NAME(m_fbc.m_clip_check));
 	save_item(NAME(m_fbc.m_status));
 	save_item(NAME(m_fbc.m_draw_status));
@@ -149,29 +153,20 @@ void sbus_cgsix_device::device_start()
 
 	save_item(NAME(m_fbc.m_vertex_count));
 
-	for (int i = 0; i < 0x1000; i++)
-	{
-		save_item(NAME(m_fbc.m_prim_buf[i].m_absx), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_absy), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_absz), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_relx), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_rely), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_relz), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_r), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_g), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_b), i);
-		save_item(NAME(m_fbc.m_prim_buf[i].m_a), i);
-	}
+	m_fbc.m_prim_buf = std::make_unique<vertex[]>(0x1000); // Unknown size on hardware
+	save_pointer(NAME(reinterpret_cast<uint8_t*>(m_fbc.m_prim_buf.get())), sizeof(vertex) * 0x1000);
 
 	save_item(NAME(m_fbc.m_curr_prim_type));
 
+	save_item(NAME(m_thc_misc));
 	save_item(NAME(m_cursor_x));
 	save_item(NAME(m_cursor_y));
 }
 
 void sbus_cgsix_device::device_reset()
 {
-	memset(&m_fbc, 0, sizeof(m_fbc));
+	m_fbc.m_vertex_count = 0;
+	m_thc_misc = 0;
 }
 
 uint32_t sbus_cgsix_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -255,7 +250,8 @@ uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst, uint8_t ma
 		const uint8_t s = src & mask;
 		const uint8_t d = dst & mask;
 		const uint32_t rop = rops[f | b];
-		//logerror("f:%d b:%d s:%02x d:%02x rop:%d\n", f >> 1, b, s, d, rop);
+		//if (fbc_misc_data() == FBC_MISC_DATA_COLOR8)
+			//logerror("f:%d b:%d s:%02x d:%02x rop:%d\n", f >> 1, b, s, d, rop);
 
 		uint8_t value = 0;
 		switch (rop)
@@ -280,16 +276,20 @@ uint8_t sbus_cgsix_device::perform_rasterop(uint8_t src, uint8_t dst, uint8_t ma
 		}
 		result |= value & mask;
 	}
+	//if (fbc_misc_data() == FBC_MISC_DATA_COLOR8)
+		//logerror("result: %02x\n", result);
 	return result;
 }
 
 void sbus_cgsix_device::handle_font_poke()
 {
-	if (fbc_misc_draw() != FBC_MISC_DRAW_RENDER)
+	if (fbc_misc_draw() > FBC_MISC_DRAW_RENDER)
 	{
 		logerror("handle_font_poke: Unsupported font draw mode %d, abandoning draw\n", fbc_misc_draw());
 		return;
 	}
+
+	const bool color8 = (fbc_misc_data() == FBC_MISC_DATA_COLOR8);
 
 	uint32_t pixel_mask = fbc_get_pixel_mask();
 	uint8_t plane_mask = fbc_get_plane_mask();
@@ -300,13 +300,20 @@ void sbus_cgsix_device::handle_font_poke()
 	const int width = (int)m_fbc.m_x1 - (int)m_fbc.m_x0;
 	const uint32_t font = m_fbc.m_font;
 	uint32_t x = m_fbc.m_x0;
-	logerror("Width: %d, bits %d to %d\n", width, 31, 31 - width);
-	for (int bit = 31; bit >= (31 - width) && x < 1152; bit--, x++)
+	//logerror("Width: %d, bits %d to %d\n", width, 31, 31 - width);
+	int step_size = color8 ? 8 : 1;
+	int start_bit = 32 - step_size;
+
+	for (int bit = start_bit; bit >= (start_bit - width * step_size) && x < 1152; bit -= step_size, x++)
 	{
 		if (!BIT(pixel_mask, 31 - (x % 32)))
 			continue;
 
-		const uint8_t src = BIT(font, bit) ? 0xff : 0x00;
+		uint8_t src = 0;
+		if (color8)
+			src = (font >> bit) & 0xff;
+		else
+			src = BIT(font, bit) ? 0xff : 0x00;
 		const uint8_t dst = vram[BYTE4_XOR_BE(x)];
 		vram[BYTE4_XOR_BE(x)]= perform_rasterop(src, dst, plane_mask);
 	}
@@ -351,7 +358,7 @@ uint8_t sbus_cgsix_device::fbc_get_plane_mask()
 // NOTE: This is basically untested, and probably full of bugs!
 void sbus_cgsix_device::handle_draw_command()
 {
-	if (fbc_misc_draw() != FBC_MISC_DRAW_RENDER)
+	if (fbc_misc_draw() > FBC_MISC_DRAW_RENDER)
 	{
 		logerror("handle_draw_command: Unsupported draw mode %d, abandoning draw\n", fbc_misc_draw());
 		return;
@@ -377,8 +384,8 @@ void sbus_cgsix_device::handle_draw_command()
 	uint32_t vindex = 0;
 	while (vindex < m_fbc.m_vertex_count)
 	{
-		vertex_t &v0 = m_fbc.m_prim_buf[vindex++];
-		vertex_t &v1 = m_fbc.m_prim_buf[vindex++];
+		vertex &v0 = m_fbc.m_prim_buf[vindex++];
+		vertex &v1 = m_fbc.m_prim_buf[vindex++];
 
 		for (uint32_t y = v0.m_absy; y <= v1.m_absy; y++)
 		{
@@ -454,6 +461,12 @@ READ32_MEMBER(sbus_cgsix_device::fbc_r)
 	uint32_t ret = 0;
 	switch (offset)
 	{
+		case FBC_CONFIG:
+		{
+			const uint32_t data = (m_fbc.m_config & FBC_CONFIG_MASK) | FBC_CONFIG_FBID | FBC_CONFIG_VERSION;
+			logerror("%s: fbc_r: CONFIG (%08x & %08x)\n", machine().describe_context(), data, mem_mask);
+			return data;
+		}
 		case FBC_MISC:
 			logerror("fbc_r: MISC (%08x & %08x)\n", m_fbc.m_misc, mem_mask);
 			return m_fbc.m_misc;
@@ -780,6 +793,10 @@ WRITE32_MEMBER(sbus_cgsix_device::fbc_w)
 
 	switch (offset)
 	{
+		case FBC_CONFIG:
+			COMBINE_DATA(&m_fbc.m_config);
+			logerror("fbc_w: CONFIG = %08x & %08x)\n", data, mem_mask);
+			break;
 		case FBC_MISC:
 			COMBINE_DATA(&m_fbc.m_misc);
 			logerror("fbc_w: MISC = %08x & %08x\n", data, mem_mask);
@@ -1237,6 +1254,50 @@ WRITE32_MEMBER(sbus_cgsix_device::cursor_ram_w)
 	COMBINE_DATA(&m_cursor_ram[offset]);
 }
 
+READ32_MEMBER(sbus_cgsix_device::thc_misc_r)
+{
+	logerror("thc_misc_r: %08x & %08x\n", m_thc_misc | THC_MISC_REV, mem_mask);
+	return m_thc_misc | THC_MISC_REV;
+}
+
+WRITE32_MEMBER(sbus_cgsix_device::thc_misc_w)
+{
+	logerror("thc_misc_w: %08x & %08x\n", data, mem_mask);
+	if (BIT(data, THC_MISC_IRQ_BIT) && BIT(m_thc_misc, THC_MISC_IRQ_BIT))
+	{
+		data &= ~(1 << THC_MISC_IRQ_BIT);
+		lower_irq(4);
+	}
+	if (BIT(data, THC_MISC_IRQEN_BIT))
+	{
+		data &= ~(1 << THC_MISC_IRQ_BIT);
+	}
+
+	COMBINE_DATA(&m_thc_misc);
+	m_thc_misc &= THC_MISC_WRITE_MASK;
+}
+
+WRITE_LINE_MEMBER(sbus_cgsix_device::vblank_w)
+{
+	int old_state = BIT(m_thc_misc, THC_MISC_VSYNC_BIT);
+	if (old_state != state)
+	{
+		if (state)
+		{
+			m_thc_misc |= 1 << THC_MISC_VSYNC_BIT;
+			if (BIT(m_thc_misc, THC_MISC_IRQEN_BIT))
+			{
+				m_thc_misc |= 1 << THC_MISC_IRQ_BIT;
+				raise_irq(4);
+			}
+		}
+		else
+		{
+			m_thc_misc &= ~(1 << THC_MISC_VSYNC_BIT);
+		}
+	}
+}
+
 //-------------------------------------------------
 //  TurboGX implementation
 //-------------------------------------------------
@@ -1262,6 +1323,7 @@ void sbus_turbogx_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_screen_update(FUNC(sbus_turbogx_device::screen_update));
 	m_screen->set_raw(105.561_MHz_XTAL, 1472, 0, 1152, 943, 0, 900);
+	m_screen->screen_vblank().set(FUNC(sbus_turbogx_device::vblank_w));
 
 	BT458(config, m_ramdac, 0);
 }
@@ -1303,6 +1365,7 @@ void sbus_turbogxp_device::device_add_mconfig(machine_config &config)
 	m_screen->set_size(1152, 900);
 	m_screen->set_visarea(0, 1152-1, 0, 900-1);
 	m_screen->set_refresh_hz(72);
+	m_screen->screen_vblank().set(FUNC(sbus_turbogxp_device::vblank_w));
 
 	BT467(config, m_ramdac, 0);
 }

@@ -36,8 +36,8 @@
 #include "emu.h"
 #include "bt45x.h"
 
-#define LOG_GENERAL (1U << 0)
-#define LOG_READS   (1U << 1)
+#define LOG_READS   (1U << 0)
+#define LOG_WRITES	(1U << 1)
 
 #define VERBOSE (0)
 
@@ -180,7 +180,7 @@ void bt45x_device_base::device_reset()
 
 READ8_MEMBER(bt45x_device_base::address_r)
 {
-	LOGMASKED(LOG_READS, "address_r 0x%02x\n", m_address & (m_palette_colors - 1));
+	LOGMASKED(LOG_READS, "%s: address_r 0x%02x\n", machine().describe_context(), m_address & (m_palette_colors - 1));
 
 	if (!machine().side_effects_disabled())
 		m_address_rgb = 0;
@@ -190,7 +190,8 @@ READ8_MEMBER(bt45x_device_base::address_r)
 
 WRITE8_MEMBER(bt45x_device_base::address_w)
 {
-	LOG("address_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: address_w 0x%02x\n", machine().describe_context(), data);
+
 	m_address_rgb = 0;
 
 	m_address = data & (m_palette_colors - 1);
@@ -230,7 +231,7 @@ READ8_MEMBER(bt45x_rgb_device_base::palette_r)
 
 	increment_address();
 
-	LOGMASKED(LOG_READS, "palette_r 0x%02x\n", data & get_mask());
+	LOGMASKED(LOG_READS, "%s: palette_r 0x%02x\n", machine().describe_context(), data & get_mask());
 
 	return data & get_mask();
 }
@@ -244,7 +245,7 @@ READ8_MEMBER(bt45x_mono_device_base::palette_r)
 
 	increment_address();
 
-	LOGMASKED(LOG_READS, "palette_r 0x%02x\n", data & get_mask());
+	LOGMASKED(LOG_READS, "%s: palette_r 0x%02x\n", machine().describe_context(), data & get_mask());
 
 	return data & get_mask();
 }
@@ -259,14 +260,14 @@ READ8_MEMBER(bt457_device::palette_r)
 
 	increment_address();
 
-	LOGMASKED(LOG_READS, "palette_r 0x%02x\n", data);
+	LOGMASKED(LOG_READS, "%s: palette_r 0x%02x\n", machine().describe_context(), data);
 
 	return data;
 }
 
 WRITE8_MEMBER(bt45x_rgb_device_base::palette_w)
 {
-	LOG("palette_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
 	m_color_ram[m_address][m_address_rgb] = data & get_mask();
 
@@ -279,7 +280,7 @@ WRITE8_MEMBER(bt45x_rgb_device_base::palette_w)
 
 WRITE8_MEMBER(bt45x_mono_device_base::palette_w)
 {
-	LOG("palette_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
 	if (m_address_rgb == 1)
 		m_color_ram[m_address] = data & get_mask();
@@ -289,7 +290,7 @@ WRITE8_MEMBER(bt45x_mono_device_base::palette_w)
 
 WRITE8_MEMBER(bt457_device::palette_w)
 {
-	LOG("palette_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
 	// device in normal mode, or rgb mode and selected
 	if (!(m_control & RGB) || (m_control & RGB) == (1 << m_address_rgb))
@@ -300,7 +301,7 @@ WRITE8_MEMBER(bt457_device::palette_w)
 
 READ8_MEMBER(bt45x_device_base::register_r)
 {
-	LOGMASKED(LOG_READS, "register_r 0x%02x\n", m_address);
+	LOGMASKED(LOG_READS, "%s: register_r 0x%02x\n", machine().describe_context(), m_address);
 
 	switch (m_address)
 	{
@@ -318,17 +319,18 @@ WRITE8_MEMBER(bt45x_device_base::register_w)
 	switch (m_address)
 	{
 	case REG_READ_MASK:
-		LOG("read mask 0x%02x\n", data);
+		LOGMASKED(LOG_WRITES, "%s: register_w: read mask 0x%02x\n", machine().describe_context(), data);
 		m_read_mask = data;
 		break;
 
 	case REG_BLINK_MASK:
-		LOG("blink mask 0x%02x\n", data);
+		LOGMASKED(LOG_WRITES, "%s: register_w: blink mask 0x%02x\n", machine().describe_context(), data);
 		m_blink_mask = data;
 		break;
 
 	case REG_COMMAND:
-		LOG("command 0x%02x, %d:1 multiplexing, use %s, %s, OL1 %s blinking, OL0 %s blinking, OL1 display %s, OL0 display %s\n",
+		LOGMASKED(LOG_WRITES, "%s: register_w: command 0x%02x, %d:1 multiplexing, use %s, %s, OL1 %s blinking, OL0 %s blinking, OL1 display %s, OL0 display %s\n",
+			machine().describe_context(),
 			data,
 			(data & CR7) ? 5 : 4,
 			(data & CR6) ? "color palette RAM" : "overlay color 0",
@@ -344,7 +346,7 @@ WRITE8_MEMBER(bt45x_device_base::register_w)
 		break;
 
 	case REG_CONTROL:
-		LOG("control 0x%02x, %s nibble%s%s%s\n",
+		LOGMASKED(LOG_WRITES, "%s: register_w: control 0x%02x, %s nibble%s%s%s\n",
 			data,
 			(data & D3) ? "low" : "high",
 			(data & D2) ? ", blue channel enable" : "",
@@ -367,7 +369,7 @@ READ8_MEMBER(bt45x_rgb_device_base::overlay_r)
 
 	increment_address();
 
-	LOGMASKED(LOG_READS, "overlay_r 0x%02x\n", data & get_mask());
+	LOGMASKED(LOG_READS, "%s: overlay_r 0x%02x\n", machine().describe_context(), data & get_mask());
 
 	return data & get_mask();
 }
@@ -384,7 +386,7 @@ READ8_MEMBER(bt45x_mono_device_base::overlay_r)
 
 	increment_address();
 
-	LOGMASKED(LOG_READS, "overlay_r 0x%02x\n", data & get_mask());
+	LOGMASKED(LOG_READS, "%s: overlay_r 0x%02x\n", machine().describe_context(), data & get_mask());
 
 	return data & get_mask();
 }
@@ -402,14 +404,14 @@ READ8_MEMBER(bt457_device::overlay_r)
 
 	increment_address();
 
-	LOGMASKED(LOG_READS, "overlay_r 0x%02x\n", data);
+	LOGMASKED(LOG_READS, "%s: overlay_r 0x%02x\n", machine().describe_context(), data);
 
 	return data;
 }
 
 WRITE8_MEMBER(bt45x_rgb_device_base::overlay_w)
 {
-	LOG("overlay_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: overlay_w 0x%02x\n", machine().describe_context(), data);
 
 	// address is ignored for 1 bit overlay devices
 	const u8 address = (m_overlay_colors == 1) ? 0 : m_address;
@@ -431,7 +433,7 @@ WRITE8_MEMBER(bt45x_rgb_device_base::overlay_w)
 
 WRITE8_MEMBER(bt45x_mono_device_base::overlay_w)
 {
-	LOG("overlay_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: overlay_w 0x%02x\n", machine().describe_context(), data);
 
 	// address is ignored for 1 bit overlay devices
 	const u8 address = (m_overlay_colors == 1) ? 0 : m_address;
@@ -444,7 +446,7 @@ WRITE8_MEMBER(bt45x_mono_device_base::overlay_w)
 
 WRITE8_MEMBER(bt457_device::overlay_w)
 {
-	LOG("overlay_w 0x%02x\n", data);
+	LOGMASKED(LOG_WRITES, "%s: overlay_w 0x%02x\n", machine().describe_context(), data);
 
 	if (m_address < m_overlay_colors)
 	{

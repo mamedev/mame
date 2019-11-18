@@ -44,10 +44,13 @@ protected:
 	DECLARE_WRITE32_MEMBER(vram_w);
 	DECLARE_READ32_MEMBER(fbc_r);
 	DECLARE_WRITE32_MEMBER(fbc_w);
+	DECLARE_READ32_MEMBER(thc_misc_r);
+	DECLARE_WRITE32_MEMBER(thc_misc_w);
 	DECLARE_READ32_MEMBER(cursor_address_r);
 	DECLARE_WRITE32_MEMBER(cursor_address_w);
 	DECLARE_READ32_MEMBER(cursor_ram_r);
 	DECLARE_WRITE32_MEMBER(cursor_ram_w);
+	DECLARE_WRITE_LINE_MEMBER(vblank_w);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t perform_rasterop(uint8_t src, uint8_t dst, uint8_t mask = 0xff);
@@ -75,6 +78,27 @@ protected:
 		ROP_SRC_OR_NDST     = 0x0d,
 		ROP_SRC_OR_DST      = 0x0e,
 		ROP_SET             = 0x0f
+	};
+
+	enum
+	{
+		THC_MISC_IRQ_BIT	= 4,
+		THC_MISC_IRQEN_BIT	= 5,
+		THC_MISC_CURRES_BIT	= 6,
+		THC_MISC_SYNCEN_BIT	= 7,
+		THC_MISC_VSYNC_BIT	= 8,
+		THC_MISC_SYNC_BIT	= 9,
+		THC_MISC_ENVID_BIT	= 10,
+		THC_MISC_RESET_BIT	= 12,
+		THC_MISC_REV        = 0x00010000,
+		THC_MISC_WRITE_MASK	= 0x000014ff
+	};
+
+	enum
+	{
+		FBC_CONFIG_FBID		= 0x60000000,
+		FBC_CONFIG_VERSION	= 0x00100000,
+		FBC_CONFIG_MASK		= 0x000f3fff
 	};
 
 	enum
@@ -233,6 +257,7 @@ protected:
 
 	enum
 	{
+		FBC_CONFIG		= 0x000/4,
 		FBC_MISC        = 0x004/4,
 		FBC_CLIP_CHECK  = 0x008/4,
 
@@ -339,7 +364,7 @@ protected:
 		FBC_IRECT_A     = 0x93c/4,
 	};
 
-	struct vertex_t
+	struct vertex
 	{
 		uint32_t m_absx;
 		uint32_t m_absy;
@@ -364,8 +389,9 @@ protected:
 		PRIM_COUNT
 	};
 
-	struct fbc_t
+	struct fbc
 	{
+		uint32_t m_config;
 		uint32_t m_misc;
 		uint32_t m_clip_check;
 		uint32_t m_status;
@@ -471,11 +497,12 @@ protected:
 		uint32_t m_irect_b;
 		uint32_t m_irect_a;
 
-		vertex_t m_prim_buf[0x1000]; // unknown size
+		std::unique_ptr<vertex[]> m_prim_buf;
 		uint32_t m_vertex_count;
 		uint32_t m_curr_prim_type;
 	};
 
+	uint32_t m_thc_misc;
 	int16_t m_cursor_x;
 	int16_t m_cursor_y;
 
@@ -485,7 +512,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<bt458_device> m_ramdac;
 
-	fbc_t m_fbc;
+	fbc m_fbc;
 
 	uint32_t m_vram_size;
 };
