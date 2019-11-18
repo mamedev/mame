@@ -278,9 +278,9 @@ void speglsht_state::speglsht_mem(address_map &map)
 	map(0x01800400, 0x01800403).portr("IN1");
 	map(0x01a00000, 0x01afffff).ram().share("framebuffer");
 	map(0x01b00000, 0x01b07fff).ram(); //cleared ...  video related ?
-	map(0x01c00000, 0x01dfffff).rom().region("user2", 0);
+	map(0x01c00000, 0x01dfffff).rom().region("subdata", 0);
 	map(0x0a000000, 0x0a003fff).rw(FUNC(speglsht_state::shared_r), FUNC(speglsht_state::shared_w));
-	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("user1", 0);
+	map(0x0fc00000, 0x0fdfffff).rom().mirror(0x10000000).region("subprog", 0);
 	map(0x1eff0000, 0x1eff001f).ram();
 	map(0x1eff003c, 0x1eff003f).r(FUNC(speglsht_state::irq_ack_clear));
 }
@@ -448,13 +448,13 @@ ROM_START( speglsht )
 	ROM_LOAD( "sx004-07.u70", 0x000000, 0x200000, CRC(2d759cc4) SHA1(9fedd829190b2aab850b2f1088caaec91e8715dd) ) /* Noted as "ZPRO0" IE: Z80 (ST0016) Program 0 */
 	/* U71 unpopulated, Noted as ZPRO1 */
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 )
-	ROM_LOAD32_BYTE( "sx004-04.u33", 0x00000, 0x80000, CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) ) /* Noted as "RPRO3" IE: R3000 Program 3 */
-	ROM_LOAD32_BYTE( "sx004-03.u32", 0x00001, 0x80000, CRC(c6ffb00e) SHA1(f57ef45bb5c690c3e63101a36835d2687abfcdbd) ) /* Noted as "RPRO2" */
-	ROM_LOAD32_BYTE( "sx004-02.u31", 0x00002, 0x80000, CRC(21eb46e4) SHA1(0ab21ed012c9a76e01c83b60c6f4670836dfa718) ) /* Noted as "RPRO1" */
-	ROM_LOAD32_BYTE( "sx004-01.u30", 0x00003, 0x80000, CRC(65646949) SHA1(74931c230f4e4b1008fbc5fba169292e216aa23b) ) /* Noted as "RPRO0" */
+	ROM_REGION32_LE( 0x200000, "subprog", 0 )
+	ROM_LOAD32_BYTE( "sx004-04.u33", 0x00003, 0x80000, CRC(e46d2e57) SHA1(b1fb836ab2ce547dc2e8d1046d7ef835b87bb04e) ) /* Noted as "RPRO3" IE: R3000 Program 3 */
+	ROM_LOAD32_BYTE( "sx004-03.u32", 0x00002, 0x80000, CRC(c6ffb00e) SHA1(f57ef45bb5c690c3e63101a36835d2687abfcdbd) ) /* Noted as "RPRO2" */
+	ROM_LOAD32_BYTE( "sx004-02.u31", 0x00001, 0x80000, CRC(21eb46e4) SHA1(0ab21ed012c9a76e01c83b60c6f4670836dfa718) ) /* Noted as "RPRO1" */
+	ROM_LOAD32_BYTE( "sx004-01.u30", 0x00000, 0x80000, CRC(65646949) SHA1(74931c230f4e4b1008fbc5fba169292e216aa23b) ) /* Noted as "RPRO0" */
 
-	ROM_REGION( 0x200000, "user2",0)
+	ROM_REGION32_LE( 0x200000, "subdata", 0)
 	ROM_LOAD32_WORD( "sx004-05.u34", 0x000000, 0x100000, CRC(f3c69468) SHA1(81daef6d0596cb67bb6f87b39874aae1b1ffe6a6) ) /* Noted as "RD0" IE: R3000 Data 0 */
 	ROM_LOAD32_WORD( "sx004-06.u35", 0x000002, 0x100000, CRC(5af78e44) SHA1(0131d50348fef80c2b100d74b7c967c6a710d548) ) /* Noted as "RD1" */
 ROM_END
