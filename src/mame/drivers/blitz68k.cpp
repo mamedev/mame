@@ -63,6 +63,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_nvram(*this, "nvram")
 		, m_frame_buffer(*this, "frame_buffer")
+		, m_blit_rom(*this, "blitter")
 		, m_blit_romaddr(*this, "blit_romaddr")
 		, m_blit_attr1_ram(*this, "blit_attr1_ram")
 		, m_blit_dst_ram_loword(*this, "blitram_loword")
@@ -204,6 +205,7 @@ private:
 	optional_shared_ptr<uint16_t> m_nvram;
 	std::unique_ptr<uint8_t[]> m_blit_buffer;
 	optional_shared_ptr<uint16_t> m_frame_buffer;
+	optional_memory_region m_blit_rom;
 	optional_shared_ptr<uint16_t> m_blit_romaddr;
 	optional_shared_ptr<uint16_t> m_blit_attr1_ram;
 	optional_shared_ptr<uint16_t> m_blit_dst_ram_loword;
@@ -323,7 +325,7 @@ uint32_t blitz68k_state::screen_update_blitz68k_noblit(screen_device &screen, bi
 
 WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 {
-	uint8_t *blit_rom = memregion("blitter")->base();
+	uint8_t *blit_rom = m_blit_rom->base();
 	uint32_t blit_dst_xpos;
 	uint32_t blit_dst_ypos;
 	int x,y,x_size,y_size;
@@ -361,14 +363,14 @@ WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 			{
 				uint8_t pen_helper;
 
-				pen_helper = blit_rom[src] & 0xff;
+				pen_helper = blit_rom[BYTE_XOR_BE(src)] & 0xff;
 				if(m_blit_transpen[0xa/2] & 0x100) //pen is opaque register
 				{
 					if(pen_helper)
-						m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+						m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[BYTE_XOR_BE(src)];
 				}
 				else
-					m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+					m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[BYTE_XOR_BE(src)];
 			}
 
 			src++;
@@ -511,8 +513,8 @@ WRITE8_MEMBER(blitz68k_state::blit_flags_w)
 
 WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 {
-	uint8_t *blit_rom  = memregion("blitter")->base();
-	int blit_romsize = memregion("blitter")->bytes();
+	uint8_t *blit_rom = m_blit_rom->base();
+	int blit_romsize = m_blit_rom->bytes();
 	uint32_t blit_dst_xpos;
 	uint32_t blit_dst_ypos;
 	int x, y, x_size, y_size;
@@ -556,7 +558,7 @@ WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 			if (!m_blit.solid)
 			{
 				src %= blit_romsize;
-				pen = blit_rom[src];
+				pen = blit_rom[BYTE_XOR_BE(src)];
 				src++;
 			}
 
@@ -2079,7 +2081,7 @@ ROM_START( bankrob )
 	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "xpi-2_2.6.u7", 0x0000, 0x2000, NO_DUMP ) // "for SPI & MPI 06/08/1995"
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "unknown_label.u70", 0x00000, 0x80000, CRC(35225bf6) SHA1(cd3176ab43c0678c6b9a92b9fafea116babdd534) )
 	ROM_LOAD16_BYTE( "unknown_label.u54", 0x00001, 0x80000, CRC(c7c0c2d1) SHA1(3b3b6954fbded65418492374aaa94e3c60af69c5) )
 
@@ -2147,7 +2149,7 @@ ROM_START( bankroba )
 	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "bankroba_sub.mcu", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "dkbkus_2.31-c.u46", 0x00000, 0x80000, CRC(d94a3ead) SHA1(e599b8d110bae16f83b3969834aa9b01076e2310) )
 	ROM_LOAD( "dkbkus_2.31-d.u51", 0x80000, 0x80000, CRC(834b63bb) SHA1(da6b5e2fc1626044ecddf438c696e606a72d6164) )
 
@@ -2181,7 +2183,7 @@ ROM_START( bankrobb ) // DK-B main PCB + 8L74 sub PCB
 	ROM_REGION( 0x2000, "mcu2", 0 ) // on sub PCB, 68HC705C8P code
 	ROM_LOAD( "8l6_74_-4.01.u18", 0x0000, 0x2000, NO_DUMP ) // actual label 8l6(74)-4.01
 
-	ROM_REGION( 0x180000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x180000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "bank-c.u46", 0x00000,  0x80000, CRC(f9f77d0f) SHA1(e56e78e7b6abff99fa228bcbe3eccf1eb40c1ee8) )
 	ROM_LOAD( "bank-d.u51", 0x80000,  0x80000, CRC(4145d57c) SHA1(bec349706d0d06ed52252835313616ae6e023b28) )
 	ROM_LOAD( "bank-e.u61", 0x100000, 0x80000, CRC(0d75efbb) SHA1(0d4dd5f3d1fdd31e0f99acdc23f05d8e67393a48) ) // u61 might be wrong, not readable on the pics
@@ -2242,7 +2244,7 @@ ROM_START( cj3play )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8A code
 	ROM_LOAD( "cj-tripleplay_2.4.c8", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-d.u68", 0x000000, 0x80000, CRC(8bbcf296) SHA1(e7e6e88f5f3065e7df7fff45429fdda1404418d6) )
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-c.u75", 0x000001, 0x80000, CRC(3dd101e0) SHA1(01241a880e72834282dd7447273ffc332a105ad1) )
 	ROM_LOAD16_BYTE( "cjtripleply-cj_1.10-f.u51", 0x100000, 0x80000, CRC(c8ccf1a7) SHA1(7a7b0f68d6ed5894fb4deb93fbf8053aff4fdb35) )
@@ -2302,7 +2304,7 @@ ROM_START( cjffruit )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "cjfunfruit_2.3.c8", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-d.u68", 0x000000, 0x80000, CRC(33ccdc3f) SHA1(8d81e25c5a38f280c6fe5710937c876dcb679e61) )
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-c.u75", 0x000001, 0x80000, CRC(93854506) SHA1(09fd85d60ab723883d28a12f56dbb0cb2b03907f) )
 	ROM_LOAD16_BYTE( "cjfunfruit-cj_1.13-f.u51", 0x100000, 0x80000, CRC(f5de1072) SHA1(943a82899ca6a07991fa4031d2ff96f625c9d6f5) )
@@ -2367,7 +2369,7 @@ ROM_START( deucesw2 )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "cbc-8l_2.0.u31", 0x0000, 0x2000, NO_DUMP )   // "for CBC-8L REV..." (label is only partially readable)
 
-	ROM_REGION( 0x80000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x80000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-d.u87", 0x00000, 0x40000, CRC(7ab3ea30) SHA1(5e435f2a6ea169b827ae0f3da6a8afda0b636d7e) ) // "for CBC ($AA97)"
 	ROM_LOAD16_BYTE( "cb2wild-ah-2.02f-c.u94", 0x00001, 0x40000, CRC(5b465430) SHA1(df428e3309732376d0999ad75567e264b7db9a1c) ) // "for CBC ($465A)"
 
@@ -2445,7 +2447,7 @@ ROM_START( dualgame )
 	ROM_REGION( 0x2000, "mcu2", 0 ) // 68HC705C8P code
 	ROM_LOAD( "dualgame.u9", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "mpduga_0.01-d.u69", 0x00000, 0x80000, CRC(2f65e87e) SHA1(ded9d75ebb46e061615dac408f86dad14df9d30b) )
 	ROM_LOAD16_BYTE( "mpduga_0.01-c.u68", 0x00001, 0x80000, CRC(bc5b4738) SHA1(69bcc15d3e7524ba26dad0e29919461fbd0a8736) )
 
@@ -2498,7 +2500,7 @@ ROM_START( hermit )
 	ROM_REGION( 0x2000, "mcu", 0 )  // 68HC705C8P code
 	ROM_LOAD( "lc-hermit_1.00.u51", 0x0000, 0x2000, NO_DUMP )   // "for LC-8L 26/04/1995"
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD16_BYTE( "unknown_label.u2", 0x00000, 0x80000, CRC(fc8b9ec6) SHA1(c7515cf78d68a1ae7f2e8e50fe3083db2547c314) )
 	ROM_LOAD16_BYTE( "unknown_label.u3", 0x00001, 0x80000, CRC(0a621d76) SHA1(66cabf4e233dc784851c9fb07f18658c10744cd7) )
 
@@ -2551,7 +2553,7 @@ ROM_START( ilpag )
 	ROM_REGION( 0x800, "mcu", 0 ) // 87C748 code
 	ROM_LOAD( "87c748.u132", 0x000, 0x800, NO_DUMP )
 
-	ROM_REGION( 0x100000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x100000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "graf1.u46",   0x00000, 0x80000, CRC(cf745964) SHA1(7af4a6c0b8d01c0d1b71bc5330a257d2fa712611) )
 	ROM_LOAD( "graf2.u51",   0x80000, 0x80000, CRC(2d64d3b5) SHA1(8fdb943d0aedf12706ce0a772c8f5155fa03e8c7) )
 ROM_END
@@ -2816,7 +2818,7 @@ ROM_START( steaser )
 	ROM_REGION( 0x1000, "mcu2", 0 ) // 68705
 	ROM_LOAD( "mc68hc705c8p_sub.mcu", 0x00000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x200000, "blitter", 0 ) // data for the blitter
+	ROM_REGION16_BE( 0x200000, "blitter", 0 ) // data for the blitter
 	ROM_LOAD( "u46.2", 0x000000, 0x80000, CRC(c4a5e47b) SHA1(9f3d3124c76c0bdf8cdca849e1d921a335e433b6) )
 	ROM_LOAD( "u51.3", 0x080000, 0x80000, CRC(4dc57435) SHA1(7dfa6f9e35986dd48869786abbe70103f336bcb1) )
 	ROM_LOAD( "u61.4", 0x100000, 0x80000, CRC(d8d8dc6f) SHA1(5a76b1fd1a3a532e5ff2de127286ace7d3567c58) )
