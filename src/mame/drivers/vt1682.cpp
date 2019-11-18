@@ -16,6 +16,17 @@
 #include "emupal.h"
 #include "screen.h"
 
+#define LOG_VRAM_WRITES      (1U << 1)
+#define LOG_SRAM_WRITES      (1U << 2)
+
+#define LOG_ALL           ( LOG_VRAM_WRITES | LOG_SRAM_WRITES )
+
+#define VERBOSE             (0)
+#include "logmacro.h"
+
+
+
+
 class vt_vt1682_state : public driver_device
 {
 public:
@@ -309,6 +320,7 @@ private:
 
 	uint8_t m_2106_enable_reg;
 
+	uint8_t m_210d_ioconfig;
 
 	DECLARE_READ8_MEMBER(vt1682_2100_prgbank1_r3_r);
 	DECLARE_WRITE8_MEMBER(vt1682_2100_prgbank1_r3_w);
@@ -368,6 +380,12 @@ private:
 	DECLARE_READ8_MEMBER(vt1682_210e_io_ab_r);
 	DECLARE_READ8_MEMBER(vt1682_210f_io_cd_r);
 
+	DECLARE_WRITE8_MEMBER(vt1682_210e_io_ab_w);
+	DECLARE_WRITE8_MEMBER(vt1682_210f_io_cd_w);
+
+	DECLARE_READ8_MEMBER(vt1682_210d_ioconfig_r);
+	DECLARE_WRITE8_MEMBER(vt1682_210d_ioconfig_w);
+
 	/* System Helpers */
 
 	uint16_t get_dma_sr_addr()
@@ -417,7 +435,8 @@ private:
 		return ((m_2126_dma_sr_bank_addr_22_15 ) | (m_2128_dma_sr_bank_addr_24_23 << 8)) & 0x3ff;
 	}
 
-	void do_dma_external_to_internal(uint16_t dstaddr, int count, bool is_video);
+	void do_dma_external_to_internal(int data, bool is_video);
+	void do_dma_internal_to_internal(int data, bool is_video);
 
 	/* Support */
 
@@ -432,7 +451,9 @@ private:
 	INTERRUPT_GEN_MEMBER(nmi);
 
 	bitmap_ind8 m_priority_bitmap;
+	void draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 	void draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 };
 
 void vt_vt1682_state::video_start()
@@ -530,6 +551,8 @@ void vt_vt1682_state::machine_start()
 	save_item(NAME(m_2128_dma_sr_bank_addr_24_23));
 
 	save_item(NAME(m_2106_enable_reg));
+
+	save_item(NAME(m_210d_ioconfig));
 }
 
 void vt_vt1682_state::machine_reset()
@@ -626,6 +649,7 @@ void vt_vt1682_state::machine_reset()
 
 	m_2106_enable_reg = 0;
 
+	m_210d_ioconfig = 0;
 
 	update_banks();
 
@@ -935,7 +959,7 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2001_vblank_r)
 	uint8_t ret = 0x00;
 
 	int sp_err = 0; // too many sprites per lien
-	int vblank = 0; // in vblank?
+	int vblank = m_screen->vpos() > 240 ? 1 : 0; // in vblank?
 
 	ret |= sp_err << 6;
 	ret |= vblank << 7;
@@ -1033,10 +1057,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2004_sprram_data_w)
 	uint16_t spriteram_address = get_spriteram_addr();
 	m_spriteram->write8(spriteram_address, data);
 
-	logerror("%s: vt1682_2004_sprram_data_w writing: %02x to SpriteRam Address %04x\n", machine().describe_context(), data, spriteram_address);
-	//spriteram_address++; // auto inc
+	LOGMASKED(LOG_SRAM_WRITES, "%s: vt1682_2004_sprram_data_w writing: %02x to SpriteRam Address %04x\n", machine().describe_context(), data, spriteram_address);
 	inc_spriteram_addr();
-	//set_spriteram_addr(spriteram_address); // update registers
 }
 
 
@@ -1120,7 +1142,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2007_vram_data_w)
 {
 	uint16_t vram_address = get_vram_addr();
 	m_vram->write8(vram_address, data);
-	//logerror("%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
+	LOGMASKED(LOG_VRAM_WRITES, "%s: vt1682_2007_vram_data_w writing: %02x to VideoRam Address %04x\n", machine().describe_context(), data, vram_address);
 	vram_address++; // auto inc
 	set_vram_addr(vram_address); // update registers
 }
@@ -2326,6 +2348,12 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2100_prgbank1_r3_w)
     0x04 - Double
     0x02 - ROM SEL
     0x01 - PRAM
+
+	TV Mode settings 0 = NTSC, 1 = PAL M, 2 = PAL N, 3 = PAL
+	see clocks near machine_config
+
+	ROM SEL is which CPU the internal ROM maps to (if used)  0 = Main CPU, 1 = Sound CPU
+
 */
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2105_comr6_tvmodes_w)
@@ -2556,6 +2584,30 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
     0x01 - IOA OE
 */
 
+READ8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_r)
+{
+	uint8_t ret = m_210d_ioconfig;
+	logerror("%s: vt1682_210d_ioconfig_r returning: %02x\n", machine().describe_context(), ret);
+	return ret;
+}
+
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210d_ioconfig_w)
+{
+	logerror("%s: vt1682_210d_ioconfig_w writing: %02x ( IOD_ENB:%1x IOD_OE:%1x | IOC_ENB:%1x IOC_OE:%1x | IOB_ENB:%1x IOB_OE:%1x | IOA_ENB:%1x IOA_OE:%1x )\n", machine().describe_context(), data,
+		(data & 0x80) ? 1 : 0,
+		(data & 0x40) ? 1 : 0,
+		(data & 0x20) ? 1 : 0,
+		(data & 0x10) ? 1 : 0,
+		(data & 0x08) ? 1 : 0,
+		(data & 0x04) ? 1 : 0,
+		(data & 0x02) ? 1 : 0,
+		(data & 0x01) ? 1 : 0);
+
+	m_210d_ioconfig = data;
+}
+
+
 /*
     Address 0x210e r/w (MAIN CPU)
 
@@ -2571,10 +2623,17 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_210c_prgbank1_r2_w)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
 {
+	//uint8_t ret = ioport("IN0")->read();
 	uint8_t ret = machine().rand();
 //	logerror("%s: vt1682_210e_io_ab_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_w)
+{
+	logerror("%s: vt1682_210e_io_ab_w writing: %02x (portb: %1x porta: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
+}
+
 
 
 /*
@@ -2592,10 +2651,17 @@ READ8_MEMBER(vt_vt1682_state::vt1682_210e_io_ab_r)
 
 READ8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_r)
 {
+	//uint8_t ret = ioport("IN1")->read();
 	uint8_t ret = machine().rand();
 //	logerror("%s: vt1682_210f_io_cd_r returning: %02x\n", machine().describe_context(), ret);
 	return ret;
 }
+
+WRITE8_MEMBER(vt_vt1682_state::vt1682_210f_io_cd_w)
+{
+	logerror("%s: vt1682_210f_io_cd_w writing: %02x (portd: %1x portc: %1x)\n", machine().describe_context(), data, (data & 0xf0) >> 4, data & 0x0f);
+}
+
 
 /*
    Address 0x2110 READ (MAIN CPU)
@@ -3206,10 +3272,15 @@ READ8_MEMBER(vt_vt1682_state::vt1682_2127_dma_status_r)
 	return ret;
 }
 
-void vt_vt1682_state::do_dma_external_to_internal(uint16_t dstaddr, int count, bool is_video)
+void vt_vt1682_state::do_dma_external_to_internal(int data, bool is_video)
 {
+	int count = data * 2;
+	if (count == 0)
+		count = 0x200;
+
 	int srcbank = get_dma_sr_bank_ddr();
 	int srcaddr = get_dma_sr_addr();
+	uint16_t dstaddr = get_dma_dt_addr();
 
 	if (is_video)
 		logerror("Doing DMA, External to Internal (VRAM/SRAM) src: %08x dest: %04x length: %03x\n", srcaddr | srcbank<<15, dstaddr, count);
@@ -3232,6 +3303,39 @@ void vt_vt1682_state::do_dma_external_to_internal(uint16_t dstaddr, int count, b
 		set_dma_sr_addr(srcaddr);
 	}
 }
+
+void vt_vt1682_state::do_dma_internal_to_internal(int data, bool is_video)
+{
+	int count = data * 2;
+	if (count == 0)
+		count = 0x200;
+
+	int srcaddr = get_dma_sr_addr();
+	uint16_t dstaddr = get_dma_dt_addr();
+
+	if (is_video)
+		logerror("Doing DMA, Internal to Internal (VRAM/SRAM) src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+	else
+		logerror("Doing DMA, Internal to Internal src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count);
+
+	for (int i = 0; i < count; i++)
+	{
+		address_space &mem = m_maincpu->space(AS_PROGRAM);
+
+		srcaddr = get_dma_sr_addr();
+		uint8_t dat = mem.read_byte(srcaddr);
+		srcaddr++;
+
+		mem.write_byte(dstaddr, dat);
+
+		if (!is_video)
+			dstaddr++;
+
+		// update registers
+		set_dma_sr_addr(srcaddr);
+	}
+}
+
 
 
 WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
@@ -3263,11 +3367,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 				return;
 			}
 
-			int count = data * 2;
-			if (count == 0)
-				count = 0x200;
 
-			do_dma_external_to_internal(dstaddr, count, get_dma_dt_is_video());
+			do_dma_external_to_internal(data, get_dma_dt_is_video());
 
 			return;
 		}
@@ -3276,6 +3377,8 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 	{
 		if (get_dma_dt_isext())
 		{
+			// this is only likely if there is RAM in the usual ROM space
+
 			// Source Internal
 			// Dest External
 			int dstbank = get_dma_sr_bank_ddr();
@@ -3305,11 +3408,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2127_dma_size_trigger_w)
 				return;
 			}
 
-			int count = data * 2;
-			if (count == 0)
-				count = 0x200;
-
-			logerror("Unhandled DMA with Params src: %04x dest: %04x length: %03x\n", srcaddr, dstaddr, count );
+			do_dma_internal_to_internal(data, get_dma_dt_is_video());
 			return;
 		}
 	}
@@ -4266,6 +4365,137 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x01 - IOB PLH
 */
 
+
+void vt_vt1682_state::draw_tile(int segment, int tile, int x, int y, int palbase, int pal, int is16pix_high, int is16pix_wide, int bpp, int depth, int opaque, int flipx, int flipy, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+
+	if (bpp == 3) pal = 0x0;
+	if (bpp == 2) pal &= 0xc;
+
+	{
+		int startaddress = segment;
+		int linebytes;
+
+		if (bpp == 3)
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 16;
+			}
+			else
+			{
+				linebytes = 8;
+			}
+		}
+		else if (bpp == 2)
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 12;
+			}
+			else
+			{
+				linebytes = 6;
+			}
+		}
+		else //if (bpp == 1) // or 0
+		{
+			if (is16pix_wide)
+			{
+				linebytes = 8;
+			}
+			else
+			{
+				linebytes = 4;
+			}
+		}
+		int tilesize_wide = is16pix_wide ? 16 : 8;
+		int tilesize_high = is16pix_high ? 16 : 8;
+
+		int tilebytes = linebytes * tilesize_high;
+
+		startaddress += tilebytes * tile;
+
+		for (int yy = 0; yy < tilesize_high; yy++) // tile y lines
+		{
+			int currentaddress;
+			
+			if (!flipy)
+				currentaddress = startaddress + yy * linebytes;
+			else
+				currentaddress = startaddress + ((tilesize_high - 1) - yy) * linebytes;
+
+			int line = y + yy;
+
+			if (line >= cliprect.min_y && line <= cliprect.max_y)
+			{
+				uint32_t* dstptr = &bitmap.pix32(line);
+				uint8_t* priptr = &m_priority_bitmap.pix8(line);
+
+				int shift_amount, mask, bytes_in;
+				if (bpp == 3) // (8bpp)
+				{
+					shift_amount = 8;
+					mask = 0xff;
+					bytes_in = 4;
+				}
+				else if (bpp == 2) // (6bpp)
+				{
+					shift_amount = 6;
+					mask = 0x3f;
+					bytes_in = 3;
+				}
+				else // 1 / 0 (4bpp)
+				{
+					shift_amount = 4;
+					mask = 0x0f;
+					bytes_in = 2;
+				}
+
+				int xbase = x;;
+
+				for (int xx = 0; xx < tilesize_wide; xx += 4) // tile x pixels
+				{
+					// draw 4 pixels
+					uint32_t pixdata = 0;
+
+					int shift = 0;
+					for (int i = 0; i < bytes_in; i++)
+					{
+						pixdata |= m_fullrom->read8(currentaddress) << shift; currentaddress++;
+						shift += 8;
+					}
+
+					shift = 0;
+					for (int ii = 0; ii < 4; ii++)
+					{
+						uint8_t pen = (pixdata >> shift)& mask;
+						if (opaque || pen)
+						{
+							int xdraw_real;
+							if (!flipx)
+								xdraw_real = xbase + xx + ii; // pixel position
+							else
+								xdraw_real = xbase + ((tilesize_wide - 1) - xx - ii);
+
+							if (xdraw_real >= cliprect.min_x && xdraw_real <= cliprect.max_x)
+							{
+								if (depth < priptr[xdraw_real])
+								{
+									const pen_t* paldata = m_palette->pens();
+									dstptr[xdraw_real] = paldata[(palbase + pen) | (pal << 4)];
+									priptr[xdraw_real] = depth;
+								}
+							}
+						}
+						shift += shift_amount;
+					}
+				}
+			}
+		}
+	}
+}
+
 void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	// m_main_control_bk[0]
@@ -4311,6 +4541,33 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 
 			int count = base;
 
+
+			int palselect;
+			if (which == 0) palselect = m_200f_bk_pal_sel & 0x03;
+			else palselect = (m_200f_bk_pal_sel & 0x0c)>>2;
+
+			int palbase;
+
+			if (palselect == 0)
+			{
+				// 'disable' ?
+				return;
+			}
+			else if (palselect == 1)
+			{
+				palbase = 0x100;
+			}
+			else if (palselect == 2)
+			{
+				palbase = 0x000;
+			}
+			else
+			{
+				// 'both' ? (how?)
+				palbase = machine().rand() & 0xff;
+			}
+
+
 			for (int y = 0; y < (bk_tilesize ? 16 : 32); y++)
 			{
 				for (int x = 0; x < (bk_tilesize ? 16 : 32); x++)
@@ -4324,115 +4581,13 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 					int tile = word & 0x0fff;
 					uint8_t pal = (word & 0xf000) >> 12;
 
-					if (bk_tilebpp == 3) pal = 0x0;
-					if (bk_tilebpp == 2) pal &= 0xc;
+	
 
-					{
-						int startaddress = segment;
 
-						if (bk_tilebpp == 3)
-						{
-							if (bk_tilesize)
-							{
-								startaddress += 256 * tile;
-							}
-							else
-							{
-								startaddress += 64 * tile;
-							}
-						}
-						else if (bk_tilebpp == 2)
-						{
-							if (bk_tilesize)
-							{
-								startaddress += 192 * tile;
-							}
-							else
-							{
-								startaddress += 48 * tile;
-							}
-						}
-						else //if (bk_tilebpp == 1) // or 0
-						{
-							if (bk_tilesize)
-							{
-								startaddress += 128 * tile;
-							}
-							else
-							{
-								startaddress += 32 * tile;
-							}
-						}
+					int xpos = x * (bk_tilesize ? 16 : 8);
+					int ypos = y * (bk_tilesize ? 16 : 8);
 
-						const pen_t* paldata = m_palette->pens();
-						int palbase;
-						
-						if (which == 0) palbase = 0x100;
-						else palbase = 0x000;
-
-						int currentadddress = startaddress;
-						for (int yy = 0; yy < (bk_tilesize ? 16 : 8); yy++)
-						{
-							int line = y * (bk_tilesize ? 16 : 8) + yy;
-
-							uint32_t* dstptr = &bitmap.pix32(line);
-							uint8_t* priptr = &m_priority_bitmap.pix8(line);
-
-							for (int xx = 0; xx < (bk_tilesize ? 16 : 8); xx += 4)
-							{
-								uint32_t pixdata;
-								if (bk_tilebpp == 3)
-								{
-									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 24; currentadddress++;
-
-									uint8_t pen;
-									int xdraw = x * (bk_tilesize ? 16 : 8);
-									int shift = 0;
-									for (int ii = 0; ii < 4; ii++)
-									{
-										pen = (pixdata >> shift) & 0xff;
-										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + pen]; priptr[xoff] = bk_depth; } }
-										shift += 8;
-									}
-								}
-								else if (bk_tilebpp == 2)
-								{
-									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
-
-									uint8_t pen;
-									int xdraw = x * (bk_tilesize ? 16 : 8);
-									int shift = 0;
-									for (int ii = 0; ii < 4; ii++)
-									{
-										pen = ((pixdata >> shift) & 0x3f);
-										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + (pen | (pal << 4))]; priptr[xoff] = bk_depth; } }
-										shift += 6;
-									}
-								}
-								else //if (bk_tilebpp == 1)// or 0
-								{
-									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
-									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
-
-									uint8_t pen;
-									int xdraw = x * (bk_tilesize ? 16 : 8);
-									int shift = 0;
-									for (int ii = 0; ii < 4; ii++)
-									{
-										pen = ((pixdata >> shift) & 0x0f);
-										if (opaque || pen) { int xoff = xdraw + xx + ii; if (bk_depth < priptr[xoff]) { dstptr[xoff] = paldata[palbase + (pen | (pal << 4))]; priptr[xoff] = bk_depth; } }
-										shift += 4;
-									}
-								}
-							}
-						}
-					}
-
+					draw_tile(segment, tile, xpos, ypos, palbase, pal, bk_tilesize, bk_tilesize, bk_tilebpp, (bk_depth*2)+1, opaque, 0, 0, screen, bitmap, cliprect);
 				}
 			}
 		}
@@ -4448,6 +4603,55 @@ void vt_vt1682_state::draw_layer(int which, int base, int opaque, screen_device&
 	}
 }
 
+void vt_vt1682_state::draw_sprites(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+{
+	int sp_en = (m_2018_spregs & 0x04) >> 2;
+	//int sp_pal_sel = (m_2018_spregs & 0x08) >> 3;
+	int sp_size = (m_2018_spregs & 0x03);
+
+	int segment = m_201a_sp_segment_7_0;
+	segment |= m_201b_sp_segment_11_8 << 8;
+	segment = segment * 0x2000;
+	// if we don't do the skipping in inc_spriteram_addr this would need to be 5 instead
+	const int SPRITE_STEP = 8;
+
+
+	if (sp_en)
+	{
+		for (int i = 0; i < 240; i++)
+		{
+			int tilenum = m_spriteram->read8((i * SPRITE_STEP) + 0);
+			int attr0 = m_spriteram->read8((i * SPRITE_STEP) + 1);
+			int x = m_spriteram->read8((i * SPRITE_STEP) + 2);
+			int attr1 = m_spriteram->read8((i * SPRITE_STEP) + 3);
+			int y = m_spriteram->read8((i * SPRITE_STEP) + 4);
+			int attr2 = m_spriteram->read8((i * SPRITE_STEP) + 5);
+
+			tilenum |= (attr0 & 0x0f) << 8;
+			int pal = (attr0 & 0xf0) >> 4;
+			
+			int flipx = (attr1 & 0x02) >> 1;
+			int flipy = (attr1 & 0x04) >> 2;
+
+			// sp_pal_sel also influences this
+			int palbase;
+			if (attr2 & 0x02)
+				palbase = 0x000;
+			else
+				palbase = 0x100;
+
+			if (attr2 & 0x01)
+				y -= 256;
+
+			if (attr1 & 0x01)
+				x -= 256;
+
+
+			draw_tile(segment, tilenum, x, y, palbase, pal, sp_size & 0x2, sp_size&0x1, 0, 0, 0, flipx, flipy, screen, bitmap, cliprect);
+		}
+	}
+	// if more than 16 sprites on any line 0x2001 bit 0x40 (SP_ERR) should be set (updated every line, can only be read in HBLANK)
+}
 
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
@@ -4457,6 +4661,8 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 	draw_layer(0, 0x000, 0, screen, bitmap, cliprect);
 
 	draw_layer(1, 0x800, 0, screen, bitmap, cliprect);
+
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -4562,9 +4768,9 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x210a, 0x210a).rw(FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_r), FUNC(vt_vt1682_state::vt1682_210a_prgbank0_r3_w));
 	map(0x210b, 0x210b).rw(FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_r), FUNC(vt_vt1682_state::vt1682_210b_misc_cs_prg0_bank_sel_w));
 	map(0x210c, 0x210c).rw(FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_r), FUNC(vt_vt1682_state::vt1682_210c_prgbank1_r2_w));
-
-	map(0x210e, 0x210e).r(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r));
-	map(0x210f, 0x210f).r(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r));
+	map(0x210d, 0x210d).rw(FUNC(vt_vt1682_state::vt1682_210d_ioconfig_r),FUNC(vt_vt1682_state::vt1682_210d_ioconfig_w));
+	map(0x210e, 0x210e).rw(FUNC(vt_vt1682_state::vt1682_210e_io_ab_r),FUNC(vt_vt1682_state::vt1682_210e_io_ab_w));
+	map(0x210f, 0x210f).rw(FUNC(vt_vt1682_state::vt1682_210f_io_cd_r),FUNC(vt_vt1682_state::vt1682_210f_io_cd_w));
 
 	// either reads/writes are on different addresses or our source info is incorrect
 	map(0x2110, 0x2110).rw(FUNC(vt_vt1682_state::vt1682_prgbank0_r4_r), FUNC(vt_vt1682_state::vt1682_prgbank1_r0_w));
@@ -4593,6 +4799,57 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 
 
 static INPUT_PORTS_START( intec )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x01, 0x01, "IN0" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -4672,6 +4929,11 @@ GFXDECODE_END
 // NTSC uses XTAL(21'477'272) Sound CPU runs at exactly this, Main CPU runs at this / 4
 // PAL  uses XTAL(26'601'712) Sound CPU runs at exactly this, Main CPU runs at this / 5
 
+// can also be used with the following
+// PAL M 21.453669MHz
+// PAL N 21.492336MHz
+ 
+
 void vt_vt1682_state::vt_vt1682(machine_config &config)
 {
 	/* basic machine hardware */
@@ -4682,6 +4944,7 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 	M6502(config, m_soundcpu, XTAL(21'477'272));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt_vt1682_state::vt_vt1682_sound_map);
 
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	ADDRESS_MAP_BANK(config, m_fullrom).set_map(&vt_vt1682_state::rom_map).set_options(ENDIANNESS_NATIVE, 8, 25, 0x2000000);
 
