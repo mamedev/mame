@@ -14483,6 +14483,10 @@ ginganina                       // (c) 1987 Jaleco
 @source:gizmondo.cpp
 gizmondo                        //
 
+@source:gkidabc.cpp
+gkidabc                         // Genius KID ABC Fan (Germany)
+miprimlec                       // Mis Primeras Lecciones (Spain)
+
 @source:gkigt.cpp
 gkigt4                          //
 gkigt43                         //
@@ -33398,7 +33402,6 @@ prehisleu                       // A8003 'GT' (c) 1989
 prehisleb                       // bootleg
 
 @source:prestige.cpp
-gkidabc                         // Genius KID ABC Fan (Germany)
 gl6000sl                        // Genius Leader 6000SL (Germany)
 gl7007sl                        // Genius Leader 7007SL (Germany)
 glcolor                         // Genius Leader Color (Germany)
