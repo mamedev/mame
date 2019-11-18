@@ -3963,7 +3963,7 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
     0x10 - IRQ_OUT
     0x08 - SLEEP
     0x04 - ExtIRQSel
-    0x02 - NMI_EN
+    0x02 - NMI_WAKEUP_EN
     0x01 - ExtMask
 
     Address 0x211c READ (SOUND CPU)
@@ -4274,31 +4274,31 @@ WRITE8_MEMBER(vt_vt1682_state::vt1682_2128_dma_sr_bank_addr_24_23_w)
 uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 
-// m_2013_bk1_main_control
-// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
-//		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
+	// m_2013_bk1_main_control
+	// logerror("%s: vt1682_2013_bk1_main_control_w writing: %02x (enable:%01x palette:%01x depth:%01x bpp:%01x linemode:%01x tilesize:%01x)\n", machine().describe_context(), data,
+	//		(data & 0x80) >> 7, (data & 0x40) >> 6, (data & 0x30) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0 );
 
-// m_2012_bk1_scroll_control
-// logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
-//		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
+	// m_2012_bk1_scroll_control
+	// logerror("%s: vt1682_2012_bk1_scroll_control_w writing: %02x (hclr: %1x page_layout:%1x ymsb:%1x xmsb:%1x)\n", machine().describe_context(), data,
+	//		(data & 0x10) >> 4, (data & 0x0c) >> 2, (data & 0x02) >> 1, (data & 0x01) >> 0);
 
 	int bk1_tilesize = (m_2013_bk1_main_control & 0x01);
-	int bk1_line =     (m_2013_bk1_main_control & 0x02) >> 1;
-	int bk1_tilebpp =  (m_2013_bk1_main_control & 0x0c) >> 2;
-	int bk1_depth =    (m_2013_bk1_main_control & 0x30) >> 4;
-	int bk1_palette =  (m_2013_bk1_main_control & 0x40) >> 5;
-	int bk1_enable =   (m_2013_bk1_main_control & 0x80) >> 7;
+	int bk1_line = (m_2013_bk1_main_control & 0x02) >> 1;
+	int bk1_tilebpp = (m_2013_bk1_main_control & 0x0c) >> 2;
+	int bk1_depth = (m_2013_bk1_main_control & 0x30) >> 4;
+	int bk1_palette = (m_2013_bk1_main_control & 0x40) >> 5;
+	int bk1_enable = (m_2013_bk1_main_control & 0x80) >> 7;
 
 
 	if (bk1_enable)
 	{
-		
+
 		int xscroll = m_2010_bk1_xscroll_7_0;
 		int yscroll = m_2011_bk1_yscoll_7_0;
-		int xscrollmsb =  (m_2012_bk1_scroll_control & 0x01);
-		int yscrollmsb =  (m_2012_bk1_scroll_control & 0x02) >> 1;
+		int xscrollmsb = (m_2012_bk1_scroll_control & 0x01);
+		int yscrollmsb = (m_2012_bk1_scroll_control & 0x02) >> 1;
 		int page_layout = (m_2012_bk1_scroll_control & 0x0c) >> 2;;
-		int high_color =  (m_2012_bk1_scroll_control & 0x10) >> 4;
+		int high_color = (m_2012_bk1_scroll_control & 0x10) >> 4;
 
 		int segment = m_201c_bk1_segment_7_0;
 		segment |= m_201d_bk1_segment_11_8 << 8;
@@ -4312,23 +4312,8 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 		{
 			// Character Mode
 			logerror("DRAWING ----- BK1, Character Mode Segment base %08x, TileSize %1x Bpp %1x, Depth %1x Palette %1x PageLayout:%1x XScroll %04x YScroll %04x\n", segment, bk1_tilesize, bk1_tilebpp, bk1_depth, bk1_palette, page_layout, xscroll, yscroll);
-		
+
 			int count = 0;
-
-			int tilebase = 0;
-			
-			if (bk1_tilebpp == 3)
-				tilebase = segment / (bk1_tilesize ? 256 : 64);
-			else if (bk1_tilebpp == 2)
-				tilebase = segment / 192;
-
-			int gfxregion = bk1_tilesize ? 4 : 3;
-
-			if (bk1_tilebpp == 2)
-				gfxregion = 5;
-
-			gfx_element *gfx = m_gfxdecode1->gfx(gfxregion);
-
 
 			for (int y = 0; y < (bk1_tilesize ? 16 : 32); y++)
 			{
@@ -4338,25 +4323,113 @@ uint32_t vt_vt1682_state::screen_update(screen_device& screen, bitmap_rgb32& bit
 					count++;
 					word |= m_vram->read8(count) << 8;
 					count++;
-					
-					int pal = 0;
+
+					//int pal = 0;
 					int tile = word & 0x0fff;
+					uint8_t pal = (word & 0xf000) >> 12;
 
-					// to draw 4 4bpp pixels must read 2 bytes
-					// to draw 4 6bpp pixels must read 3 bytes
-					// to draw 4 8bpp pixels must read 4 bytes
-					  				
+					if (bk1_tilebpp == 3) pal = 0x0;
+					if (bk1_tilebpp == 2) pal &= 0xc;
 
-					gfx->transpen(bitmap,cliprect,tilebase + tile,pal,0,0,x*(bk1_tilesize ? 16 : 8),y*(bk1_tilesize ? 16 : 8),0);
-					
+					{
+						int startaddress = segment;
+
+						if (bk1_tilebpp == 3)
+						{
+							if (bk1_tilesize)
+							{
+								startaddress += 256 * tile;
+							}
+							else
+							{
+								startaddress += 64 * tile;
+							}
+						}
+						else if (bk1_tilebpp == 2)
+						{
+							if (bk1_tilesize)
+							{
+								startaddress += 192 * tile;
+							}
+							else
+							{
+								startaddress += 48 * tile;
+							}
+						}
+
+						const pen_t* paldata = m_palette1->pens();
+						int currentadddress = startaddress;
+						for (int yy = 0; yy < (bk1_tilesize ? 16 : 8); yy++)
+						{
+							int line = y * (bk1_tilesize ? 16 : 8) + yy;
+
+							uint32_t* dstptr = &bitmap.pix32(line);
+
+
+							for (int xx = 0; xx < (bk1_tilesize ? 16 : 8); xx += 4)
+							{
+								uint32_t pixdata;
+								if (bk1_tilebpp == 3)
+								{
+									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
+									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
+									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
+									pixdata |= m_fullrom->read8(currentadddress) << 24; currentadddress++;
+
+									uint8_t pen;
+									int xdraw = x * (bk1_tilesize ? 16 : 8);
+									pen = (pixdata >> 0) & 0xff;
+									dstptr[xdraw + xx + 0] = paldata[pen];
+									pen = (pixdata >> 8) & 0xff;
+									dstptr[xdraw + xx + 1] = paldata[pen];
+									pen = (pixdata >> 16) & 0xff;
+									dstptr[xdraw + xx + 2] = paldata[pen];
+									pen = (pixdata >> 24) & 0xff;
+									dstptr[xdraw + xx + 3] = paldata[pen];
+								}
+								else if (bk1_tilebpp == 2)
+								{
+									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
+									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
+									pixdata |= m_fullrom->read8(currentadddress) << 16; currentadddress++;
+
+									uint8_t pen;
+									int xdraw = x * (bk1_tilesize ? 16 : 8);
+									pen = ((pixdata >> 0) & 0x3f) | (pal << 4);
+									dstptr[xdraw + xx + 0] = paldata[pen];
+									pen = ((pixdata >> 6) & 0x3f) | (pal << 4);
+									dstptr[xdraw + xx + 1] = paldata[pen];
+									pen = ((pixdata >> 12) & 0x3f) | (pal << 4);
+									dstptr[xdraw + xx + 2] = paldata[pen];
+									pen = ((pixdata >> 18) & 0x3f) | (pal << 4);
+									dstptr[xdraw + xx + 3] = paldata[pen];
+								}
+								else //if (bk1_tilebpp == 1)// or 0
+								{
+									pixdata = m_fullrom->read8(currentadddress) << 0; currentadddress++;
+									pixdata |= m_fullrom->read8(currentadddress) << 8; currentadddress++;
+
+									uint8_t pen;
+									int xdraw = x * (bk1_tilesize ? 16 : 8);
+									pen = ((pixdata >> 0) & 0x0f) | (pal << 4);
+									dstptr[xdraw + xx + 0] = paldata[pen];
+									pen = ((pixdata >> 4) & 0x0f) | (pal << 4);
+									dstptr[xdraw + xx + 1] = paldata[pen];
+									pen = ((pixdata >> 8) & 0x0f) | (pal << 4);
+									dstptr[xdraw + xx + 2] = paldata[pen];
+									pen = ((pixdata >> 12) & 0x0f) | (pal << 4);
+									dstptr[xdraw + xx + 3] = paldata[pen];
+								}
+							}
+						}
+					}
+
 				}
 			}
-		
 		}
 		else
 		{
 			// Line Mode
-			
 
 			if (high_color)
 			{
@@ -4509,9 +4582,8 @@ INTERRUPT_GEN_MEMBER(vt_vt1682_state::nmi)
 	if (m_2000 & 0x01)
 	{
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // same enable? (NMI_EN on sub is 'wakeup NMI')
 	}
-	// also generates on sound CPU
 }
 
 
@@ -4559,19 +4631,6 @@ static const gfx_layout helper_8bpp_16x16_layout =
 	16 * 16 * 8
 };
 
-static const gfx_layout helper_6bpp_16x16_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 5,4,3,2,1,0 },
-	{ STEP16(0,6) },
-	{ STEP16(0,16*6) },
-	16 * 16 * 6
-};
-
-
-
 // hardware has line modes, so these views might be useful
 static const uint32_t texlayout_xoffset_8bpp[256] = { STEP256(0,8) };
 static const uint32_t texlayout_yoffset_8bpp[256] = { STEP256(0,256*8) };
@@ -4603,13 +4662,13 @@ static const gfx_layout texture_helper_4bpp_layout =
 	texlayout_yoffset_4bpp
 };
 
+// there are 6bpp gfx too, but they can't be decoded cleanly due to endian and alignment issues (start on what would be non-tile boundaries etc.)
 static GFXDECODE_START( gfx_test )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_4bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_4bpp_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_8x8_layout,  0x0, 1  )
 	GFXDECODE_ENTRY( "mainrom", 0, helper_8bpp_16x16_layout,  0x0, 1  )
-	GFXDECODE_ENTRY( "mainrom_swap", 0, helper_6bpp_16x16_layout,  0x0, 4  )
 	GFXDECODE_ENTRY( "mainrom", 0, texture_helper_8bpp_layout,  0x0, 1  )
 GFXDECODE_END
 
@@ -4655,21 +4714,12 @@ void vt_vt1682_state::vt_vt1682(machine_config &config)
 
 void vt_vt1682_state::init_8in1()
 {
-	uint8_t* rom = memregion("mainrom")->base();
-	uint8_t* rom2 = memregion("mainrom_swap")->base();
-
-	for (int i = 0; i < 0x2000000; i++)
-	{
-		rom2[i] = bitswap<8>(rom[i], 0, 1, 2, 3, 4, 5, 6, 7);
-	}
 }
 
 
 ROM_START( ii8in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii8in1.bin", 0x00000, 0x2000000, CRC(7aee7464) SHA1(7a9cf7f54a350f0853a17459f2dcbef34f4f7c30) ) // 2ND HALF EMPTY
-	ROM_REGION( 0x2000000, "mainrom_swap", ROMREGION_ERASE00 )
-	// temp for 6bpp gfx decode
 
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
@@ -4677,8 +4727,6 @@ ROM_END
 ROM_START( ii32in1 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "ii32in1.bin", 0x00000, 0x2000000, CRC(ddee4eac) SHA1(828c0c18a66bb4872299f9a43d5e3647482c5925) )
-	ROM_REGION( 0x2000000, "mainrom_swap", ROMREGION_ERASE00 )
-	// temp for 6bpp gfx decode
 	                                    
 	// possible undumped 0x1000 bytes of Internal ROM
 ROM_END
