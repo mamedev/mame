@@ -106,6 +106,7 @@
 
 
 namespace {
+
 // temporary: set this to 1 to enable the originally defined behavior that
 // a field specified via PORT_MODIFY which intersects a previously-defined
 // field completely wipes out the previous definition
@@ -289,7 +290,7 @@ const struct
 	{ INPUT_STRING_None, "None" },
 };
 
-} // TODO: anonymous namespace
+} // anonymous namespace
 
 
 // XML attributes for the different types
@@ -2010,7 +2011,7 @@ void ioport_manager::frame_update_callback()
 
 void ioport_manager::frame_update()
 {
-g_profiler.start(PROFILER_INPUT);
+	g_profiler.start(PROFILER_INPUT);
 
 	// record/playback information about the current frame
 	attotime curtime = machine().time();
@@ -2048,7 +2049,7 @@ g_profiler.start(PROFILER_INPUT);
 				dynfield.write(newvalue);
 	}
 
-g_profiler.stop();
+	g_profiler.stop();
 }
 
 
